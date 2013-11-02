@@ -2,7 +2,7 @@
 
 Metric Learning algorithms in Python.
 
-Currently implemented:
+**Algorithms**
 
  * Large Margin Nearest Neighbor (LMNN)
  * Information Theoretic Metric Learning (ITML)
@@ -11,13 +11,13 @@ Currently implemented:
 
 For usage examples, see `test.py` and `demo.py`.
 
-Dependencies:
+**Dependencies**
 
  * Python 2.6+
  * numpy, scipy, scikit-learn
  * (for the demo only: matplotlib)
 
-Notes:
+**Notes**
 
 If a recent version of the Shogun Python modular (`modshogun`) library is available,
 the LMNN implementation will use the fast C++ version from there.
