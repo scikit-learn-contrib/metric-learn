@@ -7,6 +7,7 @@ Adapted from https://gist.github.com/kcarnold/5439945
 Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf
 """
 
+from random import choice
 import numpy as np
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
@@ -44,8 +45,8 @@ class SDML(BaseMetricLearner):
     a, c = np.random.randint(len(labels), size=(2,num_constraints))
     b, d = np.empty((2, num_constraints), dtype=int)
     for i,(al,cl) in enumerate(zip(labels[a],labels[c])):
-      b[i] = np.random.choice(np.nonzero(labels == al)[0])
-      d[i] = np.random.choice(np.nonzero(labels != cl)[0])
+      b[i] = choice(np.nonzero(labels == al)[0])
+      d[i] = choice(np.nonzero(labels != cl)[0])
     W = np.zeros((num_points,num_points))
     W[a,b] = 1
     W[c,d] = -1

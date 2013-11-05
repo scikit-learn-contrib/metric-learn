@@ -7,6 +7,7 @@ Adapted from https://gist.github.com/kcarnold/5439917
 Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
 """
 
+from random import choice
 import numpy as np
 import scipy.linalg
 from base_metric import BaseMetricLearner
@@ -93,8 +94,8 @@ class LSML(BaseMetricLearner):
     C = np.empty((num_constraints,4), dtype=int)
     a, c = np.random.randint(len(labels), size=(2,num_constraints))
     for i,(al,cl) in enumerate(zip(labels[a],labels[c])):
-      C[i,1] = np.random.choice(np.nonzero(labels == al)[0])
-      C[i,3] = np.random.choice(np.nonzero(labels != cl)[0])
+      C[i,1] = choice(np.nonzero(labels == al)[0])
+      C[i,3] = choice(np.nonzero(labels != cl)[0])
     C[:,0] = a
     C[:,2] = c
     return C
