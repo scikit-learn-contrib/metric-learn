@@ -220,9 +220,10 @@ def _count_edges(act1, act2, impostors, targets):
 
 def _sum_outer_products(data, a_inds, b_inds):
   Xab = data[a_inds] - data[b_inds]
-  return np.einsum('ij...,ik...', Xab, Xab)
+  return np.dot(Xab.T, Xab)
 
 
 def _sum_outer_products_weighted(data, a_inds, b_inds, weights):
   Xab = data[a_inds] - data[b_inds]
-  return np.einsum('ij...,ik...,i', Xab, Xab, weights)
+  return np.dot(Xab.T, Xab * weights[:,None])
+
