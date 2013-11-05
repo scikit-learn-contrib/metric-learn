@@ -24,9 +24,9 @@ class ITML(BaseMetricLearner):
     self.X = X
     # check to make sure that no two constrained vectors are identical
     a,b,c,d = constraints
-    ident = np.linalg.norm(self.X[a] - self.X[b], axis=1) > 1e-9
+    ident = _vector_norm(self.X[a] - self.X[b]) > 1e-9
     a, b = a[ident], b[ident]
-    ident = np.linalg.norm(self.X[c] - self.X[d], axis=1) > 1e-9
+    ident = _vector_norm(self.X[c] - self.X[d]) > 1e-9
     c, d = c[ident], d[ident]
     self.C = a,b,c,d
     # init bounds
@@ -99,3 +99,13 @@ class ITML(BaseMetricLearner):
     a,c = ac[pos], ac[~pos]
     b,d = bd[pos], bd[~pos]
     return a,b,c,d
+
+# hack around lack of axis kwarg in older numpy versions
+try:
+  np.linalg.norm([[4]], axis=1)
+except TypeError:
+  def _vector_norm(X):
+    return np.apply_along_axis(np.linalg.norm, 1, X)
+else:
+  def _vector_norm(X):
+    return np.linalg.norm(X, axis=1)
