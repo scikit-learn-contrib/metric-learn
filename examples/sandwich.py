@@ -8,10 +8,7 @@ import matplotlib.pyplot as pyplot
 from sklearn.metrics import pairwise_distances
 from sklearn.neighbors import NearestNeighbors
 
-from itml import ITML
-from lmnn import LMNN
-from lsml import LSML
-from sdml import SDML
+from metric_learn import ITML, LMNN, LSML, SDML
 
 
 def sandwich_demo():
