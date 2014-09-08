@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from distutils.core import setup
+from setuptools import setup
 
 version = "0.1.0"
 setup(name='metric_learn',
@@ -14,6 +14,12 @@ setup(name='metric_learn',
           'License :: OSI Approved :: MIT License',
           'Programming Language :: Python',
       ],
-      packages=['metric_learn']
+      packages=['metric_learn'],
+      install_requires=[
+          'numpy >= 1.5.1',
+          'scipy >= 0.8',
+          'scikit-learn'
+      ],
+      test_suite='test'
       )
 

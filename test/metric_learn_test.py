@@ -3,10 +3,10 @@ import numpy as np
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 
-from itml import ITML
-from lmnn import LMNN, python_LMNN
-from lsml import LSML
-from sdml import SDML
+import metric_learn
+from metric_learn import LSML, ITML, LMNN, SDML
+# Import this specially for testing.
+from metric_learn.lmnn import python_LMNN
 
 
 def class_separation(X, labels):
