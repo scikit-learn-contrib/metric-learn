@@ -157,6 +157,7 @@ class python_LMNN(_base_LMNN):
 
     # store the last L
     self.L = L
+    return self
 
   def metric(self):
     return self.L.T.dot(self.L)
@@ -247,6 +248,7 @@ try:
       else:
         self._lmnn.train(self.L)
       self.L = self._lmnn.get_linear_transform()
+      return self
 
 except ImportError:
   LMNN = python_LMNN

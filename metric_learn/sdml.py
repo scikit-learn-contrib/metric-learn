@@ -40,6 +40,7 @@ class SDML(BaseMetricLearner):
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
     self.M, _ = graph_lasso(emp_cov, sparsity_param, verbose=verbose)
+    return self
 
   @classmethod
   def prepare_constraints(self, labels, num_points, num_constraints):

@@ -69,6 +69,7 @@ class LSML(BaseMetricLearner):
       self.M = M_best
     else:
       print "Didn't converge after %d iterations. Final loss: %f" % (it, s_best)
+    return self
 
   def _comparison_loss(self, metric):
     dab = np.sum(self.vab.dot(metric) * self.vab, axis=1)

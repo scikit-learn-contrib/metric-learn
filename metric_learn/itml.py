@@ -94,6 +94,7 @@ class ITML(BaseMetricLearner):
         print 'itml iter: %d, conv = %f' % (it, conv)
     if verbose:
       print 'itml converged at iter: %d, conv = %f' % (it, conv)
+    return self
 
   def metric(self):
     return self.A

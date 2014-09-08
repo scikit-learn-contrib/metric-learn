@@ -32,8 +32,7 @@ class TestLSML(MetricTestCase):
     num_constraints = 200
 
     C = LSML.prepare_constraints(self.iris_labels, num_constraints)
-    lsml = LSML(self.iris_points, C)
-    lsml.fit(verbose=False)
+    lsml = LSML(self.iris_points, C).fit(verbose=False)
 
     csep = class_separation(lsml.transform(), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible
@@ -45,8 +44,7 @@ class TestITML(MetricTestCase):
 
     n = self.iris_points.shape[0]
     C = ITML.prepare_constraints(self.iris_labels, n, num_constraints)
-    itml = ITML(self.iris_points, C)
-    itml.fit(verbose=False)
+    itml = ITML().fit(self.iris_points, C, verbose=False)
 
     csep = class_separation(itml.transform(), self.iris_labels)
     self.assertLess(csep, 0.4)  # it's not great
@@ -71,8 +69,7 @@ class TestSDML(MetricTestCase):
 
     n = self.iris_points.shape[0]
     W = SDML.prepare_constraints(self.iris_labels, n, num_constraints)
-    sdml = SDML(self.iris_points, W)
-    sdml.fit()
+    sdml = SDML(self.iris_points, W).fit()
 
     csep = class_separation(sdml.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
