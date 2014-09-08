@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+import scipy.sparse
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 
@@ -25,6 +26,7 @@ class MetricTestCase(unittest.TestCase):
     iris_data = load_iris()
     self.iris_points = iris_data['data']
     self.iris_labels = iris_data['target']
+    np.random.seed(1234)
 
 
 class TestLSML(MetricTestCase):
@@ -69,10 +71,12 @@ class TestSDML(MetricTestCase):
 
     n = self.iris_points.shape[0]
     W = SDML.prepare_constraints(self.iris_labels, n, num_constraints)
-    sdml = SDML().fit(self.iris_points, W)
 
-    csep = class_separation(sdml.transform(), self.iris_labels)
-    self.assertLess(csep, 0.25)
+    # Test sparse graph inputs.
+    for graph in ((W, scipy.sparse.csr_matrix(W))):
+      sdml = SDML().fit(self.iris_points, graph)
+      csep = class_separation(sdml.transform(), self.iris_labels)
+      self.assertLess(csep, 0.25)
 
 
 if __name__ == '__main__':
