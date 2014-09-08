@@ -74,10 +74,12 @@ class LSML(BaseMetricLearner):
     dab = np.sum(self.vab.dot(metric) * self.vab, axis=1)
     dcd = np.sum(self.vcd.dot(metric) * self.vcd, axis=1)
     violations = dab > dcd
-    return self.w[violations].dot((np.sqrt(dab[violations]) - np.sqrt(dcd[violations]))**2)
+    return self.w[violations].dot((np.sqrt(dab[violations]) -
+                                   np.sqrt(dcd[violations]))**2)
 
   def _total_loss(self, metric, prior_inv):
-    return self._comparison_loss(metric) + _regularization_loss(metric, prior_inv)
+    return (self._comparison_loss(metric) +
+            _regularization_loss(metric, prior_inv))
 
   def _gradient(self, metric, prior_inv):
     dMetric = prior_inv - scipy.linalg.inv(metric)
@@ -85,8 +87,10 @@ class LSML(BaseMetricLearner):
     dcds = np.sum(self.vcd.dot(metric) * self.vcd, axis=1)
     violations = dabs > dcds
     # TODO: vectorize
-    for vab, dab, vcd, dcd in zip(self.vab[violations], dabs[violations], self.vcd[violations], dcds[violations]):
-      dMetric += (1-np.sqrt(dcd/dab))*np.outer(vab, vab) + (1-np.sqrt(dab/dcd))*np.outer(vcd, vcd)
+    for vab, dab, vcd, dcd in zip(self.vab[violations], dabs[violations],
+                                  self.vcd[violations], dcds[violations]):
+      dMetric += ((1-np.sqrt(dcd/dab))*np.outer(vab, vab) +
+                  (1-np.sqrt(dab/dcd))*np.outer(vcd, vcd))
     return dMetric
 
   @classmethod
@@ -99,6 +103,7 @@ class LSML(BaseMetricLearner):
     C[:,0] = a
     C[:,2] = c
     return C
+
 
 def _regularization_loss(metric, prior_inv):
   return np.sum(metric * prior_inv) - np.log(scipy.linalg.det(metric))

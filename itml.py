@@ -41,7 +41,8 @@ class ITML(BaseMetricLearner):
     else:
       self.A = A0
 
-  def fit(self, convergence_threshold=1e-3, gamma=1., max_iters=1000, verbose=False):
+  def fit(self, convergence_threshold=1e-3, gamma=1., max_iters=1000,
+          verbose=False):
     """
     gamma: value for slack variables
     """
