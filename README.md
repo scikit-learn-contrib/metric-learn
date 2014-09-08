@@ -13,13 +13,20 @@ Metric Learning algorithms in Python.
 
  * Python 2.6+
  * numpy, scipy, scikit-learn
- * (for the demo only: matplotlib)
+ * (for running the examples only: matplotlib)
+
+**Installation/Setup**
+
+Run `python setup.py install` for default installation.
+
+Run `python setup.py test` to run all tests.
 
 **Usage**
 
-For full usage examples, see `test.py` and `demo.py`.
+For full usage examples, see the `test` and `examples` directories.
 
-Each metric is a subclass of BaseMetricLearner, which provides default implementations for the methods
+Each metric is a subclass of `BaseMetricLearner`,
+which provides default implementations for the methods
 `metric`, `transformer`, and `transform`.
 Subclasses must provide an implementation for either `metric` or `transformer`.
 
