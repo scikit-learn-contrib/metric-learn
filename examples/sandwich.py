@@ -26,7 +26,7 @@ def sandwich_demo():
   mls = [
       (LMNN(), (x, y)),
       (ITML(), (x, ITML.prepare_constraints(y, len(x), num_constraints))),
-      (SDML(x, SDML.prepare_constraints(y, len(x), num_constraints)), ()),
+      (SDML(), (x, SDML.prepare_constraints(y, len(x), num_constraints))),
       (LSML(), (x, LSML.prepare_constraints(y, num_constraints)))
   ]
 

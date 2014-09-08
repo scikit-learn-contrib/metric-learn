@@ -17,10 +17,19 @@ from base_metric import BaseMetricLearner
 
 
 class SDML(BaseMetricLearner):
-  def __init__(self, X, W, use_cov=True):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True):
+    '''
+    balance_param: trade off between sparsity and M0 prior
+    sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
+    '''
+    self.balance_param = balance_param
+    self.sparsity_param = sparsity_param
+    self.use_cov = use_cov
+
+  def _prepare_inputs(self, X, W):
     self.X = X
     # set up prior M
-    if use_cov:
+    if self.use_cov:
       self.M = np.cov(X.T)
     else:
       self.M = np.identity(X.shape[1])
@@ -30,16 +39,13 @@ class SDML(BaseMetricLearner):
   def metric(self):
     return self.M
 
-  def fit(self, balance_param=0.5, sparsity_param=0.01, verbose=False):
-    '''
-    balance_param: trade off between sparsity and M0 prior
-    sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
-    '''
-    P = pinvh(self.M) + balance_param * self.loss_matrix
+  def fit(self, X, W, verbose=False):
+    self._prepare_inputs(X, W)
+    P = pinvh(self.M) + self.balance_param * self.loss_matrix
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
-    self.M, _ = graph_lasso(emp_cov, sparsity_param, verbose=verbose)
+    self.M, _ = graph_lasso(emp_cov, self.sparsity_param, verbose=verbose)
     return self
 
   @classmethod

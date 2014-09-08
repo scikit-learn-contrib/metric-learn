@@ -69,7 +69,7 @@ class TestSDML(MetricTestCase):
 
     n = self.iris_points.shape[0]
     W = SDML.prepare_constraints(self.iris_labels, n, num_constraints)
-    sdml = SDML(self.iris_points, W).fit()
+    sdml = SDML().fit(self.iris_points, W)
 
     csep = class_separation(sdml.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
