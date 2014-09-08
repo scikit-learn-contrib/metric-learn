@@ -12,6 +12,9 @@ from base_metric import BaseMetricLearner
 
 # commonality between LMNN implementations
 class _base_LMNN(BaseMetricLearner):
+  def __init__(self, **kwargs):
+    self.params = kwargs
+
   def transformer(self):
     return self.L
 
@@ -25,42 +28,54 @@ class python_LMNN(_base_LMNN):
    k: number of neighbors to consider, (does not include self-edges)
    regularization: weighting of pull and push terms
   """
-  def __init__(self, X, labels, k=3):
+  def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
+               regularization=0.5, convergence_tol=0.001):
+    _base_LMNN.__init__(self, k=k, min_iter=min_iter, max_iter=max_iter,
+                        learn_rate=learn_rate, regularization=regularization,
+                        convergence_tol=convergence_tol)
+
+  def _process_inputs(self, X, labels):
     num_pts = X.shape[0]
     assert len(labels) == num_pts
     unique_labels, self.label_inds = np.unique(labels, return_inverse=True)
     self.labels = np.arange(len(unique_labels))
     self.X = X
     self.L = np.eye(X.shape[1])
-    self.k = k
     required_k = np.bincount(self.label_inds).min()
+    k = self.params['k']
     assert k <= required_k, ('not enough class labels for specified k' +
                              ' (smallest class has %d)' % required_k)
 
-  def fit(self, min_iter=50, max_iter=1000, learn_rate=1e-7,
-          regularization=0.5, convergence_tol=0.001, verbose=False):
+  def fit(self, X, labels, verbose=False):
+    k = self.params['k']
+    reg = self.params['regularization']
+    learn_rate = self.params['learn_rate']
+    convergence_tol = self.params['convergence_tol']
+    min_iter = self.params['min_iter']
+    self._process_inputs(X, labels)
+
     target_neighbors = self._select_targets()
     impostors = self._find_impostors(target_neighbors[:,-1])
 
     # sum outer products
     dfG = _sum_outer_products(self.X, target_neighbors.flatten(),
-                              np.repeat(np.arange(self.X.shape[0]), self.k))
+                              np.repeat(np.arange(self.X.shape[0]), k))
     df = np.zeros_like(dfG)
 
     # storage
-    a1 = [None]*self.k
-    a2 = [None]*self.k
-    for nn_idx in xrange(self.k):
+    a1 = [None]*k
+    a2 = [None]*k
+    for nn_idx in xrange(k):
       a1[nn_idx] = np.array([])
       a2[nn_idx] = np.array([])
 
     # initialize gradient and L
-    G = dfG * regularization + df * (1-regularization)
+    G = dfG * reg + df * (1-reg)
     L = self.L
     objective = np.inf
 
     # main loop
-    for it in xrange(1, max_iter):
+    for it in xrange(1, self.params['max_iter']):
       df_old = df.copy()
       a1_old = [a.copy() for a in a1]
       a2_old = [a.copy() for a in a2]
@@ -73,7 +88,7 @@ class python_LMNN(_base_LMNN):
 
       # compute the gradient
       total_active = 0
-      for nn_idx in reversed(xrange(self.k)):
+      for nn_idx in reversed(xrange(k)):
         act1 = g0 < g1[:,nn_idx]
         act2 = g0 < g2[:,nn_idx]
         total_active += act1.sum() + act2.sum()
@@ -107,10 +122,10 @@ class python_LMNN(_base_LMNN):
 
       # do the gradient update
       assert not np.isnan(df).any()
-      G = dfG * regularization + df * (1-regularization)
+      G = dfG * reg + df * (1-reg)
 
       # compute the objective function
-      objective = total_active * (1-regularization)
+      objective = total_active * (1-reg)
       objective += G.flatten().dot(L.T.dot(L).flatten())
       assert not np.isnan(objective)
       delta_obj = objective - objective_old
@@ -138,7 +153,7 @@ class python_LMNN(_base_LMNN):
         break
     else:
       if verbose:
-        print "LMNN didn't converge in %d steps." % max_iter
+        print "LMNN didn't converge in %(max_iter)d steps." % self.params
 
     # store the last L
     self.L = L
@@ -152,12 +167,13 @@ class python_LMNN(_base_LMNN):
     return self.L.dot(X.T).T
 
   def _select_targets(self):
-    target_neighbors = np.empty((self.X.shape[0], self.k), dtype=int)
+    k = self.params['k']
+    target_neighbors = np.empty((self.X.shape[0], k), dtype=int)
     for label in self.labels:
       inds, = np.nonzero(self.label_inds == label)
       dd = pairwise_distances(self.X[inds])
       np.fill_diagonal(dd, np.inf)
-      nn = np.argsort(dd)[...,:self.k]
+      nn = np.argsort(dd)[...,:k]
       target_neighbors[inds] = inds[nn]
     return target_neighbors
 
@@ -211,20 +227,22 @@ try:
   from modshogun import RealFeatures, MulticlassLabels
 
   class LMNN(_base_LMNN):
-    def __init__(self, X, labels, k=3):
+    def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
+                 regularization=0.5, convergence_tol=0.001, use_pca=True):
+      _base_LMNN.__init__(self, k=k, min_iter=min_iter, max_iter=max_iter,
+                          learn_rate=learn_rate, regularization=regularization,
+                          convergence_tol=convergence_tol, use_pca=use_pca)
+
+    def fit(self, X, labels, verbose=False):
       self.X = X
       self.L = np.eye(X.shape[1])
       labels = MulticlassLabels(labels.astype(np.float64))
-      self._lmnn = shogun_LMNN(RealFeatures(X.T), labels, k)
-
-    def fit(self, min_iter=50, max_iter=1000, learn_rate=1e-7,
-            regularization=0.5, convergence_tol=0.001, use_pca=True,
-            verbose=False):
-      self._lmnn.set_maxiter(max_iter)
-      self._lmnn.set_obj_threshold(convergence_tol)
-      self._lmnn.set_regularization(regularization)
-      self._lmnn.set_stepsize(learn_rate)
-      if use_pca:
+      self._lmnn = shogun_LMNN(RealFeatures(X.T), labels, self.params['k'])
+      self._lmnn.set_maxiter(self.params['max_iter'])
+      self._lmnn.set_obj_threshold(self.params['convergence_tol'])
+      self._lmnn.set_regularization(self.params['regularization'])
+      self._lmnn.set_stepsize(self.params['learn_rate'])
+      if self.params['use_pca']:
         self._lmnn.train()
       else:
         self._lmnn.train(self.L)

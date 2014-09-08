@@ -3,7 +3,6 @@ import numpy as np
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 
-import metric_learn
 from metric_learn import LSML, ITML, LMNN, SDML
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
@@ -59,8 +58,8 @@ class TestLMNN(MetricTestCase):
 
     # Test both impls, if available.
     for LMNN_cls in set((LMNN, python_LMNN)):
-      lmnn = LMNN_cls(self.iris_points, self.iris_labels, k=k)
-      lmnn.fit(verbose=False, learn_rate=1e-6)
+      lmnn = LMNN_cls(k=k, learn_rate=1e-6)
+      lmnn.fit(self.iris_points, self.iris_labels, verbose=False)
 
       csep = class_separation(lmnn.transform(), self.iris_labels)
       self.assertLess(csep, 0.25)
