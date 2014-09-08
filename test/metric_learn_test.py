@@ -32,7 +32,7 @@ class TestLSML(MetricTestCase):
     num_constraints = 200
 
     C = LSML.prepare_constraints(self.iris_labels, num_constraints)
-    lsml = LSML(self.iris_points, C).fit(verbose=False)
+    lsml = LSML().fit(self.iris_points, C, verbose=False)
 
     csep = class_separation(lsml.transform(), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible

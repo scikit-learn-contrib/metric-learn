@@ -14,14 +14,11 @@ from base_metric import BaseMetricLearner
 
 
 class LSML(BaseMetricLearner):
-  def __init__(self, X, constraints, weights=None, prior=None):
-    """
-    X: data matrix, (n x d)
-    constraints: (m x 4) matrix of (a,b,c,d) indices into X, such that:
-      d(X[a],X[b]) < d(X[c],X[d])
-    weights: m-length array of weights on each constraint
-    prior: guess at a metric matrix [default: covariance(X)]
-    """
+  def __init__(self, tol=1e-3, max_iter=1000):
+    self.tol = tol
+    self.max_iter = max_iter
+
+  def _prepare_inputs(self, X, constraints, weights, prior):
     self.X = X
     self.vab = np.diff(X[constraints[:,:2]], axis=1)[:,0]
     self.vcd = np.diff(X[constraints[:,2:]], axis=1)[:,0]
@@ -38,16 +35,24 @@ class LSML(BaseMetricLearner):
   def metric(self):
     return self.M
 
-  def fit(self, tol=1e-3, max_iter=1000, verbose=False):
+  def fit(self, X, constraints, weights=None, prior=None, verbose=False):
+    """
+    X: data matrix, (n x d)
+    constraints: (m x 4) matrix of (a,b,c,d) indices into X, such that:
+      d(X[a],X[b]) < d(X[c],X[d])
+    weights: m-length array of weights on each constraint
+    prior: guess at a metric matrix [default: covariance(X)]
+    """
+    self._prepare_inputs(X, constraints, weights, prior)
     prior_inv = scipy.linalg.inv(self.M)
     s_best = self._total_loss(self.M, prior_inv)
     step_sizes = np.logspace(-10, 0, 10)
     if verbose:
       print 'initial loss', s_best
-    for it in xrange(1,max_iter+1):
+    for it in xrange(1, self.max_iter+1):
       grad = self._gradient(self.M, prior_inv)
       grad_norm = scipy.linalg.norm(grad)
-      if grad_norm < tol:
+      if grad_norm < self.tol:
         break
       if verbose:
         print 'gradient norm', grad_norm

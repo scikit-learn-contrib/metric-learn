@@ -27,7 +27,7 @@ def sandwich_demo():
       (LMNN(), (x, y)),
       (ITML(), (x, ITML.prepare_constraints(y, len(x), num_constraints))),
       (SDML(x, SDML.prepare_constraints(y, len(x), num_constraints)), ()),
-      (LSML(x, LSML.prepare_constraints(y, num_constraints)), ())
+      (LSML(), (x, LSML.prepare_constraints(y, num_constraints)))
   ]
 
   for ax_num, (ml,args) in zip(xrange(3,7), mls):
