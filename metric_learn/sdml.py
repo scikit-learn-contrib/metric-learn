@@ -40,6 +40,10 @@ class SDML(BaseMetricLearner):
     return self.M
 
   def fit(self, X, W, verbose=False):
+    """
+    X: data matrix, (n x d)
+    W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.
+    """
     self._prepare_inputs(X, W)
     P = pinvh(self.M) + self.balance_param * self.loss_matrix
     emp_cov = pinvh(P)
