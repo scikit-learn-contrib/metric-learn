@@ -4,7 +4,7 @@ from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 
 from itml import ITML
-from lmnn import LMNN
+from lmnn import LMNN, python_LMNN
 from lsml import LSML
 from sdml import SDML
 
@@ -57,11 +57,13 @@ class TestLMNN(MetricTestCase):
   def test_iris(self):
     k = 5
 
-    lmnn = LMNN(self.iris_points, self.iris_labels, k=k)
-    lmnn.fit(verbose=False, learn_rate=1e-6)
+    # Test both impls, if available.
+    for LMNN_cls in set((LMNN, python_LMNN)):
+      lmnn = LMNN_cls(self.iris_points, self.iris_labels, k=k)
+      lmnn.fit(verbose=False, learn_rate=1e-6)
 
-    csep = class_separation(lmnn.transform(), self.iris_labels)
-    self.assertLess(csep, 0.25)
+      csep = class_separation(lmnn.transform(), self.iris_labels)
+      self.assertLess(csep, 0.25)
 
 
 class TestSDML(MetricTestCase):
