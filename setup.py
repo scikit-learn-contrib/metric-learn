@@ -16,10 +16,9 @@ setup(name='metric_learn',
       ],
       packages=['metric_learn'],
       install_requires=[
-          'numpy >= 1.5.1',
-          'scipy >= 0.8',
+          'numpy',
+          'scipy',
           'scikit-learn'
       ],
       test_suite='test'
       )
-
