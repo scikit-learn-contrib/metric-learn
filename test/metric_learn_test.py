@@ -3,8 +3,9 @@ import numpy as np
 import scipy.sparse
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
+from numpy.testing import assert_array_almost_equal
 
-from metric_learn import LSML, ITML, LMNN, SDML
+from metric_learn import LSML, ITML, LMNN, SDML, NCA
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
 
@@ -78,6 +79,21 @@ class TestSDML(MetricTestCase):
       sdml = SDML().fit(self.iris_points, graph)
       csep = class_separation(sdml.transform(), self.iris_labels)
       self.assertLess(csep, 0.25)
+
+
+class TestNCA(MetricTestCase):
+  def test_iris(self):
+    n = self.iris_points.shape[0]
+    nca = NCA(max_iter=(100000//n), learning_rate=0.01)
+    nca.fit(self.iris_points, self.iris_labels)
+
+    # Result copied from Iris example at
+    # https://github.com/vomjom/nca/blob/master/README.mkd
+    expected = [[-0.09935, -0.2215,  0.3383,  0.443],
+                [+0.2532,   0.5835, -0.8461, -0.8915],
+                [-0.729,   -0.6386,  1.767,   1.832],
+                [-0.9405,  -0.8461,  2.281,   2.794]]
+    assert_array_almost_equal(expected, nca.transformer(), decimal=3)
 
 
 if __name__ == '__main__':
