@@ -8,6 +8,7 @@ Metric Learning algorithms in Python.
  * Information Theoretic Metric Learning (ITML)
  * Sparse Determinant Metric Learning (SDML)
  * Least Squares Metric Learning (LSML)
+ * Neighborhood Components Analysis (NCA)
 
 **Dependencies**
 
@@ -45,3 +46,6 @@ into the learned space, in which standard Euclidean distance can be used.
 If a recent version of the Shogun Python modular (`modshogun`) library is available,
 the LMNN implementation will use the fast C++ version from there.
 The two implementations differ slightly, and the C++ version is more complete.
+
+*TODO: implement the rest of the methods on
+[this site](http://www.cs.cmu.edu/~liuy/distlearn.htm)*
