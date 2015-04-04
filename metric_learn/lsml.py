@@ -112,4 +112,5 @@ class LSML(BaseMetricLearner):
 
 
 def _regularization_loss(metric, prior_inv):
-  return np.sum(metric * prior_inv) - np.log(scipy.linalg.det(metric))
+  sign, logdet = np.linalg.slogdet(metric)
+  return np.sum(metric * prior_inv) - sign * logdet
