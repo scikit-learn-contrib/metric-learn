@@ -34,7 +34,7 @@ class SDML(BaseMetricLearner):
     else:
       self.M = np.identity(X.shape[1])
     L = laplacian(W, normed=False)
-    self.loss_matrix = self.X.T.dot(L).dot(self.X)
+    self.loss_matrix = self.X.T.dot(L.dot(self.X))
 
   def metric(self):
     return self.M
