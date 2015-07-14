@@ -1,8 +1,8 @@
 language: python
+sudo: false
 python:
   - "2.7"
 install:
-  - sudo apt-get update -qq
   - if [[ "$TRAVIS_PYTHON_VERSION" == 2.* ]]; then
       wget http://repo.continuum.io/miniconda/Miniconda-3.4.2-Linux-x86_64.sh -O miniconda.sh;
     else
