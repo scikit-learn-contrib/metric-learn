@@ -14,6 +14,9 @@ setup(name='metric_learn',
           'Development Status :: 4 - Beta',
           'License :: OSI Approved :: MIT License',
           'Programming Language :: Python',
+          'Operating System :: OS Independent',
+          'Intended Audience :: Science/Research',
+          'Topic :: Scientific/Engineering'
       ],
       packages=['metric_learn'],
       install_requires=[
@@ -22,4 +25,7 @@ setup(name='metric_learn',
           'scikit-learn'
       ],
       test_suite='test'
+      keywords=['Metric Learning', 'Large Margin Nearest Neighbor', \
+      'Information Theoretic Metric Learning', 'Sparse Determinant Metric Learning', \
+      'Least Squares Metric Learning', 'Neighborhood Components Analysis']
       )
