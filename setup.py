@@ -6,7 +6,7 @@ version = "0.1.0"
 setup(name='metric_learn',
       version=version,
       description='Python implementations of metric learning algorithms',
-      author='CJ Carey',
+      author=['CJ Carey', 'Yuan Tang'],
       author_email='ccarey@cs.umass.edu',
       url='http://github.com/all-umass/metric_learn',
       license='MIT',
@@ -14,6 +14,9 @@ setup(name='metric_learn',
           'Development Status :: 4 - Beta',
           'License :: OSI Approved :: MIT License',
           'Programming Language :: Python',
+          'Operating System :: OS Independent',
+          'Intended Audience :: Science/Research',
+          'Topic :: Scientific/Engineering'
       ],
       packages=['metric_learn'],
       install_requires=[
@@ -21,5 +24,12 @@ setup(name='metric_learn',
           'scipy',
           'scikit-learn'
       ],
-      test_suite='test'
-      )
+      test_suite='test',
+      keywords=[
+          'Metric Learning', 
+          'Large Margin Nearest Neighbor',
+          'Information Theoretic Metric Learning',
+          'Sparse Determinant Metric Learning',
+          'Least Squares Metric Learning',
+          'Neighborhood Components Analysis'
+      ])
