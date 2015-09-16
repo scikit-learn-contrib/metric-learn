@@ -60,7 +60,7 @@ more complete.
 
 .. _this site: http://www.cs.cmu.edu/~liuy/distlearn.htm
 
-.. |Travis-CI Build Status| image:: https://api.travis-ci.org/all-umass/metric_learn.svg?branch=master
-   :target: https://travis-ci.org/all-umass/metric_learn
+.. |Travis-CI Build Status| image:: https://api.travis-ci.org/all-umass/metric-learn.svg?branch=master
+   :target: https://travis-ci.org/all-umass/metric-learn
 .. |License| image:: http://img.shields.io/:license-mit-blue.svg?style=flat
    :target: http://badges.mit-license.org
