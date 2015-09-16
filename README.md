@@ -1,3 +1,5 @@
+[![Travis-CI Build Status](https://api.travis-ci.org/all-umass/metric_learn.svg?branch=master)](https://travis-ci.org/all-umass/metric_learn)
+[![License](http://img.shields.io/:license-mit-blue.svg?style=flat)](http://badges.mit-license.org)
 # metric_learn
 
 Metric Learning algorithms in Python.
