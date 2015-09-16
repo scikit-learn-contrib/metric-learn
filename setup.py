@@ -25,7 +25,11 @@ setup(name='metric_learn',
           'scikit-learn'
       ],
       test_suite='test',
-      keywords=['Metric Learning', 'Large Margin Nearest Neighbor', \
-      'Information Theoretic Metric Learning', 'Sparse Determinant Metric Learning', \
-      'Least Squares Metric Learning', 'Neighborhood Components Analysis']
-      )
+      keywords=[
+          'Metric Learning', 
+          'Large Margin Nearest Neighbor',
+          'Information Theoretic Metric Learning',
+          'Sparse Determinant Metric Learning',
+          'Least Squares Metric Learning',
+          'Neighborhood Components Analysis'
+      ])
