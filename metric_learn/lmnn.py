@@ -5,6 +5,7 @@ TODO: periodic recalculation of impostors, PCA initialization
 """
 
 import numpy as np
+import gc
 from collections import Counter
 from sklearn.metrics import pairwise_distances
 from base_metric import BaseMetricLearner
@@ -76,6 +77,7 @@ class python_LMNN(_base_LMNN):
 
     # main loop
     for it in xrange(1, self.params['max_iter']):
+      gc.collect()
       df_old = df.copy()
       a1_old = [a.copy() for a in a1]
       a2_old = [a.copy() for a in a2]
