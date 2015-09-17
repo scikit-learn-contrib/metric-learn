@@ -20,6 +20,7 @@ Metric Learning algorithms in Python.
 -  (for running the examples only: matplotlib)
 
 **Installation/Setup**
+Run ``pip install metric-learn`` to download and install from PyPI.
 
 Run ``python setup.py install`` for default installation.
 
