@@ -82,8 +82,8 @@ class python_LMNN(_base_LMNN):
       objective_old = objective
       # Compute pairwise distances under current metric
       Lx = L.dot(self.X.T).T
-      g0 = _pairwise_L2(*Lx[impostors], inplace=True)
-      Ni = 1 + _pairwise_L2(Lx[target_neighbors], Lx[:,None,:], inplace=True)
+      g0 = _inplace_paired_L2(*Lx[impostors])
+      Ni = 1 + _inplace_paired_L2(Lx[target_neighbors], Lx[:,None,:])
       g1,g2 = Ni[impostors]
 
       # compute the gradient
@@ -180,7 +180,7 @@ class python_LMNN(_base_LMNN):
 
   def _find_impostors(self, furthest_neighbors):
     Lx = self.transform()
-    margin_radii = 1 + _pairwise_L2(Lx[furthest_neighbors], Lx, inplace=True)
+    margin_radii = 1 + _inplace_paired_L2(Lx[furthest_neighbors], Lx)
     impostors = []
     for label in self.labels[:-1]:
       in_inds, = np.nonzero(self.label_inds == label)
@@ -199,12 +199,10 @@ class python_LMNN(_base_LMNN):
     return np.hstack(impostors)
 
 
-def _pairwise_L2(A, B, inplace=False):
-  if not inplace:
-    return ((A-B)**2).sum(axis=-1)
+def _inplace_paired_L2(A, B):
+  '''Equivalent to ((A-B)**2).sum(axis=-1), but modifies A in place.'''
   A -= B
-  A **= 2
-  return A.sum(axis=-1)
+  return np.einsum('...ij,...ij->...i', A, A)
 
 
 def _count_edges(act1, act2, impostors, targets):
