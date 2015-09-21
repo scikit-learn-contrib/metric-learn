@@ -82,8 +82,8 @@ class python_LMNN(_base_LMNN):
       objective_old = objective
       # Compute pairwise distances under current metric
       Lx = L.dot(self.X.T).T
-      g0 = _pairwise_L2(*Lx[impostors])
-      Ni = ((Lx[:,None,:] - Lx[target_neighbors])**2).sum(axis=2) + 1
+      g0 = _pairwise_L2(*Lx[impostors], inplace=True)
+      Ni = 1 + _pairwise_L2(Lx[target_neighbors], Lx[:,None,:], inplace=True)
       g1,g2 = Ni[impostors]
 
       # compute the gradient
@@ -180,7 +180,7 @@ class python_LMNN(_base_LMNN):
 
   def _find_impostors(self, furthest_neighbors):
     Lx = self.transform()
-    margin_radii = _pairwise_L2(Lx, Lx[furthest_neighbors]) + 1
+    margin_radii = 1 + _pairwise_L2(Lx[furthest_neighbors], Lx, inplace=True)
     impostors = []
     for label in self.labels[:-1]:
       in_inds, = np.nonzero(self.label_inds == label)
@@ -190,17 +190,21 @@ class python_LMNN(_base_LMNN):
       i2,j2 = np.nonzero(dist < margin_radii[in_inds])
       i = np.hstack((i1,i2))
       j = np.hstack((j1,j2))
-      ind = np.vstack((i,j)).T
-      if ind.size > 0:
-        # gross: get unique rows
-        ind = np.array(list(set(map(tuple,ind))))
-      i,j = np.atleast_2d(ind).T
+      if i.size > 0:
+        # get unique (i,j) pairs using index trickery
+        shape = (i.max()+1, j.max()+1)
+        tmp = np.ravel_multi_index((i,j), shape)
+        i,j = np.unravel_index(np.unique(tmp), shape)
       impostors.append(np.vstack((in_inds[j], out_inds[i])))
     return np.hstack(impostors)
 
 
-def _pairwise_L2(A, B):
-  return ((A-B)**2).sum(axis=1)
+def _pairwise_L2(A, B, inplace=False):
+  if not inplace:
+    return ((A-B)**2).sum(axis=-1)
+  A -= B
+  A **= 2
+  return A.sum(axis=-1)
 
 
 def _count_edges(act1, act2, impostors, targets):
