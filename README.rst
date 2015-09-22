@@ -12,6 +12,7 @@ Metric Learning algorithms in Python.
 -  Sparse Determinant Metric Learning (SDML)
 -  Least Squares Metric Learning (LSML)
 -  Neighborhood Components Analysis (NCA)
+-  Local Fisher Discriminant Analysis (LFDA)
 
 **Dependencies**
 
