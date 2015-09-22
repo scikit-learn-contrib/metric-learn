@@ -1,9 +1,8 @@
-|Travis-CI Build Status| |License| |PyPI version|
+metric-learn: Metric Learning in Python  
+=====================================
+|License| |PyPI version|
 
-metric-learn
-=============
-
-Metric Learning algorithms in Python.
+Distance metric is widely used in the machine learning literature. We used to choose a distance metric according to a priori (Euclidean Distance , L1 Distance, etc.) or according to the result of cross validation within small class of functions (e.g. choosing order of polynomial for a kernel). Actually, with priori knowledge of the data, we could learn a more suitable distance metric with metric learning techniques. metric-learn  contains implementations of the state-of-the-art algorithms for metric learning. These metric learning methods are widely applied in feature extraction, dimensionality reduction, clustering, classification, information retrieval, and computer vision problems.
 
 **Algorithms**
 
@@ -64,9 +63,7 @@ more complete.
 
 .. _this site: http://www.cs.cmu.edu/~liuy/distlearn.htm
 
-.. |Travis-CI Build Status| image:: https://api.travis-ci.org/all-umass/metric-learn.svg?branch=master
-   :target: https://travis-ci.org/all-umass/metric-learn
-.. |License| image:: http://img.shields.io/:license-mit-blue.svg?style=flat
-   :target: http://badges.mit-license.org
 .. |PyPI version| image:: https://badge.fury.io/py/metric-learn.svg
    :target: http://badge.fury.io/py/metric-learn
+.. |License| image:: http://img.shields.io/:license-mit-blue.svg?style=flat
+   :target: http://badges.mit-license.org
