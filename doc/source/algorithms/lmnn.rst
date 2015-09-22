@@ -8,6 +8,7 @@ Example Code
 We use iris data here for all the examples:
 ::
 	from sklearn.datasets import load_iris
+	import numpy as np
 
 	iris_data = load_iris()
 	self.iris_points = iris_data['data']
@@ -16,12 +17,13 @@ We use iris data here for all the examples:
 
 In this package, we have two different implementations of LMNN. Here we try both implementations in a for loop:
 ::
+	from metric_learn import LMNN
+	from metric_learn.lmnn import python_LMNN
+
 	for LMNN_cls in set((LMNN, python_LMNN)):
 	      lmnn = LMNN_cls(k=k, learn_rate=1e-6)
 	      lmnn.fit(self.iris_points, self.iris_labels, verbose=False)
-
-	      csep = class_separation(lmnn.transform(), self.iris_labels)
-	      self.assertLess(csep, 0.25)
+	      lmnn.transform()
 
 References
 ------------------
