@@ -25,4 +25,4 @@ In this package, we have two different implementations of LMNN. Here we try both
 
 References
 ------------------
-`Link Distance Metric Learning for Large Margin Nearest Neighbor Classification <http://papers.nips.cc/paper/2795-distance-metric-learning-for-large-margin-nearest-neighbor-classification>`_ Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul
+`Distance Metric Learning for Large Margin Nearest Neighbor Classification <http://papers.nips.cc/paper/2795-distance-metric-learning-for-large-margin-nearest-neighbor-classification>`_ Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul
