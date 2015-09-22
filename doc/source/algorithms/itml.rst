@@ -16,4 +16,4 @@ After loading the iris data, we apply ITML:
 
 References
 ------------------
-`Information-theoretic Metric Learning <http://machinelearning.wustl.edu/mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Davis, Jason V., et al.
+`Information-theoretic Metric Learning <http://machinelearning.wustl.edu/mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis, et al.
