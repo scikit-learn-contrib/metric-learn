@@ -26,7 +26,7 @@ class LFDA(BaseMetricLearner):
     self.k = k
 
   def transformer(self):
-    return self._tranformer
+    return self._transformer
 
   def _process_inputs(self, X, Y):
     X = np.asanyarray(X)
@@ -95,7 +95,7 @@ class LFDA(BaseMetricLearner):
     elif self.metric == 'orthonormalized':
        vecs, _ = np.linalg.qr(vecs)
 
-    self._tranformer = vecs.T
+    self._transformer = vecs.T
 
 
 def _sum_outer(x):
