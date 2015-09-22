@@ -276,7 +276,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   (master_doc, 'metric-learn', u'metric-learn Documentation',
-   author, 'metric-learn', 'One line description of project.',
+   author, 'metric-learn', 'Metric Learning in Python.',
    'Miscellaneous'),
 ]
 
@@ -308,7 +308,7 @@ epub_copyright = copyright
 # for small screen space, using the same theme for HTML and epub output is
 # usually not wise. This defaults to 'epub', a theme designed to save visual
 # space.
-#epub_theme = 'epub'
+epub_theme = 'epub'
 
 # The language of the text. It defaults to the language option
 # or 'en' if the language is not set.
