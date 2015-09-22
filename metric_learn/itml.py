@@ -1,5 +1,14 @@
 """
 Information Theoretic Metric Learning, Kulis et al., ICML 2007
+
+ITML minimizes the differential relative entropy between two multivariate
+Gaussians under constraints on the distance function,
+which can be formulated into a Bregman optimization problem by minimizing the
+LogDet divergence subject to linear constraints.
+This algorithm can handle a wide variety of constraints and can optionally
+incorporate a prior on the distance function.
+Unlike some other methods, ITML does not rely on an eigenvalue computation
+or semi-definite programming.
 """
 
 import numpy as np
@@ -8,12 +17,16 @@ from base_metric import BaseMetricLearner
 
 
 class ITML(BaseMetricLearner):
-  """
-  Information Theoretic Metric Learning (ITML)
-  """
+  """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3):
-    """
-    gamma: value for slack variables
+    """Initialize the learner.
+
+    Parameters
+    ----------
+    gamma : float, optional
+        value for slack variables
+    max_iters : int, optional
+    convergence_threshold : float, optional
     """
     self.gamma = gamma
     self.max_iters = max_iters
@@ -41,14 +54,18 @@ class ITML(BaseMetricLearner):
     return a,b,c,d
 
   def fit(self, X, constraints, bounds=None, A0=None, verbose=False):
-    """
-    X: (n x d) data matrix - each row corresponds to a single instance
-    constraints: tuple of arrays: (a,b,c,d) indices into X, such that:
-      d(X[a],X[b]) < d(X[c],X[d])
-    bounds: (pos,neg) pair of bounds on similarity, such that:
-      d(X[a],X[b]) < pos
-      d(X[c],X[d]) > neg
-    A0: [optional] (d x d) initial regularization matrix, defaults to identity
+    """Learn the ITML model.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    constraints : tuple of arrays
+        (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
+    bounds : list (pos,neg) pairs, optional
+        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
+    A0 : (d x d) matrix, optional
+        initial regularization matrix, defaults to identity
     """
     a,b,c,d = self._process_inputs(X, constraints, bounds, A0)
     gamma = self.gamma

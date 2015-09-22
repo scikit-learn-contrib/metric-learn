@@ -24,6 +24,10 @@ setup(name='metric-learn',
           'scipy',
           'scikit-learn'
       ],
+      extras_require=dict(
+          docs=['sphinx', 'numpydoc'],
+          demo=['matplotlib'],
+      ),
       test_suite='test',
       keywords=[
           'Metric Learning', 

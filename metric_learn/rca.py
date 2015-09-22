@@ -1,16 +1,29 @@
+"""Relative Components Analysis (RCA)
+
+RCA learns a full rank Mahalanobis distance metric based on a
+weighted sum of in-class covariance matrices.
+It applies a global linear transformation to assign large weights to
+relevant dimensions and low weights to irrelevant dimensions.
+Those relevant dimensions are estimated using "chunklets",
+subsets of points that are known to belong to the same class.
+
+'Learning distance functions using equivalence relations', ICML 2003
+"""
 import numpy as np
+import random
 from base_metric import BaseMetricLearner
 
 
 class RCA(BaseMetricLearner):
-  '''Relevant Components Analysis (RCA)
-  'Learning distance functions using equivalence relations', ICML 2003
-  '''
-
+  """Relevant Components Analysis (RCA)"""
   def __init__(self, dim=None):
-    '''
-    dim : embedding dimension (default: original dimension of data)
-    '''
+    """Initialize the learner.
+
+    Parameters
+    ----------
+    dim : int, optional
+        embedding dimension (default: original dimension of data)
+    """
     self.dim = dim
 
   def transformer(self):
@@ -32,12 +45,16 @@ class RCA(BaseMetricLearner):
     return X, Y, num_chunks, d
 
   def fit(self, data, chunks):
-    '''
-    data : (n,d) array-like, input data
-    chunks : (n,) array-like
-      chunks[i] == -1  -> point i doesn't belong to any chunklet
-      chunks[i] == j   -> point i belongs to chunklet j
-    '''
+    """Learn the RCA model.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    chunks : (n,) array of ints
+        when ``chunks[i] == -1``, point i doesn't belong to any chunklet,
+        when ``chunks[i] == j``, point i belongs to chunklet j.
+    """
     data, chunks, num_chunks, d = self._process_inputs(data, chunks)
 
     # mean center
@@ -65,6 +82,28 @@ class RCA(BaseMetricLearner):
       self._transformer = _inv_sqrtm(inner_cov).dot(A.T)
     else:
       self._transformer = _inv_sqrtm(inner_cov).T
+
+  @classmethod
+  def prepare_constraints(cls, Y, num_chunks=100, chunk_size=2, seed=None):
+    random.seed(seed)
+    chunks = -np.ones_like(Y, dtype=int)
+    uniq, lookup = np.unique(Y, return_inverse=True)
+    all_inds = [set(np.where(lookup==c)[0]) for c in xrange(len(uniq))]
+    idx = 0
+    while idx < num_chunks and all_inds:
+      c = random.randint(0, len(all_inds)-1)
+      inds = all_inds[c]
+      if len(inds) < chunk_size:
+        del all_inds[c]
+        continue
+      ii = random.sample(inds, chunk_size)
+      inds.difference_update(ii)
+      chunks[ii] = idx
+      idx += 1
+    if idx < num_chunks:
+      raise ValueError('Unable to make %d chunks of %d examples each' %
+                       (num_chunks, chunk_size))
+    return chunks
 
 
 def _inv_sqrtm(x):

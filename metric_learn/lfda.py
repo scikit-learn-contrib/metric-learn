@@ -1,3 +1,15 @@
+"""
+Local Fisher Discriminant Analysis (LFDA)
+
+Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
+Sugiyama, ICML 2006
+
+LFDA is a linear supervised dimensionality reduction method.
+It is particularly useful when dealing with multimodality,
+where one ore more classes consist of separate clusters in input space.
+The core optimization problem of LFDA is solved as a generalized
+eigenvalue problem.
+"""
 from __future__ import division
 import numpy as np
 import scipy

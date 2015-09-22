@@ -1,8 +1,13 @@
 """
 Large-margin nearest neighbor metric learning. (Weinberger 2005)
 
-TODO: periodic recalculation of impostors, PCA initialization
+LMNN learns a Mahanalobis distance metric in the kNN classification setting
+using semidefinite programming.
+The learned metric attempts to keep k-nearest neighbors in the same class,
+while keeping examples from different classes separated by a large margin.
+This algorithm makes no assumptions about the distribution of the data.
 """
+#TODO: periodic recalculation of impostors, PCA initialization
 
 import numpy as np
 from collections import Counter
@@ -21,15 +26,13 @@ class _base_LMNN(BaseMetricLearner):
 
 # slower Python version
 class python_LMNN(_base_LMNN):
-  """
-   LMNN Learns a metric using large-margin nearest neighbor metric learning.
-     LMNN(X, labels, k).fit()
-   Learn a metric on X (NxD matrix) and labels (Nx1 vector).
-   k: number of neighbors to consider, (does not include self-edges)
-   regularization: weighting of pull and push terms
-  """
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001):
+    """Initialize the LMNN object
+
+    k: number of neighbors to consider. (does not include self-edges)
+    regularization: weighting of pull and push terms
+    """
     _base_LMNN.__init__(self, k=k, min_iter=min_iter, max_iter=max_iter,
                         learn_rate=learn_rate, regularization=regularization,
                         convergence_tol=convergence_tol)

@@ -15,6 +15,13 @@ from base_metric import BaseMetricLearner
 
 class LSML(BaseMetricLearner):
   def __init__(self, tol=1e-3, max_iter=1000):
+    """Initialize the learner.
+
+    Parameters
+    ----------
+    tol : float, optional
+    max_iter : int, optional
+    """
     self.tol = tol
     self.max_iter = max_iter
 
@@ -36,12 +43,20 @@ class LSML(BaseMetricLearner):
     return self.M
 
   def fit(self, X, constraints, weights=None, prior=None, verbose=False):
-    """
-    X: data matrix, (n x d)
-    constraints: (m x 4) matrix of (a,b,c,d) indices into X, such that:
-      d(X[a],X[b]) < d(X[c],X[d])
-    weights: m-length array of weights on each constraint
-    prior: guess at a metric matrix [default: covariance(X)]
+    """Learn the LSML model.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    constraints : (m x 4) matrix of ints
+        (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
+    weights : (m,) array of floats, optional
+        scale factor for each constraint
+    prior : (d x d) matrix, optional
+        guess at a metric [default: covariance(X)]
+    verbose : bool, optional
+        if True, prints information while learning
     """
     self._prepare_inputs(X, constraints, weights, prior)
     prior_inv = scipy.linalg.inv(self.M)

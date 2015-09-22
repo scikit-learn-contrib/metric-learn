@@ -107,14 +107,8 @@ class TestLFDA(MetricTestCase):
 class TestRCA(MetricTestCase):
   def test_iris(self):
     rca = RCA(dim=2)
-    chunks = self.iris_labels.copy()
-    a, = np.where(chunks==0)
-    b, = np.where(chunks==1)
-    c, = np.where(chunks==2)
-    chunks[:] = -1
-    chunks[a[:20]] = np.repeat(np.arange(10), 2)
-    chunks[b[:20]] = np.repeat(np.arange(10, 20), 2)
-    chunks[c[:20]] = np.repeat(np.arange(20, 30), 2)
+    chunks = RCA.prepare_constraints(self.iris_labels, num_chunks=30,
+                                     chunk_size=2, seed=1234)
     rca.fit(self.iris_points, chunks)
     csep = class_separation(rca.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
