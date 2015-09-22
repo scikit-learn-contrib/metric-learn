@@ -12,7 +12,13 @@ Contents:
    :maxdepth: 2
 
    intro
-   algorithms
+   algorithms/lmnn
+   algorithms/itml
+   algorithms/sdml
+   algorithms/lsml
+   algorithms/nca
+   algorithms/lfda
+   algorithms/rca
 
 
 
