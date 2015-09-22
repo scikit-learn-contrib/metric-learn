@@ -5,7 +5,7 @@ from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
-from metric_learn import LSML, ITML, LMNN, SDML, NCA, LFDA
+from metric_learn import LSML, ITML, LMNN, SDML, NCA, LFDA, RCA
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
 
@@ -102,6 +102,23 @@ class TestLFDA(MetricTestCase):
     lfda.fit(self.iris_points, self.iris_labels)
     csep = class_separation(lfda.transform(), self.iris_labels)
     self.assertLess(csep, 0.15)
+
+
+class TestRCA(MetricTestCase):
+  def test_iris(self):
+    rca = RCA(dim=2)
+    chunks = self.iris_labels.copy()
+    a, = np.where(chunks==0)
+    b, = np.where(chunks==1)
+    c, = np.where(chunks==2)
+    chunks[:] = -1
+    chunks[a[:20]] = np.repeat(np.arange(10), 2)
+    chunks[b[:20]] = np.repeat(np.arange(10, 20), 2)
+    chunks[c[:20]] = np.repeat(np.arange(20, 30), 2)
+    rca.fit(self.iris_points, chunks)
+    csep = class_separation(rca.transform(), self.iris_labels)
+    self.assertLess(csep, 0.25)
+
 
 if __name__ == '__main__':
   unittest.main()

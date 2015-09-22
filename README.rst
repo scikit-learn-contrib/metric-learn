@@ -13,6 +13,7 @@ Metric Learning algorithms in Python.
 -  Least Squares Metric Learning (LSML)
 -  Neighborhood Components Analysis (NCA)
 -  Local Fisher Discriminant Analysis (LFDA)
+-  Relative Components Analysis (RCA)
 
 **Dependencies**
 
