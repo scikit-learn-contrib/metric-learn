@@ -1,0 +1,316 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>metric_learn.lfda &mdash; metric-learn 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="metric-learn 0.1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> metric-learn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Algorithms</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">metric-learn</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>metric_learn.lfda</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for metric_learn.lfda</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Local Fisher Discriminant Analysis (LFDA)</span>
+
+<span class="sd">Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction</span>
+<span class="sd">Sugiyama, ICML 2006</span>
+
+<span class="sd">LFDA is a linear supervised dimensionality reduction method.</span>
+<span class="sd">It is particularly useful when dealing with multimodality,</span>
+<span class="sd">where one ore more classes consist of separate clusters in input space.</span>
+<span class="sd">The core optimization problem of LFDA is solved as a generalized</span>
+<span class="sd">eigenvalue problem.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">pairwise_distances</span>
+<span class="kn">from</span> <span class="nn">base_metric</span> <span class="kn">import</span> <span class="n">BaseMetricLearner</span>
+
+
+<div class="viewcode-block" id="LFDA"><a class="viewcode-back" href="../../metric_learn.lfda.html#metric_learn.lfda.LFDA">[docs]</a><span class="k">class</span> <span class="nc">LFDA</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction</span>
+<span class="sd">  Sugiyama, ICML 2006</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s">&#39;weighted&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    dim : dimensionality of reduced space (defaults to dimension of X)</span>
+<span class="sd">    k : nearest neighbor used in local scaling method (default: 7)</span>
+<span class="sd">    metric : type of metric in the embedding space (default: &#39;weighted&#39;)</span>
+<span class="sd">      &#39;weighted&#39;        - weighted eigenvectors</span>
+<span class="sd">      &#39;orthonormalized&#39; - orthonormalized</span>
+<span class="sd">      &#39;plain&#39;           - raw eigenvectors</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;weighted&#39;</span><span class="p">,</span> <span class="s">&#39;orthonormalized&#39;</span><span class="p">,</span> <span class="s">&#39;plain&#39;</span><span class="p">):</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid metric: </span><span class="si">%r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">metric</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+
+<div class="viewcode-block" id="LFDA.transformer"><a class="viewcode-back" href="../../metric_learn.lfda.html#metric_learn.lfda.LFDA.transformer">[docs]</a>  <span class="k">def</span> <span class="nf">transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span>
+</div>
+  <span class="k">def</span> <span class="nf">_process_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">unique_classes</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_classes</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">d</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid embedding dimension, must be in [1,</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">d</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid k, must be in [0,</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span>
+
+<div class="viewcode-block" id="LFDA.fit"><a class="viewcode-back" href="../../metric_learn.lfda.html#metric_learn.lfda.LFDA.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">     X: (n, d) array-like of samples</span>
+<span class="sd">     Y: (n,) array-like of class labels</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+    <span class="n">tSb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="n">d</span><span class="p">))</span>
+    <span class="n">tSw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="n">d</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">num_classes</span><span class="p">):</span>
+      <span class="n">Xc</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">Y</span><span class="o">==</span><span class="n">c</span><span class="p">]</span>
+      <span class="n">nc</span> <span class="o">=</span> <span class="n">Xc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+      <span class="c"># classwise affinity matrix</span>
+      <span class="n">dist</span> <span class="o">=</span> <span class="n">pairwise_distances</span><span class="p">(</span><span class="n">Xc</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s">&#39;l2&#39;</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+      <span class="c"># distances to k-th nearest neighbor</span>
+      <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">nc</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span><span class="n">k</span><span class="p">])</span>
+
+      <span class="n">local_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+      <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">):</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dist</span><span class="o">/</span><span class="n">local_scale</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">local_scale</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+      <span class="n">G</span> <span class="o">=</span> <span class="n">Xc</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">Xc</span><span class="p">)</span> <span class="o">-</span> <span class="n">Xc</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xc</span><span class="p">)</span>
+      <span class="n">tSb</span> <span class="o">+=</span> <span class="n">G</span><span class="o">/</span><span class="n">n</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">nc</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">Xc</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xc</span><span class="p">)</span> <span class="o">+</span> <span class="n">_sum_outer</span><span class="p">(</span><span class="n">Xc</span><span class="p">)</span><span class="o">/</span><span class="n">n</span>
+      <span class="n">tSw</span> <span class="o">+=</span> <span class="n">G</span><span class="o">/</span><span class="n">nc</span>
+
+    <span class="n">tSb</span> <span class="o">-=</span> <span class="n">_sum_outer</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">/</span><span class="n">n</span> <span class="o">-</span> <span class="n">tSw</span>
+
+    <span class="c"># symmetrize</span>
+    <span class="n">tSb</span> <span class="o">+=</span> <span class="n">tSb</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">tSb</span> <span class="o">/=</span> <span class="mi">2</span>
+    <span class="n">tSw</span> <span class="o">+=</span> <span class="n">tSw</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">tSw</span> <span class="o">/=</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">==</span> <span class="n">d</span><span class="p">:</span>
+      <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">tSb</span><span class="p">,</span> <span class="n">tSw</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigsh</span><span class="p">(</span><span class="n">tSb</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">tSw</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s">&#39;LA&#39;</span><span class="p">)</span>
+
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">vals</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">]</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+    <span class="n">vecs</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span><span class="n">order</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">==</span> <span class="s">&#39;weighted&#39;</span><span class="p">:</span>
+       <span class="n">vecs</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">==</span> <span class="s">&#39;orthonormalized&#39;</span><span class="p">:</span>
+       <span class="n">vecs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">vecs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span> <span class="o">=</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span>
+
+</div></div>
+<span class="k">def</span> <span class="nf">_sum_outer</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">s</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, CJ Carey and Yuan Tang.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

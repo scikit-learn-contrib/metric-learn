@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>metric_learn.lsml &mdash; metric-learn 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="metric-learn 0.1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> metric-learn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Algorithms</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">metric-learn</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>metric_learn.lsml</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for metric_learn.lsml</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Liu et al.</span>
+<span class="sd">&quot;Metric Learning from Relative Comparisons by Minimizing Squared Residual&quot;.</span>
+<span class="sd">ICDM 2012.</span>
+
+<span class="sd">Adapted from https://gist.github.com/kcarnold/5439917</span>
+<span class="sd">Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span>
+<span class="kn">from</span> <span class="nn">base_metric</span> <span class="kn">import</span> <span class="n">BaseMetricLearner</span>
+
+
+<div class="viewcode-block" id="LSML"><a class="viewcode-back" href="../../metric_learn.lsml.html#metric_learn.lsml.LSML">[docs]</a><span class="k">class</span> <span class="nc">LSML</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize the learner.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">    max_iter : int, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+
+  <span class="k">def</span> <span class="nf">_prepare_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">vab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">constraints</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">vcd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">constraints</span><span class="p">[:,</span><span class="mi">2</span><span class="p">:]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">constraints</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">weights</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c"># weights must sum to 1</span>
+    <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">prior</span>
+
+<div class="viewcode-block" id="LSML.metric"><a class="viewcode-back" href="../../metric_learn.lsml.html#metric_learn.lsml.LSML.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span>
+</div>
+<div class="viewcode-block" id="LSML.fit"><a class="viewcode-back" href="../../metric_learn.lsml.html#metric_learn.lsml.LSML.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Learn the LSML model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) data matrix</span>
+<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">    constraints : (m x 4) matrix of ints</span>
+<span class="sd">        (a,b,c,d) indices into X, such that d(X[a],X[b]) &lt; d(X[c],X[d])</span>
+<span class="sd">    weights : (m,) array of floats, optional</span>
+<span class="sd">        scale factor for each constraint</span>
+<span class="sd">    prior : (d x d) matrix, optional</span>
+<span class="sd">        guess at a metric [default: covariance(X)]</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        if True, prints information while learning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+    <span class="n">prior_inv</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">s_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_loss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">)</span>
+    <span class="n">step_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+      <span class="k">print</span> <span class="s">&#39;initial loss&#39;</span><span class="p">,</span> <span class="n">s_best</span>
+    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+      <span class="n">grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">)</span>
+      <span class="n">grad_norm</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">grad_norm</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
+        <span class="k">break</span>
+      <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;gradient norm&#39;</span><span class="p">,</span> <span class="n">grad_norm</span>
+      <span class="n">M_best</span> <span class="o">=</span> <span class="bp">None</span>
+      <span class="k">for</span> <span class="n">step_size</span> <span class="ow">in</span> <span class="n">step_sizes</span><span class="p">:</span>
+        <span class="n">step_size</span> <span class="o">/=</span> <span class="n">grad_norm</span>
+        <span class="n">new_metric</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">-</span> <span class="n">step_size</span> <span class="o">*</span> <span class="n">grad</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">new_metric</span><span class="p">)</span>
+        <span class="n">new_metric</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mf">1e-8</span><span class="p">)</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">cur_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_loss</span><span class="p">(</span><span class="n">new_metric</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cur_s</span> <span class="o">&lt;</span> <span class="n">s_best</span><span class="p">:</span>
+          <span class="n">l_best</span> <span class="o">=</span> <span class="n">step_size</span>
+          <span class="n">s_best</span> <span class="o">=</span> <span class="n">cur_s</span>
+          <span class="n">M_best</span> <span class="o">=</span> <span class="n">new_metric</span>
+      <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;iter&#39;</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="s">&#39;cost&#39;</span><span class="p">,</span> <span class="n">s_best</span><span class="p">,</span> <span class="s">&#39;best step&#39;</span><span class="p">,</span> <span class="n">l_best</span> <span class="o">*</span> <span class="n">grad_norm</span>
+      <span class="k">if</span> <span class="n">M_best</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">break</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">M_best</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">print</span> <span class="s">&quot;Didn&#39;t converge after </span><span class="si">%d</span><span class="s"> iterations. Final loss: </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">s_best</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span>
+</div>
+  <span class="k">def</span> <span class="nf">_comparison_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">):</span>
+    <span class="n">dab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vab</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dcd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vcd</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vcd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">violations</span> <span class="o">=</span> <span class="n">dab</span> <span class="o">&gt;</span> <span class="n">dcd</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">violations</span><span class="p">]</span><span class="o">.</span><span class="n">dot</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dab</span><span class="p">[</span><span class="n">violations</span><span class="p">])</span> <span class="o">-</span>
+                                   <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dcd</span><span class="p">[</span><span class="n">violations</span><span class="p">]))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_total_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_comparison_loss</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">+</span>
+            <span class="n">_regularization_loss</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">):</span>
+    <span class="n">dMetric</span> <span class="o">=</span> <span class="n">prior_inv</span> <span class="o">-</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+    <span class="n">dabs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vab</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dcds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vcd</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vcd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">violations</span> <span class="o">=</span> <span class="n">dabs</span> <span class="o">&gt;</span> <span class="n">dcds</span>
+    <span class="c"># TODO: vectorize</span>
+    <span class="k">for</span> <span class="n">vab</span><span class="p">,</span> <span class="n">dab</span><span class="p">,</span> <span class="n">vcd</span><span class="p">,</span> <span class="n">dcd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vab</span><span class="p">[</span><span class="n">violations</span><span class="p">],</span> <span class="n">dabs</span><span class="p">[</span><span class="n">violations</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">vcd</span><span class="p">[</span><span class="n">violations</span><span class="p">],</span> <span class="n">dcds</span><span class="p">[</span><span class="n">violations</span><span class="p">]):</span>
+      <span class="n">dMetric</span> <span class="o">+=</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dcd</span><span class="o">/</span><span class="n">dab</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">vab</span><span class="p">,</span> <span class="n">vab</span><span class="p">)</span> <span class="o">+</span>
+                  <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dab</span><span class="o">/</span><span class="n">dcd</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">vcd</span><span class="p">,</span> <span class="n">vcd</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">dMetric</span>
+
+  <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="LSML.prepare_constraints"><a class="viewcode-back" href="../../metric_learn.lsml.html#metric_learn.lsml.LSML.prepare_constraints">[docs]</a>  <span class="k">def</span> <span class="nf">prepare_constraints</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">):</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_constraints</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">num_constraints</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">al</span><span class="p">,</span><span class="n">cl</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">a</span><span class="p">],</span><span class="n">labels</span><span class="p">[</span><span class="n">c</span><span class="p">])):</span>
+      <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">al</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+      <span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">labels</span> <span class="o">!=</span> <span class="n">cl</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">C</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="n">C</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="k">return</span> <span class="n">C</span>
+
+</div></div>
+<span class="k">def</span> <span class="nf">_regularization_loss</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">):</span>
+  <span class="n">sign</span><span class="p">,</span> <span class="n">logdet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">slogdet</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">metric</span> <span class="o">*</span> <span class="n">prior_inv</span><span class="p">)</span> <span class="o">-</span> <span class="n">sign</span> <span class="o">*</span> <span class="n">logdet</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, CJ Carey and Yuan Tang.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

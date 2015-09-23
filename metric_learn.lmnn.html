@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Large Margin Nearest Neighbor (LMNN) &mdash; metric-learn 0.1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="metric-learn 0.1.0 documentation" href="index.html"/>
+        <link rel="up" title="metric_learn package" href="metric_learn.html"/>
+        <link rel="next" title="Least Squares Metric Learning (LSML)" href="metric_learn.lsml.html"/>
+        <link rel="prev" title="Local Fisher Discriminant Analysis (LFDA)" href="metric_learn.lfda.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> metric-learn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Algorithms</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Large Margin Nearest Neighbor (LMNN)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="metric_learn.html">Package Overview</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="metric_learn.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.html">metric_learn.base_metric module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Large Margin Nearest Neighbor (LMNN)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="metric_learn.html#module-metric_learn">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">metric-learn</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="metric_learn.html">metric_learn package</a> &raquo;</li>
+      
+    <li>Large Margin Nearest Neighbor (LMNN)</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/metric_learn.lmnn.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-metric_learn.lmnn">
+<span id="large-margin-nearest-neighbor-lmnn"></span><h1>Large Margin Nearest Neighbor (LMNN)<a class="headerlink" href="#module-metric_learn.lmnn" title="Permalink to this headline">¶</a></h1>
+<p>Large-margin nearest neighbor metric learning. (Weinberger 2005)</p>
+<p>LMNN learns a Mahanalobis distance metric in the kNN classification setting
+using semidefinite programming.
+The learned metric attempts to keep k-nearest neighbors in the same class,
+while keeping examples from different classes separated by a large margin.
+This algorithm makes no assumptions about the distribution of the data.</p>
+<dl class="attribute">
+<dt id="metric_learn.lmnn.LMNN">
+<code class="descclassname">metric_learn.lmnn.</code><code class="descname">LMNN</code><a class="reference internal" href="_modules/metric_learn/lmnn.html#LMNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.LMNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#metric_learn.lmnn.python_LMNN" title="metric_learn.lmnn.python_LMNN"><code class="xref py py-class docutils literal"><span class="pre">python_LMNN</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="metric_learn.lmnn.python_LMNN">
+<em class="property">class </em><code class="descclassname">metric_learn.lmnn.</code><code class="descname">python_LMNN</code><span class="sig-paren">(</span><em>k=3</em>, <em>min_iter=50</em>, <em>max_iter=1000</em>, <em>learn_rate=1e-07</em>, <em>regularization=0.5</em>, <em>convergence_tol=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">metric_learn.lmnn._base_LMNN</span></code></p>
+<dl class="method">
+<dt id="metric_learn.lmnn.python_LMNN.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>labels</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.lmnn.python_LMNN.metric">
+<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.metric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.lmnn.python_LMNN.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.lmnn.python_LMNN.transformer">
+<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.transformer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<div class="section" id="example-code">
+<h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">LMNN</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+
+<span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
+
+<span class="n">lmnn</span> <span class="o">=</span> <span class="n">LMNN</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+<span class="n">lmnn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If a recent version of the Shogun Python modular (<code class="docutils literal"><span class="pre">modshogun</span></code>) library
+is available, the LMNN implementation will use the fast C++ version from
+there. Otherwise, the included pure-Python version will be used.
+The two implementations differ slightly, and the C++ version is more complete.</p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://papers.nips.cc/paper/2795-distance-metric-learning-for-large-margin-nearest-neighbor-classification">Distance Metric Learning for Large Margin Nearest Neighbor Classification</a> Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="metric_learn.lsml.html" class="btn btn-neutral float-right" title="Least Squares Metric Learning (LSML)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="metric_learn.lfda.html" class="btn btn-neutral" title="Local Fisher Discriminant Analysis (LFDA)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, CJ Carey and Yuan Tang.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
