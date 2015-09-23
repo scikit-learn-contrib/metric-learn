@@ -31,7 +31,7 @@ Run ``python setup.py test`` to run all tests.
 
 **Usage**
 
-For full usage examples, see the ``test`` and ``examples`` directories.
+For full usage examples, see the `sphinx documentation`_.
 
 Each metric is a subclass of ``BaseMetricLearner``, which provides
 default implementations for the methods ``metric``, ``transformer``, and
@@ -45,7 +45,7 @@ expressed ``(x-y).dot(M).dot(x-y)``.
 
 In the same scenario, ``foo.transformer()`` returns a ``d`` by ``d``
 matrix ``L`` such that a vector ``x`` can be represented in the learned
-space as the vector ``L.dot(x)``.
+space as the vector ``x.dot(L.T)``.
 
 For convenience, the function ``foo.transform(X)`` is provided for
 converting a matrix of points (``X``) into the learned space, in which
@@ -63,6 +63,8 @@ more complete.
 - implement the rest of the methods on `this site`_
 
 .. _this site: http://www.cs.cmu.edu/~liuy/distlearn.htm
+
+.. _sphinx documentation: http://all-umass.github.io/metric-learn/
 
 .. |Travis-CI Build Status| image:: https://api.travis-ci.org/all-umass/metric-learn.svg?branch=master
    :target: https://travis-ci.org/all-umass/metric-learn
