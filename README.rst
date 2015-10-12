@@ -1,4 +1,4 @@
-|Travis-CI Build Status| |License| |PyPI version|
+|Travis-CI Build Status| |License| |PyPI version| |PyPI downloads|
 
 metric-learn
 =============
@@ -72,3 +72,5 @@ more complete.
    :target: http://badges.mit-license.org
 .. |PyPI version| image:: https://badge.fury.io/py/metric-learn.svg
    :target: http://badge.fury.io/py/metric-learn
+.. |PyPI downloads| image:: https://img.shields.io/pypi/dm/metric-learn.svg
+   :target: https://pypi.python.org/pypi/metric-learn/
