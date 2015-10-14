@@ -58,11 +58,6 @@ is available, the LMNN implementation will use the fast C++ version from
 there. The two implementations differ slightly, and the C++ version is
 more complete.
 
-**TODO**
-
-- implement the rest of the methods on `this site`_
-
-.. _this site: http://www.cs.cmu.edu/~liuy/distlearn.htm
 
 .. _sphinx documentation: http://all-umass.github.io/metric-learn/
 
