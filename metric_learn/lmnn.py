@@ -216,10 +216,10 @@ def _count_edges(act1, act2, impostors, targets):
   imp = impostors[1,act2]
   c.update(zip(imp, targets[imp]))
   if c:
-    active_pairs = np.array(c.keys())
+    active_pairs = np.array(list(c.keys()))
   else:
     active_pairs = np.empty((0,2), dtype=int)
-  return active_pairs, np.array(c.values())
+  return active_pairs, np.array(list(c.values()))
 
 
 def _sum_outer_products(data, a_inds, b_inds, weights=None):
