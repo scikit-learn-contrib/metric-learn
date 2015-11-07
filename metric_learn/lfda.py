@@ -10,11 +10,12 @@ where one ore more classes consist of separate clusters in input space.
 The core optimization problem of LFDA is solved as a generalized
 eigenvalue problem.
 """
-from __future__ import division
+from __future__ import division, absolute_import
 import numpy as np
 import scipy
+from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner
 
 
 class LFDA(BaseMetricLearner):

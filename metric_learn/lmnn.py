@@ -9,10 +9,12 @@ This algorithm makes no assumptions about the distribution of the data.
 """
 #TODO: periodic recalculation of impostors, PCA initialization
 
+from __future__ import print_function, absolute_import
 import numpy as np
 from collections import Counter
+from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner
 
 
 # commonality between LMNN implementations
@@ -134,7 +136,7 @@ class python_LMNN(_base_LMNN):
       delta_obj = objective - objective_old
 
       if verbose:
-        print it, objective, delta_obj, total_active, learn_rate
+        print(it, objective, delta_obj, total_active, learn_rate)
 
       # update step size
       if delta_obj > 0:
@@ -152,11 +154,11 @@ class python_LMNN(_base_LMNN):
       # check for convergence
       if it > min_iter and abs(delta_obj) < convergence_tol:
         if verbose:
-          print "LMNN converged with objective", objective
+          print("LMNN converged with objective", objective)
         break
     else:
       if verbose:
-        print "LMNN didn't converge in %(max_iter)d steps." % self.params
+        print("LMNN didn't converge in %(max_iter)d steps." % self.params)
 
     # store the last L
     self.L = L

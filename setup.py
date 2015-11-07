@@ -22,7 +22,8 @@ setup(name='metric-learn',
       install_requires=[
           'numpy',
           'scipy',
-          'scikit-learn'
+          'scikit-learn',
+          'six'
       ],
       extras_require=dict(
           docs=['sphinx', 'numpydoc'],

@@ -3,8 +3,10 @@ Neighborhood Components Analysis (NCA)
 Ported to Python from https://github.com/vomjom/nca
 """
 
+from __future__ import absolute_import
 import numpy as np
-from base_metric import BaseMetricLearner
+from six.moves import xrange
+from .base_metric import BaseMetricLearner
 
 
 class NCA(BaseMetricLearner):

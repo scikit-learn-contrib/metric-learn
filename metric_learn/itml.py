@@ -11,9 +11,11 @@ Unlike some other methods, ITML does not rely on an eigenvalue computation
 or semi-definite programming.
 """
 
+from __future__ import print_function, absolute_import
 import numpy as np
+from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner
 
 
 class ITML(BaseMetricLearner):
@@ -108,9 +110,9 @@ class ITML(BaseMetricLearner):
         break
       lambdaold = _lambda.copy()
       if verbose:
-        print 'itml iter: %d, conv = %f' % (it, conv)
+        print('itml iter: %d, conv = %f' % (it, conv))
     if verbose:
-      print 'itml converged at iter: %d, conv = %f' % (it, conv)
+      print('itml converged at iter: %d, conv = %f' % (it, conv))
     return self
 
   def metric(self):

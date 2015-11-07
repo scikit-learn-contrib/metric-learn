@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 import scipy.sparse
+from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal

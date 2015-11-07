@@ -9,9 +9,12 @@ subsets of points that are known to belong to the same class.
 
 'Learning distance functions using equivalence relations', ICML 2003
 """
+
+from __future__ import absolute_import
 import numpy as np
 import random
-from base_metric import BaseMetricLearner
+from six.moves import xrange
+from .base_metric import BaseMetricLearner
 
 
 class RCA(BaseMetricLearner):

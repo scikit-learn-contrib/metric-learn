@@ -7,10 +7,12 @@ Adapted from https://gist.github.com/kcarnold/5439917
 Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
 """
 
-from random import choice
+from __future__ import print_function, absolute_import
 import numpy as np
 import scipy.linalg
-from base_metric import BaseMetricLearner
+from random import choice
+from six.moves import xrange
+from .base_metric import BaseMetricLearner
 
 
 class LSML(BaseMetricLearner):
@@ -63,14 +65,14 @@ class LSML(BaseMetricLearner):
     s_best = self._total_loss(self.M, prior_inv)
     step_sizes = np.logspace(-10, 0, 10)
     if verbose:
-      print 'initial loss', s_best
+      print('initial loss', s_best)
     for it in xrange(1, self.max_iter+1):
       grad = self._gradient(self.M, prior_inv)
       grad_norm = scipy.linalg.norm(grad)
       if grad_norm < self.tol:
         break
       if verbose:
-        print 'gradient norm', grad_norm
+        print('gradient norm', grad_norm)
       M_best = None
       for step_size in step_sizes:
         step_size /= grad_norm
@@ -83,12 +85,12 @@ class LSML(BaseMetricLearner):
           s_best = cur_s
           M_best = new_metric
       if verbose:
-        print 'iter', it, 'cost', s_best, 'best step', l_best * grad_norm
+        print('iter', it, 'cost', s_best, 'best step', l_best * grad_norm)
       if M_best is None:
         break
       self.M = M_best
     else:
-      print "Didn't converge after %d iterations. Final loss: %f" % (it, s_best)
+      print("Didn't converge after", it, "iterations. Final loss:", s_best)
     return self
 
   def _comparison_loss(self, metric):

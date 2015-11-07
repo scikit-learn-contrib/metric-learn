@@ -8,12 +8,13 @@ Adapted from https://gist.github.com/kcarnold/5439945
 Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf
 """
 
-from random import choice
+from __future__ import absolute_import
 import numpy as np
+from random import choice
+from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
-from scipy.sparse.csgraph import laplacian
-from base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner
 
 
 class SDML(BaseMetricLearner):
