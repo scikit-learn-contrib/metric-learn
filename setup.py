@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-version = "0.1.1"
+version = "0.2.0"
 setup(name='metric-learn',
       version=version,
       description='Python implementations of metric learning algorithms',
