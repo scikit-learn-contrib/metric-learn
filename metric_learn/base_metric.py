@@ -46,8 +46,8 @@ class BaseMetricLearner(object):
     L = self.transformer()
     return X.dot(L.T)
 
-    def get_params(self, deep=False):
-        return self.params
+  def get_params(self, deep=False):
+    return self.params
     
-    def set_params(self, **kwarg):
-        self.params = {**kwarg, **self.params}
+  def set_params(self, **kwarg):
+    self.params = {**kwarg, **self.params}
