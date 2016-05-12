@@ -112,6 +112,7 @@ class LFDA(BaseMetricLearner):
        vecs, _ = np.linalg.qr(vecs)
 
     self._transformer = vecs.T
+    return self
 
 
 def _sum_outer(x):
