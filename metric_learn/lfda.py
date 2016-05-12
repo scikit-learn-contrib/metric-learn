@@ -34,9 +34,12 @@ class LFDA(BaseMetricLearner):
     '''
     if metric not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid metric: %r' % metric)
-    self.dim = dim
-    self.metric = metric
-    self.k = k
+    
+    self.params = {
+      'dim': dim,
+      'metric': metric,
+      'k': k,
+    }
 
   def transformer(self):
     return self._transformer
@@ -48,12 +51,12 @@ class LFDA(BaseMetricLearner):
     unique_classes, Y = np.unique(Y, return_inverse=True)
     num_classes = len(unique_classes)
 
-    if self.dim is None:
-      self.dim = d
-    elif not 0 < self.dim <= d:
+    if self.params['dim'] is None:
+      self.params['dim'] = d
+    elif not 0 < self.params['dim'] <= d:
       raise ValueError('Invalid embedding dimension, must be in [1,%d]' % d)
 
-    if not 0 < self.k < d:
+    if not 0 < self.params['k'] < d:
       raise ValueError('Invalid k, must be in [0,%d]' % (d-1))
 
     return X, Y, num_classes, n, d
@@ -74,7 +77,7 @@ class LFDA(BaseMetricLearner):
       # classwise affinity matrix
       dist = pairwise_distances(Xc, metric='l2', squared=True)
       # distances to k-th nearest neighbor
-      k = min(self.k, nc-1)
+      k = min(self.params['k'], nc-1)
       sigma = np.sqrt(np.partition(dist, k, axis=0)[:,k])
 
       local_scale = np.outer(sigma, sigma)
@@ -94,18 +97,18 @@ class LFDA(BaseMetricLearner):
     tSw += tSw.T
     tSw /= 2
 
-    if self.dim == d:
+    if self.params['dim'] == d:
       vals, vecs = scipy.linalg.eigh(tSb, tSw)
     else:
-      vals, vecs = scipy.sparse.linalg.eigsh(tSb, k=self.dim, M=tSw, which='LA')
+      vals, vecs = scipy.sparse.linalg.eigsh(tSb, k=self.params['dim'], M=tSw, which='LA')
 
-    order = np.argsort(-vals)[:self.dim]
+    order = np.argsort(-vals)[:self.params['dim']]
     vals = vals[order]
     vecs = vecs[:,order]
 
-    if self.metric == 'weighted':
+    if self.params['metric'] == 'weighted':
        vecs *= np.sqrt(vals)
-    elif self.metric == 'orthonormalized':
+    elif self.params['metric'] == 'orthonormalized':
        vecs, _ = np.linalg.qr(vecs)
 
     self._transformer = vecs.T
