@@ -11,8 +11,10 @@ from .base_metric import BaseMetricLearner
 
 class NCA(BaseMetricLearner):
   def __init__(self, max_iter=100, learning_rate=0.01):
-    self.max_iter = max_iter
-    self.learning_rate = learning_rate
+    self.params = {
+      'max_iter': max_iter,
+      'learning_rate': learning_rate,
+    }
     self.A = None
 
   def transformer(self):
@@ -32,7 +34,7 @@ class NCA(BaseMetricLearner):
     dX = X[:,None] - X[None]  # shape (n, n, d)
     tmp = np.einsum('...i,...j->...ij', dX, dX)  # shape (n, n, d, d)
     masks = labels[:,None] == labels[None]
-    for it in xrange(self.max_iter):
+    for it in xrange(self.params['max_iter']):
       for i, label in enumerate(labels):
         mask = masks[i]
         Ax = A.dot(X.T).T  # shape (n, d)
@@ -43,7 +45,7 @@ class NCA(BaseMetricLearner):
 
         t = softmax[:, None, None] * tmp[i]  # shape (n, d, d)
         d = softmax[mask].sum() * t.sum(axis=0) - t[mask].sum(axis=0)
-        A += self.learning_rate * A.dot(d)
+        A += self.params['learning_rate'] * A.dot(d)
 
     self.X = X
     self.A = A
