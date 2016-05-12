@@ -50,4 +50,4 @@ class BaseMetricLearner(object):
     return self.params
     
   def set_params(self, **kwarg):
-    self.params = {**kwarg, **self.params}
+    self.params = {**self.params, **kwarg}
