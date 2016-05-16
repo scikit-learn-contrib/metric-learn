@@ -209,6 +209,31 @@ or semi-definite programming.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="metric_learn.itml.ITML.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this metric learner.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<blockquote>
+<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
+scikit-learn has this on BaseEstimator.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : mapping of string to any</p>
+<blockquote class="last">
+<div><p>Parameter names mapped to their values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="metric_learn.itml.ITML.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.metric" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -217,6 +242,21 @@ or semi-definite programming.</p>
 <dt id="metric_learn.itml.ITML.prepare_constraints">
 <em class="property">classmethod </em><code class="descname">prepare_constraints</code><span class="sig-paren">(</span><em>labels</em>, <em>num_points</em>, <em>num_constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.prepare_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.prepare_constraints" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.itml.ITML.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this metric learner.</p>
+<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="metric_learn.itml.ITML.transform">
@@ -261,13 +301,13 @@ or semi-definite programming.</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">ITML</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
 
 <span class="n">itml</span> <span class="o">=</span> <span class="n">ITML</span><span class="p">()</span>
 

@@ -186,6 +186,31 @@ Y: (n,) array-like of class labels</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="metric_learn.lfda.LFDA.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lfda.LFDA.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this metric learner.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<blockquote>
+<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
+scikit-learn has this on BaseEstimator.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : mapping of string to any</p>
+<blockquote class="last">
+<div><p>Parameter names mapped to their values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="metric_learn.lfda.LFDA.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lfda.LFDA.metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
@@ -196,6 +221,21 @@ Y: (n,) array-like of class labels</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>M</strong> : (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.lfda.LFDA.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lfda.LFDA.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this metric learner.</p>
+<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
 </tr>
 </tbody>
 </table>
@@ -234,13 +274,13 @@ Y: (n,) array-like of class labels</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">LFDA</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
 
 <span class="n">lfda</span> <span class="o">=</span> <span class="n">LFDA</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">lfda</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>

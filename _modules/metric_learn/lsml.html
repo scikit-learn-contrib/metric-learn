@@ -137,7 +137,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.lsml</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Liu et al.</span>
 <span class="sd">&quot;Metric Learning from Relative Comparisons by Minimizing Squared Residual&quot;.</span>
 <span class="sd">ICDM 2012.</span>
@@ -146,10 +146,12 @@
 <span class="sd">Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.linalg</span>
-<span class="kn">from</span> <span class="nn">base_metric</span> <span class="kn">import</span> <span class="n">BaseMetricLearner</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">xrange</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="kn">import</span> <span class="n">BaseMetricLearner</span>
 
 
 <div class="viewcode-block" id="LSML"><a class="viewcode-back" href="../../metric_learn.lsml.html#metric_learn.lsml.LSML">[docs]</a><span class="k">class</span> <span class="nc">LSML</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
@@ -161,8 +163,10 @@
 <span class="sd">    tol : float, optional</span>
 <span class="sd">    max_iter : int, optional</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s1">&#39;tol&#39;</span><span class="p">:</span> <span class="n">tol</span><span class="p">,</span>
+      <span class="s1">&#39;max_iter&#39;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">,</span>
+    <span class="p">}</span>
 
   <span class="k">def</span> <span class="nf">_prepare_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
@@ -172,7 +176,7 @@
       <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">constraints</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">weights</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c"># weights must sum to 1</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>  <span class="c1"># weights must sum to 1</span>
     <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -202,14 +206,15 @@
     <span class="n">s_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_loss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">)</span>
     <span class="n">step_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-      <span class="k">print</span> <span class="s">&#39;initial loss&#39;</span><span class="p">,</span> <span class="n">s_best</span>
-    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+      <span class="k">print</span><span class="p">(</span><span class="s1">&#39;initial loss&#39;</span><span class="p">,</span> <span class="n">s_best</span><span class="p">)</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;tol&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_iter&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
       <span class="n">grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">prior_inv</span><span class="p">)</span>
       <span class="n">grad_norm</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">grad</span><span class="p">)</span>
-      <span class="k">if</span> <span class="n">grad_norm</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">grad_norm</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
         <span class="k">break</span>
       <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&#39;gradient norm&#39;</span><span class="p">,</span> <span class="n">grad_norm</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;gradient norm&#39;</span><span class="p">,</span> <span class="n">grad_norm</span><span class="p">)</span>
       <span class="n">M_best</span> <span class="o">=</span> <span class="bp">None</span>
       <span class="k">for</span> <span class="n">step_size</span> <span class="ow">in</span> <span class="n">step_sizes</span><span class="p">:</span>
         <span class="n">step_size</span> <span class="o">/=</span> <span class="n">grad_norm</span>
@@ -222,12 +227,12 @@
           <span class="n">s_best</span> <span class="o">=</span> <span class="n">cur_s</span>
           <span class="n">M_best</span> <span class="o">=</span> <span class="n">new_metric</span>
       <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&#39;iter&#39;</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="s">&#39;cost&#39;</span><span class="p">,</span> <span class="n">s_best</span><span class="p">,</span> <span class="s">&#39;best step&#39;</span><span class="p">,</span> <span class="n">l_best</span> <span class="o">*</span> <span class="n">grad_norm</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;iter&#39;</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="s1">&#39;cost&#39;</span><span class="p">,</span> <span class="n">s_best</span><span class="p">,</span> <span class="s1">&#39;best step&#39;</span><span class="p">,</span> <span class="n">l_best</span> <span class="o">*</span> <span class="n">grad_norm</span><span class="p">)</span>
       <span class="k">if</span> <span class="n">M_best</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="k">break</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">M_best</span>
     <span class="k">else</span><span class="p">:</span>
-      <span class="k">print</span> <span class="s">&quot;Didn&#39;t converge after </span><span class="si">%d</span><span class="s"> iterations. Final loss: </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">s_best</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Didn&#39;t converge after&quot;</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="s2">&quot;iterations. Final loss:&quot;</span><span class="p">,</span> <span class="n">s_best</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </div>
   <span class="k">def</span> <span class="nf">_comparison_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">):</span>
@@ -246,7 +251,7 @@
     <span class="n">dabs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vab</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vab</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">dcds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vcd</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vcd</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">violations</span> <span class="o">=</span> <span class="n">dabs</span> <span class="o">&gt;</span> <span class="n">dcds</span>
-    <span class="c"># TODO: vectorize</span>
+    <span class="c1"># TODO: vectorize</span>
     <span class="k">for</span> <span class="n">vab</span><span class="p">,</span> <span class="n">dab</span><span class="p">,</span> <span class="n">vcd</span><span class="p">,</span> <span class="n">dcd</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vab</span><span class="p">[</span><span class="n">violations</span><span class="p">],</span> <span class="n">dabs</span><span class="p">[</span><span class="n">violations</span><span class="p">],</span>
                                   <span class="bp">self</span><span class="o">.</span><span class="n">vcd</span><span class="p">[</span><span class="n">violations</span><span class="p">],</span> <span class="n">dcds</span><span class="p">[</span><span class="n">violations</span><span class="p">]):</span>
       <span class="n">dMetric</span> <span class="o">+=</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dcd</span><span class="o">/</span><span class="n">dab</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">vab</span><span class="p">,</span> <span class="n">vab</span><span class="p">)</span> <span class="o">+</span>

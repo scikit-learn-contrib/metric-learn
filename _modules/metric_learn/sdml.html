@@ -137,7 +137,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.sdml</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Qi et al.</span>
 <span class="sd">An efficient sparse metric learning in high-dimensional space via</span>
 <span class="sd">L1-penalized log-determinant regularization.</span>
@@ -147,12 +147,13 @@
 <span class="sd">Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">laplacian</span>
 <span class="kn">from</span> <span class="nn">sklearn.covariance</span> <span class="kn">import</span> <span class="n">graph_lasso</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">pinvh</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">laplacian</span>
-<span class="kn">from</span> <span class="nn">base_metric</span> <span class="kn">import</span> <span class="n">BaseMetricLearner</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="kn">import</span> <span class="n">BaseMetricLearner</span>
 
 
 <div class="viewcode-block" id="SDML"><a class="viewcode-back" href="../../metric_learn.sdml.html#metric_learn.sdml.SDML">[docs]</a><span class="k">class</span> <span class="nc">SDML</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
@@ -160,15 +161,18 @@
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    balance_param: trade off between sparsity and M0 prior</span>
 <span class="sd">    sparsity_param: trade off between optimizer and sparseness (see graph_lasso)</span>
+<span class="sd">    use_cov: controls prior matrix, will use the identity if use_cov=False</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">balance_param</span> <span class="o">=</span> <span class="n">balance_param</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">sparsity_param</span> <span class="o">=</span> <span class="n">sparsity_param</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">use_cov</span> <span class="o">=</span> <span class="n">use_cov</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s1">&#39;balance_param&#39;</span><span class="p">:</span> <span class="n">balance_param</span><span class="p">,</span>
+      <span class="s1">&#39;sparsity_param&#39;</span><span class="p">:</span> <span class="n">sparsity_param</span><span class="p">,</span>
+      <span class="s1">&#39;use_cov&#39;</span><span class="p">:</span> <span class="n">use_cov</span><span class="p">,</span>
+    <span class="p">}</span>
 
   <span class="k">def</span> <span class="nf">_prepare_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
-    <span class="c"># set up prior M</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cov</span><span class="p">:</span>
+    <span class="c1"># set up prior M</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;use_cov&#39;</span><span class="p">]:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -184,11 +188,12 @@
 <span class="sd">    W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
-    <span class="n">P</span> <span class="o">=</span> <span class="n">pinvh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">balance_param</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_matrix</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">pinvh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;balance_param&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_matrix</span>
     <span class="n">emp_cov</span> <span class="o">=</span> <span class="n">pinvh</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
-    <span class="c"># hack: ensure positive semidefinite</span>
+    <span class="c1"># hack: ensure positive semidefinite</span>
     <span class="n">emp_cov</span> <span class="o">=</span> <span class="n">emp_cov</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">emp_cov</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">graph_lasso</span><span class="p">(</span><span class="n">emp_cov</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sparsity_param</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">graph_lasso</span><span class="p">(</span><span class="n">emp_cov</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;sparsity_param&#39;</span><span class="p">],</span>
+                            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span>
 </div>
   <span class="nd">@classmethod</span>
@@ -201,7 +206,7 @@
     <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_points</span><span class="p">,</span><span class="n">num_points</span><span class="p">))</span>
     <span class="n">W</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">W</span><span class="p">[</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="c"># make W symmetric</span>
+    <span class="c1"># make W symmetric</span>
     <span class="n">W</span><span class="p">[</span><span class="n">b</span><span class="p">,</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">W</span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">return</span> <span class="n">W</span></div></div>

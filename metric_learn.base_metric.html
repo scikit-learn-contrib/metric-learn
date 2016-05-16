@@ -161,6 +161,31 @@
 <em class="property">class </em><code class="descclassname">metric_learn.base_metric.</code><code class="descname">BaseMetricLearner</code><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
+<dt id="metric_learn.base_metric.BaseMetricLearner.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this metric learner.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<blockquote>
+<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
+scikit-learn has this on BaseEstimator.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : mapping of string to any</p>
+<blockquote class="last">
+<div><p>Parameter names mapped to their values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="metric_learn.base_metric.BaseMetricLearner.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
@@ -171,6 +196,21 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>M</strong> : (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.base_metric.BaseMetricLearner.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this metric learner.</p>
+<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
 </tr>
 </tbody>
 </table>

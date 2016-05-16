@@ -137,12 +137,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.base_metric</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">inv</span><span class="p">,</span><span class="n">cholesky</span>
+<span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">inv</span><span class="p">,</span><span class="n">cholesky</span>
 
 
 <div class="viewcode-block" id="BaseMetricLearner"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner">[docs]</a><span class="k">class</span> <span class="nc">BaseMetricLearner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;BaseMetricLearner should not be instantiated&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;BaseMetricLearner should not be instantiated&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BaseMetricLearner.metric"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Computes the Mahalanobis matrix from the transformation matrix.</span>
@@ -183,7 +183,35 @@
     <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
       <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
     <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div></div>
+    <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BaseMetricLearner.get_params"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner.get_params">[docs]</a>  <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get parameters for this metric learner.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    deep: boolean, optional</span>
+<span class="sd">        @WARNING doesn&#39;t do anything, only exists because</span>
+<span class="sd">        scikit-learn has this on BaseEstimator.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    params : mapping of string to any</span>
+<span class="sd">        Parameter names mapped to their values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+</div>
+<div class="viewcode-block" id="BaseMetricLearner.set_params"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner.set_params">[docs]</a>  <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set the parameters of this metric learner.</span>
+
+<span class="sd">    Overwrites any default parameters or parameters specified in constructor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    self</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwarg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span></div></div>
 </pre></div>
 
            </div>
