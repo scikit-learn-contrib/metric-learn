@@ -47,7 +47,7 @@ class BaseMetricLearner(object):
     return X.dot(L.T)
 
   def get_params(self, deep=False):
-    """Get parameters for this estimator.
+    """Get parameters for this metric learner.
     
     Parameters
     ----------
@@ -62,7 +62,7 @@ class BaseMetricLearner(object):
     return self.params
     
   def set_params(self, **kwarg):
-    """Set the parameters of this estimator.
+    """Set the parameters of this metric learner.
     
     Overwrites any default parameters or parameters specified in constructor.
     
