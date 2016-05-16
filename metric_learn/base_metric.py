@@ -48,26 +48,28 @@ class BaseMetricLearner(object):
 
   def get_params(self, deep=False):
     """Get parameters for this metric learner.
-    
+
     Parameters
     ----------
     deep: boolean, optional
-        @WARNING doesn't do anything, only exists because scikit-learn has this on BaseEstimator.
-    
+        @WARNING doesn't do anything, only exists because
+        scikit-learn has this on BaseEstimator.
+
     Returns
     -------
     params : mapping of string to any
         Parameter names mapped to their values.
     """
     return self.params
-    
+
   def set_params(self, **kwarg):
     """Set the parameters of this metric learner.
-    
+
     Overwrites any default parameters or parameters specified in constructor.
-    
+
     Returns
     -------
     self
     """
     self.params.update(kwarg)
+    return self

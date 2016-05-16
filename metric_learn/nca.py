@@ -34,6 +34,7 @@ class NCA(BaseMetricLearner):
     dX = X[:,None] - X[None]  # shape (n, n, d)
     tmp = np.einsum('...i,...j->...ij', dX, dX)  # shape (n, n, d, d)
     masks = labels[:,None] == labels[None]
+    learning_rate = self.params['learning_rate']
     for it in xrange(self.params['max_iter']):
       for i, label in enumerate(labels):
         mask = masks[i]
@@ -45,7 +46,7 @@ class NCA(BaseMetricLearner):
 
         t = softmax[:, None, None] * tmp[i]  # shape (n, d, d)
         d = softmax[mask].sum() * t.sum(axis=0) - t[mask].sum(axis=0)
-        A += self.params['learning_rate'] * A.dot(d)
+        A += learning_rate * A.dot(d)
 
     self.X = X
     self.A = A

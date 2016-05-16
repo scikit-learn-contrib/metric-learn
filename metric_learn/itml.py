@@ -73,6 +73,7 @@ class ITML(BaseMetricLearner):
     """
     a,b,c,d = self._process_inputs(X, constraints, bounds, A0)
     gamma = self.params['gamma']
+    conv_thresh = self.params['convergence_threshold']
     num_pos = len(a)
     num_neg = len(c)
     _lambda = np.zeros(num_pos + num_neg)
@@ -108,7 +109,7 @@ class ITML(BaseMetricLearner):
         conv = np.inf
         break
       conv = np.abs(lambdaold - _lambda).sum() / normsum
-      if conv < self.params['convergence_threshold']:
+      if conv < conv_thresh:
         break
       lambdaold = _lambda.copy()
       if verbose:

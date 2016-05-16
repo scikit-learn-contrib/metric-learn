@@ -47,9 +47,9 @@ class python_LMNN(_base_LMNN):
     self.X = X
     self.L = np.eye(X.shape[1])
     required_k = np.bincount(self.label_inds).min()
-    k = self.params['k']
-    assert k <= required_k, ('not enough class labels for specified k' +
-                             ' (smallest class has %d)' % required_k)
+    assert self.params['k'] <= required_k, (
+        'not enough class labels for specified k'
+        ' (smallest class has %d)' % required_k)
 
   def fit(self, X, labels, verbose=False):
     k = self.params['k']

@@ -68,10 +68,11 @@ class LSML(BaseMetricLearner):
     step_sizes = np.logspace(-10, 0, 10)
     if verbose:
       print('initial loss', s_best)
+    tol = self.params['tol']
     for it in xrange(1, self.params['max_iter']+1):
       grad = self._gradient(self.M, prior_inv)
       grad_norm = scipy.linalg.norm(grad)
-      if grad_norm < self.params['tol']:
+      if grad_norm < tol:
         break
       if verbose:
         print('gradient norm', grad_norm)

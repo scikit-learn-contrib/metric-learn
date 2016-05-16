@@ -34,7 +34,7 @@ class LFDA(BaseMetricLearner):
     '''
     if metric not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid metric: %r' % metric)
-    
+
     self.params = {
       'dim': dim,
       'metric': metric,
@@ -100,7 +100,8 @@ class LFDA(BaseMetricLearner):
     if self.params['dim'] == d:
       vals, vecs = scipy.linalg.eigh(tSb, tSw)
     else:
-      vals, vecs = scipy.sparse.linalg.eigsh(tSb, k=self.params['dim'], M=tSw, which='LA')
+      vals, vecs = scipy.sparse.linalg.eigsh(tSb, k=self.params['dim'], M=tSw,
+                                             which='LA')
 
     order = np.argsort(-vals)[:self.params['dim']]
     vals = vals[order]

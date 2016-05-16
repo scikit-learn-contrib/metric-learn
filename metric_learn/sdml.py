@@ -22,6 +22,7 @@ class SDML(BaseMetricLearner):
     '''
     balance_param: trade off between sparsity and M0 prior
     sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
+    use_cov: controls prior matrix, will use the identity if use_cov=False
     '''
     self.params = {
       'balance_param': balance_param,
@@ -52,7 +53,8 @@ class SDML(BaseMetricLearner):
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
-    self.M, _ = graph_lasso(emp_cov, self.params['sparsity_param'], verbose=verbose)
+    self.M, _ = graph_lasso(emp_cov, self.params['sparsity_param'],
+                            verbose=verbose)
     return self
 
   @classmethod
