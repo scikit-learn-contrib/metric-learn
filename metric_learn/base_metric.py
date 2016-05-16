@@ -70,4 +70,4 @@ class BaseMetricLearner(object):
     -------
     self
     """
-    self.params = {**self.params, **kwarg}
+    self.params.update(kwarg)
