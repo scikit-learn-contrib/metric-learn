@@ -23,14 +23,16 @@ class SDML(BaseMetricLearner):
     balance_param: trade off between sparsity and M0 prior
     sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
     '''
-    self.balance_param = balance_param
-    self.sparsity_param = sparsity_param
-    self.use_cov = use_cov
+    self.params = {
+      'balance_param': balance_param,
+      'sparsity_param': sparsity_param,
+      'use_cov': use_cov,
+    }
 
   def _prepare_inputs(self, X, W):
     self.X = X
     # set up prior M
-    if self.use_cov:
+    if self.params['use_cov']:
       self.M = np.cov(X.T)
     else:
       self.M = np.identity(X.shape[1])
@@ -46,11 +48,11 @@ class SDML(BaseMetricLearner):
     W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.
     """
     self._prepare_inputs(X, W)
-    P = pinvh(self.M) + self.balance_param * self.loss_matrix
+    P = pinvh(self.M) + self.params['balance_param'] * self.loss_matrix
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
-    self.M, _ = graph_lasso(emp_cov, self.sparsity_param, verbose=verbose)
+    self.M, _ = graph_lasso(emp_cov, self.params['sparsity_param'], verbose=verbose)
     return self
 
   @classmethod
