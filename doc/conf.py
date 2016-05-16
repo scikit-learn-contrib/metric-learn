@@ -17,8 +17,8 @@ master_doc = 'index'
 project = u'metric-learn'
 copyright = u'2015, CJ Carey and Yuan Tang'
 author = u'CJ Carey and Yuan Tang'
-version = '0.1.0'
-release = '0.1.0'
+version = '0.2.1'
+release = '0.2.1'
 language = 'en'
 
 exclude_patterns = ['_build']
