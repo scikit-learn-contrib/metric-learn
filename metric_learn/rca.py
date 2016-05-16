@@ -27,7 +27,9 @@ class RCA(BaseMetricLearner):
     dim : int, optional
         embedding dimension (default: original dimension of data)
     """
-    self.dim = dim
+    self.params = {
+      'dim': dim,
+    }
 
   def transformer(self):
     return self._transformer
@@ -37,9 +39,9 @@ class RCA(BaseMetricLearner):
     self.X = X
     n, d = X.shape
 
-    if self.dim is None:
-      self.dim = d
-    elif not 0 < self.dim <= d:
+    if self.params['dim'] is None:
+      self.params['dim'] = d
+    elif not 0 < self.params['dim'] <= d:
       raise ValueError('Invalid embedding dimension, must be in [1,%d]' % d)
 
     Y = np.asanyarray(Y)
@@ -75,11 +77,11 @@ class RCA(BaseMetricLearner):
     inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
 
     # Fisher Linear Discriminant projection
-    if self.dim < d:
+    if self.params['dim'] < d:
       total_cov = np.cov(data[chunk_mask], rowvar=0)
       tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
       vals, vecs = np.linalg.eig(tmp)
-      inds = np.argsort(vals)[:self.dim]
+      inds = np.argsort(vals)[:self.params['dim']]
       A = vecs[:,inds]
       inner_cov = A.T.dot(inner_cov).dot(A)
       self._transformer = _inv_sqrtm(inner_cov).dot(A.T)

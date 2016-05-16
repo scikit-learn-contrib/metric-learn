@@ -24,8 +24,10 @@ class LSML(BaseMetricLearner):
     tol : float, optional
     max_iter : int, optional
     """
-    self.tol = tol
-    self.max_iter = max_iter
+    self.params = {
+      'tol': tol,
+      'max_iter': max_iter,
+    }
 
   def _prepare_inputs(self, X, constraints, weights, prior):
     self.X = X
@@ -66,10 +68,10 @@ class LSML(BaseMetricLearner):
     step_sizes = np.logspace(-10, 0, 10)
     if verbose:
       print('initial loss', s_best)
-    for it in xrange(1, self.max_iter+1):
+    for it in xrange(1, self.params['max_iter']+1):
       grad = self._gradient(self.M, prior_inv)
       grad_norm = scipy.linalg.norm(grad)
-      if grad_norm < self.tol:
+      if grad_norm < self.params['tol']:
         break
       if verbose:
         print('gradient norm', grad_norm)

@@ -30,9 +30,11 @@ class ITML(BaseMetricLearner):
     max_iters : int, optional
     convergence_threshold : float, optional
     """
-    self.gamma = gamma
-    self.max_iters = max_iters
-    self.convergence_threshold = convergence_threshold
+    self.params = {
+      'gamma': gamma,
+      'max_iters': max_iters,
+      'convergence_threshold': convergence_threshold,
+    }
 
   def _process_inputs(self, X, constraints, bounds, A0):
     self.X = X
@@ -70,7 +72,7 @@ class ITML(BaseMetricLearner):
         initial regularization matrix, defaults to identity
     """
     a,b,c,d = self._process_inputs(X, constraints, bounds, A0)
-    gamma = self.gamma
+    gamma = self.params['gamma']
     num_pos = len(a)
     num_neg = len(c)
     _lambda = np.zeros(num_pos + num_neg)
@@ -80,7 +82,7 @@ class ITML(BaseMetricLearner):
     neg_bhat = np.zeros(num_neg) + self.bounds[1]
     A = self.A
 
-    for it in xrange(self.max_iters):
+    for it in xrange(self.params['max_iters']):
       # update positives
       vv = self.X[a] - self.X[b]
       for i,v in enumerate(vv):
@@ -106,7 +108,7 @@ class ITML(BaseMetricLearner):
         conv = np.inf
         break
       conv = np.abs(lambdaold - _lambda).sum() / normsum
-      if conv < self.convergence_threshold:
+      if conv < self.params['convergence_threshold']:
         break
       lambdaold = _lambda.copy()
       if verbose:
