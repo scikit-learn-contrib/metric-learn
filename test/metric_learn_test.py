@@ -36,7 +36,7 @@ class TestLSML(MetricTestCase):
     num_constraints = 200
 
     C = LSML.prepare_constraints(self.iris_labels, num_constraints)
-    lsml = LSML().fit(self.iris_points, C, verbose=False)
+    lsml = LSML().fit_constraints(self.iris_points, C, verbose=False)
 
     csep = class_separation(lsml.transform(), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible
@@ -48,7 +48,7 @@ class TestITML(MetricTestCase):
 
     n = self.iris_points.shape[0]
     C = ITML.prepare_constraints(self.iris_labels, n, num_constraints)
-    itml = ITML().fit(self.iris_points, C, verbose=False)
+    itml = ITML().fit_constraints(self.iris_points, C, verbose=False)
 
     csep = class_separation(itml.transform(), self.iris_labels)
     self.assertLess(csep, 0.4)  # it's not great
@@ -79,7 +79,7 @@ class TestSDML(MetricTestCase):
 
     # Test sparse graph inputs.
     for graph in ((W, scipy.sparse.csr_matrix(W))):
-      sdml = SDML().fit(self.iris_points, graph)
+      sdml = SDML().fit_constraints(self.iris_points, graph)
       csep = class_separation(sdml.transform(), self.iris_labels)
       self.assertLess(csep, 0.25)
 
@@ -112,7 +112,7 @@ class TestRCA(MetricTestCase):
     rca = RCA(dim=2)
     chunks = RCA.prepare_constraints(self.iris_labels, num_chunks=30,
                                      chunk_size=2, seed=1234)
-    rca.fit(self.iris_points, chunks)
+    rca.fit_constraints(self.iris_points, chunks)
     csep = class_separation(rca.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
