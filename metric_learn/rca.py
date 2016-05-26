@@ -19,16 +19,22 @@ from .base_metric import BaseMetricLearner
 
 class RCA(BaseMetricLearner):
   """Relevant Components Analysis (RCA)"""
-  def __init__(self, dim=None):
+  def __init__(self, dim=None, num_chunks=100, chunk_size=2, seed=None):
     """Initialize the learner.
 
     Parameters
     ----------
     dim : int, optional
         embedding dimension (default: original dimension of data)
+    num_chunks: int, optional
+    chunk_size: int, optional
+    seed: int, optional
     """
     self.params = {
       'dim': dim,
+      'num_chunks': num_chunks,
+      'chunk_size': chunk_size,
+      'seed': seed,
     }
 
   def transformer(self):
@@ -49,7 +55,24 @@ class RCA(BaseMetricLearner):
 
     return X, Y, num_chunks, d
 
-  def fit(self, data, chunks):
+  def fit(self, X, labels):
+    """Create constraints from labels and learn the LSML model.
+    Needs num_constraints specified in constructor.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    labels : (n) data labels
+    """
+    num_chunks = self.params['num_chunks']
+    if num_chunks is None:
+      raise ValueError('You need to specify `num_chunks` before using .fit()')
+
+    C = self.prepare_constraints(labels, num_chunks, self.params['chunk_size'], self.params['seed'])
+    return self.fit_constraints(X, C)
+
+  def fit_constraints(self, data, chunks):
     """Learn the RCA model.
 
     Parameters
@@ -87,6 +110,8 @@ class RCA(BaseMetricLearner):
       self._transformer = _inv_sqrtm(inner_cov).dot(A.T)
     else:
       self._transformer = _inv_sqrtm(inner_cov).T
+
+    return self
 
   @classmethod
   def prepare_constraints(cls, Y, num_chunks=100, chunk_size=2, seed=None):
