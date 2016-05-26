@@ -18,16 +18,20 @@ from .base_metric import BaseMetricLearner
 
 
 class SDML(BaseMetricLearner):
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True, num_constraints=None, verbose=False):
     '''
     balance_param: trade off between sparsity and M0 prior
     sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
     use_cov: controls prior matrix, will use the identity if use_cov=False
+    num_constraints: int, needed for .fit()
+    verbose: bool
     '''
     self.params = {
       'balance_param': balance_param,
       'sparsity_param': sparsity_param,
       'use_cov': use_cov,
+      'num_constraints': num_constraints,
+      'verbose': verbose,
     }
 
   def _prepare_inputs(self, X, W):
@@ -43,7 +47,25 @@ class SDML(BaseMetricLearner):
   def metric(self):
     return self.M
 
-  def fit(self, X, W, verbose=False):
+  def fit(self, X, labels):
+    """Create constraints from labels and learn the SDML model.
+    Needs num_constraints specified in constructor.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    labels : (n) data labels
+    """
+    num_constraints = self.params['num_constraints']
+    if num_constraints is None:
+      raise ValueError('You need to specify `num_constraints` before using .fit()')
+
+    W = self.prepare_constraints(labels, X.shape[0], num_constraints)
+    self.fit_constraints(X, W, verbose=self.params['verbose'])
+    return self
+
+  def fit_constraints(self, X, W, verbose=False):
     """
     X: data matrix, (n x d)
     W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.
