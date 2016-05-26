@@ -62,8 +62,7 @@ class SDML(BaseMetricLearner):
       raise ValueError('You need to specify `num_constraints` before using .fit()')
 
     W = self.prepare_constraints(labels, X.shape[0], num_constraints)
-    self.fit_constraints(X, W, verbose=self.params['verbose'])
-    return self
+    return self.fit_constraints(X, W, verbose=self.params['verbose'])
 
   def fit_constraints(self, X, W, verbose=False):
     """

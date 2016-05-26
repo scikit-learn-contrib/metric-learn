@@ -78,8 +78,7 @@ class ITML(BaseMetricLearner):
       raise ValueError('You need to specify `num_constraints` before using .fit()')
 
     C = self.prepare_constraints(labels, X.shape[0], num_constraints)
-    self.fit_constraints(X, C, bounds=self.params['bounds'], A0=self.params['A0'], verbose=self.params['verbose'])
-    return self
+    return self.fit_constraints(X, C, bounds=self.params['bounds'], A0=self.params['A0'], verbose=self.params['verbose'])
 
   def fit_constraints(self, X, constraints, bounds=None, A0=None, verbose=False):
     """Learn the ITML model.
