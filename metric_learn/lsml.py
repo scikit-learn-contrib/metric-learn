@@ -13,31 +13,24 @@ import scipy.linalg
 from random import choice
 from six.moves import xrange
 from .base_metric import BaseMetricLearner
+from .constraints import Constraints
 
 
 class LSML(BaseMetricLearner):
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_constraints=None, weights=None, verbose=False):
+  def __init__(self, tol=1e-3, max_iter=1000, verbose=False):
     """Initialize the learner.
 
     Parameters
     ----------
     tol : float, optional
     max_iter : int, optional
-    prior : (d x d) matrix, optional
-        guess at a metric [default: covariance(X)]
-    num_constraints: int, needed for .fit()
-    weights : (m,) array of floats, optional
-        scale factor for each constraint
     verbose : bool, optional
         if True, prints information while learning
     """
     self.params = {
       'tol': tol,
       'max_iter': max_iter,
-      'prior': prior,
       'verbose': verbose,
-      'num_constraints': num_constraints,
-      'weights': weights,
     }
 
   def _prepare_inputs(self, X, constraints, weights, prior):
@@ -57,24 +50,7 @@ class LSML(BaseMetricLearner):
   def metric(self):
     return self.M
 
-  def fit(self, X, labels):
-    """Create constraints from labels and learn the LSML model.
-    Needs num_constraints specified in constructor.
-
-    Parameters
-    ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    labels : (n) data labels
-    """
-    num_constraints = self.params['num_constraints']
-    if num_constraints is None:
-      raise ValueError('You need to specify `num_constraints` before using .fit()')
-
-    C = self.prepare_constraints(labels, num_constraints)
-    return self.fit_constraints(X, C, weights=self.params['weights'], prior=self.params['prior'], verbose=self.params['verbose'])
-
-  def fit_constraints(self, X, constraints, weights=None, prior=None, verbose=False):
+  def fit(self, X, constraints, weights=None, prior=None):
     """Learn the LSML model.
 
     Parameters
@@ -90,6 +66,7 @@ class LSML(BaseMetricLearner):
     verbose : bool, optional
         if True, prints information while learning
     """
+    verbose = self.params['verbose']
     self._prepare_inputs(X, constraints, weights, prior)
     prior_inv = scipy.linalg.inv(self.M)
     s_best = self._total_loss(self.M, prior_inv)
@@ -148,18 +125,48 @@ class LSML(BaseMetricLearner):
                   (1-np.sqrt(dab/dcd))*np.outer(vcd, vcd))
     return dMetric
 
-  @classmethod
-  def prepare_constraints(cls, labels, num_constraints):
-    C = np.empty((num_constraints,4), dtype=int)
-    a, c = np.random.randint(len(labels), size=(2,num_constraints))
-    for i,(al,cl) in enumerate(zip(labels[a],labels[c])):
-      C[i,1] = choice(np.nonzero(labels == al)[0])
-      C[i,3] = choice(np.nonzero(labels != cl)[0])
-    C[:,0] = a
-    C[:,2] = c
-    return C
-
-
 def _regularization_loss(metric, prior_inv):
   sign, logdet = np.linalg.slogdet(metric)
   return np.sum(metric * prior_inv) - sign * logdet
+
+class LSML_Supervised(LSML):
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_constraints=None, weights=None, verbose=False):
+    """Initialize the learner.
+
+    Parameters
+    ----------
+    tol : float, optional
+    max_iter : int, optional
+    prior : (d x d) matrix, optional
+        guess at a metric [default: covariance(X)]
+    num_constraints: int, needed for .fit()
+    weights : (m,) array of floats, optional
+        scale factor for each constraint
+    verbose : bool, optional
+        if True, prints information while learning
+    """
+    self.params = {
+      'tol': tol,
+      'max_iter': max_iter,
+      'prior': prior,
+      'verbose': verbose,
+      'num_constraints': num_constraints,
+      'weights': weights,
+    }
+
+  def fit(self, X, labels):
+    """Create constraints from labels and learn the LSML model.
+    Needs num_constraints specified in constructor.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    labels : (n) data labels
+    """
+    num_constraints = self.params['num_constraints']
+    if num_constraints is None:
+      num_constraints = 20*(len(set(labels)))**2 # 20* number of classes**2
+
+    C = Constraints.relativeQuadruplets(labels, num_constraints)
+    return super().fit(X, C, weights=self.params['weights'], prior=self.params['prior'])

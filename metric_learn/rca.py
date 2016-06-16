@@ -15,11 +15,12 @@ import numpy as np
 import random
 from six.moves import xrange
 from .base_metric import BaseMetricLearner
+from .constraints import Constraints
 
 
 class RCA(BaseMetricLearner):
   """Relevant Components Analysis (RCA)"""
-  def __init__(self, dim=None, num_chunks=100, chunk_size=2, seed=None):
+  def __init__(self, dim=None):
     """Initialize the learner.
 
     Parameters
@@ -32,9 +33,6 @@ class RCA(BaseMetricLearner):
     """
     self.params = {
       'dim': dim,
-      'num_chunks': num_chunks,
-      'chunk_size': chunk_size,
-      'seed': seed,
     }
 
   def transformer(self):
@@ -55,24 +53,7 @@ class RCA(BaseMetricLearner):
 
     return X, Y, num_chunks, d
 
-  def fit(self, X, labels):
-    """Create constraints from labels and learn the LSML model.
-    Needs num_constraints specified in constructor.
-
-    Parameters
-    ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    labels : (n) data labels
-    """
-    num_chunks = self.params['num_chunks']
-    if num_chunks is None:
-      raise ValueError('You need to specify `num_chunks` before using .fit()')
-
-    C = self.prepare_constraints(labels, num_chunks, self.params['chunk_size'], self.params['seed'])
-    return self.fit_constraints(X, C)
-
-  def fit_constraints(self, data, chunks):
+  def fit(self, data, chunks):
     """Learn the RCA model.
 
     Parameters
@@ -113,30 +94,41 @@ class RCA(BaseMetricLearner):
 
     return self
 
-  @classmethod
-  def prepare_constraints(cls, Y, num_chunks=100, chunk_size=2, seed=None):
-    random.seed(seed)
-    chunks = -np.ones_like(Y, dtype=int)
-    uniq, lookup = np.unique(Y, return_inverse=True)
-    all_inds = [set(np.where(lookup==c)[0]) for c in xrange(len(uniq))]
-    idx = 0
-    while idx < num_chunks and all_inds:
-      c = random.randint(0, len(all_inds)-1)
-      inds = all_inds[c]
-      if len(inds) < chunk_size:
-        del all_inds[c]
-        continue
-      ii = random.sample(inds, chunk_size)
-      inds.difference_update(ii)
-      chunks[ii] = idx
-      idx += 1
-    if idx < num_chunks:
-      raise ValueError('Unable to make %d chunks of %d examples each' %
-                       (num_chunks, chunk_size))
-    return chunks
-
-
 def _inv_sqrtm(x):
   '''Computes x^(-1/2)'''
   vals, vecs = np.linalg.eigh(x)
   return (vecs / np.sqrt(vals)).dot(vecs.T)
+
+
+class RCA_Supervised(RCA):
+  """Relevant Components Analysis (RCA)"""
+  def __init__(self, dim=None, num_chunks=None, chunk_size=None, seed=None):
+    """Initialize the learner.
+
+    Parameters
+    ----------
+    dim : int, optional
+        embedding dimension (default: original dimension of data)
+    num_chunks: int, optional
+    chunk_size: int, optional
+    seed: int, optional
+    """
+    self.params = {
+      'dim': dim,
+      'num_chunks': 100 if num_chunks is None else num_chunks,
+      'chunk_size': 2 if chunk_size is None else chunk_size,
+      'seed': seed,
+    }
+
+  def fit(self, X, labels):
+    """Create constraints from labels and learn the LSML model.
+    Needs num_constraints specified in constructor.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    labels : (n) data labels
+    """
+    C = Constraints.chunks(labels, self.params['num_chunks'], self.params['chunk_size'], self.params['seed'])
+    return super().fit(X, C)

@@ -15,16 +15,61 @@ from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from .base_metric import BaseMetricLearner
+from .constraints import Constraints
 
 
 class SDML(BaseMetricLearner):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True, verbose=False):
+    '''
+    balance_param: trade off between sparsity and M0 prior
+    sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
+    use_cov: controls prior matrix, will use the identity if use_cov=False
+    verbose : bool, optional
+        if True, prints information while learning
+    '''
+    self.params = {
+      'balance_param': balance_param,
+      'sparsity_param': sparsity_param,
+      'use_cov': use_cov,
+      'verbose': verbose,
+    }
+
+  def _prepare_inputs(self, X, W):
+    self.X = X
+    # set up prior M
+    if self.params['use_cov']:
+      self.M = np.cov(X.T)
+    else:
+      self.M = np.identity(X.shape[1])
+    L = laplacian(W, normed=False)
+    self.loss_matrix = self.X.T.dot(L.dot(self.X))
+
+  def metric(self):
+    return self.M
+
+  def fit(self, X, W):
+    """
+    X: data matrix, (n x d)
+    W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.
+    """
+    self._prepare_inputs(X, W)
+    P = pinvh(self.M) + self.params['balance_param'] * self.loss_matrix
+    emp_cov = pinvh(P)
+    # hack: ensure positive semidefinite
+    emp_cov = emp_cov.T.dot(emp_cov)
+    self.M, _ = graph_lasso(emp_cov, self.params['sparsity_param'],
+                            verbose=self.params['verbose'])
+    return self
+
+class SDML_Supervised(SDML):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True, num_constraints=None, verbose=False):
     '''
     balance_param: trade off between sparsity and M0 prior
     sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
     use_cov: controls prior matrix, will use the identity if use_cov=False
     num_constraints: int, needed for .fit()
-    verbose: bool
+    verbose : bool, optional
+        if True, prints information while learning
     '''
     self.params = {
       'balance_param': balance_param,
@@ -59,36 +104,7 @@ class SDML(BaseMetricLearner):
     """
     num_constraints = self.params['num_constraints']
     if num_constraints is None:
-      raise ValueError('You need to specify `num_constraints` before using .fit()')
+      num_constraints = 20*(len(set(labels)))**2 # 20* number of classes**2
 
-    W = self.prepare_constraints(labels, X.shape[0], num_constraints)
-    return self.fit_constraints(X, W, verbose=self.params['verbose'])
-
-  def fit_constraints(self, X, W, verbose=False):
-    """
-    X: data matrix, (n x d)
-    W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.
-    """
-    self._prepare_inputs(X, W)
-    P = pinvh(self.M) + self.params['balance_param'] * self.loss_matrix
-    emp_cov = pinvh(P)
-    # hack: ensure positive semidefinite
-    emp_cov = emp_cov.T.dot(emp_cov)
-    self.M, _ = graph_lasso(emp_cov, self.params['sparsity_param'],
-                            verbose=verbose)
-    return self
-
-  @classmethod
-  def prepare_constraints(self, labels, num_points, num_constraints):
-    a, c = np.random.randint(len(labels), size=(2,num_constraints))
-    b, d = np.empty((2, num_constraints), dtype=int)
-    for i,(al,cl) in enumerate(zip(labels[a],labels[c])):
-      b[i] = choice(np.nonzero(labels == al)[0])
-      d[i] = choice(np.nonzero(labels != cl)[0])
-    W = np.zeros((num_points,num_points))
-    W[a,b] = 1
-    W[c,d] = -1
-    # make W symmetric
-    W[b,a] = 1
-    W[d,c] = -1
-    return W
+    W = Constraints.adjacencyMatrix(labels, X.shape[0], num_constraints)
+    return super().fit(X, W)
