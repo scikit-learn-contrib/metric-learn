@@ -79,19 +79,6 @@ class SDML_Supervised(SDML):
       'verbose': verbose,
     }
 
-  def _prepare_inputs(self, X, W):
-    self.X = X
-    # set up prior M
-    if self.params['use_cov']:
-      self.M = np.cov(X.T)
-    else:
-      self.M = np.identity(X.shape[1])
-    L = laplacian(W, normed=False)
-    self.loss_matrix = self.X.T.dot(L.dot(self.X))
-
-  def metric(self):
-    return self.M
-
   def fit(self, X, labels):
     """Create constraints from labels and learn the SDML model.
     Needs num_constraints specified in constructor.
