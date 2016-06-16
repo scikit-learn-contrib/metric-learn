@@ -131,4 +131,4 @@ class RCA_Supervised(RCA):
     labels : (n) data labels
     """
     C = Constraints.chunks(labels, self.params['num_chunks'], self.params['chunk_size'], self.params['seed'])
-    return super().fit(X, C)
+    return super(RCA_Supervised,self).fit(X, C)

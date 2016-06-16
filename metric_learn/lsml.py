@@ -169,4 +169,4 @@ class LSML_Supervised(LSML):
       num_constraints = 20*(len(set(labels)))**2 # 20* number of classes**2
 
     C = Constraints.relativeQuadruplets(labels, num_constraints)
-    return super().fit(X, C, weights=self.params['weights'], prior=self.params['prior'])
+    return super(LSML_Supervised,self).fit(X, C, weights=self.params['weights'], prior=self.params['prior'])

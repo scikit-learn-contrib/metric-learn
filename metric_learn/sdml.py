@@ -94,4 +94,4 @@ class SDML_Supervised(SDML):
       num_constraints = 20*(len(set(labels)))**2 # 20* number of classes**2
 
     W = Constraints.adjacencyMatrix(labels, X.shape[0], num_constraints)
-    return super().fit(X, W)
+    return super(SDML_Supervised,self).fit(X, W)

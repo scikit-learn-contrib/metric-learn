@@ -178,4 +178,4 @@ class ITML_Supervised(ITML):
       num_constraints = 20*(len(set(labels)))**2 # 20* number of classes**2
 
     C = Constraints.positiveNegativePairs(labels, X.shape[0], num_constraints)
-    return super().fit(X, C, bounds=self.params['bounds'], A0=self.params['A0'])
+    return super(ITML_Supervised,self).fit(X, C, bounds=self.params['bounds'], A0=self.params['A0'])
