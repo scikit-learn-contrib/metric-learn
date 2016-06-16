@@ -1,3 +1,5 @@
+""" Helper class that can generate different types of constraints from supervised data labels."""
+
 import random
 import numpy as np
 from six.moves import xrange
