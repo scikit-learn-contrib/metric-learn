@@ -8,3 +8,4 @@ from .nca import NCA
 from .lfda import LFDA
 from .rca import RCA, RCA_Supervised
 from .constraints import adjacencyMatrix, positiveNegativePairs, relativeQuadruplets, chunks
+from .covariance import Covariance
