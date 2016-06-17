@@ -115,11 +115,11 @@ class RCA_Supervised(RCA):
     """
     # @TODO: remove seed from param. See @TODO in constraints/chunks
     RCA.__init__(self, dim=dim)
-    self.params = {
+    self.params.update({
       'num_chunks': 100 if num_chunks is None else num_chunks,
       'chunk_size': 2 if chunk_size is None else chunk_size,
       'seed': seed,
-    }
+    })
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the LSML model.

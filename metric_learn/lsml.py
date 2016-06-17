@@ -144,11 +144,11 @@ class LSML_Supervised(LSML):
         if True, prints information while learning
     """
     LSML.__init__(self, tol=tol, max_iter=max_iter, verbose=verbose)
-    self.params = {
+    self.params.update({
       'prior': prior,
       'num_constraints': num_constraints,
       'weights': weights,
-    }
+    })
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the LSML model.

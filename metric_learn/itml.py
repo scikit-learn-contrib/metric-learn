@@ -155,11 +155,11 @@ class ITML_Supervised(ITML):
     """
     ITML.__init__(self, gamma=gamma, max_iters=max_iters, 
       convergence_threshold=convergence_threshold, verbose=verbose)
-    self.params = {
+    self.params.update({
       'num_constraints': num_constraints,
       'bounds': bounds,
       'A0': A0,
-    }
+    })
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the ITML model.
