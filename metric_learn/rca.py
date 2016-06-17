@@ -15,7 +15,7 @@ import numpy as np
 import random
 from six.moves import xrange
 from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .constraints import chunks
 
 
 class RCA(BaseMetricLearner):
@@ -113,8 +113,9 @@ class RCA_Supervised(RCA):
     chunk_size: int, optional
     seed: int, optional
     """
+    # @TODO: remove seed from param. See @TODO in constraints/chunks
+    RCA.__init__(self, dim=dim)
     self.params = {
-      'dim': dim,
       'num_chunks': 100 if num_chunks is None else num_chunks,
       'chunk_size': 2 if chunk_size is None else chunk_size,
       'seed': seed,
@@ -130,5 +131,5 @@ class RCA_Supervised(RCA):
         each row corresponds to a single instance
     labels : (n) data labels
     """
-    C = Constraints.chunks(labels, self.params['num_chunks'], self.params['chunk_size'], self.params['seed'])
-    return super(RCA_Supervised,self).fit(X, C)
+    C = chunks(labels, self.params['num_chunks'], self.params['chunk_size'], self.params['seed'])
+    return RCA.fit(self, X, C)

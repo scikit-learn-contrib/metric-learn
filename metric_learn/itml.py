@@ -16,7 +16,7 @@ import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .constraints import positiveNegativePairs
 
 
 class ITML(BaseMetricLearner):
@@ -153,12 +153,10 @@ class ITML_Supervised(ITML):
     verbose : bool, optional
         if True, prints information while learning
     """
+    ITML.__init__(self, gamma=gamma, max_iters=max_iters, 
+      convergence_threshold=convergence_threshold, verbose=verbose)
     self.params = {
-      'gamma': gamma,
-      'max_iters': max_iters,
-      'convergence_threshold': convergence_threshold,
       'num_constraints': num_constraints,
-      'verbose': verbose,
       'bounds': bounds,
       'A0': A0,
     }
@@ -175,7 +173,8 @@ class ITML_Supervised(ITML):
     """
     num_constraints = self.params['num_constraints']
     if num_constraints is None:
-      num_constraints = 20*(len(set(labels)))**2 # 20* number of classes**2
+      num_classes = np.unique(labels)
+      num_constraints = 20*(len(num_classes))**2
 
-    C = Constraints.positiveNegativePairs(labels, X.shape[0], num_constraints)
-    return super(ITML_Supervised,self).fit(X, C, bounds=self.params['bounds'], A0=self.params['A0'])
+    C = positiveNegativePairs(labels, X.shape[0], num_constraints)
+    return ITML.fit(self, X, C, bounds=self.params['bounds'], A0=self.params['A0'])

@@ -15,7 +15,7 @@ from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .constraints import adjacencyMatrix
 
 
 class SDML(BaseMetricLearner):
@@ -71,13 +71,8 @@ class SDML_Supervised(SDML):
     verbose : bool, optional
         if True, prints information while learning
     '''
-    self.params = {
-      'balance_param': balance_param,
-      'sparsity_param': sparsity_param,
-      'use_cov': use_cov,
-      'num_constraints': num_constraints,
-      'verbose': verbose,
-    }
+    SDML.__init__(self, balance_param=balance_param, sparsity_param=sparsity_param, use_cov=use_cov, verbose=verbose)
+    self.params['num_constraints'] = num_constraints
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the SDML model.
@@ -91,7 +86,8 @@ class SDML_Supervised(SDML):
     """
     num_constraints = self.params['num_constraints']
     if num_constraints is None:
-      num_constraints = 20*(len(set(labels)))**2 # 20* number of classes**2
+      num_classes = np.unique(labels)
+      num_constraints = 20*(len(num_classes))**2
 
-    W = Constraints.adjacencyMatrix(labels, X.shape[0], num_constraints)
-    return super(SDML_Supervised,self).fit(X, W)
+    W = adjacencyMatrix(labels, X.shape[0], num_constraints)
+    return SDML.fit(self, X, W)

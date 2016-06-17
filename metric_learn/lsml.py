@@ -13,7 +13,7 @@ import scipy.linalg
 from random import choice
 from six.moves import xrange
 from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .constraints import relativeQuadruplets
 
 
 class LSML(BaseMetricLearner):
@@ -63,8 +63,6 @@ class LSML(BaseMetricLearner):
         scale factor for each constraint
     prior : (d x d) matrix, optional
         guess at a metric [default: covariance(X)]
-    verbose : bool, optional
-        if True, prints information while learning
     """
     verbose = self.params['verbose']
     self._prepare_inputs(X, constraints, weights, prior)
@@ -145,11 +143,9 @@ class LSML_Supervised(LSML):
     verbose : bool, optional
         if True, prints information while learning
     """
+    LSML.__init__(self, tol=tol, max_iter=max_iter, verbose=verbose)
     self.params = {
-      'tol': tol,
-      'max_iter': max_iter,
       'prior': prior,
-      'verbose': verbose,
       'num_constraints': num_constraints,
       'weights': weights,
     }
@@ -166,7 +162,8 @@ class LSML_Supervised(LSML):
     """
     num_constraints = self.params['num_constraints']
     if num_constraints is None:
-      num_constraints = 20*(len(set(labels)))**2 # 20* number of classes**2
+      num_classes = np.unique(labels)
+      num_constraints = 20*(len(num_classes))**2
 
-    C = Constraints.relativeQuadruplets(labels, num_constraints)
-    return super(LSML_Supervised,self).fit(X, C, weights=self.params['weights'], prior=self.params['prior'])
+    C = relativeQuadruplets(labels, num_constraints)
+    return LSML.fit(self, X, C, weights=self.params['weights'], prior=self.params['prior'])
