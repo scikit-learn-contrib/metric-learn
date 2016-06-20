@@ -15,19 +15,23 @@ from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from .base_metric import BaseMetricLearner
+from .constraints import adjacencyMatrix
 
 
 class SDML(BaseMetricLearner):
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True, verbose=False):
     '''
     balance_param: trade off between sparsity and M0 prior
     sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
     use_cov: controls prior matrix, will use the identity if use_cov=False
+    verbose : bool, optional
+        if True, prints information while learning
     '''
     self.params = {
       'balance_param': balance_param,
       'sparsity_param': sparsity_param,
       'use_cov': use_cov,
+      'verbose': verbose,
     }
 
   def _prepare_inputs(self, X, W):
@@ -43,7 +47,7 @@ class SDML(BaseMetricLearner):
   def metric(self):
     return self.M
 
-  def fit(self, X, W, verbose=False):
+  def fit(self, X, W):
     """
     X: data matrix, (n x d)
     W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.
@@ -54,20 +58,36 @@ class SDML(BaseMetricLearner):
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
     self.M, _ = graph_lasso(emp_cov, self.params['sparsity_param'],
-                            verbose=verbose)
+                            verbose=self.params['verbose'])
     return self
 
-  @classmethod
-  def prepare_constraints(self, labels, num_points, num_constraints):
-    a, c = np.random.randint(len(labels), size=(2,num_constraints))
-    b, d = np.empty((2, num_constraints), dtype=int)
-    for i,(al,cl) in enumerate(zip(labels[a],labels[c])):
-      b[i] = choice(np.nonzero(labels == al)[0])
-      d[i] = choice(np.nonzero(labels != cl)[0])
-    W = np.zeros((num_points,num_points))
-    W[a,b] = 1
-    W[c,d] = -1
-    # make W symmetric
-    W[b,a] = 1
-    W[d,c] = -1
-    return W
+class SDML_Supervised(SDML):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True, num_constraints=None, verbose=False):
+    '''
+    balance_param: trade off between sparsity and M0 prior
+    sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
+    use_cov: controls prior matrix, will use the identity if use_cov=False
+    num_constraints: int, needed for .fit()
+    verbose : bool, optional
+        if True, prints information while learning
+    '''
+    SDML.__init__(self, balance_param=balance_param, sparsity_param=sparsity_param, use_cov=use_cov, verbose=verbose)
+    self.params['num_constraints'] = num_constraints
+
+  def fit(self, X, labels):
+    """Create constraints from labels and learn the SDML model.
+    Needs num_constraints specified in constructor.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    labels : (n) data labels
+    """
+    num_constraints = self.params['num_constraints']
+    if num_constraints is None:
+      num_classes = np.unique(labels)
+      num_constraints = 20*(len(num_classes))**2
+
+    W = adjacencyMatrix(labels, X.shape[0], num_constraints)
+    return SDML.fit(self, X, W)

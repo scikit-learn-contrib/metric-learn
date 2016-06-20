@@ -16,11 +16,12 @@ import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from .base_metric import BaseMetricLearner
+from .constraints import positiveNegativePairs
 
 
 class ITML(BaseMetricLearner):
   """Information Theoretic Metric Learning (ITML)"""
-  def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3):
+  def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3, verbose=False):
     """Initialize the learner.
 
     Parameters
@@ -29,11 +30,14 @@ class ITML(BaseMetricLearner):
         value for slack variables
     max_iters : int, optional
     convergence_threshold : float, optional
+    verbose : bool, optional
+        if True, prints information while learning
     """
     self.params = {
       'gamma': gamma,
       'max_iters': max_iters,
       'convergence_threshold': convergence_threshold,
+      'verbose': verbose,
     }
 
   def _process_inputs(self, X, constraints, bounds, A0):
@@ -57,7 +61,7 @@ class ITML(BaseMetricLearner):
       self.A = A0
     return a,b,c,d
 
-  def fit(self, X, constraints, bounds=None, A0=None, verbose=False):
+  def fit(self, X, constraints, bounds=None, A0=None):
     """Learn the ITML model.
 
     Parameters
@@ -71,6 +75,7 @@ class ITML(BaseMetricLearner):
     A0 : (d x d) matrix, optional
         initial regularization matrix, defaults to identity
     """
+    verbose = self.params['verbose']
     a,b,c,d = self._process_inputs(X, constraints, bounds, A0)
     gamma = self.params['gamma']
     conv_thresh = self.params['convergence_threshold']
@@ -121,14 +126,6 @@ class ITML(BaseMetricLearner):
   def metric(self):
     return self.A
 
-  @classmethod
-  def prepare_constraints(self, labels, num_points, num_constraints):
-    ac,bd = np.random.randint(num_points, size=(2,num_constraints))
-    pos = labels[ac] == labels[bd]
-    a,c = ac[pos], ac[~pos]
-    b,d = bd[pos], bd[~pos]
-    return a,b,c,d
-
 # hack around lack of axis kwarg in older numpy versions
 try:
   np.linalg.norm([[4]], axis=1)
@@ -138,3 +135,46 @@ except TypeError:
 else:
   def _vector_norm(X):
     return np.linalg.norm(X, axis=1)
+
+
+class ITML_Supervised(ITML):
+  """Information Theoretic Metric Learning (ITML)"""
+  def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3, num_constraints=None,
+    bounds=None, A0=None, verbose=False):
+    """Initialize the learner.
+
+    Parameters
+    ----------
+    gamma : float, optional
+        value for slack variables
+    max_iters : int, optional
+    convergence_threshold : float, optional
+    num_constraints: int, needed for .fit()
+    verbose : bool, optional
+        if True, prints information while learning
+    """
+    ITML.__init__(self, gamma=gamma, max_iters=max_iters, 
+      convergence_threshold=convergence_threshold, verbose=verbose)
+    self.params.update({
+      'num_constraints': num_constraints,
+      'bounds': bounds,
+      'A0': A0,
+    })
+
+  def fit(self, X, labels):
+    """Create constraints from labels and learn the ITML model.
+    Needs num_constraints specified in constructor.
+
+    Parameters
+    ----------
+    X : (n x d) data matrix
+        each row corresponds to a single instance
+    labels : (n) data labels
+    """
+    num_constraints = self.params['num_constraints']
+    if num_constraints is None:
+      num_classes = np.unique(labels)
+      num_constraints = 20*(len(num_classes))**2
+
+    C = positiveNegativePairs(labels, X.shape[0], num_constraints)
+    return ITML.fit(self, X, C, bounds=self.params['bounds'], A0=self.params['A0'])
