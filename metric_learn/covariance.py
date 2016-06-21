@@ -1,5 +1,11 @@
 """
-Simple Covariance metric (learner)
+Covariance metric (baseline method)
+
+This method does not "learn" anything, only calculates covariance matrix.
+Inverse of this covariance matrix is then used in Mahalanobis distance.
+
+This is a simple baseline method first introduced in
+On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 """
 
 from __future__ import absolute_import
