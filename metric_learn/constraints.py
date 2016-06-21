@@ -1,5 +1,7 @@
-""" Helper class that can generate different types of constraints from supervised data labels."""
-
+"""
+Helper module for generating different types of constraints
+from supervised data labels.
+"""
 import numpy as np
 import random
 from six.moves import xrange
@@ -7,7 +9,8 @@ from six.moves import xrange
 # @TODO: consider creating a stateful class
 # https://github.com/all-umass/metric-learn/pull/19#discussion_r67386226
 
-def adjacencyMatrix(labels, num_points, num_constraints):
+
+def adjacency_matrix(labels, num_points, num_constraints):
   a, c = np.random.randint(len(labels), size=(2,num_constraints))
   b, d = np.empty((2, num_constraints), dtype=int)
   for i,(al,cl) in enumerate(zip(labels[a],labels[c])):
@@ -21,14 +24,16 @@ def adjacencyMatrix(labels, num_points, num_constraints):
   W[d,c] = -1
   return W
 
-def positiveNegativePairs(labels, num_points, num_constraints):
+
+def positive_negative_pairs(labels, num_points, num_constraints):
   ac,bd = np.random.randint(num_points, size=(2,num_constraints))
   pos = labels[ac] == labels[bd]
   a,c = ac[pos], ac[~pos]
   b,d = bd[pos], bd[~pos]
   return a,b,c,d
 
-def relativeQuadruplets(labels, num_constraints):
+
+def relative_quadruplets(labels, num_constraints):
   C = np.empty((num_constraints,4), dtype=int)
   a, c = np.random.randint(len(labels), size=(2,num_constraints))
   for i,(al,cl) in enumerate(zip(labels[a],labels[c])):
@@ -37,6 +42,7 @@ def relativeQuadruplets(labels, num_constraints):
   C[:,0] = a
   C[:,2] = c
   return C
+
 
 def chunks(Y, num_chunks=100, chunk_size=2, seed=None):
   # @TODO: remove seed from params and use numpy RandomState

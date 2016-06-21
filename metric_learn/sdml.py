@@ -10,20 +10,24 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 
 from __future__ import absolute_import
 import numpy as np
-from random import choice
 from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
+
+from . import constraints
 from .base_metric import BaseMetricLearner
-from .constraints import adjacencyMatrix
 
 
 class SDML(BaseMetricLearner):
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True, verbose=False):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
+               verbose=False):
     '''
-    balance_param: trade off between sparsity and M0 prior
-    sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
-    use_cov: controls prior matrix, will use the identity if use_cov=False
+    balance_param: float, optional
+        trade off between sparsity and M0 prior
+    sparsity_param: float, optional
+        trade off between optimizer and sparseness (see graph_lasso)
+    use_cov: bool, optional
+        controls prior matrix, will use the identity if use_cov=False
     verbose : bool, optional
         if True, prints information while learning
     '''
@@ -50,6 +54,7 @@ class SDML(BaseMetricLearner):
   def fit(self, X, W):
     """
     X: data matrix, (n x d)
+        each row corresponds to a single instance
     W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.
     """
     self._prepare_inputs(X, W)
@@ -61,33 +66,33 @@ class SDML(BaseMetricLearner):
                             verbose=self.params['verbose'])
     return self
 
+
 class SDML_Supervised(SDML):
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True, num_constraints=None, verbose=False):
-    '''
-    balance_param: trade off between sparsity and M0 prior
-    sparsity_param: trade off between optimizer and sparseness (see graph_lasso)
-    use_cov: controls prior matrix, will use the identity if use_cov=False
-    num_constraints: int, needed for .fit()
-    verbose : bool, optional
-        if True, prints information while learning
-    '''
-    SDML.__init__(self, balance_param=balance_param, sparsity_param=sparsity_param, use_cov=use_cov, verbose=verbose)
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
+               num_constraints=None, verbose=False):
+    SDML.__init__(self, balance_param=balance_param,
+                  sparsity_param=sparsity_param, use_cov=use_cov,
+                  verbose=verbose)
     self.params['num_constraints'] = num_constraints
+
+  __init__.__doc__ = (
+      SDML.__init__.__doc__ +
+      'num_constraints: int, optional\n'
+      '        number of constraints to generate')
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the SDML model.
-    Needs num_constraints specified in constructor.
 
     Parameters
     ----------
-    X : (n x d) data matrix
+    X: data matrix, (n x d)
         each row corresponds to a single instance
-    labels : (n) data labels
+    labels: data labels, (n,) array-like
     """
     num_constraints = self.params['num_constraints']
     if num_constraints is None:
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    W = adjacencyMatrix(labels, X.shape[0], num_constraints)
+    W = constraints.adjacency_matrix(labels, X.shape[0], num_constraints)
     return SDML.fit(self, X, W)

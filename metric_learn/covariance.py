@@ -1,8 +1,8 @@
 """
 Covariance metric (baseline method)
 
-This method does not "learn" anything, only calculates covariance matrix.
-Inverse of this covariance matrix is then used in Mahalanobis distance.
+This method does not "learn" anything, rather it calculates
+the covariance matrix of the input data.
 
 This is a simple baseline method first introduced in
 On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
@@ -23,7 +23,7 @@ class Covariance(BaseMetricLearner):
   def fit(self, X, y=None):
     """
     X: data matrix, (n x d)
-    y: labels (optional)
+    y: unused, optional
     """
     self.M = np.cov(X.T)
     return self

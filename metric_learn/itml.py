@@ -15,13 +15,15 @@ from __future__ import print_function, absolute_import
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
+
+from . import constraints
 from .base_metric import BaseMetricLearner
-from .constraints import positiveNegativePairs
 
 
 class ITML(BaseMetricLearner):
   """Information Theoretic Metric Learning (ITML)"""
-  def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3, verbose=False):
+  def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3,
+               verbose=False):
     """Initialize the learner.
 
     Parameters
@@ -139,8 +141,8 @@ else:
 
 class ITML_Supervised(ITML):
   """Information Theoretic Metric Learning (ITML)"""
-  def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3, num_constraints=None,
-    bounds=None, A0=None, verbose=False):
+  def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3,
+               num_constraints=None, bounds=None, A0=None, verbose=False):
     """Initialize the learner.
 
     Parameters
@@ -153,8 +155,8 @@ class ITML_Supervised(ITML):
     verbose : bool, optional
         if True, prints information while learning
     """
-    ITML.__init__(self, gamma=gamma, max_iters=max_iters, 
-      convergence_threshold=convergence_threshold, verbose=verbose)
+    ITML.__init__(self, gamma=gamma, max_iters=max_iters,
+                  convergence_threshold=convergence_threshold, verbose=verbose)
     self.params.update({
       'num_constraints': num_constraints,
       'bounds': bounds,
@@ -176,5 +178,6 @@ class ITML_Supervised(ITML):
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    C = positiveNegativePairs(labels, X.shape[0], num_constraints)
-    return ITML.fit(self, X, C, bounds=self.params['bounds'], A0=self.params['A0'])
+    C = constraints.positive_negative_pairs(labels, X.shape[0], num_constraints)
+    return ITML.fit(self, X, C, bounds=self.params['bounds'],
+                    A0=self.params['A0'])

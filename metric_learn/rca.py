@@ -12,10 +12,10 @@ subsets of points that are known to belong to the same class.
 
 from __future__ import absolute_import
 import numpy as np
-import random
 from six.moves import xrange
+
+from . import constraints
 from .base_metric import BaseMetricLearner
-from .constraints import chunks
 
 
 class RCA(BaseMetricLearner):
@@ -27,9 +27,6 @@ class RCA(BaseMetricLearner):
     ----------
     dim : int, optional
         embedding dimension (default: original dimension of data)
-    num_chunks: int, optional
-    chunk_size: int, optional
-    seed: int, optional
     """
     self.params = {
       'dim': dim,
@@ -94,6 +91,7 @@ class RCA(BaseMetricLearner):
 
     return self
 
+
 def _inv_sqrtm(x):
   '''Computes x^(-1/2)'''
   vals, vecs = np.linalg.eigh(x)
@@ -101,7 +99,6 @@ def _inv_sqrtm(x):
 
 
 class RCA_Supervised(RCA):
-  """Relevant Components Analysis (RCA)"""
   def __init__(self, dim=None, num_chunks=None, chunk_size=None, seed=None):
     """Initialize the learner.
 
@@ -131,5 +128,6 @@ class RCA_Supervised(RCA):
         each row corresponds to a single instance
     labels : (n) data labels
     """
-    C = chunks(labels, self.params['num_chunks'], self.params['chunk_size'], self.params['seed'])
+    C = constraints.chunks(labels, self.params['num_chunks'],
+                           self.params['chunk_size'], self.params['seed'])
     return RCA.fit(self, X, C)

@@ -10,10 +10,10 @@ Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
 from __future__ import print_function, absolute_import
 import numpy as np
 import scipy.linalg
-from random import choice
 from six.moves import xrange
+
+from . import constraints
 from .base_metric import BaseMetricLearner
-from .constraints import relativeQuadruplets
 
 
 class LSML(BaseMetricLearner):
@@ -123,12 +123,15 @@ class LSML(BaseMetricLearner):
                   (1-np.sqrt(dab/dcd))*np.outer(vcd, vcd))
     return dMetric
 
+
 def _regularization_loss(metric, prior_inv):
   sign, logdet = np.linalg.slogdet(metric)
   return np.sum(metric * prior_inv) - sign * logdet
 
+
 class LSML_Supervised(LSML):
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_constraints=None, weights=None, verbose=False):
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_constraints=None,
+               weights=None, verbose=False):
     """Initialize the learner.
 
     Parameters
@@ -165,5 +168,6 @@ class LSML_Supervised(LSML):
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    C = relativeQuadruplets(labels, num_constraints)
-    return LSML.fit(self, X, C, weights=self.params['weights'], prior=self.params['prior'])
+    C = constraints.relative_quadruplets(labels, num_constraints)
+    return LSML.fit(self, X, C, weights=self.params['weights'],
+                    prior=self.params['prior'])
