@@ -17,7 +17,7 @@ Metric Learning algorithms in Python.
 
 **Dependencies**
 
--  Python 2.6+
+-  Python 2.7+, 3.4+
 -  numpy, scipy, scikit-learn
 -  (for running the examples only: matplotlib)
 

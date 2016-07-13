@@ -55,7 +55,8 @@ class SDML(BaseMetricLearner):
     """
     X: data matrix, (n x d)
         each row corresponds to a single instance
-    W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.
+    W: connectivity graph, (n x n)
+        +1 for positive pairs, -1 for negative.
     """
     self._prepare_inputs(X, W)
     P = pinvh(self.M) + self.params['balance_param'] * self.loss_matrix

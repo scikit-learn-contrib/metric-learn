@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-version = "0.2.1"
+version = "0.3.0"
 setup(name='metric-learn',
       version=version,
       description='Python implementations of metric learning algorithms',
@@ -26,12 +26,12 @@ setup(name='metric-learn',
           'six'
       ],
       extras_require=dict(
-          docs=['sphinx', 'numpydoc'],
+          docs=['sphinx', 'shinx_rtd_theme', 'numpydoc'],
           demo=['matplotlib'],
       ),
       test_suite='test',
       keywords=[
-          'Metric Learning', 
+          'Metric Learning',
           'Large Margin Nearest Neighbor',
           'Information Theoretic Metric Learning',
           'Sparse Determinant Metric Learning',
