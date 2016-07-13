@@ -82,6 +82,7 @@
             
                 <p class="caption"><span class="caption-text">Algorithms</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
@@ -137,7 +138,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.itml</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Information Theoretic Metric Learning, Kulis et al., ICML 2007</span>
 
 <span class="sd">ITML minimizes the differential relative entropy between two multivariate</span>
@@ -150,16 +151,19 @@
 <span class="sd">or semi-definite programming.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="kn">import</span> <span class="nb">xrange</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">pairwise_distances</span>
-<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="kn">import</span> <span class="n">BaseMetricLearner</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">pairwise_distances</span>
+
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">BaseMetricLearner</span>
+<span class="kn">from</span> <span class="nn">.constraints</span> <span class="k">import</span> <span class="n">Constraints</span>
 
 
 <div class="viewcode-block" id="ITML"><a class="viewcode-back" href="../../metric_learn.itml.html#metric_learn.itml.ITML">[docs]</a><span class="k">class</span> <span class="nc">ITML</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Information Theoretic Metric Learning (ITML)&quot;&quot;&quot;</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span>
+               <span class="n">verbose</span><span class="o">=</span><span class="k">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initialize the learner.</span>
 
 <span class="sd">    Parameters</span>
@@ -168,51 +172,55 @@
 <span class="sd">        value for slack variables</span>
 <span class="sd">    max_iters : int, optional</span>
 <span class="sd">    convergence_threshold : float, optional</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        if True, prints information while learning</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="n">gamma</span><span class="p">,</span>
-      <span class="s1">&#39;max_iters&#39;</span><span class="p">:</span> <span class="n">max_iters</span><span class="p">,</span>
-      <span class="s1">&#39;convergence_threshold&#39;</span><span class="p">:</span> <span class="n">convergence_threshold</span><span class="p">,</span>
+      <span class="s">&#39;gamma&#39;</span><span class="p">:</span> <span class="n">gamma</span><span class="p">,</span>
+      <span class="s">&#39;max_iters&#39;</span><span class="p">:</span> <span class="n">max_iters</span><span class="p">,</span>
+      <span class="s">&#39;convergence_threshold&#39;</span><span class="p">:</span> <span class="n">convergence_threshold</span><span class="p">,</span>
+      <span class="s">&#39;verbose&#39;</span><span class="p">:</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">}</span>
 
   <span class="k">def</span> <span class="nf">_process_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">A0</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
-    <span class="c1"># check to make sure that no two constrained vectors are identical</span>
+    <span class="c"># check to make sure that no two constrained vectors are identical</span>
     <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">constraints</span>
-    <span class="n">ident</span> <span class="o">=</span> <span class="n">_vector_norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">b</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1e-9</span>
+    <span class="n">ident</span> <span class="o">=</span> <span class="n">_vector_norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">b</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">9</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">ident</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="n">ident</span><span class="p">]</span>
-    <span class="n">ident</span> <span class="o">=</span> <span class="n">_vector_norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">d</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1e-9</span>
+    <span class="n">ident</span> <span class="o">=</span> <span class="n">_vector_norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">d</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">9</span>
     <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">ident</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="n">ident</span><span class="p">]</span>
-    <span class="c1"># init bounds</span>
-    <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="c"># init bounds</span>
+    <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="k">None</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">pairwise_distances</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">95</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span>
-    <span class="c1"># init metric</span>
-    <span class="k">if</span> <span class="n">A0</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="c"># init metric</span>
+    <span class="k">if</span> <span class="n">A0</span> <span class="ow">is</span> <span class="k">None</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A0</span>
     <span class="k">return</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span>
 
-<div class="viewcode-block" id="ITML.fit"><a class="viewcode-back" href="../../metric_learn.itml.html#metric_learn.itml.ITML.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">A0</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ITML.fit"><a class="viewcode-back" href="../../metric_learn.itml.html#metric_learn.itml.ITML.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">A0</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Learn the ITML model.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    X : (n x d) data matrix</span>
 <span class="sd">        each row corresponds to a single instance</span>
-<span class="sd">    constraints : tuple of arrays</span>
+<span class="sd">    constraints : 4-tuple of arrays</span>
 <span class="sd">        (a,b,c,d) indices into X, such that d(X[a],X[b]) &lt; d(X[c],X[d])</span>
 <span class="sd">    bounds : list (pos,neg) pairs, optional</span>
 <span class="sd">        bounds on similarity, s.t. d(X[a],X[b]) &lt; pos and d(X[c],X[d]) &gt; neg</span>
 <span class="sd">    A0 : (d x d) matrix, optional</span>
 <span class="sd">        initial regularization matrix, defaults to identity</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;verbose&#39;</span><span class="p">]</span>
     <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">A0</span><span class="p">)</span>
-    <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]</span>
-    <span class="n">conv_thresh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;convergence_threshold&#39;</span><span class="p">]</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;gamma&#39;</span><span class="p">]</span>
+    <span class="n">conv_thresh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;convergence_threshold&#39;</span><span class="p">]</span>
     <span class="n">num_pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="n">num_neg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
     <span class="n">_lambda</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_pos</span> <span class="o">+</span> <span class="n">num_neg</span><span class="p">)</span>
@@ -222,21 +230,21 @@
     <span class="n">neg_bhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_neg</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
 
-    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_iters&#39;</span><span class="p">]):</span>
-      <span class="c1"># update positives</span>
+    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;max_iters&#39;</span><span class="p">]):</span>
+      <span class="c"># update positives</span>
       <span class="n">vv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
       <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vv</span><span class="p">):</span>
-        <span class="n">wtw</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>  <span class="c1"># scalar</span>
+        <span class="n">wtw</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>  <span class="c"># scalar</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">_lambda</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">gamma_proj</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">wtw</span> <span class="o">-</span> <span class="mf">1.</span><span class="o">/</span><span class="n">pos_bhat</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
         <span class="n">_lambda</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">alpha</span>
         <span class="n">beta</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">*</span><span class="n">wtw</span><span class="p">)</span>
         <span class="n">pos_bhat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">pos_bhat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">))</span>
         <span class="n">A</span> <span class="o">+=</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">v</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 
-      <span class="c1"># update negatives</span>
+      <span class="c"># update negatives</span>
       <span class="n">vv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
       <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vv</span><span class="p">):</span>
-        <span class="n">wtw</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>  <span class="c1"># scalar</span>
+        <span class="n">wtw</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>  <span class="c"># scalar</span>
         <span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">_lambda</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">num_pos</span><span class="p">],</span><span class="n">gamma_proj</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">neg_bhat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.</span><span class="o">/</span><span class="n">wtw</span><span class="p">))</span>
         <span class="n">_lambda</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">num_pos</span><span class="p">]</span> <span class="o">-=</span> <span class="n">alpha</span>
         <span class="n">beta</span> <span class="o">=</span> <span class="o">-</span><span class="n">alpha</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">wtw</span><span class="p">)</span>
@@ -252,23 +260,15 @@
         <span class="k">break</span>
       <span class="n">lambdaold</span> <span class="o">=</span> <span class="n">_lambda</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
       <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;itml iter: </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">conv</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s">&#39;itml iter: %d, conv = %f&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">conv</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-      <span class="k">print</span><span class="p">(</span><span class="s1">&#39;itml converged at iter: </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">conv</span><span class="p">))</span>
-    <span class="k">return</span> <span class="bp">self</span>
-</div>
-<div class="viewcode-block" id="ITML.metric"><a class="viewcode-back" href="../../metric_learn.itml.html#metric_learn.itml.ITML.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span>
-</div>
-  <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ITML.prepare_constraints"><a class="viewcode-back" href="../../metric_learn.itml.html#metric_learn.itml.ITML.prepare_constraints">[docs]</a>  <span class="k">def</span> <span class="nf">prepare_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">):</span>
-    <span class="n">ac</span><span class="p">,</span><span class="n">bd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">num_points</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">num_constraints</span><span class="p">))</span>
-    <span class="n">pos</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">ac</span><span class="p">]</span> <span class="o">==</span> <span class="n">labels</span><span class="p">[</span><span class="n">bd</span><span class="p">]</span>
-    <span class="n">a</span><span class="p">,</span><span class="n">c</span> <span class="o">=</span> <span class="n">ac</span><span class="p">[</span><span class="n">pos</span><span class="p">],</span> <span class="n">ac</span><span class="p">[</span><span class="o">~</span><span class="n">pos</span><span class="p">]</span>
-    <span class="n">b</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">bd</span><span class="p">[</span><span class="n">pos</span><span class="p">],</span> <span class="n">bd</span><span class="p">[</span><span class="o">~</span><span class="n">pos</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span>
+      <span class="nb">print</span><span class="p">(</span><span class="s">&#39;itml converged at iter: %d, conv = %f&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">conv</span><span class="p">))</span>
+    <span class="k">return</span> <span class="bp">self</span></div>
 
-<span class="c1"># hack around lack of axis kwarg in older numpy versions</span></div></div>
+<div class="viewcode-block" id="ITML.metric"><a class="viewcode-back" href="../../metric_learn.itml.html#metric_learn.itml.ITML.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span></div></div>
+
+<span class="c"># hack around lack of axis kwarg in older numpy versions</span>
 <span class="k">try</span><span class="p">:</span>
   <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">([[</span><span class="mi">4</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
@@ -277,6 +277,51 @@
 <span class="k">else</span><span class="p">:</span>
   <span class="k">def</span> <span class="nf">_vector_norm</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ITML_Supervised"><a class="viewcode-back" href="../../metric_learn.itml.html#metric_learn.itml.ITML_Supervised">[docs]</a><span class="k">class</span> <span class="nc">ITML_Supervised</span><span class="p">(</span><span class="n">ITML</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Information Theoretic Metric Learning (ITML)&quot;&quot;&quot;</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span>
+               <span class="n">num_labeled</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">num_constraints</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">A0</span><span class="o">=</span><span class="k">None</span><span class="p">,</span>
+               <span class="n">verbose</span><span class="o">=</span><span class="k">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize the learner.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gamma : float, optional</span>
+<span class="sd">        value for slack variables</span>
+<span class="sd">    max_iters : int, optional</span>
+<span class="sd">    convergence_threshold : float, optional</span>
+<span class="sd">    num_labeled : int, optional</span>
+<span class="sd">        number of labels to preserve for training</span>
+<span class="sd">    num_constraints: int, optional</span>
+<span class="sd">        number of constraints to generate</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        if True, prints information while learning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ITML</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="n">max_iters</span><span class="p">,</span>
+                  <span class="n">convergence_threshold</span><span class="o">=</span><span class="n">convergence_threshold</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">num_labeled</span><span class="o">=</span><span class="n">num_labeled</span><span class="p">,</span> <span class="n">num_constraints</span><span class="o">=</span><span class="n">num_constraints</span><span class="p">,</span>
+                       <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">A0</span><span class="o">=</span><span class="n">A0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ITML_Supervised.fit"><a class="viewcode-back" href="../../metric_learn.itml.html#metric_learn.itml.ITML_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create constraints from labels and learn the ITML model.</span>
+<span class="sd">    Needs num_constraints specified in constructor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) data matrix</span>
+<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">    labels : (n) data labels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;num_constraints&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">num_constraints</span> <span class="ow">is</span> <span class="k">None</span><span class="p">:</span>
+      <span class="n">num_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+      <span class="n">num_constraints</span> <span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">num_classes</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Constraints</span><span class="o">.</span><span class="n">random_subset</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;num_labeled&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ITML</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">positive_negative_pairs</span><span class="p">(</span><span class="n">num_constraints</span><span class="p">),</span>
+                    <span class="n">bounds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;bounds&#39;</span><span class="p">],</span> <span class="n">A0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;A0&#39;</span><span class="p">])</span></div></div>
 </pre></div>
 
            </div>

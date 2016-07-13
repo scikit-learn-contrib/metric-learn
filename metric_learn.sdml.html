@@ -31,8 +31,8 @@
 
   
     <link rel="top" title="metric-learn 0.2.1 documentation" href="index.html"/>
-        <link rel="up" title="metric_learn package" href="metric_learn.html"/>
-        <link rel="prev" title="Relative Components Analysis (RCA)" href="metric_learn.rca.html"/> 
+        <link rel="next" title="Least Squares Metric Learning (LSML)" href="metric_learn.lsml.html"/>
+        <link rel="prev" title="Information Theoretic Metric Learning (ITML)" href="metric_learn.itml.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -83,9 +83,10 @@
             
                 <p class="caption"><span class="caption-text">Algorithms</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Sparse Determinant Metric Learning (SDML)</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Sparse Determinant Metric Learning (SDML)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -105,7 +106,7 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">Sparse Determinant Metric Learning (SDML)</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Sparse Determinant Metric Learning (SDML)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -137,15 +138,13 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
-      
-          <li><a href="metric_learn.html">metric_learn package</a> &raquo;</li>
       
     <li>Sparse Determinant Metric Learning (SDML)</li>
       <li class="wy-breadcrumbs-aside">
@@ -171,13 +170,17 @@ ICML 2009</p>
 Paper: <a class="reference external" href="http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf">http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf</a></p>
 <dl class="class">
 <dt id="metric_learn.sdml.SDML">
-<em class="property">class </em><code class="descclassname">metric_learn.sdml.</code><code class="descname">SDML</code><span class="sig-paren">(</span><em>balance_param=0.5</em>, <em>sparsity_param=0.01</em>, <em>use_cov=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/sdml.html#SDML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.sdml.SDML" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">metric_learn.sdml.</code><code class="descname">SDML</code><span class="sig-paren">(</span><em>balance_param=0.5</em>, <em>sparsity_param=0.01</em>, <em>use_cov=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/sdml.html#SDML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.sdml.SDML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
 <dl class="method">
 <dt id="metric_learn.sdml.SDML.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>W</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/sdml.html#SDML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.sdml.SDML.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>X: data matrix, (n x d)
-W: connectivity graph, (n x n). +1 for positive pairs, -1 for negative.</p>
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>W</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/sdml.html#SDML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.sdml.SDML.fit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>X: data matrix, (n x d)</dt>
+<dd>each row corresponds to a single instance</dd>
+<dt>W: connectivity graph, (n x n)</dt>
+<dd>+1 for positive pairs, -1 for negative.</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -208,11 +211,6 @@ scikit-learn has this on BaseEstimator.</p>
 <dl class="method">
 <dt id="metric_learn.sdml.SDML.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/sdml.html#SDML.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.sdml.SDML.metric" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="metric_learn.sdml.SDML.prepare_constraints">
-<em class="property">classmethod </em><code class="descname">prepare_constraints</code><span class="sig-paren">(</span><em>labels</em>, <em>num_points</em>, <em>num_constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/sdml.html#SDML.prepare_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.sdml.SDML.prepare_constraints" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -271,19 +269,126 @@ scikit-learn has this on BaseEstimator.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="metric_learn.sdml.SDML_Supervised">
+<em class="property">class </em><code class="descclassname">metric_learn.sdml.</code><code class="descname">SDML_Supervised</code><span class="sig-paren">(</span><em>balance_param=0.5</em>, <em>sparsity_param=0.01</em>, <em>use_cov=True</em>, <em>num_labeled=inf</em>, <em>num_constraints=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/sdml.html#SDML_Supervised"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.sdml.SDML_Supervised" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#metric_learn.sdml.SDML" title="metric_learn.sdml.SDML"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.sdml.SDML</span></code></a></p>
+<dl class="method">
+<dt id="metric_learn.sdml.SDML_Supervised.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>labels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/sdml.html#SDML_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.sdml.SDML_Supervised.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create constraints from labels and learn the SDML model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X: data matrix, (n x d)</strong></p>
+<blockquote>
+<div><p>each row corresponds to a single instance</p>
+</div></blockquote>
+<p class="last"><strong>labels: data labels, (n,) array-like</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.sdml.SDML_Supervised.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.sdml.SDML_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this metric learner.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<blockquote>
+<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
+scikit-learn has this on BaseEstimator.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : mapping of string to any</p>
+<blockquote class="last">
+<div><p>Parameter names mapped to their values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.sdml.SDML_Supervised.metric">
+<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.sdml.SDML_Supervised.metric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.sdml.SDML_Supervised.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.sdml.SDML_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this metric learner.</p>
+<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.sdml.SDML_Supervised.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.sdml.SDML_Supervised.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies the metric transformation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : (n x d) matrix, optional</p>
+<blockquote>
+<div><p>Data to transform. If not supplied, the training data will be used.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transformed</strong> : (n x d) matrix</p>
+<blockquote class="last">
+<div><p>Input data transformed to the metric space by <span class="math">\(XL^{\top}\)</span></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.sdml.SDML_Supervised.transformer">
+<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.sdml.SDML_Supervised.transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
+<p>L = inv(cholesky(M))</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">SDML</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">SDML_Supervised</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
 
-<span class="n">sdml</span> <span class="o">=</span> <span class="n">SDML</span><span class="p">()</span>
-<span class="n">W</span> <span class="o">=</span> <span class="n">SDML</span><span class="o">.</span><span class="n">prepare_constraints</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1500</span><span class="p">)</span>
-<span class="n">sdml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
+<span class="n">sdml</span> <span class="o">=</span> <span class="n">SDML_Supervised</span><span class="p">(</span><span class="n">num_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">sdml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -299,8 +404,10 @@ scikit-learn has this on BaseEstimator.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="metric_learn.lsml.html" class="btn btn-neutral float-right" title="Least Squares Metric Learning (LSML)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="metric_learn.rca.html" class="btn btn-neutral" title="Relative Components Analysis (RCA)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="metric_learn.itml.html" class="btn btn-neutral" title="Information Theoretic Metric Learning (ITML)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

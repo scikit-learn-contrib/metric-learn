@@ -31,9 +31,8 @@
 
   
     <link rel="top" title="metric-learn 0.2.1 documentation" href="index.html"/>
-        <link rel="up" title="metric_learn package" href="metric_learn.html"/>
-        <link rel="next" title="Local Fisher Discriminant Analysis (LFDA)" href="metric_learn.lfda.html"/>
-        <link rel="prev" title="metric_learn.base_metric module" href="metric_learn.base_metric.html"/> 
+        <link rel="next" title="Sparse Determinant Metric Learning (SDML)" href="metric_learn.sdml.html"/>
+        <link rel="prev" title="Large Margin Nearest Neighbor (LMNN)" href="metric_learn.lmnn.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -84,8 +83,9 @@
             
                 <p class="caption"><span class="caption-text">Algorithms</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Information Theoretic Metric Learning (ITML)</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Information Theoretic Metric Learning (ITML)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -100,7 +100,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="metric_learn.html">Package Overview</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="metric_learn.html#submodules">Submodules</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.html">metric_learn.base_metric module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">Information Theoretic Metric Learning (ITML)</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Information Theoretic Metric Learning (ITML)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -138,15 +138,13 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
-      
-          <li><a href="metric_learn.html">metric_learn package</a> &raquo;</li>
       
     <li>Information Theoretic Metric Learning (ITML)</li>
       <li class="wy-breadcrumbs-aside">
@@ -175,12 +173,12 @@ Unlike some other methods, ITML does not rely on an eigenvalue computation
 or semi-definite programming.</p>
 <dl class="class">
 <dt id="metric_learn.itml.ITML">
-<em class="property">class </em><code class="descclassname">metric_learn.itml.</code><code class="descname">ITML</code><span class="sig-paren">(</span><em>gamma=1.0</em>, <em>max_iters=1000</em>, <em>convergence_threshold=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">metric_learn.itml.</code><code class="descname">ITML</code><span class="sig-paren">(</span><em>gamma=1.0</em>, <em>max_iters=1000</em>, <em>convergence_threshold=0.001</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
 <p>Information Theoretic Metric Learning (ITML)</p>
 <dl class="method">
 <dt id="metric_learn.itml.ITML.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>constraints</em>, <em>bounds=None</em>, <em>A0=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.fit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>constraints</em>, <em>bounds=None</em>, <em>A0=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Learn the ITML model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -190,7 +188,7 @@ or semi-definite programming.</p>
 <blockquote>
 <div><p>each row corresponds to a single instance</p>
 </div></blockquote>
-<p><strong>constraints</strong> : tuple of arrays</p>
+<p><strong>constraints</strong> : 4-tuple of arrays</p>
 <blockquote>
 <div><p>(a,b,c,d) indices into X, such that d(X[a],X[b]) &lt; d(X[c],X[d])</p>
 </div></blockquote>
@@ -236,11 +234,6 @@ scikit-learn has this on BaseEstimator.</p>
 <dl class="method">
 <dt id="metric_learn.itml.ITML.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.metric" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="metric_learn.itml.ITML.prepare_constraints">
-<em class="property">classmethod </em><code class="descname">prepare_constraints</code><span class="sig-paren">(</span><em>labels</em>, <em>num_points</em>, <em>num_constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.prepare_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.prepare_constraints" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -299,21 +292,128 @@ scikit-learn has this on BaseEstimator.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="metric_learn.itml.ITML_Supervised">
+<em class="property">class </em><code class="descclassname">metric_learn.itml.</code><code class="descname">ITML_Supervised</code><span class="sig-paren">(</span><em>gamma=1.0</em>, <em>max_iters=1000</em>, <em>convergence_threshold=0.001</em>, <em>num_labeled=inf</em>, <em>num_constraints=None</em>, <em>bounds=None</em>, <em>A0=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML_Supervised"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML_Supervised" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#metric_learn.itml.ITML" title="metric_learn.itml.ITML"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.itml.ITML</span></code></a></p>
+<p>Information Theoretic Metric Learning (ITML)</p>
+<dl class="method">
+<dt id="metric_learn.itml.ITML_Supervised.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>labels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create constraints from labels and learn the ITML model.
+Needs num_constraints specified in constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : (n x d) data matrix</p>
+<blockquote>
+<div><p>each row corresponds to a single instance</p>
+</div></blockquote>
+<p class="last"><strong>labels</strong> : (n) data labels</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.itml.ITML_Supervised.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this metric learner.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<blockquote>
+<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
+scikit-learn has this on BaseEstimator.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : mapping of string to any</p>
+<blockquote class="last">
+<div><p>Parameter names mapped to their values.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.itml.ITML_Supervised.metric">
+<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.metric" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.itml.ITML_Supervised.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this metric learner.</p>
+<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.itml.ITML_Supervised.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies the metric transformation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : (n x d) matrix, optional</p>
+<blockquote>
+<div><p>Data to transform. If not supplied, the training data will be used.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transformed</strong> : (n x d) matrix</p>
+<blockquote class="last">
+<div><p>Input data transformed to the metric space by <span class="math">\(XL^{\top}\)</span></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.itml.ITML_Supervised.transformer">
+<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
+<p>L = inv(cholesky(M))</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">ITML</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">ITML_Supervised</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
 
-<span class="n">itml</span> <span class="o">=</span> <span class="n">ITML</span><span class="p">()</span>
-
-<span class="n">num_constraints</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="n">C</span> <span class="o">=</span> <span class="n">ITML</span><span class="o">.</span><span class="n">prepare_constraints</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num_constraints</span><span class="p">)</span>
-<span class="n">itml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">itml</span> <span class="o">=</span> <span class="n">ITML_Supervised</span><span class="p">(</span><span class="n">num_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">itml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -330,10 +430,10 @@ scikit-learn has this on BaseEstimator.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.lfda.html" class="btn btn-neutral float-right" title="Local Fisher Discriminant Analysis (LFDA)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.sdml.html" class="btn btn-neutral float-right" title="Sparse Determinant Metric Learning (SDML)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metric_learn.base_metric.html" class="btn btn-neutral" title="metric_learn.base_metric module" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="metric_learn.lmnn.html" class="btn btn-neutral" title="Large Margin Nearest Neighbor (LMNN)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

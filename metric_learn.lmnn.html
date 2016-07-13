@@ -31,9 +31,8 @@
 
   
     <link rel="top" title="metric-learn 0.2.1 documentation" href="index.html"/>
-        <link rel="up" title="metric_learn package" href="metric_learn.html"/>
-        <link rel="next" title="Least Squares Metric Learning (LSML)" href="metric_learn.lsml.html"/>
-        <link rel="prev" title="Local Fisher Discriminant Analysis (LFDA)" href="metric_learn.lfda.html"/> 
+        <link rel="next" title="Information Theoretic Metric Learning (ITML)" href="metric_learn.itml.html"/>
+        <link rel="prev" title="metric-learn: Metric Learning in Python" href="index.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -84,7 +83,7 @@
             
                 <p class="caption"><span class="caption-text">Algorithms</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Large Margin Nearest Neighbor (LMNN)</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Large Margin Nearest Neighbor (LMNN)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -102,7 +101,7 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.html">metric_learn.base_metric module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">Large Margin Nearest Neighbor (LMNN)</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Large Margin Nearest Neighbor (LMNN)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -138,15 +137,13 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
-      
-          <li><a href="metric_learn.html">metric_learn package</a> &raquo;</li>
       
     <li>Large Margin Nearest Neighbor (LMNN)</li>
       <li class="wy-breadcrumbs-aside">
@@ -178,11 +175,11 @@ This algorithm makes no assumptions about the distribution of the data.</p>
 
 <dl class="class">
 <dt id="metric_learn.lmnn.python_LMNN">
-<em class="property">class </em><code class="descclassname">metric_learn.lmnn.</code><code class="descname">python_LMNN</code><span class="sig-paren">(</span><em>k=3</em>, <em>min_iter=50</em>, <em>max_iter=1000</em>, <em>learn_rate=1e-07</em>, <em>regularization=0.5</em>, <em>convergence_tol=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">metric_learn.lmnn.</code><code class="descname">python_LMNN</code><span class="sig-paren">(</span><em>k=3</em>, <em>min_iter=50</em>, <em>max_iter=1000</em>, <em>learn_rate=1e-07</em>, <em>regularization=0.5</em>, <em>convergence_tol=0.001</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">metric_learn.lmnn._base_LMNN</span></code></p>
 <dl class="method">
 <dt id="metric_learn.lmnn.python_LMNN.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>labels</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.fit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>labels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -244,16 +241,16 @@ scikit-learn has this on BaseEstimator.</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">LMNN</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">LMNN</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
 
-<span class="n">lmnn</span> <span class="o">=</span> <span class="n">LMNN</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
-<span class="n">lmnn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">lmnn</span> <span class="o">=</span> <span class="n">LMNN</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">lmnn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="k">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If a recent version of the Shogun Python modular (<code class="docutils literal"><span class="pre">modshogun</span></code>) library
@@ -274,10 +271,10 @@ The two implementations differ slightly, and the C++ version is more complete.</
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.lsml.html" class="btn btn-neutral float-right" title="Least Squares Metric Learning (LSML)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.itml.html" class="btn btn-neutral float-right" title="Information Theoretic Metric Learning (ITML)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metric_learn.lfda.html" class="btn btn-neutral" title="Local Fisher Discriminant Analysis (LFDA)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="metric-learn: Metric Learning in Python" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

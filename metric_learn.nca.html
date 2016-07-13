@@ -31,8 +31,7 @@
 
   
     <link rel="top" title="metric-learn 0.2.1 documentation" href="index.html"/>
-        <link rel="up" title="metric_learn package" href="metric_learn.html"/>
-        <link rel="next" title="Relative Components Analysis (RCA)" href="metric_learn.rca.html"/>
+        <link rel="next" title="Local Fisher Discriminant Analysis (LFDA)" href="metric_learn.lfda.html"/>
         <link rel="prev" title="Least Squares Metric Learning (LSML)" href="metric_learn.lsml.html"/> 
 
   
@@ -88,7 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Neighborhood Components Analysis (NCA)</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Neighborhood Components Analysis (NCA)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -104,7 +103,7 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">Neighborhood Components Analysis (NCA)</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Neighborhood Components Analysis (NCA)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -138,15 +137,13 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
-      
-          <li><a href="metric_learn.html">metric_learn package</a> &raquo;</li>
       
     <li>Neighborhood Components Analysis (NCA)</li>
       <li class="wy-breadcrumbs-aside">
@@ -266,13 +263,13 @@ scikit-learn has this on BaseEstimator.</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<div class="highlight-default"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">NCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
 
 <span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
 <span class="n">nca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
@@ -291,7 +288,7 @@ scikit-learn has this on BaseEstimator.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.rca.html" class="btn btn-neutral float-right" title="Relative Components Analysis (RCA)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.lfda.html" class="btn btn-neutral float-right" title="Local Fisher Discriminant Analysis (LFDA)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="metric_learn.lsml.html" class="btn btn-neutral" title="Least Squares Metric Learning (LSML)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>

@@ -17,6 +17,7 @@ metric learning algorithms.
    :caption: Algorithms
    :maxdepth: 1
 
+   metric_learn.covariance
    metric_learn.lmnn
    metric_learn.itml
    metric_learn.sdml
@@ -51,7 +52,7 @@ Alternately, download the source repository and run:
 
 **Dependencies**
 
--  Python 2.6+
+-  Python 2.7+, 3.4+
 -  numpy, scipy, scikit-learn
 -  (for running the examples only: matplotlib)
 
