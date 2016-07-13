@@ -8,6 +8,7 @@ import matplotlib.pyplot as pyplot
 from sklearn.metrics import pairwise_distances
 from sklearn.neighbors import NearestNeighbors
 
+import metric_learn.constraints as C
 from metric_learn import ITML, LMNN, LSML, SDML
 
 
@@ -25,9 +26,9 @@ def sandwich_demo():
   num_constraints = 60
   mls = [
       (LMNN(), (x, y)),
-      (ITML(), (x, ITML.prepare_constraints(y, len(x), num_constraints))),
-      (SDML(), (x, SDML.prepare_constraints(y, len(x), num_constraints))),
-      (LSML(), (x, LSML.prepare_constraints(y, num_constraints)))
+      (ITML(), (x, C.positive_negative_pairs(y, len(x), num_constraints))),
+      (SDML(), (x, C.adjacency_matrix(y, len(x), num_constraints))),
+      (LSML(), (x, C.relative_quadruplets(y, num_constraints)))
   ]
 
   for ax_num, (ml,args) in zip(xrange(3,7), mls):
