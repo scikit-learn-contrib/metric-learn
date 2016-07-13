@@ -15,10 +15,10 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'metric-learn'
-copyright = u'2015, CJ Carey and Yuan Tang'
+copyright = u'2015-2016, CJ Carey and Yuan Tang'
 author = u'CJ Carey and Yuan Tang'
-version = '0.2.1'
-release = '0.2.1'
+version = '0.3.0'
+release = '0.3.0'
 language = 'en'
 
 exclude_patterns = ['_build']
