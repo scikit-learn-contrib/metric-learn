@@ -1,13 +1,13 @@
 import unittest
 import numpy as np
-import scipy.sparse
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
-from metric_learn import LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised
-from metric_learn import LMNN, NCA, LFDA
+from metric_learn import (
+    LMNN, NCA, LFDA,
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
 
@@ -34,9 +34,8 @@ class MetricTestCase(unittest.TestCase):
 
 class TestLSML(MetricTestCase):
   def test_iris(self):
-    num_constraints = 200
-
-    lsml = LSML_Supervised(num_constraints=num_constraints).fit(self.iris_points, self.iris_labels)
+    lsml = LSML_Supervised(num_constraints=200)
+    lsml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(lsml.transform(), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible
@@ -44,9 +43,8 @@ class TestLSML(MetricTestCase):
 
 class TestITML(MetricTestCase):
   def test_iris(self):
-    num_constraints = 200
-
-    itml = ITML_Supervised(num_constraints=num_constraints).fit(self.iris_points, self.iris_labels)
+    itml = ITML_Supervised(num_constraints=200)
+    itml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(itml.transform(), self.iris_labels)
     self.assertLess(csep, 0.4)  # it's not great
@@ -54,11 +52,9 @@ class TestITML(MetricTestCase):
 
 class TestLMNN(MetricTestCase):
   def test_iris(self):
-    k = 5
-
     # Test both impls, if available.
     for LMNN_cls in set((LMNN, python_LMNN)):
-      lmnn = LMNN_cls(k=k, learn_rate=1e-6, verbose=False)
+      lmnn = LMNN_cls(k=5, learn_rate=1e-6, verbose=False)
       lmnn.fit(self.iris_points, self.iris_labels)
 
       csep = class_separation(lmnn.transform(), self.iris_labels)
@@ -67,13 +63,12 @@ class TestLMNN(MetricTestCase):
 
 class TestSDML(MetricTestCase):
   def test_iris(self):
-    num_constraints = 1500
-
     # Note: this is a flaky test, which fails for certain seeds.
     # TODO: un-flake it!
     np.random.seed(5555)
 
-    sdml = SDML_Supervised(num_constraints=num_constraints).fit(self.iris_points, self.iris_labels)
+    sdml = SDML_Supervised(num_constraints=1500)
+    sdml.fit(self.iris_points, self.iris_labels)
     csep = class_separation(sdml.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
