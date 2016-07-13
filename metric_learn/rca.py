@@ -14,8 +14,8 @@ from __future__ import absolute_import
 import numpy as np
 from six.moves import xrange
 
-from . import constraints
 from .base_metric import BaseMetricLearner
+from .constraints import Constraints
 
 
 class RCA(BaseMetricLearner):
@@ -99,7 +99,7 @@ def _inv_sqrtm(x):
 
 
 class RCA_Supervised(RCA):
-  def __init__(self, dim=None, num_chunks=None, chunk_size=None, seed=None):
+  def __init__(self, dim=None, num_chunks=100, chunk_size=2):
     """Initialize the learner.
 
     Parameters
@@ -108,15 +108,9 @@ class RCA_Supervised(RCA):
         embedding dimension (default: original dimension of data)
     num_chunks: int, optional
     chunk_size: int, optional
-    seed: int, optional
     """
-    # @TODO: remove seed from param. See @TODO in constraints/chunks
     RCA.__init__(self, dim=dim)
-    self.params.update({
-      'num_chunks': 100 if num_chunks is None else num_chunks,
-      'chunk_size': 2 if chunk_size is None else chunk_size,
-      'seed': seed,
-    })
+    self.params.update(num_chunks=num_chunks, chunk_size=chunk_size)
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the LSML model.
@@ -128,6 +122,6 @@ class RCA_Supervised(RCA):
         each row corresponds to a single instance
     labels : (n) data labels
     """
-    C = constraints.chunks(labels, self.params['num_chunks'],
-                           self.params['chunk_size'], self.params['seed'])
-    return RCA.fit(self, X, C)
+    chunks = Constraints(labels).chunks(num_chunks=self.params['num_chunks'],
+                                        chunk_size=self.params['chunk_size'])
+    return RCA.fit(self, X, chunks)

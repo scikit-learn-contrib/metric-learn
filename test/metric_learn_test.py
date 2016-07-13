@@ -98,7 +98,7 @@ class TestLFDA(MetricTestCase):
 
 class TestRCA(MetricTestCase):
   def test_iris(self):
-    rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2, seed=1234)
+    rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)

@@ -16,8 +16,8 @@ import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 
-from . import constraints
 from .base_metric import BaseMetricLearner
+from .constraints import Constraints
 
 
 class ITML(BaseMetricLearner):
@@ -70,7 +70,7 @@ class ITML(BaseMetricLearner):
     ----------
     X : (n x d) data matrix
         each row corresponds to a single instance
-    constraints : tuple of arrays
+    constraints : 4-tuple of arrays
         (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
     bounds : list (pos,neg) pairs, optional
         bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
@@ -142,7 +142,8 @@ else:
 class ITML_Supervised(ITML):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iters=1000, convergence_threshold=1e-3,
-               num_constraints=None, bounds=None, A0=None, verbose=False):
+               num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
+               verbose=False):
     """Initialize the learner.
 
     Parameters
@@ -151,17 +152,17 @@ class ITML_Supervised(ITML):
         value for slack variables
     max_iters : int, optional
     convergence_threshold : float, optional
-    num_constraints: int, needed for .fit()
+    num_labeled : int, optional
+        number of labels to preserve for training
+    num_constraints: int, optional
+        number of constraints to generate
     verbose : bool, optional
         if True, prints information while learning
     """
     ITML.__init__(self, gamma=gamma, max_iters=max_iters,
                   convergence_threshold=convergence_threshold, verbose=verbose)
-    self.params.update({
-      'num_constraints': num_constraints,
-      'bounds': bounds,
-      'A0': A0,
-    })
+    self.params.update(num_labeled=num_labeled, num_constraints=num_constraints,
+                       bounds=bounds, A0=A0)
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the ITML model.
@@ -178,6 +179,6 @@ class ITML_Supervised(ITML):
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    C = constraints.positive_negative_pairs(labels, X.shape[0], num_constraints)
-    return ITML.fit(self, X, C, bounds=self.params['bounds'],
-                    A0=self.params['A0'])
+    c = Constraints.random_subset(labels, self.params['num_labeled'])
+    return ITML.fit(self, X, c.positive_negative_pairs(num_constraints),
+                    bounds=self.params['bounds'], A0=self.params['A0'])

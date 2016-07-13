@@ -14,8 +14,8 @@ from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 
-from . import constraints
 from .base_metric import BaseMetricLearner
+from .constraints import Constraints
 
 
 class SDML(BaseMetricLearner):
@@ -69,16 +69,25 @@ class SDML(BaseMetricLearner):
 
 class SDML_Supervised(SDML):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_constraints=None, verbose=False):
+               num_labeled=np.inf, num_constraints=None, verbose=False):
     SDML.__init__(self, balance_param=balance_param,
                   sparsity_param=sparsity_param, use_cov=use_cov,
                   verbose=verbose)
-    self.params['num_constraints'] = num_constraints
-
-  __init__.__doc__ = (
-      SDML.__init__.__doc__ +
-      'num_constraints: int, optional\n'
-      '        number of constraints to generate')
+    '''
+    balance_param: float, optional
+        trade off between sparsity and M0 prior
+    sparsity_param: float, optional
+        trade off between optimizer and sparseness (see graph_lasso)
+    use_cov: bool, optional
+        controls prior matrix, will use the identity if use_cov=False
+    num_labeled : int, optional
+        number of labels to preserve for training
+    num_constraints: int, optional
+        number of constraints to generate
+    verbose : bool, optional
+        if True, prints information while learning
+    '''
+    self.params.update(num_labeled=num_labeled, num_constraints=num_constraints)
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the SDML model.
@@ -94,5 +103,5 @@ class SDML_Supervised(SDML):
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    W = constraints.adjacency_matrix(labels, X.shape[0], num_constraints)
-    return SDML.fit(self, X, W)
+    c = Constraints.random_subset(labels, self.params['num_labeled'])
+    return SDML.fit(self, X, c.adjacency_matrix(num_constraints))

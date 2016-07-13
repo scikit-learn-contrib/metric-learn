@@ -7,8 +7,7 @@ from matplotlib import pyplot as plt
 from sklearn.metrics import pairwise_distances
 from sklearn.neighbors import NearestNeighbors
 
-import metric_learn.constraints as C
-from metric_learn import ITML, LMNN, LSML, SDML
+from metric_learn import LMNN, ITML_Supervised, LSML_Supervised, SDML_Supervised
 
 
 def sandwich_demo():
@@ -22,22 +21,21 @@ def sandwich_demo():
   ax.set_xticks([])
   ax.set_yticks([])
 
-  num_constraints = 60
   mls = [
-      (LMNN(), (x, y)),
-      (ITML(), (x, C.positive_negative_pairs(y, len(x), num_constraints))),
-      (SDML(), (x, C.adjacency_matrix(y, len(x), num_constraints))),
-      (LSML(), (x, C.relative_quadruplets(y, num_constraints)))
+      LMNN(),
+      ITML_Supervised(num_constraints=200),
+      SDML_Supervised(num_constraints=200),
+      LSML_Supervised(num_constraints=200),
   ]
 
-  for ax_num, (ml,args) in zip(range(3,7), mls):
-    ml.fit(*args)
+  for ax_num, ml in enumerate(mls, start=3):
+    ml.fit(x, y)
     tx = ml.transform()
     ml_knn = nearest_neighbors(tx, k=2)
-    ax = plt.subplot(3,2,ax_num)
-    plot_sandwich_data(tx, y, ax)
-    plot_neighborhood_graph(tx, ml_knn, y, ax)
-    ax.set_title('%s space' % ml.__class__.__name__)
+    ax = plt.subplot(3, 2, ax_num)
+    plot_sandwich_data(tx, y, axis=ax)
+    plot_neighborhood_graph(tx, ml_knn, y, axis=ax)
+    ax.set_title(ml.__class__.__name__)
     ax.set_xticks([])
     ax.set_yticks([])
   plt.show()

@@ -10,6 +10,7 @@ On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
 from __future__ import absolute_import
 import numpy as np
+
 from .base_metric import BaseMetricLearner
 
 

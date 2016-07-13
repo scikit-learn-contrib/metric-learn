@@ -15,6 +15,7 @@ import numpy as np
 import scipy
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
+
 from .base_metric import BaseMetricLearner
 
 

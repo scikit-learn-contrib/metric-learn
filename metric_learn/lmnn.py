@@ -14,6 +14,7 @@ import numpy as np
 from collections import Counter
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
+
 from .base_metric import BaseMetricLearner
 
 
@@ -237,10 +238,12 @@ try:
 
   class LMNN(_base_LMNN):
     def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
-                 regularization=0.5, convergence_tol=0.001, use_pca=True, verbose=False):
+                 regularization=0.5, convergence_tol=0.001, use_pca=True,
+                 verbose=False):
       _base_LMNN.__init__(self, k=k, min_iter=min_iter, max_iter=max_iter,
                           learn_rate=learn_rate, regularization=regularization,
-                          convergence_tol=convergence_tol, use_pca=use_pca, verbose=verbose)
+                          convergence_tol=convergence_tol, use_pca=use_pca,
+                          verbose=verbose)
 
     def fit(self, X, labels):
       self.X = X

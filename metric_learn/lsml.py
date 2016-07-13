@@ -12,8 +12,8 @@ import numpy as np
 import scipy.linalg
 from six.moves import xrange
 
-from . import constraints
 from .base_metric import BaseMetricLearner
+from .constraints import Constraints
 
 
 class LSML(BaseMetricLearner):
@@ -35,10 +35,12 @@ class LSML(BaseMetricLearner):
 
   def _prepare_inputs(self, X, constraints, weights, prior):
     self.X = X
-    self.vab = np.diff(X[constraints[:,:2]], axis=1)[:,0]
-    self.vcd = np.diff(X[constraints[:,2:]], axis=1)[:,0]
+    a,b,c,d = constraints
+    self.vab = X[a] - X[b]
+    self.vcd = X[c] - X[d]
+    assert self.vab.shape == self.vcd.shape, 'Constraints must have same length'
     if weights is None:
-      self.w = np.ones(constraints.shape[0])
+      self.w = np.ones(self.vab.shape[0])
     else:
       self.w = weights
     self.w /= self.w.sum()  # weights must sum to 1
@@ -57,7 +59,7 @@ class LSML(BaseMetricLearner):
     ----------
     X : (n x d) data matrix
         each row corresponds to a single instance
-    constraints : (m x 4) matrix of ints
+    constraints : 4-tuple of arrays
         (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
     weights : (m,) array of floats, optional
         scale factor for each constraint
@@ -130,8 +132,8 @@ def _regularization_loss(metric, prior_inv):
 
 
 class LSML_Supervised(LSML):
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_constraints=None,
-               weights=None, verbose=False):
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
+               num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.
 
     Parameters
@@ -140,18 +142,18 @@ class LSML_Supervised(LSML):
     max_iter : int, optional
     prior : (d x d) matrix, optional
         guess at a metric [default: covariance(X)]
-    num_constraints: int, needed for .fit()
+    num_labeled : int, optional
+        number of labels to preserve for training
+    num_constraints: int, optional
+        number of constraints to generate
     weights : (m,) array of floats, optional
         scale factor for each constraint
     verbose : bool, optional
         if True, prints information while learning
     """
     LSML.__init__(self, tol=tol, max_iter=max_iter, verbose=verbose)
-    self.params.update({
-      'prior': prior,
-      'num_constraints': num_constraints,
-      'weights': weights,
-    })
+    self.params.update(prior=prior, num_labeled=num_labeled,
+                       num_constraints=num_constraints, weights=weights)
 
   def fit(self, X, labels):
     """Create constraints from labels and learn the LSML model.
@@ -168,6 +170,7 @@ class LSML_Supervised(LSML):
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    C = constraints.relative_quadruplets(labels, num_constraints)
-    return LSML.fit(self, X, C, weights=self.params['weights'],
+    c = Constraints.random_subset(labels, self.params['num_labeled'])
+    pairs = c.positive_negative_pairs(num_constraints, same_length=True)
+    return LSML.fit(self, X, pairs, weights=self.params['weights'],
                     prior=self.params['prior'])
