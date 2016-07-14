@@ -93,10 +93,8 @@ class LFDA(BaseMetricLearner):
     tSb -= _sum_outer(X)/n - tSw
 
     # symmetrize
-    tSb += tSb.T
-    tSb /= 2
-    tSw += tSw.T
-    tSw /= 2
+    tSb = (tSb + tSb.T) / 2
+    tSw = (tSw + tSw.T) / 2
 
     if self.params['dim'] == d:
       vals, vecs = scipy.linalg.eigh(tSb, tSw)
