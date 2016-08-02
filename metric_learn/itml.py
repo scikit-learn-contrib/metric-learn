@@ -9,6 +9,8 @@ This algorithm can handle a wide variety of constraints and can optionally
 incorporate a prior on the distance function.
 Unlike some other methods, ITML does not rely on an eigenvalue computation
 or semi-definite programming.
+
+Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
 """
 
 from __future__ import print_function, absolute_import
