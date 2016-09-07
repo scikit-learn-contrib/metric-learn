@@ -6,7 +6,7 @@ from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
-    LMNN, NCA, LFDA,
+    LMNN, NCA, LFDA, Covariance,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
@@ -30,6 +30,16 @@ class MetricTestCase(unittest.TestCase):
     self.iris_points = iris_data['data']
     self.iris_labels = iris_data['target']
     np.random.seed(1234)
+
+
+class TestCovariance(MetricTestCase):
+  def test_iris(self):
+    cov = Covariance()
+    cov.fit(self.iris_points)
+
+    csep = class_separation(cov.transform(), self.iris_labels)
+    # deterministic result
+    self.assertAlmostEqual(csep, 0.73068122)
 
 
 class TestLSML(MetricTestCase):

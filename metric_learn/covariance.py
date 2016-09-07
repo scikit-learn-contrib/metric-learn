@@ -26,5 +26,6 @@ class Covariance(BaseMetricLearner):
     X: data matrix, (n x d)
     y: unused, optional
     """
+    self.X = X
     self.M = np.cov(X.T)
     return self
