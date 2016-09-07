@@ -138,7 +138,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.rca</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;Relative Components Analysis (RCA)</span>
+<span></span><span class="sd">&quot;&quot;&quot;Relative Components Analysis (RCA)</span>
 
 <span class="sd">RCA learns a full rank Mahalanobis distance metric based on a</span>
 <span class="sd">weighted sum of in-class covariance matrices.</span>
@@ -160,7 +160,7 @@
 
 <div class="viewcode-block" id="RCA"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA">[docs]</a><span class="k">class</span> <span class="nc">RCA</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Relevant Components Analysis (RCA)&quot;&quot;&quot;</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initialize the learner.</span>
 
 <span class="sd">    Parameters</span>
@@ -169,7 +169,7 @@
 <span class="sd">        embedding dimension (default: original dimension of data)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="s">&#39;dim&#39;</span><span class="p">:</span> <span class="n">dim</span><span class="p">,</span>
+      <span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="n">dim</span><span class="p">,</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="RCA.transformer"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA.transformer">[docs]</a>  <span class="k">def</span> <span class="nf">transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -180,10 +180,10 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
     <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="k">None</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">:</span>
-      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid embedding dimension, must be in [1,%d]&#39;</span> <span class="o">%</span> <span class="n">d</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid embedding dimension, must be in [1,</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">d</span><span class="p">)</span>
 
     <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
     <span class="n">num_chunks</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
@@ -203,10 +203,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_inputs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span>
 
-    <span class="c"># mean center</span>
+    <span class="c1"># mean center</span>
     <span class="n">data</span> <span class="o">-=</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c"># mean center each chunklet separately</span>
+    <span class="c1"># mean center each chunklet separately</span>
     <span class="n">chunk_mask</span> <span class="o">=</span> <span class="n">chunks</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="n">chunk_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">]</span>
     <span class="n">chunk_labels</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">]</span>
@@ -214,15 +214,15 @@
       <span class="n">mask</span> <span class="o">=</span> <span class="n">chunk_labels</span> <span class="o">==</span> <span class="n">c</span>
       <span class="n">chunk_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-=</span> <span class="n">chunk_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c"># &quot;inner&quot; covariance of chunk deviations</span>
+    <span class="c1"># &quot;inner&quot; covariance of chunk deviations</span>
     <span class="n">inner_cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">chunk_data</span><span class="p">,</span> <span class="n">rowvar</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="c"># Fisher Linear Discriminant projection</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
+    <span class="c1"># Fisher Linear Discriminant projection</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
       <span class="n">total_cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">],</span> <span class="n">rowvar</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
       <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">total_cov</span><span class="p">,</span> <span class="n">inner_cov</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
       <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-      <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">vals</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]]</span>
+      <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">vals</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]]</span>
       <span class="n">A</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span><span class="n">inds</span><span class="p">]</span>
       <span class="n">inner_cov</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inner_cov</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span> <span class="o">=</span> <span class="n">_inv_sqrtm</span><span class="p">(</span><span class="n">inner_cov</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
@@ -239,7 +239,7 @@
 
 
 <div class="viewcode-block" id="RCA_Supervised"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA_Supervised">[docs]</a><span class="k">class</span> <span class="nc">RCA_Supervised</span><span class="p">(</span><span class="n">RCA</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">num_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initialize the learner.</span>
 
 <span class="sd">    Parameters</span>
@@ -262,8 +262,8 @@
 <span class="sd">        each row corresponds to a single instance</span>
 <span class="sd">    labels : (n) data labels</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">chunks</span> <span class="o">=</span> <span class="n">Constraints</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">chunks</span><span class="p">(</span><span class="n">num_chunks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;num_chunks&#39;</span><span class="p">],</span>
-                                        <span class="n">chunk_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;chunk_size&#39;</span><span class="p">])</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="n">Constraints</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">chunks</span><span class="p">(</span><span class="n">num_chunks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_chunks&#39;</span><span class="p">],</span>
+                                        <span class="n">chunk_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">RCA</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span></div></div>
 </pre></div>
 

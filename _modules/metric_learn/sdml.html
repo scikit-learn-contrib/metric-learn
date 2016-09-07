@@ -138,7 +138,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.sdml</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Qi et al.</span>
 <span class="sd">An efficient sparse metric learning in high-dimensional space via</span>
 <span class="sd">L1-penalized log-determinant regularization.</span>
@@ -159,8 +159,8 @@
 
 
 <div class="viewcode-block" id="SDML"><a class="viewcode-back" href="../../metric_learn.sdml.html#metric_learn.sdml.SDML">[docs]</a><span class="k">class</span> <span class="nc">SDML</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">use_cov</span><span class="o">=</span><span class="k">True</span><span class="p">,</span>
-               <span class="n">verbose</span><span class="o">=</span><span class="k">False</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">use_cov</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+               <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    balance_param: float, optional</span>
 <span class="sd">        trade off between sparsity and M0 prior</span>
@@ -172,20 +172,20 @@
 <span class="sd">        if True, prints information while learning</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="s">&#39;balance_param&#39;</span><span class="p">:</span> <span class="n">balance_param</span><span class="p">,</span>
-      <span class="s">&#39;sparsity_param&#39;</span><span class="p">:</span> <span class="n">sparsity_param</span><span class="p">,</span>
-      <span class="s">&#39;use_cov&#39;</span><span class="p">:</span> <span class="n">use_cov</span><span class="p">,</span>
-      <span class="s">&#39;verbose&#39;</span><span class="p">:</span> <span class="n">verbose</span><span class="p">,</span>
+      <span class="s1">&#39;balance_param&#39;</span><span class="p">:</span> <span class="n">balance_param</span><span class="p">,</span>
+      <span class="s1">&#39;sparsity_param&#39;</span><span class="p">:</span> <span class="n">sparsity_param</span><span class="p">,</span>
+      <span class="s1">&#39;use_cov&#39;</span><span class="p">:</span> <span class="n">use_cov</span><span class="p">,</span>
+      <span class="s1">&#39;verbose&#39;</span><span class="p">:</span> <span class="n">verbose</span><span class="p">,</span>
     <span class="p">}</span>
 
   <span class="k">def</span> <span class="nf">_prepare_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
-    <span class="c"># set up prior M</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;use_cov&#39;</span><span class="p">]:</span>
+    <span class="c1"># set up prior M</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;use_cov&#39;</span><span class="p">]:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="n">laplacian</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="k">False</span><span class="p">)</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">laplacian</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">loss_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">))</span>
 
 <div class="viewcode-block" id="SDML.metric"><a class="viewcode-back" href="../../metric_learn.sdml.html#metric_learn.sdml.SDML.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -199,18 +199,18 @@
 <span class="sd">        +1 for positive pairs, -1 for negative.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span>
-    <span class="n">P</span> <span class="o">=</span> <span class="n">pinvh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;balance_param&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_matrix</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">pinvh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;balance_param&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_matrix</span>
     <span class="n">emp_cov</span> <span class="o">=</span> <span class="n">pinvh</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
-    <span class="c"># hack: ensure positive semidefinite</span>
+    <span class="c1"># hack: ensure positive semidefinite</span>
     <span class="n">emp_cov</span> <span class="o">=</span> <span class="n">emp_cov</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">emp_cov</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">graph_lasso</span><span class="p">(</span><span class="n">emp_cov</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;sparsity_param&#39;</span><span class="p">],</span>
-                            <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;verbose&#39;</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">M</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">graph_lasso</span><span class="p">(</span><span class="n">emp_cov</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;sparsity_param&#39;</span><span class="p">],</span>
+                            <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;verbose&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="bp">self</span></div></div>
 
 
 <div class="viewcode-block" id="SDML_Supervised"><a class="viewcode-back" href="../../metric_learn.sdml.html#metric_learn.sdml.SDML_Supervised">[docs]</a><span class="k">class</span> <span class="nc">SDML_Supervised</span><span class="p">(</span><span class="n">SDML</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">use_cov</span><span class="o">=</span><span class="k">True</span><span class="p">,</span>
-               <span class="n">num_labeled</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">num_constraints</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="k">False</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">use_cov</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+               <span class="n">num_labeled</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">num_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">SDML</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="n">balance_param</span><span class="p">,</span>
                   <span class="n">sparsity_param</span><span class="o">=</span><span class="n">sparsity_param</span><span class="p">,</span> <span class="n">use_cov</span><span class="o">=</span><span class="n">use_cov</span><span class="p">,</span>
                   <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
@@ -239,12 +239,12 @@
 <span class="sd">        each row corresponds to a single instance</span>
 <span class="sd">    labels: data labels, (n,) array-like</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;num_constraints&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">num_constraints</span> <span class="ow">is</span> <span class="k">None</span><span class="p">:</span>
+    <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_constraints&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">num_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="n">num_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
       <span class="n">num_constraints</span> <span class="o">=</span> <span class="mi">20</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">num_classes</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
 
-    <span class="n">c</span> <span class="o">=</span> <span class="n">Constraints</span><span class="o">.</span><span class="n">random_subset</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;num_labeled&#39;</span><span class="p">])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Constraints</span><span class="o">.</span><span class="n">random_subset</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_labeled&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">SDML</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">adjacency_matrix</span><span class="p">(</span><span class="n">num_constraints</span><span class="p">))</span></div></div>
 </pre></div>
 

@@ -138,7 +138,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.lmnn</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Large-margin nearest neighbor metric learning. (Weinberger 2005)</span>
 
 <span class="sd">LMNN learns a Mahanalobis distance metric in the kNN classification setting</span>
@@ -147,7 +147,7 @@
 <span class="sd">while keeping examples from different classes separated by a large margin.</span>
 <span class="sd">This algorithm makes no assumptions about the distribution of the data.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c">#TODO: periodic recalculation of impostors, PCA initialization</span>
+<span class="c1">#TODO: periodic recalculation of impostors, PCA initialization</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -158,7 +158,7 @@
 <span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">BaseMetricLearner</span>
 
 
-<span class="c"># commonality between LMNN implementations</span>
+<span class="c1"># commonality between LMNN implementations</span>
 <span class="k">class</span> <span class="nc">_base_LMNN</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">kwargs</span>
@@ -167,10 +167,10 @@
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
 
 
-<span class="c"># slower Python version</span>
+<span class="c1"># slower Python version</span>
 <div class="viewcode-block" id="python_LMNN"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.python_LMNN">[docs]</a><span class="k">class</span> <span class="nc">python_LMNN</span><span class="p">(</span><span class="n">_base_LMNN</span><span class="p">):</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span>
-               <span class="n">regularization</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="k">False</span><span class="p">):</span>
+               <span class="n">regularization</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initialize the LMNN object</span>
 
 <span class="sd">    k: number of neighbors to consider. (does not include self-edges)</span>
@@ -183,57 +183,57 @@
   <span class="k">def</span> <span class="nf">_process_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
     <span class="n">num_pts</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_pts</span>
-    <span class="n">unique_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
+    <span class="n">unique_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">required_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">required_k</span><span class="p">,</span> <span class="p">(</span>
-        <span class="s">&#39;not enough class labels for specified k&#39;</span>
-        <span class="s">&#39; (smallest class has %d)&#39;</span> <span class="o">%</span> <span class="n">required_k</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">required_k</span><span class="p">,</span> <span class="p">(</span>
+        <span class="s1">&#39;not enough class labels for specified k&#39;</span>
+        <span class="s1">&#39; (smallest class has </span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">required_k</span><span class="p">)</span>
 
 <div class="viewcode-block" id="python_LMNN.fit"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.python_LMNN.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
-    <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span>
-    <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;verbose&#39;</span><span class="p">]</span>
-    <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;regularization&#39;</span><span class="p">]</span>
-    <span class="n">learn_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;learn_rate&#39;</span><span class="p">]</span>
-    <span class="n">convergence_tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;convergence_tol&#39;</span><span class="p">]</span>
-    <span class="n">min_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;min_iter&#39;</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;verbose&#39;</span><span class="p">]</span>
+    <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;regularization&#39;</span><span class="p">]</span>
+    <span class="n">learn_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;learn_rate&#39;</span><span class="p">]</span>
+    <span class="n">convergence_tol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;convergence_tol&#39;</span><span class="p">]</span>
+    <span class="n">min_iter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;min_iter&#39;</span><span class="p">]</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_process_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 
     <span class="n">target_neighbors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_targets</span><span class="p">()</span>
     <span class="n">impostors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_impostors</span><span class="p">(</span><span class="n">target_neighbors</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
-    <span class="c"># sum outer products</span>
+    <span class="c1"># sum outer products</span>
     <span class="n">dfG</span> <span class="o">=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">target_neighbors</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
                               <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">k</span><span class="p">))</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dfG</span><span class="p">)</span>
 
-    <span class="c"># storage</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="p">[</span><span class="k">None</span><span class="p">]</span><span class="o">*</span><span class="n">k</span>
-    <span class="n">a2</span> <span class="o">=</span> <span class="p">[</span><span class="k">None</span><span class="p">]</span><span class="o">*</span><span class="n">k</span>
+    <span class="c1"># storage</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">k</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">k</span>
     <span class="k">for</span> <span class="n">nn_idx</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
       <span class="n">a1</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
       <span class="n">a2</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
-    <span class="c"># initialize gradient and L</span>
+    <span class="c1"># initialize gradient and L</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">dfG</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">+</span> <span class="n">df</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">reg</span><span class="p">)</span>
     <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span>
     <span class="n">objective</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
 
-    <span class="c"># main loop</span>
-    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;max_iter&#39;</span><span class="p">]):</span>
+    <span class="c1"># main loop</span>
+    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_iter&#39;</span><span class="p">]):</span>
       <span class="n">df_old</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
       <span class="n">a1_old</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">a1</span><span class="p">]</span>
       <span class="n">a2_old</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">a2</span><span class="p">]</span>
       <span class="n">objective_old</span> <span class="o">=</span> <span class="n">objective</span>
-      <span class="c"># Compute pairwise distances under current metric</span>
+      <span class="c1"># Compute pairwise distances under current metric</span>
       <span class="n">Lx</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
       <span class="n">g0</span> <span class="o">=</span> <span class="n">_inplace_paired_L2</span><span class="p">(</span><span class="o">*</span><span class="n">Lx</span><span class="p">[</span><span class="n">impostors</span><span class="p">])</span>
-      <span class="n">Ni</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">_inplace_paired_L2</span><span class="p">(</span><span class="n">Lx</span><span class="p">[</span><span class="n">target_neighbors</span><span class="p">],</span> <span class="n">Lx</span><span class="p">[:,</span><span class="k">None</span><span class="p">,:])</span>
+      <span class="n">Ni</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">_inplace_paired_L2</span><span class="p">(</span><span class="n">Lx</span><span class="p">[</span><span class="n">target_neighbors</span><span class="p">],</span> <span class="n">Lx</span><span class="p">[:,</span><span class="kc">None</span><span class="p">,:])</span>
       <span class="n">g1</span><span class="p">,</span><span class="n">g2</span> <span class="o">=</span> <span class="n">Ni</span><span class="p">[</span><span class="n">impostors</span><span class="p">]</span>
 
-      <span class="c"># compute the gradient</span>
+      <span class="c1"># compute the gradient</span>
       <span class="n">total_active</span> <span class="o">=</span> <span class="mi">0</span>
       <span class="k">for</span> <span class="n">nn_idx</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">xrange</span><span class="p">(</span><span class="n">k</span><span class="p">)):</span>
         <span class="n">act1</span> <span class="o">=</span> <span class="n">g0</span> <span class="o">&lt;</span> <span class="n">g1</span><span class="p">[:,</span><span class="n">nn_idx</span><span class="p">]</span>
@@ -267,11 +267,11 @@
         <span class="n">a1</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">act1</span>
         <span class="n">a2</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">act2</span>
 
-      <span class="c"># do the gradient update</span>
+      <span class="c1"># do the gradient update</span>
       <span class="k">assert</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
       <span class="n">G</span> <span class="o">=</span> <span class="n">dfG</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">+</span> <span class="n">df</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">reg</span><span class="p">)</span>
 
-      <span class="c"># compute the objective function</span>
+      <span class="c1"># compute the objective function</span>
       <span class="n">objective</span> <span class="o">=</span> <span class="n">total_active</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">reg</span><span class="p">)</span>
       <span class="n">objective</span> <span class="o">+=</span> <span class="n">G</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
       <span class="k">assert</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">objective</span><span class="p">)</span>
@@ -280,42 +280,42 @@
       <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">delta_obj</span><span class="p">,</span> <span class="n">total_active</span><span class="p">,</span> <span class="n">learn_rate</span><span class="p">)</span>
 
-      <span class="c"># update step size</span>
+      <span class="c1"># update step size</span>
       <span class="k">if</span> <span class="n">delta_obj</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c"># we&#39;re getting worse... roll back!</span>
+        <span class="c1"># we&#39;re getting worse... roll back!</span>
         <span class="n">learn_rate</span> <span class="o">/=</span> <span class="mf">2.0</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df_old</span>
         <span class="n">a1</span> <span class="o">=</span> <span class="n">a1_old</span>
         <span class="n">a2</span> <span class="o">=</span> <span class="n">a2_old</span>
         <span class="n">objective</span> <span class="o">=</span> <span class="n">objective_old</span>
       <span class="k">else</span><span class="p">:</span>
-        <span class="c"># update L</span>
+        <span class="c1"># update L</span>
         <span class="n">L</span> <span class="o">-=</span> <span class="n">learn_rate</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
         <span class="n">learn_rate</span> <span class="o">*=</span> <span class="mf">1.01</span>
 
-      <span class="c"># check for convergence</span>
+      <span class="c1"># check for convergence</span>
       <span class="k">if</span> <span class="n">it</span> <span class="o">&gt;</span> <span class="n">min_iter</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">delta_obj</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">convergence_tol</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-          <span class="nb">print</span><span class="p">(</span><span class="s">&quot;LMNN converged with objective&quot;</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+          <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LMNN converged with objective&quot;</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
         <span class="k">break</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s">&quot;LMNN didn&#39;t converge in %(max_iter)d steps.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LMNN didn&#39;t converge in </span><span class="si">%(max_iter)d</span><span class="s2"> steps.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
 
-    <span class="c"># store the last L</span>
+    <span class="c1"># store the last L</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">L</span>
     <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="python_LMNN.metric"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.python_LMNN.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="python_LMNN.transform"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.python_LMNN.transform">[docs]</a>  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="k">None</span><span class="p">:</span>
+<div class="viewcode-block" id="python_LMNN.transform"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.python_LMNN.transform">[docs]</a>  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
 
   <span class="k">def</span> <span class="nf">_select_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span>
     <span class="n">target_neighbors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">k</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
       <span class="n">inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span>
@@ -333,12 +333,12 @@
       <span class="n">in_inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span>
       <span class="n">out_inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds</span> <span class="o">&gt;</span> <span class="n">label</span><span class="p">)</span>
       <span class="n">dist</span> <span class="o">=</span> <span class="n">pairwise_distances</span><span class="p">(</span><span class="n">Lx</span><span class="p">[</span><span class="n">out_inds</span><span class="p">],</span> <span class="n">Lx</span><span class="p">[</span><span class="n">in_inds</span><span class="p">])</span>
-      <span class="n">i1</span><span class="p">,</span><span class="n">j1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">dist</span> <span class="o">&lt;</span> <span class="n">margin_radii</span><span class="p">[</span><span class="n">out_inds</span><span class="p">][:,</span><span class="k">None</span><span class="p">])</span>
+      <span class="n">i1</span><span class="p">,</span><span class="n">j1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">dist</span> <span class="o">&lt;</span> <span class="n">margin_radii</span><span class="p">[</span><span class="n">out_inds</span><span class="p">][:,</span><span class="kc">None</span><span class="p">])</span>
       <span class="n">i2</span><span class="p">,</span><span class="n">j2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">dist</span> <span class="o">&lt;</span> <span class="n">margin_radii</span><span class="p">[</span><span class="n">in_inds</span><span class="p">])</span>
       <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">i1</span><span class="p">,</span><span class="n">i2</span><span class="p">))</span>
       <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">j1</span><span class="p">,</span><span class="n">j2</span><span class="p">))</span>
       <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c"># get unique (i,j) pairs using index trickery</span>
+        <span class="c1"># get unique (i,j) pairs using index trickery</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel_multi_index</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">),</span> <span class="n">shape</span><span class="p">)</span>
         <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">shape</span><span class="p">)</span>
@@ -349,7 +349,7 @@
 <span class="k">def</span> <span class="nf">_inplace_paired_L2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;Equivalent to ((A-B)**2).sum(axis=-1), but modifies A in place.&#39;&#39;&#39;</span>
   <span class="n">A</span> <span class="o">-=</span> <span class="n">B</span>
-  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s">&#39;...ij,...ij-&gt;...i&#39;</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;...ij,...ij-&gt;...i&#39;</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_count_edges</span><span class="p">(</span><span class="n">act1</span><span class="p">,</span> <span class="n">act2</span><span class="p">,</span> <span class="n">impostors</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
@@ -364,22 +364,22 @@
   <span class="k">return</span> <span class="n">active_pairs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
 
 
-<span class="k">def</span> <span class="nf">_sum_outer_products</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">a_inds</span><span class="p">,</span> <span class="n">b_inds</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_sum_outer_products</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">a_inds</span><span class="p">,</span> <span class="n">b_inds</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
   <span class="n">Xab</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">a_inds</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="n">b_inds</span><span class="p">]</span>
-  <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="k">None</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xab</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Xab</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[:,</span><span class="k">None</span><span class="p">])</span>
+  <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xab</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Xab</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[:,</span><span class="kc">None</span><span class="p">])</span>
   <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xab</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Xab</span><span class="p">)</span>
 
 
 <span class="k">try</span><span class="p">:</span>
-  <span class="c"># use the fast C++ version, if available</span>
+  <span class="c1"># use the fast C++ version, if available</span>
   <span class="kn">from</span> <span class="nn">modshogun</span> <span class="k">import</span> <span class="n">LMNN</span> <span class="k">as</span> <span class="n">shogun_LMNN</span>
   <span class="kn">from</span> <span class="nn">modshogun</span> <span class="k">import</span> <span class="n">RealFeatures</span><span class="p">,</span> <span class="n">MulticlassLabels</span>
 
 <div class="viewcode-block" id="LMNN"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.LMNN">[docs]</a>  <span class="k">class</span> <span class="nc">LMNN</span><span class="p">(</span><span class="n">_base_LMNN</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span>
-                 <span class="n">regularization</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">use_pca</span><span class="o">=</span><span class="k">True</span><span class="p">,</span>
-                 <span class="n">verbose</span><span class="o">=</span><span class="k">False</span><span class="p">):</span>
+                 <span class="n">regularization</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">use_pca</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
       <span class="n">_base_LMNN</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="n">min_iter</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
                           <span class="n">learn_rate</span><span class="o">=</span><span class="n">learn_rate</span><span class="p">,</span> <span class="n">regularization</span><span class="o">=</span><span class="n">regularization</span><span class="p">,</span>
                           <span class="n">convergence_tol</span><span class="o">=</span><span class="n">convergence_tol</span><span class="p">,</span> <span class="n">use_pca</span><span class="o">=</span><span class="n">use_pca</span><span class="p">,</span>
@@ -389,12 +389,12 @@
       <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
       <span class="n">labels</span> <span class="o">=</span> <span class="n">MulticlassLabels</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span> <span class="o">=</span> <span class="n">shogun_LMNN</span><span class="p">(</span><span class="n">RealFeatures</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">])</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_maxiter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;max_iter&#39;</span><span class="p">])</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_obj_threshold</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;convergence_tol&#39;</span><span class="p">])</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_regularization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;regularization&#39;</span><span class="p">])</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_stepsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;learn_rate&#39;</span><span class="p">])</span>
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;use_pca&#39;</span><span class="p">]:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span> <span class="o">=</span> <span class="n">shogun_LMNN</span><span class="p">(</span><span class="n">RealFeatures</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_maxiter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_iter&#39;</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_obj_threshold</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;convergence_tol&#39;</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_regularization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;regularization&#39;</span><span class="p">])</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_stepsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;learn_rate&#39;</span><span class="p">])</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;use_pca&#39;</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
       <span class="k">else</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>

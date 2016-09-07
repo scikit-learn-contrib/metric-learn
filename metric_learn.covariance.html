@@ -247,13 +247,13 @@ scikit-learn has this on BaseEstimator.</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">Covariance</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">Covariance</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
-<span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
 
-<span class="n">cov</span> <span class="o">=</span> <span class="n">Covariance</span><span class="p">()</span>
-<span class="n">x</span> <span class="o">=</span> <span class="n">cov</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">])</span>
+<span class="n">cov</span> <span class="o">=</span> <span class="n">Covariance</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">cov</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

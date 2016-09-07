@@ -138,7 +138,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.nca</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Neighborhood Components Analysis (NCA)</span>
 <span class="sd">Ported to Python from https://github.com/vomjom/nca</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -153,10 +153,10 @@
 <div class="viewcode-block" id="NCA"><a class="viewcode-back" href="../../metric_learn.nca.html#metric_learn.nca.NCA">[docs]</a><span class="k">class</span> <span class="nc">NCA</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="s">&#39;max_iter&#39;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">,</span>
-      <span class="s">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="n">learning_rate</span><span class="p">,</span>
+      <span class="s1">&#39;max_iter&#39;</span><span class="p">:</span> <span class="n">max_iter</span><span class="p">,</span>
+      <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="n">learning_rate</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="k">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="NCA.transformer"><a class="viewcode-back" href="../../metric_learn.nca.html#metric_learn.nca.NCA.transformer">[docs]</a>  <span class="k">def</span> <span class="nf">transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span></div>
@@ -167,25 +167,25 @@
 <span class="sd">    labels: scalar labels, (n)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
-    <span class="c"># Initialize A to a scaling matrix</span>
+    <span class="c1"># Initialize A to a scaling matrix</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
     <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)))</span>
 
-    <span class="c"># Run NCA</span>
-    <span class="n">dX</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span><span class="k">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="k">None</span><span class="p">]</span>  <span class="c"># shape (n, n, d)</span>
-    <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s">&#39;...i,...j-&gt;...ij&#39;</span><span class="p">,</span> <span class="n">dX</span><span class="p">,</span> <span class="n">dX</span><span class="p">)</span>  <span class="c"># shape (n, n, d, d)</span>
-    <span class="n">masks</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[:,</span><span class="k">None</span><span class="p">]</span> <span class="o">==</span> <span class="n">labels</span><span class="p">[</span><span class="k">None</span><span class="p">]</span>
-    <span class="n">learning_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;learning_rate&#39;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;max_iter&#39;</span><span class="p">]):</span>
+    <span class="c1"># Run NCA</span>
+    <span class="n">dX</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>  <span class="c1"># shape (n, n, d)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;...i,...j-&gt;...ij&#39;</span><span class="p">,</span> <span class="n">dX</span><span class="p">,</span> <span class="n">dX</span><span class="p">)</span>  <span class="c1"># shape (n, n, d, d)</span>
+    <span class="n">masks</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]</span> <span class="o">==</span> <span class="n">labels</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+    <span class="n">learning_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;learning_rate&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_iter&#39;</span><span class="p">]):</span>
       <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">masks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">Ax</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c"># shape (n, d)</span>
+        <span class="n">Ax</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># shape (n, d)</span>
 
-        <span class="n">softmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">Ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">Ax</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>  <span class="c"># shape (n)</span>
+        <span class="n">softmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">Ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">Ax</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># shape (n)</span>
         <span class="n">softmax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">softmax</span> <span class="o">/=</span> <span class="n">softmax</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
-        <span class="n">t</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">[:,</span> <span class="k">None</span><span class="p">,</span> <span class="k">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c"># shape (n, d, d)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># shape (n, d, d)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="n">t</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">A</span> <span class="o">+=</span> <span class="n">learning_rate</span> <span class="o">*</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 

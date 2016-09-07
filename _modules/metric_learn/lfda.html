@@ -138,7 +138,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.lfda</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Local Fisher Discriminant Analysis (LFDA)</span>
 
 <span class="sd">Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction</span>
@@ -164,7 +164,7 @@
 <span class="sd">  Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction</span>
 <span class="sd">  Sugiyama, ICML 2006</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="k">None</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s">&#39;weighted&#39;</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    dim : dimensionality of reduced space (defaults to dimension of X)</span>
 <span class="sd">    k : nearest neighbor used in local scaling method (default: 7)</span>
@@ -173,13 +173,13 @@
 <span class="sd">      &#39;orthonormalized&#39; - orthonormalized</span>
 <span class="sd">      &#39;plain&#39;           - raw eigenvectors</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;weighted&#39;</span><span class="p">,</span> <span class="s">&#39;orthonormalized&#39;</span><span class="p">,</span> <span class="s">&#39;plain&#39;</span><span class="p">):</span>
-      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid metric: %r&#39;</span> <span class="o">%</span> <span class="n">metric</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="s1">&#39;orthonormalized&#39;</span><span class="p">,</span> <span class="s1">&#39;plain&#39;</span><span class="p">):</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid metric: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">metric</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="s">&#39;dim&#39;</span><span class="p">:</span> <span class="n">dim</span><span class="p">,</span>
-      <span class="s">&#39;metric&#39;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
-      <span class="s">&#39;k&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
+      <span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="n">dim</span><span class="p">,</span>
+      <span class="s1">&#39;metric&#39;</span><span class="p">:</span> <span class="n">metric</span><span class="p">,</span>
+      <span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span>
     <span class="p">}</span>
 
 <div class="viewcode-block" id="LFDA.transformer"><a class="viewcode-back" href="../../metric_learn.lfda.html#metric_learn.lfda.LFDA.transformer">[docs]</a>  <span class="k">def</span> <span class="nf">transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -189,16 +189,16 @@
     <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
     <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">unique_classes</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
+    <span class="n">unique_classes</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_classes</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="k">None</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">:</span>
-      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid embedding dimension, must be in [1,%d]&#39;</span> <span class="o">%</span> <span class="n">d</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid embedding dimension, must be in [1,</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">d</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
-      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Invalid k, must be in [0,%d]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid k, must be in [0,</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span>
 
@@ -215,42 +215,40 @@
       <span class="n">Xc</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">Y</span><span class="o">==</span><span class="n">c</span><span class="p">]</span>
       <span class="n">nc</span> <span class="o">=</span> <span class="n">Xc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-      <span class="c"># classwise affinity matrix</span>
-      <span class="n">dist</span> <span class="o">=</span> <span class="n">pairwise_distances</span><span class="p">(</span><span class="n">Xc</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s">&#39;l2&#39;</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
-      <span class="c"># distances to k-th nearest neighbor</span>
-      <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">],</span> <span class="n">nc</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="c1"># classwise affinity matrix</span>
+      <span class="n">dist</span> <span class="o">=</span> <span class="n">pairwise_distances</span><span class="p">(</span><span class="n">Xc</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;l2&#39;</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="c1"># distances to k-th nearest neighbor</span>
+      <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">],</span> <span class="n">nc</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
       <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span><span class="n">k</span><span class="p">])</span>
 
       <span class="n">local_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
-      <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s">&#39;ignore&#39;</span><span class="p">):</span>
+      <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
         <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dist</span><span class="o">/</span><span class="n">local_scale</span><span class="p">)</span>
         <span class="n">A</span><span class="p">[</span><span class="n">local_scale</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-      <span class="n">G</span> <span class="o">=</span> <span class="n">Xc</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span><span class="k">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">Xc</span><span class="p">)</span> <span class="o">-</span> <span class="n">Xc</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xc</span><span class="p">)</span>
+      <span class="n">G</span> <span class="o">=</span> <span class="n">Xc</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">Xc</span><span class="p">)</span> <span class="o">-</span> <span class="n">Xc</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xc</span><span class="p">)</span>
       <span class="n">tSb</span> <span class="o">+=</span> <span class="n">G</span><span class="o">/</span><span class="n">n</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">nc</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">Xc</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xc</span><span class="p">)</span> <span class="o">+</span> <span class="n">_sum_outer</span><span class="p">(</span><span class="n">Xc</span><span class="p">)</span><span class="o">/</span><span class="n">n</span>
       <span class="n">tSw</span> <span class="o">+=</span> <span class="n">G</span><span class="o">/</span><span class="n">nc</span>
 
     <span class="n">tSb</span> <span class="o">-=</span> <span class="n">_sum_outer</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">/</span><span class="n">n</span> <span class="o">-</span> <span class="n">tSw</span>
 
-    <span class="c"># symmetrize</span>
-    <span class="n">tSb</span> <span class="o">+=</span> <span class="n">tSb</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">tSb</span> <span class="o">/=</span> <span class="mi">2</span>
-    <span class="n">tSw</span> <span class="o">+=</span> <span class="n">tSw</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">tSw</span> <span class="o">/=</span> <span class="mi">2</span>
+    <span class="c1"># symmetrize</span>
+    <span class="n">tSb</span> <span class="o">=</span> <span class="p">(</span><span class="n">tSb</span> <span class="o">+</span> <span class="n">tSb</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">tSw</span> <span class="o">=</span> <span class="p">(</span><span class="n">tSw</span> <span class="o">+</span> <span class="n">tSw</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">d</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">d</span><span class="p">:</span>
       <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">tSb</span><span class="p">,</span> <span class="n">tSw</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-      <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigsh</span><span class="p">(</span><span class="n">tSb</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">],</span> <span class="n">M</span><span class="o">=</span><span class="n">tSw</span><span class="p">,</span>
-                                             <span class="n">which</span><span class="o">=</span><span class="s">&#39;LA&#39;</span><span class="p">)</span>
+      <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigsh</span><span class="p">(</span><span class="n">tSb</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">],</span> <span class="n">M</span><span class="o">=</span><span class="n">tSw</span><span class="p">,</span>
+                                             <span class="n">which</span><span class="o">=</span><span class="s1">&#39;LA&#39;</span><span class="p">)</span>
 
-    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">vals</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;dim&#39;</span><span class="p">]]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">vals</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]]</span>
     <span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
     <span class="n">vecs</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span><span class="n">order</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;metric&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;weighted&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;metric&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;weighted&#39;</span><span class="p">:</span>
        <span class="n">vecs</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;metric&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;orthonormalized&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;metric&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;orthonormalized&#39;</span><span class="p">:</span>
        <span class="n">vecs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">vecs</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span> <span class="o">=</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span>

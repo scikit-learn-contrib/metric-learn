@@ -138,12 +138,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for metric_learn.base_metric</h1><div class="highlight"><pre>
-<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">inv</span><span class="p">,</span><span class="n">cholesky</span>
+<span></span><span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="k">import</span> <span class="n">inv</span><span class="p">,</span><span class="n">cholesky</span>
 
 
 <div class="viewcode-block" id="BaseMetricLearner"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner">[docs]</a><span class="k">class</span> <span class="nc">BaseMetricLearner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;BaseMetricLearner should not be instantiated&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;BaseMetricLearner should not be instantiated&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BaseMetricLearner.metric"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Computes the Mahalanobis matrix from the transformation matrix.</span>
@@ -168,7 +168,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">inv</span><span class="p">(</span><span class="n">cholesky</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">()))</span></div>
 
-<div class="viewcode-block" id="BaseMetricLearner.transform"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner.transform">[docs]</a>  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="k">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseMetricLearner.transform"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner.transform">[docs]</a>  <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Applies the metric transformation.</span>
 
 <span class="sd">    Parameters</span>
@@ -181,12 +181,12 @@
 <span class="sd">    transformed : (n x d) matrix</span>
 <span class="sd">        Input data transformed to the metric space by :math:`XL^{\\top}`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="k">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
     <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BaseMetricLearner.get_params"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner.get_params">[docs]</a>  <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="k">False</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseMetricLearner.get_params"><a class="viewcode-back" href="../../metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner.get_params">[docs]</a>  <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get parameters for this metric learner.</span>
 
 <span class="sd">    Parameters</span>

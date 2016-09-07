@@ -15,7 +15,7 @@ Example Code
     from metric_learn import Covariance
     from sklearn.datasets import load_iris
 
-    iris_data = load_iris()
+    iris = load_iris()['data']
 
-    cov = Covariance()
-    x = cov.fit_transform(iris_data['data'])
+    cov = Covariance().fit(iris)
+    x = cov.transform(iris)
