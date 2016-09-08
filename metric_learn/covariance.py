@@ -29,3 +29,14 @@ class Covariance(BaseMetricLearner):
     self.X = X
     self.M = np.cov(X.T)
     return self
+
+  def fit_transform(self, X, y=None):
+
+    """
+    applies covariance fit and returns transformed matrix
+    X: data matrix, (n x d)
+    y: unused, optional
+    """
+    self.X = X
+    self.M = np.cov(X.T)
+    return self.transform(self.X)
