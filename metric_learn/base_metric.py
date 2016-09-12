@@ -45,6 +45,14 @@ class BaseMetricLearner(object):
       X = self.X
     L = self.transformer()
     return X.dot(L.T)
+  
+  def fit_transform(self, *args, **kwargs):
+    """
+    Performs the fit function described in the metric learning algoirthm chosen.
+    Returns the transformed matrix.
+    """
+    self.fit(*args, **kwargs)
+    return self.transform()
 
   def get_params(self, deep=False):
     """Get parameters for this metric learner.
