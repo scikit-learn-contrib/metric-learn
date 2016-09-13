@@ -48,8 +48,22 @@ class BaseMetricLearner(object):
   
   def fit_transform(self, *args, **kwargs):
     """
-    Performs the fit function described in the metric learning algoirthm chosen.
-    Returns the transformed matrix.
+    Function calls .fit() and returns the result of .transform()
+    Essentially, it runs the relevant Metric Learning algorithm with .fit()
+    and returns the metric-transformed input data.
+
+    Paramters
+    ---------
+    
+    Since all the parameters passed to fit_transform are passed on to
+    fit(), the parameters to be passed must be noted from the corresponding
+    Metric Learning algorithm's fit method.
+
+    Returns
+    -------
+    transformed : (n x d) matrix
+        Input data transformed to the metric space by :math:`XL^{\\top}`
+
     """
     self.fit(*args, **kwargs)
     return self.transform()
