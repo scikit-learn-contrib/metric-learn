@@ -113,7 +113,7 @@ class RCA_Supervised(RCA):
     self.params.update(num_chunks=num_chunks, chunk_size=chunk_size)
 
   def fit(self, X, labels):
-    """Create constraints from labels and learn the LSML model.
+    """Create constraints from labels and learn the RCA model.
     Needs num_constraints specified in constructor.
 
     Parameters
