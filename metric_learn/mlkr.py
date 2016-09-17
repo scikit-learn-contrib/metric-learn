@@ -62,10 +62,14 @@ class MLKR(BaseMetricLearner):
             A = np.identity(d)  # Initialize A as eye matrix
         else:
             A = self.params['A0']
-            assert A.shape == (d, d)
+            if A.shape != (d, d):
+                raise ValueError('A0 should be a square matrix of dimension'
+                                 ' %d. %s shape was provided' % (d, A.shape))
         cost = np.Inf
         # Gradient descent procedure
-        while cost > self.params['alpha']:
+        alpha = self.params['alpha']
+        epsilon = self.params['epsilon']
+        while cost > alpha:
             K = self._computeK(X, A)
             yhat = self._computeyhat(y, K)
             sum_i = 0
@@ -78,7 +82,7 @@ class MLKR(BaseMetricLearner):
                     sum_j += diffK * x_ij.dot(x_ijT)
                 sum_i += (yhat[i] - y[i]) * sum_j
             gradient = 4 * A.dot(sum_i)
-            A -= self.params['epsilon'] * gradient
+            A -= epsilon * gradient
             cost = np.sum(np.square(yhat - y))
         self._transformer = A
         return self
@@ -98,9 +102,7 @@ class MLKR(BaseMetricLearner):
            distance is defined as squared L2 norm of (x_i - x_j)
         """
         dist_mat = pdist(X, metric='mahalanobis', VI=A.T.dot(A))
-        dist_mat = np.square(dist_mat)
-        dist_mat = squareform(dist_mat)
-        return np.exp(-dist_mat)
+        return squareform(np.exp(-dist_mat ** 2))
 
     def _computeyhat(self, y, K):
         """
