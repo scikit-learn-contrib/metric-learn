@@ -166,7 +166,7 @@ class ITML_Supervised(ITML):
     self.params.update(num_labeled=num_labeled, num_constraints=num_constraints,
                        bounds=bounds, A0=A0)
 
-  def fit(self, X, labels):
+  def fit(self, X, labels, random_state=None):
     """Create constraints from labels and learn the ITML model.
     Needs num_constraints specified in constructor.
 
@@ -175,12 +175,13 @@ class ITML_Supervised(ITML):
     X : (n x d) data matrix
         each row corresponds to a single instance
     labels : (n) data labels
+    random_state : a numpy random.seed object to fix the random_state if needed.
     """
     num_constraints = self.params['num_constraints']
     if num_constraints is None:
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    c = Constraints.random_subset(labels, self.params['num_labeled'])
+    c = Constraints.random_subset(labels, self.params['num_labeled'], random_subset=random_state)
     return ITML.fit(self, X, c.positive_negative_pairs(num_constraints),
                     bounds=self.params['bounds'], A0=self.params['A0'])

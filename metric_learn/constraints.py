@@ -59,7 +59,11 @@ class Constraints(object):
     ab = np.array(list(ab)[:num_constraints], dtype=int)
     return self.known_label_idx[ab.T]
 
-  def chunks(self, num_chunks=100, chunk_size=2):
+  def chunks(self, num_chunks=100, chunk_size=2, random_state=None):
+    """
+    the random state object to be passed must be a random.seed() object and not a numpy random seed
+    """
+    state = random_state
     chunks = -np.ones_like(self.known_label_idx, dtype=int)
     uniq, lookup = np.unique(self.known_labels, return_inverse=True)
     all_inds = [set(np.where(lookup==c)[0]) for c in xrange(len(uniq))]
@@ -80,7 +84,11 @@ class Constraints(object):
     return chunks
 
   @staticmethod
-  def random_subset(all_labels, num_preserved=np.inf):
+  def random_subset(all_labels, num_preserved=np.infm, random_state=None):
+    """
+    the random state object to be passed must be a numpy random seed
+    """
+    state = random_state
     n = len(all_labels)
     num_ignored = max(0, n - num_preserved)
     idx = np.random.randint(n, size=num_ignored)
