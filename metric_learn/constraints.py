@@ -84,7 +84,7 @@ class Constraints(object):
     return chunks
 
   @staticmethod
-  def random_subset(all_labels, num_preserved=np.infm, random_state=None):
+  def random_subset(all_labels, num_preserved=np.inf, random_state=None):
     """
     the random state object to be passed must be a numpy random seed
     """
