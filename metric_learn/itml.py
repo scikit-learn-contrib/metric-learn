@@ -182,6 +182,6 @@ class ITML_Supervised(ITML):
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    c = Constraints.random_subset(labels, self.params['num_labeled'], random_subset=random_state)
+    c = Constraints.random_subset(labels, self.params['num_labeled'], random_state=random_state)
     return ITML.fit(self, X, c.positive_negative_pairs(num_constraints),
                     bounds=self.params['bounds'], A0=self.params['A0'])
