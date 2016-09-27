@@ -74,7 +74,7 @@ class Constraints(object):
       if len(inds) < chunk_size:
         del all_inds[c]
         continue
-      ii = np.random.choice(inds, chunk_size, replace=False)
+      ii = np.random.choice(list(inds), chunk_size, replace=False)
       inds.difference_update(ii)
       chunks[ii] = idx
       idx += 1
