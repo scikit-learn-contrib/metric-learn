@@ -155,7 +155,7 @@ class LSML_Supervised(LSML):
     self.params.update(prior=prior, num_labeled=num_labeled,
                        num_constraints=num_constraints, weights=weights)
 
-  def fit(self, X, labels, random_state=np.random):
+  def fit(self, X, labels, random_state=None):
     """Create constraints from labels and learn the LSML model.
     Needs num_constraints specified in constructor.
 

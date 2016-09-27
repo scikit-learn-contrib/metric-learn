@@ -112,7 +112,7 @@ class RCA_Supervised(RCA):
     RCA.__init__(self, dim=dim)
     self.params.update(num_chunks=num_chunks, chunk_size=chunk_size)
 
-  def fit(self, X, labels, random_state=np.random):
+  def fit(self, X, labels, random_state=None):
     """Create constraints from labels and learn the RCA model.
     Needs num_constraints specified in constructor.
 

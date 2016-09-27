@@ -166,7 +166,7 @@ class ITML_Supervised(ITML):
     self.params.update(num_labeled=num_labeled, num_constraints=num_constraints,
                        bounds=bounds, A0=A0)
 
-  def fit(self, X, labels, random_state=np.random):
+  def fit(self, X, labels, random_state=None):
     """Create constraints from labels and learn the ITML model.
     Needs num_constraints specified in constructor.
 
