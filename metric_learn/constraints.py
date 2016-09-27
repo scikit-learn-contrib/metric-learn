@@ -59,9 +59,9 @@ class Constraints(object):
     ab = np.array(list(ab)[:num_constraints], dtype=int)
     return self.known_label_idx[ab.T]
 
-  def chunks(self, num_chunks=100, chunk_size=2, random_state=None):
+  def chunks(self, num_chunks=100, chunk_size=2, random_state=np.random):
     """
-    the random state object to be passed must be a random.seed() object and not a numpy random seed
+    the random state object to be passed must be a numpy random seed
     """
     state = random_state
     chunks = -np.ones_like(self.known_label_idx, dtype=int)
@@ -69,12 +69,12 @@ class Constraints(object):
     all_inds = [set(np.where(lookup==c)[0]) for c in xrange(len(uniq))]
     idx = 0
     while idx < num_chunks and all_inds:
-      c = random.randint(0, len(all_inds)-1)
+      c = np.random.randint(0, high=len(all_inds)-1)
       inds = all_inds[c]
       if len(inds) < chunk_size:
         del all_inds[c]
         continue
-      ii = random.sample(inds, chunk_size)
+      ii = np.random.choice(inds, chunk_size, replace=False)
       inds.difference_update(ii)
       chunks[ii] = idx
       idx += 1
@@ -84,7 +84,7 @@ class Constraints(object):
     return chunks
 
   @staticmethod
-  def random_subset(all_labels, num_preserved=np.inf, random_state=None):
+  def random_subset(all_labels, num_preserved=np.inf, random_state=np.random):
     """
     the random state object to be passed must be a numpy random seed
     """
