@@ -90,7 +90,7 @@ class SDML_Supervised(SDML):
     '''
     self.params.update(num_labeled=num_labeled, num_constraints=num_constraints)
 
-  def fit(self, X, labels, random_state=None):
+  def fit(self, X, labels, random_state=np.random):
     """Create constraints from labels and learn the SDML model.
 
     Parameters

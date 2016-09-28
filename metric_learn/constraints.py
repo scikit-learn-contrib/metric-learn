@@ -69,12 +69,12 @@ class Constraints(object):
     all_inds = [set(np.where(lookup==c)[0]) for c in xrange(len(uniq))]
     idx = 0
     while idx < num_chunks and all_inds:
-      c = np.random.randint(0, high=len(all_inds)-1)
+      c = random_state.randint(0, high=len(all_inds)-1)
       inds = all_inds[c]
       if len(inds) < chunk_size:
         del all_inds[c]
         continue
-      ii = np.random.choice(list(inds), chunk_size, replace=False)
+      ii = random_state.choice(list(inds), chunk_size, replace=False)
       inds.difference_update(ii)
       chunks[ii] = idx
       idx += 1
@@ -91,7 +91,7 @@ class Constraints(object):
     state = random_state
     n = len(all_labels)
     num_ignored = max(0, n - num_preserved)
-    idx = np.random.randint(n, size=num_ignored)
+    idx = random_state.randint(n, size=num_ignored)
     partial_labels = np.array(all_labels, copy=True)
     partial_labels[idx] = -1
     return Constraints(partial_labels)
