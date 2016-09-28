@@ -63,7 +63,6 @@ class Constraints(object):
     """
     the random state object to be passed must be a numpy random seed
     """
-    state = random_state
     chunks = -np.ones_like(self.known_label_idx, dtype=int)
     uniq, lookup = np.unique(self.known_labels, return_inverse=True)
     all_inds = [set(np.where(lookup==c)[0]) for c in xrange(len(uniq))]
@@ -88,7 +87,6 @@ class Constraints(object):
     """
     the random state object to be passed must be a numpy random seed
     """
-    state = random_state
     n = len(all_labels)
     num_ignored = max(0, n - num_preserved)
     idx = random_state.randint(n, size=num_ignored)
