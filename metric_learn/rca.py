@@ -112,8 +112,8 @@ class RCA_Supervised(RCA):
     RCA.__init__(self, dim=dim)
     self.params.update(num_chunks=num_chunks, chunk_size=chunk_size)
 
-  def fit(self, X, labels):
-    """Create constraints from labels and learn the LSML model.
+  def fit(self, X, labels, random_state=np.random):
+    """Create constraints from labels and learn the RCA model.
     Needs num_constraints specified in constructor.
 
     Parameters
@@ -121,7 +121,8 @@ class RCA_Supervised(RCA):
     X : (n x d) data matrix
         each row corresponds to a single instance
     labels : (n) data labels
+    random_state : a random.seed object to fix the random_state if needed.
     """
     chunks = Constraints(labels).chunks(num_chunks=self.params['num_chunks'],
-                                        chunk_size=self.params['chunk_size'])
+                                        chunk_size=self.params['chunk_size'], random_state=random_state)
     return RCA.fit(self, X, chunks)
