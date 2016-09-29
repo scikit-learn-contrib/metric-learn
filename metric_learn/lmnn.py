@@ -207,8 +207,8 @@ class python_LMNN(_base_LMNN):
         i,j = np.unravel_index(np.unique(tmp), shape)
       impostors.append(np.vstack((in_inds[j], out_inds[i])))
     if len(impostors) == 0:
-        """No impostors detected"""
-        return []
+        # No impostors detected
+        return impostors
     return np.hstack(impostors)
 
 
