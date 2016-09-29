@@ -30,7 +30,7 @@ class _base_LMNN(BaseMetricLearner):
 # slower Python version
 class python_LMNN(_base_LMNN):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
-               regularization=0.5, convergence_tol=0.001, verbose=False):
+               regularization=0.5, convergence_tol=0.001, verbose=False, debug=False):
     """Initialize the LMNN object
 
     k: number of neighbors to consider. (does not include self-edges)
@@ -38,7 +38,7 @@ class python_LMNN(_base_LMNN):
     """
     _base_LMNN.__init__(self, k=k, min_iter=min_iter, max_iter=max_iter,
                         learn_rate=learn_rate, regularization=regularization,
-                        convergence_tol=convergence_tol, verbose=verbose)
+                        convergence_tol=convergence_tol, verbose=verbose, debug=debug)
 
   def _process_inputs(self, X, labels):
     num_pts = X.shape[0]
@@ -48,6 +48,9 @@ class python_LMNN(_base_LMNN):
     self.X = X
     self.L = np.eye(X.shape[1])
     required_k = np.bincount(self.label_inds).min()
+    if self.params['debug']:
+        # Readying the stats to store the objective function
+        self.stats = np.zeros(self.params['max_iter']-1)
     assert self.params['k'] <= required_k, (
         'not enough class labels for specified k'
         ' (smallest class has %d)' % required_k)
@@ -59,6 +62,7 @@ class python_LMNN(_base_LMNN):
     learn_rate = self.params['learn_rate']
     convergence_tol = self.params['convergence_tol']
     min_iter = self.params['min_iter']
+    debug = self.params['debug']
     self._process_inputs(X, labels)
 
     target_neighbors = self._select_targets()
@@ -140,6 +144,9 @@ class python_LMNN(_base_LMNN):
       assert not np.isnan(objective)
       delta_obj = objective - objective_old
 
+      if debug:
+          self.stats[it-1] = objective
+
       if verbose:
         print(it, objective, delta_obj, total_active, learn_rate)
 
@@ -176,6 +183,9 @@ class python_LMNN(_base_LMNN):
     if X is None:
       X = self.X
     return self.L.dot(X.T).T
+
+  def get_statistics(self):
+      return self.stats
 
   def _select_targets(self):
     k = self.params['k']
