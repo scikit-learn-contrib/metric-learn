@@ -19,8 +19,8 @@ class Constraints(object):
     self.known_label_idx, = np.where(partial_labels >= 0)
     self.known_labels = partial_labels[self.known_label_idx]
 
-  def adjacency_matrix(self, num_constraints):
-    a, b, c, d = self.positive_negative_pairs(num_constraints)
+  def adjacency_matrix(self, num_constraints, random_state=np.random):
+    a, b, c, d = self.positive_negative_pairs(num_constraints, random_state=random_state)
     row = np.concatenate((a, c))
     col = np.concatenate((b, d))
     data = np.ones_like(row, dtype=int)
