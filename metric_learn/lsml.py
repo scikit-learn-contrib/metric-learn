@@ -155,7 +155,7 @@ class LSML_Supervised(LSML):
     self.params.update(prior=prior, num_labeled=num_labeled,
                        num_constraints=num_constraints, weights=weights)
 
-  def fit(self, X, labels):
+  def fit(self, X, labels, random_state=np.random):
     """Create constraints from labels and learn the LSML model.
     Needs num_constraints specified in constructor.
 
@@ -164,13 +164,14 @@ class LSML_Supervised(LSML):
     X : (n x d) data matrix
         each row corresponds to a single instance
     labels : (n) data labels
+    random_state : a numpy random.seed object to fix the random_state if needed.
     """
     num_constraints = self.params['num_constraints']
     if num_constraints is None:
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    c = Constraints.random_subset(labels, self.params['num_labeled'])
+    c = Constraints.random_subset(labels, self.params['num_labeled'], random_state=random_state)
     pairs = c.positive_negative_pairs(num_constraints, same_length=True)
     return LSML.fit(self, X, pairs, weights=self.params['weights'],
                     prior=self.params['prior'])
