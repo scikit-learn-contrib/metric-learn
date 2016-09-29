@@ -32,25 +32,27 @@ class TestCovariance(MetricTestCase):
 
 class TestLSML(MetricTestCase):
   def test_lsml(self):
-    np.random.seed(1234)
+
+    seed = np.random.RandomState(1234)
     lsml = LSML_Supervised(num_constraints=200)
-    lsml.fit(self.iris_points, self.iris_labels)
+    lsml.fit(self.iris_points, self.iris_labels, random_state=seed)
     res_1 = lsml.transform()
 
     lsml = LSML_Supervised(num_constraints=200)
-    res_2 = lsml.fit_transform(self.iris_points, self.iris_labels)
+    res_2 = lsml.fit_transform(self.iris_points, self.iris_labels, random_state=seed)
     
     assert_array_almost_equal(res_1, res_2)
 
 class TestITML(MetricTestCase):
   def test_itml(self):
 
+    seed = np.random.RandomState(1234)
     itml = ITML_Supervised(num_constraints=200)
-    itml.fit(self.iris_points, self.iris_labels)
+    itml.fit(self.iris_points, self.iris_labels, random_state=seed)
     res_1 = itml.transform()
 
     itml = ITML_Supervised(num_constraints=200)
-    res_2 = itml.fit_transform(self.iris_points, self.iris_labels)
+    res_2 = itml.fit_transform(self.iris_points, self.iris_labels, random_state=seed)
 
     assert_array_almost_equal(res_1, res_2)
 
@@ -69,17 +71,19 @@ class TestLMNN(MetricTestCase):
 class TestSDML(MetricTestCase):
   def test_sdml(self):
 
+    seed = np.random.RandomState(1234)
     sdml = SDML_Supervised(num_constraints=1500)
-    sdml.fit(self.iris_points, self.iris_labels)
+    sdml.fit(self.iris_points, self.iris_labels, random_state=seed)
     res_1 = sdml.transform()
 
     sdml = SDML_Supervised(num_constraints=1500)
-    res_2 = sdml.fit_transform(self.iris_points, self.iris_labels)
+    res_2 = sdml.fit_transform(self.iris_points, self.iris_labels, random_state=seed)
 
     assert_array_almost_equal(res_1, res_2)
 
 class TestNCA(MetricTestCase):
   def test_nca(self):
+    
     n = self.iris_points.shape[0]
     nca = NCA(max_iter=(100000//n), learning_rate=0.01)
     nca.fit(self.iris_points, self.iris_labels)
@@ -92,6 +96,7 @@ class TestNCA(MetricTestCase):
 
 class TestLFDA(MetricTestCase):
   def test_lfda(self):
+    
     lfda = LFDA(k=2, dim=2)
     lfda.fit(self.iris_points, self.iris_labels)
     res_1 = lfda.transform()
@@ -103,12 +108,14 @@ class TestLFDA(MetricTestCase):
 
 class TestRCA(MetricTestCase):
   def test_rca(self):
+
+    seed = np.random.RandomState(1234)
     rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
-    rca.fit(self.iris_points, self.iris_labels)
+    rca.fit(self.iris_points, self.iris_labels, random_state=seed)
     res_1 = rca.transform()
 
     rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
-    res_2 = rca.fit_transform(self.iris_points, self.iris_labels)
+    res_2 = rca.fit_transform(self.iris_points, self.iris_labels, random_state=seed)
 
     assert_array_almost_equal(res_1, res_2)
 
