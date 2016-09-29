@@ -37,13 +37,13 @@ class Constraints(object):
       return a[:n], b[:n], c[:n], d[:n]
     return a, b, c, d
 
-  def _pairs(self, num_constraints, same_label=True, max_iter=10):
+  def _pairs(self, num_constraints, same_label=True, max_iter=10, random_state=np.random):
     num_labels = len(self.known_labels)
     ab = set()
     it = 0
     while it < max_iter and len(ab) < num_constraints:
       nc = num_constraints - len(ab)
-      for aidx in np.random.randint(num_labels, size=nc):
+      for aidx in random_state.randint(num_labels, size=nc):
         if same_label:
           mask = self.known_labels[aidx] == self.known_labels
           mask[aidx] = False  # avoid identity pairs
@@ -51,7 +51,7 @@ class Constraints(object):
           mask = self.known_labels[aidx] != self.known_labels
         b_choices, = np.where(mask)
         if len(b_choices) > 0:
-          ab.add((aidx, np.random.choice(b_choices)))
+          ab.add((aidx, random_state.choice(b_choices)))
       it += 1
     if len(ab) < num_constraints:
       warnings.warn("Only generated %d %s constraints (requested %d)" % (
