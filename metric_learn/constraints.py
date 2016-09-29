@@ -29,9 +29,9 @@ class Constraints(object):
     # symmetrize
     return adj + adj.T
 
-  def positive_negative_pairs(self, num_constraints, same_length=False):
-    a, b = self._pairs(num_constraints, same_label=True)
-    c, d = self._pairs(num_constraints, same_label=False)
+  def positive_negative_pairs(self, num_constraints, same_length=False, random_state=np.random):
+    a, b = self._pairs(num_constraints, same_label=True, random_state=random_state)
+    c, d = self._pairs(num_constraints, same_label=False, random_state=random_state)
     if same_length and len(a) != len(c):
       n = min(len(a), len(c))
       return a[:n], b[:n], c[:n], d[:n]
