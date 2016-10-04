@@ -107,7 +107,11 @@ class TestLFDA(MetricTestCase):
     lfda = LFDA(k=2, dim=2)
     res_2 = lfda.fit_transform(self.iris_points, self.iris_labels)
 
-    assert_array_almost_equal(res_1, -(res_2))
+    res_1 = round(res_1[0][0], 3)
+    res_2 = round(res_2[0][0], 3)
+    res = (res_1 == res_2 or res_1 == -res_2)
+
+    self.assertTrue(res)
 
 class TestRCA(MetricTestCase):
   def test_rca(self):
