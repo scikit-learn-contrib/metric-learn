@@ -172,6 +172,6 @@ class LSML_Supervised(LSML):
       num_constraints = 20*(len(num_classes))**2
 
     c = Constraints.random_subset(labels, self.params['num_labeled'], random_state=random_state)
-    pairs = c.positive_negative_pairs(num_constraints, same_length=True)
+    pairs = c.positive_negative_pairs(num_constraints, same_length=True, random_state=random_state)
     return LSML.fit(self, X, pairs, weights=self.params['weights'],
                     prior=self.params['prior'])
