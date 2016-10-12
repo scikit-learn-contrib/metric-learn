@@ -63,6 +63,9 @@ class python_LMNN(_base_LMNN):
 
     target_neighbors = self._select_targets()
     impostors = self._find_impostors(target_neighbors[:,-1])
+    if len(impostors) == 0:
+        # L has already been initialized to an identity matrix of requisite shape
+        return
 
     # sum outer products
     dfG = _sum_outer_products(self.X, target_neighbors.flatten(),
@@ -203,6 +206,9 @@ class python_LMNN(_base_LMNN):
         tmp = np.ravel_multi_index((i,j), shape)
         i,j = np.unravel_index(np.unique(tmp), shape)
       impostors.append(np.vstack((in_inds[j], out_inds[i])))
+    if len(impostors) == 0:
+        # No impostors detected
+        return impostors
     return np.hstack(impostors)
 
 
