@@ -72,6 +72,8 @@ class MLKR(BaseMetricLearner):
         while cost > alpha:
             K = self._computeK(X, A)
             yhat = self._computeyhat(y, K)
+            cost = np.sum(np.square(yhat - y))
+            # Compute gradient
             sum_i = 0
             for i in xrange(n):
                 sum_j = 0
@@ -83,11 +85,11 @@ class MLKR(BaseMetricLearner):
                 sum_i += (yhat[i] - y[i]) * sum_j
             gradient = 4 * A.dot(sum_i)
             A -= epsilon * gradient
-            cost = np.sum(np.square(yhat - y))
         self._transformer = A
         return self
 
-    def _computeK(self, X, A):
+    @staticmethod
+    def _computeK(X, A):
         """
         Internal helper function to compute K matrix.
 
@@ -102,9 +104,10 @@ class MLKR(BaseMetricLearner):
            distance is defined as squared L2 norm of (x_i - x_j)
         """
         dist_mat = pdist(X, metric='mahalanobis', VI=A.T.dot(A))
-        return squareform(np.exp(-dist_mat ** 2))
+        return np.exp(squareform(-(dist_mat ** 2)))
 
-    def _computeyhat(self, y, K):
+    @staticmethod
+    def _computeyhat(y, K):
         """
         Internal helper function to compute yhat matrix.
 
@@ -117,8 +120,11 @@ class MLKR(BaseMetricLearner):
         -------
         yhat: (n x 1) yhat matrix
         """
-        numerator = K.dot(y)
-        denominator = np.sum(K, 1)[:, np.newaxis]
+        K_mod = np.copy(K)
+        np.fill_diagonal(K_mod, 0)
+        numerator = K_mod.dot(y)
+        denominator = np.sum(K_mod, 1)[:, np.newaxis]
+        denominator[denominator == 0] = 2.2204e-16  # eps val in octave
         yhat = numerator / denominator
         return yhat
 
