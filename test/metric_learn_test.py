@@ -6,8 +6,8 @@ from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MLKR)
+    LMNN, NCA, LFDA, Covariance, MLKR,
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
 
@@ -113,9 +113,10 @@ class TestRCA(MetricTestCase):
     csep = class_separation(rca.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
+
 class TestMLKR(MetricTestCase):
   def test_iris(self):
-    mlkr = MLKR(epsilon=10, alpha=10)  # for faster testing
+    mlkr = MLKR()
     mlkr.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mlkr.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
