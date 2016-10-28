@@ -14,6 +14,7 @@ Metric Learning algorithms in Python.
 -  Neighborhood Components Analysis (NCA)
 -  Local Fisher Discriminant Analysis (LFDA)
 -  Relative Components Analysis (RCA)
+-  Metric Learning for Kernel Regression (MLKR)
 
 **Dependencies**
 
