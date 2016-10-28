@@ -75,10 +75,10 @@ class TestSDML(MetricTestCase):
   def test_iris(self):
     # Note: this is a flaky test, which fails for certain seeds.
     # TODO: un-flake it!
-    np.random.seed(5555)
+    rs = np.random.RandomState(5555)
 
     sdml = SDML_Supervised(num_constraints=1500)
-    sdml.fit(self.iris_points, self.iris_labels)
+    sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
     csep = class_separation(sdml.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
