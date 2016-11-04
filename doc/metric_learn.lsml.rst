@@ -20,7 +20,7 @@ Example Code
     Y = iris_data['target']
 
     lsml = LSML_Supervised(num_constraints=200)
-    isml.fit(X, Y)
+    lsml.fit(X, Y)
 
 References
 ----------
