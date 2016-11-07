@@ -3,7 +3,6 @@ Helper module for generating different types of constraints
 from supervised data labels.
 """
 import numpy as np
-import random
 import warnings
 from six.moves import xrange
 from scipy.sparse import coo_matrix
