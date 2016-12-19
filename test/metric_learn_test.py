@@ -4,6 +4,7 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
+from memory_profiler import profile
 import time
 
 from metric_learn import (
@@ -62,6 +63,7 @@ class TestITML(MetricTestCase):
 
 
 class TestLMNN(MetricTestCase):
+  @profile
   def test_iris(self):
     # Test both impls, if available.
     for LMNN_cls in set((LMNN, python_LMNN)):
@@ -75,6 +77,7 @@ class TestLMNN(MetricTestCase):
       self.assertLess(csep, 0.25)
 
 class TestLMNNTimed(MetricTestCase):
+  @profile
   def test_iris(self):
     # Test both impls, if available.
     for LMNN_cls in set((LMNN, python_LMNN)):
