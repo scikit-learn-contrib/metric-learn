@@ -50,7 +50,7 @@ class python_LMNN(_base_LMNN):
     required_k = np.bincount(self.label_inds).min()
     if self.params['debug']:
         # Readying the stats to store the objective function
-        self.stats = np.zeros(self.params['max_iter']-1)
+        self.stats = []
     assert self.params['k'] <= required_k, (
         'not enough class labels for specified k'
         ' (smallest class has %d)' % required_k)
@@ -145,7 +145,7 @@ class python_LMNN(_base_LMNN):
       delta_obj = objective - objective_old
 
       if debug:
-          self.stats[it-1] = objective
+          self.stats.append(objective)
 
       if verbose:
         print(it, objective, delta_obj, total_active, learn_rate)
@@ -171,6 +171,9 @@ class python_LMNN(_base_LMNN):
     else:
       if verbose:
         print("LMNN didn't converge in %(max_iter)d steps." % self.params)
+
+    if debug:
+        self.stats = np.array(self.stats)
 
     # store the last L
     self.L = L
@@ -255,7 +258,7 @@ try:
   class LMNN(_base_LMNN):
     def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                  regularization=0.5, convergence_tol=0.001, use_pca=True,
-                 verbose=False):
+                 verbose=False, debug=True):
       _base_LMNN.__init__(self, k=k, min_iter=min_iter, max_iter=max_iter,
                           learn_rate=learn_rate, regularization=regularization,
                           convergence_tol=convergence_tol, use_pca=use_pca,

@@ -4,9 +4,10 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
+import time
 
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance,
+    LMNN, NCA, LFDA, Covariance, MLKR,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
@@ -65,20 +66,35 @@ class TestLMNN(MetricTestCase):
     # Test both impls, if available.
     for LMNN_cls in set((LMNN, python_LMNN)):
       lmnn = LMNN_cls(k=5, learn_rate=1e-6, verbose=False)
+      a = time.time()
       lmnn.fit(self.iris_points, self.iris_labels)
+      b = time.time()
+      print "Time taken to fit the model without stat: {0}".format(b-a)
 
       csep = class_separation(lmnn.transform(), self.iris_labels)
       self.assertLess(csep, 0.25)
 
+class TestLMNNTimed(MetricTestCase):
+  def test_iris(self):
+    # Test both impls, if available.
+    for LMNN_cls in set((LMNN, python_LMNN)):
+      lmnn = LMNN_cls(k=5, learn_rate=1e-6, verbose=False, debug=True)
+      a = time.time()
+      lmnn.fit(self.iris_points, self.iris_labels)
+      b = time.time()
+      print "Time taken to fit the model with stat: {0}".format(b-a)
+
+      csep = class_separation(lmnn.transform(), self.iris_labels)
+      self.assertLess(csep, 0.25)
 
 class TestSDML(MetricTestCase):
   def test_iris(self):
     # Note: this is a flaky test, which fails for certain seeds.
     # TODO: un-flake it!
-    np.random.seed(5555)
+    rs = np.random.RandomState(5555)
 
     sdml = SDML_Supervised(num_constraints=1500)
-    sdml.fit(self.iris_points, self.iris_labels)
+    sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
     csep = class_separation(sdml.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
@@ -111,6 +127,14 @@ class TestRCA(MetricTestCase):
     rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(), self.iris_labels)
+    self.assertLess(csep, 0.25)
+
+
+class TestMLKR(MetricTestCase):
+  def test_iris(self):
+    mlkr = MLKR()
+    mlkr.fit(self.iris_points, self.iris_labels)
+    csep = class_separation(mlkr.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
 
