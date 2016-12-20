@@ -9,6 +9,7 @@ from six.moves import xrange
 
 from .base_metric import BaseMetricLearner
 
+EPS = np.finfo(float).eps
 
 class NCA(BaseMetricLearner):
   def __init__(self, max_iter=100, learning_rate=0.01):
@@ -29,7 +30,7 @@ class NCA(BaseMetricLearner):
     n, d = X.shape
     # Initialize A to a scaling matrix
     A = np.zeros((d, d))
-    np.fill_diagonal(A, 1./(X.max(axis=0)-X.min(axis=0)))
+    np.fill_diagonal(A, 1./(np.maximum(X.max(axis=0)-X.min(axis=0), EPS)))
 
     # Run NCA
     dX = X[:,None] - X[None]  # shape (n, n, d)
