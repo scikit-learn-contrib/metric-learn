@@ -86,9 +86,10 @@ class TestSDML(MetricTestCase):
 class TestNCA(MetricTestCase):
   def test_iris(self):
     n = self.iris_points.shape[0]
+
+    # Without dimension reduction
     nca = NCA(max_iter=(100000//n), learning_rate=0.01)
     nca.fit(self.iris_points, self.iris_labels)
-
     # Result copied from Iris example at
     # https://github.com/vomjom/nca/blob/master/README.mkd
     expected = [[-0.09935, -0.2215,  0.3383,  0.443],
@@ -96,6 +97,12 @@ class TestNCA(MetricTestCase):
                 [-0.729,   -0.6386,  1.767,   1.832],
                 [-0.9405,  -0.8461,  2.281,   2.794]]
     assert_array_almost_equal(expected, nca.transformer(), decimal=3)
+
+    # With dimension reduction
+    nca = NCA(max_iter=(100000//n), learning_rate=0.01, num_dims=2)
+    nca.fit(self.iris_points, self.iris_labels)
+    csep = class_separation(nca.transform(), self.iris_labels)
+    self.assertLess(csep, 0.15)
 
 
 class TestLFDA(MetricTestCase):
