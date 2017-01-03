@@ -11,7 +11,7 @@ from .base_metric import BaseMetricLearner
 from .evo_metric import EvoMetric
 
 class CMAES(BaseMetricLearner):
-    def __init__(self, metric='diagonal', n_gen=250, n_neighbors=1, knn_weights='uniform', split_size=0.33, n_jobs=-1, verbose=False):
+    def __init__(self, metric='diagonal', n_gen=250, n_neighbors=1, knn_weights='uniform', train_subset_size=1.0, split_size=0.33, n_jobs=-1, verbose=False):
         if metric not in ('diagonal', 'full'):
             raise ValueError('Invalid metric: %r' % metric)
 
@@ -20,6 +20,7 @@ class CMAES(BaseMetricLearner):
             'n_gen': n_gen,
             'n_neighbors': n_neighbors,
             'knn_weights': knn_weights,
+            'train_subset_size': train_subset_size,
             'split_size': split_size,
             'n_jobs': n_jobs,
             'verbose': verbose,
@@ -35,25 +36,13 @@ class CMAES(BaseMetricLearner):
         assert N == X.shape[1]
 #         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.10, random_state=47)
         
-#         def knnEvaluation(individual):
-#             es = EvoMetric(individual, N)
-            
-#             subset = .1
-#             train_mask = np.random.choice([True, False], X.shape[0], p=[subset, 1-subset])
-#             X_train, X_test, y_train, y_test = train_test_split(X[train_mask], y[train_mask], test_size=0.33)#, random_state=47)
-#             X_train_trans = es.transform(X_train)
-#             X_test_trans = es.transform(X_test)
-#             knn = KNeighborsClassifier(n_neighbors=8, n_jobs=-1)
-#             knn.fit(X_train_trans, y_train)
-#             score = knn.score(X_test_trans, y_test)
-
-#             return [score]
-#             return [score - mean_squared_error(individual, np.ones(N))]
-#             return [score - np.sum(np.absolute(individual))]
-    
         def knnEvaluation(individual):
             es = EvoMetric(individual, N)
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.params['split_size'])#, random_state=47)
+
+            subset = self.params['train_subset_size']
+            train_mask = np.random.choice([True, False], X.shape[0], p=[subset, 1-subset])
+            X_train, X_test, y_train, y_test = train_test_split(X[train_mask], y[train_mask], test_size=self.params['split_size'])#, random_state=47)
+
             X_train_trans = es.transform(X_train)
             X_test_trans = es.transform(X_test)
             knn = KNeighborsClassifier(
