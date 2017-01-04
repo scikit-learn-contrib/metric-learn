@@ -9,6 +9,8 @@ class EvoMetric(BaseMetricLearner):
             self.L = np.diag(L)
         elif N**2 == len(L):
             self.L = np.reshape(L, (N, N))
+        elif len(L)%N==0:
+            self.L = np.reshape(L, (len(L)//N, N))
         else:
             raise Error('Invalid size of N')
 

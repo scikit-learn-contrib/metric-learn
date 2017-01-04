@@ -18,12 +18,13 @@ toolbox = base.Toolbox()
 toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
 
 class CMAES(BaseMetricLearner):
-    def __init__(self, metric='diagonal', n_gen=25, n_neighbors=1, knn_weights='uniform', train_subset_size=1.0, split_size=0.33, n_jobs=-1, verbose=False):
+    def __init__(self, metric='full', dim=None, n_gen=25, n_neighbors=1, knn_weights='uniform', train_subset_size=1.0, split_size=0.33, n_jobs=-1, verbose=False):
         if metric not in ('diagonal', 'full'):
             raise ValueError('Invalid metric: %r' % metric)
 
         self.params = {
             'metric': metric,
+            'dim': dim,
             'n_gen': n_gen,
             'n_neighbors': n_neighbors,
             'knn_weights': knn_weights,
@@ -71,6 +72,7 @@ class CMAES(BaseMetricLearner):
          Y: (n,) array-like of class labels
         '''
         self.N = X.shape[1]
+        self.outputDim = self.N if self.params['dim'] is None else self.params['dim']
         
         toolbox.register("evaluate", self.knnEvaluationBuilder(X, Y, self.N))
 
@@ -84,7 +86,7 @@ class CMAES(BaseMetricLearner):
         if self.params['metric'] == 'diagonal':
             sizeOfIndividual = self.N
         else:
-            sizeOfIndividual = self.N**2
+            sizeOfIndividual = self.N*self.outputDim
         
         strategy = cma.Strategy(centroid=[0.0]*sizeOfIndividual, sigma=10.0) # lambda_=20*N
         toolbox.register("generate", strategy.generate, creator.Individual)
@@ -114,7 +116,7 @@ class CMAES(BaseMetricLearner):
         if self.params['metric'] == 'diagonal':
             self.L = np.diag(self.hof[0])
         else:
-            self.L = np.reshape(self.hof[0], (self.N, self.N))
+            self.L = np.reshape(self.hof[0], (self.outputDim, self.N))
         return self
     
     def fit_transform(self, X, Y):
