@@ -10,8 +10,15 @@ from deap import algorithms, base, benchmarks, cma, creator, tools
 from .base_metric import BaseMetricLearner
 from .evo_metric import EvoMetric
 
+# This DEAP settings needs to be global because of parallelism
+creator.create("FitnessMin", base.Fitness, weights=(1.0,))
+creator.create("Individual", list, fitness=creator.FitnessMin)
+
+toolbox = base.Toolbox()
+toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
+
 class CMAES(BaseMetricLearner):
-    def __init__(self, metric='diagonal', n_gen=250, n_neighbors=1, knn_weights='uniform', train_subset_size=1.0, split_size=0.33, n_jobs=-1, verbose=False):
+    def __init__(self, metric='diagonal', n_gen=25, n_neighbors=1, knn_weights='uniform', train_subset_size=1.0, split_size=0.33, n_jobs=-1, verbose=False):
         if metric not in ('diagonal', 'full'):
             raise ValueError('Invalid metric: %r' % metric)
 
@@ -65,15 +72,10 @@ class CMAES(BaseMetricLearner):
         '''
         self.N = X.shape[1]
         
-        creator.create("FitnessMin", base.Fitness, weights=(1.0,))
-        creator.create("Individual", list, fitness=creator.FitnessMin)
-
-        toolbox = base.Toolbox()
         toolbox.register("evaluate", self.knnEvaluationBuilder(X, Y, self.N))
-        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
-        
+
         # The cma module uses the numpy random number generator
-        np.random.seed(128)
+        # np.random.seed(128)
 
         # The CMA-ES algorithm takes a population of one individual as argument
         # The centroid is set to a vector of 5.0 see http://www.lri.fr/~hansen/cmaes_inmatlab.html
