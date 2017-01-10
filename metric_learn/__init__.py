@@ -11,3 +11,4 @@ from .lfda import LFDA
 from .rca import RCA, RCA_Supervised
 from .mlkr import MLKR
 from .cmaes import CMAES
+from .cmaes import EvoNNMetric

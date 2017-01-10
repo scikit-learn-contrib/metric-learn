@@ -17,6 +17,62 @@ creator.create("Individual", list, fitness=creator.FitnessMin)
 toolbox = base.Toolbox()
 toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
 
+class EvoNNMetric(BaseMetricLearner):
+    def __init__(self, input_size, layers, individual, use_biases=False):
+        self.params = {}
+
+        if len(individual) != EvoNNMetric.individual_size(input_size, layers, use_biases):
+            raise Error('Invalid size of the individual')
+
+        self.parsed_weights = self.parse_weights(input_size, layers, individual, use_biases)
+
+    @staticmethod
+    def individual_size(input_size, layers, use_biases):
+        last_layer_size = input_size
+
+        size = 0
+        for layer in layers:
+            size += last_layer_size*layer
+
+            if use_biases:
+                size += layer
+
+            last_layer_size = layer
+
+        return size
+
+    def parse_weights(self, input_size, layers, individual, use_biases):
+        weights = []
+
+        last_layer_size = input_size
+        start = 0
+        for layer in layers:
+            W = individual[start:start+last_layer_size*layer].reshape((last_layer_size, layer))
+            start += last_layer_size*layer
+            
+            if use_biases:
+                b = individual[start:start+layer]
+                start += layer
+            else:
+                b = np.zeros((layer))
+
+            weights.append( (W, b) )
+
+            if start > len(individual):
+                raise Error('Invalid size of the individual')
+
+            last_layer_size = layer
+
+        return weights
+
+    def transform(self, X):
+        for W, b in self.parsed_weights:
+            X = np.add(np.matmul(X, W), b)
+        return X
+        
+    def transformer(self):
+        return None
+
 class CMAES(BaseMetricLearner):
     def __init__(self, metric='full', dim=None, n_gen=25, n_neighbors=1, knn_weights='uniform', train_subset_size=1.0, split_size=0.33, n_jobs=-1, verbose=False):
         if metric not in ('diagonal', 'full'):
