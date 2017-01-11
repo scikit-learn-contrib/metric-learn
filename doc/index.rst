@@ -63,7 +63,7 @@ is available, the LMNN implementation will use the fast C++ version from
 there. The two implementations differ slightly, and the C++ version is
 more complete.
 
-Naviagtion
+Navigation
 ----------
 
 :ref:`genindex` | :ref:`modindex` | :ref:`search`
