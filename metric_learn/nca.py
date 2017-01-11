@@ -11,6 +11,7 @@ from .base_metric import BaseMetricLearner
 
 EPS = np.finfo(float).eps
 
+
 class NCA(BaseMetricLearner):
   def __init__(self, num_dims=None, max_iter=100, learning_rate=0.01):
     self.params = {

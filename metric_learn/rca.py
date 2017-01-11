@@ -124,5 +124,6 @@ class RCA_Supervised(RCA):
     random_state : a random.seed object to fix the random_state if needed.
     """
     chunks = Constraints(labels).chunks(num_chunks=self.params['num_chunks'],
-                                        chunk_size=self.params['chunk_size'], random_state=random_state)
+                                        chunk_size=self.params['chunk_size'],
+                                        random_state=random_state)
     return RCA.fit(self, X, chunks)
