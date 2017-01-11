@@ -64,7 +64,7 @@ class python_LMNN(_base_LMNN):
     target_neighbors = self._select_targets()
     impostors = self._find_impostors(target_neighbors[:,-1])
     if len(impostors) == 0:
-        # L has already been initialized to an identity matrix of requisite shape
+        # L has already been initialized to an identity matrix
         return
 
     # sum outer products
