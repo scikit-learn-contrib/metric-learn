@@ -105,5 +105,7 @@ class SDML_Supervised(SDML):
       num_classes = np.unique(labels)
       num_constraints = 20*(len(num_classes))**2
 
-    c = Constraints.random_subset(labels, self.params['num_labeled'], random_state=random_state)
-    return SDML.fit(self, X, c.adjacency_matrix(num_constraints, random_state=random_state))
+    c = Constraints.random_subset(labels, self.params['num_labeled'],
+                                  random_state=random_state)
+    adj = c.adjacency_matrix(num_constraints, random_state=random_state)
+    return SDML.fit(self, X, adj)

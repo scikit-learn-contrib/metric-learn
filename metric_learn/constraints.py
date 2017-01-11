@@ -19,7 +19,8 @@ class Constraints(object):
     self.known_labels = partial_labels[self.known_label_idx]
 
   def adjacency_matrix(self, num_constraints, random_state=np.random):
-    a, b, c, d = self.positive_negative_pairs(num_constraints, random_state=random_state)
+    a, b, c, d = self.positive_negative_pairs(num_constraints,
+                                              random_state=random_state)
     row = np.concatenate((a, c))
     col = np.concatenate((b, d))
     data = np.ones_like(row, dtype=int)
@@ -28,15 +29,19 @@ class Constraints(object):
     # symmetrize
     return adj + adj.T
 
-  def positive_negative_pairs(self, num_constraints, same_length=False, random_state=np.random):
-    a, b = self._pairs(num_constraints, same_label=True, random_state=random_state)
-    c, d = self._pairs(num_constraints, same_label=False, random_state=random_state)
+  def positive_negative_pairs(self, num_constraints, same_length=False,
+                              random_state=np.random):
+    a, b = self._pairs(num_constraints, same_label=True,
+                       random_state=random_state)
+    c, d = self._pairs(num_constraints, same_label=False,
+                       random_state=random_state)
     if same_length and len(a) != len(c):
       n = min(len(a), len(c))
       return a[:n], b[:n], c[:n], d[:n]
     return a, b, c, d
 
-  def _pairs(self, num_constraints, same_label=True, max_iter=10, random_state=np.random):
+  def _pairs(self, num_constraints, same_label=True, max_iter=10,
+             random_state=np.random):
     num_labels = len(self.known_labels)
     ab = set()
     it = 0
