@@ -9,10 +9,12 @@ from six.moves import xrange
 
 from .base_metric import BaseMetricLearner
 
+EPS = np.finfo(float).eps
 
 class NCA(BaseMetricLearner):
-  def __init__(self, max_iter=100, learning_rate=0.01):
+  def __init__(self, num_dims=None, max_iter=100, learning_rate=0.01):
     self.params = {
+      'num_dims': num_dims,
       'max_iter': max_iter,
       'learning_rate': learning_rate,
     }
@@ -27,9 +29,12 @@ class NCA(BaseMetricLearner):
     labels: scalar labels, (n)
     """
     n, d = X.shape
+    num_dims = self.params['num_dims']
+    if num_dims is None:
+        num_dims = d
     # Initialize A to a scaling matrix
-    A = np.zeros((d, d))
-    np.fill_diagonal(A, 1./(X.max(axis=0)-X.min(axis=0)))
+    A = np.zeros((num_dims, d))
+    np.fill_diagonal(A, 1./(np.maximum(X.max(axis=0)-X.min(axis=0), EPS)))
 
     # Run NCA
     dX = X[:,None] - X[None]  # shape (n, n, d)
@@ -39,7 +44,7 @@ class NCA(BaseMetricLearner):
     for it in xrange(self.params['max_iter']):
       for i, label in enumerate(labels):
         mask = masks[i]
-        Ax = A.dot(X.T).T  # shape (n, d)
+        Ax = A.dot(X.T).T  # shape (n, num_dims)
 
         softmax = np.exp(-((Ax[i] - Ax)**2).sum(axis=1))  # shape (n)
         softmax[i] = 0
