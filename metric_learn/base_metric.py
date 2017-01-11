@@ -47,16 +47,12 @@ class BaseMetricLearner(object):
       X = self.X
     L = self.transformer()
     return X.dot(L.T)
-  
+
   def fit_transform(self, *args, **kwargs):
-    """
-    Function calls .fit() and returns the result of .transform()
+    """Calls .fit() then returns the result of .transform()
+
     Essentially, it runs the relevant Metric Learning algorithm with .fit()
     and returns the metric-transformed input data.
-
-    Paramters
-    ---------
-    
     Since all the parameters passed to fit_transform are passed on to
     fit(), the parameters to be passed must be noted from the corresponding
     Metric Learning algorithm's fit method.
@@ -65,7 +61,6 @@ class BaseMetricLearner(object):
     -------
     transformed : (n x d) matrix
         Input data transformed to the metric space by :math:`XL^{\\top}`
-
     """
     self.fit(*args, **kwargs)
     return self.transform()
@@ -97,59 +92,63 @@ class BaseMetricLearner(object):
     """
     self.params.update(kwarg)
     return self
-  
-  # https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/base.py#L287
+
+  # Mimics sklearn's BaseEstimator.__repr__
   def __repr__(self):
     class_name = self.__class__.__name__
-    params = self.get_params(deep=False)
-    return '%s(%s)' % (class_name, _pprint(params, offset=len(class_name)))
+    params = self.get_params()
+    offset = min(len(class_name) + 1, 40)
+    return '%s(%s)' % (class_name, _pprint(params, offset=offset))
 
-###############################################################################
 
-# __pprint taken from:
-# https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/base.py#L124
-def _pprint(params, offset=0, printer=repr):
-    """Pretty print the dictionary 'params'
-    Parameters
-    ----------
-    params : dict
-        The dictionary to pretty print
-    offset : int
-        The offset in characters to add at the begin of each line.
-    printer : callable
-        The function to convert entries to strings, typically
-        the builtin str or repr
-    """
-    # Do a multi-line justified repr:
-    options = np.get_printoptions()
-    np.set_printoptions(precision=5, threshold=64, edgeitems=2)
-    params_list = list()
-    this_line_length = offset
-    line_sep = ',\n' + (1 + offset // 2) * ' '
-    for i, (k, v) in enumerate(sorted(iteritems(params))):
-        if type(v) is float:
-            # use str for representing floating point numbers
-            # this way we get consistent representation across
-            # architectures and versions.
-            this_repr = '%s=%s' % (k, str(v))
-        else:
-            # use repr of the rest
-            this_repr = '%s=%s' % (k, printer(v))
-        if len(this_repr) > 500:
-            this_repr = this_repr[:300] + '...' + this_repr[-100:]
-        if i > 0:
-            if (this_line_length + len(this_repr) >= 75 or '\n' in this_repr):
-                params_list.append(line_sep)
-                this_line_length = len(line_sep)
-            else:
-                params_list.append(', ')
-                this_line_length += 2
-        params_list.append(this_repr)
-        this_line_length += len(this_repr)
+def _pprint(params, offset=0):
+  """Make a pretty-printable representation of a dictionary.
 
-    np.set_printoptions(**options)
-    lines = ''.join(params_list)
-    # Strip trailing space to avoid nightmare in doctests
-    lines = '\n'.join(l.rstrip(' ') for l in lines.split('\n'))
-    return lines
-###############################################################################
+  Parameters
+  ----------
+  params : dict
+      The dictionary to pretty print
+  offset : int
+      The offset in characters to add at the begin of each line.
+  """
+  repr_chunks = []
+  linewidth = 79 - offset
+  stored_printoptions = np.get_printoptions()
+  try:
+    np.set_printoptions(precision=5, threshold=64, edgeitems=2,
+                        linewidth=linewidth)
+    for k, v in sorted(iteritems(params)):
+      # use str for representing floating point numbers
+      # this way we get consistent representation across
+      # architectures and versions.
+      if isinstance(v, float):
+        this_repr = '%s=%s' % (k, v)
+      else:
+        this_repr = '%s=%r' % (k, v)
+
+      if len(this_repr) > 500:
+        this_repr = this_repr[:300] + '...' + this_repr[-100:]
+      repr_chunks.append(this_repr)
+  finally:
+    np.set_printoptions(**stored_printoptions)
+
+  if not repr_chunks:
+    return ''
+
+  params_list = [repr_chunks[0]]
+  this_line_length = offset + len(repr_chunks[0])
+  line_sep = ',\n' + ' ' * offset
+  for this_repr in repr_chunks[1:]:
+    if (this_line_length + len(this_repr) >= 75 or '\n' in this_repr):
+      params_list.append(line_sep)
+      this_line_length = len(line_sep)
+    else:
+      params_list.append(', ')
+      this_line_length += 2
+    params_list.append(this_repr)
+    this_line_length += len(this_repr)
+
+  lines = ''.join(params_list)
+  # Strip trailing space to avoid nightmare in doctests
+  lines = '\n'.join(l.rstrip(' ') for l in lines.split('\n'))
+  return lines
