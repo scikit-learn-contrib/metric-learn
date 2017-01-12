@@ -131,10 +131,10 @@ class TestMLKR(MetricTestCase):
 
 class TestCMAES(MetricTestCase):
   def test_iris(self):
-    cmaes = CMAES(transformer=FullMatrixTransformer())
+    cmaes = CMAES(transformer=FullMatrixTransformer(), random_state=47)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
-    self.assertLess(csep, 0.35)
+    self.assertAlmostEqual(csep, 0.27621894651217788)
 
 if __name__ == '__main__':
   unittest.main()

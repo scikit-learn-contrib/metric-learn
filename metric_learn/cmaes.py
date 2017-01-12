@@ -147,7 +147,7 @@ class CMAES(BaseMetricLearner):
     '''
     def __init__(self, transformer, n_gen=25, n_neighbors=1,
                  knn_weights='uniform', train_subset_size=1.0, split_size=0.33,
-                 n_jobs=-1, verbose=False):
+                 n_jobs=-1, random_state=np.random, verbose=False):
         """Initialize the learner.
 
         Parameters
@@ -175,6 +175,7 @@ class CMAES(BaseMetricLearner):
             'train_subset_size': train_subset_size,
             'split_size': split_size,
             'n_jobs': n_jobs,
+            'random_state': random_state,
             'verbose': verbose,
         }
 
@@ -192,7 +193,7 @@ class CMAES(BaseMetricLearner):
 
             subset = self.params['train_subset_size']
             train_mask = np.random.choice([True, False], X.shape[0], p=[subset, 1-subset])
-            X_train, X_test, y_train, y_test = train_test_split(X[train_mask], y[train_mask], test_size=self.params['split_size'])#, random_state=47)
+            X_train, X_test, y_train, y_test = train_test_split(X[train_mask], y[train_mask], test_size=self.params['split_size'], random_state=self.params['random_state'])
 
             X_train_trans = transformer.transform(X_train)
             X_test_trans = transformer.transform(X_test)
@@ -214,6 +215,7 @@ class CMAES(BaseMetricLearner):
          X: (n, d) array-like of samples
          Y: (n,) array-like of class labels
         '''
+        np.random.seed(self.params['random_state'])
         self._input_dim = X.shape[1]
 
         sizeOfIndividual = self._transformer.individual_size(self._input_dim)
