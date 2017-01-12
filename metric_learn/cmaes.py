@@ -188,6 +188,15 @@ class CMAES(BaseMetricLearner):
         return self._transformer
 
     def knnEvaluationBuilder(self, X, y):
+        def class_separation(X, labels):
+            unique_labels, label_inds = np.unique(labels, return_inverse=True)
+            ratio = 0
+            for li in xrange(len(unique_labels)):
+                Xc = X[label_inds==li]
+                Xnc = X[label_inds!=li]
+                ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc,Xnc).mean()
+            return ratio / len(unique_labels)
+
         def knnEvaluation(individual):
             transformer = self._transformer.duplicate_instance().fit(self._input_dim, individual)
 
@@ -204,7 +213,7 @@ class CMAES(BaseMetricLearner):
             knn.fit(X_train_trans, y_train)
             score = knn.score(X_test_trans, y_test)
 
-            return [score]
+            return [score + class_separation(X_test_trans, y_test)]
             return [score - mean_squared_error(individual, np.ones(self._input_dim))]
             return [score - np.sum(np.absolute(individual))]
         
