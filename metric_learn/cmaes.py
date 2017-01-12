@@ -61,6 +61,9 @@ class FullMatrixTransformer(_MatrixTransformer):
         }
 
     def individual_size(self, input_dim):
+        if self.params['n_components'] is None:
+            return input_dim**2
+
         return input_dim*self.params['n_components']
 
     def fit(self, input_dim, flat_weights):
