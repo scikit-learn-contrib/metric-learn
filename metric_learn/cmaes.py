@@ -147,7 +147,7 @@ class CMAES(BaseMetricLearner):
     '''
     def __init__(self, transformer, n_gen=25, n_neighbors=1,
                  knn_weights='uniform', train_subset_size=1.0, split_size=0.33,
-                 n_jobs=-1, random_state=np.random, verbose=False):
+                 n_jobs=-1, random_state=None, verbose=False):
         """Initialize the learner.
 
         Parameters
