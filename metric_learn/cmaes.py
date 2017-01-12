@@ -1,12 +1,15 @@
+# The CMA-ES algorithm takes a population of one individual as argument
+# See http://www.lri.fr/~hansen/cmaes_inmatlab.html
+# for more details about the rastrigin and other tests for CMA-ES
+
 from __future__ import division, absolute_import
 import numpy as np
-from concurrent.futures import ThreadPoolExecutor 
 
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
 from deap import algorithms, base, benchmarks, cma, creator, tools
-
+from concurrent.futures import ThreadPoolExecutor 
 from .base_metric import BaseMetricLearner
 
 # This DEAP settings needs to be global because of parallelism
@@ -16,18 +19,19 @@ creator.create("Individual", list, fitness=creator.FitnessMin)
 toolbox = base.Toolbox()
 toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
 
+
 class _MatrixTransformer(BaseMetricLearner):
     def __init__(self):
-        raise NotImplementedError('BaseMetricLearner should not be instantiated')
+        raise NotImplementedError('_MatrixTransformer should not be instantiated')
 
     def duplicate_instance(self):
         return self.__class__(**self.params)
 
     def individual_size(self, input_dim):
-        raise NotImplementedError('BaseMetricLearner should not be instantiated')
+        raise NotImplementedError('_MatrixTransformer should not be instantiated')
 
     def fit(self, input_dim, flat_weights):
-        raise NotImplementedError('BaseMetricLearner should not be instantiated')
+        raise NotImplementedError('_MatrixTransformer should not be instantiated')
 
     def transform(self, X):
         return X.dot(self.transformer().T)
@@ -135,7 +139,31 @@ class NeuralNetworkTransformer(BaseMetricLearner):
         return self._parsed_weights
 
 class CMAES(BaseMetricLearner):
-    def __init__(self, transformer, n_gen=25, n_neighbors=1, knn_weights='uniform', train_subset_size=1.0, split_size=0.33, n_jobs=-1, verbose=False):
+    '''
+    CMAES
+    '''
+    def __init__(self, transformer, n_gen=25, n_neighbors=1,
+                 knn_weights='uniform', train_subset_size=1.0, split_size=0.33,
+                 n_jobs=-1, verbose=False):
+        """Initialize the learner.
+
+        Parameters
+        ----------
+        transformer : _MatrixTransformer object
+            transformer defines transforming function to learn
+        n_gen : int, optional
+            number of generations of evolution algorithm
+        n_neighbors : int, optional
+            number of neighbors to use for k_neighbors queries
+        knn_weights : [uniform, distance], optional
+            weight function used in prediction (for Scikit's KNeighborsClassifier)
+        train_subset_size : float (0,1], optional
+            size of data to use for individual evaluation
+        split_size : float (0,1], optional
+            size of the data to leave for test error
+        verbose : bool, optional
+            if True, prints information while learning
+        """
         self.params = {
             'transformer': transformer,
             'n_gen': n_gen,
@@ -156,10 +184,7 @@ class CMAES(BaseMetricLearner):
         return self._transformer
 
     def knnEvaluationBuilder(self, X, y):
-#         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.10, random_state=47)
-        
         def knnEvaluation(individual):
-            # input_dim, layers, individual, use_biases=False
             transformer = self._transformer.duplicate_instance().fit(self._input_dim, individual)
 
             subset = self.params['train_subset_size']
@@ -188,16 +213,9 @@ class CMAES(BaseMetricLearner):
         '''
         self._input_dim = X.shape[1]
 
-        # The cma module uses the numpy random number generator
-        # np.random.seed(128)
-
-        # The CMA-ES algorithm takes a population of one individual as argument
-        # The centroid is set to a vector of 5.0 see http://www.lri.fr/~hansen/cmaes_inmatlab.html
-        # for more details about the rastrigin and other tests for CMA-ES
-        
         sizeOfIndividual = self._transformer.individual_size(self._input_dim)
         
-        strategy = cma.Strategy(centroid=[0.0]*sizeOfIndividual, sigma=10.0) # lambda_=20*input_dim
+        strategy = cma.Strategy(centroid=[0.0]*sizeOfIndividual, sigma=1.0)
         toolbox.register("evaluate", self.knnEvaluationBuilder(X, Y))
         toolbox.register("generate", strategy.generate, creator.Individual)
         toolbox.register("update", strategy.update)
@@ -212,9 +230,7 @@ class CMAES(BaseMetricLearner):
             stats.register("max", np.max)
         else:
             stats=None
-#         logger = tools.EvolutionLogger(stats.functions.keys())
 
-        # The CMA-ES algorithm converge with good probability with those settings
         pop, logbook = algorithms.eaGenerateUpdate(
             toolbox,
             ngen=self.params['n_gen'],
