@@ -68,9 +68,10 @@ class FullMatrixTransformer(_MatrixTransformer):
         return self
 
 class NeuralNetworkTransformer(BaseMetricLearner):
-    def __init__(self, layers, use_biases=False):
+    def __init__(self, layers, activation='relu', use_biases=False):
         self.params = {
             'layers': layers,
+            'activation': activation,
             'use_biases': use_biases,
         }
 
@@ -119,8 +120,15 @@ class NeuralNetworkTransformer(BaseMetricLearner):
         return self
 
     def transform(self, X):
-        for W, b in self._parsed_weights:
+        for i, (W, b) in enumerate(self._parsed_weights):
             X = np.add(np.matmul(X, W), b)
+
+            if i+1 < len(self._parsed_weights):
+                if self.params['activation']=='relu':
+                    X = np.maximum(X, 0) # ReLU
+                else:
+                    X = np.tanh(X) # tanh
+
         return X
         
     def transformer(self):
