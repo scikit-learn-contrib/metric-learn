@@ -7,6 +7,7 @@ import numpy as np
 
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import pairwise_distances
 
 from deap import algorithms, base, benchmarks, cma, creator, tools
 from concurrent.futures import ThreadPoolExecutor 
@@ -191,7 +192,7 @@ class CMAES(BaseMetricLearner):
         def class_separation(X, labels):
             unique_labels, label_inds = np.unique(labels, return_inverse=True)
             ratio = 0
-            for li in xrange(len(unique_labels)):
+            for li in range(len(unique_labels)):
                 Xc = X[label_inds==li]
                 Xnc = X[label_inds!=li]
                 ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc,Xnc).mean()
@@ -213,7 +214,7 @@ class CMAES(BaseMetricLearner):
             knn.fit(X_train_trans, y_train)
             score = knn.score(X_test_trans, y_test)
 
-            return [score + class_separation(X_test_trans, y_test)]
+            return [score, class_separation(X_test_trans, y_test)]
             return [score - mean_squared_error(individual, np.ones(self._input_dim))]
             return [score - np.sum(np.absolute(individual))]
         
