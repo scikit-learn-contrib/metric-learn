@@ -146,7 +146,7 @@ class CMAES(BaseMetricLearner):
     '''
     CMAES
     '''
-    def __init__(self, transformer, n_gen=25, n_neighbors=1,
+    def __init__(self, transformer, n_gen=25, n_neighbors=1, class_separation=True,
                  knn_weights='uniform', train_subset_size=1.0, split_size=0.33,
                  n_jobs=-1, random_state=None, verbose=False):
         """Initialize the learner.
@@ -159,6 +159,8 @@ class CMAES(BaseMetricLearner):
             number of generations of evolution algorithm
         n_neighbors : int, optional
             number of neighbors to use for k_neighbors queries
+        class_separation : bool, optional
+            add class separation to fitness
         knn_weights : [uniform, distance], optional
             weight function used in prediction (for Scikit's KNeighborsClassifier)
         train_subset_size : float (0,1], optional
@@ -172,6 +174,7 @@ class CMAES(BaseMetricLearner):
             'transformer': transformer,
             'n_gen': n_gen,
             'n_neighbors': n_neighbors,
+            'class_separation': class_separation,
             'knn_weights': knn_weights,
             'train_subset_size': train_subset_size,
             'split_size': split_size,
@@ -214,7 +217,10 @@ class CMAES(BaseMetricLearner):
             knn.fit(X_train_trans, y_train)
             score = knn.score(X_test_trans, y_test)
 
-            return [score, class_separation(X_test_trans, y_test)]
+            if self.params['class_separation']:
+                return [score, 1.0-class_separation(X_test_trans, y_test)]
+            else:
+                return [score]
             return [score - mean_squared_error(individual, np.ones(self._input_dim))]
             return [score - np.sum(np.absolute(individual))]
         
