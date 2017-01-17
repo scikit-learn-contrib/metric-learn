@@ -14,7 +14,7 @@ from concurrent.futures import ThreadPoolExecutor
 from .base_metric import BaseMetricLearner
 
 # This DEAP settings needs to be global because of parallelism
-creator.create("FitnessMin", base.Fitness, weights=(1.0,))
+creator.create("FitnessMin", base.Fitness, weights=(1.0, 1.0))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
 toolbox = base.Toolbox()
@@ -134,8 +134,10 @@ class NeuralNetworkTransformer(BaseMetricLearner):
             if i+1 < len(self._parsed_weights):
                 if self.params['activation']=='relu':
                     X = np.maximum(X, 0) # ReLU
-                else:
+                elif self.params['activation']=='tanh':
                     X = np.tanh(X) # tanh
+                else:
+                    pass
 
         return X
         
@@ -146,7 +148,7 @@ class CMAES(BaseMetricLearner):
     '''
     CMAES
     '''
-    def __init__(self, transformer, n_gen=25, n_neighbors=1, class_separation=True,
+    def __init__(self, transformer, n_gen=25, n_neighbors=1, class_separation=0,
                  knn_weights='uniform', train_subset_size=1.0, split_size=0.33,
                  n_jobs=-1, random_state=None, verbose=False):
         """Initialize the learner.
@@ -217,10 +219,11 @@ class CMAES(BaseMetricLearner):
             knn.fit(X_train_trans, y_train)
             score = knn.score(X_test_trans, y_test)
 
-            if self.params['class_separation']:
-                return [score, 1.0-class_separation(X_test_trans, y_test)]
-            else:
-                return [score]
+            # if self.params['class_separation']:
+            separation_score = class_separation(X_test_trans, y_test)
+            return [score, self.params['class_separation']*separation_score]
+            # else:
+            #     return [score]
             return [score - mean_squared_error(individual, np.ones(self._input_dim))]
             return [score - np.sum(np.absolute(individual))]
         
@@ -244,11 +247,17 @@ class CMAES(BaseMetricLearner):
         self.hof = tools.HallOfFame(1)
         
         if self.params['verbose']:
-            stats = tools.Statistics(lambda ind: ind.fitness.values)
-            stats.register("avg", np.mean)
-            stats.register("std", np.std)
-            stats.register("min", np.min)
-            stats.register("max", np.max)
+            stats_fit = tools.Statistics(key=lambda ind: ind.fitness.values)
+            stats_fit.register("avg", np.mean, axis=0)
+            stats_fit.register("std", np.std, axis=0)
+            stats_fit.register("min", np.min, axis=0)
+            stats_fit.register("max", np.max, axis=0)
+            
+            stats_size = tools.Statistics()
+            stats_size.register("x", lambda x: x)
+
+            stats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+            stats = stats_fit
         else:
             stats=None
 
