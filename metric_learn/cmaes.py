@@ -7,6 +7,7 @@ import numpy as np
 
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC, LinearSVC
 from sklearn.metrics import pairwise_distances
 
 from deap import algorithms, base, benchmarks, cma, creator, tools
@@ -148,7 +149,7 @@ class CMAES(BaseMetricLearner):
     '''
     CMAES
     '''
-    def __init__(self, transformer, n_gen=25, n_neighbors=1, class_separation=0,
+    def __init__(self, transformer, n_gen=25, n_neighbors=1, classifier='knn', class_separation=0,
                  knn_weights='uniform', train_subset_size=1.0, split_size=0.33,
                  n_jobs=-1, random_state=None, verbose=False):
         """Initialize the learner.
@@ -176,6 +177,7 @@ class CMAES(BaseMetricLearner):
             'transformer': transformer,
             'n_gen': n_gen,
             'n_neighbors': n_neighbors,
+            'classifier': classifier,
             'class_separation': class_separation,
             'knn_weights': knn_weights,
             'train_subset_size': train_subset_size,
@@ -212,12 +214,21 @@ class CMAES(BaseMetricLearner):
 
             X_train_trans = transformer.transform(X_train)
             X_test_trans = transformer.transform(X_test)
-            knn = KNeighborsClassifier(
-                n_neighbors=self.params['n_neighbors'],
-                n_jobs=self.params['n_jobs'],
-                weights=self.params['knn_weights'])
-            knn.fit(X_train_trans, y_train)
-            score = knn.score(X_test_trans, y_test)
+
+            if self.params['classifier']=='svm':
+                classifier = SVC(
+                    random_state=self.params['random_state'])
+            elif self.params['classifier']=='lsvm':
+                classifier = LinearSVC(
+                    dual=False,
+                    random_state=self.params['random_state'])
+            else: # == knn
+                classifier = KNeighborsClassifier(
+                    n_neighbors=self.params['n_neighbors'],
+                    n_jobs=self.params['n_jobs'],
+                    weights=self.params['knn_weights'])
+            classifier.fit(X_train_trans, y_train)
+            score = classifier.score(X_test_trans, y_test)
 
             # if self.params['class_separation']:
             separation_score = class_separation(X_test_trans, y_test)
