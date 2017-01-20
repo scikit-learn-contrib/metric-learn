@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 from .base_metric import BaseMetricLearner
 
 # This DEAP settings needs to be global because of parallelism
-creator.create("FitnessMin", base.Fitness, weights=(1.0, 1.0))
+creator.create("FitnessMin", base.Fitness, weights=(1.0, -1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
 toolbox = base.Toolbox()
@@ -76,22 +76,31 @@ class FullMatrixTransformer(_MatrixTransformer):
         self.L = np.reshape(flat_weights, (len(flat_weights)//input_dim, input_dim))
         return self
 
-class NeuralNetworkTransformer(BaseMetricLearner):
-    def __init__(self, layers, activation='relu', use_biases=False):
+class NeuralNetworkTransformer(_MatrixTransformer):
+    def __init__(self, layers=None, activation='relu', use_biases=False):
         self.params = {
             'layers': layers,
             'activation': activation,
             'use_biases': use_biases,
         }
 
-    def duplicate_instance(self):
-        return self.__class__(**self.params)
+    def _build_activation(self):
+        activation = self.params['activation']
+
+        if activation is None:
+            return lambda X: X # identity
+        elif activation == 'relu':
+            return lambda X: np.maximum(X, 0) # ReLU
+        elif activation == 'tanh':
+            return np.tanh
+        else:
+            raise ValueError('Invalid activation paramater value')
 
     def individual_size(self, input_dim):
         last_layer = input_dim
 
         size = 0
-        for layer in self.params['layers']:
+        for layer in self.params['layers'] or (input_dim,):
             size += last_layer*layer
 
             if self.params['use_biases']:
@@ -111,7 +120,7 @@ class NeuralNetworkTransformer(BaseMetricLearner):
 
         last_layer = input_dim
         offset = 0
-        for layer in self.params['layers']:
+        for layer in self.params['layers'] or (input_dim,):
             W = flat_weights[offset:offset+last_layer*layer].reshape((last_layer, layer))
             offset += last_layer*layer
             
@@ -126,6 +135,7 @@ class NeuralNetworkTransformer(BaseMetricLearner):
             last_layer = layer
 
         self._parsed_weights = weights
+        self._activation = self._build_activation()
         return self
 
     def transform(self, X):
@@ -133,12 +143,7 @@ class NeuralNetworkTransformer(BaseMetricLearner):
             X = np.add(np.matmul(X, W), b)
 
             if i+1 < len(self._parsed_weights):
-                if self.params['activation']=='relu':
-                    X = np.maximum(X, 0) # ReLU
-                elif self.params['activation']=='tanh':
-                    X = np.tanh(X) # tanh
-                else:
-                    pass
+                X = self._activation(X)
 
         return X
         
@@ -149,23 +154,21 @@ class CMAES(BaseMetricLearner):
     '''
     CMAES
     '''
-    def __init__(self, transformer, n_gen=25, n_neighbors=1, classifier='knn', class_separation=0,
-                 knn_weights='uniform', train_subset_size=1.0, split_size=0.33,
-                 n_jobs=-1, random_state=None, verbose=False):
+    def __init__(self, classifier='knn', transformer='full', n_gen=25, class_separation=False,
+                 train_subset_size=1.0, split_size=0.33,
+                 random_state=None, verbose=False, **kwargs):
         """Initialize the learner.
 
         Parameters
         ----------
-        transformer : _MatrixTransformer object
+        classifier : ('knn', 'svc', 'lsvc', classifier object)
+            classifier is used in fitness scoring
+        transformer : ('full', 'diagonal', _MatrixTransformer object)
             transformer defines transforming function to learn
         n_gen : int, optional
             number of generations of evolution algorithm
-        n_neighbors : int, optional
-            number of neighbors to use for k_neighbors queries
         class_separation : bool, optional
             add class separation to fitness
-        knn_weights : [uniform, distance], optional
-            weight function used in prediction (for Scikit's KNeighborsClassifier)
         train_subset_size : float (0,1], optional
             size of data to use for individual evaluation
         split_size : float (0,1], optional
@@ -174,26 +177,72 @@ class CMAES(BaseMetricLearner):
             if True, prints information while learning
         """
         self.params = {
+            **kwargs,
+            'classifier': classifier,
             'transformer': transformer,
             'n_gen': n_gen,
-            'n_neighbors': n_neighbors,
-            'classifier': classifier,
             'class_separation': class_separation,
-            'knn_weights': knn_weights,
             'train_subset_size': train_subset_size,
             'split_size': split_size,
-            'n_jobs': n_jobs,
             'random_state': random_state,
             'verbose': verbose,
         }
 
-        self._transformer = transformer
+    def _get_extra_params(self, prefixes):
+        params = {}
+        for pname, pvalue in self.params.items():
+            if '__' not in pname: continue
+
+            prefix, pkey = pname.split('__', 1)
+            if prefix not in prefixes: continue
+
+            params[pkey] = pvalue
+
+        return params
+
+    def _build_transformer(self):
+        transformer = self.params['transformer']
+        params = self._get_extra_params(('transformer', 't'))
+
+        if isinstance(transformer, _MatrixTransformer):
+            return transformer
+        elif transformer == 'diagonal':
+            return DiagonalMatrixTransformer(**params)
+        elif transformer == 'full':
+            return FullMatrixTransformer(**params)
+        elif transformer == 'neuralnetwork':
+            return NeuralNetworkTransformer(**params)
+        
+        raise ValueError('Invalid transformer parameter.')
+
+    def _build_classifier(self):
+        classifier = self.params['classifier']
+        params = self._get_extra_params(('classifier', 'c'))
+
+        if classifier == 'svc':
+            return SVC(
+                random_state=self.params['random_state'],
+                **params,
+            )
+        elif classifier == 'lsvc':
+            return LinearSVC(
+                random_state=self.params['random_state'],
+                **params,
+            )
+        elif classifier == 'knn':
+            return KNeighborsClassifier(**params)
+
+        raise ValueError('Invalid classifier parameter.')
 
     def transform(self, X):
         return self._transformer.transform(X)
         
     def transformer(self):
         return self._transformer
+
+    def fit_transform(self, X, Y):
+        self.fit(X,Y)
+        return self.transform(X)
 
     def knnEvaluationBuilder(self, X, y):
         def class_separation(X, labels):
@@ -215,28 +264,18 @@ class CMAES(BaseMetricLearner):
             X_train_trans = transformer.transform(X_train)
             X_test_trans = transformer.transform(X_test)
 
-            if self.params['classifier']=='svm':
-                classifier = SVC(
-                    random_state=self.params['random_state'])
-            elif self.params['classifier']=='lsvm':
-                classifier = LinearSVC(
-                    dual=False,
-                    random_state=self.params['random_state'])
-            else: # == knn
-                classifier = KNeighborsClassifier(
-                    n_neighbors=self.params['n_neighbors'],
-                    n_jobs=self.params['n_jobs'],
-                    weights=self.params['knn_weights'])
+            classifier = self._build_classifier()
             classifier.fit(X_train_trans, y_train)
             score = classifier.score(X_test_trans, y_test)
 
-            # if self.params['class_separation']:
-            separation_score = class_separation(X_test_trans, y_test)
-            return [score, self.params['class_separation']*separation_score]
-            # else:
-            #     return [score]
-            return [score - mean_squared_error(individual, np.ones(self._input_dim))]
-            return [score - np.sum(np.absolute(individual))]
+            if self.params['class_separation']:
+                return (score, class_separation(X_test_trans, y_test),)
+            else:
+                return (score, 0,)
+
+            # return [score, self.params['class_separation']*separation_score]
+            # return [score - mean_squared_error(individual, np.ones(self._input_dim))]
+            # return [score - np.sum(np.absolute(individual))]
         
         return knnEvaluation
 
@@ -247,6 +286,7 @@ class CMAES(BaseMetricLearner):
         '''
         np.random.seed(self.params['random_state'])
         self._input_dim = X.shape[1]
+        self._transformer = self._build_transformer()
 
         sizeOfIndividual = self._transformer.individual_size(self._input_dim)
         
@@ -282,7 +322,3 @@ class CMAES(BaseMetricLearner):
         
         self._transformer.fit(self._input_dim, self.hof[0])
         return self
-    
-    def fit_transform(self, X, Y):
-        self.fit(X,Y)
-        return self.transform(X)
