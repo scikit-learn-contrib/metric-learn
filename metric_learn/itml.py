@@ -101,7 +101,8 @@ class ITML(BaseMetricLearner):
         _lambda[i] -= alpha
         beta = alpha/(1 - alpha*wtw)
         pos_bhat[i] = 1./((1 / pos_bhat[i]) + (alpha / gamma))
-        A += beta * A.dot(np.outer(v,v)).dot(A)
+        Av = A.dot(v)
+        A += beta * np.outer(Av, Av)
 
       # update negatives
       vv = self.X[c] - self.X[d]
@@ -111,7 +112,8 @@ class ITML(BaseMetricLearner):
         _lambda[i+num_pos] -= alpha
         beta = -alpha/(1 + alpha*wtw)
         neg_bhat[i] = 1./((1 / neg_bhat[i]) - (alpha / gamma))
-        A += beta * A.dot(np.outer(v,v)).dot(A)
+        Av = A.dot(v)
+        A += beta * np.outer(Av, Av)
 
       normsum = np.linalg.norm(_lambda) + np.linalg.norm(lambdaold)
       if normsum == 0:
