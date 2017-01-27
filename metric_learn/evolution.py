@@ -5,11 +5,16 @@
 from __future__ import division, absolute_import
 import numpy as np
 
+import itertools
+import math
+import random
+
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC, LinearSVC
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances
+from sklearn.base import ClassifierMixin
 from scipy.spatial import distance
 
 from deap import algorithms, base, benchmarks, cma, creator, tools
@@ -20,13 +25,9 @@ from .base_metric import BaseMetricLearner
 creator.create("FitnessMin", base.Fitness, weights=(1.0, -1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
-toolbox = base.Toolbox()
-toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
-
-
-class _BaseBuilder():
+class BaseBuilder():
     def __init__(self):
-        raise NotImplementedError('_BaseBuilder should not be instantiated')
+        raise NotImplementedError('BaseBuilder should not be instantiated')
 
     def _get_extra_params(self, prefixes):
         params = {}
@@ -40,26 +41,34 @@ class _BaseBuilder():
 
         return params
 
-    def _build_transformer(self, transformer):
-        params = self._get_extra_params(('transformer', 't'))
+    def transformer_builder(self, transformer=None, params=None):
+        if transformer is None:
+            transformer = self.params['transformer']
+        if params is None:
+            params = self._get_extra_params(('transformer', 't'))
 
-        if isinstance(transformer, _MatrixTransformer):
-            return transformer
-        elif transformer == 'diagonal':
-            return DiagonalMatrixTransformer(**params)
-        elif transformer == 'full':
-            return FullMatrixTransformer(**params)
-        elif transformer == 'neuralnetwork':
-            return NeuralNetworkTransformer(**params)
-        elif transformer == 'kmeans':
-            return KMeansTransformer(**params)
-        
-        raise ValueError('Invalid transformer parameter.')
+        def build():
+            if isinstance(transformer, MatrixTransformer):
+                return transformer
+            elif transformer == 'diagonal':
+                return DiagonalMatrixTransformer(**params)
+            elif transformer == 'full':
+                return FullMatrixTransformer(**params)
+            elif transformer == 'neuralnetwork':
+                return NeuralNetworkTransformer(**params)
+            elif transformer == 'kmeans':
+                return KMeansTransformer(**params)
+            
+            raise ValueError('Invalid `transformer` parameter value.')
+
+        return build
 
     def _build_classifier(self, classifier):
         params = self._get_extra_params(('classifier', 'c'))
 
-        if classifier == 'svc':
+        if isinstance(classifier, ClassifierMixin):
+            return classifier
+        elif classifier == 'svc':
             return SVC(
                 random_state=self.params['random_state'],
                 **params,
@@ -72,20 +81,56 @@ class _BaseBuilder():
         elif classifier == 'knn':
             return KNeighborsClassifier(**params)
 
-        raise ValueError('Invalid classifier parameter.')
+        raise ValueError('Invalid `classifier` parameter value.')
 
-class _MatrixTransformer(BaseMetricLearner):
+    def build_strategy(self, strategy, fitnesses, n_dim, transformer_builder):
+        params = self._get_extra_params(('strategy', 's'))
+        params.update({
+            'fitnesses': fitnesses,
+            'n_dim': n_dim,
+            'transformer_builder': transformer_builder,
+            'random_state': self.params['random_state'],
+            'verbose': self.params['verbose'],
+        })
+
+        if isinstance(strategy, BaseEvolutionStrategy):
+            return strategy
+        elif strategy == 'cmaes':
+            return CMAES(**params)
+        elif strategy == 'de':
+            return DifferentialEvolution(**params)
+        elif strategy == 'dde':
+            return DynamicDifferentialEvolution(**params)
+        
+        raise ValueError('Invalid `strategy` parameter value.')
+
+    def build_fitnesses(self, fitnesses):
+        if not isinstance(fitnesses, (list, tuple)):
+            fitnesses = [fitnesses]
+
+        return list(map(self.build_fitness, fitnesses))
+
+    def build_fitness(self, fitness):
+        def f(X_train, X_test, y_train, y_test):
+            classifier = self._build_classifier(fitness)
+            classifier.fit(X_train, y_train)
+            return classifier.score(X_test, y_test)
+
+        if fitness in ('knn', 'svc', 'lsvc'):
+            return f
+
+class MatrixTransformer(BaseMetricLearner):
     def __init__(self):
-        raise NotImplementedError('_MatrixTransformer should not be instantiated')
+        raise NotImplementedError('MatrixTransformer should not be instantiated')
 
     def duplicate_instance(self):
         return self.__class__(**self.params)
 
     def individual_size(self, input_dim):
-        raise NotImplementedError('_MatrixTransformer should not be instantiated')
+        raise NotImplementedError('individual_size() is not implemented')
 
     def fit(self, X, y, flat_weights):
-        raise NotImplementedError('_MatrixTransformer should not be instantiated')
+        raise NotImplementedError('fit() is not implemented')
 
     def transform(self, X):
         return X.dot(self.transformer().T)
@@ -93,7 +138,7 @@ class _MatrixTransformer(BaseMetricLearner):
     def transformer(self):
         return self.L
 
-class DiagonalMatrixTransformer(_MatrixTransformer):
+class DiagonalMatrixTransformer(MatrixTransformer):
     def __init__(self):
         self.params = {}
 
@@ -108,7 +153,7 @@ class DiagonalMatrixTransformer(_MatrixTransformer):
         self.L = np.diag(flat_weights)
         return self
 
-class FullMatrixTransformer(_MatrixTransformer):
+class FullMatrixTransformer(MatrixTransformer):
     def __init__(self, n_components=None):
         self.params = {
             'n_components': n_components
@@ -128,7 +173,7 @@ class FullMatrixTransformer(_MatrixTransformer):
         self.L = np.reshape(flat_weights, (len(flat_weights)//input_dim, input_dim))
         return self
 
-class NeuralNetworkTransformer(_MatrixTransformer):
+class NeuralNetworkTransformer(MatrixTransformer):
     def __init__(self, layers=None, activation='relu', use_biases=False):
         self.params = {
             'layers': layers,
@@ -204,7 +249,7 @@ class NeuralNetworkTransformer(_MatrixTransformer):
     def transformer(self):
         return self._parsed_weights
 
-class KMeansTransformer(_MatrixTransformer, _BaseBuilder):
+class KMeansTransformer(MatrixTransformer, BaseBuilder):
     def __init__(self, transformer='full', n_clusters='classes', function='distance', n_init=1, random_state=None, **kwargs):
         self._transformer = None
         self.params = {
@@ -218,12 +263,12 @@ class KMeansTransformer(_MatrixTransformer, _BaseBuilder):
 
     def individual_size(self, input_dim):
         if self._transformer is None:
-            self._transformer = self._build_transformer(self.params['transformer'])
+            self._transformer = self.transformer_builder()()
 
         return self._transformer.individual_size(input_dim)
 
     def fit(self, X, y, flat_weights):
-        self._transformer = self._build_transformer(self.params['transformer'])
+        self._transformer = self.transformer_builder()()
         self._transformer.fit(X, y, flat_weights)
 
         if self.params['n_clusters'] == 'classes':
@@ -256,56 +301,25 @@ class KMeansTransformer(_MatrixTransformer, _BaseBuilder):
     def transformer(self):
         return self._transformer
 
-class CMAES(BaseMetricLearner, _BaseBuilder):
-    '''
-    CMAES
-    '''
-    def __init__(self, classifier='knn', transformer='full', n_gen=25, class_separation=False,
-                 train_subset_size=1.0, split_size=0.33, evolution_strategy='cmaes',
-                 random_state=None, verbose=False, **kwargs):
-        """Initialize the learner.
-
-        Parameters
-        ----------
-        classifier : ('knn', 'svc', 'lsvc', classifier object)
-            classifier is used in fitness scoring
-        transformer : ('full', 'diagonal', _MatrixTransformer object)
-            transformer defines transforming function to learn
-        n_gen : int, optional
-            number of generations of evolution algorithm
-        class_separation : bool, optional
-            add class separation to fitness
-        train_subset_size : float (0,1], optional
-            size of data to use for individual evaluation
-        split_size : float (0,1], optional
-            size of the data to leave for test error
-        verbose : bool, optional
-            if True, prints information while learning
-        """
+class BaseEvolutionStrategy():
+    def __init__(self, n_dim, fitnesses, transformer_builder=None, n_gen=25, split_size=0.33, train_subset_size=1.0, random_state=None, verbose=False):
         self.params = {
-            **kwargs,
-            'classifier': classifier,
-            'evolution_strategy': evolution_strategy,
-            'transformer': transformer,
+            'n_dim': n_dim,
+            'fitnesses': fitnesses,
+            'transformer_builder': transformer_builder,
             'n_gen': n_gen,
-            'class_separation': class_separation,
-            'train_subset_size': train_subset_size,
             'split_size': split_size,
+            'train_subset_size': train_subset_size,
             'random_state': random_state,
             'verbose': verbose,
         }
-        np.random.seed(random_state)
 
-    def transform(self, X):
-        return self._transformer.transform(X)
-        
-    def transformer(self):
-        return self._transformer
+    def fit(self, X, y, flat_weights):
+        raise NotImplementedError('fit() is not implemented')
 
-    def fit_transform(self, X, Y):
-        self.fit(X,Y)
-        return self.transform(X)
-
+    def best_individual(self):
+        raise NotImplementedError('best_individual() is not implemented')
+    
     def _build_stats(self, verbose):
         if verbose == False:
             return None
@@ -319,66 +333,175 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
         return fitness
         # stats_size = tools.Statistics()
         # stats_size.register("x", lambda x: x)
-
         # stats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
 
+    def _subset_train_test_split(self, X, y):
+        subset = self.params['train_subset_size']
+        assert(0.0 < subset <= 1.0)
+
+        if subset==1.0:
+            return train_test_split(X, y, 
+                test_size=self.params['split_size'],
+                random_state=self.params['random_state'],
+            )
+
+        train_mask = np.random.choice([True, False], X.shape[0], p=[subset, 1-subset])
+        return train_test_split(X[train_mask], y[train_mask],
+            test_size=self.params['split_size'],
+            random_state=self.params['random_state'],
+        )
+
     def evaluation_builder(self, X, y):
-        def class_separation(X, labels):
-            unique_labels, label_inds = np.unique(labels, return_inverse=True)
-            ratio = 0
-            for li in range(len(unique_labels)):
-                Xc = X[label_inds==li]
-                Xnc = X[label_inds!=li]
-                ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc,Xnc).mean()
-            return ratio / len(unique_labels)
+        # def class_separation(X, y):
+        #     unique_labels, label_inds = np.unique(y, return_inverse=True)
+        #     ratio = 0
+        #     for li in range(len(unique_labels)):
+        #         Xc = X[label_inds==li]
+        #         Xnc = X[label_inds!=li]
+        #         ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc,Xnc).mean()
+        #     return ratio / len(unique_labels)
 
         def evaluate(individual):
-            subset = self.params['train_subset_size']
-            train_mask = np.random.choice([True, False], X.shape[0], p=[subset, 1-subset])
-            X_train, X_test, y_train, y_test = train_test_split(X[train_mask], y[train_mask], test_size=self.params['split_size'], random_state=self.params['random_state'])
+            X_train, X_test, y_train, y_test = self._subset_train_test_split(X, y)
 
-            transformer = self._transformer.duplicate_instance().fit(X_train, y_train, individual)
-            X_train_trans = transformer.transform(X_train)
-            X_test_trans = transformer.transform(X_test)
+            if self.params['transformer_builder']:
+                transformer = self.params['transformer_builder']()
+                transformer.fit(X_train, y_train, individual)
+                X_train = transformer.transform(X_train)
+                X_test = transformer.transform(X_test)
 
-            classifier = self._build_classifier(self.params['classifier'])
-            classifier.fit(X_train_trans, y_train)
-            score = classifier.score(X_test_trans, y_test)
+            return [f(X_train, X_test, y_train, y_test) for f in self.params['fitnesses']]
 
-            if self.params['class_separation']:
-                return (score, class_separation(X_test_trans, y_test),)
-            else:
-                return (score, 0,)
+            # classifier = self._build_classifier(self.params['classifier'])
+            # classifier.fit(X_train_trans, y_train)
+            # score = classifier.score(X_test_trans, y_test)
+
+            # if self.params['class_separation']:
+            #     return (score, class_separation(X_test_trans, y_test),)
+            # else:
+            #     return (score, 0,)
 
             # return [score, self.params['class_separation']*separation_score]
             # return [score - mean_squared_error(individual, np.ones(self._input_dim))]
             # return [score - np.sum(np.absolute(individual))]
         return evaluate
 
-    def fit(self, X, Y):
-        '''
-         X: (n, d) array-like of samples
-         Y: (n,) array-like of class labels
-        '''
-        if self.params['evolution_strategy']=='cmaes':
-            return self.fit_cmaes(X, Y)
-        elif self.params['evolution_strategy']=='de':
-            return self.fit_de(X, Y)
-        elif self.params['evolution_strategy']=='dde':
-            return self.fit_dde(X, Y)
+class CMAES(BaseEvolutionStrategy):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         
-        raise ValueError('Invalid evolution_strategy parameter value.')
+        self.params.update({
+            # 'n_dim': n_dim,
+        })
 
-    def fit_dde(self, X, Y):
-        '''
-         X: (n, d) array-like of samples
-         Y: (n,) array-like of class labels
-        '''
+    def best_individual(self):
+        return self.hall_of_fame[0]
 
-        import itertools
-        import math
-        import random
+    def fit(self, X, y):
+        strategy = cma.Strategy(centroid=[0.0]*self.params['n_dim'], sigma=1.0)
 
+        toolbox = base.Toolbox()
+        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
+        
+        toolbox.register("evaluate", self.evaluation_builder(X, y))
+        toolbox.register("generate", strategy.generate, creator.Individual)
+        toolbox.register("update", strategy.update)
+
+        self.hall_of_fame = tools.HallOfFame(1)
+
+        self.pop, self.logbook = algorithms.eaGenerateUpdate(
+            toolbox,
+            ngen=self.params['n_gen'],
+            stats=self._build_stats(self.params['verbose']),
+            halloffame=self.hall_of_fame,
+            verbose=self.params['verbose']
+        )
+
+        return self
+
+
+class DifferentialEvolution(BaseEvolutionStrategy):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+        self.params.update({
+            # 'n_dim': n_dim,
+        })
+
+    def best_individual(self):
+        return self.hall_of_fame[0]
+
+    def fit(self, X, y):
+        individual_size = self.params['n_dim']
+        
+        toolbox = base.Toolbox()
+        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
+        toolbox.register("attr_float", np.random.uniform, -1, 1)
+        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_float, individual_size)
+        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+        toolbox.register("select", tools.selRandom, k=3)
+        
+        toolbox.register("evaluate", self.evaluation_builder(X, y))
+
+        self.hall_of_fame = tools.HallOfFame(1)
+        stats = self._build_stats(self.params['verbose'])
+
+        # Differential evolution parameters
+        CR = 0.25
+        F = 1  
+        MU = 50
+        
+        pop = toolbox.population(n=MU);
+        
+        logbook = tools.Logbook()
+        logbook.header = "gen", "evals", "std", "min", "avg", "max"
+        
+        # Evaluate the individuals
+        fitnesses = toolbox.map(toolbox.evaluate, pop)
+        for ind, fit in zip(pop, fitnesses):
+            ind.fitness.values = fit
+        
+        if stats:
+            record = stats.compile(pop)
+            logbook.record(gen=0, evals=len(pop), **record)
+            print(logbook.stream)
+        
+        for g in range(1, self.params['n_gen']):
+            for k, agent in enumerate(pop):
+                a,b,c = toolbox.select(pop)
+                y = toolbox.clone(agent)
+                index = np.random.randint(individual_size)
+                for i, value in enumerate(agent):
+                    if i == index or np.random.random() < CR:
+                        y[i] = a[i] + F*(b[i]-c[i])
+                y.fitness.values = toolbox.evaluate(y)
+                if y.fitness > agent.fitness:
+                    pop[k] = y
+            self.hall_of_fame.update(pop)
+            
+            if stats:
+                record = stats.compile(pop)
+                logbook.record(gen=g, evals=len(pop), **record)
+                print(logbook.stream)
+
+        return self
+
+
+class DynamicDifferentialEvolution(BaseEvolutionStrategy):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+        self.params.update({
+            # 'n_dim': n_dim,
+        })
+
+    def best_individual(self):
+        return self.hall_of_fame[0]
+
+    def _brown_ind(self, iclass, best, sigma):
+            return iclass(random.gauss(x, sigma) for x in best)
+
+    def fit(self, X, y):
         # Differential evolution parameters
         NPOP = 10 # Should be equal to the number of peaks
         CR = 0.6
@@ -386,24 +509,21 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
         regular, brownian = 4, 2
         BOUNDS = (-1, 1)
 
-        self._transformer = self._build_transformer(self.params['transformer'])
-        individual_size = self._transformer.individual_size(X.shape[1])
+        individual_size = self.params['n_dim']
 
+        toolbox = base.Toolbox()
+        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
         toolbox.register("attr_float", np.random.uniform, -1, 1)
         toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_float, individual_size)
-
-        def brown_ind(iclass, best, sigma):
-            return iclass(random.gauss(x, sigma) for x in best)
-
-        toolbox.register("brownian_individual", brown_ind, creator.Individual, sigma=0.3)
+        toolbox.register("brownian_individual", self._brown_ind, creator.Individual, sigma=0.3)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
         
         toolbox.register("select", random.sample, k=4)
         toolbox.register("best", tools.selBest, k=1)
 
-        toolbox.register("evaluate", self.evaluation_builder(X, Y))
+        toolbox.register("evaluate", self.evaluation_builder(X, y))
 
-        self.hof = tools.HallOfFame(1)
+        self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats(self.params['verbose'])
 
         logbook = tools.Logbook()
@@ -452,7 +572,7 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
                 ind.fitness.values = fit
 
             all_pops = list(itertools.chain(*populations))
-            self.hof.update(all_pops)
+            self.hall_of_fame.update(all_pops)
         
             if stats:
                 record = stats.compile(all_pops)
@@ -467,9 +587,9 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
                 for individual in subpop[:regular]:
                     x1, x2, x3, x4 = toolbox.select(subpop)
                     offspring = toolbox.clone(individual)
-                    index = random.randrange(individual_size)
+                    index = np.random.randint(individual_size)
                     for i, value in enumerate(individual):
-                        if i == index or random.random() < CR:
+                        if i == index or np.random.random() < CR:
                             offspring[i] = xbest[i] + F * (x1[i] + x2[i] - x3[i] - x4[i])
                     offspring.fitness.values = toolbox.evaluate(offspring)
                     if offspring.fitness >= individual.fitness:
@@ -486,92 +606,61 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
 
                 # Replace the population 
                 populations[idx] = newpop
-
-        self._transformer.fit(X, Y, self.hof[0])
+        
         return self
 
-    def fit_de(self, X, Y):
+class MetricEvolution(BaseMetricLearner, BaseBuilder):
+    '''
+    CMAES
+    '''
+    def __init__(self, strategy='cmaes', fitnesses='knn', transformer='full',
+                 random_state=None, verbose=False, **kwargs):
+        """Initialize the learner.
+
+        Parameters
+        ----------
+        fitnesses : ('knn', 'svc', 'lsvc', fitnesses object)
+            fitnesses is used in fitness scoring
+        transformer : ('full', 'diagonal', MatrixTransformer object)
+            transformer defines transforming function to learn
+        verbose : bool, optional
+            if True, prints information while learning
+        """
+        self.params = {
+            **kwargs,
+            'strategy': strategy,
+            'fitnesses': fitnesses,
+            'transformer': transformer,
+            'random_state': random_state,
+            'verbose': verbose,
+        }
+        np.random.seed(random_state)
+
+    def transform(self, X):
+        return self._transformer.transform(X)
+        
+    def transformer(self):
+        return self._transformer
+
+    def fit_transform(self, X, y):
+        self.fit(X, y)
+        return self.transform(X)
+
+    def fit(self, X, y):
         '''
          X: (n, d) array-like of samples
          Y: (n,) array-like of class labels
         '''
-        self._transformer = self._build_transformer(self.params['transformer'])
-        individual_size = self._transformer.individual_size(X.shape[1])
+        transformer_builder = self.transformer_builder()
+        self._transformer = transformer_builder()
         
-        toolbox.register("attr_float", np.random.uniform, -1, 1)
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_float, individual_size)
-        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-        toolbox.register("select", tools.selRandom, k=3)
-        
-        toolbox.register("evaluate", self.evaluation_builder(X, Y))
-
-        self.hof = tools.HallOfFame(1)
-        stats = self._build_stats(self.params['verbose'])
-
-        # Differential evolution parameters
-        CR = 0.25
-        F = 1  
-        MU = 50
-        
-        pop = toolbox.population(n=MU);
-        
-        logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "std", "min", "avg", "max"
-        
-        # Evaluate the individuals
-        fitnesses = toolbox.map(toolbox.evaluate, pop)
-        for ind, fit in zip(pop, fitnesses):
-            ind.fitness.values = fit
-        
-        if stats:
-            record = stats.compile(pop)
-            logbook.record(gen=0, evals=len(pop), **record)
-            print(logbook.stream)
-        
-        for g in range(1, self.params['n_gen']):
-            for k, agent in enumerate(pop):
-                a,b,c = toolbox.select(pop)
-                y = toolbox.clone(agent)
-                index = np.random.randint(individual_size)
-                for i, value in enumerate(agent):
-                    if i == index or np.random.random() < CR:
-                        y[i] = a[i] + F*(b[i]-c[i])
-                y.fitness.values = toolbox.evaluate(y)
-                if y.fitness > agent.fitness:
-                    pop[k] = y
-            self.hof.update(pop)
-            
-            if stats:
-                record = stats.compile(pop)
-                logbook.record(gen=g, evals=len(pop), **record)
-                print(logbook.stream)
-        
-        self._transformer.fit(X, Y, self.hof[0])
-        return self
-
-    def fit_cmaes(self, X, Y):
-        '''
-         X: (n, d) array-like of samples
-         Y: (n,) array-like of class labels
-        '''
-        self._transformer = self._build_transformer(self.params['transformer'])
-        individual_size = self._transformer.individual_size(X.shape[1])
-        
-        strategy = cma.Strategy(centroid=[0.0]*individual_size, sigma=1.0)
-        toolbox.register("evaluate", self.evaluation_builder(X, Y))
-        toolbox.register("generate", strategy.generate, creator.Individual)
-        toolbox.register("update", strategy.update)
-
-        self.hof = tools.HallOfFame(1)
-        stats = self._build_stats(self.params['verbose'])
-
-        pop, logbook = algorithms.eaGenerateUpdate(
-            toolbox,
-            ngen=self.params['n_gen'],
-            stats=stats,
-            halloffame=self.hof,
-            verbose=self.params['verbose']
+        strategy = self.build_strategy(
+            strategy=self.params['strategy'],
+            fitnesses=self.build_fitnesses(self.params['fitnesses']),
+            n_dim=self._transformer.individual_size(X.shape[1]),
+            transformer_builder=transformer_builder,
         )
+        strategy.fit(X, y)
         
-        self._transformer.fit(X, Y, self.hof[0])
+        self._transformer.fit(X, y, strategy.best_individual())
         return self
