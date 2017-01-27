@@ -21,10 +21,12 @@ from deap import algorithms, base, benchmarks, cma, creator, tools
 from concurrent.futures import ThreadPoolExecutor 
 from .base_metric import BaseMetricLearner
 
+# @TODO MAKE THIS FLEXIBLE (dimension of fitnesses)
 # This DEAP settings needs to be global because of parallelism
 creator.create("FitnessMin", base.Fitness, weights=(1.0, -1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
+# @TODO refactor this builder
 class BaseBuilder():
     def __init__(self):
         raise NotImplementedError('BaseBuilder should not be instantiated')
@@ -111,6 +113,7 @@ class BaseBuilder():
         return list(map(self.build_fitness, fitnesses))
 
     def build_fitness(self, fitness):
+        # TODO: FINISH THIS
         def f(X_train, X_test, y_train, y_test):
             classifier = self._build_classifier(fitness)
             classifier.fit(X_train, y_train)
@@ -446,6 +449,7 @@ class DifferentialEvolution(BaseEvolutionStrategy):
         self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats(self.params['verbose'])
 
+        # @TODO add this to params
         # Differential evolution parameters
         CR = 0.25
         F = 1  
@@ -502,6 +506,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
             return iclass(random.gauss(x, sigma) for x in best)
 
     def fit(self, X, y):
+        # @TODO add this to params
         # Differential evolution parameters
         NPOP = 10 # Should be equal to the number of peaks
         CR = 0.6
@@ -654,6 +659,7 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         transformer_builder = self.transformer_builder()
         self._transformer = transformer_builder()
         
+        # @TODO simplify this?
         strategy = self.build_strategy(
             strategy=self.params['strategy'],
             fitnesses=self.build_fitnesses(self.params['fitnesses']),
