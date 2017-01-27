@@ -306,6 +306,22 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
         self.fit(X,Y)
         return self.transform(X)
 
+    def _build_stats(self, verbose):
+        if verbose == False:
+            return None
+
+        fitness = tools.Statistics(key=lambda ind: ind.fitness.values)
+        fitness.register("avg", np.mean, axis=0)
+        fitness.register("std", np.std, axis=0)
+        fitness.register("min", np.min, axis=0)
+        fitness.register("max", np.max, axis=0)
+
+        return fitness
+        # stats_size = tools.Statistics()
+        # stats_size.register("x", lambda x: x)
+
+        # stats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+
     def evaluation_builder(self, X, y):
         def class_separation(X, labels):
             unique_labels, label_inds = np.unique(labels, return_inverse=True)
@@ -346,10 +362,135 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
         '''
         if self.params['evolution_strategy']=='cmaes':
             return self.fit_cmaes(X, Y)
+        elif self.params['evolution_strategy']=='de':
+            return self.fit_de(X, Y)
+        elif self.params['evolution_strategy']=='dde':
+            return self.fit_dde(X, Y)
         
-        return self.fit_diffevo(X, Y)
+        raise ValueError('Invalid evolution_strategy parameter value.')
 
-    def fit_diffevo(self, X, Y):
+    def fit_dde(self, X, Y):
+        '''
+         X: (n, d) array-like of samples
+         Y: (n,) array-like of class labels
+        '''
+
+        import itertools
+        import math
+        import random
+
+        # Differential evolution parameters
+        NPOP = 10 # Should be equal to the number of peaks
+        CR = 0.6
+        F = 0.4
+        regular, brownian = 4, 2
+        BOUNDS = (-1, 1)
+
+        self._transformer = self._build_transformer(self.params['transformer'])
+        individual_size = self._transformer.individual_size(X.shape[1])
+
+        toolbox.register("attr_float", np.random.uniform, -1, 1)
+        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_float, individual_size)
+
+        def brown_ind(iclass, best, sigma):
+            return iclass(random.gauss(x, sigma) for x in best)
+
+        toolbox.register("brownian_individual", brown_ind, creator.Individual, sigma=0.3)
+        toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+        
+        toolbox.register("select", random.sample, k=4)
+        toolbox.register("best", tools.selBest, k=1)
+
+        toolbox.register("evaluate", self.evaluation_builder(X, Y))
+
+        self.hof = tools.HallOfFame(1)
+        stats = self._build_stats(self.params['verbose'])
+
+        logbook = tools.Logbook()
+        logbook.header = "gen", "evals", "std", "min", "avg", "max"
+        
+        # Initialize populations
+        populations = [toolbox.population(n=regular + brownian) for _ in range(NPOP)]
+
+        # Evaluate the individuals
+        for idx, subpop in enumerate(populations):
+            fitnesses = toolbox.map(toolbox.evaluate, subpop)
+            for ind, fit in zip(subpop, fitnesses):
+                ind.fitness.values = fit
+
+        if stats:
+            record = stats.compile(itertools.chain(*populations))
+            logbook.record(gen=0, evals=len(populations), **record)
+            print(logbook.stream)
+
+        for g in range(1, self.params['n_gen']):
+            # Detect a change and invalidate fitnesses if necessary
+            bests = [toolbox.best(subpop)[0] for subpop in populations]
+            if any(b.fitness.values != toolbox.evaluate(b) for b in bests):
+                for individual in itertools.chain(*populations):
+                    del individual.fitness.values
+
+            # Apply exclusion
+            rexcl = (BOUNDS[1] - BOUNDS[0]) / (2 * NPOP**(1.0/individual_size))
+            for i, j in itertools.combinations(range(NPOP), 2):
+                if bests[i].fitness.valid and bests[j].fitness.valid:
+                    d = sum((bests[i][k] - bests[j][k])**2 for k in range(individual_size))
+                    d = math.sqrt(d)
+
+                    if d < rexcl:
+                        if bests[i].fitness < bests[j].fitness:
+                            k = i
+                        else:
+                            k = j
+
+                        populations[k] = toolbox.population(n=regular + brownian)
+            
+            # Evaluate the individuals with an invalid fitness
+            invalid_ind = [ind for ind in itertools.chain(*populations) if not ind.fitness.valid]
+            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+            for ind, fit in zip(invalid_ind, fitnesses):
+                ind.fitness.values = fit
+
+            all_pops = list(itertools.chain(*populations))
+            self.hof.update(all_pops)
+        
+            if stats:
+                record = stats.compile(all_pops)
+                logbook.record(gen=g, evals=len(populations), **record)
+                print(logbook.stream)
+
+            # Evolve the sub-populations
+            for idx, subpop in enumerate(populations):
+                newpop = []
+                xbest, = toolbox.best(subpop)
+                # Apply regular DE to the first part of the population
+                for individual in subpop[:regular]:
+                    x1, x2, x3, x4 = toolbox.select(subpop)
+                    offspring = toolbox.clone(individual)
+                    index = random.randrange(individual_size)
+                    for i, value in enumerate(individual):
+                        if i == index or random.random() < CR:
+                            offspring[i] = xbest[i] + F * (x1[i] + x2[i] - x3[i] - x4[i])
+                    offspring.fitness.values = toolbox.evaluate(offspring)
+                    if offspring.fitness >= individual.fitness:
+                        newpop.append(offspring)
+                    else:
+                        newpop.append(individual)
+
+                # Apply Brownian to the last part of the population
+                newpop.extend(toolbox.brownian_individual(xbest) for _ in range(brownian))
+
+                # Evaluate the brownian individuals
+                for individual in newpop[-brownian:]:
+                    individual.fitness.value = toolbox.evaluate(individual)
+
+                # Replace the population 
+                populations[idx] = newpop
+
+        self._transformer.fit(X, Y, self.hof[0])
+        return self
+
+    def fit_de(self, X, Y):
         '''
          X: (n, d) array-like of samples
          Y: (n,) array-like of class labels
@@ -365,21 +506,7 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
         toolbox.register("evaluate", self.evaluation_builder(X, Y))
 
         self.hof = tools.HallOfFame(1)
-        
-        if self.params['verbose']:
-            stats_fit = tools.Statistics(key=lambda ind: ind.fitness.values)
-            stats_fit.register("avg", np.mean, axis=0)
-            stats_fit.register("std", np.std, axis=0)
-            stats_fit.register("min", np.min, axis=0)
-            stats_fit.register("max", np.max, axis=0)
-            
-            stats_size = tools.Statistics()
-            stats_size.register("x", lambda x: x)
-
-            stats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-            stats = stats_fit
-        else:
-            stats=None
+        stats = self._build_stats(self.params['verbose'])
 
         # Differential evolution parameters
         CR = 0.25
@@ -418,7 +545,6 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
                 record = stats.compile(pop)
                 logbook.record(gen=g, evals=len(pop), **record)
                 print(logbook.stream)
-                print("Best individual is ", self.hof[0], self.hof[0].fitness.values[0])
         
         self._transformer.fit(X, Y, self.hof[0])
         return self
@@ -437,21 +563,7 @@ class CMAES(BaseMetricLearner, _BaseBuilder):
         toolbox.register("update", strategy.update)
 
         self.hof = tools.HallOfFame(1)
-        
-        if self.params['verbose']:
-            stats_fit = tools.Statistics(key=lambda ind: ind.fitness.values)
-            stats_fit.register("avg", np.mean, axis=0)
-            stats_fit.register("std", np.std, axis=0)
-            stats_fit.register("min", np.min, axis=0)
-            stats_fit.register("max", np.max, axis=0)
-            
-            stats_size = tools.Statistics()
-            stats_size.register("x", lambda x: x)
-
-            stats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-            stats = stats_fit
-        else:
-            stats=None
+        stats = self._build_stats(self.params['verbose'])
 
         pop, logbook = algorithms.eaGenerateUpdate(
             toolbox,
