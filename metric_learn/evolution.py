@@ -17,16 +17,82 @@ from sklearn.metrics import pairwise_distances
 from sklearn.base import ClassifierMixin
 from scipy.spatial import distance
 
-from deap import algorithms, base, benchmarks, cma, creator, tools
+from deap import algorithms, base, cma, tools # creator, benchmarks
 from concurrent.futures import ThreadPoolExecutor 
 from .base_metric import BaseMetricLearner
 
-# @TODO MAKE THIS FLEXIBLE (dimension of fitnesses)
-# This DEAP settings needs to be global because of parallelism
-creator.create("FitnessMin", base.Fitness, weights=(1.0, -1.0,))
-creator.create("Individual", list, fitness=creator.FitnessMin)
+class MultidimensionalFitness(base.Fitness):
+    def __init__(self, n_dim, *args, **kwargs):
+        self.n_dim = n_dim
+        self.weights = (1.0,)*n_dim
+        
+        super().__init__(*args, **kwargs)
 
-# @TODO refactor this builder
+    def __deepcopy__(self, memo):
+        copy_ = self.__class__(self.n_dim)
+        copy_.wvalues = self.wvalues
+        return copy_
+
+class BaseFitness():
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def available():
+        return []
+
+    def __call__(self, X_train, X_test, y_train, y_test):
+        raise NotImplementedError('__call__ has not been implemented')
+
+class ScorerFitness(BaseFitness):
+    def __init__(self, classifier, **kwargs):
+        self.params = {
+            'classifier': classifier,
+        }
+        self.classifier_params = kwargs
+
+    @staticmethod
+    def available():
+        return ['knn', 'scv', 'lsvc']
+
+    def __call__(self, X_train, X_test, y_train, y_test):
+        classifier = self._build_classifier(
+            self.params['classifier'],
+            self.classifier_params,
+        )
+        classifier.fit(X_train, y_train)
+        return classifier.score(X_test, y_test)
+        # return [score - mean_squared_error(individual, np.ones(self._input_dim))]
+        # return [score - np.sum(np.absolute(individual))]
+
+    def _build_classifier(self, classifier, params):
+        if isinstance(classifier, ClassifierMixin):
+            return classifier
+        elif classifier == 'svc':
+            return SVC(**params)
+        elif classifier == 'lsvc':
+            return LinearSVC(**params)
+        elif classifier == 'knn':
+            return KNeighborsClassifier(**params)
+
+        raise ValueError('Invalid `classifier` parameter value.')
+
+class ClassSeparationFitness(BaseFitness):
+    @staticmethod
+    def available():
+        return ['class_separation']
+
+    def __call__(self, X_train, X_test, y_train, y_test):
+        X = np.vstack([X_train, X_test])
+        y = np.hstack([y_train, y_test])
+        unique_labels, label_inds = np.unique(y, return_inverse=True)
+        ratio = 0
+        for li in range(len(unique_labels)):
+            Xc = X[label_inds==li]
+            Xnc = X[label_inds!=li]
+            ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc,Xnc).mean()
+        return -ratio / len(unique_labels)
+
 class BaseBuilder():
     def __init__(self):
         raise NotImplementedError('BaseBuilder should not be instantiated')
@@ -65,63 +131,6 @@ class BaseBuilder():
 
         return build
 
-    def _build_classifier(self, classifier):
-        params = self._get_extra_params(('classifier', 'c'))
-
-        if isinstance(classifier, ClassifierMixin):
-            return classifier
-        elif classifier == 'svc':
-            return SVC(
-                random_state=self.params['random_state'],
-                **params,
-            )
-        elif classifier == 'lsvc':
-            return LinearSVC(
-                random_state=self.params['random_state'],
-                **params,
-            )
-        elif classifier == 'knn':
-            return KNeighborsClassifier(**params)
-
-        raise ValueError('Invalid `classifier` parameter value.')
-
-    def build_strategy(self, strategy, fitnesses, n_dim, transformer_builder):
-        params = self._get_extra_params(('strategy', 's'))
-        params.update({
-            'fitnesses': fitnesses,
-            'n_dim': n_dim,
-            'transformer_builder': transformer_builder,
-            'random_state': self.params['random_state'],
-            'verbose': self.params['verbose'],
-        })
-
-        if isinstance(strategy, BaseEvolutionStrategy):
-            return strategy
-        elif strategy == 'cmaes':
-            return CMAES(**params)
-        elif strategy == 'de':
-            return DifferentialEvolution(**params)
-        elif strategy == 'dde':
-            return DynamicDifferentialEvolution(**params)
-        
-        raise ValueError('Invalid `strategy` parameter value.')
-
-    def build_fitnesses(self, fitnesses):
-        if not isinstance(fitnesses, (list, tuple)):
-            fitnesses = [fitnesses]
-
-        return list(map(self.build_fitness, fitnesses))
-
-    def build_fitness(self, fitness):
-        # TODO: FINISH THIS
-        def f(X_train, X_test, y_train, y_test):
-            classifier = self._build_classifier(fitness)
-            classifier.fit(X_train, y_train)
-            return classifier.score(X_test, y_test)
-
-        if fitness in ('knn', 'svc', 'lsvc'):
-            return f
-
 class MatrixTransformer(BaseMetricLearner):
     def __init__(self):
         raise NotImplementedError('MatrixTransformer should not be instantiated')
@@ -151,7 +160,7 @@ class DiagonalMatrixTransformer(MatrixTransformer):
     def fit(self, X, y, flat_weights):
         self.input_dim = X.shape[1]
         if self.input_dim != len(flat_weights):
-            raise Error('Invalid size of input_dim')
+            raise Error('`input_dim` and `flat_weights` sizes do not match')
 
         self.L = np.diag(flat_weights)
         return self
@@ -171,7 +180,7 @@ class FullMatrixTransformer(MatrixTransformer):
     def fit(self, X, y, flat_weights):
         input_dim = X.shape[1]
         if self.individual_size(input_dim) != len(flat_weights):
-            raise Error('input_dim and flat_weights sizes do not match')
+            raise Error('`input_dim` and `flat_weights` sizes do not match')
 
         self.L = np.reshape(flat_weights, (len(flat_weights)//input_dim, input_dim))
         return self
@@ -354,19 +363,33 @@ class BaseEvolutionStrategy():
             random_state=self.params['random_state'],
         )
 
-    def evaluation_builder(self, X, y):
-        # def class_separation(X, y):
-        #     unique_labels, label_inds = np.unique(y, return_inverse=True)
-        #     ratio = 0
-        #     for li in range(len(unique_labels)):
-        #         Xc = X[label_inds==li]
-        #         Xnc = X[label_inds!=li]
-        #         ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc,Xnc).mean()
-        #     return ratio / len(unique_labels)
+    def individual_builder(self, fitness_obj=None):
+        fitness_len = len(self.params['fitnesses'])
 
+        if fitness_obj is None:
+            fitness_obj = MultidimensionalFitness
+
+        def fitness_builder():
+            return fitness_obj(fitness_len)
+
+        class Individual(list):
+            def __init__(self, *args):
+                super().__init__(args[0])
+                self.fitness = fitness_builder()
+
+        return Individual
+
+    def create_toolbox(self):
+        toolbox = base.Toolbox()
+        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
+
+        return toolbox
+
+    def evaluation_builder(self, X, y):
         def evaluate(individual):
             X_train, X_test, y_train, y_test = self._subset_train_test_split(X, y)
 
+            # transform the inputs if there is a transformer
             if self.params['transformer_builder']:
                 transformer = self.params['transformer_builder']()
                 transformer.fit(X_train, y_train, individual)
@@ -375,39 +398,29 @@ class BaseEvolutionStrategy():
 
             return [f(X_train, X_test, y_train, y_test) for f in self.params['fitnesses']]
 
-            # classifier = self._build_classifier(self.params['classifier'])
-            # classifier.fit(X_train_trans, y_train)
-            # score = classifier.score(X_test_trans, y_test)
-
-            # if self.params['class_separation']:
-            #     return (score, class_separation(X_test_trans, y_test),)
-            # else:
-            #     return (score, 0,)
-
-            # return [score, self.params['class_separation']*separation_score]
-            # return [score - mean_squared_error(individual, np.ones(self._input_dim))]
-            # return [score - np.sum(np.absolute(individual))]
         return evaluate
 
 class CMAES(BaseEvolutionStrategy):
-    def __init__(self, **kwargs):
+    def __init__(self, mean=0.0, sigma=1.0, **kwargs):
         super().__init__(**kwargs)
         
         self.params.update({
-            # 'n_dim': n_dim,
+            'mean': mean,
+            'sigma': sigma,
         })
 
     def best_individual(self):
         return self.hall_of_fame[0]
 
     def fit(self, X, y):
-        strategy = cma.Strategy(centroid=[0.0]*self.params['n_dim'], sigma=1.0)
-
-        toolbox = base.Toolbox()
-        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
+        strategy = cma.Strategy(
+            centroid=[self.params['mean']]*self.params['n_dim'],
+            sigma=self.params['sigma'],
+        )
         
+        toolbox = self.create_toolbox()
         toolbox.register("evaluate", self.evaluation_builder(X, y))
-        toolbox.register("generate", strategy.generate, creator.Individual)
+        toolbox.register("generate", strategy.generate, self.individual_builder())
         toolbox.register("update", strategy.update)
 
         self.hall_of_fame = tools.HallOfFame(1)
@@ -424,11 +437,13 @@ class CMAES(BaseEvolutionStrategy):
 
 
 class DifferentialEvolution(BaseEvolutionStrategy):
-    def __init__(self, **kwargs):
+    def __init__(self, population_size=50, cr=.25, f=1.0, **kwargs):
         super().__init__(**kwargs)
         
         self.params.update({
-            # 'n_dim': n_dim,
+            'population_size': population_size,
+            'cr': cr,
+            'f': f,
         })
 
     def best_individual(self):
@@ -437,10 +452,9 @@ class DifferentialEvolution(BaseEvolutionStrategy):
     def fit(self, X, y):
         individual_size = self.params['n_dim']
         
-        toolbox = base.Toolbox()
-        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
+        toolbox = self.create_toolbox()
         toolbox.register("attr_float", np.random.uniform, -1, 1)
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_float, individual_size)
+        toolbox.register("individual", tools.initRepeat, self.individual_builder(), toolbox.attr_float, individual_size)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
         toolbox.register("select", tools.selRandom, k=3)
         
@@ -449,13 +463,9 @@ class DifferentialEvolution(BaseEvolutionStrategy):
         self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats(self.params['verbose'])
 
-        # @TODO add this to params
-        # Differential evolution parameters
-        CR = 0.25
-        F = 1  
-        MU = 50
-        
-        pop = toolbox.population(n=MU);
+        CR = self.params['cr']
+        F = self.params['f']
+        pop = toolbox.population(n=self.params['population_size'])
         
         logbook = tools.Logbook()
         logbook.header = "gen", "evals", "std", "min", "avg", "max"
@@ -492,11 +502,14 @@ class DifferentialEvolution(BaseEvolutionStrategy):
 
 
 class DynamicDifferentialEvolution(BaseEvolutionStrategy):
-    def __init__(self, **kwargs):
+    def __init__(self, populations=10, pop_regular=4, pop_brownian=2, cr=0.6, f=0.4, bounds=(-1.0, 1.0), **kwargs):
         super().__init__(**kwargs)
         
         self.params.update({
-            # 'n_dim': n_dim,
+            'populations': populations,
+            'cr': cr,
+            'f': f,
+            'bounds': bounds,
         })
 
     def best_individual(self):
@@ -506,21 +519,18 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
             return iclass(random.gauss(x, sigma) for x in best)
 
     def fit(self, X, y):
-        # @TODO add this to params
         # Differential evolution parameters
-        NPOP = 10 # Should be equal to the number of peaks
-        CR = 0.6
-        F = 0.4
-        regular, brownian = 4, 2
-        BOUNDS = (-1, 1)
+        NPOP = self.params['populations'] # Should be equal to the number of peaks
+        CR, F = self.params['cr'], self.params['f']
+        regular, brownian = self.params['pop_regular'], self.params['pop_brownian']
+        BOUNDS = self.params['bounds']
 
         individual_size = self.params['n_dim']
 
-        toolbox = base.Toolbox()
-        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
+        toolbox = self.create_toolbox()
         toolbox.register("attr_float", np.random.uniform, -1, 1)
-        toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_float, individual_size)
-        toolbox.register("brownian_individual", self._brown_ind, creator.Individual, sigma=0.3)
+        toolbox.register("individual", tools.initRepeat, self.individual_builder(), toolbox.attr_float, individual_size)
+        toolbox.register("brownian_individual", self._brown_ind, self.individual_builder(), sigma=0.3)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
         
         toolbox.register("select", random.sample, k=4)
@@ -641,6 +651,49 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         }
         np.random.seed(random_state)
 
+    def build_fitnesses(self, fitnesses):
+        # make it an array if it is not already one
+        if not isinstance(fitnesses, (list, tuple)):
+            fitnesses = [fitnesses]
+
+        return list(map(self.build_fitness, fitnesses))
+
+    def build_fitness(self, fitness):
+        # fitness can be a tuple of fitness and its params
+        if isinstance(fitness, (list, tuple)):
+            fitness, params = fitness
+        else:
+            params = {}
+
+        if fitness in ScorerFitness.available():
+            return ScorerFitness(fitness, **params)
+
+        if fitness in ClassSeparationFitness.available():
+            return ClassSeparationFitness()
+
+         # TODO unify error messages
+        raise ValueError('Invalid value of fitness: `{}`'.format(fitness))
+
+    def build_strategy(self, strategy, strategy_params, fitnesses, n_dim, transformer_builder, random_state, verbose):
+        strategy_params.update({
+            'fitnesses': fitnesses,
+            'n_dim': n_dim,
+            'transformer_builder': transformer_builder,
+            'random_state': random_state,
+            'verbose': verbose,
+        })
+
+        if isinstance(strategy, BaseEvolutionStrategy):
+            return strategy
+        elif strategy == 'cmaes':
+            return CMAES(**strategy_params)
+        elif strategy == 'de':
+            return DifferentialEvolution(**strategy_params)
+        elif strategy == 'dde':
+            return DynamicDifferentialEvolution(**strategy_params)
+        
+        raise ValueError('Invalid `strategy` parameter value.')
+
     def transform(self, X):
         return self._transformer.transform(X)
         
@@ -656,17 +709,24 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
          X: (n, d) array-like of samples
          Y: (n,) array-like of class labels
         '''
+        # Initialize Transformer builder and default transformer
         transformer_builder = self.transformer_builder()
         self._transformer = transformer_builder()
         
-        # @TODO simplify this?
+        # Build strategy and fitnesses with correct params
         strategy = self.build_strategy(
-            strategy=self.params['strategy'],
-            fitnesses=self.build_fitnesses(self.params['fitnesses']),
-            n_dim=self._transformer.individual_size(X.shape[1]),
-            transformer_builder=transformer_builder,
+            strategy = self.params['strategy'],
+            strategy_params = self._get_extra_params(('strategy', 's')),
+            fitnesses = self.build_fitnesses(self.params['fitnesses']),
+            n_dim = self._transformer.individual_size(X.shape[1]),
+            transformer_builder = transformer_builder,
+            random_state = self.params['random_state'],
+            verbose = self.params['verbose'],
         )
+
+        # Evolve best transformer
         strategy.fit(X, y)
-        
+
+        # Fit transformer with the best individual
         self._transformer.fit(X, y, strategy.best_individual())
         return self
