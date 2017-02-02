@@ -14,9 +14,31 @@ subsets of points that are known to belong to the same class.
 from __future__ import absolute_import
 import numpy as np
 from six.moves import xrange
+from sklearn import decomposition
 
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
+
+def _process_chunks(data, chunks, num_chunks):
+  # mean center
+  data -= data.mean(axis=0)
+
+  # mean center each chunklet separately
+  chunk_mask = chunks != -1
+  chunk_data = data[chunk_mask]
+  chunk_labels = chunks[chunk_mask]
+  for c in xrange(num_chunks):
+    mask = chunk_labels == c
+    chunk_data[mask] -= chunk_data[mask].mean(axis=0)
+
+  return chunk_mask, chunk_data, chunk_labels
+
+# "inner" covariance of chunk deviations
+def _compute_inner_cov(chunk_data):
+  inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
+  rank = np.linalg.matrix_rank(inner_cov)
+
+  return inner_cov, rank
 
 
 class RCA(BaseMetricLearner):
@@ -34,7 +56,10 @@ class RCA(BaseMetricLearner):
     }
 
   def transformer(self):
-    return self._transformer
+    if self.pca is None:
+        return self._transformer
+    else:
+        return self._transformer.dot(self.pca.components_)
 
   def _process_inputs(self, X, Y):
     X = np.asanyarray(X)
@@ -63,27 +88,28 @@ class RCA(BaseMetricLearner):
         when ``chunks[i] == j``, point i belongs to chunklet j.
     """
     data, chunks, num_chunks, d = self._process_inputs(data, chunks)
+    chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks, num_chunks)
+    inner_cov, rank = _compute_inner_cov(chunk_data)
 
-    # mean center
-    data -= data.mean(axis=0)
+    # If the inner covariance matrix is not full rank,
+    # the input data are first projected with a PCA to a space of dimension rank.
+    self.pca = None
+    if rank < d:
+      self.pca = decomposition.PCA(n_components = rank)
+      self.pca.fit(data)
+      data = self.pca.transform(data)
+      chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks, num_chunks)
+      inner_cov, rank = _compute_inner_cov(chunk_data)
 
-    # mean center each chunklet separately
-    chunk_mask = chunks != -1
-    chunk_data = data[chunk_mask]
-    chunk_labels = chunks[chunk_mask]
-    for c in xrange(num_chunks):
-      mask = chunk_labels == c
-      chunk_data[mask] -= chunk_data[mask].mean(axis=0)
-
-    # "inner" covariance of chunk deviations
-    inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
+    # The embedding dimension must be smaller than the rank of the inner covariance matrix
+    dim = min(self.params['dim'], rank)
 
     # Fisher Linear Discriminant projection
-    if self.params['dim'] < d:
+    if dim < rank:
       total_cov = np.cov(data[chunk_mask], rowvar=0)
       tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
       vals, vecs = np.linalg.eig(tmp)
-      inds = np.argsort(vals)[:self.params['dim']]
+      inds = np.argsort(vals)[:dim]
       A = vecs[:,inds]
       inner_cov = A.T.dot(inner_cov).dot(A)
       self._transformer = _inv_sqrtm(inner_cov).dot(A.T)
