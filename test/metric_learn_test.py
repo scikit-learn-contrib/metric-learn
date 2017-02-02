@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, load_digits
 from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
@@ -29,6 +29,9 @@ class MetricTestCase(unittest.TestCase):
     iris_data = load_iris()
     self.iris_points = iris_data['data']
     self.iris_labels = iris_data['target']
+    digits_data = load_digits()
+    self.digits_points = digits_data['data']
+    self.digits_labels = digits_data['target']
     np.random.seed(1234)
 
 
@@ -119,6 +122,19 @@ class TestRCA(MetricTestCase):
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
+  def test_feature_null_variance(self):
+    rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
+    X = np.hstack((self.iris_points, 
+        np.eye(self.iris_points.shape[0], M = 1)))
+    rca.fit(X, self.iris_labels)
+    csep = class_separation(rca.transform(), self.iris_labels)
+    self.assertLess(csep, 0.25)
+  def test_digits(self):
+    rca = RCA_Supervised(dim=3, num_chunks=100, chunk_size=10)
+    rca.fit(self.digits_points, self.digits_labels)
+    csep = class_separation(rca.transform(), self.digits_labels)
+    self.assertLess(csep, 0.40)
+
 
 
 class TestMLKR(MetricTestCase):
