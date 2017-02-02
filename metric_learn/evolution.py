@@ -9,6 +9,7 @@ import itertools
 import math
 import random
 
+from sklearn.base import clone
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC, LinearSVC
@@ -68,7 +69,7 @@ class ScorerFitness(BaseFitness):
 
     def _build_classifier(self, classifier, params):
         if isinstance(classifier, ClassifierMixin):
-            return classifier
+            return clone(classifier)
         elif classifier == 'svc':
             return SVC(**params)
         elif classifier == 'lsvc':
