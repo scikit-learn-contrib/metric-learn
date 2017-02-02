@@ -8,6 +8,7 @@ Those relevant dimensions are estimated using "chunklets",
 subsets of points that are known to belong to the same class.
 
 'Learning distance functions using equivalence relations', ICML 2003
+'Learning a Mahalanobis metric from equivalence constraints', JMLR 2005
 """
 
 from __future__ import absolute_import
