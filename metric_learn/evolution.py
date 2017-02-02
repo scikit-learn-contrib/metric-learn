@@ -38,8 +38,8 @@ class BaseFitness():
         pass
 
     @staticmethod
-    def available():
-        return []
+    def available(method):
+        return False
 
     def __call__(self, X_train, X_test, y_train, y_test):
         raise NotImplementedError('__call__ has not been implemented')
@@ -52,8 +52,9 @@ class ScorerFitness(BaseFitness):
         self.classifier_params = kwargs
 
     @staticmethod
-    def available():
-        return ['knn', 'scv', 'lsvc']
+    def available(method):
+        return (method in ['knn', 'scv', 'lsvc']) or \
+                isinstance(method, ClassifierMixin)
 
     def __call__(self, X_train, X_test, y_train, y_test):
         classifier = self._build_classifier(
@@ -79,8 +80,8 @@ class ScorerFitness(BaseFitness):
 
 class ClassSeparationFitness(BaseFitness):
     @staticmethod
-    def available():
-        return ['class_separation']
+    def available(method):
+        return method in ['class_separation']
 
     def __call__(self, X_train, X_test, y_train, y_test):
         X = np.vstack([X_train, X_test])
@@ -665,10 +666,10 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         else:
             params = {}
 
-        if fitness in ScorerFitness.available():
+        if ScorerFitness.available(fitness):
             return ScorerFitness(fitness, **params)
 
-        if fitness in ClassSeparationFitness.available():
+        if ClassSeparationFitness.available(fitness):
             return ClassSeparationFitness()
 
          # TODO unify error messages
