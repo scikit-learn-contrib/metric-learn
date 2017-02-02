@@ -128,7 +128,7 @@ class TestRCA(MetricTestCase):
         np.eye(self.iris_points.shape[0], M = 1)))
     rca.fit(X, self.iris_labels)
     csep = class_separation(rca.transform(), self.iris_labels)
-    self.assertLess(csep, 0.25)
+    self.assertLess(csep, 0.30)
   def test_digits(self):
     rca = RCA_Supervised(dim=3, num_chunks=100, chunk_size=10)
     rca.fit(self.digits_points, self.digits_labels)

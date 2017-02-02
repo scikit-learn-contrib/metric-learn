@@ -106,7 +106,7 @@ class RCA(BaseMetricLearner):
     if dim < self.params['dim']:
       mess  = 'WARNING : The embedding dimension must be smaller than the rank of the inner covariance matrix. '
       mess += 'dim is set to ' + str(dim) + '.'
-      print mess
+      print(mess)
 
     # Fisher Linear Discriminant projection
     if dim < rank:
