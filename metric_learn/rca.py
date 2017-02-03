@@ -54,12 +54,9 @@ class RCA(BaseMetricLearner):
     self.params = {
       'dim': dim,
     }
-
+  
   def transformer(self):
-    if self.pca is None:
-        return self._transformer
-    else:
-        return self._transformer.dot(self.pca.components_)
+    return self._transformer
 
   def _process_inputs(self, X, Y):
     X = np.asanyarray(X)
@@ -93,11 +90,12 @@ class RCA(BaseMetricLearner):
 
     # If the inner covariance matrix is not full rank,
     # the input data are first projected with a PCA to a space of dimension rank.
-    self.pca = None
+    M_pca = np.identity(d)
     if rank < d:
-      self.pca = decomposition.PCA(n_components = rank)
-      self.pca.fit(data)
-      data = self.pca.transform(data)
+      pca = decomposition.PCA(n_components = rank)
+      pca.fit(data)
+      M_pca = pca.components_
+      data = pca.transform(data)
       chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks, num_chunks)
       inner_cov, rank = _compute_inner_cov(chunk_data)
 
@@ -119,6 +117,8 @@ class RCA(BaseMetricLearner):
       self._transformer = _inv_sqrtm(inner_cov).dot(A.T)
     else:
       self._transformer = _inv_sqrtm(inner_cov).T
+        
+    self._transformer = self._transformer.dot(M_pca)
 
     return self
 
