@@ -33,13 +33,6 @@ def _process_chunks(data, chunks, num_chunks):
 
   return chunk_mask, chunk_data, chunk_labels
 
-# "inner" covariance of chunk deviations
-def _compute_inner_cov(chunk_data):
-  inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
-  rank = np.linalg.matrix_rank(inner_cov)
-
-  return inner_cov, rank
-
 
 class RCA(BaseMetricLearner):
   """Relevant Components Analysis (RCA)"""
@@ -86,7 +79,8 @@ class RCA(BaseMetricLearner):
     """
     data, chunks, num_chunks, d = self._process_inputs(data, chunks)
     chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks, num_chunks)
-    inner_cov, rank = _compute_inner_cov(chunk_data)
+    inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
+    rank = np.linalg.matrix_rank(inner_cov)
 
     # If the inner covariance matrix is not full rank,
     # the input data are first projected with a PCA to a space of dimension rank.
@@ -97,7 +91,8 @@ class RCA(BaseMetricLearner):
       M_pca = pca.components_
       data = pca.transform(data)
       chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks, num_chunks)
-      inner_cov, rank = _compute_inner_cov(chunk_data)
+      inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
+      rank = np.linalg.matrix_rank(inner_cov)
 
     # The embedding dimension must be smaller than the rank of the inner covariance matrix
     dim = min(self.params['dim'], rank)
