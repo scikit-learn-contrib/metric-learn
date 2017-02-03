@@ -15,6 +15,7 @@ from __future__ import absolute_import
 import numpy as np
 from six.moves import xrange
 from sklearn import decomposition
+import warnings
 
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
@@ -97,9 +98,9 @@ class RCA(BaseMetricLearner):
     # The embedding dimension must be smaller than the rank of the inner covariance matrix
     dim = min(self.params['dim'], rank)
     if dim < self.params['dim']:
-      mess  = 'WARNING : The embedding dimension must be smaller than the rank of the inner covariance matrix. '
+      mess  = 'The embedding dimension must be smaller than the rank of the inner covariance matrix. '
       mess += 'dim is set to ' + str(dim) + '.'
-      print(mess)
+      warnings.warn(mess)
 
     # Fisher Linear Discriminant projection
     if dim < rank:
