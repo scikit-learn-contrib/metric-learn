@@ -20,6 +20,7 @@ import warnings
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
 
+
 def _process_chunks(data, chunks, num_chunks):
   # mean center
   data -= data.mean(axis=0)
@@ -45,10 +46,8 @@ class RCA(BaseMetricLearner):
     dim : int, optional
         embedding dimension (default: original dimension of data)
     """
-    self.params = {
-      'dim': dim,
-    }
-  
+    self.params = {'dim': dim}
+
   def transformer(self):
     return self._transformer
 
@@ -79,28 +78,31 @@ class RCA(BaseMetricLearner):
         when ``chunks[i] == j``, point i belongs to chunklet j.
     """
     data, chunks, num_chunks, d = self._process_inputs(data, chunks)
-    chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks, num_chunks)
+    chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks,
+                                                           num_chunks)
     inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
     rank = np.linalg.matrix_rank(inner_cov)
 
-    # If the inner covariance matrix is not full rank,
-    # the input data are first projected with a PCA to a space of dimension rank.
-    M_pca = np.identity(d)
+    # If the inner covariance matrix is not full rank, the input data are
+    # first projected with a PCA to a space of dimension rank.
+    M_pca = None
     if rank < d:
-      pca = decomposition.PCA(n_components = rank)
-      pca.fit(data)
+      pca = decomposition.PCA(n_components=rank)
+      data = pca.fit_transform(data)
       M_pca = pca.components_
-      data = pca.transform(data)
-      chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks, num_chunks)
+      chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks,
+                                                             num_chunks)
       inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
       rank = np.linalg.matrix_rank(inner_cov)
 
-    # The embedding dimension must be smaller than the rank of the inner covariance matrix
-    dim = min(self.params['dim'], rank)
-    if dim < self.params['dim']:
-      mess  = 'The embedding dimension must be smaller than the rank of the inner covariance matrix. '
-      mess += 'dim is set to ' + str(dim) + '.'
-      warnings.warn(mess)
+    # The embedding dimension must be smaller than the rank of the inner
+    # covariance matrix
+    dim = self.params['dim']
+    if rank < dim:
+      warnings.warn('The embedding dimension must be smaller than the rank ' +
+                    'of the inner covariance matrix. ' +
+                    'dim is set to ' + str(rank) + '.')
+      dim = rank
 
     # Fisher Linear Discriminant projection
     if dim < rank:
@@ -108,13 +110,14 @@ class RCA(BaseMetricLearner):
       tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
       vals, vecs = np.linalg.eig(tmp)
       inds = np.argsort(vals)[:dim]
-      A = vecs[:,inds]
+      A = vecs[:, inds]
       inner_cov = A.T.dot(inner_cov).dot(A)
       self._transformer = _inv_sqrtm(inner_cov).dot(A.T)
     else:
       self._transformer = _inv_sqrtm(inner_cov).T
-        
-    self._transformer = self._transformer.dot(M_pca)
+
+    if M_pca is not None:
+        self._transformer = self._transformer.dot(M_pca)
 
     return self
 
