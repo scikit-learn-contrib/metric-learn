@@ -316,7 +316,7 @@ class KMeansTransformer(MatrixTransformer, BaseBuilder):
         return self._transformer
 
 class BaseEvolutionStrategy():
-    def __init__(self, n_dim, fitnesses, transformer_builder=None, n_gen=25, split_size=0.33, train_subset_size=1.0, random_state=None, verbose=False):
+    def __init__(self, n_dim, fitnesses, transformer_builder=None, n_gen=25, split_size=0.33, train_subset_size=1.0, stats=None, random_state=None, verbose=False):
         self.params = {
             'n_dim': n_dim,
             'fitnesses': fitnesses,
@@ -324,6 +324,7 @@ class BaseEvolutionStrategy():
             'n_gen': n_gen,
             'split_size': split_size,
             'train_subset_size': train_subset_size,
+            'stats': stats,
             'random_state': random_state,
             'verbose': verbose,
         }
@@ -334,20 +335,22 @@ class BaseEvolutionStrategy():
     def best_individual(self):
         raise NotImplementedError('best_individual() is not implemented')
     
-    def _build_stats(self, verbose):
-        if verbose == False:
+    def _build_stats(self):
+        if self.params['stats'] is None:
             return None
+        elif isinstance(self.params['stats'], tools.Statistics):
+            return self.params['stats']
+        elif self.params['stats'] == 'identity':
+            fitness = tools.Statistics(key=lambda ind: ind)
+            fitness.register("id", lambda ind: ind)
+            return fitness
 
         fitness = tools.Statistics(key=lambda ind: ind.fitness.values)
         fitness.register("avg", np.mean, axis=0)
         fitness.register("std", np.std, axis=0)
         fitness.register("min", np.min, axis=0)
         fitness.register("max", np.max, axis=0)
-
         return fitness
-        # stats_size = tools.Statistics()
-        # stats_size.register("x", lambda x: x)
-        # stats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
 
     def _subset_train_test_split(self, X, y):
         subset = self.params['train_subset_size']
@@ -430,7 +433,7 @@ class CMAES(BaseEvolutionStrategy):
         self.pop, self.logbook = algorithms.eaGenerateUpdate(
             toolbox,
             ngen=self.params['n_gen'],
-            stats=self._build_stats(self.params['verbose']),
+            stats=self._build_stats(),
             halloffame=self.hall_of_fame,
             verbose=self.params['verbose']
         )
@@ -463,7 +466,7 @@ class DifferentialEvolution(BaseEvolutionStrategy):
         toolbox.register("evaluate", self.evaluation_builder(X, y))
 
         self.hall_of_fame = tools.HallOfFame(1)
-        stats = self._build_stats(self.params['verbose'])
+        stats = self._build_stats()
 
         CR = self.params['cr']
         F = self.params['f']
@@ -541,7 +544,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
         toolbox.register("evaluate", self.evaluation_builder(X, y))
 
         self.hall_of_fame = tools.HallOfFame(1)
-        stats = self._build_stats(self.params['verbose'])
+        stats = self._build_stats()
 
         logbook = tools.Logbook()
         logbook.header = "gen", "evals", "std", "min", "avg", "max"
@@ -716,7 +719,7 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         self._transformer = transformer_builder()
         
         # Build strategy and fitnesses with correct params
-        strategy = self.build_strategy(
+        self._strategy = self.build_strategy(
             strategy = self.params['strategy'],
             strategy_params = self._get_extra_params(('strategy', 's')),
             fitnesses = self.build_fitnesses(self.params['fitnesses']),
@@ -727,8 +730,8 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         )
 
         # Evolve best transformer
-        strategy.fit(X, y)
+        self._strategy.fit(X, y)
 
         # Fit transformer with the best individual
-        self._transformer.fit(X, y, strategy.best_individual())
+        self._transformer.fit(X, y, self._strategy.best_individual())
         return self
