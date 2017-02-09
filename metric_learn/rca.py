@@ -30,7 +30,7 @@ def _chunk_mean_centering(data, chunks, num_chunks):
     mask = chunk_labels == c
     chunk_data[mask] -= chunk_data[mask].mean(axis=0)
 
-  return chunk_mask, chunk_data, chunk_labels
+  return chunk_mask, chunk_data
 
 
 class RCA(BaseMetricLearner):
@@ -50,20 +50,26 @@ class RCA(BaseMetricLearner):
   def transformer(self):
     return self._transformer
 
-  def _process_inputs(self, X, Y):
-    X = np.asanyarray(X)
-    self.X = X
-    n, d = X.shape
+  def _process_data(self, data):
+    data = np.asanyarray(data)
+    self.X = data
+    n, d = data.shape
+    return data, d
 
+  def _process_chunks(self, data, chunks):
+    chunks = np.asanyarray(chunks)
+    num_chunks = chunks.max() + 1
+    chunk_mask, chunk_data = _chunk_mean_centering(data, chunks, num_chunks)
+    return chunk_mask, chunk_data
+
+  def _process_parameters(self, d):
     if self.params['dim'] is None:
       self.params['dim'] = d
-    #elif not 0 < self.params['dim'] <= d:
-    #  raise ValueError('Invalid embedding dimension, must be in [1,%d]' % d)
-
-    Y = np.asanyarray(Y)
-    num_chunks = Y.max() + 1
-
-    return X, Y, num_chunks, d
+    if self.params['dim'] > d:
+      self.params['dim'] = d
+      warnings.warn('dim must be smaller than the data dimension. ' +
+                    'dim is set to %d.' % (d))
+    return self.params['dim']
 
   def fit(self, data, chunks):
     """Learn the RCA model.
@@ -76,18 +82,19 @@ class RCA(BaseMetricLearner):
         when ``chunks[i] == -1``, point i doesn't belong to any chunklet,
         when ``chunks[i] == j``, point i belongs to chunklet j.
     """
+
+    data, d = self._process_data(data)
+
     # PCA projection to remove noise and redundant information.
     M_pca = None
     if self.params['pca_comps'] is not None:
       pca = decomposition.PCA(n_components=self.params['pca_comps'],
                               svd_solver='full')
-      data = pca.fit_transform(data)
+      data, d = pca.fit_transform(data), self.params['pca_comps']
       M_pca = pca.components_
 
-    data, chunks, num_chunks, d = self._process_inputs(data, chunks)
     data -= data.mean(axis=0)
-    chunk_mask, chunk_data, chunk_labels = _chunk_mean_centering(data, chunks,
-                                                                 num_chunks)
+    chunk_mask, chunk_data = self._process_chunks(data, chunks)
     inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
     rank = np.linalg.matrix_rank(inner_cov)
 
@@ -97,13 +104,8 @@ class RCA(BaseMetricLearner):
                     'You should adjust pca_comps to remove noise and ' +
                     'redundant information.')
 
-    dim = self.params['dim']
-    if dim > d:
-      dim = d
-      warnings.warn('dim must be smaller than pca_comps. ' +
-                    'dim is set to %d.' % (d))
-
     # Fisher Linear Discriminant projection
+    dim = self._process_parameters(d)
     if dim < d:
       total_cov = np.cov(data[chunk_mask], rowvar=0)
       tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
