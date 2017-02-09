@@ -43,7 +43,10 @@ class RCA(BaseMetricLearner):
     dim : int, optional
         embedding dimension (default: original dimension of data)
     pca_comps : int, float, None or string
-        see the sklearn documentation
+        Number of components to keep during PCA preprocessing.
+        If None (default), does not perform PCA.
+        If ``0 < pca_comps < 1``, it is used as the minimum explained variance ratio.
+        See sklearn.decomposition.PCA for more details.
     """
     self.params = {'dim': dim, 'pca_comps': pca_comps}
 
@@ -59,13 +62,14 @@ class RCA(BaseMetricLearner):
   def _process_chunks(self, data, chunks):
     chunks = np.asanyarray(chunks)
     num_chunks = chunks.max() + 1
-    chunk_mask, chunk_data = _chunk_mean_centering(data, chunks, num_chunks)
-    return chunk_mask, chunk_data
+    return _chunk_mean_centering(data, chunks, num_chunks)
 
   def _process_parameters(self, d):
     if self.params['dim'] is None:
       self.params['dim'] = d
-    if self.params['dim'] > d:
+    elif not self.params['dim'] > 0:
+      raise ValueError('Invalid embedding dimension, dim must be greater than 0.')
+    elif self.params['dim'] > d:
       self.params['dim'] = d
       warnings.warn('dim must be smaller than the data dimension. ' +
                     'dim is set to %d.' % (d))
@@ -90,18 +94,20 @@ class RCA(BaseMetricLearner):
     if self.params['pca_comps'] is not None:
       pca = decomposition.PCA(n_components=self.params['pca_comps'],
                               svd_solver='full')
-      data, d = pca.fit_transform(data), self.params['pca_comps']
+      data = pca.fit_transform(data)
+      d = data.shape[1]
       M_pca = pca.components_
+    else:
+        data -= data.mean(axis=0)
 
-    data -= data.mean(axis=0)
     chunk_mask, chunk_data = self._process_chunks(data, chunks)
     inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
     rank = np.linalg.matrix_rank(inner_cov)
 
     if rank < d:
-      warnings.warn('The inner covariance matrix is not invertible, ' +
-                    'so the transformation matrix may contain Nan values. ' +
-                    'You should adjust pca_comps to remove noise and ' +
+      warnings.warn('The inner covariance matrix is not invertible, '
+                    'so the transformation matrix may contain Nan values. '
+                    'You should adjust pca_comps to remove noise and '
                     'redundant information.')
 
     # Fisher Linear Discriminant projection
