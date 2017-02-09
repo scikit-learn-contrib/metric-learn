@@ -21,16 +21,18 @@ from .constraints import Constraints
 class SDML(BaseMetricLearner):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False):
-    '''
-    balance_param: float, optional
+    """
+    Parameters
+    ----------
+    balance_param : float, optional
         trade off between sparsity and M0 prior
-    sparsity_param: float, optional
+    sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
-    use_cov: bool, optional
+    use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
     verbose : bool, optional
         if True, prints information while learning
-    '''
+    """
     self.params = {
       'balance_param': balance_param,
       'sparsity_param': sparsity_param,
@@ -52,11 +54,19 @@ class SDML(BaseMetricLearner):
     return self.M
 
   def fit(self, X, W):
-    """
-    X: data matrix, (n x d)
-        each row corresponds to a single instance
-    W: connectivity graph, (n x n)
-        +1 for positive pairs, -1 for negative.
+    """Learn the SDML model.
+
+    Parameters
+    ----------
+    X : array-like, shape (n, d)
+        data matrix, where each row corresponds to a single instance
+    W : array-like, shape (n, n)
+        connectivity graph, with +1 for positive pairs and -1 for negative
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
     """
     self._prepare_inputs(X, W)
     P = pinvh(self.M) + self.params['balance_param'] * self.loss_matrix
@@ -71,23 +81,25 @@ class SDML(BaseMetricLearner):
 class SDML_Supervised(SDML):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
-    SDML.__init__(self, balance_param=balance_param,
-                  sparsity_param=sparsity_param, use_cov=use_cov,
-                  verbose=verbose)
-    '''
-    balance_param: float, optional
+    """
+    Parameters
+    ----------
+    balance_param : float, optional
         trade off between sparsity and M0 prior
-    sparsity_param: float, optional
+    sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
-    use_cov: bool, optional
+    use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
     num_labeled : int, optional
         number of labels to preserve for training
-    num_constraints: int, optional
+    num_constraints : int, optional
         number of constraints to generate
     verbose : bool, optional
         if True, prints information while learning
-    '''
+    """
+    SDML.__init__(self, balance_param=balance_param,
+                  sparsity_param=sparsity_param, use_cov=use_cov,
+                  verbose=verbose)
     self.params.update(num_labeled=num_labeled, num_constraints=num_constraints)
 
   def fit(self, X, labels, random_state=np.random):
@@ -95,15 +107,23 @@ class SDML_Supervised(SDML):
 
     Parameters
     ----------
-    X: data matrix, (n x d)
-        each row corresponds to a single instance
-    labels: data labels, (n,) array-like
-    random_state : a numpy random.seed object to fix the random_state if needed.
+    X : array-like, shape (n, d)
+        data matrix, where each row corresponds to a single instance
+    labels : array-like, shape (n,)
+        data labels, one for each instance
+    random_state : {numpy.random.RandomState, int}, optional
+        Random number generator or random seed. If not given, the singleton
+        numpy.random will be used.
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
     """
     num_constraints = self.params['num_constraints']
     if num_constraints is None:
-      num_classes = np.unique(labels)
-      num_constraints = 20*(len(num_classes))**2
+      num_classes = len(np.unique(labels))
+      num_constraints = 20 * num_classes**2
 
     c = Constraints.random_subset(labels, self.params['num_labeled'],
                                   random_state=random_state)
