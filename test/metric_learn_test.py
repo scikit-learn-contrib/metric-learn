@@ -121,7 +121,7 @@ class TestRCA(MetricTestCase):
     self.assertLess(csep, 0.25)
 
   def test_feature_null_variance(self):
-    rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(dim=2, pca_comps=3, num_chunks=30, chunk_size=2)
     X = np.hstack((self.iris_points,
         np.eye(self.iris_points.shape[0], M = 1)))
     rca.fit(X, self.iris_labels)

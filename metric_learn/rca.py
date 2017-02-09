@@ -21,11 +21,8 @@ from .base_metric import BaseMetricLearner
 from .constraints import Constraints
 
 
-def _process_chunks(data, chunks, num_chunks):
-  # mean center
-  data -= data.mean(axis=0)
-
-  # mean center each chunklet separately
+# mean center each chunklet separately
+def _chunk_mean_centering(data, chunks, num_chunks):
   chunk_mask = chunks != -1
   chunk_data = data[chunk_mask]
   chunk_labels = chunks[chunk_mask]
@@ -38,15 +35,17 @@ def _process_chunks(data, chunks, num_chunks):
 
 class RCA(BaseMetricLearner):
   """Relevant Components Analysis (RCA)"""
-  def __init__(self, dim=None):
+  def __init__(self, dim=None, pca_comps=None):
     """Initialize the learner.
 
     Parameters
     ----------
     dim : int, optional
         embedding dimension (default: original dimension of data)
+    pca_comps : int, float, None or string
+        see the sklearn documentation
     """
-    self.params = {'dim': dim}
+    self.params = {'dim': dim, 'pca_comps': pca_comps}
 
   def transformer(self):
     return self._transformer
@@ -58,8 +57,8 @@ class RCA(BaseMetricLearner):
 
     if self.params['dim'] is None:
       self.params['dim'] = d
-    elif not 0 < self.params['dim'] <= d:
-      raise ValueError('Invalid embedding dimension, must be in [1,%d]' % d)
+    #elif not 0 < self.params['dim'] <= d:
+    #  raise ValueError('Invalid embedding dimension, must be in [1,%d]' % d)
 
     Y = np.asanyarray(Y)
     num_chunks = Y.max() + 1
@@ -77,35 +76,35 @@ class RCA(BaseMetricLearner):
         when ``chunks[i] == -1``, point i doesn't belong to any chunklet,
         when ``chunks[i] == j``, point i belongs to chunklet j.
     """
+    # PCA projection to remove noise and redundant information.
+    M_pca = None
+    if self.params['pca_comps'] is not None:
+      pca = decomposition.PCA(n_components=self.params['pca_comps'],
+                              svd_solver='full')
+      data = pca.fit_transform(data)
+      M_pca = pca.components_
+
     data, chunks, num_chunks, d = self._process_inputs(data, chunks)
-    chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks,
-                                                           num_chunks)
+    data -= data.mean(axis=0)
+    chunk_mask, chunk_data, chunk_labels = _chunk_mean_centering(data, chunks,
+                                                                 num_chunks)
     inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
     rank = np.linalg.matrix_rank(inner_cov)
 
-    # If the inner covariance matrix is not full rank, the input data are
-    # first projected with a PCA to a space of dimension rank.
-    M_pca = None
     if rank < d:
-      pca = decomposition.PCA(n_components=rank)
-      data = pca.fit_transform(data)
-      M_pca = pca.components_
-      chunk_mask, chunk_data, chunk_labels = _process_chunks(data, chunks,
-                                                             num_chunks)
-      inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
-      rank = np.linalg.matrix_rank(inner_cov)
+      warnings.warn('The inner covariance matrix is not invertible, ' +
+                    'so the transformation matrix may contain Nan values. ' +
+                    'You should adjust pca_comps to remove noise and ' +
+                    'redundant information.')
 
-    # The embedding dimension must be smaller than the rank of the inner
-    # covariance matrix
     dim = self.params['dim']
-    if rank < dim:
-      warnings.warn('The embedding dimension must be smaller than the rank ' +
-                    'of the inner covariance matrix. ' +
-                    'dim is set to ' + str(rank) + '.')
-      dim = rank
+    if dim > d:
+      dim = d
+      warnings.warn('dim must be smaller than pca_comps. ' +
+                    'dim is set to %d.' % (d))
 
     # Fisher Linear Discriminant projection
-    if dim < rank:
+    if dim < d:
       total_cov = np.cov(data[chunk_mask], rowvar=0)
       tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
       vals, vecs = np.linalg.eig(tmp)
@@ -129,7 +128,7 @@ def _inv_sqrtm(x):
 
 
 class RCA_Supervised(RCA):
-  def __init__(self, dim=None, num_chunks=100, chunk_size=2):
+  def __init__(self, dim=None, pca_comps=None, num_chunks=100, chunk_size=2):
     """Initialize the learner.
 
     Parameters
@@ -139,7 +138,7 @@ class RCA_Supervised(RCA):
     num_chunks: int, optional
     chunk_size: int, optional
     """
-    RCA.__init__(self, dim=dim)
+    RCA.__init__(self, dim=dim, pca_comps=pca_comps)
     self.params.update(num_chunks=num_chunks, chunk_size=chunk_size)
 
   def fit(self, X, labels, random_state=np.random):
