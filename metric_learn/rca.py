@@ -98,7 +98,7 @@ class RCA(BaseMetricLearner):
       d = data.shape[1]
       M_pca = pca.components_
     else:
-        data -= data.mean(axis=0)
+      data -= data.mean(axis=0)
 
     chunk_mask, chunk_data = self._process_chunks(data, chunks)
     inner_cov = np.cov(chunk_data, rowvar=0, bias=1)
