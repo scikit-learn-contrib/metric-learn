@@ -39,9 +39,9 @@ SDML_Supervised(balance_param=0.5, num_constraints=None, num_labeled=inf,
                 sparsity_param=0.01, use_cov=True, verbose=False)
 """.strip('\n'))
 
-    self.assertEqual(str(metric_learn.RCA()), "RCA(dim=None)")
+    self.assertEqual(str(metric_learn.RCA()), "RCA(dim=None, pca_comps=None)")
     self.assertEqual(str(metric_learn.RCA_Supervised()),
-                     "RCA_Supervised(chunk_size=2, dim=None, num_chunks=100)")
+                     "RCA_Supervised(chunk_size=2, dim=None, num_chunks=100, pca_comps=None)")
 
     self.assertEqual(str(metric_learn.MLKR()), """
 MLKR(A0=None, alpha=0.0001, epsilon=0.01, max_iter=1000, num_dims=None)
