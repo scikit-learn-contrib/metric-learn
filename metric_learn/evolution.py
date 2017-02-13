@@ -472,8 +472,8 @@ class DifferentialEvolution(BaseEvolutionStrategy):
         F = self.params['f']
         pop = toolbox.population(n=self.params['population_size'])
         
-        logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "std", "min", "avg", "max"
+        self.logbook = tools.Logbook()
+        self.logbook.header = "gen", "evals", "std", "min", "avg", "max"
         
         # Evaluate the individuals
         fitnesses = toolbox.map(toolbox.evaluate, pop)
@@ -482,8 +482,8 @@ class DifferentialEvolution(BaseEvolutionStrategy):
         
         if stats:
             record = stats.compile(pop)
-            logbook.record(gen=0, evals=len(pop), **record)
-            print(logbook.stream)
+            self.logbook.record(gen=0, evals=len(pop), **record)
+            if self.params['verbose']: print(self.logbook.stream)
         
         for g in range(1, self.params['n_gen']):
             for k, agent in enumerate(pop):
@@ -500,21 +500,23 @@ class DifferentialEvolution(BaseEvolutionStrategy):
             
             if stats:
                 record = stats.compile(pop)
-                logbook.record(gen=g, evals=len(pop), **record)
-                print(logbook.stream)
+                self.logbook.record(gen=g, evals=len(pop), **record)
+                if self.params['verbose']: print(self.logbook.stream)
 
         return self
 
 
 class DynamicDifferentialEvolution(BaseEvolutionStrategy):
-    def __init__(self, populations=10, pop_regular=4, pop_brownian=2, cr=0.6, f=0.4, bounds=(-1.0, 1.0), **kwargs):
+    def __init__(self, population_size=10, population_regular=4, population_brownian=2, cr=0.6, f=0.4, bounds=(-1.0, 1.0), **kwargs):
         super().__init__(**kwargs)
         
         self.params.update({
-            'populations': populations,
+            'population_size': population_size,
             'cr': cr,
             'f': f,
             'bounds': bounds,
+            'population_regular': population_regular,
+            'population_brownian': population_brownian,
         })
 
     def best_individual(self):
@@ -525,12 +527,12 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
 
     def fit(self, X, y):
         # Differential evolution parameters
-        NPOP = self.params['populations'] # Should be equal to the number of peaks
-        CR, F = self.params['cr'], self.params['f']
-        regular, brownian = self.params['pop_regular'], self.params['pop_brownian']
-        BOUNDS = self.params['bounds']
-
         individual_size = self.params['n_dim']
+        population_size = self.params['population_size'] # Should be equal to the number of peaks
+        
+        CR, F = self.params['cr'], self.params['f']
+        regular, brownian = self.params['population_regular'], self.params['population_brownian']
+        bounds = self.params['bounds']
 
         toolbox = self.create_toolbox()
         toolbox.register("attr_float", np.random.uniform, -1, 1)
@@ -546,11 +548,11 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
         self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats()
 
-        logbook = tools.Logbook()
-        logbook.header = "gen", "evals", "std", "min", "avg", "max"
+        self.logbook = tools.Logbook()
+        self.logbook.header = "gen", "evals", "std", "min", "avg", "max"
         
         # Initialize populations
-        populations = [toolbox.population(n=regular + brownian) for _ in range(NPOP)]
+        populations = [toolbox.population(n=regular + brownian) for _ in range(population_size)]
 
         # Evaluate the individuals
         for idx, subpop in enumerate(populations):
@@ -560,8 +562,8 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
 
         if stats:
             record = stats.compile(itertools.chain(*populations))
-            logbook.record(gen=0, evals=len(populations), **record)
-            print(logbook.stream)
+            self.logbook.record(gen=0, evals=len(populations), **record)
+            if self.params['verbose']: print(self.logbook.stream)
 
         for g in range(1, self.params['n_gen']):
             # Detect a change and invalidate fitnesses if necessary
@@ -571,8 +573,8 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
                     del individual.fitness.values
 
             # Apply exclusion
-            rexcl = (BOUNDS[1] - BOUNDS[0]) / (2 * NPOP**(1.0/individual_size))
-            for i, j in itertools.combinations(range(NPOP), 2):
+            rexcl = (bounds[1] - bounds[0]) / (2 * population_size**(1.0/individual_size))
+            for i, j in itertools.combinations(range(population_size), 2):
                 if bests[i].fitness.valid and bests[j].fitness.valid:
                     d = sum((bests[i][k] - bests[j][k])**2 for k in range(individual_size))
                     d = math.sqrt(d)
@@ -596,8 +598,8 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
         
             if stats:
                 record = stats.compile(all_pops)
-                logbook.record(gen=g, evals=len(populations), **record)
-                print(logbook.stream)
+                self.logbook.record(gen=g, evals=len(populations), **record)
+                if self.params['verbose']: print(self.logbook.stream)
 
             # Evolve the sub-populations
             for idx, subpop in enumerate(populations):
