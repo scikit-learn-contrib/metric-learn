@@ -11,6 +11,7 @@ This algorithm makes no assumptions about the distribution of the data.
 
 from __future__ import print_function, absolute_import
 import numpy as np
+import gc
 from collections import Counter
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
@@ -86,6 +87,7 @@ class python_LMNN(_base_LMNN):
 
     # main loop
     for it in xrange(1, self.params['max_iter']):
+      gc.collect()
       df_old = df.copy()
       a1_old = [a.copy() for a in a1]
       a2_old = [a.copy() for a in a2]
