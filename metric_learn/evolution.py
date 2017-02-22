@@ -9,16 +9,17 @@ import itertools
 import math
 import random
 
-from sklearn.base import clone
+from sklearn.base import ClassifierMixin, clone
+from sklearn.cluster import KMeans
+from sklearn.metrics import pairwise_distances, confusion_matrix, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC, LinearSVC
-from sklearn.cluster import KMeans
-from sklearn.metrics import pairwise_distances
-from sklearn.base import ClassifierMixin
 from scipy.spatial import distance
 
-from deap import algorithms, base, cma, tools # creator, benchmarks
+
+from deap import algorithms, base, cma, tools
 from concurrent.futures import ThreadPoolExecutor 
 from .base_metric import BaseMetricLearner
 
@@ -78,6 +79,59 @@ class ScorerFitness(BaseFitness):
             return KNeighborsClassifier(**params)
 
         raise ValueError('Invalid `classifier` parameter value.')
+
+class RandomFitness(BaseFitness):
+    @staticmethod
+    def available(method):
+        return method in ['random']
+
+    def __call__(self, X_train, X_test, y_train, y_test):
+        return np.random.random()
+
+class WeightedFMeasureFitness(BaseFitness):
+    def __init__(self, weighted=False, sig=5, kmeans__n_init=1):
+        self.params = {
+            'weighted': weighted,
+            'sig': sig,
+            'kmeans__n_init': kmeans__n_init,
+        }
+
+    @staticmethod
+    def available(method):
+        return method in ['wfme']
+
+    def __call__(self, X_train, X_test, y_train, y_test):
+        X = np.vstack([X_train, X_test])
+        y = np.hstack([y_train, y_test])
+        le = LabelEncoder()
+        y = le.fit_transform(y)
+
+        kmeans = KMeans(n_clusters=len(np.unique(y)), n_init=self.params['kmeans__n_init'])
+        kmeans.fit(X)
+
+        if not self.params['weighted']:
+            return f1_score(y, kmeans.labels_, average='weighted')
+
+        r = distance.cdist(kmeans.cluster_centers_, kmeans.cluster_centers_)
+        h = np.exp(-r/(self.params['sig']**2))
+
+        N = confusion_matrix(y, kmeans.labels_)
+
+        wN = np.zeros(h.shape)
+        for l in range(wN.shape[0]): # label
+            for c in range(wN.shape[0]): # cluster
+                for j in range(wN.shape[0]):
+                    wN[l,c] += h[l,c]*N[l,j]
+
+        Prec = wN / wN.sum(axis=0)
+        Rec  = wN /  N.sum(axis=1)[:,None]
+        F    = (2*Prec*Rec) / (Prec+Rec)
+
+        wFme = 0
+        for l in range(F.shape[0]):
+            wFme += (N[l,:].sum()/N.sum())*F[l,:].max()
+
+        return wFme
 
 class ClassSeparationFitness(BaseFitness):
     @staticmethod
@@ -162,7 +216,8 @@ class DiagonalMatrixTransformer(MatrixTransformer):
     def fit(self, X, y, flat_weights):
         self.input_dim = X.shape[1]
         if self.input_dim != len(flat_weights):
-            raise Error('`input_dim` and `flat_weights` sizes do not match')
+            raise Exception('`input_dim` and `flat_weights` sizes do not match: {} vs {}'
+                .format(input_dim, len(flat_weights)))
 
         self.L = np.diag(flat_weights)
         return self
@@ -182,7 +237,8 @@ class FullMatrixTransformer(MatrixTransformer):
     def fit(self, X, y, flat_weights):
         input_dim = X.shape[1]
         if self.individual_size(input_dim) != len(flat_weights):
-            raise Error('`input_dim` and `flat_weights` sizes do not match')
+            raise Exception('`input_dim` and `flat_weights` sizes do not match: {} vs {}'
+                .format(self.individual_size(input_dim), len(flat_weights)))
 
         self.L = np.reshape(flat_weights, (len(flat_weights)//input_dim, input_dim))
         return self
@@ -227,7 +283,7 @@ class NeuralNetworkTransformer(MatrixTransformer):
         flat_weights = np.array(flat_weights)
         flat_weights_len = len(flat_weights)
         if flat_weights_len != self.individual_size(input_dim):
-            raise Error('Invalid size of the flat_weights')
+            raise Exception('Invalid size of the flat_weights')
 
         weights = []
 
@@ -390,6 +446,9 @@ class BaseEvolutionStrategy():
 
         return toolbox
 
+    def cut_individual(self, individual):
+        return individual
+
     def evaluation_builder(self, X, y):
         def evaluate(individual):
             X_train, X_test, y_train, y_test = self._subset_train_test_split(X, y)
@@ -397,7 +456,7 @@ class BaseEvolutionStrategy():
             # transform the inputs if there is a transformer
             if self.params['transformer_builder']:
                 transformer = self.params['transformer_builder']()
-                transformer.fit(X_train, y_train, individual)
+                transformer.fit(X_train, y_train, self.cut_individual(individual))
                 X_train = transformer.transform(X_train)
                 X_test = transformer.transform(X_test)
 
@@ -517,8 +576,11 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
             't2': t2,
         })
 
+    def cut_individual(self, individual):
+        return individual[2:]
+
     def best_individual(self):
-        return self.hall_of_fame[0][2:]
+        return self.cut_individual(self.hall_of_fame[0])
 
     def fit(self, X, y):
         individual_size = self.params['n_dim']+2
@@ -568,7 +630,7 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
                 
                 # Selection
                 y.fitness.values = toolbox.evaluate(y)
-                if y.fitness > agent.fitness:
+                if y.fitness >= agent.fitness:
                     pop[k] = y
             self.hall_of_fame.update(pop)
             
@@ -744,13 +806,19 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         if isinstance(fitness, (list, tuple)):
             fitness, params = fitness
         else:
-            params = {}
+            params = self._get_extra_params(('fitness', 'f'))
+
+        if RandomFitness.available(fitness):
+            return RandomFitness()
 
         if ScorerFitness.available(fitness):
             return ScorerFitness(fitness, **params)
 
         if ClassSeparationFitness.available(fitness):
             return ClassSeparationFitness()
+
+        if WeightedFMeasureFitness.available(fitness):
+            return WeightedFMeasureFitness()
 
          # TODO unify error messages
         raise ValueError('Invalid value of fitness: `{}`'.format(fitness))
