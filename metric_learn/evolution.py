@@ -23,6 +23,11 @@ from deap import algorithms, base, cma, tools
 from concurrent.futures import ThreadPoolExecutor 
 from .base_metric import BaseMetricLearner
 
+class Individual(list):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.fitness = None
+
 class MultidimensionalFitness(base.Fitness):
     def __init__(self, n_dim, *args, **kwargs):
         self.n_dim = n_dim
@@ -424,21 +429,20 @@ class BaseEvolutionStrategy():
             random_state=self.params['random_state'],
         )
 
-    def individual_builder(self, fitness_obj=None):
+    def generate_individual_with_fitness(self, func, n):
         fitness_len = len(self.params['fitnesses'])
+        ind = Individual(func() for _ in range(n))
+        ind.fitness = MultidimensionalFitness(fitness_len)
+        return ind
 
-        if fitness_obj is None:
-            fitness_obj = MultidimensionalFitness
+    def generate_pop_with_fitness(self, generate):
+        fitness_len = len(self.params['fitnesses'])
+        
+        individuals = generate(Individual)
+        for ind in individuals:
+            setattr(ind, 'fitness', MultidimensionalFitness(fitness_len))
 
-        def fitness_builder():
-            return fitness_obj(fitness_len)
-
-        class Individual(list):
-            def __init__(self, *args):
-                super().__init__(args[0])
-                self.fitness = fitness_builder()
-
-        return Individual
+        return individuals
 
     def create_toolbox(self):
         toolbox = base.Toolbox()
@@ -484,7 +488,7 @@ class CMAES(BaseEvolutionStrategy):
         
         toolbox = self.create_toolbox()
         toolbox.register("evaluate", self.evaluation_builder(X, y))
-        toolbox.register("generate", strategy.generate, self.individual_builder())
+        toolbox.register("generate", self.generate_pop_with_fitness, strategy.generate)
         toolbox.register("update", strategy.update)
 
         self.hall_of_fame = tools.HallOfFame(1)
@@ -518,7 +522,7 @@ class DifferentialEvolution(BaseEvolutionStrategy):
         
         toolbox = self.create_toolbox()
         toolbox.register("attr_float", np.random.uniform, -1, 1)
-        toolbox.register("individual", tools.initRepeat, self.individual_builder(), toolbox.attr_float, individual_size)
+        toolbox.register("individual", self.generate_individual_with_fitness, toolbox.attr_float, individual_size)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
         toolbox.register("select", tools.selRandom, k=3)
         
@@ -587,7 +591,7 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
         
         toolbox = self.create_toolbox()
         toolbox.register("attr_float", np.random.uniform, -1, 1)
-        toolbox.register("individual", tools.initRepeat, self.individual_builder(), toolbox.attr_float, individual_size)
+        toolbox.register("individual", self.generate_individual_with_fitness, toolbox.attr_float, individual_size)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
         toolbox.register("select", tools.selRandom, k=3)
         toolbox.register("evaluate", self.evaluation_builder(X, y))
@@ -658,8 +662,11 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
     def best_individual(self):
         return self.hall_of_fame[0]
 
-    def _brown_ind(self, iclass, best, sigma):
-            return iclass(random.gauss(x, sigma) for x in best)
+    def generate_brow_ind_with_fitness(self, best, sigma=0.3):
+        fitness_len = len(self.params['fitnesses'])
+        ind = Individual(random.gauss(x, sigma) for x in best)
+        ind.fitness = MultidimensionalFitness(fitness_len)
+        return ind
 
     def fit(self, X, y):
         # Differential evolution parameters
@@ -672,8 +679,8 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
 
         toolbox = self.create_toolbox()
         toolbox.register("attr_float", np.random.uniform, -1, 1)
-        toolbox.register("individual", tools.initRepeat, self.individual_builder(), toolbox.attr_float, individual_size)
-        toolbox.register("brownian_individual", self._brown_ind, self.individual_builder(), sigma=0.3)
+        toolbox.register("individual", self.generate_individual_with_fitness, toolbox.attr_float, individual_size)
+        toolbox.register("brownian_individual", self.generate_brow_ind_with_fitness)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
         
         toolbox.register("select", random.sample, k=4)
