@@ -170,27 +170,24 @@ class BaseBuilder():
 
         return params
 
-    def transformer_builder(self, transformer=None, params=None):
+    def build_transformer(self, transformer=None, params=None):
         if transformer is None:
             transformer = self.params['transformer']
         if params is None:
             params = self._get_extra_params(('transformer', 't'))
 
-        def build():
-            if isinstance(transformer, MatrixTransformer):
-                return transformer
-            elif transformer == 'diagonal':
-                return DiagonalMatrixTransformer(**params)
-            elif transformer == 'full':
-                return FullMatrixTransformer(**params)
-            elif transformer == 'neuralnetwork':
-                return NeuralNetworkTransformer(**params)
-            elif transformer == 'kmeans':
-                return KMeansTransformer(**params)
-            
-            raise ValueError('Invalid `transformer` parameter value.')
-
-        return build
+        if isinstance(transformer, MatrixTransformer):
+            return transformer
+        elif transformer == 'diagonal':
+            return DiagonalMatrixTransformer(**params)
+        elif transformer == 'full':
+            return FullMatrixTransformer(**params)
+        elif transformer == 'neuralnetwork':
+            return NeuralNetworkTransformer(**params)
+        elif transformer == 'kmeans':
+            return KMeansTransformer(**params)
+        
+        raise ValueError('Invalid `transformer` parameter value.')
 
 class MatrixTransformer(BaseMetricLearner):
     def __init__(self):
@@ -338,12 +335,12 @@ class KMeansTransformer(MatrixTransformer, BaseBuilder):
 
     def individual_size(self, input_dim):
         if self._transformer is None:
-            self._transformer = self.transformer_builder()()
+            self._transformer = self.build_transformer()
 
         return self._transformer.individual_size(input_dim)
 
     def fit(self, X, y, flat_weights):
-        self._transformer = self.transformer_builder()()
+        self._transformer = self.build_transformer()
         self._transformer.fit(X, y, flat_weights)
 
         if self.params['n_clusters'] == 'classes':
@@ -377,11 +374,11 @@ class KMeansTransformer(MatrixTransformer, BaseBuilder):
         return self._transformer
 
 class BaseEvolutionStrategy():
-    def __init__(self, n_dim, fitnesses, transformer_builder=None, n_gen=25, split_size=0.33, train_subset_size=1.0, stats=None, random_state=None, verbose=False):
+    def __init__(self, n_dim, fitnesses, transformer=None, n_gen=25, split_size=0.33, train_subset_size=1.0, stats=None, random_state=None, verbose=False):
         self.params = {
             'n_dim': n_dim,
             'fitnesses': fitnesses,
-            'transformer_builder': transformer_builder,
+            'transformer': transformer,
             'n_gen': n_gen,
             'split_size': split_size,
             'train_subset_size': train_subset_size,
@@ -435,15 +432,6 @@ class BaseEvolutionStrategy():
         ind.fitness = MultidimensionalFitness(fitness_len)
         return ind
 
-    def generate_pop_with_fitness(self, generate):
-        fitness_len = len(self.params['fitnesses'])
-        
-        individuals = generate(Individual)
-        for ind in individuals:
-            setattr(ind, 'fitness', MultidimensionalFitness(fitness_len))
-
-        return individuals
-
     def create_toolbox(self):
         toolbox = base.Toolbox()
         toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
@@ -458,8 +446,8 @@ class BaseEvolutionStrategy():
             X_train, X_test, y_train, y_test = self._subset_train_test_split(X, y)
 
             # transform the inputs if there is a transformer
-            if self.params['transformer_builder']:
-                transformer = self.params['transformer_builder']()
+            if self.params['transformer']:
+                transformer = self.params['transformer'].duplicate_instance()
                 transformer.fit(X_train, y_train, self.cut_individual(individual))
                 X_train = transformer.transform(X_train)
                 X_test = transformer.transform(X_test)
@@ -480,6 +468,15 @@ class CMAES(BaseEvolutionStrategy):
     def best_individual(self):
         return self.hall_of_fame[0]
 
+    def _generate_pop_with_fitness(self, generate):
+        fitness_len = len(self.params['fitnesses'])
+        
+        individuals = generate(Individual)
+        for ind in individuals:
+            setattr(ind, 'fitness', MultidimensionalFitness(fitness_len))
+
+        return individuals
+
     def fit(self, X, y):
         strategy = cma.Strategy(
             centroid=[self.params['mean']]*self.params['n_dim'],
@@ -488,7 +485,7 @@ class CMAES(BaseEvolutionStrategy):
         
         toolbox = self.create_toolbox()
         toolbox.register("evaluate", self.evaluation_builder(X, y))
-        toolbox.register("generate", self.generate_pop_with_fitness, strategy.generate)
+        toolbox.register("generate", self._generate_pop_with_fitness, strategy.generate)
         toolbox.register("update", strategy.update)
 
         self.hall_of_fame = tools.HallOfFame(1)
@@ -830,11 +827,11 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
          # TODO unify error messages
         raise ValueError('Invalid value of fitness: `{}`'.format(fitness))
 
-    def build_strategy(self, strategy, strategy_params, fitnesses, n_dim, transformer_builder, random_state, verbose):
+    def build_strategy(self, strategy, strategy_params, fitnesses, n_dim, transformer, random_state, verbose):
         strategy_params.update({
             'fitnesses': fitnesses,
             'n_dim': n_dim,
-            'transformer_builder': transformer_builder,
+            'transformer': transformer,
             'random_state': random_state,
             'verbose': verbose,
         })
@@ -868,8 +865,7 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
          Y: (n,) array-like of class labels
         '''
         # Initialize Transformer builder and default transformer
-        transformer_builder = self.transformer_builder()
-        self._transformer = transformer_builder()
+        self._transformer = self.build_transformer()
         
         # Build strategy and fitnesses with correct params
         self._strategy = self.build_strategy(
@@ -877,7 +873,7 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
             strategy_params = self._get_extra_params(('strategy', 's')),
             fitnesses = self.build_fitnesses(self.params['fitnesses']),
             n_dim = self._transformer.individual_size(X.shape[1]),
-            transformer_builder = transformer_builder,
+            transformer = self._transformer,
             random_state = self.params['random_state'],
             verbose = self.params['verbose'],
         )
