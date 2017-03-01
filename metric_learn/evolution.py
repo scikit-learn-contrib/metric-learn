@@ -629,7 +629,13 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
         self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats()
 
-        population_size = self.params['population_size'] or 10*self.params['n_dim']
+        # TODO: Make this more general and move to BaseEvolutionStrategy
+        if self.params['population_size'] == 'log':
+            population_size = int(4 + 3 * np.log(self.params['n_dim']))
+        elif self.params['population_size'] is not None:
+            population_size = self.params['population_size']
+        else:
+            population_size = 10*self.params['n_dim']
         pop = toolbox.population(n=population_size)
         
         self.logbook = tools.Logbook()
