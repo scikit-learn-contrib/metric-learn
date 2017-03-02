@@ -17,7 +17,7 @@ from __future__ import print_function, absolute_import
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
@@ -64,6 +64,7 @@ class ITML(BaseMetricLearner):
     else:
       assert len(bounds) == 2
       self.bounds_ = bounds
+    self.bounds_[self.bounds_==0] = 1e-9
     # init metric
     if self.A0 is None:
       self.A_ = np.identity(X.shape[1])
@@ -192,7 +193,7 @@ class ITML_Supervised(ITML):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    y = check_array(y, ensure_2d=False)
+    X, y = check_X_y(X, y)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

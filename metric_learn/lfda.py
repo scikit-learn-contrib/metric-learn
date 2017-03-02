@@ -16,7 +16,7 @@ import scipy
 import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_X_y
 
 from .base_metric import BaseMetricLearner
 
@@ -55,9 +55,9 @@ class LFDA(BaseMetricLearner):
     return self.transformer_
 
   def _process_inputs(self, X, y):
-    self.X_ = check_array(X)
-    n, d = self.X_.shape
     unique_classes, y = np.unique(y, return_inverse=True)
+    self.X_, y = check_X_y(X, y)
+    n, d = self.X_.shape
     num_classes = len(unique_classes)
 
     if self.num_dims is None:

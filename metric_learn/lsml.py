@@ -11,7 +11,7 @@ from __future__ import print_function, absolute_import
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
@@ -171,7 +171,7 @@ class LSML_Supervised(LSML):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    y = check_array(y, ensure_2d=False)
+    X, y = check_X_y(X, y)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
