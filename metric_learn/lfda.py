@@ -13,8 +13,10 @@ eigenvalue problem.
 from __future__ import division, absolute_import
 import numpy as np
 import scipy
+import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
+from sklearn.utils.validation import check_array
 
 from .base_metric import BaseMetricLearner
 
@@ -24,61 +26,80 @@ class LFDA(BaseMetricLearner):
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
   Sugiyama, ICML 2006
   '''
-  def __init__(self, dim=None, k=7, metric='weighted'):
+  def __init__(self, num_dims=None, k=None, metric='weighted'):
     '''
-    dim : dimensionality of reduced space (defaults to dimension of X)
-    k : nearest neighbor used in local scaling method (default: 7)
-    metric : type of metric in the embedding space (default: 'weighted')
-      'weighted'        - weighted eigenvectors
-      'orthonormalized' - orthonormalized
-      'plain'           - raw eigenvectors
+    Initialize LFDA.
+
+    Parameters
+    ----------
+    num_dims : int, optional
+        Dimensionality of reduced space (defaults to dimension of X)
+
+    k : int, optional
+        Number of nearest neighbors used in local scaling method.
+        Defaults to min(7, num_dims - 1).
+
+    metric : str, optional
+        Type of metric in the embedding space (default: 'weighted')
+          'weighted'        - weighted eigenvectors
+          'orthonormalized' - orthonormalized
+          'plain'           - raw eigenvectors
     '''
     if metric not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid metric: %r' % metric)
-
-    self.params = {
-      'dim': dim,
-      'metric': metric,
-      'k': k,
-    }
+    self.num_dims = num_dims
+    self.metric = metric
+    self.k = k
 
   def transformer(self):
-    return self._transformer
+    return self.transformer_
 
-  def _process_inputs(self, X, Y):
-    X = np.asanyarray(X)
-    self.X = X
-    n, d = X.shape
-    unique_classes, Y = np.unique(Y, return_inverse=True)
+  def _process_inputs(self, X, y):
+    self.X_ = check_array(X)
+    n, d = self.X_.shape
+    unique_classes, y = np.unique(y, return_inverse=True)
     num_classes = len(unique_classes)
 
-    if self.params['dim'] is None:
-      self.params['dim'] = d
-    elif not 0 < self.params['dim'] <= d:
-      raise ValueError('Invalid embedding dimension, must be in [1,%d]' % d)
+    if self.num_dims is None:
+      dim = d
+    else:
+      if not 0 < self.num_dims <= d:
+        raise ValueError('Invalid num_dims, must be in [1,%d]' % d)
+      dim = self.num_dims
 
-    if not 0 < self.params['k'] < d:
-      raise ValueError('Invalid k, must be in [0,%d]' % (d-1))
+    if self.k is None:
+      k = min(7, d - 1)
+    elif self.k >= d:
+      warnings.warn('Chosen k (%d) too large, using %d instead.' % (self.k,d-1))
+      k = d - 1
+    else:
+      k = int(self.k)
 
-    return X, Y, num_classes, n, d
+    return self.X_, y, num_classes, n, d, dim, k
 
-  def fit(self, X, Y):
+  def fit(self, X, y):
+    '''Fit the LFDA model.
+
+    Parameters
+    ----------
+    X : (n, d) array-like
+        Input data.
+
+    y : (n,) array-like
+        Class labels, one per point of data.
     '''
-     X: (n, d) array-like of samples
-     Y: (n,) array-like of class labels
-    '''
-    X, Y, num_classes, n, d = self._process_inputs(X, Y)
+    X, y, num_classes, n, d, dim, k_ = self._process_inputs(X, y)
     tSb = np.zeros((d,d))
     tSw = np.zeros((d,d))
 
     for c in xrange(num_classes):
-      Xc = X[Y==c]
+      Xc = X[y==c]
       nc = Xc.shape[0]
 
       # classwise affinity matrix
       dist = pairwise_distances(Xc, metric='l2', squared=True)
       # distances to k-th nearest neighbor
-      k = min(self.params['k'], nc-1)
+      k = min(k_, nc-1)
       sigma = np.sqrt(np.partition(dist, k, axis=0)[:,k])
 
       local_scale = np.outer(sigma, sigma)
@@ -96,25 +117,32 @@ class LFDA(BaseMetricLearner):
     tSb = (tSb + tSb.T) / 2
     tSw = (tSw + tSw.T) / 2
 
-    if self.params['dim'] == d:
-      vals, vecs = scipy.linalg.eigh(tSb, tSw)
-    else:
-      vals, vecs = scipy.sparse.linalg.eigsh(tSb, k=self.params['dim'], M=tSw,
-                                             which='LA')
-
-    order = np.argsort(-vals)[:self.params['dim']]
-    vals = vals[order]
+    vals, vecs = _eigh(tSb, tSw, dim)
+    order = np.argsort(-vals)[:dim]
+    vals = vals[order].real
     vecs = vecs[:,order]
 
-    if self.params['metric'] == 'weighted':
+    if self.metric == 'weighted':
        vecs *= np.sqrt(vals)
-    elif self.params['metric'] == 'orthonormalized':
+    elif self.metric == 'orthonormalized':
        vecs, _ = np.linalg.qr(vecs)
 
-    self._transformer = vecs.T
+    self.transformer_ = vecs.T
     return self
 
 
 def _sum_outer(x):
   s = x.sum(axis=0)
   return np.outer(s, s)
+
+
+def _eigh(a, b, dim):
+  try:
+    return scipy.sparse.linalg.eigsh(a, k=dim, M=b, which='LA')
+  except (ValueError, scipy.sparse.linalg.ArpackNoConvergence):
+    pass
+  try:
+    return scipy.linalg.eigh(a, b)
+  except np.linalg.LinAlgError:
+    pass
+  return scipy.linalg.eig(a, b)

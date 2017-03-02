@@ -84,11 +84,11 @@ class TestFitTransform(unittest.TestCase):
     assert_array_almost_equal(res_1, res_2)
 
   def test_lfda(self):
-    lfda = LFDA(k=2, dim=2)
+    lfda = LFDA(k=2, num_dims=2)
     lfda.fit(self.X, self.y)
     res_1 = lfda.transform()
 
-    lfda = LFDA(k=2, dim=2)
+    lfda = LFDA(k=2, num_dims=2)
     res_2 = lfda.fit_transform(self.X, self.y)
 
     # signs may be flipped, that's okay
@@ -98,12 +98,12 @@ class TestFitTransform(unittest.TestCase):
 
   def test_rca_supervised(self):
     seed = np.random.RandomState(1234)
-    rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
     rca.fit(self.X, self.y, random_state=seed)
     res_1 = rca.transform()
 
     seed = np.random.RandomState(1234)
-    rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
     res_2 = rca.fit_transform(self.X, self.y, random_state=seed)
 
     assert_array_almost_equal(res_1, res_2)
