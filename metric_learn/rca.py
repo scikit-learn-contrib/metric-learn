@@ -63,7 +63,7 @@ class RCA(BaseMetricLearner):
 
     # PCA projection to remove noise and redundant information.
     if self.pca_comps is not None:
-      pca = decomposition.PCA(n_components=self.pca_comps, svd_solver='full')
+      pca = decomposition.PCA(n_components=self.pca_comps)
       X = pca.fit_transform(X)
       M_pca = pca.components_
     else:
