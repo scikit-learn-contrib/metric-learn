@@ -13,7 +13,7 @@ __all__ = ['Constraints']
 class Constraints(object):
   def __init__(self, partial_labels):
     '''partial_labels : int arraylike, -1 indicating unknown label'''
-    partial_labels = np.asanyarray(partial_labels)
+    partial_labels = np.asanyarray(partial_labels, dtype=int)
     self.num_points, = partial_labels.shape
     self.known_label_idx, = np.where(partial_labels >= 0)
     self.known_labels = partial_labels[self.known_label_idx]
@@ -72,7 +72,10 @@ class Constraints(object):
     all_inds = [set(np.where(lookup==c)[0]) for c in xrange(len(uniq))]
     idx = 0
     while idx < num_chunks and all_inds:
-      c = random_state.randint(0, high=len(all_inds)-1)
+      if len(all_inds) == 1:
+        c = 0
+      else:
+        c = random_state.randint(0, high=len(all_inds)-1)
       inds = all_inds[c]
       if len(inds) < chunk_size:
         del all_inds[c]

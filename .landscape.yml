@@ -1,0 +1,16 @@
+strictness: medium
+pep8:
+  disable:
+    - E111
+    - E114
+    - E231
+    - E225
+    - E402
+    - W503
+pylint:
+  disable:
+    - bad-indentation
+    - invalid-name
+    - too-many-arguments
+ignore-paths:
+  - bench/
