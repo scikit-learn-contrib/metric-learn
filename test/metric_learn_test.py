@@ -108,7 +108,7 @@ class TestNCA(MetricTestCase):
 
 class TestLFDA(MetricTestCase):
   def test_iris(self):
-    lfda = LFDA(k=2, dim=2)
+    lfda = LFDA(k=2, num_dims=2)
     lfda.fit(self.iris_points, self.iris_labels)
     csep = class_separation(lfda.transform(), self.iris_labels)
     self.assertLess(csep, 0.15)
@@ -116,10 +116,26 @@ class TestLFDA(MetricTestCase):
 
 class TestRCA(MetricTestCase):
   def test_iris(self):
-    rca = RCA_Supervised(dim=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
+
+  def test_feature_null_variance(self):
+    X = np.hstack((self.iris_points, np.eye(len(self.iris_points), M=1)))
+
+    # Apply PCA with the number of components
+    rca = RCA_Supervised(num_dims=2, pca_comps=3, num_chunks=30, chunk_size=2)
+    rca.fit(X, self.iris_labels)
+    csep = class_separation(rca.transform(), self.iris_labels)
+    self.assertLess(csep, 0.30)
+
+    # Apply PCA with the minimum variance ratio
+    rca = RCA_Supervised(num_dims=2, pca_comps=0.95, num_chunks=30,
+                         chunk_size=2)
+    rca.fit(X, self.iris_labels)
+    csep = class_separation(rca.transform(), self.iris_labels)
+    self.assertLess(csep, 0.30)
 
 
 class TestMLKR(MetricTestCase):

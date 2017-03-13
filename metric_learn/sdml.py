@@ -13,6 +13,7 @@ import numpy as np
 from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
+from sklearn.utils.validation import check_array
 
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
@@ -21,91 +22,114 @@ from .constraints import Constraints
 class SDML(BaseMetricLearner):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False):
-    '''
-    balance_param: float, optional
+    """
+    Parameters
+    ----------
+    balance_param : float, optional
         trade off between sparsity and M0 prior
-    sparsity_param: float, optional
+
+    sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
-    use_cov: bool, optional
+
+    use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
+
     verbose : bool, optional
         if True, prints information while learning
-    '''
-    self.params = {
-      'balance_param': balance_param,
-      'sparsity_param': sparsity_param,
-      'use_cov': use_cov,
-      'verbose': verbose,
-    }
+    """
+    self.balance_param = balance_param
+    self.sparsity_param = sparsity_param
+    self.use_cov = use_cov
+    self.verbose = verbose
 
   def _prepare_inputs(self, X, W):
-    self.X = X
+    self.X_ = X = check_array(X)
+    W = check_array(W, accept_sparse=True)
     # set up prior M
-    if self.params['use_cov']:
-      self.M = np.cov(X.T)
+    if self.use_cov:
+      self.M_ = np.cov(X.T)
     else:
-      self.M = np.identity(X.shape[1])
+      self.M_ = np.identity(X.shape[1])
     L = laplacian(W, normed=False)
-    self.loss_matrix = self.X.T.dot(L.dot(self.X))
+    return X.T.dot(L.dot(X))
 
   def metric(self):
-    return self.M
+    return self.M_
 
   def fit(self, X, W):
+    """Learn the SDML model.
+
+    Parameters
+    ----------
+    X : array-like, shape (n, d)
+        data matrix, where each row corresponds to a single instance
+    W : array-like, shape (n, n)
+        connectivity graph, with +1 for positive pairs and -1 for negative
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
     """
-    X: data matrix, (n x d)
-        each row corresponds to a single instance
-    W: connectivity graph, (n x n)
-        +1 for positive pairs, -1 for negative.
-    """
-    self._prepare_inputs(X, W)
-    P = pinvh(self.M) + self.params['balance_param'] * self.loss_matrix
+    loss_matrix = self._prepare_inputs(X, W)
+    P = pinvh(self.M_) + self.balance_param * loss_matrix
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
-    self.M, _ = graph_lasso(emp_cov, self.params['sparsity_param'],
-                            verbose=self.params['verbose'])
+    self.M_, _ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
     return self
 
 
 class SDML_Supervised(SDML):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
-    SDML.__init__(self, balance_param=balance_param,
-                  sparsity_param=sparsity_param, use_cov=use_cov,
-                  verbose=verbose)
-    '''
-    balance_param: float, optional
+    """
+    Parameters
+    ----------
+    balance_param : float, optional
         trade off between sparsity and M0 prior
-    sparsity_param: float, optional
+    sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
-    use_cov: bool, optional
+    use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
     num_labeled : int, optional
         number of labels to preserve for training
-    num_constraints: int, optional
+    num_constraints : int, optional
         number of constraints to generate
     verbose : bool, optional
         if True, prints information while learning
-    '''
-    self.params.update(num_labeled=num_labeled, num_constraints=num_constraints)
+    """
+    SDML.__init__(self, balance_param=balance_param,
+                  sparsity_param=sparsity_param, use_cov=use_cov,
+                  verbose=verbose)
+    self.num_labeled = num_labeled
+    self.num_constraints = num_constraints
 
-  def fit(self, X, labels, random_state=np.random):
+  def fit(self, X, y, random_state=np.random):
     """Create constraints from labels and learn the SDML model.
 
     Parameters
     ----------
-    X: data matrix, (n x d)
-        each row corresponds to a single instance
-    labels: data labels, (n,) array-like
-    random_state : a numpy random.seed object to fix the random_state if needed.
-    """
-    num_constraints = self.params['num_constraints']
-    if num_constraints is None:
-      num_classes = np.unique(labels)
-      num_constraints = 20*(len(num_classes))**2
+    X : array-like, shape (n, d)
+        data matrix, where each row corresponds to a single instance
+    y : array-like, shape (n,)
+        data labels, one for each instance
+    random_state : {numpy.random.RandomState, int}, optional
+        Random number generator or random seed. If not given, the singleton
+        numpy.random will be used.
 
-    c = Constraints.random_subset(labels, self.params['num_labeled'],
+    Returns
+    -------
+    self : object
+        Returns the instance.
+    """
+    y = check_array(y, ensure_2d=False)
+    num_constraints = self.num_constraints
+    if num_constraints is None:
+      num_classes = len(np.unique(y))
+      num_constraints = 20 * num_classes**2
+
+    c = Constraints.random_subset(y, self.num_labeled,
                                   random_state=random_state)
     adj = c.adjacency_matrix(num_constraints, random_state=random_state)
     return SDML.fit(self, X, adj)
