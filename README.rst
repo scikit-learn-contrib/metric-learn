@@ -40,11 +40,13 @@ default implementations for the methods ``metric``, ``transformer``, and
 ``metric`` or ``transformer``.
 
 For an instance of a metric learner named ``foo`` learning from a set of
-``d``-dimensional points, ``foo.metric()`` returns a ``d`` by ``d``
-matrix ``M`` such that a distance between vectors ``x`` and ``y`` is
-expressed ``(x-y).dot(M).dot(x-y)``.
+``d``-dimensional points, ``foo.metric()`` returns a ``d x d``
+matrix ``M`` such that the distance between vectors ``x`` and ``y`` is
+expressed ``sqrt((x-y).dot(inv(M)).dot(x-y))``.
+Using scipy's ``pdist`` function, this would look like
+``pdist(X, metric='mahalanobis', VI=inv(foo.metric()))``.
 
-In the same scenario, ``foo.transformer()`` returns a ``d`` by ``d``
+In the same scenario, ``foo.transformer()`` returns a ``d x d``
 matrix ``L`` such that a vector ``x`` can be represented in the learned
 space as the vector ``x.dot(L.T)``.
 
