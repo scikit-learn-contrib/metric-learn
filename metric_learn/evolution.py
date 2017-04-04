@@ -4,6 +4,7 @@
 
 from __future__ import division, absolute_import
 import numpy as np
+import scipy
 
 import itertools
 import math
@@ -295,6 +296,8 @@ class NeuralNetworkTransformer(MatrixTransformer):
             return lambda X: np.maximum(X, 0) # ReLU
         elif activation == 'tanh':
             return np.tanh
+        elif activation == 'sigm':
+            return scipy.special.expit
         else:
             raise ValueError('Invalid activation paramater value')
 
