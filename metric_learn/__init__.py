@@ -10,4 +10,4 @@ from .nca import NCA
 from .lfda import LFDA
 from .rca import RCA, RCA_Supervised
 from .mlkr import MLKR
-from .evolution import MetricEvolution, DiagonalMatrixTransformer, FullMatrixTransformer, NeuralNetworkTransformer
+from .evolution import *
