@@ -223,7 +223,7 @@ class BaseBuilder():
         elif transformer == 'kmeans':
             return KMeansTransformer(**params)
         
-        raise ValueError('Invalid `transformer` parameter value.')
+        raise ValueError('Invalid `transformer` parameter value: `{}`'.format(transformer))
 
 class MatrixTransformer(BaseMetricLearner):
     def __init__(self):
