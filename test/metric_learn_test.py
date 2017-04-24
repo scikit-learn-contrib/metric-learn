@@ -8,7 +8,7 @@ from numpy.testing import assert_array_almost_equal
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised,
-    CMAES, FullMatrixTransformer)
+    MetricEvolution)
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
 
@@ -145,12 +145,18 @@ class TestMLKR(MetricTestCase):
     csep = class_separation(mlkr.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
-class TestCMAES(MetricTestCase):
-  def test_iris(self):
-    cmaes = CMAES(transformer=FullMatrixTransformer(), random_state=47)
+class TestEvolution(MetricTestCase):
+  def test_iris_full(self):
+    cmaes = MetricEvolution(strategy='cmaes', transformer_shape='full', random_state=47)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
-    self.assertAlmostEqual(csep, 0.27621894651217788)
+    self.assertAlmostEqual(csep, 0.29535891756070715)
+
+  def test_iris_diagonal(self):
+    cmaes = MetricEvolution(strategy='cmaes', transformer_shape='diagonal', random_state=47)
+    cmaes.fit(self.iris_points, self.iris_labels)
+    csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
+    self.assertAlmostEqual(csep, 0.25318789171576289)
 
 if __name__ == '__main__':
   unittest.main()

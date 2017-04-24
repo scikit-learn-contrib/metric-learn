@@ -192,38 +192,38 @@ class BaseBuilder():
     def __init__(self):
         raise NotImplementedError('BaseBuilder should not be instantiated')
 
-    def _get_extra_params(self, prefixes):
-        params = {}
-        for pname, pvalue in self.params.items():
-            if '__' not in pname: continue
+    # def _get_extra_params(self, prefixes):
+    #     params = {}
+    #     for pname, pvalue in self.params.items():
+    #         if '__' not in pname: continue
 
-            prefix, pkey = pname.split('__', 1)
-            if prefix not in prefixes: continue
+    #         prefix, pkey = pname.split('__', 1)
+    #         if prefix not in prefixes: continue
 
-            params[pkey] = pvalue
+    #         params[pkey] = pvalue
 
-        return params
+    #     return params
 
-    def build_transformer(self, transformer=None, params=None):
-        if transformer is None:
-            transformer = self.params['transformer']
-        if params is None:
-            params = self._get_extra_params(('transformer', 't'))
+    def build_transformer(self, transformer_shape=None, params={}):
+        if transformer_shape is None:
+            transformer_shape = self.transformer_shape
+        # if params is None:
+            # params = self._get_extra_params(('transformer_shape', 't'))
 
-        if isinstance(transformer, MatrixTransformer):
-            return transformer
-        elif transformer == 'diagonal':
+        if isinstance(transformer_shape, MatrixTransformer):
+            return transformer_shape
+        elif transformer_shape == 'diagonal':
             return DiagonalMatrixTransformer(**params)
-        elif transformer == 'full':
+        elif transformer_shape == 'full':
             return FullMatrixTransformer(**params)
-        elif transformer == 'triangular':
+        elif transformer_shape == 'triangular':
             return TriangularMatrixTransformer(**params)
-        elif transformer == 'neuralnetwork':
+        elif transformer_shape == 'neuralnetwork':
             return NeuralNetworkTransformer(**params)
-        elif transformer == 'kmeans':
+        elif transformer_shape == 'kmeans':
             return KMeansTransformer(**params)
         
-        raise ValueError('Invalid `transformer` parameter value: `{}`'.format(transformer))
+        raise ValueError('Invalid `transformer_shape` parameter value: `{}`'.format(transformer_shape))
 
 class MatrixTransformer(BaseMetricLearner):
     def __init__(self):
@@ -833,30 +833,25 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
         return self
 
 class MetricEvolution(BaseMetricLearner, BaseBuilder):
-    '''
-    CMAES
-    '''
-    def __init__(self, strategy='cmaes', fitnesses='knn', transformer='full',
-                 random_state=None, verbose=False, **kwargs):
+    def __init__(self, strategy='cmaes', fitnesses='knn', transformer_shape='full',
+                 random_state=None, verbose=False):
         """Initialize the learner.
 
         Parameters
         ----------
         fitnesses : ('knn', 'svc', 'lsvc', fitnesses object)
             fitnesses is used in fitness scoring
-        transformer : ('full', 'diagonal', MatrixTransformer object)
-            transformer defines transforming function to learn
+        transformer_shape : ('full', 'diagonal', MatrixTransformer object)
+            transformer shape defines transforming function to learn
         verbose : bool, optional
             if True, prints information while learning
         """
-        self.params = {
-            **kwargs,
-            'strategy': strategy,
-            'fitnesses': fitnesses,
-            'transformer': transformer,
-            'random_state': random_state,
-            'verbose': verbose,
-        }
+        self.strategy = strategy
+        self.fitnesses = fitnesses
+        self.transformer_shape = transformer_shape
+        self.random_state = random_state
+        self.verbose = verbose
+
         np.random.seed(random_state)
 
     def build_fitnesses(self, fitnesses):
@@ -866,12 +861,12 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
 
         return list(map(self.build_fitness, fitnesses))
 
-    def build_fitness(self, fitness):
+    def build_fitness(self, fitness, params={}):
         # fitness can be a tuple of fitness and its params
         if isinstance(fitness, (list, tuple)):
             fitness, params = fitness
-        else:
-            params = self._get_extra_params(('fitness', 'f'))
+        # else:
+            # params = self._get_extra_params(('fitness', 'f'))
 
         if RandomFitness.available(fitness):
             return RandomFitness()
@@ -892,13 +887,13 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         raise ValueError('Invalid value of fitness: `{}`'.format(fitness))
 
     def build_strategy(self, strategy, strategy_params, fitnesses, n_dim, transformer, random_state, verbose):
-        strategy_params.update({
+        strategy_params = {
             'fitnesses': fitnesses,
             'n_dim': n_dim,
             'transformer': transformer,
             'random_state': random_state,
             'verbose': verbose,
-        })
+        }
 
         if isinstance(strategy, BaseEvolutionStrategy):
             return strategy
@@ -933,13 +928,13 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         
         # Build strategy and fitnesses with correct params
         self._strategy = self.build_strategy(
-            strategy = self.params['strategy'],
-            strategy_params = self._get_extra_params(('strategy', 's')),
-            fitnesses = self.build_fitnesses(self.params['fitnesses']),
+            strategy = self.strategy,
+            strategy_params = {}, # self._get_extra_params(('strategy', 's')),
+            fitnesses = self.build_fitnesses(self.fitnesses),
             n_dim = self._transformer.individual_size(X.shape[1]),
             transformer = self._transformer,
-            random_state = self.params['random_state'],
-            verbose = self.params['verbose'],
+            random_state = self.random_state,
+            verbose = self.verbose,
         )
 
         # Evolve best transformer

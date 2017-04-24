@@ -8,7 +8,7 @@ class TestStringRepr(unittest.TestCase):
     self.assertEqual(str(metric_learn.Covariance()), "Covariance()")
 
   def test_lmnn(self):
-    self.assertRegexpMatches(
+    self.assertRegex(
         str(metric_learn.LMNN()),
         r"(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
         r"max_iter=1000,\n      min_iter=50, regularization=0.5, "
@@ -62,6 +62,12 @@ SDML_Supervised(balance_param=0.5, num_constraints=None, num_labeled=inf,
     self.assertEqual(str(metric_learn.MLKR()),
                      "MLKR(A0=None, alpha=0.0001, epsilon=0.01, "
                      "max_iter=1000, num_dims=None)")
+
+  def test_evolution(self):
+    self.assertEqual(str(metric_learn.MetricEvolution()), """
+MetricEvolution(fitnesses='knn', random_state=None, strategy='cmaes',
+        transformer_shape='full', verbose=False)
+""".strip('\n'))
 
 if __name__ == '__main__':
   unittest.main()
