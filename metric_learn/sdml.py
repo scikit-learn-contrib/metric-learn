@@ -47,7 +47,7 @@ class SDML(BaseMetricLearner):
     W = check_array(W, accept_sparse=True)
     # set up prior M
     if self.use_cov:
-      self.M_ = np.cov(X.T)
+      self.M_ = pinvh(np.cov(X, rowvar = False))
     else:
       self.M_ = np.identity(X.shape[1])
     L = laplacian(W, normed=False)
@@ -72,11 +72,11 @@ class SDML(BaseMetricLearner):
         Returns the instance.
     """
     loss_matrix = self._prepare_inputs(X, W)
-    P = pinvh(self.M_) + self.balance_param * loss_matrix
+    P = self.M_ + self.balance_param * loss_matrix
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
-    self.M_, _ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
+    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
     return self
 
 
