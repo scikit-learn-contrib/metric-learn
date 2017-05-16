@@ -28,5 +28,9 @@ class Covariance(BaseMetricLearner):
     y : unused
     """
     self.X_ = check_array(X, ensure_min_samples=2)
-    self.M_ = np.cov(self.X_.T)
+    self.M_ = np.cov(self.X_, rowvar = False)
+    if self.M_.ndim == 0:
+      self.M_ = 1./self.M_
+    else:
+      self.M_ = np.linalg.inv(self.M_)
     return self

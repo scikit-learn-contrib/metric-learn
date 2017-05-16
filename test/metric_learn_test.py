@@ -57,7 +57,7 @@ class TestITML(MetricTestCase):
     itml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(itml.transform(), self.iris_labels)
-    self.assertLess(csep, 0.4)  # it's not great
+    self.assertLess(csep, 0.2)
 
 
 class TestLMNN(MetricTestCase):

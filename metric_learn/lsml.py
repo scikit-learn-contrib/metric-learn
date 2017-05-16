@@ -26,7 +26,7 @@ class LSML(BaseMetricLearner):
     tol : float, optional
     max_iter : int, optional
     prior : (d x d) matrix, optional
-        guess at a metric [default: covariance(X)]
+        guess at a metric [default: inv(covariance(X))]
     verbose : bool, optional
         if True, prints information while learning
     """
@@ -48,7 +48,11 @@ class LSML(BaseMetricLearner):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     if self.prior is None:
-      self.M_ = np.cov(X.T)
+      self.M_ = np.cov(X, rowvar = False)
+      if self.M_.ndim == 0:
+        self.M_ = 1./self.M_
+      else:
+        self.M_ = np.linalg.inv(self.M_)
     else:
       self.M_ = self.prior
 
