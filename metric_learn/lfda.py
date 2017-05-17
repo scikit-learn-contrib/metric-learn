@@ -26,7 +26,7 @@ class LFDA(BaseMetricLearner):
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
   Sugiyama, ICML 2006
   '''
-  def __init__(self, num_dims=None, k=None, metric='weighted'):
+  def __init__(self, num_dims=None, k=None, embedding_type='weighted'):
     '''
     Initialize LFDA.
 
@@ -39,16 +39,16 @@ class LFDA(BaseMetricLearner):
         Number of nearest neighbors used in local scaling method.
         Defaults to min(7, num_dims - 1).
 
-    metric : str, optional
+    embedding_type : str, optional
         Type of metric in the embedding space (default: 'weighted')
           'weighted'        - weighted eigenvectors
           'orthonormalized' - orthonormalized
           'plain'           - raw eigenvectors
     '''
-    if metric not in ('weighted', 'orthonormalized', 'plain'):
-      raise ValueError('Invalid metric: %r' % metric)
+    if embedding_type not in ('weighted', 'orthonormalized', 'plain'):
+      raise ValueError('Invalid embedding_type: %r' % embedding_type)
     self.num_dims = num_dims
-    self.metric = metric
+    self.embedding_type = embedding_type
     self.k = k
 
   def transformer(self):
@@ -122,9 +122,9 @@ class LFDA(BaseMetricLearner):
     vals = vals[order].real
     vecs = vecs[:,order]
 
-    if self.metric == 'weighted':
+    if self.embedding_type == 'weighted':
        vecs *= np.sqrt(vals)
-    elif self.metric == 'orthonormalized':
+    elif self.embedding_type == 'orthonormalized':
        vecs, _ = np.linalg.qr(vecs)
 
     self.transformer_ = vecs.T

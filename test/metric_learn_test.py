@@ -112,6 +112,10 @@ class TestLFDA(MetricTestCase):
     csep = class_separation(lfda.transform(), self.iris_labels)
     self.assertLess(csep, 0.15)
 
+    # Sanity checks for learned matrices.
+    self.assertEqual(lfda.metric().shape, (4, 4))
+    self.assertEqual(lfda.transformer().shape, (2, 4))
+
 
 class TestRCA(MetricTestCase):
   def test_iris(self):

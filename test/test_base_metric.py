@@ -20,7 +20,7 @@ class TestStringRepr(unittest.TestCase):
 
   def test_lfda(self):
     self.assertEqual(str(metric_learn.LFDA()),
-                     "LFDA(k=None, metric='weighted', num_dims=None)")
+                     "LFDA(embedding_type='weighted', k=None, num_dims=None)")
 
   def test_itml(self):
     self.assertEqual(str(metric_learn.ITML()), """
