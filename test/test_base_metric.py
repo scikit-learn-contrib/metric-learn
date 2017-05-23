@@ -63,5 +63,16 @@ SDML_Supervised(balance_param=0.5, num_constraints=None, num_labeled=inf,
                      "MLKR(A0=None, alpha=0.0001, epsilon=0.01, "
                      "max_iter=1000, num_dims=None)")
 
+  def test_pgdm(self):
+    self.assertEqual(str(metric_learn.PGDM()), """
+PGDM(A0=None, convergence_threshold=0.001, diagonal=False, diagonal_c=1,
+   max_iter=100, max_proj=10000, verbose=False)
+""".strip('\n'))
+    self.assertEqual(str(metric_learn.PGDM_Supervised()), """
+PGDM_Supervised(A0=None, convergence_threshold=1e-06, diagonal=False,
+        diagonal_c=1, max_iter=100, max_proj=10000, num_constraints=None,
+        num_labeled=inf, verbose=False)
+""".strip('\n'))
+
 if __name__ == '__main__':
   unittest.main()
