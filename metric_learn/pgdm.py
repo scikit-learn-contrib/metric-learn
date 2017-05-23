@@ -309,8 +309,8 @@ class PGDM(BaseMetricLearner):
     dim = X.shape[1]
     diff = X[c] - X[d]
     M = np.einsum('ij,ik->ijk', diff, diff) # outer products of all rows in `diff`
-    dist = np.sqrt(M.dot(A).trace(axis1 = 1, axis2 = 2))
-    sum_deri = np.sum(0.5 * (M / (dist[:,None,None] + 1e-6)), axis = 0)
+    dist = np.sqrt(np.sum(M * A[None,:,:], axis = (1,2)))
+    sum_deri = np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis = 0)
     sum_dist = dist.sum()
     return sum_deri / (sum_dist + 1e-6)
   
