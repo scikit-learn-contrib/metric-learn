@@ -69,7 +69,7 @@ class LSML(BaseMetricLearner):
     """
     self._prepare_inputs(X, constraints, weights)
     prior_inv = scipy.linalg.inv(self.M_)
-    s_best = self._total_loss(self.M_, prior_inv)
+    l_best = s_best = self._total_loss(self.M_, prior_inv)
     step_sizes = np.logspace(-10, 0, 10)
     if self.verbose:
       print('initial loss', s_best)
