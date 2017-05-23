@@ -65,12 +65,12 @@ SDML_Supervised(balance_param=0.5, num_constraints=None, num_labeled=inf,
 
   def test_pgdm(self):
     self.assertEqual(str(metric_learn.PGDM()), """
-PGDM(A0=None, convergence_threshold=0.001, diagonal=False, diagonal_c=1,
+PGDM(A0=None, convergence_threshold=0.001, diagonal=False, diagonal_c=1.0,
    max_iter=100, max_proj=10000, verbose=False)
 """.strip('\n'))
     self.assertEqual(str(metric_learn.PGDM_Supervised()), """
 PGDM_Supervised(A0=None, convergence_threshold=1e-06, diagonal=False,
-        diagonal_c=1, max_iter=100, max_proj=10000, num_constraints=None,
+        diagonal_c=1.0, max_iter=100, max_proj=10000, num_constraints=None,
         num_labeled=inf, verbose=False)
 """.strip('\n'))
 

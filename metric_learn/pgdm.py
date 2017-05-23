@@ -40,7 +40,7 @@ else:
 class PGDM(BaseMetricLearner):
   """Probabilistic Global Distance Metric Learning (PGDM)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               A0=None, diagonal=False, diagonal_c=1, verbose=False):
+               A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
     """Initialize PGDM.
     Parameters
     ----------
@@ -100,7 +100,7 @@ class PGDM(BaseMetricLearner):
       if not self.diagonal:
         # Don't know why division by 10... it's in the original code
         # and seems to affect the overall scale of the learned metric.
-        self.A_ /= 10
+        self.A_ /= 10.0
     else:
       self.A_ = check_array(self.A0)
     
@@ -244,9 +244,9 @@ class PGDM(BaseMetricLearner):
     s_sum = np.sum((X[a] - X[b]) ** 2, axis = 0)
     
     it = 0
-    error = 1
+    error = 1.0
     eps = 1e-6
-    reduction = 2
+    reduction = 2.0
     w = np.diag(self.A_).copy()
     
     while error > self.convergence_threshold:
@@ -382,7 +382,7 @@ class PGDM_Supervised(PGDM):
   """Probabilistic Global Distance Metric Learning (PGDM)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
-               A0=None, diagonal=False, diagonal_c=1, verbose=False):
+               A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
     """Initialize the learner.
     Parameters
     ----------
