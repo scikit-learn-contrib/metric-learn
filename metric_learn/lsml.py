@@ -68,9 +68,11 @@ class LSML(BaseMetricLearner):
         scale factor for each constraint
     """
     self._prepare_inputs(X, constraints, weights)
-    prior_inv = scipy.linalg.inv(self.M_)
-    s_best = self._total_loss(self.M_, prior_inv)
     step_sizes = np.logspace(-10, 0, 10)
+    prior_inv = scipy.linalg.inv(self.M_)
+    # Keep track of the best step size and the loss at that step.
+    l_best = 0
+    s_best = self._total_loss(self.M_, prior_inv)
     if self.verbose:
       print('initial loss', s_best)
     for it in xrange(1, self.max_iter+1):
