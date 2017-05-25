@@ -154,19 +154,13 @@ class TestPGDM(MetricTestCase):
 
     # Generate full set of constraints for comparison with reference implementation
     n = self.iris_points.shape[0]
-    a, b, c, d = [], [], [], []
-    for i in range(n):
-      for j in range(i+1, n):
-        if self.iris_labels[i] == self.iris_labels[j]:
-          a.append(i)
-          b.append(j)
-        else:
-          c.append(i)
-          d.append(j)
+    mask = (self.iris_labels[None] == self.iris_labels[:,None])
+    a, b = np.nonzero(np.triu(mask, k=1))
+    c, d = np.nonzero(np.triu(~mask, k=1))
 
     # Full metric
-    pgdm = PGDM(convergence_threshold = 0.01)
-    pgdm.fit(self.iris_points, [np.asarray(x) for x in [a,b,c,d]])
+    pgdm = PGDM(convergence_threshold=0.01)
+    pgdm.fit(self.iris_points, [a,b,c,d])
     expected = [[+0.00046504, +0.00083371, -0.00111959, -0.00165265],
                 [+0.00083371, +0.00149466, -0.00200719, -0.00296284],
                 [-0.00111959, -0.00200719, +0.00269546, +0.00397881],
@@ -174,8 +168,8 @@ class TestPGDM(MetricTestCase):
     assert_array_almost_equal(expected, pgdm.metric(), decimal=6)
 
     # Diagonal metric
-    pgdm = PGDM(diagonal = True)
-    pgdm.fit(self.iris_points, [np.asarray(x) for x in [a,b,c,d]])
+    pgdm = PGDM(diagonal=True)
+    pgdm.fit(self.iris_points, [a,b,c,d])
     expected = [0, 0, 1.21045968, 1.22552608]
     assert_array_almost_equal(np.diag(expected), pgdm.metric(), decimal=6)
     
@@ -186,7 +180,7 @@ class TestPGDM(MetricTestCase):
     self.assertLess(csep, 0.15)
     
     # Supervised Diagonal
-    pgdm = PGDM_Supervised(diagonal = True)
+    pgdm = PGDM_Supervised(diagonal=True)
     pgdm.fit(self.iris_points, self.iris_labels)
     csep = class_separation(pgdm.transform(), self.iris_labels)
     self.assertLess(csep, 0.2)

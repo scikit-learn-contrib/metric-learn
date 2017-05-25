@@ -16,7 +16,7 @@ this method. However, it is one of the earliest and a still often cited techniqu
 Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
 """
 
-from __future__ import print_function, absolute_import
+from __future__ import print_function, absolute_import, division
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
@@ -24,17 +24,8 @@ from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
+from ._util import vector_norm
 
-
-# hack around lack of axis kwarg in older numpy versions
-try:
-  np.linalg.norm([[4]], axis=1)
-except TypeError:
-  def _vector_norm(X):
-    return np.apply_along_axis(np.linalg.norm, 1, X)
-else:
-  def _vector_norm(X):
-    return np.linalg.norm(X, axis=1)
 
 
 class PGDM(BaseMetricLearner):
@@ -89,10 +80,14 @@ class PGDM(BaseMetricLearner):
     
     # check to make sure that no two constrained vectors are identical
     a,b,c,d = constraints
-    ident = _vector_norm(X[a] - X[b]) > 1e-9
-    a, b = a[ident], b[ident]
-    ident = _vector_norm(X[c] - X[d]) > 1e-9
-    c, d = c[ident], d[ident]
+    no_ident = vector_norm(X[a] - X[b]) > 1e-9
+    a, b = a[no_ident], b[no_ident]
+    no_ident = vector_norm(X[c] - X[d]) > 1e-9
+    c, d = c[no_ident], d[no_ident]
+    if len(a) == 0:
+      raise RuntimeError('No similarity constraints given for PGDM.')
+    if len(c) == 0:
+      raise RuntimeError('No dissimilarity constraints given for PGDM.')
     
     # init metric
     if self.A0 is None:
@@ -135,17 +130,18 @@ class PGDM(BaseMetricLearner):
     #         1,
     #         X[a] - X[b]
     #     ).sum(axis = 0)
-    t = w.dot(A.ravel() / 100.0)
+    t = w.dot(A.ravel()) / 100.0
     
-    w1 = w / np.linalg.norm(w) # make `w` a unit vector
-    t1 = t / np.linalg.norm(w) # distance from origin to `w^T*x=t` plane
+    w_norm = np.linalg.norm(w)
+    w1 = w / w_norm  # make `w` a unit vector
+    t1 = t / w_norm  # distance from origin to `w^T*x=t` plane
     
     cycle = 1
-    alpha = 0.1 # initial step size along gradient
+    alpha = 0.1  # initial step size along gradient
     
-    grad1 = self._fS1(X, a, b, A)           # gradient of similarity constraint function
-    grad2 = self._fD1(X, c, d, A)           # gradient of dissimilarity constraint function
-    M = self._grad_projection(grad1, grad2) # gradient of fD1 orthogonal to fS1
+    grad1 = self._fS1(X, a, b, A)            # gradient of similarity constraint function
+    grad2 = self._fD1(X, c, d, A)            # gradient of dissimilarity constraint function
+    M = self._grad_projection(grad1, grad2)  # gradient of fD1 orthogonal to fS1
     
     A_old = A.copy()
 
@@ -185,13 +181,13 @@ class PGDM(BaseMetricLearner):
       # max: g(A) >= 1
       # here we suppose g(A) = fD(A) = \sum_{I,J \in D} sqrt(d_ij' A d_ij)
       
-      obj_previous = self._fD(X, c, d, A_old) # g(A_old)
-      obj = self._fD(X, c, d, A)              # g(A)
+      obj_previous = self._fD(X, c, d, A_old)  # g(A_old)
+      obj = self._fD(X, c, d, A)               # g(A)
       
-      if ((obj > obj_previous) or (cycle == 0)) and (satisfy):
+      if satisfy and (obj > obj_previous or cycle == 0):
         
         # If projection of 1 and 2 is successful, and such projection
-        # imprives objective function, slightly increase learning rate
+        # improves objective function, slightly increase learning rate
         # and update from the current A.
         alpha *= 1.05
         A_old[:] = A
@@ -241,7 +237,7 @@ class PGDM(BaseMetricLearner):
     num_neg = len(c)
     num_samples, num_dim = X.shape
     
-    s_sum = np.sum((X[a] - X[b]) ** 2, axis = 0)
+    s_sum = np.sum((X[a] - X[b]) ** 2, axis=0)
     
     it = 0
     error = 1.0
@@ -253,19 +249,19 @@ class PGDM(BaseMetricLearner):
       
       fD0, fD_1st_d, fD_2nd_d = self._D_constraint(X, c, d, w)
       obj_initial = np.dot(s_sum, w) + self.diagonal_c * fD0
-      fS_1st_d = s_sum # first derivative of the similarity constraints
+      fS_1st_d = s_sum  # first derivative of the similarity constraints
       
-      gradient = fS_1st_d - self.diagonal_c * fD_1st_d              # gradient of the objective
-      hessian = -self.diagonal_c * fD_2nd_d + eps * np.eye(num_dim) # Hessian of the objective
+      gradient = fS_1st_d - self.diagonal_c * fD_1st_d               # gradient of the objective
+      hessian = -self.diagonal_c * fD_2nd_d + eps * np.eye(num_dim)  # Hessian of the objective
       step = np.dot(np.linalg.inv(hessian), gradient);
       
       # Newton-Rapshon update
       # search over optimal lambda
-      lambd = 1 # initial step-size
+      lambd = 1  # initial step-size
       w_tmp = np.maximum(0, w - lambd * step)
       
       obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
-      obj_previous = obj * 1.1 # just to get the while-loop started
+      obj_previous = obj * 1.1  # just to get the while-loop started
       
       inner_it = 0
       while obj < obj_previous:
@@ -292,7 +288,7 @@ class PGDM(BaseMetricLearner):
     i.e. distance can be L1:  \sqrt{(x_i-x_j)A(x_i-x_j)'}
     """
     diff = X[c] - X[d]
-    return np.log(np.sum(np.sqrt(np.sum(np.dot(diff, A) * diff, axis = 1))) + 1e-6)
+    return np.log(np.sum(np.sqrt(np.sum(np.dot(diff, A) * diff, axis=1))) + 1e-6)
   
   def _fD1(self, X, c, d, A):
     """The gradient of the dissimilarity constraint function w.r.t. A.
@@ -309,8 +305,8 @@ class PGDM(BaseMetricLearner):
     dim = X.shape[1]
     diff = X[c] - X[d]
     M = np.einsum('ij,ik->ijk', diff, diff)    # outer products of all rows in `diff`
-    dist = np.sqrt(np.einsum('ijk,jk', M, A))  # equivalent to: np.sqrt(np.sum(M * A[None,:,:], axis = (1,2)))
-    sum_deri = np.einsum('ijk,i->jk', M, 0.5 / (dist + 1e-6))  # equivalent to: np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis = 0)
+    dist = np.sqrt(np.einsum('ijk,jk', M, A))  # equivalent to: np.sqrt(np.sum(M * A[None,:,:], axis=(1,2)))
+    sum_deri = np.einsum('ijk,i->jk', M, 0.5 / (dist + 1e-6))  # equivalent to: np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis=0)
     sum_dist = dist.sum()
     return sum_deri / (sum_dist + 1e-6)
   
@@ -325,7 +321,7 @@ class PGDM(BaseMetricLearner):
     """
     dim = X.shape[1]
     diff = X[a] - X[b]
-    return np.einsum('ij,ik->jk', diff, diff) # sum of outer products of all rows in `diff`
+    return np.einsum('ij,ik->jk', diff, diff)  # sum of outer products of all rows in `diff`
   
   def _grad_projection(self, grad1, grad2):
     grad2 = grad2 / np.linalg.norm(grad2)
@@ -334,7 +330,7 @@ class PGDM(BaseMetricLearner):
     return gtemp
   
   def _D_objective(self, X, c, d, w):
-    return np.log(np.sum(np.sqrt(np.sum(((X[c] - X[d]) ** 2) * w[None,:], axis = 1) + 1e-6)))
+    return np.log(np.sum(np.sqrt(np.sum(((X[c] - X[d]) ** 2) * w[None,:], axis=1) + 1e-6)))
   
   def _D_constraint(self, X, c, d, w):
     """Compute the value, 1st derivative, second derivative (Hessian) of 

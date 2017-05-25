@@ -21,6 +21,7 @@ from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
+from ._util import vector_norm
 
 
 class ITML(BaseMetricLearner):
@@ -54,10 +55,10 @@ class ITML(BaseMetricLearner):
     self.X_ = X = check_array(X)
     # check to make sure that no two constrained vectors are identical
     a,b,c,d = constraints
-    ident = _vector_norm(X[a] - X[b]) > 1e-9
-    a, b = a[ident], b[ident]
-    ident = _vector_norm(X[c] - X[d]) > 1e-9
-    c, d = c[ident], d[ident]
+    no_ident = vector_norm(X[a] - X[b]) > 1e-9
+    a, b = a[no_ident], b[no_ident]
+    no_ident = vector_norm(X[c] - X[d]) > 1e-9
+    c, d = c[no_ident], d[no_ident]
     # init bounds
     if bounds is None:
       self.bounds_ = np.percentile(pairwise_distances(X), (5, 95))
@@ -137,16 +138,6 @@ class ITML(BaseMetricLearner):
 
   def metric(self):
     return self.A_
-
-# hack around lack of axis kwarg in older numpy versions
-try:
-  np.linalg.norm([[4]], axis=1)
-except TypeError:
-  def _vector_norm(X):
-    return np.apply_along_axis(np.linalg.norm, 1, X)
-else:
-  def _vector_norm(X):
-    return np.linalg.norm(X, axis=1)
 
 
 class ITML_Supervised(ITML):
