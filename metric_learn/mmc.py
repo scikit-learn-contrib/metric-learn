@@ -85,9 +85,9 @@ class MMC(BaseMetricLearner):
     no_ident = vector_norm(X[c] - X[d]) > 1e-9
     c, d = c[no_ident], d[no_ident]
     if len(a) == 0:
-      raise RuntimeError('No similarity constraints given for MMC.')
+      raise ValueError('No non-trivial similarity constraints given for MMC.')
     if len(c) == 0:
-      raise RuntimeError('No dissimilarity constraints given for MMC.')
+      raise ValueError('No non-trivial dissimilarity constraints given for MMC.')
     
     # init metric
     if self.A0 is None:
@@ -304,9 +304,12 @@ class MMC(BaseMetricLearner):
     """
     dim = X.shape[1]
     diff = X[c] - X[d]
-    M = np.einsum('ij,ik->ijk', diff, diff)    # outer products of all rows in `diff`
-    dist = np.sqrt(np.einsum('ijk,jk', M, A))  # equivalent to: np.sqrt(np.sum(M * A[None,:,:], axis=(1,2)))
-    sum_deri = np.einsum('ijk,i->jk', M, 0.5 / (dist + 1e-6))  # equivalent to: np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis=0)
+    # outer products of all rows in `diff`
+    M = np.einsum('ij,ik->ijk', diff, diff)
+    # faster version of: dist = np.sqrt(np.sum(M * A[None,:,:], axis=(1,2)))
+    dist = np.sqrt(np.einsum('ijk,jk', M, A))
+    # faster version of: sum_deri = np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis=0)
+    sum_deri = np.einsum('ijk,i->jk', M, 0.5 / (dist + 1e-6))
     sum_dist = dist.sum()
     return sum_deri / (sum_dist + 1e-6)
   
@@ -342,9 +345,9 @@ class MMC(BaseMetricLearner):
     dist = np.sqrt(diff_sq.dot(w))
     sum_deri1 = np.einsum('ij,i', diff_sq, 0.5 / np.maximum(dist, 1e-6))
     sum_deri2 = np.einsum(
-      'ijk,i',
-      np.einsum('ij,ik->ijk', diff_sq, diff_sq),
-      -0.25 / np.maximum(1e-6, dist**3)
+        'ij,ik->jk',
+        diff_sq,
+        diff_sq / (-4 * np.maximum(1e-6, dist**3))[:,None]
     )
     sum_dist = dist.sum()
     return (
