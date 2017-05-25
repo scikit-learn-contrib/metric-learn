@@ -308,9 +308,9 @@ class PGDM(BaseMetricLearner):
     """
     dim = X.shape[1]
     diff = X[c] - X[d]
-    M = np.einsum('ij,ik->ijk', diff, diff) # outer products of all rows in `diff`
-    dist = np.sqrt(np.sum(M * A[None,:,:], axis = (1,2)))
-    sum_deri = np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis = 0)
+    M = np.einsum('ij,ik->ijk', diff, diff)    # outer products of all rows in `diff`
+    dist = np.sqrt(np.einsum('ijk,jk', M, A))  # equivalent to: np.sqrt(np.sum(M * A[None,:,:], axis = (1,2)))
+    sum_deri = np.einsum('ijk,i->jk', M, 0.5 / (dist + 1e-6))  # equivalent to: np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis = 0)
     sum_dist = dist.sum()
     return sum_deri / (sum_dist + 1e-6)
   
@@ -344,10 +344,11 @@ class PGDM(BaseMetricLearner):
     diff = X[c] - X[d]
     diff_sq = diff * diff
     dist = np.sqrt(diff_sq.dot(w))
-    sum_deri1 = np.sum(diff_sq / (2 * np.maximum(dist, 1e-6))[:,None], axis = 0)
-    sum_deri2 = np.sum(
-      np.einsum('ij,ik->ijk', diff_sq, diff_sq) / (-4 * np.maximum(1e-6, dist**3)[:,None,None]),
-      axis = 0
+    sum_deri1 = np.einsum('ij,i', diff_sq, 0.5 / np.maximum(dist, 1e-6))
+    sum_deri2 = np.einsum(
+      'ijk,i',
+      np.einsum('ij,ik->ijk', diff_sq, diff_sq),
+      -0.25 / np.maximum(1e-6, dist**3)
     )
     sum_dist = dist.sum()
     return (
