@@ -1,7 +1,7 @@
 """
-Probabilistic Global Distance Metric Learning, Xing et al., NIPS 2002
+Mahalanobis Metric Learning with Application for Clustering with Side-Information, Xing et al., NIPS 2002
 
-PGDM minimizes the sum of squared distances between similar examples,
+MMC minimizes the sum of squared distances between similar examples,
 while enforcing the sum of distances between dissimilar examples to be
 greater than a certain margin.
 This leads to a convex and, thus, local-minima-free optimization problem
@@ -9,7 +9,7 @@ that can be solved efficiently.
 However, the algorithm involves the computation of eigenvalues, which is the
 main speed-bottleneck.
 Since it has initially been designed for clustering applications, one of the
-implicit assumptions of PGDM is that all classes form a compact set, i.e.,
+implicit assumptions of MMC is that all classes form a compact set, i.e.,
 follow a unimodal distribution, which restricts the possible use-cases of
 this method. However, it is one of the earliest and a still often cited technique.
 
@@ -28,11 +28,11 @@ from ._util import vector_norm
 
 
 
-class PGDM(BaseMetricLearner):
-  """Probabilistic Global Distance Metric Learning (PGDM)"""
+class MMC(BaseMetricLearner):
+  """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
-    """Initialize PGDM.
+    """Initialize MMC.
     Parameters
     ----------
     max_iter : int, optional
@@ -59,7 +59,7 @@ class PGDM(BaseMetricLearner):
     self.verbose = verbose
   
   def fit(self, X, constraints):
-    """Learn the PGDM model.
+    """Learn the MMC model.
     Parameters
     ----------
     X : (n x d) data matrix
@@ -85,9 +85,9 @@ class PGDM(BaseMetricLearner):
     no_ident = vector_norm(X[c] - X[d]) > 1e-9
     c, d = c[no_ident], d[no_ident]
     if len(a) == 0:
-      raise RuntimeError('No similarity constraints given for PGDM.')
+      raise RuntimeError('No similarity constraints given for MMC.')
     if len(c) == 0:
-      raise RuntimeError('No dissimilarity constraints given for PGDM.')
+      raise RuntimeError('No dissimilarity constraints given for MMC.')
     
     # init metric
     if self.A0 is None:
@@ -102,7 +102,7 @@ class PGDM(BaseMetricLearner):
     return a,b,c,d
 
   def _fit_full(self, X, constraints):
-    """Learn full metric using PGDM.
+    """Learn full metric using MMC.
     Parameters
     ----------
     X : (n x d) data matrix
@@ -208,22 +208,22 @@ class PGDM(BaseMetricLearner):
       if delta < self.convergence_threshold:
         break
       if self.verbose:
-        print('pgdm iter: %d, conv = %f, projections = %d' % (cycle, delta, it+1))
+        print('mmc iter: %d, conv = %f, projections = %d' % (cycle, delta, it+1))
 
     if delta > self.convergence_threshold:
       self.converged_ = False
       if self.verbose:
-        print('pgdm did not converge, conv = %f' % (delta,))
+        print('mmc did not converge, conv = %f' % (delta,))
     else:
       self.converged_ = True
       if self.verbose:
-        print('pgdm converged at iter %d, conv = %f' % (cycle, delta))
+        print('mmc converged at iter %d, conv = %f' % (cycle, delta))
     self.A_[:] = A_old
     self.n_iter_ = cycle
     return self
   
   def _fit_diag(self, X, constraints):
-    """Learn diagonal metric using PGDM.
+    """Learn diagonal metric using MMC.
     Parameters
     ----------
     X : (n x d) data matrix
@@ -275,7 +275,7 @@ class PGDM(BaseMetricLearner):
       w[:] = w_previous
       error = np.abs((obj_previous - obj_initial) / obj_previous)
       if self.verbose:
-        print('pgdm iter: %d, conv = %f' % (it, error))
+        print('mmc iter: %d, conv = %f' % (it, error))
       it += 1
     
     self.A_ = np.diag(w)
@@ -361,7 +361,7 @@ class PGDM(BaseMetricLearner):
     L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with
     the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.
     
-    The Cholesky decomposition cannot be applied here, since PGDM learns only a positive
+    The Cholesky decomposition cannot be applied here, since MMC learns only a positive
     *semi*-definite Mahalanobis matrix.
     
     Returns
@@ -375,8 +375,8 @@ class PGDM(BaseMetricLearner):
       return V.T * np.sqrt(np.maximum(0, w[:,None]))
 
 
-class PGDM_Supervised(PGDM):
-  """Probabilistic Global Distance Metric Learning (PGDM)"""
+class MMC_Supervised(MMC):
+  """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
@@ -402,15 +402,15 @@ class PGDM_Supervised(PGDM):
     verbose : bool, optional
         if True, prints information while learning
     """
-    PGDM.__init__(self, max_iter=max_iter, max_proj=max_proj,
-                  convergence_threshold=convergence_threshold,
-                  A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
-                  verbose=verbose)
+    MMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
+                 convergence_threshold=convergence_threshold,
+                 A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
+                 verbose=verbose)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
   def fit(self, X, y, random_state=np.random):
-    """Create constraints from labels and learn the PGDM model.
+    """Create constraints from labels and learn the MMC model.
     Parameters
     ----------
     X : (n x d) matrix
@@ -430,4 +430,4 @@ class PGDM_Supervised(PGDM):
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    return PGDM.fit(self, X, pos_neg)
+    return MMC.fit(self, X, pos_neg)

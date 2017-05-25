@@ -15,7 +15,7 @@ Metric Learning algorithms in Python.
 -  Local Fisher Discriminant Analysis (LFDA)
 -  Relative Components Analysis (RCA)
 -  Metric Learning for Kernel Regression (MLKR)
--  Probabilistic Global Distance Metric Learning (PGDM)
+-  Mahalanobis Metric for Clustering (MMC)
 
 **Dependencies**
 

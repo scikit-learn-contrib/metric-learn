@@ -4,7 +4,7 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, PGDM_Supervised)
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
 
 
 # Wrap the _Supervised methods with a deterministic wrapper for testing.
@@ -22,7 +22,7 @@ class dITML(deterministic_mixin, ITML_Supervised):
   pass
 
 
-class dPGDM(deterministic_mixin, PGDM_Supervised):
+class dMMC(deterministic_mixin, MMC_Supervised):
   pass
 
 
@@ -56,8 +56,8 @@ class TestSklearnCompat(unittest.TestCase):
   def test_itml(self):
     check_estimator(dITML)
 
-  def test_pgdm(self):
-    check_estimator(dPGDM)
+  def test_mmc(self):
+    check_estimator(dMMC)
 
   # This fails due to a FloatingPointError
   # def test_sdml(self):

@@ -6,8 +6,8 @@ from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, PGDM,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, PGDM_Supervised)
+    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
 
@@ -149,7 +149,7 @@ class TestMLKR(MetricTestCase):
     self.assertLess(csep, 0.25)
 
 
-class TestPGDM(MetricTestCase):
+class TestMMC(MetricTestCase):
   def test_iris(self):
 
     # Generate full set of constraints for comparison with reference implementation
@@ -159,30 +159,30 @@ class TestPGDM(MetricTestCase):
     c, d = np.nonzero(np.triu(~mask, k=1))
 
     # Full metric
-    pgdm = PGDM(convergence_threshold=0.01)
-    pgdm.fit(self.iris_points, [a,b,c,d])
+    mmc = MMC(convergence_threshold=0.01)
+    mmc.fit(self.iris_points, [a,b,c,d])
     expected = [[+0.00046504, +0.00083371, -0.00111959, -0.00165265],
                 [+0.00083371, +0.00149466, -0.00200719, -0.00296284],
                 [-0.00111959, -0.00200719, +0.00269546, +0.00397881],
                 [-0.00165265, -0.00296284, +0.00397881, +0.00587320]]
-    assert_array_almost_equal(expected, pgdm.metric(), decimal=6)
+    assert_array_almost_equal(expected, mmc.metric(), decimal=6)
 
     # Diagonal metric
-    pgdm = PGDM(diagonal=True)
-    pgdm.fit(self.iris_points, [a,b,c,d])
+    mmc = MMC(diagonal=True)
+    mmc.fit(self.iris_points, [a,b,c,d])
     expected = [0, 0, 1.21045968, 1.22552608]
-    assert_array_almost_equal(np.diag(expected), pgdm.metric(), decimal=6)
+    assert_array_almost_equal(np.diag(expected), mmc.metric(), decimal=6)
     
     # Supervised Full
-    pgdm = PGDM_Supervised()
-    pgdm.fit(self.iris_points, self.iris_labels)
-    csep = class_separation(pgdm.transform(), self.iris_labels)
+    mmc = MMC_Supervised()
+    mmc.fit(self.iris_points, self.iris_labels)
+    csep = class_separation(mmc.transform(), self.iris_labels)
     self.assertLess(csep, 0.15)
     
     # Supervised Diagonal
-    pgdm = PGDM_Supervised(diagonal=True)
-    pgdm.fit(self.iris_points, self.iris_labels)
-    csep = class_separation(pgdm.transform(), self.iris_labels)
+    mmc = MMC_Supervised(diagonal=True)
+    mmc.fit(self.iris_points, self.iris_labels)
+    csep = class_separation(mmc.transform(), self.iris_labels)
     self.assertLess(csep, 0.2)
 
 
