@@ -5,7 +5,7 @@ from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
 
 
 class TestFitTransform(unittest.TestCase):
@@ -115,6 +115,18 @@ class TestFitTransform(unittest.TestCase):
 
     mlkr = MLKR(num_dims=2)
     res_2 = mlkr.fit_transform(self.X, self.y)
+
+    assert_array_almost_equal(res_1, res_2)
+
+  def test_mmc_supervised(self):
+    seed = np.random.RandomState(1234)
+    mmc = MMC_Supervised(num_constraints=200)
+    mmc.fit(self.X, self.y, random_state=seed)
+    res_1 = mmc.transform()
+
+    seed = np.random.RandomState(1234)
+    mmc = MMC_Supervised(num_constraints=200)
+    res_2 = mmc.fit_transform(self.X, self.y, random_state=seed)
 
     assert_array_almost_equal(res_1, res_2)
 
