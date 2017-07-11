@@ -24,7 +24,7 @@ from .base_metric import BaseMetricLearner
 class _base_LMNN(BaseMetricLearner):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001, use_pca=True,
-               verbose=False):
+               verbose=False,warm_start=False):
     """Initialize the LMNN object.
 
     Parameters
@@ -43,7 +43,9 @@ class _base_LMNN(BaseMetricLearner):
     self.convergence_tol = convergence_tol
     self.use_pca = use_pca
     self.verbose = verbose
-
+    self.warm_start = warm_start
+    self.warm=False
+    print("hi")
   def transformer(self):
     return self.L_
 
@@ -60,7 +62,9 @@ class python_LMNN(_base_LMNN):
     self.labels_ = np.arange(len(unique_labels))
     if self.use_pca:
       warnings.warn('use_pca does nothing for the python_LMNN implementation')
-    self.L_ = np.eye(num_dims)
+    if self.warm and not self.warm_start:
+      self.L_ = np.eye(num_dims)
+
     required_k = np.bincount(self.label_inds_).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'
@@ -178,6 +182,7 @@ class python_LMNN(_base_LMNN):
 
     # store the last L
     self.L_ = L
+    self.warm=True
     self.n_iter_ = it
     return self
 
@@ -247,7 +252,7 @@ try:
 
   class LMNN(_base_LMNN):
 
-    def fit(self, X, y):
+    def fit(self, X, y,warm_start=False):
       self.X_, y = check_X_y(X, y, dtype=float)
       labels = MulticlassLabels(y)
       self._lmnn = shogun_LMNN(RealFeatures(self.X_.T), labels, self.k)
@@ -258,7 +263,10 @@ try:
       if self.use_pca:
         self._lmnn.train()
       else:
-        self._lmnn.train(np.eye(X.shape[1]))
+        if warm_start:
+          self._lmnn.train(self.L)
+        else:
+          self._lmnn.train(np.eye(X.shape[1]))
       self.L_ = self._lmnn.get_linear_transform()
       return self
 
