@@ -45,7 +45,7 @@ class _base_LMNN(BaseMetricLearner):
     self.verbose = verbose
     self.warm_start = warm_start
     self.warm=False
-    print("hi")
+    print("hi ")
   def transformer(self):
     return self.L_
 
