@@ -379,14 +379,14 @@ class NeuralNetworkTransformer(MatrixTransformer):
 class KMeansTransformer(MatrixTransformer, BaseBuilder):
     def __init__(self, transformer='full', n_clusters='classes', function='distance', n_init=1, random_state=None, **kwargs):
         self._transformer = None
-        self.params = {
-            **kwargs,
+        self.params = {            
             'transformer': transformer,
             'n_clusters': n_clusters,
             'function': function,
             'n_init': n_init,
             'random_state': random_state,
         }
+        self.params.update(**kwargs)
 
     def individual_size(self, input_dim):
         if self._transformer is None:
