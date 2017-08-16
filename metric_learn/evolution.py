@@ -204,7 +204,7 @@ class BaseBuilder():
 
     #     return params
 
-    def build_transformer(self, transformer_shape=None, params={}):
+    def build_transformer(self, transformer_shape=None, num_dims=None, params={}):
         if transformer_shape is None:
             transformer_shape = self.transformer_shape
         # if params is None:
@@ -215,7 +215,7 @@ class BaseBuilder():
         elif transformer_shape == 'diagonal':
             return DiagonalMatrixTransformer(**params)
         elif transformer_shape == 'full':
-            return FullMatrixTransformer(**params)
+            return FullMatrixTransformer(num_dims=num_dims, **params)
         elif transformer_shape == 'triangular':
             return TriangularMatrixTransformer(**params)
         elif transformer_shape == 'neuralnetwork':
@@ -278,16 +278,16 @@ class TriangularMatrixTransformer(MatrixTransformer):
         return self
 
 class FullMatrixTransformer(MatrixTransformer):
-    def __init__(self, n_components=None):
+    def __init__(self, num_dims=None):
         self.params = {
-            'n_components': n_components
+            'num_dims': num_dims
         }
 
     def individual_size(self, input_dim):
-        if self.params['n_components'] is None:
+        if self.params['num_dims'] is None:
             return input_dim**2
 
-        return input_dim*self.params['n_components']
+        return input_dim*self.params['num_dims']
 
     def fit(self, X, y, flat_weights):
         input_dim = X.shape[1]
@@ -834,7 +834,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
 
 class MetricEvolution(BaseMetricLearner, BaseBuilder):
     def __init__(self, strategy='cmaes', fitnesses='knn', transformer_shape='full',
-                 random_state=None, verbose=False):
+                 num_dims=None, random_state=None, verbose=False):
         """Initialize the learner.
 
         Parameters
@@ -843,12 +843,18 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
             fitnesses is used in fitness scoring
         transformer_shape : ('full', 'diagonal', MatrixTransformer object)
             transformer shape defines transforming function to learn
+        num_dims : int, optional
+            Dimensionality of reduced space (defaults to dimension of X)
         verbose : bool, optional
             if True, prints information while learning
         """
+        if (num_dims is not None) and (transformer_shape != 'full'):
+            raise Exception('`num_dims` can be only set for `transformer_shape`=="full"')
+
         self.strategy = strategy
         self.fitnesses = fitnesses
         self.transformer_shape = transformer_shape
+        self.num_dims = num_dims
         self.random_state = random_state
         self.verbose = verbose
 
@@ -911,8 +917,14 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
     def transform(self, X):
         return self._transformer.transform(X)
         
-    def transformer(self):
+    def transformer_class(self):
         return self._transformer
+
+    def transformer(self):
+        return self._transformer.transformer()
+
+    def metric(self):
+        return self._transformer.metric()
 
     def fit_transform(self, X, y):
         self.fit(X, y)
@@ -924,7 +936,7 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
          Y: (n,) array-like of class labels
         '''
         # Initialize Transformer builder and default transformer
-        self._transformer = self.build_transformer()
+        self._transformer = self.build_transformer(num_dims=self.num_dims)
         
         # Build strategy and fitnesses with correct params
         self._strategy = self.build_strategy(

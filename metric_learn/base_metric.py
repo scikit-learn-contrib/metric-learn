@@ -22,13 +22,13 @@ class BaseMetricLearner(BaseEstimator, TransformerMixin):
   def transformer(self):
     """Computes the transformation matrix from the Mahalanobis matrix.
 
-    L = inv(cholesky(M))
+    L = cholesky(M).T
 
     Returns
     -------
-    L : (d x d) matrix
+    L : upper triangular (d x d) matrix
     """
-    return inv(cholesky(self.metric()))
+    return cholesky(self.metric()).T
 
   def transform(self, X=None):
     """Applies the metric transformation.

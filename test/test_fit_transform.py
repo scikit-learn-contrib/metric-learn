@@ -4,8 +4,9 @@ from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MetricEvolution, FullMatrixTransformer,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
+    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised,
+    MetricEvolution)
 
 
 class TestFitTransform(unittest.TestCase):
@@ -119,12 +120,24 @@ class TestFitTransform(unittest.TestCase):
     assert_array_almost_equal(res_1, res_2)
 
   def test_evolution(self):
-    cmaes = MetricEvolution(random_state=47, transformer_shape=FullMatrixTransformer(n_components=2))
+    cmaes = MetricEvolution(random_state=47, num_dims=2)
     cmaes.fit(self.X, self.y)
     res_1 = cmaes.transform(self.X)
 
-    cmaes = MetricEvolution(random_state=47, transformer_shape=FullMatrixTransformer(n_components=2))
+    cmaes = MetricEvolution(random_state=47, num_dims=2)
     res_2 = cmaes.fit_transform(self.X, self.y)
+
+    assert_array_almost_equal(res_1, res_2)
+
+  def test_mmc_supervised(self):
+    seed = np.random.RandomState(1234)
+    mmc = MMC_Supervised(num_constraints=200)
+    mmc.fit(self.X, self.y, random_state=seed)
+    res_1 = mmc.transform()
+
+    seed = np.random.RandomState(1234)
+    mmc = MMC_Supervised(num_constraints=200)
+    res_2 = mmc.fit_transform(self.X, self.y, random_state=seed)
 
     assert_array_almost_equal(res_1, res_2)
 

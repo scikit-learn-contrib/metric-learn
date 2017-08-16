@@ -15,6 +15,7 @@ Metric Learning algorithms in Python.
 -  Local Fisher Discriminant Analysis (LFDA)
 -  Relative Components Analysis (RCA)
 -  Metric Learning for Kernel Regression (MLKR)
+-  Mahalanobis Metric for Clustering (MMC)
 
 **Dependencies**
 
@@ -42,9 +43,9 @@ default implementations for the methods ``metric``, ``transformer``, and
 For an instance of a metric learner named ``foo`` learning from a set of
 ``d``-dimensional points, ``foo.metric()`` returns a ``d x d``
 matrix ``M`` such that the distance between vectors ``x`` and ``y`` is
-expressed ``sqrt((x-y).dot(inv(M)).dot(x-y))``.
+expressed ``sqrt((x-y).dot(M).dot(x-y))``.
 Using scipy's ``pdist`` function, this would look like
-``pdist(X, metric='mahalanobis', VI=inv(foo.metric()))``.
+``pdist(X, metric='mahalanobis', VI=foo.metric())``.
 
 In the same scenario, ``foo.transformer()`` returns a ``d x d``
 matrix ``L`` such that a vector ``x`` can be represented in the learned

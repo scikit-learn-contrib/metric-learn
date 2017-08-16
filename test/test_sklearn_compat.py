@@ -3,8 +3,9 @@ import unittest
 from sklearn.utils.estimator_checks import check_estimator
 
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MetricEvolution,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
+    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised,
+    MetricEvolution)
 
 
 # Wrap the _Supervised methods with a deterministic wrapper for testing.
@@ -19,6 +20,10 @@ class dLSML(deterministic_mixin, LSML_Supervised):
 
 
 class dITML(deterministic_mixin, ITML_Supervised):
+  pass
+
+
+class dMMC(deterministic_mixin, MMC_Supervised):
   pass
 
 
@@ -55,6 +60,9 @@ class TestSklearnCompat(unittest.TestCase):
   # This fails in check_dtype_object, not sure why
   # def test_evolution(self):
   #   check_estimator(MetricEvolution)
+
+  def test_mmc(self):
+    check_estimator(dMMC)
 
   # This fails due to a FloatingPointError
   # def test_sdml(self):

@@ -7,7 +7,7 @@ Adapted from https://gist.github.com/kcarnold/5439917
 Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
 """
 
-from __future__ import print_function, absolute_import
+from __future__ import print_function, absolute_import, division
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
@@ -26,7 +26,7 @@ class LSML(BaseMetricLearner):
     tol : float, optional
     max_iter : int, optional
     prior : (d x d) matrix, optional
-        guess at a metric [default: covariance(X)]
+        guess at a metric [default: inv(covariance(X))]
     verbose : bool, optional
         if True, prints information while learning
     """
@@ -48,9 +48,11 @@ class LSML(BaseMetricLearner):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     if self.prior is None:
-      self.M_ = np.cov(X.T)
+      self.prior_inv_ = np.atleast_2d(np.cov(X, rowvar=False))
+      self.M_ = np.linalg.inv(self.prior_inv_)
     else:
       self.M_ = self.prior
+      self.prior_inv_ = np.linalg.inv(self.prior)
 
   def metric(self):
     return self.M_
@@ -68,13 +70,14 @@ class LSML(BaseMetricLearner):
         scale factor for each constraint
     """
     self._prepare_inputs(X, constraints, weights)
-    prior_inv = scipy.linalg.inv(self.M_)
-    s_best = self._total_loss(self.M_, prior_inv)
     step_sizes = np.logspace(-10, 0, 10)
+    # Keep track of the best step size and the loss at that step.
+    l_best = 0
+    s_best = self._total_loss(self.M_)
     if self.verbose:
       print('initial loss', s_best)
     for it in xrange(1, self.max_iter+1):
-      grad = self._gradient(self.M_, prior_inv)
+      grad = self._gradient(self.M_)
       grad_norm = scipy.linalg.norm(grad)
       if grad_norm < self.tol:
         break
@@ -86,7 +89,7 @@ class LSML(BaseMetricLearner):
         new_metric = self.M_ - step_size * grad
         w, v = scipy.linalg.eigh(new_metric)
         new_metric = v.dot((np.maximum(w, 1e-8) * v).T)
-        cur_s = self._total_loss(new_metric, prior_inv)
+        cur_s = self._total_loss(new_metric)
         if cur_s < s_best:
           l_best = step_size
           s_best = cur_s
@@ -107,14 +110,16 @@ class LSML(BaseMetricLearner):
     dcd = np.sum(self.vcd_.dot(metric) * self.vcd_, axis=1)
     violations = dab > dcd
     return self.w_[violations].dot((np.sqrt(dab[violations]) -
-                                   np.sqrt(dcd[violations]))**2)
+                                    np.sqrt(dcd[violations]))**2)
 
-  def _total_loss(self, metric, prior_inv):
-    return (self._comparison_loss(metric) +
-            _regularization_loss(metric, prior_inv))
+  def _total_loss(self, metric):
+    # Regularization loss
+    sign, logdet = np.linalg.slogdet(metric)
+    reg_loss = np.sum(metric * self.prior_inv_) - sign * logdet
+    return self._comparison_loss(metric) + reg_loss
 
-  def _gradient(self, metric, prior_inv):
-    dMetric = prior_inv - scipy.linalg.inv(metric)
+  def _gradient(self, metric):
+    dMetric = self.prior_inv_ - np.linalg.inv(metric)
     dabs = np.sum(self.vab_.dot(metric) * self.vab_, axis=1)
     dcds = np.sum(self.vcd_.dot(metric) * self.vcd_, axis=1)
     violations = dabs > dcds
@@ -124,11 +129,6 @@ class LSML(BaseMetricLearner):
       dMetric += ((1-np.sqrt(dcd/dab))*np.outer(vab, vab) +
                   (1-np.sqrt(dab/dcd))*np.outer(vcd, vcd))
     return dMetric
-
-
-def _regularization_loss(metric, prior_inv):
-  sign, logdet = np.linalg.slogdet(metric)
-  return np.sum(metric * prior_inv) - sign * logdet
 
 
 class LSML_Supervised(LSML):

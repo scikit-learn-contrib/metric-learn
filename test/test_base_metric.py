@@ -20,7 +20,7 @@ class TestStringRepr(unittest.TestCase):
 
   def test_lfda(self):
     self.assertEqual(str(metric_learn.LFDA()),
-                     "LFDA(k=None, metric='weighted', num_dims=None)")
+                     "LFDA(embedding_type='weighted', k=None, num_dims=None)")
 
   def test_itml(self):
     self.assertEqual(str(metric_learn.ITML()), """
@@ -65,9 +65,22 @@ SDML_Supervised(balance_param=0.5, num_constraints=None, num_labeled=inf,
 
   def test_evolution(self):
     self.assertEqual(str(metric_learn.MetricEvolution()), """
-MetricEvolution(fitnesses='knn', random_state=None, strategy='cmaes',
-        transformer_shape='full', verbose=False)
+MetricEvolution(fitnesses='knn', num_dims=None, random_state=None,
+        strategy='cmaes', transformer_shape='full', verbose=False)
 """.strip('\n'))
+
+  def test_mmc(self):
+    self.assertEqual(str(metric_learn.MMC()), """
+MMC(A0=None, convergence_threshold=0.001, diagonal=False, diagonal_c=1.0,
+  max_iter=100, max_proj=10000, verbose=False)
+""".strip('\n'))
+
+    self.assertEqual(str(metric_learn.MMC_Supervised()), """
+MMC_Supervised(A0=None, convergence_threshold=1e-06, diagonal=False,
+        diagonal_c=1.0, max_iter=100, max_proj=10000, num_constraints=None,
+        num_labeled=inf, verbose=False)
+""".strip('\n'))
+
 
 if __name__ == '__main__':
   unittest.main()

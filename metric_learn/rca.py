@@ -97,7 +97,7 @@ class RCA(BaseMetricLearner):
 
     Parameters
     ----------
-    X : (n x d) data matrix
+    data : (n x d) data matrix
         Each row corresponds to a single instance
     chunks : (n,) array of ints
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.

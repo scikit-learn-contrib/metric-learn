@@ -21,6 +21,7 @@ from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner
 from .constraints import Constraints
+from ._util import vector_norm
 
 
 class ITML(BaseMetricLearner):
@@ -54,10 +55,10 @@ class ITML(BaseMetricLearner):
     self.X_ = X = check_array(X)
     # check to make sure that no two constrained vectors are identical
     a,b,c,d = constraints
-    ident = _vector_norm(X[a] - X[b]) > 1e-9
-    a, b = a[ident], b[ident]
-    ident = _vector_norm(X[c] - X[d]) > 1e-9
-    c, d = c[ident], d[ident]
+    no_ident = vector_norm(X[a] - X[b]) > 1e-9
+    a, b = a[no_ident], b[no_ident]
+    no_ident = vector_norm(X[c] - X[d]) > 1e-9
+    c, d = c[no_ident], d[no_ident]
     # init bounds
     if bounds is None:
       self.bounds_ = np.percentile(pairwise_distances(X), (5, 95))
@@ -80,7 +81,8 @@ class ITML(BaseMetricLearner):
     X : (n x d) data matrix
         each row corresponds to a single instance
     constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
+        (a,b,c,d) indices into X, with (a,b) specifying positive and (c,d)
+        negative pairs
     bounds : list (pos,neg) pairs, optional
         bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
     """
@@ -93,30 +95,30 @@ class ITML(BaseMetricLearner):
     gamma_proj = 1. if gamma is np.inf else gamma/(gamma+1.)
     pos_bhat = np.zeros(num_pos) + self.bounds_[0]
     neg_bhat = np.zeros(num_neg) + self.bounds_[1]
+    pos_vv = self.X_[a] - self.X_[b]
+    neg_vv = self.X_[c] - self.X_[d]
     A = self.A_
 
     for it in xrange(self.max_iter):
       # update positives
-      vv = self.X_[a] - self.X_[b]
-      for i,v in enumerate(vv):
+      for i,v in enumerate(pos_vv):
         wtw = v.dot(A).dot(v)  # scalar
         alpha = min(_lambda[i], gamma_proj*(1./wtw - 1./pos_bhat[i]))
         _lambda[i] -= alpha
         beta = alpha/(1 - alpha*wtw)
         pos_bhat[i] = 1./((1 / pos_bhat[i]) + (alpha / gamma))
         Av = A.dot(v)
-        A += beta * np.outer(Av, Av)
+        A += np.outer(Av, Av * beta)
 
       # update negatives
-      vv = self.X_[c] - self.X_[d]
-      for i,v in enumerate(vv):
+      for i,v in enumerate(neg_vv):
         wtw = v.dot(A).dot(v)  # scalar
         alpha = min(_lambda[i+num_pos], gamma_proj*(1./neg_bhat[i] - 1./wtw))
         _lambda[i+num_pos] -= alpha
         beta = -alpha/(1 + alpha*wtw)
         neg_bhat[i] = 1./((1 / neg_bhat[i]) - (alpha / gamma))
         Av = A.dot(v)
-        A += beta * np.outer(Av, Av)
+        A += np.outer(Av, Av * beta)
 
       normsum = np.linalg.norm(_lambda) + np.linalg.norm(lambdaold)
       if normsum == 0:
@@ -136,16 +138,6 @@ class ITML(BaseMetricLearner):
 
   def metric(self):
     return self.A_
-
-# hack around lack of axis kwarg in older numpy versions
-try:
-  np.linalg.norm([[4]], axis=1)
-except TypeError:
-  def _vector_norm(X):
-    return np.apply_along_axis(np.linalg.norm, 1, X)
-else:
-  def _vector_norm(X):
-    return np.linalg.norm(X, axis=1)
 
 
 class ITML_Supervised(ITML):
