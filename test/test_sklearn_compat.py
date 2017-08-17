@@ -3,9 +3,10 @@ import unittest
 from sklearn.utils.estimator_checks import check_estimator
 
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised,
-    MetricEvolution)
+  LMNN, NCA, LFDA, Covariance, MLKR, MMC, CMAES, JDE,
+  LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised,
+  MMC_Supervised
+)
 
 
 # Wrap the _Supervised methods with a deterministic wrapper for testing.
@@ -58,8 +59,12 @@ class TestSklearnCompat(unittest.TestCase):
     check_estimator(dITML)
 
   # This fails in check_dtype_object, not sure why
-  # def test_evolution(self):
-  #   check_estimator(MetricEvolution)
+  # TODO !!!!!
+  # def test_cmaes(self):
+  #   check_estimator(CMAES)
+
+  # def test_jde(self):
+  #   check_estimator(JDE)
 
   def test_mmc(self):
     check_estimator(dMMC)

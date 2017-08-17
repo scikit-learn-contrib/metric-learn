@@ -1,12 +1,16 @@
 import unittest
+
 import numpy as np
-from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
+from sklearn.datasets import load_iris
+
+
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised,
-    MetricEvolution)
+    LMNN, NCA, LFDA, Covariance, MLKR, MMC, CMAES, JDE,
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised,
+    MMC_Supervised,
+)
 
 
 class TestFitTransform(unittest.TestCase):
@@ -119,13 +123,23 @@ class TestFitTransform(unittest.TestCase):
 
     assert_array_almost_equal(res_1, res_2)
 
-  def test_evolution(self):
-    cmaes = MetricEvolution(random_state=47, num_dims=2)
+  def test_cmaes(self):
+    cmaes = CMAES(random_state=47, num_dims=2)
     cmaes.fit(self.X, self.y)
     res_1 = cmaes.transform(self.X)
 
-    cmaes = MetricEvolution(random_state=47, num_dims=2)
+    cmaes = CMAES(random_state=47, num_dims=2)
     res_2 = cmaes.fit_transform(self.X, self.y)
+
+    assert_array_almost_equal(res_1, res_2)
+
+  def test_jde(self):
+    jde = JDE(random_state=47)
+    jde.fit(self.X, self.y)
+    res_1 = jde.transform(self.X)
+
+    jde = JDE(random_state=47)
+    res_2 = jde.fit_transform(self.X, self.y)
 
     assert_array_almost_equal(res_1, res_2)
 

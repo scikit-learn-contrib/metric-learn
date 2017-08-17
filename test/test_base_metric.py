@@ -63,10 +63,14 @@ SDML_Supervised(balance_param=0.5, num_constraints=None, num_labeled=inf,
                      "MLKR(A0=None, alpha=0.0001, epsilon=0.01, "
                      "max_iter=1000, num_dims=None)")
 
-  def test_evolution(self):
-    self.assertEqual(str(metric_learn.MetricEvolution()), """
-MetricEvolution(fitnesses='knn', num_dims=None, random_state=None,
-        strategy='cmaes', transformer_shape='full', verbose=False)
+  def test_cmaes(self):
+    self.assertEqual(str(metric_learn.CMAES()), """
+CMAES(num_dims=None, random_state=None, transformer='full', verbose=False)
+""".strip('\n'))
+
+  def test_jde(self):
+    self.assertEqual(str(metric_learn.JDE()), """
+JDE(random_state=None, transformer='triangular', verbose=False)
 """.strip('\n'))
 
   def test_mmc(self):

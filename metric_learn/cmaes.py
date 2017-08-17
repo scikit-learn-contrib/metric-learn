@@ -25,6 +25,7 @@ class CMAES(MetricEvolution):
             strategy='cmaes',
             fitnesses='knn',
             transformer=transformer,
+            num_dims=num_dims,
             random_state=random_state,
             verbose=verbose,
         )

@@ -1,12 +1,14 @@
 import unittest
+
 import numpy as np
-from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
+from sklearn.datasets import load_iris
+
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised,
-    MetricEvolution)
+    LMNN, NCA, LFDA, Covariance, MLKR, MMC, CMAES, JDE,
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised,
+    MMC_Supervised)
 
 
 class TestTransformerMetricConversion(unittest.TestCase):
@@ -76,12 +78,17 @@ class TestTransformerMetricConversion(unittest.TestCase):
     L = mlkr.transformer()
     assert_array_almost_equal(L.T.dot(L), mlkr.metric())
 
-  def test_evolution(self):
-    seed = np.random.RandomState(1234)
-    evolution = MetricEvolution(num_dims=2)
-    evolution.fit(self.X, self.y)
-    L = evolution.transformer()
-    assert_array_almost_equal(L.T.dot(L), evolution.metric())
+  def test_cmaes(self):
+    cmaes = CMAES(num_dims=2)
+    cmaes.fit(self.X, self.y)
+    L = cmaes.transformer()
+    assert_array_almost_equal(L.T.dot(L), cmaes.metric())
+
+  def test_jde(self):
+    jde = JDE()
+    jde.fit(self.X, self.y)
+    L = jde.transformer()
+    assert_array_almost_equal(L.T.dot(L), jde.metric())
 
   def test_mmc_supervised(self):
     mmc = MMC_Supervised(num_constraints=200)
