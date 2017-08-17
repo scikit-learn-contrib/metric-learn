@@ -1,39 +1,29 @@
-# from ..base_metric import BaseMetricLearner
-
-
-from numpy.linalg import cholesky
-
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
 
-class BaseMetricLearner(BaseEstimator, TransformerMixin):
+class MatrixTransformer(BaseEstimator, TransformerMixin):
     def __init__(self):
         raise NotImplementedError(
-            'BaseMetricLearner should not be instantiated')
+            'MatrixTransformer should not be instantiated')
 
-    def metric(self):
-        """Computes the Mahalanobis matrix from the transformation matrix.
+    def duplicate_instance(self):
+        return self.__class__(**self.params)
 
-        .. math:: M = L^{\\top} L
+    def individual_size(self, input_dim):
+        raise NotImplementedError('individual_size() is not implemented')
 
-        Returns
-        -------
-        M : (d x d) matrix
-        """
-        L = self.transformer()
-        return L.T.dot(L)
+    def fit(self, X, y, flat_weights):
+        raise NotImplementedError('fit() is not implemented')
 
     def transformer(self):
-        """Computes the transformation matrix from the Mahalanobis matrix.
-
-        L = cholesky(M).T
+        """Returns the evolved transformation matrix from the Mahalanobis matrix.
 
         Returns
         -------
-        L : upper triangular (d x d) matrix
+        L : (d x d) matrix
         """
-        return cholesky(self.metric()).T
+        return self.L
 
     def transform(self, X=None):
         """Applies the metric transformation.
@@ -55,23 +45,14 @@ class BaseMetricLearner(BaseEstimator, TransformerMixin):
         L = self.transformer()
         return X.dot(L.T)
 
+    def metric(self):
+        """Computes the Mahalanobis matrix from the transformation matrix.
 
-class MatrixTransformer(BaseMetricLearner):
-    def __init__(self):
-        raise NotImplementedError(
-            'MatrixTransformer should not be instantiated')
+        .. math:: M = L^{\\top} L
 
-    def duplicate_instance(self):
-        return self.__class__(**self.params)
-
-    def individual_size(self, input_dim):
-        raise NotImplementedError('individual_size() is not implemented')
-
-    def fit(self, X, y, flat_weights):
-        raise NotImplementedError('fit() is not implemented')
-
-    def transform(self, X):
-        return X.dot(self.transformer().T)
-
-    def transformer(self):
-        return self.L
+        Returns
+        -------
+        M : (d x d) matrix
+        """
+        L = self.transformer()
+        return L.T.dot(L)

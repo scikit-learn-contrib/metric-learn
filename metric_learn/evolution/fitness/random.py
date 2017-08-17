@@ -1,9 +1,12 @@
 import numpy as np
 
-from .base import BaseFitness
+from .base_fitness import BaseFitness
 
 
 class RandomFitness(BaseFitness):
+    def __init__(self, random_state=None):
+        np.random.seed(random_state)
+
     @staticmethod
     def available(method):
         return method in ['random']

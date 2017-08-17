@@ -7,14 +7,12 @@ from .matrix import MatrixTransformer
 
 class NeuralNetworkTransformer(MatrixTransformer):
     def __init__(self, layers=None, activation='relu', use_biases=False):
-        self.params = {
-            'layers': layers,
-            'activation': activation,
-            'use_biases': use_biases,
-        }
+        self.layers = layers
+        self.activation = activation
+        self.use_biases = use_biases
 
     def _build_activation(self):
-        activation = self.params['activation']
+        activation = self.activation
 
         if activation is None:
             return lambda X: X  # identity
@@ -31,10 +29,10 @@ class NeuralNetworkTransformer(MatrixTransformer):
         last_layer = input_dim
 
         size = 0
-        for layer in self.params['layers'] or (input_dim,):
+        for layer in self.layers or (input_dim,):
             size += last_layer * layer
 
-            if self.params['use_biases']:
+            if self.use_biases:
                 size += layer
 
             last_layer = layer
@@ -53,12 +51,12 @@ class NeuralNetworkTransformer(MatrixTransformer):
 
         last_layer = input_dim
         offset = 0
-        for layer in self.params['layers'] or (input_dim,):
+        for layer in self.layers or (input_dim,):
             W = flat_weights[offset:offset + last_layer * layer].reshape(
                 (last_layer, layer))
             offset += last_layer * layer
 
-            if self.params['use_biases']:
+            if self.use_biases:
                 b = flat_weights[offset:offset + layer]
                 offset += layer
             else:
@@ -81,5 +79,15 @@ class NeuralNetworkTransformer(MatrixTransformer):
 
         return X
 
-    def transformer(self):
+    def weights(self):
         return self._parsed_weights
+
+    def transformer(self):
+        raise Exception(
+            '`NeuralNetworkTransformer` does not use '
+            'Mahalanobis matrix transformer.')
+
+    def metric(self):
+        raise Exception(
+            '`NeuralNetworkTransformer` does not use '
+            'Mahalanobis matrix metric.')

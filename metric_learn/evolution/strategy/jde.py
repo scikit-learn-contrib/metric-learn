@@ -2,21 +2,19 @@ from deap import tools
 
 import numpy as np
 
-from .base import BaseEvolutionStrategy
+from .base_strategy import BaseEvolutionStrategy
 
 
 class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
-    def __init__(self, population_size=None, Fl=0.1, Fu=0.9, t1=0.1, t2=0.1,
+    def __init__(self, population_size=None, fl=0.1, fu=0.9, t1=0.1, t2=0.1,
                  random_state=None, **kwargs):
         super().__init__(random_state=random_state, **kwargs)
 
-        self.params.update({
-            'population_size': population_size,
-            'Fl': Fl,
-            'Fu': Fu,
-            't1': t1,
-            't2': t2,
-        })
+        self.population_size = population_size
+        self.fl = fl
+        self.fu = fu
+        self.t1 = t1
+        self.t2 = t2
 
         np.random.seed(random_state)
 
@@ -27,7 +25,7 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
         return self.cut_individual(self.hall_of_fame[0])
 
     def fit(self, X, y):
-        individual_size = self.params['n_dim'] + 2
+        individual_size = self.n_dim + 2
 
         toolbox = self.create_toolbox()
         toolbox.register("attr_float", np.random.uniform, -1, 1)
@@ -44,12 +42,12 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
         stats = self._build_stats()
 
         # TODO: Make this more general and move to BaseEvolutionStrategy
-        if self.params['population_size'] == 'log':
-            population_size = int(4 + 3 * np.log(self.params['n_dim']))
-        elif self.params['population_size'] is not None:
-            population_size = self.params['population_size']
+        if self.population_size == 'log':
+            population_size = int(4 + 3 * np.log(self.n_dim))
+        elif self.population_size is not None:
+            population_size = self.population_size
         else:
-            population_size = 10 * self.params['n_dim']
+            population_size = 10 * self.n_dim
         pop = toolbox.population(n=population_size)
 
         self.logbook = tools.Logbook()
@@ -64,20 +62,20 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
         if stats:
             record = stats.compile(pop)
             self.logbook.record(gen=0, evals=len(pop), **record)
-            if self.params['verbose']:
+            if self.verbose:
                 print(self.logbook.stream)
 
-        for g in range(1, self.params['n_gen']):
+        for g in range(1, self.n_gen):
             for k, agent in enumerate(pop):
                 idxs = np.random.choice(len(pop), size=3)
                 a, b, c = pop[idxs[0]], pop[idxs[1]], pop[idxs[2]]
                 y = toolbox.clone(agent)
 
                 # Update the control parameters
-                if np.random.random() < self.params['t1']:  # F
-                    y[0] = self.params['Fl'] \
-                        + np.random.random() * self.params['Fu']
-                if np.random.random() < self.params['t2']:  # CR
+                if np.random.random() < self.t1:  # F
+                    y[0] = self.fl \
+                        + np.random.random() * self.fu
+                if np.random.random() < self.t2:  # CR
                     y[1] = np.random.random()
 
                 # Mutation and crossover
@@ -95,7 +93,7 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
             if stats:
                 record = stats.compile(pop)
                 self.logbook.record(gen=g, evals=len(pop), **record)
-                if self.params['verbose']:
+                if self.verbose:
                     print(self.logbook.stream)
 
         return self

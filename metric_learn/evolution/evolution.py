@@ -5,7 +5,6 @@
 from __future__ import absolute_import, division
 
 import numpy as np
-from numpy.linalg import cholesky
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
@@ -15,98 +14,8 @@ from . import strategy as st
 from . import transformer as tr
 
 
-class BaseBuilder():
-    def __init__(self):
-        raise NotImplementedError('BaseBuilder should not be instantiated')
-
-    # def _get_extra_params(self, prefixes):
-    #     params = {}
-    #     for pname, pvalue in self.params.items():
-    #         if '__' not in pname: continue
-
-    #         prefix, pkey = pname.split('__', 1)
-    #         if prefix not in prefixes: continue
-
-    #         params[pkey] = pvalue
-
-    #     return params
-
-    def build_transformer(self, transformer_shape=None, num_dims=None,
-                          params={}):
-        if transformer_shape is None:
-            transformer_shape = self.transformer_shape
-        # if params is None:
-            # params = self._get_extra_params(('transformer_shape', 't'))
-
-        if isinstance(transformer_shape, tr.MatrixTransformer):
-            return transformer_shape
-        elif transformer_shape == 'diagonal':
-            return tr.DiagonalMatrixTransformer(**params)
-        elif transformer_shape == 'full':
-            return tr.FullMatrixTransformer(
-                num_dims=num_dims, **params)
-        elif transformer_shape == 'triangular':
-            return tr.TriangularMatrixTransformer(**params)
-        elif transformer_shape == 'neuralnetwork':
-            return tr.NeuralNetworkTransformer(**params)
-        elif transformer_shape == 'kmeans':
-            return tr.KMeansTransformer(**params)
-
-        raise ValueError(
-            'Invalid `transformer_shape` parameter value: `{}`'
-            .format(transformer_shape))
-
-
-class BaseMetricLearner(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        raise NotImplementedError('BaseMetricLearner should not be instantiated')
-
-    def metric(self):
-        """Computes the Mahalanobis matrix from the transformation matrix.
-
-        .. math:: M = L^{\\top} L
-
-        Returns
-        -------
-        M : (d x d) matrix
-        """
-        L = self.transformer()
-        return L.T.dot(L)
-
-    def transformer(self):
-        """Computes the transformation matrix from the Mahalanobis matrix.
-
-        L = cholesky(M).T
-
-        Returns
-        -------
-        L : upper triangular (d x d) matrix
-        """
-        return cholesky(self.metric()).T
-
-    def transform(self, X=None):
-        """Applies the metric transformation.
-
-        Parameters
-        ----------
-        X : (n x d) matrix, optional
-            Data to transform. If not supplied, the training data will be used.
-
-        Returns
-        -------
-        transformed : (n x d) matrix
-            Input data transformed to the metric space by :math:`XL^{\\top}`
-        """
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, accept_sparse=True)
-        L = self.transformer()
-        return X.dot(L.T)
-
-
-class MetricEvolution(BaseMetricLearner, BaseBuilder):
-    def __init__(self, strategy='cmaes', fitnesses='knn', transformer_shape='full',
+class MetricEvolution(BaseEstimator, TransformerMixin):
+    def __init__(self, strategy='cmaes', fitnesses='knn', transformer='full',
                  num_dims=None, random_state=None, verbose=False):
         """Initialize the learner.
 
@@ -114,20 +23,20 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         ----------
         fitnesses : ('knn', 'svc', 'lsvc', fitnesses object)
             fitnesses is used in fitness scoring
-        transformer_shape : ('full', 'diagonal', MatrixTransformer object)
+        transformer : ('full', 'diagonal', MatrixTransformer object)
             transformer shape defines transforming function to learn
         num_dims : int, optional
             Dimensionality of reduced space (defaults to dimension of X)
         verbose : bool, optional
             if True, prints information while learning
         """
-        if (num_dims is not None) and (transformer_shape != 'full'):
+        if (num_dims is not None) and (transformer != 'full'):
             raise Exception(
-                '`num_dims` can be only set for `transformer_shape`=="full"')
+                '`num_dims` can be only set for `transformer`=="full"')
 
         self.strategy = strategy
         self.fitnesses = fitnesses
-        self.transformer_shape = transformer_shape
+        self.transformer = transformer
         self.num_dims = num_dims
         self.random_state = random_state
         self.verbose = verbose
@@ -189,16 +98,68 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
 
         raise ValueError('Invalid `strategy` parameter value.')
 
+    def build_transformer(self, transformer=None, num_dims=None,
+                          params={}):
+        if transformer is None:
+            transformer = self.transformer
+        # if params is None:
+            # params = self._get_extra_params(('transformer', 't'))
+
+        if isinstance(transformer, tr.MatrixTransformer):
+            return transformer
+        elif transformer == 'diagonal':
+            return tr.DiagonalMatrixTransformer(**params)
+        elif transformer == 'full':
+            return tr.FullMatrixTransformer(
+                num_dims=num_dims, **params)
+        elif transformer == 'triangular':
+            return tr.TriangularMatrixTransformer(**params)
+        elif transformer == 'neuralnetwork':
+            return tr.NeuralNetworkTransformer(**params)
+        elif transformer == 'kmeans':
+            return tr.KMeansTransformer(**params)
+
+        raise ValueError(
+            'Invalid `transformer` parameter value: `{}`'
+            .format(transformer))
+
     def transform(self, X):
+        """Applies the metric transformation.
+
+        Parameters
+        ----------
+        X : (n x d) matrix
+            Data to transform.
+
+        Returns
+        -------
+        transformed : (n x d) matrix
+            Input data transformed to the metric space by :math:`XL^{\\top}`
+        """
+        X = check_array(X, accept_sparse=True)
         return self._transformer.transform(X)
 
     def transformer_class(self):
         return self._transformer
 
     def transformer(self):
+        """Computes the transformation matrix from the Mahalanobis matrix.
+
+        Returns
+        -------
+        L : (d x d) matrix
+        """
         return self._transformer.transformer()
 
     def metric(self):
+        """Computes the Mahalanobis matrix from the transformation matrix.
+
+        .. math:: M = L^{\\top} L
+
+        Returns
+        -------
+        M : (d x d) matrix
+        """
         return self._transformer.metric()
 
     def fit_transform(self, X, y):

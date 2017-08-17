@@ -6,56 +6,38 @@ import numpy as np
 
 from sklearn.model_selection import train_test_split
 
-
-class Individual(list):
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.fitness = None
-
-
-class MultidimensionalFitness(base.Fitness):
-    def __init__(self, n_dim, *args, **kwargs):
-        self.n_dim = n_dim
-        self.weights = (1.0,)*n_dim
-
-        super().__init__(*args, **kwargs)
-
-    def __deepcopy__(self, memo):
-        copy_ = self.__class__(self.n_dim)
-        copy_.wvalues = self.wvalues
-        return copy_
+from .individual import Individual
+from .mfitness import MultidimensionalFitness
 
 
 class BaseEvolutionStrategy():
     def __init__(self, n_dim, fitnesses, transformer=None, n_gen=25,
                  split_size=0.33, train_subset_size=1.0, stats=None,
                  random_state=None, verbose=False):
-        self.params = {
-            'n_dim': n_dim,
-            'fitnesses': fitnesses,
-            'transformer': transformer,
-            'n_gen': n_gen,
-            'split_size': split_size,
-            'train_subset_size': train_subset_size,
-            'stats': stats,
-            'random_state': random_state,
-            'verbose': verbose,
-        }
+        self.n_dim = n_dim
+        self.fitnesses = fitnesses
+        self.transformer = transformer
+        self.n_gen = n_gen
+        self.split_size = split_size
+        self.train_subset_size = train_subset_size
+        self.stats = stats
+        self.random_state = random_state
+        self.verbose = verbose
 
-        np.random.seed(random_state)
+        # np.random.seed(random_state)
 
-    def fit(self, X, y, flat_weights):
+    def fit(self, x, y, flat_weights):
         raise NotImplementedError('fit() is not implemented')
 
     def best_individual(self):
         raise NotImplementedError('best_individual() is not implemented')
 
     def _build_stats(self):
-        if self.params['stats'] is None:
+        if self.stats is None:
             return None
-        elif isinstance(self.params['stats'], tools.Statistics):
-            return self.params['stats']
-        elif self.params['stats'] == 'identity':
+        elif isinstance(self.stats, tools.Statistics):
+            return self.stats
+        elif self.stats == 'identity':
             fitness = tools.Statistics(key=lambda ind: ind)
             fitness.register("id", lambda ind: ind)
             return fitness
@@ -68,14 +50,14 @@ class BaseEvolutionStrategy():
         return fitness
 
     def _subset_train_test_split(self, X, y):
-        subset = self.params['train_subset_size']
+        subset = self.train_subset_size
         assert(0.0 < subset <= 1.0)
 
         if subset == 1.0:
             return train_test_split(
                 X, y,
-                test_size=self.params['split_size'],
-                random_state=self.params['random_state'],
+                test_size=self.split_size,
+                random_state=self.random_state,
             )
 
         train_mask = np.random.choice(
@@ -85,12 +67,12 @@ class BaseEvolutionStrategy():
         )
         return train_test_split(
             X[train_mask], y[train_mask],
-            test_size=self.params['split_size'],
-            random_state=self.params['random_state'],
+            test_size=self.split_size,
+            random_state=self.random_state,
         )
 
     def generate_individual_with_fitness(self, func, n):
-        fitness_len = len(self.params['fitnesses'])
+        fitness_len = len(self.fitnesses)
         ind = Individual(func() for _ in range(n))
         ind.fitness = MultidimensionalFitness(fitness_len)
         return ind
@@ -111,8 +93,8 @@ class BaseEvolutionStrategy():
             )
 
             # transform the inputs if there is a transformer
-            if self.params['transformer']:
-                transformer = self.params['transformer'].duplicate_instance()
+            if self.transformer:
+                transformer = self.transformer.duplicate_instance()
                 transformer.fit(
                     X_train,
                     y_train,
@@ -122,6 +104,6 @@ class BaseEvolutionStrategy():
                 X_test = transformer.transform(X_test)
 
             return [f(X_train, X_test, y_train, y_test)
-                    for f in self.params['fitnesses']]
+                    for f in self.fitnesses]
 
         return evaluate

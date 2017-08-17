@@ -2,24 +2,22 @@ from deap import tools
 
 import numpy as np
 
-from .base import BaseEvolutionStrategy
+from .base_strategy import BaseEvolutionStrategy
 
 
 class DifferentialEvolution(BaseEvolutionStrategy):
     def __init__(self, population_size=50, cr=.25, f=1.0, **kwargs):
         super().__init__(**kwargs)
 
-        self.params.update({
-            'population_size': population_size,
-            'cr': cr,
-            'f': f,
-        })
+        self.population_size = population_size
+        self.cr = cr
+        self.f = f
 
     def best_individual(self):
         return self.hall_of_fame[0]
 
     def fit(self, X, y):
-        individual_size = self.params['n_dim']
+        individual_size = self.n_dim
 
         toolbox = self.create_toolbox()
         toolbox.register("attr_float", np.random.uniform, -1, 1)
@@ -33,9 +31,7 @@ class DifferentialEvolution(BaseEvolutionStrategy):
         self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats()
 
-        CR = self.params['cr']
-        F = self.params['f']
-        pop = toolbox.population(n=self.params['population_size'])
+        pop = toolbox.population(n=self.population_size)
 
         self.logbook = tools.Logbook()
         self.logbook.header = ['gen', 'nevals'] \
@@ -49,18 +45,18 @@ class DifferentialEvolution(BaseEvolutionStrategy):
         if stats:
             record = stats.compile(pop)
             self.logbook.record(gen=0, evals=len(pop), **record)
-            if self.params['verbose']:
+            if self.verbose:
                 print(self.logbook.stream)
 
-        for g in range(1, self.params['n_gen']):
+        for g in range(1, self.n_gen):
             for k, agent in enumerate(pop):
                 idxs = np.random.choice(len(pop), size=3)
                 a, b, c = pop[idxs[0]], pop[idxs[1]], pop[idxs[2]]
                 y = toolbox.clone(agent)
                 index = np.random.randint(individual_size)
                 for i, value in enumerate(agent):
-                    if i == index or np.random.random() < CR:
-                        y[i] = a[i] + F*(b[i]-c[i])
+                    if i == index or np.random.random() < self.cr:
+                        y[i] = a[i] + self.f * (b[i] - c[i])
                 y.fitness.values = toolbox.evaluate(y)
                 if y.fitness > agent.fitness:
                     pop[k] = y
@@ -69,7 +65,7 @@ class DifferentialEvolution(BaseEvolutionStrategy):
             if stats:
                 record = stats.compile(pop)
                 self.logbook.record(gen=g, evals=len(pop), **record)
-                if self.params['verbose']:
+                if self.verbose:
                     print(self.logbook.stream)
 
         return self

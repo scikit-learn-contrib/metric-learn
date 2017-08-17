@@ -6,18 +6,16 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import confusion_matrix, f1_score
 from sklearn.preprocessing import LabelEncoder
 
-from .base import BaseFitness
+from .base_fitness import BaseFitness
 
 
 class WeightedFMeasureFitness(BaseFitness):
     def __init__(self, weighted=False, sig=5, kmeans__n_init=1,
                  random_state=None):
-        self.params = {
-            'weighted': weighted,
-            'sig': sig,
-            'kmeans__n_init': kmeans__n_init,
-            'random_state': random_state,
-        }
+        self.weighted = weighted
+        self.sig = sig
+        self.kmeans__n_init = kmeans__n_init
+        self.random_state = random_state
 
     @staticmethod
     def available(method):
@@ -31,16 +29,16 @@ class WeightedFMeasureFitness(BaseFitness):
 
         kmeans = KMeans(
             n_clusters=len(np.unique(y)),
-            n_init=self.params['kmeans__n_init'],
-            random_state=self.params['random_state'],
+            n_init=self.kmeans__n_init,
+            random_state=self.random_state,
         )
         kmeans.fit(X)
 
-        if not self.params['weighted']:
+        if not self.weighted:
             return f1_score(y, kmeans.labels_, average='weighted')
 
         r = distance.cdist(kmeans.cluster_centers_, kmeans.cluster_centers_)
-        h = np.exp(-r / (self.params['sig']**2))
+        h = np.exp(-r / (self.sig**2))
 
         N = confusion_matrix(y, kmeans.labels_)
 

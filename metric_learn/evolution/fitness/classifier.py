@@ -2,14 +2,12 @@ from sklearn.base import ClassifierMixin, clone
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC, SVC
 
-from .base import BaseFitness
+from .base_fitness import BaseFitness
 
 
 class ClassifierFitness(BaseFitness):
     def __init__(self, classifier, **kwargs):
-        self.params = {
-            'classifier': classifier,
-        }
+        self.classifier = classifier
         self.classifier_params = kwargs
 
     @staticmethod
@@ -19,7 +17,7 @@ class ClassifierFitness(BaseFitness):
 
     def __call__(self, X_train, X_test, y_train, y_test):
         classifier = self._build_classifier(
-            self.params['classifier'],
+            self.classifier,
             self.classifier_params,
         )
         classifier.fit(X_train, y_train)

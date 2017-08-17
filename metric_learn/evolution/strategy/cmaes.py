@@ -1,22 +1,22 @@
 from deap import algorithms, cma, tools
 
-from .base import BaseEvolutionStrategy, Individual, MultidimensionalFitness
+from .base_strategy import BaseEvolutionStrategy
+from .individual import Individual
+from .mfitness import MultidimensionalFitness
 
 
 class CMAESEvolution(BaseEvolutionStrategy):
     def __init__(self, mean=0.0, sigma=1.0, **kwargs):
         super().__init__(**kwargs)
 
-        self.params.update({
-            'mean': mean,
-            'sigma': sigma,
-        })
+        self.mean = mean
+        self.sigma = sigma
 
     def best_individual(self):
         return self.hall_of_fame[0]
 
     def _generate_pop_with_fitness(self, generate):
-        fitness_len = len(self.params['fitnesses'])
+        fitness_len = len(self.fitnesses)
 
         individuals = generate(Individual)
         for ind in individuals:
@@ -26,8 +26,8 @@ class CMAESEvolution(BaseEvolutionStrategy):
 
     def fit(self, X, y):
         strategy = cma.Strategy(
-            centroid=[self.params['mean']]*self.params['n_dim'],
-            sigma=self.params['sigma'],
+            centroid=[self.mean] * self.n_dim,
+            sigma=self.sigma,
         )
 
         toolbox = self.create_toolbox()
@@ -42,10 +42,10 @@ class CMAESEvolution(BaseEvolutionStrategy):
 
         self.pop, self.logbook = algorithms.eaGenerateUpdate(
             toolbox,
-            ngen=self.params['n_gen'],
+            ngen=self.n_gen,
             stats=self._build_stats(),
             halloffame=self.hall_of_fame,
-            verbose=self.params['verbose']
+            verbose=self.verbose
         )
 
         return self

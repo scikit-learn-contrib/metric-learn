@@ -21,17 +21,10 @@ class CMAES(MetricEvolution):
         verbose : bool, optional
             if True, prints information while learning
         """
-        if transformer == 'full':
-            transformer_class = tr.FullMatrixTransformer(num_dims)
-        elif transformer == 'diagonal':
-            transformer_class = tr.DiagonalMatrixTransformer()
-        else:
-            transformer_class = transformer
-
         super(CMAES, self).__init__(
             strategy='cmaes',
             fitnesses='knn',
-            transformer_shape=transformer_class,
+            transformer=transformer,
             random_state=random_state,
             verbose=verbose,
         )

@@ -21,11 +21,10 @@ class JDE(MetricEvolution):
         verbose : bool, optional
             if True, prints information while learning
         """
-
         super(JDE, self).__init__(
             strategy='jde',
             fitnesses='wfme',
-            transformer_shape=transformer,
+            transformer=transformer,
             random_state=random_state,
             verbose=verbose,
         )
