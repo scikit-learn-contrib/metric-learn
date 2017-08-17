@@ -28,8 +28,6 @@ class DifferentialEvolution(BaseEvolutionStrategy):
             toolbox.attr_float, individual_size)
         toolbox.register(
             "population", tools.initRepeat, list, toolbox.individual)
-        toolbox.register("select", tools.selRandom, k=3)
-
         toolbox.register("evaluate", self.evaluation_builder(X, y))
 
         self.hall_of_fame = tools.HallOfFame(1)
@@ -56,7 +54,8 @@ class DifferentialEvolution(BaseEvolutionStrategy):
 
         for g in range(1, self.params['n_gen']):
             for k, agent in enumerate(pop):
-                a, b, c = toolbox.select(pop)
+                idxs = np.random.choice(len(pop), size=3)
+                a, b, c = pop[idxs[0]], pop[idxs[1]], pop[idxs[2]]
                 y = toolbox.clone(agent)
                 index = np.random.randint(individual_size)
                 for i, value in enumerate(agent):

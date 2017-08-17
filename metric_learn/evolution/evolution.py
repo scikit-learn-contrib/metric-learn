@@ -157,10 +157,10 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
             return fit.ClassSeparationFitness()
 
         if fit.WeightedPurityFitness.available(fitness):
-            return fit.WeightedPurityFitness(**params)
+            return fit.WeightedPurityFitness(random_state=self.random_state, **params)
 
         if fit.WeightedFMeasureFitness.available(fitness):
-            return fit.WeightedFMeasureFitness(**params)
+            return fit.WeightedFMeasureFitness(random_state=self.random_state, **params)
 
         # TODO unify error messages
         raise ValueError('Invalid value of fitness: `{}`'.format(fitness))
@@ -178,7 +178,7 @@ class MetricEvolution(BaseMetricLearner, BaseBuilder):
         if isinstance(strategy, st.BaseEvolutionStrategy):
             return strategy
         elif strategy == 'cmaes':
-            return st.CMAES(**strategy_params)
+            return st.CMAESEvolution(**strategy_params)
         elif strategy == 'de':
             return st.DifferentialEvolution(**strategy_params)
         elif strategy == 'jde':

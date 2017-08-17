@@ -3,7 +3,7 @@ from deap import algorithms, cma, tools
 from .base import BaseEvolutionStrategy, Individual, MultidimensionalFitness
 
 
-class CMAES(BaseEvolutionStrategy):
+class CMAESEvolution(BaseEvolutionStrategy):
     def __init__(self, mean=0.0, sigma=1.0, **kwargs):
         super().__init__(**kwargs)
 

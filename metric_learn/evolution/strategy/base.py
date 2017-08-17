@@ -42,6 +42,8 @@ class BaseEvolutionStrategy():
             'verbose': verbose,
         }
 
+        np.random.seed(random_state)
+
     def fit(self, X, y, flat_weights):
         raise NotImplementedError('fit() is not implemented')
 

@@ -31,7 +31,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
 
     def generate_brow_ind_with_fitness(self, best, sigma=0.3):
         fitness_len = len(self.params['fitnesses'])
-        ind = Individual(random.gauss(x, sigma) for x in best)
+        ind = Individual(np.random.normal(x, sigma) for x in best)
         ind.fitness = MultidimensionalFitness(fitness_len)
         return ind
 
@@ -62,7 +62,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
             list,
             toolbox.individual)
 
-        toolbox.register("select", random.sample, k=4)
+        toolbox.register("select", np.random.choice, size=4)
         toolbox.register("best", tools.selBest, k=1)
 
         toolbox.register("evaluate", self.evaluation_builder(X, y))
@@ -137,7 +137,9 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
                 xbest, = toolbox.best(subpop)
                 # Apply regular DE to the first part of the population
                 for individual in subpop[:regular]:
-                    x1, x2, x3, x4 = toolbox.select(subpop)
+                    idxs = np.random.choice(len(subpop), size=4)
+                    x1, x2, x3, x4 = subpop[idxs[0]], subpop[idxs[1]], \
+                        subpop[idxs[2]], subpop[idxs[3]]
                     offspring = toolbox.clone(individual)
                     index = np.random.randint(individual_size)
                     for i, value in enumerate(individual):

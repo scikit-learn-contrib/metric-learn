@@ -6,10 +6,8 @@ from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+    LMNN, NCA, LFDA, Covariance, MLKR, MMC, CMAES, JDE,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
-
-from metric_learn.evolution import MetricEvolution
 
 # Import this specially for testing.
 from metric_learn.lmnn import python_LMNN
@@ -151,18 +149,33 @@ class TestMLKR(MetricTestCase):
     csep = class_separation(mlkr.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
-class TestEvolution(MetricTestCase):
+class TestCMAES(MetricTestCase):
   def test_iris_full(self):
-    cmaes = MetricEvolution(strategy='cmaes', transformer_shape='full', random_state=47)
+    cmaes = CMAES(transformer='full', random_state=1)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
-    self.assertAlmostEqual(csep, 0.29535891756070715)
+    self.assertAlmostEqual(csep, 0.25013740054012018)
+
+  def test_iris_full_dimred(self):
+    cmaes = CMAES(transformer='full', num_dims=2, random_state=1)
+    cmaes.fit(self.iris_points, self.iris_labels)
+    csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
+    self.assertAlmostEqual(csep, 0.23937784480379207)
 
   def test_iris_diagonal(self):
-    cmaes = MetricEvolution(strategy='cmaes', transformer_shape='diagonal', random_state=47)
+    cmaes = CMAES(transformer='diagonal', random_state=1)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
-    self.assertAlmostEqual(csep, 0.25318789171576289)
+    self.assertAlmostEqual(csep, 0.27556793726123091)
+
+
+class TestJDE(MetricTestCase):
+  def test_iris_full(self):
+    jde = JDE(random_state=1)
+    jde.fit(self.iris_points, self.iris_labels)
+    csep = class_separation(jde.transform(self.iris_points), self.iris_labels)
+    self.assertAlmostEqual(csep, 0.61907365320838126)
+
 
 class TestMMC(MetricTestCase):
   def test_iris(self):

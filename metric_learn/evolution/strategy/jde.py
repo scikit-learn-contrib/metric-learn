@@ -7,8 +7,8 @@ from .base import BaseEvolutionStrategy
 
 class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
     def __init__(self, population_size=None, Fl=0.1, Fu=0.9, t1=0.1, t2=0.1,
-                 **kwargs):
-        super().__init__(**kwargs)
+                 random_state=None, **kwargs):
+        super().__init__(random_state=random_state, **kwargs)
 
         self.params.update({
             'population_size': population_size,
@@ -17,6 +17,8 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
             't1': t1,
             't2': t2,
         })
+
+        np.random.seed(random_state)
 
     def cut_individual(self, individual):
         return individual[2:]
@@ -36,7 +38,6 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
             individual_size)
         toolbox.register(
             "population", tools.initRepeat, list, toolbox.individual)
-        toolbox.register("select", tools.selRandom, k=3)
         toolbox.register("evaluate", self.evaluation_builder(X, y))
 
         self.hall_of_fame = tools.HallOfFame(1)
@@ -68,7 +69,8 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
 
         for g in range(1, self.params['n_gen']):
             for k, agent in enumerate(pop):
-                a, b, c = toolbox.select(pop)
+                idxs = np.random.choice(len(pop), size=3)
+                a, b, c = pop[idxs[0]], pop[idxs[1]], pop[idxs[2]]
                 y = toolbox.clone(agent)
 
                 # Update the control parameters

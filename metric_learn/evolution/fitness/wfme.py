@@ -10,11 +10,13 @@ from .base import BaseFitness
 
 
 class WeightedFMeasureFitness(BaseFitness):
-    def __init__(self, weighted=False, sig=5, kmeans__n_init=1):
+    def __init__(self, weighted=False, sig=5, kmeans__n_init=1,
+                 random_state=None):
         self.params = {
             'weighted': weighted,
             'sig': sig,
             'kmeans__n_init': kmeans__n_init,
+            'random_state': random_state,
         }
 
     @staticmethod
@@ -27,7 +29,11 @@ class WeightedFMeasureFitness(BaseFitness):
         le = LabelEncoder()
         y = le.fit_transform(y)
 
-        kmeans = KMeans(n_clusters=len(np.unique(y)), n_init=self.params['kmeans__n_init'])
+        kmeans = KMeans(
+            n_clusters=len(np.unique(y)),
+            n_init=self.params['kmeans__n_init'],
+            random_state=self.params['random_state'],
+        )
         kmeans.fit(X)
 
         if not self.params['weighted']:
