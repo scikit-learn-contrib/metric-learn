@@ -13,3 +13,24 @@ from .mmc import MMC, MMC_Supervised
 from .nca import NCA
 from .rca import RCA, RCA_Supervised
 from .sdml import SDML, SDML_Supervised
+
+__all__ = [
+    'CMAES',
+    'Constraints',
+    'Covariance',
+    'ITML',
+    'ITML_Supervised',
+    'JDE',
+    'LFDA',
+    'LMNN',
+    'LSML',
+    'LSML_Supervised',
+    'MLKR',
+    'MMC',
+    'MMC_Supervised',
+    'NCA',
+    'RCA',
+    'RCA_Supervised',
+    'SDML',
+    'SDML_Supervised',
+]
