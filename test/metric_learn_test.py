@@ -1,35 +1,48 @@
 import unittest
-import numpy as np
-from six.moves import xrange
-from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris
-from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC, CMAES, JDE,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
+    CMAES,
+    Covariance,
+    ITML_Supervised,
+    JDE,
+    LFDA,
+    LMNN,
+    LSML_Supervised,
+    MLKR,
+    MMC,
+    MMC_Supervised,
+    NCA,
+    RCA_Supervised,
+    SDML_Supervised,
+)
+from metric_learn.lmnn import python_LMNN  # import this specially for testing
 
-# Import this specially for testing.
-from metric_learn.lmnn import python_LMNN
+import numpy as np
+from numpy.testing import assert_array_almost_equal
+
+from six.moves import xrange
+
+from sklearn.datasets import load_iris
+from sklearn.metrics import pairwise_distances
 
 
 def class_separation(X, labels):
   unique_labels, label_inds = np.unique(labels, return_inverse=True)
   ratio = 0
   for li in xrange(len(unique_labels)):
-    Xc = X[label_inds==li]
-    Xnc = X[label_inds!=li]
-    ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc,Xnc).mean()
+    Xc = X[label_inds == li]
+    Xnc = X[label_inds != li]
+    ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc, Xnc).mean()
   return ratio / len(unique_labels)
 
 
 class MetricTestCase(unittest.TestCase):
   @classmethod
-  def setUpClass(self):
+  def setUpClass(cls):
     # runs once per test class
     iris_data = load_iris()
-    self.iris_points = iris_data['data']
-    self.iris_labels = iris_data['target']
+    cls.iris_points = iris_data['data']
+    cls.iris_labels = iris_data['target']
     np.random.seed(1234)
 
 
@@ -89,7 +102,7 @@ class TestNCA(MetricTestCase):
     n = self.iris_points.shape[0]
 
     # Without dimension reduction
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01)
+    nca = NCA(max_iter=(100000 // n), learning_rate=0.01)
     nca.fit(self.iris_points, self.iris_labels)
     # Result copied from Iris example at
     # https://github.com/vomjom/nca/blob/master/README.mkd
@@ -100,7 +113,7 @@ class TestNCA(MetricTestCase):
     assert_array_almost_equal(expected, nca.transformer(), decimal=3)
 
     # With dimension reduction
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01, num_dims=2)
+    nca = NCA(max_iter=(100000 // n), learning_rate=0.01, num_dims=2)
     nca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(nca.transform(), self.iris_labels)
     self.assertLess(csep, 0.15)
@@ -149,21 +162,22 @@ class TestMLKR(MetricTestCase):
     csep = class_separation(mlkr.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
 
+
 class TestCMAES(MetricTestCase):
   def test_iris_full(self):
-    cmaes = CMAES(transformer='full', random_state=1)
+    cmaes = CMAES(transformer_func='full', random_state=1)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
     self.assertAlmostEqual(csep, 0.25013740054012018)
 
   def test_iris_full_dimred(self):
-    cmaes = CMAES(transformer='full', num_dims=2, random_state=1)
+    cmaes = CMAES(transformer_func='full', num_dims=2, random_state=1)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
     self.assertAlmostEqual(csep, 0.23937784480379207)
 
   def test_iris_diagonal(self):
-    cmaes = CMAES(transformer='diagonal', random_state=1)
+    cmaes = CMAES(transformer_func='diagonal', random_state=1)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
     self.assertAlmostEqual(csep, 0.27556793726123091)
@@ -181,14 +195,13 @@ class TestMMC(MetricTestCase):
   def test_iris(self):
 
     # Generate full set of constraints for comparison with reference implementation
-    n = self.iris_points.shape[0]
-    mask = (self.iris_labels[None] == self.iris_labels[:,None])
+    mask = (self.iris_labels[None] == self.iris_labels[:, None])
     a, b = np.nonzero(np.triu(mask, k=1))
     c, d = np.nonzero(np.triu(~mask, k=1))
 
     # Full metric
     mmc = MMC(convergence_threshold=0.01)
-    mmc.fit(self.iris_points, [a,b,c,d])
+    mmc.fit(self.iris_points, [a, b, c, d])
     expected = [[+0.00046504, +0.00083371, -0.00111959, -0.00165265],
                 [+0.00083371, +0.00149466, -0.00200719, -0.00296284],
                 [-0.00111959, -0.00200719, +0.00269546, +0.00397881],
@@ -197,16 +210,16 @@ class TestMMC(MetricTestCase):
 
     # Diagonal metric
     mmc = MMC(diagonal=True)
-    mmc.fit(self.iris_points, [a,b,c,d])
+    mmc.fit(self.iris_points, [a, b, c, d])
     expected = [0, 0, 1.21045968, 1.22552608]
     assert_array_almost_equal(np.diag(expected), mmc.metric(), decimal=6)
-    
+
     # Supervised Full
     mmc = MMC_Supervised()
     mmc.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mmc.transform(), self.iris_labels)
     self.assertLess(csep, 0.15)
-    
+
     # Supervised Diagonal
     mmc = MMC_Supervised(diagonal=True)
     mmc.fit(self.iris_points, self.iris_labels)

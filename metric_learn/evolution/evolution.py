@@ -15,28 +15,29 @@ from . import transformer as tr
 
 
 class MetricEvolution(BaseEstimator, TransformerMixin):
-    def __init__(self, strategy='cmaes', fitnesses='knn', transformer='full',
-                 num_dims=None, random_state=None, verbose=False):
+    def __init__(self, strategy='cmaes', fitnesses='knn',
+                 transformer_func='full', num_dims=None,
+                 random_state=None, verbose=False):
         """Initialize the learner.
 
         Parameters
         ----------
         fitnesses : ('knn', 'svc', 'lsvc', fitnesses object)
             fitnesses is used in fitness scoring
-        transformer : ('full', 'diagonal', MatrixTransformer object)
-            transformer shape defines transforming function to learn
+        transformer_func : ('full', 'diagonal', MatrixTransformer object)
+            transformer_func shape defines transforming function to learn
         num_dims : int, optional
             Dimensionality of reduced space (defaults to dimension of X)
         verbose : bool, optional
             if True, prints information while learning
         """
-        if (num_dims is not None) and (transformer != 'full'):
+        if (num_dims is not None) and (transformer_func != 'full'):
             raise Exception(
-                '`num_dims` can be only set for `transformer`=="full"')
+                '`num_dims` can be only set for `transformer_func`=="full"')
 
         self.strategy = strategy
         self.fitnesses = fitnesses
-        self.transformer = transformer
+        self.transformer_func = transformer_func
         self.num_dims = num_dims
         self.random_state = random_state
         self.verbose = verbose
@@ -101,7 +102,7 @@ class MetricEvolution(BaseEstimator, TransformerMixin):
     def build_transformer(self, transformer=None, num_dims=None,
                           params={}):
         if transformer is None:
-            transformer = self.transformer
+            transformer = self.transformer_func
         # if params is None:
             # params = self._get_extra_params(('transformer', 't'))
 
@@ -161,10 +162,6 @@ class MetricEvolution(BaseEstimator, TransformerMixin):
         M : (d x d) matrix
         """
         return self._transformer.metric()
-
-    def fit_transform(self, X, y):
-        self.fit(X, y)
-        return self.transform(X)
 
     def fit(self, X, y):
         '''

@@ -7,7 +7,7 @@ from .evolution import transformer as tr
 
 
 class CMAES(MetricEvolution):
-    def __init__(self, transformer='full', num_dims=None, random_state=None,
+    def __init__(self, transformer_func='full', num_dims=None, random_state=None,
                  verbose=False):
         """Initialize the learner.
 
@@ -15,7 +15,7 @@ class CMAES(MetricEvolution):
         ----------
         TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!
         transformer_shape : ('full', 'diagonal', MatrixTransformer object)
-            transformer shape defines transforming function to learn
+            transformer_func shape defines transforming function to learn
         num_dims : int, optional
             Dimensionality of reduced space (defaults to dimension of X)
         verbose : bool, optional
@@ -24,7 +24,7 @@ class CMAES(MetricEvolution):
         super(CMAES, self).__init__(
             strategy='cmaes',
             fitnesses='knn',
-            transformer=transformer,
+            transformer_func=transformer_func,
             num_dims=num_dims,
             random_state=random_state,
             verbose=verbose,

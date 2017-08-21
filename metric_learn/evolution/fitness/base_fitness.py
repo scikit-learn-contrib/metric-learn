@@ -1,4 +1,4 @@
-class BaseFitness():
+class BaseFitness(object):
     def __init__(self):
         pass
 

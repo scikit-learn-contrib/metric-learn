@@ -33,7 +33,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
         ind.fitness = MultidimensionalFitness(fitness_len)
         return ind
 
-    def fit(self, x, y):
+    def fit(self, X, y):
         # Differential evolution parameters
         individual_size = self.n_dim
         # Should be equal to the number of peaks
@@ -62,7 +62,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
         toolbox.register("select", np.random.choice, size=4)
         toolbox.register("best", tools.selBest, k=1)
 
-        toolbox.register("evaluate", self.evaluation_builder(x, y))
+        toolbox.register("evaluate", self.evaluation_builder(X, y))
 
         self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats()

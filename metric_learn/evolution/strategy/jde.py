@@ -8,7 +8,8 @@ from .base_strategy import BaseEvolutionStrategy
 class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
     def __init__(self, population_size=None, fl=0.1, fu=0.9, t1=0.1, t2=0.1,
                  random_state=None, **kwargs):
-        super().__init__(random_state=random_state, **kwargs)
+        super(SelfAdaptingDifferentialEvolution, self).__init__(
+            random_state=random_state, **kwargs)
 
         self.population_size = population_size
         self.fl = fl
@@ -80,7 +81,7 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
 
                 # Mutation and crossover
                 index = np.random.randint(2, individual_size)
-                for i, value in enumerate(agent[2:], 2):
+                for i, _ in enumerate(agent[2:], 2):
                     if i == index or np.random.random() < y[1]:
                         y[i] = a[i] + y[0] * (b[i] - c[i])
 

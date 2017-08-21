@@ -10,7 +10,7 @@ from .individual import Individual
 from .mfitness import MultidimensionalFitness
 
 
-class BaseEvolutionStrategy():
+class BaseEvolutionStrategy(object):
     def __init__(self, n_dim, fitnesses, transformer=None, n_gen=25,
                  split_size=0.33, train_subset_size=1.0, stats=None,
                  random_state=None, verbose=False):
@@ -26,7 +26,7 @@ class BaseEvolutionStrategy():
 
         # np.random.seed(random_state)
 
-    def fit(self, x, y, flat_weights):
+    def fit(self, X, y):
         raise NotImplementedError('fit() is not implemented')
 
     def best_individual(self):
