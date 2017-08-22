@@ -1,11 +1,10 @@
 # https://github.com/svecon/thesis-distance-metric-learning/releases/tag/1.0
+from sklearn.neighbors import KNeighborsClassifier
 
-from .evolution import MetricEvolution, MetricEvolutionBuilder
+from .evolution import MetricEvolution
 from .evolution import fitness as fit
 from .evolution import strategy as st
 from .evolution import transformer as tr
-
-from sklearn.neighbors import KNeighborsClassifier
 
 
 class CMAES(MetricEvolution):
@@ -22,12 +21,14 @@ class CMAES(MetricEvolution):
         verbose : bool, optional
             if True, prints information while learning
         """
-        super(CMAES, self).__init__(
-            strategy=st.CMAESEvolution(),
-            fitness=[fit.ClassifierFitness(KNeighborsClassifier())],
-            transformer_func=tr.FullMatrixTransformer(num_dims=num_dims),
-            **kwargs,
-        )
+        params = kwargs
+        params.update({
+            'strategy': st.CMAESEvolution(),
+            'fitness': [fit.ClassifierFitness(KNeighborsClassifier())],
+            'transformer_func': tr.FullMatrixTransformer(num_dims=num_dims),
+        })
+
+        super(CMAES, self).__init__(**params)
 
 
 class CMAES_Diagonal(MetricEvolution):
@@ -44,9 +45,11 @@ class CMAES_Diagonal(MetricEvolution):
         verbose : bool, optional
             if True, prints information while learning
         """
-        super(CMAES_Diagonal, self).__init__(
-            strategy=st.CMAESEvolution(),
-            fitness=[fit.ClassifierFitness(KNeighborsClassifier())],
-            transformer_func=tr.DiagonalMatrixTransformer(),
-            **kwargs,
-        )
+        params = kwargs
+        params.update({
+            'strategy': st.CMAESEvolution(),
+            'fitness': [fit.ClassifierFitness(KNeighborsClassifier())],
+            'transformer_func': tr.DiagonalMatrixTransformer(),
+        })
+
+        super(CMAES_Diagonal, self).__init__(**params)
