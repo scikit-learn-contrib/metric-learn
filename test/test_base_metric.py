@@ -65,13 +65,12 @@ SDML_Supervised(balance_param=0.5, num_constraints=None, num_labeled=inf,
 
   def test_cmaes(self):
     self.assertEqual(str(metric_learn.CMAES()), """
-CMAES(num_dims=None, random_state=None, transformer_func='full',
-   verbose=False)
+CMAES(num_dims=None)
 """.strip('\n'))
 
   def test_jde(self):
     self.assertEqual(str(metric_learn.JDE()), """
-JDE(random_state=None, transformer_func='triangular', verbose=False)
+JDE()
 """.strip('\n'))
 
   def test_mmc(self):

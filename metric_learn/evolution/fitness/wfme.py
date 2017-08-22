@@ -10,12 +10,12 @@ from .base_fitness import BaseFitness
 
 
 class WeightedFMeasureFitness(BaseFitness):
-    def __init__(self, weighted=False, sig=5, kmeans__n_init=1,
-                 random_state=None):
+    def __init__(self, weighted=False, sig=5, kmeans__n_init=1, **kwargs):
+        super(WeightedFMeasureFitness, self).__init__(**kwargs)
+
         self.weighted = weighted
         self.sig = sig
         self.kmeans__n_init = kmeans__n_init
-        self.random_state = random_state
 
     @staticmethod
     def available(method):

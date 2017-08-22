@@ -7,17 +7,14 @@ from .base_strategy import BaseEvolutionStrategy
 
 class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
     def __init__(self, population_size=None, fl=0.1, fu=0.9, t1=0.1, t2=0.1,
-                 random_state=None, **kwargs):
-        super(SelfAdaptingDifferentialEvolution, self).__init__(
-            random_state=random_state, **kwargs)
+                 **kwargs):
+        super(SelfAdaptingDifferentialEvolution, self).__init__(**kwargs)
 
         self.population_size = population_size
         self.fl = fl
         self.fu = fu
         self.t1 = t1
         self.t2 = t2
-
-        np.random.seed(random_state)
 
     def cut_individual(self, individual):
         return individual[2:]

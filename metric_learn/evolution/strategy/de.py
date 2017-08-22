@@ -7,7 +7,7 @@ from .base_strategy import BaseEvolutionStrategy
 
 class DifferentialEvolution(BaseEvolutionStrategy):
     def __init__(self, population_size=50, cr=.25, f=1.0, **kwargs):
-        super().__init__(**kwargs)
+        super(DifferentialEvolution, self).__init__(**kwargs)
 
         self.population_size = population_size
         self.cr = cr

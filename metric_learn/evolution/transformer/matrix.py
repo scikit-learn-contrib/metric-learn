@@ -8,7 +8,7 @@ class MatrixTransformer(BaseEstimator, TransformerMixin):
             'MatrixTransformer should not be instantiated')
 
     def duplicate_instance(self):
-        return self.__class__(**self.params)
+        return self.__class__(**self.get_params())
 
     def individual_size(self, input_dim):
         raise NotImplementedError('individual_size() is not implemented')

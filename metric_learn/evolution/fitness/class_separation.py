@@ -6,6 +6,10 @@ from .base_fitness import BaseFitness
 
 
 class ClassSeparationFitness(BaseFitness):
+
+    def __init__(self, **kwargs):
+        super(ClassSeparationFitness, self).__init__(**kwargs)
+
     @staticmethod
     def available(method):
         return method in ['class_separation']

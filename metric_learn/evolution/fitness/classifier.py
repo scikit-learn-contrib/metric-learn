@@ -6,9 +6,11 @@ from .base_fitness import BaseFitness
 
 
 class ClassifierFitness(BaseFitness):
-    def __init__(self, classifier, **kwargs):
+    def __init__(self, classifier, classifier_params={}, **kwargs):
+        super(ClassifierFitness, self).__init__(**kwargs)
+
         self.classifier = classifier
-        self.classifier_params = kwargs
+        self.classifier_params = classifier_params
 
     @staticmethod
     def available(method):

@@ -7,7 +7,7 @@ from .mfitness import MultidimensionalFitness
 
 class CMAESEvolution(BaseEvolutionStrategy):
     def __init__(self, mean=0.0, sigma=1.0, **kwargs):
-        super().__init__(**kwargs)
+        super(CMAESEvolution, self).__init__(**kwargs)
 
         self.mean = mean
         self.sigma = sigma

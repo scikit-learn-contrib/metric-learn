@@ -2,6 +2,7 @@ import unittest
 
 from metric_learn import (
     CMAES,
+    CMAES_Diagonal,
     Covariance,
     ITML_Supervised,
     JDE,
@@ -165,19 +166,19 @@ class TestMLKR(MetricTestCase):
 
 class TestCMAES(MetricTestCase):
   def test_iris_full(self):
-    cmaes = CMAES(transformer_func='full', random_state=1)
+    cmaes = CMAES(random_state=1)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
     self.assertAlmostEqual(csep, 0.25013740054012018)
 
   def test_iris_full_dimred(self):
-    cmaes = CMAES(transformer_func='full', num_dims=2, random_state=1)
+    cmaes = CMAES(num_dims=2, random_state=1)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
     self.assertAlmostEqual(csep, 0.23937784480379207)
 
   def test_iris_diagonal(self):
-    cmaes = CMAES(transformer_func='diagonal', random_state=1)
+    cmaes = CMAES_Diagonal(random_state=1)
     cmaes.fit(self.iris_points, self.iris_labels)
     csep = class_separation(cmaes.transform(self.iris_points), self.iris_labels)
     self.assertAlmostEqual(csep, 0.27556793726123091)

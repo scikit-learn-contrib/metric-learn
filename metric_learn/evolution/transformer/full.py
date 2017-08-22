@@ -5,15 +5,13 @@ from .matrix import MatrixTransformer
 
 class FullMatrixTransformer(MatrixTransformer):
     def __init__(self, num_dims=None):
-        self.params = {
-            'num_dims': num_dims
-        }
+        self.num_dims = num_dims
 
     def individual_size(self, input_dim):
-        if self.params['num_dims'] is None:
+        if self.num_dims is None:
             return input_dim**2
 
-        return input_dim * self.params['num_dims']
+        return input_dim * self.num_dims
 
     def fit(self, X, y, flat_weights):
         input_dim = X.shape[1]

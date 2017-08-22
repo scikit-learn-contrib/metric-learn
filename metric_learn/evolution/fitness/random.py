@@ -4,8 +4,8 @@ from .base_fitness import BaseFitness
 
 
 class RandomFitness(BaseFitness):
-    def __init__(self, random_state=None):
-        np.random.seed(random_state)
+    def __init__(self, **kwargs):
+        super(RandomFitness, self).__init__(**kwargs)
 
     @staticmethod
     def available(method):

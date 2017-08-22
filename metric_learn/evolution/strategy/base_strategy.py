@@ -11,20 +11,28 @@ from .mfitness import MultidimensionalFitness
 
 
 class BaseEvolutionStrategy(object):
-    def __init__(self, n_dim, fitnesses, transformer=None, n_gen=25,
-                 split_size=0.33, train_subset_size=1.0, stats=None,
-                 random_state=None, verbose=False):
-        self.n_dim = n_dim
-        self.fitnesses = fitnesses
-        self.transformer = transformer
+    def __init__(self, n_gen=25, split_size=0.33, train_subset_size=1.0,
+                 stats=None, random_state=None, verbose=False):
         self.n_gen = n_gen
         self.split_size = split_size
         self.train_subset_size = train_subset_size
         self.stats = stats
+
         self.random_state = random_state
         self.verbose = verbose
 
-        # np.random.seed(random_state)
+        np.random.seed(random_state)
+
+    def inject_generated_params(self, n_dim, fitnesses, transformer,
+                                random_state=None, verbose=False):
+        self.n_dim = n_dim
+        self.fitnesses = fitnesses
+        self.transformer = transformer
+
+        self.random_state = random_state
+        self.verbose = verbose
+
+        np.random.seed(random_state)
 
     def fit(self, X, y):
         raise NotImplementedError('fit() is not implemented')

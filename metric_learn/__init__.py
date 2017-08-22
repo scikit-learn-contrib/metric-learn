@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from .cmaes import CMAES
+from .cmaes import CMAES, CMAES_Diagonal
 from .constraints import Constraints
 from .covariance import Covariance
 from .itml import ITML, ITML_Supervised
@@ -16,6 +16,7 @@ from .sdml import SDML, SDML_Supervised
 
 __all__ = [
     'CMAES',
+    'CMAES_Diagonal',
     'Constraints',
     'Covariance',
     'ITML',

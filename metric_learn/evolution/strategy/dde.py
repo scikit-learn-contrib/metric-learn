@@ -15,7 +15,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
     def __init__(self, population_size=10, population_regular=4,
                  population_brownian=2, cr=0.6, f=0.4, bounds=(-1.0, 1.0),
                  **kwargs):
-        super().__init__(**kwargs)
+        super(DynamicDifferentialEvolution, self).__init__(**kwargs)
 
         self.population_size = population_size
         self.cr = cr

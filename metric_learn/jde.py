@@ -7,8 +7,7 @@ from .evolution import transformer as tr
 
 
 class JDE(MetricEvolution):
-    def __init__(self, transformer_func='triangular', random_state=None,
-                 verbose=False):
+    def __init__(self, **kwargs):
         """Initialize the learner.
 
         Parameters
@@ -22,9 +21,8 @@ class JDE(MetricEvolution):
             if True, prints information while learning
         """
         super(JDE, self).__init__(
-            strategy='jde',
-            fitnesses='wfme',
-            transformer_func=transformer_func,
-            random_state=random_state,
-            verbose=verbose,
+            strategy=st.SelfAdaptingDifferentialEvolution(),
+            fitnesses=fit.WeightedFMeasureFitness(),
+            transformer_func=tr.TriangularMatrixTransformer(),
+            **kwargs,
         )
