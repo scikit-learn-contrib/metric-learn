@@ -6,7 +6,7 @@ class MultidimensionalFitness(base.Fitness):
         self.n_dim = n_dim
         self.weights = (1.0,) * n_dim
 
-        super().__init__(*args, **kwargs)
+        super(MultidimensionalFitness, self).__init__(*args, **kwargs)
 
     def __deepcopy__(self, memo):
         copy_ = self.__class__(self.n_dim)

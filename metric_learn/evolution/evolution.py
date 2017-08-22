@@ -74,11 +74,15 @@ class MetricEvolution(BaseEstimator, TransformerMixin):
          X: (n, d) array-like of samples
          Y: (n,) array-like of class labels
         '''
-        [f.inject_generated_params(
-            random_state=self.random_state,
-        ) for f in self._fitness]
 
-        self._strategy.inject_generated_params(
+        # Inject parameters into all fitness functions
+        for f in self._fitness:
+            f.inject_params(
+                random_state=self.random_state,
+            )
+
+        # Inject parameters into Strategy
+        self._strategy.inject_params(
             n_dim=self._transformer.individual_size(X.shape[1]),
             fitness=self._fitness,
             transformer=self._transformer,

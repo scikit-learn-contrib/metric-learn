@@ -5,7 +5,7 @@ from .matrix import MatrixTransformer
 
 class TriangularMatrixTransformer(MatrixTransformer):
     def __init__(self):
-        self.params = {}
+        pass
 
     def individual_size(self, input_dim):
         return input_dim * (input_dim + 1) // 2

@@ -139,7 +139,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
                         subpop[idxs[2]], subpop[idxs[3]]
                     offspring = toolbox.clone(individual)
                     index = np.random.randint(individual_size)
-                    for i, value in enumerate(individual):
+                    for i, _ in enumerate(individual):
                         if i == index or np.random.random() < self.cr:
                             offspring[i] = xbest[i] + self.f \
                                 * (x1[i] + x2[i] - x3[i] - x4[i])

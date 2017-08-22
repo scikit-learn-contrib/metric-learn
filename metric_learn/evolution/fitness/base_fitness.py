@@ -6,7 +6,7 @@ class BaseFitness(object):
         self.random_state = random_state
         np.random.seed(random_state)
 
-    def inject_generated_params(self, random_state):
+    def inject_params(self, random_state):
         self.random_state = random_state
         np.random.seed(random_state)
 

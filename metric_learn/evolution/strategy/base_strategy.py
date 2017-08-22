@@ -23,8 +23,8 @@ class BaseEvolutionStrategy(object):
 
         np.random.seed(random_state)
 
-    def inject_generated_params(self, n_dim, fitness, transformer,
-                                random_state=None, verbose=False):
+    def inject_params(self, n_dim, fitness, transformer,
+                      random_state=None, verbose=False):
         self.n_dim = n_dim
         self.fitness = fitness
         self.transformer = transformer

@@ -54,7 +54,7 @@ class DifferentialEvolution(BaseEvolutionStrategy):
                 a, b, c = pop[idxs[0]], pop[idxs[1]], pop[idxs[2]]
                 y = toolbox.clone(agent)
                 index = np.random.randint(individual_size)
-                for i, value in enumerate(agent):
+                for i, _ in enumerate(agent):
                     if i == index or np.random.random() < self.cr:
                         y[i] = a[i] + self.f * (b[i] - c[i])
                 y.fitness.values = toolbox.evaluate(y)

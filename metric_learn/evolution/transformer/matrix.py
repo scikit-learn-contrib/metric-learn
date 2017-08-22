@@ -25,23 +25,20 @@ class MatrixTransformer(BaseEstimator, TransformerMixin):
         """
         return self.L
 
-    def transform(self, X=None):
+    def transform(self, X):
         """Applies the metric transformation.
 
         Parameters
         ----------
         X : (n x d) matrix, optional
-            Data to transform. If not supplied, the training data will be used.
+            Data to transform.
 
         Returns
         -------
         transformed : (n x d) matrix
             Input data transformed to the metric space by :math:`XL^{\\top}`
         """
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, accept_sparse=True)
+        X = check_array(X, accept_sparse=True)
         L = self.transformer()
         return X.dot(L.T)
 
