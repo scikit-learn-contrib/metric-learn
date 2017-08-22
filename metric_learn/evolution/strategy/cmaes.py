@@ -1,3 +1,10 @@
+'''
+The Covariance Matrix Adaptation Evolution Strategy (CMA-ES), Hansen 2001
+
+Hansen and Ostermeier, 2001. Completely Derandomized Self-Adaptation
+in Evolution Strategies. Evolutionary Computation
+'''
+
 from deap import algorithms, cma, tools
 
 from .base_strategy import BaseEvolutionStrategy

@@ -1,4 +1,12 @@
-# https://github.com/svecon/thesis-distance-metric-learning/releases/tag/1.0
+"""
+Using CMA-ES for evolving a Mahalanobis matrix
+
+Based on my Master thesis "Evolutionary Algorithms for Data Transformation"
+
+The thesis can be found at
+https://github.com/svecon/thesis-distance-metric-learning/releases/download/1.0/MasterThesis-SvecOndrej.pdf
+"""
+
 from sklearn.neighbors import KNeighborsClassifier
 
 from .evolution import MetricEvolution
@@ -8,23 +16,21 @@ from .evolution import transformer as tr
 
 
 class CMAES(MetricEvolution):
+    """
+    Using CMA-ES for evolving a Mahalanobis matrix.
+    """
     def __init__(self, num_dims=None, **kwargs):
         """Initialize the learner.
 
         Parameters
         ----------
-        TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        transformer_shape : ('full', 'diagonal', MatrixTransformer object)
-            transformer_func shape defines transforming function to learn
         num_dims : int, optional
-            Dimensionality of reduced space (defaults to dimension of X)
-        verbose : bool, optional
-            if True, prints information while learning
+            Dimension of the target space (defaults to the original dimension)
         """
         params = kwargs
         params.update({
             'strategy': st.CMAESEvolution(),
-            'fitness': [fit.ClassifierFitness(KNeighborsClassifier())],
+            'fitness_list': [fit.ClassifierFitness(KNeighborsClassifier())],
             'transformer_func': tr.FullMatrixTransformer(num_dims=num_dims),
         })
 
@@ -32,23 +38,15 @@ class CMAES(MetricEvolution):
 
 
 class CMAES_Diagonal(MetricEvolution):
+    """
+    Using CMA-ES for evolving a Mahalanobis matrix restricted to a digonal.
+    """
     def __init__(self, **kwargs):
-        """Initialize the learner.
-
-        Parameters
-        ----------
-        TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        transformer_shape : ('full', 'diagonal', MatrixTransformer object)
-            transformer_func shape defines transforming function to learn
-        num_dims : int, optional
-            Dimensionality of reduced space (defaults to dimension of X)
-        verbose : bool, optional
-            if True, prints information while learning
-        """
+        """Initialize the learner."""
         params = kwargs
         params.update({
             'strategy': st.CMAESEvolution(),
-            'fitness': [fit.ClassifierFitness(KNeighborsClassifier())],
+            'fitness_list': [fit.ClassifierFitness(KNeighborsClassifier())],
             'transformer_func': tr.DiagonalMatrixTransformer(),
         })
 

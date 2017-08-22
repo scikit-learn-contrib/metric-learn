@@ -1,6 +1,18 @@
-# The CMA-ES algorithm takes a population of one individual as argument
-# See http://www.lri.fr/~hansen/cmaes_inmatlab.html
-# for more details about the rastrigin and other tests for CMA-ES
+"""
+MetricEvolution is a modular interface for evolving a transformation function
+
+It joins together three important parts:
+    - transformation function (typically Mahalanobis metric matrix)
+    - fitness function(s) describing the quality of the transformation
+    - evolution strategy used for finding the best transformation
+      according to a given fitness function(s)
+
+Because an evolutionary strategy is used to find
+the best transformation function,
+the fitness function does not have to be differentiable
+and the transformation function can be any function
+parametrized by a vector of real values.
+"""
 
 import numpy as np
 
@@ -9,21 +21,28 @@ from sklearn.utils.validation import check_array
 
 
 class MetricEvolution(BaseEstimator, TransformerMixin):
-    def __init__(self, strategy, fitness, transformer_func,
+    """
+    Modular interface for evolving a transformation function
+    """
+    def __init__(self, strategy, fitness_list, transformer_func,
                  random_state=None, verbose=False):
-        """Initialize the learner.
+        """Initialize the evolutionary learner.
 
         Parameters
         ----------
-        fitness : ('knn', 'svc', 'lsvc', fitness object)
-            fitness is used in fitness scoring
-        transformer_func : ('full', 'diagonal', MatrixTransformer object)
-            transformer_func shape defines transforming function to learn
+        strategy : BaseEvolutionStrategy object
+            Evolution strategy used for the optimization
+        fitness_list : list of BaseFitness objects
+            Fitnesses are used during the evolution to evaluate the metric
+        transformer_func : BaseTransformer object
+            Defines a transforming function to be learnt
+        random_state : numpy.random.RandomState, optional
+            If provided, controls random number generation.
         verbose : bool, optional
             if True, prints information while learning
         """
         self._strategy = strategy
-        self._fitness = fitness
+        self._fitness = fitness_list
         self._transformer = transformer_func
         self.random_state = random_state
         self.verbose = verbose
@@ -40,8 +59,8 @@ class MetricEvolution(BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        transformed : (n x d) matrix
-            Input data transformed to the metric space by :math:`XL^{\\top}`
+        transformed : (n x D) matrix
+            Input data transformed to the metric space by transformer function`
         """
         X = check_array(X, accept_sparse=True)
         return self._transformer.transform(X)
@@ -56,10 +75,16 @@ class MetricEvolution(BaseEstimator, TransformerMixin):
         return self._transformer.transformer()
 
     def transformer_class(self):
+        """Getter for transformer object
+
+        Returns
+        -------
+        transformer object inheriting from BaseTransformer object
+        """
         return self._transformer
 
     def metric(self):
-        """Computes the Mahalanobis matrix from the transformation matrix.
+        """Computes the Mahalanobis matrix from the transformation matrix if available.
 
         .. math:: M = L^{\\top} L
 
@@ -70,9 +95,15 @@ class MetricEvolution(BaseEstimator, TransformerMixin):
         return self._transformer.metric()
 
     def fit(self, X, y):
-        '''
-         X: (n, d) array-like of samples
-         Y: (n,) array-like of class labels
+        '''Fit the model.
+
+        Parameters
+        ----------
+        X : (n, d) array-like
+            Input data.
+
+        y : (n,) array-like
+            Class labels, one per point of data.
         '''
 
         # Inject parameters into all fitness functions
@@ -90,9 +121,9 @@ class MetricEvolution(BaseEstimator, TransformerMixin):
             verbose=self.verbose,
         )
 
-        # Evolve best transformer
+        # transformer functions using strategy by optimising _fitnesses
         self._strategy.fit(X, y)
 
-        # Fit transformer with the best individual
+        # Fit (fill) transformer with the weights from the best individual
         self._transformer.fit(X, y, self._strategy.best_individual())
         return self

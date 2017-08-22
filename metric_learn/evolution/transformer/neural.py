@@ -2,10 +2,10 @@ import numpy as np
 
 import scipy
 
-from .matrix import MatrixTransformer
+from .base_transformer import BaseTransformer
 
 
-class NeuralNetworkTransformer(MatrixTransformer):
+class NeuralNetworkTransformer(BaseTransformer):
     def __init__(self, layers=None, activation='relu', use_biases=False):
         self.layers = layers
         self.activation = activation

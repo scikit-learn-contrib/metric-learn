@@ -1,6 +1,10 @@
-# The CMA-ES algorithm takes a population of one individual as argument
-# See http://www.lri.fr/~hansen/cmaes_inmatlab.html
-# for more details about the rastrigin and other tests for CMA-ES
+"""
+MetricEvolutionBuilder is an extension of MetricEvolution whose purpose
+is to make it easier to instantiate the class.
+
+Therefore instead of instantiating all the parameters, one can just pass
+string representations of the strategy, fitness and transformer.
+"""
 
 from . import fitness as fit
 from . import strategy as st
@@ -10,25 +14,39 @@ from .evolution import MetricEvolution
 
 class MetricEvolutionBuilder(MetricEvolution):
     def __init__(self, strategy, fitness, transformer_func, **kwargs):
-        """Initialize the learner.
+        """Initialize the evolutionary learner.
 
         Parameters
         ----------
-        fitness : ('knn', 'svc', 'lsvc', fitness object)
+        strategy : (str, BaseEvolutionStrategy object)
+            evolution strategy used for the optimization.
+                'de' - basic Differential Evolution
+                'dde' - Dynamic Differential Evolution
+                'sade' - Self-adapting Differential Evolution
+                'cmaes' - CMA-ES
+        fitness : (str, BaseFitness object)
             fitness is used in fitness scoring
-        transformer_func : ('full', 'diagonal', MatrixTransformer object)
-            transformer_func shape defines transforming function to learn
-        num_dims : int, optional
-            Dimensionality of reduced space (defaults to dimension of X)
-        verbose : bool, optional
-            if True, prints information while learning
+                'knn' - kNearestNeighbour classifier (by ClassifierFitness)
+                'svc' - SVM classifier (by ClassifierFitness)
+                'lsvc' - linear SVM classifier (by ClassifierFitness)
+                'wfme' - weighted Fmeasure score
+                'wpur' - weighted purity score
+                'random' - random fitness score
+                'class_separation' - class separation score
+        transformer_func : ('str', BaseTransformer object)
+            transformer_func defines transforming function to be learnt
+                'full' - full Mahalanobis matrix
+                'diagonal' - matrix restricted to diagonal
+                'triangular' - upper triangular matrix
+                'neuralnetwork' - fully connected neural network
         """
-        super(MetricEvolutionBuilder, self).__init__(
-            strategy=self.build_strategy(strategy),
-            fitness=self.build_fitnesses(fitness),
-            transformer_func=self.build_transformer(transformer_func),
-            **kwargs,
-        )
+        params = kwargs
+        params.update({
+            'strategy': self.build_strategy(strategy),
+            'fitness_list': self.build_fitnesses(fitness),
+            'transformer_func': self.build_transformer(transformer_func),
+        })
+        super(MetricEvolutionBuilder, self).__init__(**params)
 
     def build_fitnesses(self, fitnesses):
         # make it an array if it is not already one
@@ -83,8 +101,6 @@ class MetricEvolutionBuilder(MetricEvolution):
             return tr.TriangularMatrixTransformer()
         elif transformer == 'neuralnetwork':
             return tr.NeuralNetworkTransformer()
-        elif transformer == 'kmeans':
-            return tr.KMeansTransformer()
 
         raise ValueError(
             'Invalid `transformer` value: `{}`'.format(transformer))

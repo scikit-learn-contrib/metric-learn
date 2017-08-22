@@ -1,20 +1,12 @@
-from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
+from .base_transformer import BaseTransformer
 
-class MatrixTransformer(BaseEstimator, TransformerMixin):
+
+class MatrixTransformer(BaseTransformer):
     def __init__(self):
         raise NotImplementedError(
             'MatrixTransformer should not be instantiated')
-
-    def duplicate_instance(self):
-        return self.__class__(**self.get_params())
-
-    def individual_size(self, input_dim):
-        raise NotImplementedError('individual_size() is not implemented')
-
-    def fit(self, X, y, flat_weights):
-        raise NotImplementedError('fit() is not implemented')
 
     def transformer(self):
         """Returns the evolved transformation matrix from the Mahalanobis matrix.
