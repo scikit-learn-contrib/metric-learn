@@ -28,7 +28,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
         return self.hall_of_fame[0]
 
     def generate_brow_ind_with_fitness(self, best, sigma=0.3):
-        fitness_len = len(self.fitnesses)
+        fitness_len = len(self.fitness)
         ind = Individual(np.random.normal(x, sigma) for x in best)
         ind.fitness = MultidimensionalFitness(fitness_len)
         return ind
@@ -77,8 +77,8 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
 
         # Evaluate the individuals
         for idx, subpop in enumerate(populations):
-            fitnesses = toolbox.map(toolbox.evaluate, subpop)
-            for ind, fit in zip(subpop, fitnesses):
+            fitness = toolbox.map(toolbox.evaluate, subpop)
+            for ind, fit in zip(subpop, fitness):
                 ind.fitness.values = fit
 
         if stats:
@@ -88,7 +88,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
                 print(self.logbook.stream)
 
         for g in range(1, self.n_gen):
-            # Detect a change and invalidate fitnesses if necessary
+            # Detect a change and invalidate fitness if necessary
             bests = [toolbox.best(subpop)[0] for subpop in populations]
             if any(b.fitness.values != toolbox.evaluate(b) for b in bests):
                 for individual in itertools.chain(*populations):
@@ -115,8 +115,8 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
             # Evaluate the individuals with an invalid fitness
             invalid_ind = [ind for ind in itertools.chain(*populations)
                            if not ind.fitness.valid]
-            fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-            for ind, fit in zip(invalid_ind, fitnesses):
+            fitness = toolbox.map(toolbox.evaluate, invalid_ind)
+            for ind, fit in zip(invalid_ind, fitness):
                 ind.fitness.values = fit
 
             all_pops = list(itertools.chain(*populations))

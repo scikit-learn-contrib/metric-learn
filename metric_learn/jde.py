@@ -22,7 +22,7 @@ class JDE(MetricEvolution):
         """
         super(JDE, self).__init__(
             strategy=st.SelfAdaptingDifferentialEvolution(),
-            fitnesses=fit.WeightedFMeasureFitness(),
+            fitness=[fit.WeightedFMeasureFitness()],
             transformer_func=tr.TriangularMatrixTransformer(),
             **kwargs,
         )

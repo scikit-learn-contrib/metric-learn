@@ -53,8 +53,8 @@ class SelfAdaptingDifferentialEvolution(BaseEvolutionStrategy):
             + (stats.fields if stats else [])
 
         # Evaluate the individuals
-        fitnesses = toolbox.map(toolbox.evaluate, pop)
-        for ind, fit in zip(pop, fitnesses):
+        fitness = toolbox.map(toolbox.evaluate, pop)
+        for ind, fit in zip(pop, fitness):
             ind.fitness.values = fit
 
         if stats:

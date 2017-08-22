@@ -16,7 +16,7 @@ class CMAESEvolution(BaseEvolutionStrategy):
         return self.hall_of_fame[0]
 
     def _generate_pop_with_fitness(self, generate):
-        fitness_len = len(self.fitnesses)
+        fitness_len = len(self.fitness)
 
         individuals = generate(Individual)
         for ind in individuals:

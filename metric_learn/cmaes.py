@@ -1,6 +1,6 @@
 # https://github.com/svecon/thesis-distance-metric-learning/releases/tag/1.0
 
-from .evolution import MetricEvolution
+from .evolution import MetricEvolution, MetricEvolutionBuilder
 from .evolution import fitness as fit
 from .evolution import strategy as st
 from .evolution import transformer as tr
@@ -24,7 +24,7 @@ class CMAES(MetricEvolution):
         """
         super(CMAES, self).__init__(
             strategy=st.CMAESEvolution(),
-            fitnesses=KNeighborsClassifier(),
+            fitness=[fit.ClassifierFitness(KNeighborsClassifier())],
             transformer_func=tr.FullMatrixTransformer(num_dims=num_dims),
             **kwargs,
         )
@@ -46,7 +46,7 @@ class CMAES_Diagonal(MetricEvolution):
         """
         super(CMAES_Diagonal, self).__init__(
             strategy=st.CMAESEvolution(),
-            fitnesses=KNeighborsClassifier(),
+            fitness=[fit.ClassifierFitness(KNeighborsClassifier())],
             transformer_func=tr.DiagonalMatrixTransformer(),
             **kwargs,
         )

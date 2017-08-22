@@ -23,10 +23,10 @@ class BaseEvolutionStrategy(object):
 
         np.random.seed(random_state)
 
-    def inject_generated_params(self, n_dim, fitnesses, transformer,
+    def inject_generated_params(self, n_dim, fitness, transformer,
                                 random_state=None, verbose=False):
         self.n_dim = n_dim
-        self.fitnesses = fitnesses
+        self.fitness = fitness
         self.transformer = transformer
 
         self.random_state = random_state
@@ -80,7 +80,7 @@ class BaseEvolutionStrategy(object):
         )
 
     def generate_individual_with_fitness(self, func, n):
-        fitness_len = len(self.fitnesses)
+        fitness_len = len(self.fitness)
         ind = Individual(func() for _ in range(n))
         ind.fitness = MultidimensionalFitness(fitness_len)
         return ind
@@ -112,6 +112,6 @@ class BaseEvolutionStrategy(object):
                 X_test = transformer.transform(X_test)
 
             return [f(X_train, X_test, y_train, y_test)
-                    for f in self.fitnesses]
+                    for f in self.fitness]
 
         return evaluate
