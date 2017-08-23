@@ -1,5 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
-
 from deap import base, tools
 
 import numpy as np
@@ -12,11 +10,12 @@ from .mfitness import MultidimensionalFitness
 
 class BaseEvolutionStrategy(object):
     def __init__(self, n_gen=25, split_size=0.33, train_subset_size=1.0,
-                 stats=None, random_state=None, verbose=False):
+                 stats=None, max_workers=1, random_state=None, verbose=False):
         self.n_gen = n_gen
         self.split_size = split_size
         self.train_subset_size = train_subset_size
         self.stats = stats
+        self.max_workers = max_workers
 
         self.random_state = random_state
         self.verbose = verbose
@@ -85,33 +84,40 @@ class BaseEvolutionStrategy(object):
         ind.fitness = MultidimensionalFitness(fitness_len)
         return ind
 
-    def create_toolbox(self):
+    def create_toolbox(self, X, y):
         toolbox = base.Toolbox()
-        toolbox.register("map", ThreadPoolExecutor(max_workers=None).map)
+
+        if self.max_workers != 1:
+            import multiprocessing
+            toolbox.register("map", multiprocessing.Pool(self.max_workers).map)
+
+        self.X, self.y = X, y  # needed in self.evaluate function
+        toolbox.register("evaluate", self.evaluate)
 
         return toolbox
 
     def cut_individual(self, individual):
         return individual
 
-    def evaluation_builder(self, X, y):
-        def evaluate(individual):
-            X_train, X_test, y_train, y_test = self._subset_train_test_split(
-                X, y,
+    def cleanup(self):
+        del self.X
+        del self.y
+
+    def evaluate(self, individual):
+        X_train, X_test, y_train, y_test = self._subset_train_test_split(
+            self.X, self.y,
+        )
+
+        # transform the inputs if there is a transformer
+        if self.transformer:
+            transformer = self.transformer.duplicate_instance()
+            transformer.fit(
+                X_train,
+                y_train,
+                self.cut_individual(individual)
             )
+            X_train = transformer.transform(X_train)
+            X_test = transformer.transform(X_test)
 
-            # transform the inputs if there is a transformer
-            if self.transformer:
-                transformer = self.transformer.duplicate_instance()
-                transformer.fit(
-                    X_train,
-                    y_train,
-                    self.cut_individual(individual)
-                )
-                X_train = transformer.transform(X_train)
-                X_test = transformer.transform(X_test)
-
-            return [f(X_train, X_test, y_train, y_test)
-                    for f in self.fitness]
-
-        return evaluate
+        return [f(X_train, X_test, y_train, y_test)
+                for f in self.fitness]

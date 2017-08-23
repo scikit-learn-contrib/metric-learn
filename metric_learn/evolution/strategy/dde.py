@@ -43,7 +43,7 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
         brownian = self.population_brownian
         bounds = self.bounds
 
-        toolbox = self.create_toolbox()
+        toolbox = self.create_toolbox(X, y)
         toolbox.register("attr_float", np.random.uniform, -1, 1)
         toolbox.register(
             "individual",
@@ -61,8 +61,6 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
 
         toolbox.register("select", np.random.choice, size=4)
         toolbox.register("best", tools.selBest, k=1)
-
-        toolbox.register("evaluate", self.evaluation_builder(X, y))
 
         self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats()
@@ -160,4 +158,5 @@ class DynamicDifferentialEvolution(BaseEvolutionStrategy):
                 # Replace the population
                 populations[idx] = newpop
 
+        self.cleanup()
         return self

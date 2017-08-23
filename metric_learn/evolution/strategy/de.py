@@ -19,14 +19,13 @@ class DifferentialEvolution(BaseEvolutionStrategy):
     def fit(self, X, y):
         individual_size = self.n_dim
 
-        toolbox = self.create_toolbox()
+        toolbox = self.create_toolbox(X, y)
         toolbox.register("attr_float", np.random.uniform, -1, 1)
         toolbox.register(
             "individual", self.generate_individual_with_fitness,
             toolbox.attr_float, individual_size)
         toolbox.register(
             "population", tools.initRepeat, list, toolbox.individual)
-        toolbox.register("evaluate", self.evaluation_builder(X, y))
 
         self.hall_of_fame = tools.HallOfFame(1)
         stats = self._build_stats()
@@ -68,4 +67,5 @@ class DifferentialEvolution(BaseEvolutionStrategy):
                 if self.verbose:
                     print(self.logbook.stream)
 
+        self.cleanup()
         return self

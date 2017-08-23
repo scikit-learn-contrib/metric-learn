@@ -37,8 +37,7 @@ class CMAESEvolution(BaseEvolutionStrategy):
             sigma=self.sigma,
         )
 
-        toolbox = self.create_toolbox()
-        toolbox.register("evaluate", self.evaluation_builder(X, y))
+        toolbox = self.create_toolbox(X, y)
         toolbox.register(
             "generate",
             self._generate_pop_with_fitness,
@@ -55,4 +54,5 @@ class CMAESEvolution(BaseEvolutionStrategy):
             verbose=self.verbose
         )
 
+        self.cleanup()
         return self
