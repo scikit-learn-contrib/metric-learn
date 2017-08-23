@@ -8,7 +8,7 @@ class TestStringRepr(unittest.TestCase):
     self.assertEqual(str(metric_learn.Covariance()), "Covariance()")
 
   def test_lmnn(self):
-    self.assertRegex(
+    self.assertRegexpMatches(
         str(metric_learn.LMNN()),
         r"(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
         r"max_iter=1000,\n      min_iter=50, regularization=0.5, "
