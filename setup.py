@@ -23,7 +23,8 @@ setup(name='metric-learn',
           'numpy',
           'scipy',
           'scikit-learn',
-          'six'
+          'six',
+          'deap'
       ],
       extras_require=dict(
           docs=['sphinx', 'shinx_rtd_theme', 'numpydoc'],
