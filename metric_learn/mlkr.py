@@ -72,7 +72,7 @@ class MLKR(BaseMetricLearner):
       """
       Fit MLKR model
 
-      Parameters:
+      Parameters
       ----------
       X : (n x d) array of samples
       y : (n) data labels
