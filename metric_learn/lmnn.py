@@ -14,7 +14,6 @@ import numpy as np
 import warnings
 from collections import Counter
 from six.moves import xrange
-from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_X_y, check_array
 
 from .base_metric import BaseMetricLearner
@@ -185,7 +184,7 @@ class python_LMNN(_base_LMNN):
     target_neighbors = np.empty((self.X_.shape[0], self.k), dtype=int)
     for label in self.labels_:
       inds, = np.nonzero(self.label_inds_ == label)
-      dd = pairwise_distances(self.X_[inds], metric='seuclidean')
+      dd = pairwiseEuclidean(self.X_[inds], self.X_[inds], squared=True)
       np.fill_diagonal(dd, np.inf)
       nn = np.argsort(dd)[..., :self.k]
       target_neighbors[inds] = inds[nn]
@@ -198,7 +197,7 @@ class python_LMNN(_base_LMNN):
     for label in self.labels_[:-1]:
       in_inds, = np.nonzero(self.label_inds_ == label)
       out_inds, = np.nonzero(self.label_inds_ > label)
-      dist = pairwise_distances(Lx[out_inds], Lx[in_inds], metric='seuclidean')
+      dist = pairwiseEuclidean(Lx[out_inds], Lx[in_inds], squared=True)
       i1,j1 = np.nonzero(dist < margin_radii[out_inds][:,None])
       i2,j2 = np.nonzero(dist < margin_radii[in_inds])
       i = np.hstack((i1,i2))
@@ -219,6 +218,55 @@ def _inplace_paired_L2(A, B):
   '''Equivalent to ((A-B)**2).sum(axis=-1), but modifies A in place.'''
   A -= B
   return np.einsum('...ij,...ij->...i', A, A)
+
+
+def pairwiseEuclidean(a, b, squared=False):
+    """
+    Compute the pairwise euclidean distance between matrices a and b.
+
+
+    Parameters
+    ----------
+    a : np.ndarray (n, f)
+        first matrix
+    b : np.ndarray (m, f)
+        second matrix
+    squared : boolean, optional (default False)
+        if True, return squared euclidean distance matrix
+
+
+    Returns
+    -------
+    c : (n x m) np.ndarray
+        pairwise euclidean distance distance matrix
+    """
+    # a is shape (n, f) and b shape (m, f). Return matrix c of shape (n, m).
+    # First compute in c the squared euclidean distance. And return its
+    # square root. At each cell [i,j] of c, we want to have
+    # sum{k in range(f)} ( (a[i,k] - b[j,k])^2 ). We know that
+    # (a-b)^2 = a^2 -2ab +b^2. Thus we want to have in each cell of c:
+    # sum{k in range(f)} ( a[i,k]^2 -2a[i,k]b[j,k] +b[j,k]^2).
+
+    # Multiply a by b transpose to obtain in each cell [i,j] of c the
+    # value sum{k in range(f)} ( a[i,k]b[j,k] )
+    c = a.dot(b.T)
+    # multiply by -2 to have sum{k in range(f)} ( -2a[i,k]b[j,k] )
+    np.multiply(c, -2, out=c)
+
+    # Compute the vectors of the sum of squared elements.
+    a = np.power(a, 2).sum(axis=1)
+    b = np.power(b, 2).sum(axis=1)
+
+    # Add the vectors in each columns (respectivly rows) of c.
+    # sum{k in range(f)} ( a[i,k]^2 -2a[i,k]b[j,k] )
+    c += a.reshape(-1, 1)
+    # sum{k in range(f)} ( a[i,k]^2 -2a[i,k]b[j,k] +b[j,k]^2)
+    c += b
+
+    if not squared:
+        np.sqrt(c, out=c)
+
+    return c
 
 
 def _count_edges(act1, act2, impostors, targets):
