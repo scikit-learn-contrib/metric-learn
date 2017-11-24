@@ -185,7 +185,7 @@ class python_LMNN(_base_LMNN):
     target_neighbors = np.empty((self.X_.shape[0], self.k), dtype=int)
     for label in self.labels_:
       inds, = np.nonzero(self.label_inds_ == label)
-      dd = pairwise_distances(self.X_[inds])
+      dd = pairwise_distances(self.X_[inds], metric='seuclidean')
       np.fill_diagonal(dd, np.inf)
       nn = np.argsort(dd)[..., :self.k]
       target_neighbors[inds] = inds[nn]
@@ -198,7 +198,7 @@ class python_LMNN(_base_LMNN):
     for label in self.labels_[:-1]:
       in_inds, = np.nonzero(self.label_inds_ == label)
       out_inds, = np.nonzero(self.label_inds_ > label)
-      dist = pairwise_distances(Lx[out_inds], Lx[in_inds])
+      dist = pairwise_distances(Lx[out_inds], Lx[in_inds], metric='seuclidean')
       i1,j1 = np.nonzero(dist < margin_radii[out_inds][:,None])
       i2,j2 = np.nonzero(dist < margin_radii[in_inds])
       i = np.hstack((i1,i2))
