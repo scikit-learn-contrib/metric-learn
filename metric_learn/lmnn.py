@@ -185,7 +185,7 @@ class python_LMNN(_base_LMNN):
     target_neighbors = np.empty((self.X_.shape[0], self.k), dtype=int)
     for label in self.labels_:
       inds, = np.nonzero(self.label_inds_ == label)
-      dd = euclidean_distances(self.X_[inds], self.X_[inds], squared=True)
+      dd = euclidean_distances(self.X_[inds], squared=True)
       np.fill_diagonal(dd, np.inf)
       nn = np.argsort(dd)[..., :self.k]
       target_neighbors[inds] = inds[nn]
