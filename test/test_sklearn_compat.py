@@ -35,6 +35,13 @@ class dSDML(deterministic_mixin, SDML_Supervised):
 class dRCA(deterministic_mixin, RCA_Supervised):
   pass
 
+class dCMAES(CMAES):
+    def __init__(self, **kwargs):
+        super(dCMAES, self).__init__(**kwargs, n_gen=2, random_state=1234)
+
+class dJDE(JDE):
+    def __init__(self, **kwargs):
+        super(dJDE, self).__init__(**kwargs, n_gen=2, random_state=1234)
 
 class TestSklearnCompat(unittest.TestCase):
   def test_covariance(self):
@@ -58,13 +65,11 @@ class TestSklearnCompat(unittest.TestCase):
   def test_itml(self):
     check_estimator(dITML)
 
-  # This fails in check_dtype_object, not sure why
-  # TODO !!!!!
-  # def test_cmaes(self):
-  #   check_estimator(CMAES)
+  def test_cmaes(self):
+    check_estimator(dCMAES)
 
-  # def test_jde(self):
-  #   check_estimator(JDE)
+  def test_jde(self):
+    check_estimator(dJDE)
 
   def test_mmc(self):
     check_estimator(dMMC)

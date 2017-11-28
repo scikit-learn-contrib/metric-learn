@@ -17,8 +17,7 @@ parametrized by a vector of real values.
 import numpy as np
 
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_array
-
+from sklearn.utils.validation import check_array, check_X_y
 
 class MetricEvolution(BaseEstimator, TransformerMixin):
     """
@@ -105,6 +104,7 @@ class MetricEvolution(BaseEstimator, TransformerMixin):
         y : (n,) array-like
             Class labels, one per point of data.
         '''
+        X, y = check_X_y(X, y)
 
         # Inject parameters into all fitness functions
         for f in self._fitness:

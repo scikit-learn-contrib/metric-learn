@@ -19,17 +19,19 @@ class CMAES(MetricEvolution):
     """
     Using CMA-ES for evolving a Mahalanobis matrix.
     """
-    def __init__(self, num_dims=None, **kwargs):
+    def __init__(self, num_dims=None, n_gen=25, **kwargs):
         """Initialize the learner.
 
         Parameters
         ----------
         num_dims : int, optional
             Dimension of the target space (defaults to the original dimension)
+        n_gen : int, optional
+            Number of generations for the evolution strategy
         """
         params = kwargs
         params.update({
-            'strategy': st.CMAESEvolution(),
+            'strategy': st.CMAESEvolution(n_gen=n_gen),
             'fitness_list': [fit.ClassifierFitness(KNeighborsClassifier())],
             'transformer_func': tr.FullMatrixTransformer(num_dims=num_dims),
         })

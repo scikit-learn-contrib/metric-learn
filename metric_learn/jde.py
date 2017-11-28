@@ -18,11 +18,17 @@ class JDE(MetricEvolution):
     """
     Using jDE for evolving a triangular Mahalanobis matrix.
     """
-    def __init__(self, **kwargs):
-        """Initialize the learner."""
+    def __init__(self, n_gen=25, **kwargs):
+        """Initialize the learner.
+
+        Parameters
+        ----------
+        n_gen : int, optional
+            Number of generations for the evolution strategy
+        """
         params = kwargs
         params.update({
-            'strategy': st.SelfAdaptingDifferentialEvolution(),
+            'strategy': st.SelfAdaptingDifferentialEvolution(n_gen=n_gen),
             'fitness_list': [fit.WeightedFMeasureFitness()],
             'transformer_func': tr.TriangularMatrixTransformer(),
         })
