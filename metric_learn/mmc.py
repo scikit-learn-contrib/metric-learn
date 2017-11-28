@@ -57,9 +57,10 @@ class MMC(BaseMetricLearner):
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
     self.verbose = verbose
-  
+
   def fit(self, X, constraints):
     """Learn the MMC model.
+
     Parameters
     ----------
     X : (n x d) data matrix
@@ -73,11 +74,11 @@ class MMC(BaseMetricLearner):
       return self._fit_diag(X, constraints)
     else:
       return self._fit_full(X, constraints)
-  
+
   def _process_inputs(self, X, constraints):
-    
+
     self.X_ = X = check_array(X)
-    
+
     # check to make sure that no two constrained vectors are identical
     a,b,c,d = constraints
     no_ident = vector_norm(X[a] - X[b]) > 1e-9
@@ -88,7 +89,7 @@ class MMC(BaseMetricLearner):
       raise ValueError('No non-trivial similarity constraints given for MMC.')
     if len(c) == 0:
       raise ValueError('No non-trivial dissimilarity constraints given for MMC.')
-    
+
     # init metric
     if self.A0 is None:
       self.A_ = np.identity(X.shape[1])
@@ -98,11 +99,12 @@ class MMC(BaseMetricLearner):
         self.A_ /= 10.0
     else:
       self.A_ = check_array(self.A0)
-    
+
     return a,b,c,d
 
   def _fit_full(self, X, constraints):
     """Learn full metric using MMC.
+
     Parameters
     ----------
     X : (n x d) data matrix
@@ -115,11 +117,11 @@ class MMC(BaseMetricLearner):
     num_pos = len(a)
     num_neg = len(c)
     num_samples, num_dim = X.shape
-    
+
     error1 = error2 = 1e10
     eps = 0.01        # error-bound of iterative projection on C1 and C2
     A = self.A_
-    
+
     # Create weight vector from similar samples
     pos_diff = X[a] - X[b]
     w = np.einsum('ij,ik->jk', pos_diff, pos_diff).ravel()
@@ -131,27 +133,27 @@ class MMC(BaseMetricLearner):
     #         X[a] - X[b]
     #     ).sum(axis = 0)
     t = w.dot(A.ravel()) / 100.0
-    
+
     w_norm = np.linalg.norm(w)
     w1 = w / w_norm  # make `w` a unit vector
     t1 = t / w_norm  # distance from origin to `w^T*x=t` plane
-    
+
     cycle = 1
     alpha = 0.1  # initial step size along gradient
-    
+
     grad1 = self._fS1(X, a, b, A)            # gradient of similarity constraint function
     grad2 = self._fD1(X, c, d, A)            # gradient of dissimilarity constraint function
     M = self._grad_projection(grad1, grad2)  # gradient of fD1 orthogonal to fS1
-    
+
     A_old = A.copy()
 
     for cycle in xrange(self.max_iter):
-      
+
       # projection of constraints C1 and C2
       satisfy = False
-      
+
       for it in xrange(self.max_proj):
-        
+
         # First constraint:
         # f(A) = \sum_{i,j \in S} d_ij' A d_ij <= t              (1)
         # (1) can be rewritten as a linear constraint: w^T x = t,
@@ -164,28 +166,28 @@ class MMC(BaseMetricLearner):
         else:
           x = x0 + (t1 - w1.dot(x0)) * w1
           A[:] = x.reshape(num_dim, num_dim)
-        
+
         # Second constraint:
         # PSD constraint A >= 0
         # project A onto domain A>0
         l, V = np.linalg.eigh((A + A.T) / 2)
         A[:] = np.dot(V * np.maximum(0, l[None,:]), V.T)
-        
+
         fDC2 = w.dot(A.ravel())
         error2 = (fDC2 - t) / t
         if error2 < eps:
           satisfy = True
           break
-      
+
       # third constraint: gradient ascent
       # max: g(A) >= 1
       # here we suppose g(A) = fD(A) = \sum_{I,J \in D} sqrt(d_ij' A d_ij)
-      
+
       obj_previous = self._fD(X, c, d, A_old)  # g(A_old)
       obj = self._fD(X, c, d, A)               # g(A)
-      
+
       if satisfy and (obj > obj_previous or cycle == 0):
-        
+
         # If projection of 1 and 2 is successful, and such projection
         # improves objective function, slightly increase learning rate
         # and update from the current A.
@@ -195,15 +197,15 @@ class MMC(BaseMetricLearner):
         grad1 = self._fD1(X, c, d, A)
         M = self._grad_projection(grad1, grad2)
         A += alpha * M
-      
+
       else:
-        
+
         # If projection of 1 and 2 failed, or obj <= obj_previous due
         # to projection of 1 and 2, shrink learning rate and re-update
         # from the previous A.
         alpha /= 2
         A[:] = A_old + alpha * M
-      
+
       delta = np.linalg.norm(alpha * M) / np.linalg.norm(A_old)
       if delta < self.convergence_threshold:
         break
@@ -221,7 +223,7 @@ class MMC(BaseMetricLearner):
     self.A_[:] = A_old
     self.n_iter_ = cycle
     return self
-  
+
   def _fit_diag(self, X, constraints):
     """Learn diagonal metric using MMC.
     Parameters
@@ -236,33 +238,33 @@ class MMC(BaseMetricLearner):
     num_pos = len(a)
     num_neg = len(c)
     num_samples, num_dim = X.shape
-    
+
     s_sum = np.sum((X[a] - X[b]) ** 2, axis=0)
-    
+
     it = 0
     error = 1.0
     eps = 1e-6
     reduction = 2.0
     w = np.diag(self.A_).copy()
-    
+
     while error > self.convergence_threshold:
-      
+
       fD0, fD_1st_d, fD_2nd_d = self._D_constraint(X, c, d, w)
       obj_initial = np.dot(s_sum, w) + self.diagonal_c * fD0
       fS_1st_d = s_sum  # first derivative of the similarity constraints
-      
+
       gradient = fS_1st_d - self.diagonal_c * fD_1st_d               # gradient of the objective
       hessian = -self.diagonal_c * fD_2nd_d + eps * np.eye(num_dim)  # Hessian of the objective
       step = np.dot(np.linalg.inv(hessian), gradient);
-      
+
       # Newton-Rapshon update
       # search over optimal lambda
       lambd = 1  # initial step-size
       w_tmp = np.maximum(0, w - lambd * step)
-      
+
       obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
       obj_previous = obj * 1.1  # just to get the while-loop started
-      
+
       inner_it = 0
       while obj < obj_previous:
         obj_previous = obj
@@ -271,32 +273,32 @@ class MMC(BaseMetricLearner):
         w_tmp = np.maximum(0, w - lambd * step)
         obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
         inner_it += 1
-      
+
       w[:] = w_previous
       error = np.abs((obj_previous - obj_initial) / obj_previous)
       if self.verbose:
         print('mmc iter: %d, conv = %f' % (it, error))
       it += 1
-    
+
     self.A_ = np.diag(w)
     return self
 
   def _fD(self, X, c, d, A):
     """The value of the dissimilarity constraint function.
-    
+
     f = f(\sum_{ij \in D} distance(x_i, x_j))
     i.e. distance can be L1:  \sqrt{(x_i-x_j)A(x_i-x_j)'}
     """
     diff = X[c] - X[d]
     return np.log(np.sum(np.sqrt(np.sum(np.dot(diff, A) * diff, axis=1))) + 1e-6)
-  
+
   def _fD1(self, X, c, d, A):
     """The gradient of the dissimilarity constraint function w.r.t. A.
-    
+
     For example, let distance by L1 norm:
     f = f(\sum_{ij \in D} \sqrt{(x_i-x_j)A(x_i-x_j)'})
     df/dA_{kl} = f'* d(\sum_{ij \in D} \sqrt{(x_i-x_j)^k*(x_i-x_j)^l})/dA_{kl}
-    
+
     Note that d_ij*A*d_ij' = tr(d_ij*A*d_ij') = tr(d_ij'*d_ij*A)
     so, d(d_ij*A*d_ij')/dA = d_ij'*d_ij
         df/dA = f'(\sum_{ij \in D} \sqrt{tr(d_ij'*d_ij*A)})
@@ -312,31 +314,31 @@ class MMC(BaseMetricLearner):
     sum_deri = np.einsum('ijk,i->jk', M, 0.5 / (dist + 1e-6))
     sum_dist = dist.sum()
     return sum_deri / (sum_dist + 1e-6)
-  
+
   def _fS1(self, X, a, b, A):
     """The gradient of the similarity constraint function w.r.t. A.
-    
+
     f = \sum_{ij}(x_i-x_j)A(x_i-x_j)' = \sum_{ij}d_ij*A*d_ij'
     df/dA = d(d_ij*A*d_ij')/dA
-    
+
     Note that d_ij*A*d_ij' = tr(d_ij*A*d_ij') = tr(d_ij'*d_ij*A)
     so, d(d_ij*A*d_ij')/dA = d_ij'*d_ij
     """
     dim = X.shape[1]
     diff = X[a] - X[b]
     return np.einsum('ij,ik->jk', diff, diff)  # sum of outer products of all rows in `diff`
-  
+
   def _grad_projection(self, grad1, grad2):
     grad2 = grad2 / np.linalg.norm(grad2)
     gtemp = grad1 - np.sum(grad1 * grad2) * grad2
     gtemp /= np.linalg.norm(gtemp)
     return gtemp
-  
+
   def _D_objective(self, X, c, d, w):
     return np.log(np.sum(np.sqrt(np.sum(((X[c] - X[d]) ** 2) * w[None,:], axis=1) + 1e-6)))
-  
+
   def _D_constraint(self, X, c, d, w):
-    """Compute the value, 1st derivative, second derivative (Hessian) of 
+    """Compute the value, 1st derivative, second derivative (Hessian) of
     a dissimilarity constraint function gF(sum_ij distance(d_ij A d_ij))
     where A is a diagonal matrix (in the form of a column vector 'w').
     """
@@ -355,18 +357,18 @@ class MMC(BaseMetricLearner):
       sum_deri1 / sum_dist,
       sum_deri2 / sum_dist - np.outer(sum_deri1, sum_deri1) / (sum_dist * sum_dist)
     )
-  
+
   def metric(self):
     return self.A_
-  
+
   def transformer(self):
     """Computes the transformation matrix from the Mahalanobis matrix.
     L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with
     the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.
-    
+
     The Cholesky decomposition cannot be applied here, since MMC learns only a positive
     *semi*-definite Mahalanobis matrix.
-    
+
     Returns
     -------
     L : (d x d) matrix
@@ -384,6 +386,7 @@ class MMC_Supervised(MMC):
                num_labeled=np.inf, num_constraints=None,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
     """Initialize the learner.
+
     Parameters
     ----------
     max_iter : int, optional
@@ -414,6 +417,7 @@ class MMC_Supervised(MMC):
 
   def fit(self, X, y, random_state=np.random):
     """Create constraints from labels and learn the MMC model.
+
     Parameters
     ----------
     X : (n x d) matrix
