@@ -36,12 +36,12 @@ class dRCA(deterministic_mixin, RCA_Supervised):
   pass
 
 class dCMAES(CMAES):
-    def __init__(self, **kwargs):
-        super(dCMAES, self).__init__(**kwargs, n_gen=2, random_state=1234)
+    def __init__(self):
+        super(dCMAES, self).__init__(n_gen=2, random_state=1234)
 
 class dJDE(JDE):
-    def __init__(self, **kwargs):
-        super(dJDE, self).__init__(**kwargs, n_gen=2, random_state=1234)
+    def __init__(self):
+        super(dJDE, self).__init__(n_gen=2, random_state=1234)
 
 class TestSklearnCompat(unittest.TestCase):
   def test_covariance(self):
