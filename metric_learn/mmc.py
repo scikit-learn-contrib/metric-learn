@@ -22,13 +22,13 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import PairsMetricLearner, SupervisedMetricLearner
 from .constraints import Constraints
 from ._util import vector_norm
 
 
 
-class MMC(BaseMetricLearner):
+class MMC(PairsMetricLearner):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
@@ -380,7 +380,7 @@ class MMC(BaseMetricLearner):
       return V.T * np.sqrt(np.maximum(0, w[:,None]))
 
 
-class MMC_Supervised(MMC):
+class MMC_Supervised(MMC, SupervisedMetricLearner):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,

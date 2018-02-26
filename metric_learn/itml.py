@@ -19,12 +19,12 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import PairsMetricLearner, SupervisedMetricLearner
 from .constraints import Constraints
 from ._util import vector_norm
 
 
-class ITML(BaseMetricLearner):
+class ITML(PairsMetricLearner):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False):
@@ -140,7 +140,7 @@ class ITML(BaseMetricLearner):
     return self.A_
 
 
-class ITML_Supervised(ITML):
+class ITML_Supervised(ITML, SupervisedMetricLearner):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,

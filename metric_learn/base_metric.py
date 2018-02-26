@@ -3,7 +3,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
 
-class BaseMetricLearner(BaseEstimator, TransformerMixin):
+class BaseMetricLearner(BaseEstimator):
   def __init__(self):
     raise NotImplementedError('BaseMetricLearner should not be instantiated')
 
@@ -49,3 +49,31 @@ class BaseMetricLearner(BaseEstimator, TransformerMixin):
       X = check_array(X, accept_sparse=True)
     L = self.transformer()
     return X.dot(L.T)
+
+
+class SupervisedMetricLearner(BaseMetricLearner, TransformerMixin):
+
+  def fit(self, X, y):
+    return NotImplementedError
+
+
+class WeaklySupervisedMetricLearner(BaseMetricLearner):
+
+  def fit(self, X, constraints):
+    return NotImplementedError
+
+
+class PairsMetricLearner(WeaklySupervisedMetricLearner):
+
+  def __init__(self):
+    raise NotImplementedError('PairsMetricLearner should not be instantiated')
+  # TODO: introduce specific scoring functions etc
+
+
+class TripletsMetricLearner(WeaklySupervisedMetricLearner):
+
+  def __init__(self):
+    raise NotImplementedError('TripletsMetricLearner should not be '
+                              'instantiated')
+  # TODO: introduce specific scoring functions etc
+

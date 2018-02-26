@@ -13,11 +13,11 @@ import scipy.linalg
 from six.moves import xrange
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import PairsMetricLearner, SupervisedMetricLearner
 from .constraints import Constraints
 
 
-class LSML(BaseMetricLearner):
+class LSML(PairsMetricLearner):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
     """Initialize LSML.
 
@@ -131,7 +131,7 @@ class LSML(BaseMetricLearner):
     return dMetric
 
 
-class LSML_Supervised(LSML):
+class LSML_Supervised(LSML, SupervisedMetricLearner):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
                num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.

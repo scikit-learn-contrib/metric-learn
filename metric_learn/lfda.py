@@ -18,10 +18,10 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import SupervisedMetricLearner
 
 
-class LFDA(BaseMetricLearner):
+class LFDA(SupervisedMetricLearner):
   '''
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
   Sugiyama, ICML 2006

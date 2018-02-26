@@ -15,11 +15,11 @@ from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from sklearn.utils.validation import check_array
 
-from .base_metric import BaseMetricLearner
+from .base_metric import PairsMetricLearner, SupervisedMetricLearner
 from .constraints import Constraints
 
 
-class SDML(BaseMetricLearner):
+class SDML(PairsMetricLearner):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False):
     """
@@ -80,7 +80,7 @@ class SDML(BaseMetricLearner):
     return self
 
 
-class SDML_Supervised(SDML):
+class SDML_Supervised(SDML, SupervisedMetricLearner):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
     """
