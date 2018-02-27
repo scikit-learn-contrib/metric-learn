@@ -65,7 +65,7 @@ more complete.
 
 .. _sphinx documentation: http://metric-learn.github.io/metric-learn/
 
-.. |Travis-CI Build Status| image:: https://api.travis-ci.org/all-umass/metric-learn.svg?branch=master
+.. |Travis-CI Build Status| image:: https://api.travis-ci.org/metric-learn/metric-learn.svg?branch=master
    :target: https://travis-ci.org/metric-learn/metric-learn
 .. |License| image:: http://img.shields.io/:license-mit-blue.svg?style=flat
    :target: http://badges.mit-license.org
