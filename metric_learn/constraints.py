@@ -7,7 +7,7 @@ import warnings
 from six.moves import xrange
 from scipy.sparse import coo_matrix, csr_matrix
 
-__all__ = ['Constraints']
+__all__ = ['Constraints', 'ConstrainedDataset']
 
 
 class Constraints(object):
@@ -102,45 +102,37 @@ class Constraints(object):
     return Constraints(partial_labels)
 
 
-  class ConstrainedDataset(object):
+class ConstrainedDataset(object):
 
-    def __init__(self, X, c):
-      self.c = c
-      self.X = X
-      self.shape = (len(c), X.shape[1])
+  def __init__(self, X, c):
+    self.c = c
+    self.X = X
+    self.shape = (len(c) if hasattr(c, '__len__') else 0, X.shape[1])
 
-    def __getitem__(self, item):
-      # Note that to avoid useless memory consumption, when splitting we
-      # delete the points that are not used
-      # TODO: deal with different types of slices (lists, arrays etc)
-      c_sliced = self.c[item]
-      unique_array = np.unique(c_sliced)
-      pruned_X = self.X[unique_array]
-      # We build an inverted index to find the new indices of pairs after
-      # having filtered some Xs out.
-      inverted_index = np.zeros((np.max(unique_array) + 1,), dtype=int)
-      inverted_index[unique_array] = np.arange(len(unique_array))
-      rescaled_sliced_c = inverted_index[c_sliced]
-      return self.__init__(pruned_X, rescaled_sliced_c)
+  def __getitem__(self, item):
+    return ConstrainedDataset(self.X, self.c[item])
 
-    def __len__(self):
-      return self.shape
+  def __len__(self):
+    return self.shape
 
-    def __str__(self):
-      return self.asarray().__str__()
+  def __str__(self):
+    return self.toarray().__str__()
 
-    def __repr__(self):
-      return self.asarray().__repr__()
+  def __repr__(self):
+    return self.toarray().__repr__()
 
-    def asarray(self):
-      return self.X[self.c]
+  def toarray(self):
+    return self.X[self.c]
 
-    @staticmethod
-    def pairs_from_labels(y):
-      # TODO: to be implemented
-      return NotImplementedError
+  def __copy__(self):
+    raise NotImplementedError
 
-    @staticmethod
-    def triplets_from_labels(y):
-      # TODO: to be implemented
-      return NotImplementedError
+  @staticmethod
+  def pairs_from_labels(y):
+    # TODO: to be implemented
+    raise NotImplementedError
+
+  @staticmethod
+  def triplets_from_labels(y):
+    # TODO: to be implemented
+    raise NotImplementedError
