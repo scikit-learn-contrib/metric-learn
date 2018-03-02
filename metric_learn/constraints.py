@@ -108,8 +108,8 @@ class ConstrainedDataset(object):
   def __init__(self, X, c):
     # we convert the data to a suitable format
     self.X = check_array(X, accept_sparse=True, dtype=None, warn_on_dtype=True)
-    self.c = check_array(c, dtype=['int', *np.sctypes['int'],
-                                   *np.sctypes['uint']],
+    self.c = check_array(c, dtype=['int'] + np.sctypes['int']
+                                  + np.sctypes['uint'],
                          # we add 'int' at the beginning to tell it is the
                          # default format we want in case of conversion
                          ensure_2d=False, ensure_min_samples=False,
