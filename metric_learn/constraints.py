@@ -5,7 +5,8 @@ from supervised data labels.
 import numpy as np
 import warnings
 from six.moves import xrange
-from scipy.sparse import coo_matrix, csr_matrix
+from scipy.sparse import coo_matrix
+from sklearn.utils import check_array
 
 __all__ = ['Constraints', 'ConstrainedDataset']
 
@@ -105,9 +106,16 @@ class Constraints(object):
 class ConstrainedDataset(object):
 
   def __init__(self, X, c):
-    self.c = c
-    self.X = X
-    self.shape = (len(c) if hasattr(c, '__len__') else 0, X.shape[1])
+    # we convert the data to a suitable format
+    self.X = check_array(X, accept_sparse=True, dtype=None, warn_on_dtype=True)
+    self.c = check_array(c, dtype=['int', *np.sctypes['int'],
+                                   *np.sctypes['uint']],
+                         # we add 'int' at the beginning to tell it is the
+                         # default format we want in case of conversion
+                         ensure_2d=False, ensure_min_samples=False,
+                         ensure_min_features=False, warn_on_dtype=True)
+    self._check_index(self.X.shape[0], self.c)
+    self.shape = (len(c) if hasattr(c, '__len__') else 0, self.X.shape[1])
 
   def __getitem__(self, item):
     return ConstrainedDataset(self.X, self.c[item])
@@ -124,8 +132,19 @@ class ConstrainedDataset(object):
   def toarray(self):
     return self.X[self.c]
 
-  def __copy__(self):
-    raise NotImplementedError
+  @staticmethod
+  def _check_index(length, indices):
+    max_index = np.max(indices)
+    min_index = np.min(indices)
+    pb_index = None
+    if max_index >= length:
+      pb_index = max_index
+    elif min_index > length + 1:
+      pb_index = min_index
+    if pb_index is not None:
+      raise IndexError("ConstrainedDataset cannot be created: the length of "
+                       "the dataset is {}, so index {} is out of range."
+                       .format(length, pb_index))
 
   @staticmethod
   def pairs_from_labels(y):
