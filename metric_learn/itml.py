@@ -20,7 +20,7 @@ from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import PairsMetricLearner, SupervisedMetricLearner
-from .constraints import Constraints
+from .constraints import Constraints, unwrap_pairs, wrap_pairs
 from ._util import vector_norm
 
 
@@ -73,19 +73,19 @@ class ITML(PairsMetricLearner):
       self.A_ = check_array(self.A0)
     return a,b,c,d
 
-  def fit(self, X, constraints, bounds=None):
+  def fit(self, constrained_dataset, y, bounds=None):
     """Learn the ITML model.
 
     Parameters
     ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, with (a,b) specifying positive and (c,d)
-        negative pairs
+    constrained_dataset : ConstrainedDataset
+        with constraints being an array of shape [n_constraints, 2]
+    y : array-like, shape (n x 1)
+        labels of the constraints
     bounds : list (pos,neg) pairs, optional
         bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
     """
+    X, constraints = unwrap_pairs(constrained_dataset, y)
     a,b,c,d = self._process_inputs(X, constraints, bounds)
     gamma = self.gamma
     num_pos = len(a)
@@ -195,4 +195,5 @@ class ITML_Supervised(ITML, SupervisedMetricLearner):
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    return ITML.fit(self, X, pos_neg, bounds=self.bounds)
+    constrained_dataset, y = wrap_pairs(X, pos_neg)
+    return ITML.fit(self, constrained_dataset, y, bounds=self.bounds)

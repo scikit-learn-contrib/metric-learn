@@ -13,11 +13,11 @@ import scipy.linalg
 from six.moves import xrange
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import PairsMetricLearner, SupervisedMetricLearner
-from .constraints import Constraints
+from .base_metric import SupervisedMetricLearner, QuadrupletsMetricLearner
+from .constraints import Constraints, ConstrainedDataset
 
 
-class LSML(PairsMetricLearner):
+class LSML(QuadrupletsMetricLearner):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
     """Initialize LSML.
 
@@ -57,18 +57,23 @@ class LSML(PairsMetricLearner):
   def metric(self):
     return self.M_
 
-  def fit(self, X, constraints, weights=None):
+  def fit(self, constrained_dataset, y=None, weights=None):
     """Learn the LSML model.
 
     Parameters
     ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
+    constrained_dataset : ConstrainedDataset
+        with constraints being an array of shape [n_constraints, 4]. It
+        should be the concatenation of 4 column vectors a, b, c and d,
+        such that: ``d(X[a[i]],X[b[i]]) < d(X[c[i]],X[d[i]])`` for every
+        constraint index ``i``.
+    y : object
+        Not used, for scikit-learn compatibility
     weights : (m,) array of floats, optional
         scale factor for each constraint
     """
+    X = constrained_dataset.X
+    constraints = [constrained_dataset.c[:, i].ravel() for i in range(4)]
     self._prepare_inputs(X, constraints, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -181,4 +186,7 @@ class LSML_Supervised(LSML, SupervisedMetricLearner):
                                   random_state=random_state)
     pairs = c.positive_negative_pairs(num_constraints, same_length=True,
                                       random_state=random_state)
-    return LSML.fit(self, X, pairs, weights=self.weights)
+    constrained_dataset = ConstrainedDataset(X, np.hstack([pairs[i][:, None]
+                                                           for i in
+                                                           range(4)]))
+    return LSML.fit(self, constrained_dataset, weights=self.weights)

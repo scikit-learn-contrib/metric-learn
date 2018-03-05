@@ -19,17 +19,6 @@ class Constraints(object):
     self.known_label_idx, = np.where(partial_labels >= 0)
     self.known_labels = partial_labels[self.known_label_idx]
 
-  def adjacency_matrix(self, num_constraints, random_state=np.random):
-    a, b, c, d = self.positive_negative_pairs(num_constraints,
-                                              random_state=random_state)
-    row = np.concatenate((a, c))
-    col = np.concatenate((b, d))
-    data = np.ones_like(row, dtype=int)
-    data[len(a):] = -1
-    adj = coo_matrix((data, (row, col)), shape=(self.num_points,)*2)
-    # symmetrize
-    return adj + adj.T
-
   def positive_negative_pairs(self, num_constraints, same_length=False,
                               random_state=np.random):
     a, b = self._pairs(num_constraints, same_label=True,
@@ -155,3 +144,34 @@ class ConstrainedDataset(object):
   def triplets_from_labels(y):
     # TODO: to be implemented
     raise NotImplementedError
+
+
+def unwrap_pairs(constrained_dataset, y):
+  a = constrained_dataset.c[(y == 0)[:, 0]][:, 0]
+  b = constrained_dataset.c[(y == 0)[:, 0]][:, 1]
+  c = constrained_dataset.c[(y == 1)[:, 0]][:, 0]
+  d = constrained_dataset.c[(y == 1)[:, 0]][:, 1]
+  X = constrained_dataset.X
+  return X, [a, b, c, d]
+
+def wrap_pairs(X, constraints):
+  a = np.array(constraints[0])
+  b = np.array(constraints[1])
+  c = np.array(constraints[2])
+  d = np.array(constraints[3])
+  constraints = np.vstack([np.hstack([a[:, None], b[:, None]]),
+                           np.hstack([c[:, None], d[:, None]])])
+  y = np.vstack([np.zeros((len(a), 1)), np.ones((len(c), 1))])
+  constrained_dataset = ConstrainedDataset(X, constraints)
+  return constrained_dataset, y
+
+def unwrap_to_graph(constrained_dataset, y):
+
+  X, [a, b, c, d] = unwrap_pairs(constrained_dataset, y)
+  row = np.concatenate((a, c))
+  col = np.concatenate((b, d))
+  data = np.ones_like(row, dtype=int)
+  data[len(a):] = -1
+  adj = coo_matrix((data, (row, col)), shape=(constrained_dataset.X.shape[0],)
+                                             * 2)
+  return constrained_dataset.X, adj + adj.T

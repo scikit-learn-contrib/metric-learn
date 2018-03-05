@@ -59,7 +59,7 @@ class SupervisedMetricLearner(BaseMetricLearner):
 
 class WeaklySupervisedMetricLearner(BaseMetricLearner):
 
-  def fit(self, X, constraints):
+  def fit(self, constrained_dataset, y):
     return NotImplementedError
 
 
@@ -77,3 +77,9 @@ class TripletsMetricLearner(WeaklySupervisedMetricLearner):
                               'instantiated')
   # TODO: introduce specific scoring functions etc
 
+class QuadrupletsMetricLearner(WeaklySupervisedMetricLearner):
+
+  def __init__(self):
+    raise NotImplementedError('QuadrupletsMetricLearner should not be '
+                              'instantiated')
+  # TODO: introduce specific scoring functions etc
