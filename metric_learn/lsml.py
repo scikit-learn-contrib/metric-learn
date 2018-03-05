@@ -13,11 +13,12 @@ import scipy.linalg
 from six.moves import xrange
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import PairsMetricLearner, SupervisedMetricLearner
+from .base_metric import PairsMixin, \
+  BaseMetricLearner, WeaklySupervisedMixin, SupervisedMixin
 from .constraints import Constraints
 
 
-class LSML(PairsMetricLearner):
+class _LSML(BaseMetricLearner):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
     """Initialize LSML.
 
@@ -57,7 +58,7 @@ class LSML(PairsMetricLearner):
   def metric(self):
     return self.M_
 
-  def fit(self, X, constraints, weights=None):
+  def _fit(self, X, constraints, weights=None):
     """Learn the LSML model.
 
     Parameters
@@ -131,7 +132,7 @@ class LSML(PairsMetricLearner):
     return dMetric
 
 
-class LSML_Supervised(LSML, SupervisedMetricLearner):
+class LSML_Supervised(_LSML, SupervisedMixin):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
                num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.
@@ -151,7 +152,7 @@ class LSML_Supervised(LSML, SupervisedMetricLearner):
     verbose : bool, optional
         if True, prints information while learning
     """
-    LSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
+    _LSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                   verbose=verbose)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
@@ -181,4 +182,9 @@ class LSML_Supervised(LSML, SupervisedMetricLearner):
                                   random_state=random_state)
     pairs = c.positive_negative_pairs(num_constraints, same_length=True,
                                       random_state=random_state)
-    return LSML.fit(self, X, pairs, weights=self.weights)
+    return _LSML._fit(self, X, pairs, weights=self.weights)
+
+
+class LSML(_LSML, PairsMixin):
+
+  pass

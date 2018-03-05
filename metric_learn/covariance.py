@@ -12,17 +12,17 @@ from __future__ import absolute_import
 import numpy as np
 from sklearn.utils.validation import check_array
 
-from .base_metric import SupervisedMetricLearner
+from .base_metric import BaseMetricLearner, UnsupervisedMixin
 
 
-class Covariance(SupervisedMetricLearner):
+class _Covariance(BaseMetricLearner):
   def __init__(self):
     pass
 
   def metric(self):
     return self.M_
 
-  def fit(self, X, y=None):
+  def _fit(self, X, y=None):
     """
     X : data matrix, (n x d)
     y : unused
@@ -34,3 +34,8 @@ class Covariance(SupervisedMetricLearner):
     else:
       self.M_ = np.linalg.inv(self.M_)
     return self
+
+class Covariance(_Covariance, UnsupervisedMixin):
+
+  def fit(self, X, y=None):
+    return self._fit(X, y)

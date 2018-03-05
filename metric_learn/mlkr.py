@@ -13,12 +13,13 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.decomposition import PCA
 from sklearn.utils.validation import check_X_y
 
-from .base_metric import SupervisedMetricLearner
+from .base_metric import BaseMetricLearner, \
+    SupervisedMixin
 
 EPS = np.finfo(float).eps
 
 
-class MLKR(SupervisedMetricLearner):
+class _MLKR(BaseMetricLearner):
   """Metric Learning for Kernel Regression (MLKR)"""
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
                max_iter=1000):
@@ -68,7 +69,7 @@ class MLKR(SupervisedMetricLearner):
               m, d, A.shape))
       return self.X_, y, A
 
-  def fit(self, X, y):
+  def _fit(self, X, y):
       """
       Fit MLKR model
 
@@ -110,3 +111,17 @@ def _loss(flatA, X, y, dX):
   M = (dX.T * W.ravel()).dot(dX)
   grad = 2 * A.dot(M)
   return cost, grad.ravel()
+
+
+class MLKR(_MLKR, SupervisedMixin):
+
+    def fit(self, X, y):
+        """
+        Fit MLKR model
+
+        Parameters
+        ----------
+        X : (n x d) array of samples
+        y : (n) data labels
+        """
+        return self._fit(X, y)

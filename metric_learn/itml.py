@@ -19,12 +19,13 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import PairsMetricLearner, SupervisedMetricLearner
+from .base_metric import BaseMetricLearner, PairsMixin, \
+  SupervisedMixin, WeaklySupervisedMixin
 from .constraints import Constraints
 from ._util import vector_norm
 
 
-class ITML(PairsMetricLearner):
+class _ITML(BaseMetricLearner):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False):
@@ -73,7 +74,7 @@ class ITML(PairsMetricLearner):
       self.A_ = check_array(self.A0)
     return a,b,c,d
 
-  def fit(self, X, constraints, bounds=None):
+  def _fit(self, X, constraints, bounds=None):
     """Learn the ITML model.
 
     Parameters
@@ -140,7 +141,7 @@ class ITML(PairsMetricLearner):
     return self.A_
 
 
-class ITML_Supervised(ITML, SupervisedMetricLearner):
+class ITML_Supervised(_ITML, SupervisedMixin):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
@@ -164,7 +165,7 @@ class ITML_Supervised(ITML, SupervisedMetricLearner):
     verbose : bool, optional
         if True, prints information while learning
     """
-    ITML.__init__(self, gamma=gamma, max_iter=max_iter,
+    _ITML.__init__(self, gamma=gamma, max_iter=max_iter,
                   convergence_threshold=convergence_threshold,
                   A0=A0, verbose=verbose)
     self.num_labeled = num_labeled
@@ -195,4 +196,8 @@ class ITML_Supervised(ITML, SupervisedMetricLearner):
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    return ITML.fit(self, X, pos_neg, bounds=self.bounds)
+    return _ITML._fit(self, X, pos_neg, bounds=self.bounds)
+
+class ITML(_ITML, PairsMixin):
+
+  pass

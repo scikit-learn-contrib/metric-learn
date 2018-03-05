@@ -11,15 +11,16 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 from __future__ import absolute_import
 import numpy as np
 from scipy.sparse.csgraph import laplacian
+from sklearn.base import BaseEstimator
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from sklearn.utils.validation import check_array
 
-from .base_metric import PairsMetricLearner, SupervisedMetricLearner
+from .base_metric import PairsMixin, SupervisedMixin, BaseMetricLearner
 from .constraints import Constraints
 
 
-class SDML(PairsMetricLearner):
+class _SDML(BaseMetricLearner):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False):
     """
@@ -56,7 +57,7 @@ class SDML(PairsMetricLearner):
   def metric(self):
     return self.M_
 
-  def fit(self, X, W):
+  def _fit(self, X, W):
     """Learn the SDML model.
 
     Parameters
@@ -80,7 +81,7 @@ class SDML(PairsMetricLearner):
     return self
 
 
-class SDML_Supervised(SDML, SupervisedMetricLearner):
+class SDML_Supervised(_SDML, SupervisedMixin):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
     """
@@ -99,7 +100,7 @@ class SDML_Supervised(SDML, SupervisedMetricLearner):
     verbose : bool, optional
         if True, prints information while learning
     """
-    SDML.__init__(self, balance_param=balance_param,
+    _SDML.__init__(self, balance_param=balance_param,
                   sparsity_param=sparsity_param, use_cov=use_cov,
                   verbose=verbose)
     self.num_labeled = num_labeled
@@ -132,4 +133,8 @@ class SDML_Supervised(SDML, SupervisedMetricLearner):
     c = Constraints.random_subset(y, self.num_labeled,
                                   random_state=random_state)
     adj = c.adjacency_matrix(num_constraints, random_state=random_state)
-    return SDML.fit(self, X, adj)
+    return _SDML._fit(self, X, adj)
+
+class SDML(_SDML, PairsMixin):
+
+  pass

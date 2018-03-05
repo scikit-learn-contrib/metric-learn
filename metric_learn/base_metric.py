@@ -1,7 +1,42 @@
 from numpy.linalg import inv, cholesky
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_array
 
+
+class TransformerMixin(object):
+  """Mixin class for all transformers in metric-learn. Same as the one in
+  scikit-learn, but the documentation is changed: this Transformer is
+  allowed to take as y a non array-like input"""
+
+  def fit_transform(self, X, y=None, **fit_params):
+    """Fit to data, then transform it.
+
+    Fits transformer to X and y with optional parameters fit_params
+    and returns a transformed version of X.
+
+    Parameters
+    ----------
+    X : numpy array of shape [n_samples, n_features]
+        Training set.
+
+    y : numpy array of shape [n_samples] or 4-tuple of arrays
+        Target values, or constraints (a, b, c, d) indices into X, with
+        (a, b) specifying similar and (c,d) dissimilar pairs).
+
+    Returns
+    -------
+    X_new : numpy array of shape [n_samples, n_features_new]
+        Transformed array.
+
+    """
+    # non-optimized default implementation; override when a better
+    # method is possible for a given clustering algorithm
+    if y is None:
+      # fit method of arity 1 (unsupervised transformation)
+      return self.fit(X, **fit_params).transform(X)
+    else:
+      # fit method of arity 2 (supervised transformation)
+      return self.fit(X, y, **fit_params).transform(X)
 
 class BaseMetricLearner(BaseEstimator, TransformerMixin):
   def __init__(self):
@@ -51,29 +86,35 @@ class BaseMetricLearner(BaseEstimator, TransformerMixin):
     return X.dot(L.T)
 
 
-class SupervisedMetricLearner(BaseMetricLearner):
+class SupervisedMixin(object):
 
   def fit(self, X, y):
     return NotImplementedError
 
 
-class WeaklySupervisedMetricLearner(BaseMetricLearner):
+class UnsupervisedMixin(object):
 
-  def fit(self, X, constraints):
+  def fit(self, X, y=None):
     return NotImplementedError
 
 
-class PairsMetricLearner(WeaklySupervisedMetricLearner):
+class WeaklySupervisedMixin(object):
+
+  def fit(self, X, constraints, **kwargs):
+    return self._fit(X, constraints, **kwargs)
+
+
+class PairsMixin(WeaklySupervisedMixin):
 
   def __init__(self):
-    raise NotImplementedError('PairsMetricLearner should not be instantiated')
+    raise NotImplementedError('PairsMixin should not be instantiated')
   # TODO: introduce specific scoring functions etc
 
 
-class TripletsMetricLearner(WeaklySupervisedMetricLearner):
+class TripletsMixin(WeaklySupervisedMixin):
 
   def __init__(self):
-    raise NotImplementedError('TripletsMetricLearner should not be '
+    raise NotImplementedError('TripletsMixin should not be '
                               'instantiated')
   # TODO: introduce specific scoring functions etc
 
