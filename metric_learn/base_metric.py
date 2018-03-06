@@ -1,6 +1,10 @@
+from sklearn.metrics import roc_auc_score
+
+from metric_learn.constraints import ConstrainedDataset
 from numpy.linalg import cholesky
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_array
+import numpy as np
 
 class BaseMetricLearner(BaseEstimator):
 
@@ -66,8 +70,9 @@ class BaseMetricLearner(BaseEstimator):
 
     Parameters
     ----------
-    X : (n x d) matrix, optional
+    X : (n x d) matrix or ConstrainedDataset, optional
         Data to transform. If not supplied, the training data will be used.
+        In the case of a ConstrainedDataset, X_constrained.X is used.
 
     Returns
     -------
@@ -76,6 +81,8 @@ class BaseMetricLearner(BaseEstimator):
     """
     if X is None:
       X = self.X_
+    elif type(X) is ConstrainedDataset:
+      X = X.X
     else:
       X = check_array(X, accept_sparse=True)
     L = self.transformer()
@@ -109,12 +116,24 @@ class WeaklySupervisedMixin(object):
   def fit(self, X, constraints, **kwargs):
     return self._fit(X, constraints, **kwargs)
 
+  def decision_function(self, X_constrained):
+      return self.predict(X_constrained)
+
 
 class PairsMixin(WeaklySupervisedMixin):
 
   def __init__(self):
     raise NotImplementedError('PairsMixin should not be instantiated')
-  # TODO: introduce specific scoring functions etc
+
+  def predict(self, X_constrained):
+    # TODO: provide better implementation
+    pairwise_diffs = X_constrained.X[X_constrained.c[:, 0]] - \
+                     X_constrained.X[X_constrained.c[:, 1]]
+    return np.sqrt(np.sum(pairwise_diffs.dot(self.metric()) * pairwise_diffs,
+                                  axis=1))
+
+  def score(self, X_constrained, y):
+      return roc_auc_score(y, self.decision_function(X_constrained))
 
 
 class TripletsMixin(WeaklySupervisedMixin):
@@ -122,7 +141,22 @@ class TripletsMixin(WeaklySupervisedMixin):
   def __init__(self):
     raise NotImplementedError('TripletsMixin should not be '
                               'instantiated')
-  # TODO: introduce specific scoring functions etc
+
+  def predict(self, X_constrained):
+    # TODO: provide better implementation
+    similar_diffs = X_constrained.X[X_constrained.c[:, 0]] - \
+                    X_constrained.X[X_constrained.c[:, 1]]
+    dissimilar_diffs = X_constrained.X[X_constrained.c[:, 0]] - \
+                       X_constrained.X[X_constrained.c[:, 2]]
+    return np.sqrt(np.sum(similar_diffs.dot(self.metric()) *
+                          similar_diffs, axis=1)) - \
+           np.sqrt(np.sum(dissimilar_diffs.dot(self.metric()) *
+                          dissimilar_diffs, axis=1))
+
+  def score(self, X_constrained, y=None):
+    predicted_sign = self.decision_function(X_constrained) < 0
+    return np.sum(predicted_sign) / predicted_sign.shape[0]
+
 
 
 class QuadrupletsMixin(WeaklySupervisedMixin):
@@ -130,8 +164,23 @@ class QuadrupletsMixin(WeaklySupervisedMixin):
   def __init__(self):
     raise NotImplementedError('QuadrupletsMixin should not be '
                               'instantiated')
-  # TODO: introduce specific scoring functions etc
 
   def fit(self, X, constraints=None, **kwargs):
     return self._fit(X, **kwargs)
 
+  def predict(self, X_constrained):
+    similar_diffs = X_constrained.X[X_constrained.c[:, 0]] - \
+                    X_constrained.X[X_constrained.c[:, 1]]
+    dissimilar_diffs = X_constrained.X[X_constrained.c[:, 2]] - \
+                       X_constrained.X[X_constrained.c[:, 3]]
+    return np.sqrt(np.sum(similar_diffs.dot(self.metric()) *
+                          similar_diffs, axis=1)) - \
+           np.sqrt(np.sum(dissimilar_diffs.dot(self.metric()) *
+                          dissimilar_diffs, axis=1))
+
+  def decision_fuction(self, X_constrained):
+      return self.predict(X_constrained)
+
+  def score(self, X_constrained, y=None):
+    predicted_sign = self.decision_function(X_constrained) < 0
+    return np.sum(predicted_sign) / predicted_sign.shape[0]
