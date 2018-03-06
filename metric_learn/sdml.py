@@ -17,7 +17,7 @@ from sklearn.utils.extmath import pinvh
 from sklearn.utils.validation import check_array
 
 from .base_metric import PairsMixin, SupervisedMixin, BaseMetricLearner
-from .constraints import Constraints
+from .constraints import Constraints, wrap_pairs, unwrap_to_graph
 
 
 class _SDML(BaseMetricLearner):
@@ -57,21 +57,22 @@ class _SDML(BaseMetricLearner):
   def metric(self):
     return self.M_
 
-  def _fit(self, X, W):
+  def _fit(self, X_constrained, y):
     """Learn the SDML model.
 
     Parameters
     ----------
-    X : array-like, shape (n, d)
-        data matrix, where each row corresponds to a single instance
-    W : array-like, shape (n, n)
-        connectivity graph, with +1 for positive pairs and -1 for negative
+    X_constrained : ConstrainedDataset
+        with constraints being an array of shape [n_constraints, 2]
+    y : array-like, shape (n_constraints x 1)
+        labels of the constraints
 
     Returns
     -------
     self : object
         Returns the instance.
     """
+    X, W = unwrap_to_graph(X_constrained, y)
     loss_matrix = self._prepare_inputs(X, W)
     P = self.M_ + self.balance_param * loss_matrix
     emp_cov = pinvh(P)
@@ -132,8 +133,10 @@ class SDML_Supervised(_SDML, SupervisedMixin):
 
     c = Constraints.random_subset(y, self.num_labeled,
                                   random_state=random_state)
-    adj = c.adjacency_matrix(num_constraints, random_state=random_state)
-    return _SDML._fit(self, X, adj)
+    pos_neg = c.positive_negative_pairs(num_constraints,
+                                              random_state=random_state)
+    X_constrained, y = wrap_pairs(X, pos_neg)
+    return _SDML._fit(self, X_constrained, y)
 
 class SDML(_SDML, WeaklySupervisedMixin, PairsMixin):
 

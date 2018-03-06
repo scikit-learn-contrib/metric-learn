@@ -16,7 +16,7 @@ from sklearn.utils.validation import check_array, check_X_y
 from .base_metric import PairsMixin, \
   BaseMetricLearner, WeaklySupervisedMixin, SupervisedMixin, QuadrupletsMixin, \
   UnsupervisedMixin
-from .constraints import Constraints
+from .constraints import Constraints, ConstrainedDataset
 
 
 class _LSML(BaseMetricLearner):
@@ -59,18 +59,23 @@ class _LSML(BaseMetricLearner):
   def metric(self):
     return self.M_
 
-  def _fit(self, X, constraints, weights=None):
+  def _fit(self, X_constrained, y=None, weights=None):
     """Learn the LSML model.
 
     Parameters
     ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
+    X_constrained : ConstrainedDataset
+        with constraints being an array of shape [n_constraints, 4]. It
+        should be the concatenation of 4 column vectors a, b, c and d,
+        such that: ``d(X[a[i]],X[b[i]]) < d(X[c[i]],X[d[i]])`` for every
+        constraint index ``i``.
+    y : object
+        Not used, for scikit-learn compatibility
     weights : (m,) array of floats, optional
         scale factor for each constraint
     """
+    X = X_constrained.X
+    constraints = [X_constrained.c[:, i].ravel() for i in range(4)]
     self._prepare_inputs(X, constraints, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -183,7 +188,10 @@ class LSML_Supervised(_LSML, SupervisedMixin):
                                   random_state=random_state)
     pairs = c.positive_negative_pairs(num_constraints, same_length=True,
                                       random_state=random_state)
-    return _LSML._fit(self, X, pairs, weights=self.weights)
+    X_constrained = ConstrainedDataset(X, np.hstack([pairs[i][:, None]
+                                                           for i in
+                                                           range(4)]))
+    return _LSML._fit(self, X_constrained, weights=self.weights)
 
 
 class LSML(_LSML, UnsupervisedMixin, QuadrupletsMixin):

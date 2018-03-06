@@ -24,7 +24,8 @@ from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import PairsMixin, \
   BaseMetricLearner, SupervisedMixin, WeaklySupervisedMixin
-from .constraints import Constraints
+from .constraints import Constraints, ConstrainedDataset, unwrap_pairs, \
+  wrap_pairs
 from ._util import vector_norm
 
 
@@ -59,17 +60,17 @@ class _MMC(BaseMetricLearner):
     self.diagonal_c = diagonal_c
     self.verbose = verbose
 
-  def _fit(self, X, constraints):
+  def _fit(self, X_constrained, y):
     """Learn the MMC model.
 
     Parameters
     ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)
-        dissimilar pairs
+    X_constrained : ConstrainedDataset
+        with constraints being an array of shape [n_constraints, 2]
+    y : array-like, shape (n_constraints x 1)
+        labels of the constraints
     """
+    X, constraints = unwrap_pairs(X_constrained, y)
     constraints = self._process_inputs(X, constraints)
     if self.diagonal:
       return self._fit_diag(X, constraints)
@@ -438,7 +439,8 @@ class MMC_Supervised(_MMC, SupervisedMixin):
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    return _MMC._fit(self, X, pos_neg)
+    X_constrained, y = wrap_pairs(X, pos_neg)
+    return _MMC._fit(self, X_constrained, y)
 
 class MMC(_MMC, WeaklySupervisedMixin, PairsMixin):
 

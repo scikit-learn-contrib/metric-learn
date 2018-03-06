@@ -21,7 +21,7 @@ from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner, PairsMixin, \
   SupervisedMixin, WeaklySupervisedMixin
-from .constraints import Constraints
+from .constraints import Constraints, unwrap_pairs, wrap_pairs
 from ._util import vector_norm
 
 
@@ -74,19 +74,19 @@ class _ITML(BaseMetricLearner):
       self.A_ = check_array(self.A0)
     return a,b,c,d
 
-  def _fit(self, X, constraints, bounds=None):
+  def _fit(self, X_constrained, y, bounds=None):
     """Learn the ITML model.
 
     Parameters
     ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, with (a,b) specifying positive and (c,d)
-        negative pairs
+    X_constrained : ConstrainedDataset
+        with constraints being an array of shape [n_constraints, 2]
+    y : array-like, shape (n_constraints x 1)
+        labels of the constraints
     bounds : list (pos,neg) pairs, optional
         bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
     """
+    X, constraints = unwrap_pairs(X_constrained, y)
     a,b,c,d = self._process_inputs(X, constraints, bounds)
     gamma = self.gamma
     num_pos = len(a)
@@ -196,7 +196,8 @@ class ITML_Supervised(_ITML, SupervisedMixin):
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    return _ITML._fit(self, X, pos_neg, bounds=self.bounds)
+    X_constrained, y = wrap_pairs(X, pos_neg)
+    return _ITML._fit(self, X_constrained, y, bounds=self.bounds)
 
 class ITML(_ITML, WeaklySupervisedMixin, PairsMixin):
 
