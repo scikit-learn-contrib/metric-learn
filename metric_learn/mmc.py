@@ -59,17 +59,17 @@ class MMC(PairsMetricLearner):
     self.diagonal_c = diagonal_c
     self.verbose = verbose
 
-  def fit(self, constrained_dataset, y):
+  def fit(self, X_constrained, y):
     """Learn the MMC model.
 
     Parameters
     ----------
-    constrained_dataset : ConstrainedDataset
+    X_constrained : ConstrainedDataset
         with constraints being an array of shape [n_constraints, 2]
-    y : array-like, shape (n x 1)
+    y : array-like, shape (n_constraints x 1)
         labels of the constraints
     """
-    X, constraints = unwrap_pairs(constrained_dataset, y)
+    X, constraints = unwrap_pairs(X_constrained, y)
     constraints = self._process_inputs(X, constraints)
     if self.diagonal:
       return self._fit_diag(X, constraints)
@@ -438,5 +438,5 @@ class MMC_Supervised(MMC, SupervisedMetricLearner):
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    constrained_dataset, y = wrap_pairs(X, pos_neg)
-    return MMC.fit(self, constrained_dataset, y)
+    X_constrained, y = wrap_pairs(X, pos_neg)
+    return MMC.fit(self, X_constrained, y)

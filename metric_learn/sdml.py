@@ -56,14 +56,14 @@ class SDML(PairsMetricLearner):
   def metric(self):
     return self.M_
 
-  def fit(self, constrained_dataset, y):
+  def fit(self, X_constrained, y):
     """Learn the SDML model.
 
     Parameters
     ----------
-    constrained_dataset : ConstrainedDataset
+    X_constrained : ConstrainedDataset
         with constraints being an array of shape [n_constraints, 2]
-    y : array-like, shape (n x 1)
+    y : array-like, shape (n_constraints x 1)
         labels of the constraints
 
     Returns
@@ -71,7 +71,7 @@ class SDML(PairsMetricLearner):
     self : object
         Returns the instance.
     """
-    X, W = unwrap_to_graph(constrained_dataset, y)
+    X, W = unwrap_to_graph(X_constrained, y)
     loss_matrix = self._prepare_inputs(X, W)
     P = self.M_ + self.balance_param * loss_matrix
     emp_cov = pinvh(P)
@@ -134,5 +134,5 @@ class SDML_Supervised(SDML, SupervisedMetricLearner):
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                               random_state=random_state)
-    constrained_dataset, y = wrap_pairs(X, pos_neg)
-    return SDML.fit(self, constrained_dataset, y)
+    X_constrained, y = wrap_pairs(X, pos_neg)
+    return SDML.fit(self, X_constrained, y)

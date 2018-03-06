@@ -146,12 +146,12 @@ class ConstrainedDataset(object):
     raise NotImplementedError
 
 
-def unwrap_pairs(constrained_dataset, y):
-  a = constrained_dataset.c[(y == 0)[:, 0]][:, 0]
-  b = constrained_dataset.c[(y == 0)[:, 0]][:, 1]
-  c = constrained_dataset.c[(y == 1)[:, 0]][:, 0]
-  d = constrained_dataset.c[(y == 1)[:, 0]][:, 1]
-  X = constrained_dataset.X
+def unwrap_pairs(X_constrained, y):
+  a = X_constrained.c[(y == 0)[:, 0]][:, 0]
+  b = X_constrained.c[(y == 0)[:, 0]][:, 1]
+  c = X_constrained.c[(y == 1)[:, 0]][:, 0]
+  d = X_constrained.c[(y == 1)[:, 0]][:, 1]
+  X = X_constrained.X
   return X, [a, b, c, d]
 
 def wrap_pairs(X, constraints):
@@ -162,16 +162,16 @@ def wrap_pairs(X, constraints):
   constraints = np.vstack([np.hstack([a[:, None], b[:, None]]),
                            np.hstack([c[:, None], d[:, None]])])
   y = np.vstack([np.zeros((len(a), 1)), np.ones((len(c), 1))])
-  constrained_dataset = ConstrainedDataset(X, constraints)
-  return constrained_dataset, y
+  X_constrained = ConstrainedDataset(X, constraints)
+  return X_constrained, y
 
-def unwrap_to_graph(constrained_dataset, y):
+def unwrap_to_graph(X_constrained, y):
 
-  X, [a, b, c, d] = unwrap_pairs(constrained_dataset, y)
+  X, [a, b, c, d] = unwrap_pairs(X_constrained, y)
   row = np.concatenate((a, c))
   col = np.concatenate((b, d))
   data = np.ones_like(row, dtype=int)
   data[len(a):] = -1
-  adj = coo_matrix((data, (row, col)), shape=(constrained_dataset.X.shape[0],)
+  adj = coo_matrix((data, (row, col)), shape=(X_constrained.X.shape[0],)
                                              * 2)
-  return constrained_dataset.X, adj + adj.T
+  return X_constrained.X, adj + adj.T

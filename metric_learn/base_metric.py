@@ -59,7 +59,7 @@ class SupervisedMetricLearner(BaseMetricLearner):
 
 class WeaklySupervisedMetricLearner(BaseMetricLearner):
 
-  def fit(self, constrained_dataset, y):
+  def fit(self, X_constrained, y):
     return NotImplementedError
 
 

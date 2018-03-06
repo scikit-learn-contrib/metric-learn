@@ -57,12 +57,12 @@ class LSML(QuadrupletsMetricLearner):
   def metric(self):
     return self.M_
 
-  def fit(self, constrained_dataset, y=None, weights=None):
+  def fit(self, X_constrained, y=None, weights=None):
     """Learn the LSML model.
 
     Parameters
     ----------
-    constrained_dataset : ConstrainedDataset
+    X_constrained : ConstrainedDataset
         with constraints being an array of shape [n_constraints, 4]. It
         should be the concatenation of 4 column vectors a, b, c and d,
         such that: ``d(X[a[i]],X[b[i]]) < d(X[c[i]],X[d[i]])`` for every
@@ -72,8 +72,8 @@ class LSML(QuadrupletsMetricLearner):
     weights : (m,) array of floats, optional
         scale factor for each constraint
     """
-    X = constrained_dataset.X
-    constraints = [constrained_dataset.c[:, i].ravel() for i in range(4)]
+    X = X_constrained.X
+    constraints = [X_constrained.c[:, i].ravel() for i in range(4)]
     self._prepare_inputs(X, constraints, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -186,7 +186,7 @@ class LSML_Supervised(LSML, SupervisedMetricLearner):
                                   random_state=random_state)
     pairs = c.positive_negative_pairs(num_constraints, same_length=True,
                                       random_state=random_state)
-    constrained_dataset = ConstrainedDataset(X, np.hstack([pairs[i][:, None]
+    X_constrained = ConstrainedDataset(X, np.hstack([pairs[i][:, None]
                                                            for i in
                                                            range(4)]))
-    return LSML.fit(self, constrained_dataset, weights=self.weights)
+    return LSML.fit(self, X_constrained, weights=self.weights)
