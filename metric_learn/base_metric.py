@@ -1,4 +1,4 @@
-from numpy.linalg import inv, cholesky
+from numpy.linalg import cholesky
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_array
 
@@ -104,14 +104,14 @@ class WeaklySupervisedMixin(object):
     return self._fit(X, constraints, **kwargs)
 
 
-class PairsMixin(object):
+class PairsMixin(WeaklySupervisedMixin):
 
   def __init__(self):
     raise NotImplementedError('PairsMixin should not be instantiated')
   # TODO: introduce specific scoring functions etc
 
 
-class TripletsMixin(object):
+class TripletsMixin(WeaklySupervisedMixin):
 
   def __init__(self):
     raise NotImplementedError('TripletsMixin should not be '
@@ -119,10 +119,10 @@ class TripletsMixin(object):
   # TODO: introduce specific scoring functions etc
 
 
-class QuadrupletsMixin(object):
+class QuadrupletsMixin(UnsupervisedMixin):
 
   def __init__(self):
-    raise NotImplementedError('TripletsMixin should not be '
+    raise NotImplementedError('QuadrupletsMixin should not be '
                               'instantiated')
   # TODO: introduce specific scoring functions etc
 

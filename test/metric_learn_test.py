@@ -10,7 +10,7 @@ from metric_learn import (
     NCA, LFDA, Covariance, MLKR, MMC,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
 # Import this specially for testing.
-from metric_learn.lmnn import _python_LMNN, _LMNN
+from metric_learn.lmnn import python_LMNN, LMNN
 
 
 def class_separation(X, labels):
@@ -64,7 +64,7 @@ class TestITML(MetricTestCase):
 class TestLMNN(MetricTestCase):
   def test_iris(self):
     # Test both impls, if available.
-    for LMNN_cls in set((_LMNN, _python_LMNN)):
+    for LMNN_cls in set((LMNN, python_LMNN)):
       lmnn = LMNN_cls(k=5, learn_rate=1e-6, verbose=False)
       lmnn._fit(self.iris_points, self.iris_labels)
 

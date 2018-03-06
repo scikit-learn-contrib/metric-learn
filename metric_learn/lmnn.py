@@ -239,7 +239,6 @@ def _sum_outer_products(data, a_inds, b_inds, weights=None):
     return np.dot(Xab.T, Xab * weights[:,None])
   return np.dot(Xab.T, Xab)
 
-
 try:
   # use the fast C++ version, if available
   from modshogun import LMNN as shogun_LMNN
@@ -262,10 +261,18 @@ try:
       self.L_ = self._lmnn.get_linear_transform()
       return self
 
+
+  class LMNN(_LMNN, SupervisedMixin):
+
+    def fit(self, X, y):
+      return self._fit(X, y)
+
+
 except ImportError:
-  _LMNN = _python_LMNN
 
-class LMNN(_LMNN, SupervisedMixin):
+  class python_LMNN(_python_LMNN, SupervisedMixin):
 
-  def fit(self, X, y):
-    return self._fit(X, y)
+    def fit(self, X, y):
+      return self._fit(X, y)
+
+  LMNN = python_LMNN

@@ -11,7 +11,6 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 from __future__ import absolute_import
 import numpy as np
 from scipy.sparse.csgraph import laplacian
-from sklearn.base import BaseEstimator
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from sklearn.utils.validation import check_array
@@ -138,6 +137,6 @@ class SDML_Supervised(_SDML, SupervisedMixin):
     X_constrained, y = wrap_pairs(X, pos_neg)
     return _SDML._fit(self, X_constrained, y)
 
-class SDML(_SDML, WeaklySupervisedMixin, PairsMixin):
+class SDML(_SDML, PairsMixin):
 
   pass

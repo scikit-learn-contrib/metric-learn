@@ -19,8 +19,7 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner, PairsMixin, \
-  SupervisedMixin, WeaklySupervisedMixin
+from .base_metric import BaseMetricLearner, PairsMixin, SupervisedMixin
 from .constraints import Constraints, unwrap_pairs, wrap_pairs
 from ._util import vector_norm
 
@@ -199,6 +198,6 @@ class ITML_Supervised(_ITML, SupervisedMixin):
     X_constrained, y = wrap_pairs(X, pos_neg)
     return _ITML._fit(self, X_constrained, y, bounds=self.bounds)
 
-class ITML(_ITML, WeaklySupervisedMixin, PairsMixin):
+class ITML(_ITML, PairsMixin):
 
   pass

@@ -8,8 +8,7 @@ import numpy as np
 from six.moves import xrange
 from sklearn.utils.validation import check_X_y
 
-from .base_metric import BaseMetricLearner, \
-  SupervisedMixin
+from .base_metric import BaseMetricLearner, SupervisedMixin
 
 EPS = np.finfo(float).eps
 

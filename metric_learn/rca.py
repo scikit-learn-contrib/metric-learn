@@ -18,8 +18,7 @@ from six.moves import xrange
 from sklearn import decomposition
 from sklearn.utils.validation import check_array
 
-from .base_metric import BaseMetricLearner, \
-  PairsMixin, WeaklySupervisedMixin, TransformerMixin, SupervisedMixin
+from .base_metric import BaseMetricLearner, PairsMixin, SupervisedMixin
 from .constraints import Constraints
 
 

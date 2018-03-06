@@ -13,8 +13,7 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.decomposition import PCA
 from sklearn.utils.validation import check_X_y
 
-from .base_metric import BaseMetricLearner, \
-    SupervisedMixin
+from .base_metric import BaseMetricLearner, SupervisedMixin
 
 EPS = np.finfo(float).eps
 

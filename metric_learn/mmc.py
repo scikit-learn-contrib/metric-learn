@@ -19,11 +19,9 @@ Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/co
 from __future__ import print_function, absolute_import, division
 import numpy as np
 from six.moves import xrange
-from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import PairsMixin, \
-  BaseMetricLearner, SupervisedMixin, WeaklySupervisedMixin
+from .base_metric import PairsMixin, BaseMetricLearner, SupervisedMixin
 from .constraints import Constraints, ConstrainedDataset, unwrap_pairs, \
   wrap_pairs
 from ._util import vector_norm
@@ -442,6 +440,6 @@ class MMC_Supervised(_MMC, SupervisedMixin):
     X_constrained, y = wrap_pairs(X, pos_neg)
     return _MMC._fit(self, X_constrained, y)
 
-class MMC(_MMC, WeaklySupervisedMixin, PairsMixin):
+class MMC(_MMC, PairsMixin):
 
   pass

@@ -13,9 +13,7 @@ import scipy.linalg
 from six.moves import xrange
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import PairsMixin, \
-  BaseMetricLearner, WeaklySupervisedMixin, SupervisedMixin, QuadrupletsMixin, \
-  UnsupervisedMixin
+from .base_metric import BaseMetricLearner, SupervisedMixin, QuadrupletsMixin
 from .constraints import Constraints, ConstrainedDataset
 
 
@@ -194,6 +192,6 @@ class LSML_Supervised(_LSML, SupervisedMixin):
     return _LSML._fit(self, X_constrained, weights=self.weights)
 
 
-class LSML(_LSML, UnsupervisedMixin, QuadrupletsMixin):
+class LSML(_LSML, QuadrupletsMixin):
 
   pass
