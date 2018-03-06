@@ -440,6 +440,6 @@ class MMC_Supervised(_MMC, SupervisedMixin):
                                         random_state=random_state)
     return _MMC._fit(self, X, pos_neg)
 
-class MMC(_MMC, PairsMixin):
+class MMC(_MMC, WeaklySupervisedMixin, PairsMixin):
 
   pass

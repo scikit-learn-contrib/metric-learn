@@ -104,14 +104,22 @@ class WeaklySupervisedMixin(object):
     return self._fit(X, constraints, **kwargs)
 
 
-class PairsMixin(WeaklySupervisedMixin):
+class PairsMixin(object):
 
   def __init__(self):
     raise NotImplementedError('PairsMixin should not be instantiated')
   # TODO: introduce specific scoring functions etc
 
 
-class TripletsMixin(WeaklySupervisedMixin):
+class TripletsMixin(object):
+
+  def __init__(self):
+    raise NotImplementedError('TripletsMixin should not be '
+                              'instantiated')
+  # TODO: introduce specific scoring functions etc
+
+
+class QuadrupletsMixin(object):
 
   def __init__(self):
     raise NotImplementedError('TripletsMixin should not be '

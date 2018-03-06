@@ -14,7 +14,8 @@ from six.moves import xrange
 from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import PairsMixin, \
-  BaseMetricLearner, WeaklySupervisedMixin, SupervisedMixin
+  BaseMetricLearner, WeaklySupervisedMixin, SupervisedMixin, QuadrupletsMixin, \
+  UnsupervisedMixin
 from .constraints import Constraints
 
 
@@ -185,6 +186,6 @@ class LSML_Supervised(_LSML, SupervisedMixin):
     return _LSML._fit(self, X, pairs, weights=self.weights)
 
 
-class LSML(_LSML, PairsMixin):
+class LSML(_LSML, UnsupervisedMixin, QuadrupletsMixin):
 
   pass

@@ -198,6 +198,6 @@ class ITML_Supervised(_ITML, SupervisedMixin):
                                         random_state=random_state)
     return _ITML._fit(self, X, pos_neg, bounds=self.bounds)
 
-class ITML(_ITML, PairsMixin):
+class ITML(_ITML, WeaklySupervisedMixin, PairsMixin):
 
   pass

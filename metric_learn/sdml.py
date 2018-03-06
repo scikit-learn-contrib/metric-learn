@@ -135,6 +135,6 @@ class SDML_Supervised(_SDML, SupervisedMixin):
     adj = c.adjacency_matrix(num_constraints, random_state=random_state)
     return _SDML._fit(self, X, adj)
 
-class SDML(_SDML, PairsMixin):
+class SDML(_SDML, WeaklySupervisedMixin, PairsMixin):
 
   pass
