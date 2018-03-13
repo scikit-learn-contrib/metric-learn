@@ -186,7 +186,5 @@ class LSML_Supervised(LSML, SupervisedMetricLearner):
                                   random_state=random_state)
     pairs = c.positive_negative_pairs(num_constraints, same_length=True,
                                       random_state=random_state)
-    X_constrained = ConstrainedDataset(X, np.hstack([pairs[i][:, None]
-                                                           for i in
-                                                           range(4)]))
+    X_constrained = ConstrainedDataset(X, np.column_stack(pairs))
     return LSML.fit(self, X_constrained, weights=self.weights)

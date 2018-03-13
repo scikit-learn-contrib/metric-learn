@@ -49,14 +49,14 @@ class TestConstrainedDataset(unittest.TestCase):
             self.check_indexing(item)
 
     def test_repr(self):
-        assert repr(cd) == repr(X[c])
+        self.assertEqual(repr(cd), repr(X[c]))
 
     def test_str(self):
-        assert str(cd) == str(X[c])
+        self.assertEqual(str(cd), str(X[c]))
 
     def test_shape(self):
-        assert cd.shape == (c.shape[0], X.shape[1])
-        assert cd[0, 0].shape == (0, X.shape[1])
+        self.assertEqual(cd.shape, (c.shape[0], X.shape[1]))
+        self.assertEqual(cd[0, 0].shape, (0, X.shape[1]))
 
     def test_toarray(self):
         assert_array_equal(cd.toarray(), cd.X[c])
