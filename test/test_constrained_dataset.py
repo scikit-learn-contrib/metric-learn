@@ -65,6 +65,9 @@ class TestConstrainedDataset(unittest.TestCase):
         self.assertEqual(X_constrained.shape, (c.shape[0], X.shape[1]))
         self.assertEqual(X_constrained[0, 0].shape, (0, X.shape[1]))
 
+    def test_len(self):
+        self.assertEqual(len(X_constrained),c.shape[0])
+
     def test_toarray(self):
         assert_array_equal(X_constrained.toarray(), X_constrained.X[c])
 

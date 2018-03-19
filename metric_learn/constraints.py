@@ -96,7 +96,7 @@ class ConstrainedDataset(object):
 
   def __init__(self, X, c):
     # we convert the data to a suitable format
-    self.X = check_array(X, accept_sparse=True, dtype=None, warn_on_dtype=True)
+    self.X = check_array(X, accept_sparse=True, warn_on_dtype=True)
     self.c = check_array(c, dtype=['int'] + np.sctypes['int']
                                   + np.sctypes['uint'],
                          # we add 'int' at the beginning to tell it is the
@@ -110,7 +110,7 @@ class ConstrainedDataset(object):
     return ConstrainedDataset(self.X, self.c[item])
 
   def __len__(self):
-    return self.shape
+    return self.shape[0]
 
   def __str__(self):
     return self.toarray().__str__()

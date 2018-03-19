@@ -127,8 +127,8 @@ class PairsMixin(WeaklySupervisedMixin):
 
   def predict(self, X_constrained):
     # TODO: provide better implementation
-    pairwise_diffs = X_constrained.X[X_constrained.c[:, 0]] - \
-                     X_constrained.X[X_constrained.c[:, 1]]
+    pairwise_diffs = (X_constrained.X[X_constrained.c[:, 0]] -
+                      X_constrained.X[X_constrained.c[:, 1]])
     return np.sqrt(np.sum(pairwise_diffs.dot(self.metric()) * pairwise_diffs,
                                   axis=1))
 
