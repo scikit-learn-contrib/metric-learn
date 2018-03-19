@@ -9,10 +9,10 @@ class TestStringRepr(unittest.TestCase):
 
   def test_lmnn(self):
     self.assertRegexpMatches(
-        str(metric_learn.LMNN()),
-        r"(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
-        r"max_iter=1000,\n      min_iter=50, regularization=0.5, "
-        r"use_pca=True, verbose=False\)")
+      str(metric_learn.LMNN()),
+      r"^(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
+      r"max_iter=1000,(\n     )? min_iter=50,(\n  )? regularization=0.5, "
+      r"use_pca=True, verbose=False\)$")
 
   def test_nca(self):
     self.assertEqual(str(metric_learn.NCA()),

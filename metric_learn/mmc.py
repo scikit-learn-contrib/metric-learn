@@ -21,14 +21,14 @@ import numpy as np
 from six.moves import xrange
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import PairsMetricLearner, SupervisedMetricLearner
+from .base_metric import PairsMixin, BaseMetricLearner, SupervisedMixin
 from .constraints import (Constraints, ConstrainedDataset,
                           unwrap_pairs, wrap_pairs)
 from ._util import vector_norm
 
 
 
-class MMC(PairsMetricLearner):
+class _MMC(BaseMetricLearner):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
@@ -58,7 +58,7 @@ class MMC(PairsMetricLearner):
     self.diagonal_c = diagonal_c
     self.verbose = verbose
 
-  def fit(self, X_constrained, y):
+  def _fit(self, X_constrained, y):
     """Learn the MMC model.
 
     Parameters
@@ -380,7 +380,7 @@ class MMC(PairsMetricLearner):
       return V.T * np.sqrt(np.maximum(0, w[:,None]))
 
 
-class MMC_Supervised(MMC, SupervisedMetricLearner):
+class MMC_Supervised(_MMC, SupervisedMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
@@ -408,7 +408,7 @@ class MMC_Supervised(MMC, SupervisedMetricLearner):
     verbose : bool, optional
         if True, prints information while learning
     """
-    MMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
+    _MMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                  convergence_threshold=convergence_threshold,
                  A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
                  verbose=verbose)
@@ -438,4 +438,8 @@ class MMC_Supervised(MMC, SupervisedMetricLearner):
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     X_constrained, y = wrap_pairs(X, pos_neg)
-    return MMC.fit(self, X_constrained, y)
+    return _MMC._fit(self, X_constrained, y)
+
+class MMC(_MMC, PairsMixin):
+
+  pass

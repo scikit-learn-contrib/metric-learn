@@ -13,11 +13,11 @@ import scipy.linalg
 from six.moves import xrange
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import SupervisedMetricLearner, QuadrupletsMetricLearner
+from .base_metric import BaseMetricLearner, SupervisedMixin, QuadrupletsMixin
 from .constraints import Constraints, ConstrainedDataset
 
 
-class LSML(QuadrupletsMetricLearner):
+class _LSML(BaseMetricLearner):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
     """Initialize LSML.
 
@@ -57,7 +57,7 @@ class LSML(QuadrupletsMetricLearner):
   def metric(self):
     return self.M_
 
-  def fit(self, X_constrained, y=None, weights=None):
+  def _fit(self, X_constrained, y=None, weights=None):
     """Learn the LSML model.
 
     Parameters
@@ -136,7 +136,7 @@ class LSML(QuadrupletsMetricLearner):
     return dMetric
 
 
-class LSML_Supervised(LSML, SupervisedMetricLearner):
+class LSML_Supervised(_LSML, SupervisedMixin):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
                num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.
@@ -156,7 +156,7 @@ class LSML_Supervised(LSML, SupervisedMetricLearner):
     verbose : bool, optional
         if True, prints information while learning
     """
-    LSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
+    _LSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                   verbose=verbose)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
@@ -187,4 +187,9 @@ class LSML_Supervised(LSML, SupervisedMetricLearner):
     pairs = c.positive_negative_pairs(num_constraints, same_length=True,
                                       random_state=random_state)
     X_constrained = ConstrainedDataset(X, np.column_stack(pairs))
-    return LSML.fit(self, X_constrained, weights=self.weights)
+    return _LSML._fit(self, X_constrained, weights=self.weights)
+
+
+class LSML(_LSML, QuadrupletsMixin):
+
+  pass

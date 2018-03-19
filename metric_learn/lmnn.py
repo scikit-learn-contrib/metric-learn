@@ -17,11 +17,11 @@ from six.moves import xrange
 from sklearn.utils.validation import check_X_y, check_array
 from sklearn.metrics import euclidean_distances
 
-from .base_metric import SupervisedMetricLearner
+from .base_metric import BaseMetricLearner, SupervisedMixin
 
 
 # commonality between LMNN implementations
-class _base_LMNN(SupervisedMetricLearner):
+class _base_LMNN(BaseMetricLearner):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001, use_pca=True,
                verbose=False):
@@ -49,7 +49,7 @@ class _base_LMNN(SupervisedMetricLearner):
 
 
 # slower Python version
-class python_LMNN(_base_LMNN):
+class _python_LMNN(_base_LMNN):
 
   def _process_inputs(self, X, labels):
     self.X_ = check_array(X, dtype=float)
@@ -66,7 +66,7 @@ class python_LMNN(_base_LMNN):
       raise ValueError('not enough class labels for specified k'
                        ' (smallest class has %d)' % required_k)
 
-  def fit(self, X, y):
+  def _fit(self, X, y):
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate
@@ -239,15 +239,14 @@ def _sum_outer_products(data, a_inds, b_inds, weights=None):
     return np.dot(Xab.T, Xab * weights[:,None])
   return np.dot(Xab.T, Xab)
 
-
 try:
   # use the fast C++ version, if available
   from modshogun import LMNN as shogun_LMNN
   from modshogun import RealFeatures, MulticlassLabels
 
-  class LMNN(_base_LMNN):
+  class _LMNN(_base_LMNN):
 
-    def fit(self, X, y):
+    def _fit(self, X, y):
       self.X_, y = check_X_y(X, y, dtype=float)
       labels = MulticlassLabels(y)
       self._lmnn = shogun_LMNN(RealFeatures(self.X_.T), labels, self.k)
@@ -262,5 +261,18 @@ try:
       self.L_ = self._lmnn.get_linear_transform()
       return self
 
+
+  class LMNN(_LMNN, SupervisedMixin):
+
+    def fit(self, X, y):
+      return self._fit(X, y)
+
+
 except ImportError:
+
+  class python_LMNN(_python_LMNN, SupervisedMixin):
+
+    def fit(self, X, y):
+      return self._fit(X, y)
+
   LMNN = python_LMNN
