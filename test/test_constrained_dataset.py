@@ -23,9 +23,12 @@ class TestConstrainedDataset(unittest.TestCase):
         np.testing.assert_array_equal(cd[idx].toarray(), X[c[idx]])
         np.testing.assert_array_equal(cd[idx].toarray(), X[c][idx])
 
-    def test_inputs(self):
-        # test the allowed and forbidden ways to create a ConstrainedDataset
+    def test_allowed_inputs(self):
+        # test the allowed ways to create a ConstrainedDataset
         ConstrainedDataset(X, c)
+
+    def test_invalid_inputs(self):
+        # test the invalid ways to create a ConstrainedDataset
         two_points = [[1, 2], [3, 5]]
         out_of_range_constraints = [[1, 2], [0, 1]]
         msg = "ConstrainedDataset cannot be created: the length of " \
