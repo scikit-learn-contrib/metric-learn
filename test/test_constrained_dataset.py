@@ -31,9 +31,9 @@ class TestConstrainedDataset(unittest.TestCase):
         # test the invalid ways to create a ConstrainedDataset
         two_points = [[1, 2], [3, 5]]
         out_of_range_constraints = [[1, 2], [0, 1]]
-        msg = "ConstrainedDataset cannot be created: the length of " \
-              "the dataset is 2, so index 2 is out of " \
-              "range."
+        msg = ("ConstrainedDataset cannot be created: the length of "
+              "the dataset is 2, so index 2 is out of "
+              "range.")
         assert_raise_message(IndexError, msg, ConstrainedDataset, two_points,
                              out_of_range_constraints)
 
