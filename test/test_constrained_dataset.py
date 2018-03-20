@@ -5,23 +5,24 @@ from numpy.testing import assert_array_equal
 from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.utils.testing import assert_raise_message
 
-X = np.random.randn(20, 5)
-c = np.random.randint(0, X.shape[0], (15, 2))
-cd = ConstrainedDataset(X, c)
-y = np.random.randint(0, 2, c.shape[0])
-group = np.random.randint(0, 3, c.shape[0])
+num_points = 20
+num_features = 5
+num_constraints = 15
 
-c_shape = c.shape[0]
-
+X = np.random.randn(num_points, num_features)
+c = np.random.randint(0, num_points, (num_constraints, 2))
+X_constrained = ConstrainedDataset(X, c)
+y = np.random.randint(0, 2, num_constraints)
+group = np.random.randint(0, 3, num_constraints)
 
 class TestConstrainedDataset(unittest.TestCase):
 
     @staticmethod
     def check_indexing(idx):
         # checks that an indexing returns the data we expect
-        np.testing.assert_array_equal(cd[idx].c, c[idx])
-        np.testing.assert_array_equal(cd[idx].toarray(), X[c[idx]])
-        np.testing.assert_array_equal(cd[idx].toarray(), X[c][idx])
+        np.testing.assert_array_equal(X_constrained[idx].c, c[idx])
+        np.testing.assert_array_equal(X_constrained[idx].toarray(), X[c[idx]])
+        np.testing.assert_array_equal(X_constrained[idx].toarray(), X[c][idx])
 
     def test_allowed_inputs(self):
         # test the allowed ways to create a ConstrainedDataset
@@ -52,17 +53,17 @@ class TestConstrainedDataset(unittest.TestCase):
             self.check_indexing(item)
 
     def test_repr(self):
-        self.assertEqual(repr(cd), repr(X[c]))
+        self.assertEqual(repr(X_constrained), repr(X[c]))
 
     def test_str(self):
-        self.assertEqual(str(cd), str(X[c]))
+        self.assertEqual(str(X_constrained), str(X[c]))
 
     def test_shape(self):
-        self.assertEqual(cd.shape, (c.shape[0], X.shape[1]))
-        self.assertEqual(cd[0, 0].shape, (0, X.shape[1]))
+        self.assertEqual(X_constrained.shape, (c.shape[0], X.shape[1]))
+        self.assertEqual(X_constrained[0, 0].shape, (0, X.shape[1]))
 
     def test_toarray(self):
-        assert_array_equal(cd.toarray(), cd.X[c])
+        assert_array_equal(X_constrained.toarray(), X_constrained.X[c])
 
     def test_folding(self):
         # test that ConstrainedDataset is compatible with scikit-learn folding
@@ -71,7 +72,8 @@ class TestConstrainedDataset(unittest.TestCase):
         for alg in [KFold, StratifiedKFold]:
             for shuffle_i in shuffle_list:
                 for group_i in groups_list:
-                    for train_idx, test_idx in alg(
-                            shuffle=shuffle_i).split(cd, y, group_i):
+                    for train_idx, test_idx \
+                            in alg(shuffle=shuffle_i).split(X_constrained, y,
+                                                            group_i):
                         self.check_indexing(train_idx)
                         self.check_indexing(test_idx)
