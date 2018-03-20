@@ -147,10 +147,9 @@ class ConstrainedDataset(object):
 
 
 def unwrap_pairs(X_constrained, y):
-  a = X_constrained.c[(y == 0)[:, 0]][:, 0]
-  b = X_constrained.c[(y == 0)[:, 0]][:, 1]
-  c = X_constrained.c[(y == 1)[:, 0]][:, 0]
-  d = X_constrained.c[(y == 1)[:, 0]][:, 1]
+  y_zero = (y == 0).ravel()
+  a, b = X_constrained.c[y_zero].T
+  c, d = X_constrained.c[~y_zero].T
   X = X_constrained.X
   return X, [a, b, c, d]
 
