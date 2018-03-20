@@ -40,15 +40,16 @@ class TestConstrainedDataset(unittest.TestCase):
 
     def test_getitem(self):
         # test different types of slicing
-        i = np.random.randint(1, c_shape - 1)
-        begin = np.random.randint(1, c_shape - 1)
-        end = np.random.randint(begin + 1, c_shape)
-        fancy_index = np.random.randint(0, c_shape, 20)
-        binary_index = np.random.randint(0, 2, c_shape)
+        i = np.random.randint(1, num_constraints - 1)
+        begin = np.random.randint(1, num_constraints - 1)
+        end = np.random.randint(begin + 1, num_constraints)
+        fancy_index = np.random.randint(0, num_constraints, 20)
+        binary_index = np.random.randint(0, 2, num_constraints)
         boolean_index = binary_index.astype(bool)
-        items = [0, c_shape - 1, i, slice(i), slice(0, begin), slice(begin,
-                 end), slice(end, c_shape), slice(0, c_shape), fancy_index,
-                 binary_index, boolean_index]
+        items = [0, num_constraints - 1, i, slice(i), slice(0, begin),
+                 slice(begin, end), slice(end, num_constraints),
+                 slice(0, num_constraints), fancy_index, binary_index,
+                 boolean_index]
         for item in items:
             self.check_indexing(item)
 
