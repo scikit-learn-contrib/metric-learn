@@ -158,8 +158,7 @@ def wrap_pairs(X, constraints):
   b = np.array(constraints[1])
   c = np.array(constraints[2])
   d = np.array(constraints[3])
-  constraints = np.vstack([np.hstack([a[:, None], b[:, None]]),
-                           np.hstack([c[:, None], d[:, None]])])
+  constraints = np.vstack((np.column_stack((a, b)), np.column_stack((c, d))))
   y = np.vstack([np.zeros((len(a), 1)), np.ones((len(c), 1))])
   X_constrained = ConstrainedDataset(X, constraints)
   return X_constrained, y
