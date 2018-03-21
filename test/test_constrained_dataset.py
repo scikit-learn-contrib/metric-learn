@@ -3,17 +3,19 @@ import numpy as np
 from metric_learn.constraints import ConstrainedDataset
 from numpy.testing import assert_array_equal
 from sklearn.model_selection import StratifiedKFold, KFold
+from sklearn.utils import check_random_state
 from sklearn.utils.testing import assert_raise_message
 
 num_points = 20
 num_features = 5
 num_constraints = 15
+RNG = check_random_state(0)
 
-X = np.random.randn(num_points, num_features)
-c = np.random.randint(0, num_points, (num_constraints, 2))
+X = RNG.randn(num_points, num_features)
+c = RNG.randint(0, num_points, (num_constraints, 2))
 X_constrained = ConstrainedDataset(X, c)
-y = np.random.randint(0, 2, num_constraints)
-group = np.random.randint(0, 3, num_constraints)
+y = RNG.randint(0, 2, num_constraints)
+group = RNG.randint(0, 3, num_constraints)
 
 class TestConstrainedDataset(unittest.TestCase):
 
@@ -40,11 +42,11 @@ class TestConstrainedDataset(unittest.TestCase):
 
     def test_getitem(self):
         # test different types of slicing
-        i = np.random.randint(1, num_constraints - 1)
-        begin = np.random.randint(1, num_constraints - 1)
-        end = np.random.randint(begin + 1, num_constraints)
-        fancy_index = np.random.randint(0, num_constraints, 20)
-        binary_index = np.random.randint(0, 2, num_constraints)
+        i = RNG.randint(1, num_constraints - 1)
+        begin = RNG.randint(1, num_constraints - 1)
+        end = RNG.randint(begin + 1, num_constraints)
+        fancy_index = RNG.randint(0, num_constraints, 20)
+        binary_index = RNG.randint(0, 2, num_constraints)
         boolean_index = binary_index.astype(bool)
         items = [0, num_constraints - 1, i, slice(i), slice(0, begin),
                  slice(begin, end), slice(end, num_constraints),
