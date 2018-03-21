@@ -8,6 +8,9 @@ class TransformerMixin(object):
   scikit-learn, but the documentation is changed: this Transformer is
   allowed to take as y a non array-like input"""
 
+  def __init__(self):
+    raise NotImplementedError('TransformerMixin should not be instantiated')
+
   def fit_transform(self, X, y=None, **fit_params):
     """Fit to data, then transform it.
 
@@ -39,6 +42,7 @@ class TransformerMixin(object):
       return self.fit(X, y, **fit_params).transform(X)
 
 class BaseMetricLearner(BaseEstimator, TransformerMixin):
+
   def __init__(self):
     raise NotImplementedError('BaseMetricLearner should not be instantiated')
 
@@ -88,17 +92,27 @@ class BaseMetricLearner(BaseEstimator, TransformerMixin):
 
 class SupervisedMixin(object):
 
+  def __init__(self):
+    raise NotImplementedError('UnsupervisedMixin should not be instantiated')
+
   def fit(self, X, y):
     return NotImplementedError
 
 
 class UnsupervisedMixin(object):
 
+  def __init__(self):
+    raise NotImplementedError('UnsupervisedMixin should not be instantiated')
+
   def fit(self, X, y=None):
     return NotImplementedError
 
 
 class WeaklySupervisedMixin(object):
+
+  def __init__(self):
+    raise NotImplementedError('WeaklySupervisedMixin should not be '
+                              'instantiated')
 
   def fit(self, X, constraints, **kwargs):
     return self._fit(X, constraints, **kwargs)
