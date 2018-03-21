@@ -119,10 +119,13 @@ class TripletsMixin(WeaklySupervisedMixin):
   # TODO: introduce specific scoring functions etc
 
 
-class QuadrupletsMixin(UnsupervisedMixin):
+class QuadrupletsMixin(WeaklySupervisedMixin):
 
   def __init__(self):
     raise NotImplementedError('QuadrupletsMixin should not be '
                               'instantiated')
   # TODO: introduce specific scoring functions etc
+
+  def fit(self, X, constraints=None, **kwargs):
+    return self._fit(X, **kwargs)
 

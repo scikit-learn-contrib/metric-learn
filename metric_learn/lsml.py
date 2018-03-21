@@ -57,7 +57,7 @@ class _LSML(BaseMetricLearner):
   def metric(self):
     return self.M_
 
-  def _fit(self, X_constrained, y=None, weights=None):
+  def _fit(self, X_constrained, weights=None):
     """Learn the LSML model.
 
     Parameters
