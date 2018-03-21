@@ -2,14 +2,11 @@ from numpy.linalg import cholesky
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_array
 
-
-class TransformerMixin(object):
-  """Mixin class for all transformers in metric-learn. Same as the one in
-  scikit-learn, but the documentation is changed: this Transformer is
-  allowed to take as y a non array-like input"""
+class BaseMetricLearner(BaseEstimator):
 
   def __init__(self):
-    raise NotImplementedError('TransformerMixin should not be instantiated')
+    raise NotImplementedError('BaseMetricLearner should not be instantiated')
+
 
   def fit_transform(self, X, y=None, **fit_params):
     """Fit to data, then transform it.
@@ -19,7 +16,7 @@ class TransformerMixin(object):
 
     Parameters
     ----------
-    X : numpy array of shape [n_samples, n_features]
+    X : array-like of shape [n_samples, n_features], or ConstrainedDataset
         Training set.
 
     y : numpy array of shape [n_samples] or 4-tuple of arrays
@@ -40,11 +37,6 @@ class TransformerMixin(object):
     else:
       # fit method of arity 2 (supervised transformation)
       return self.fit(X, y, **fit_params).transform(X)
-
-class BaseMetricLearner(BaseEstimator, TransformerMixin):
-
-  def __init__(self):
-    raise NotImplementedError('BaseMetricLearner should not be instantiated')
 
   def metric(self):
     """Computes the Mahalanobis matrix from the transformation matrix.
