@@ -56,14 +56,14 @@ class _SDML(BaseMetricLearner):
   def metric(self):
     return self.M_
 
-  def _fit(self, X_constrained, y):
+  def _fit(self, X_constrained, y_constraints):
     """Learn the SDML model.
 
     Parameters
     ----------
     X_constrained : ConstrainedDataset
         with constraints being an array of shape [n_constraints, 2]
-    y : array-like, shape (n_constraints x 1)
+    y_constraints : array-like, shape (n_constraints x 1)
         labels of the constraints
 
     Returns
@@ -71,7 +71,7 @@ class _SDML(BaseMetricLearner):
     self : object
         Returns the instance.
     """
-    X, W = unwrap_to_graph(X_constrained, y)
+    X, W = unwrap_to_graph(X_constrained, y_constraints)
     loss_matrix = self._prepare_inputs(X, W)
     P = self.M_ + self.balance_param * loss_matrix
     emp_cov = pinvh(P)

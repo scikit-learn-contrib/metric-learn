@@ -9,6 +9,10 @@ extensions = [
     'numpydoc',
 ]
 
+autodoc_default_flags = ['members', 'inherited-members']
+
+default_role='any'
+
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'

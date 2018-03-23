@@ -93,6 +93,57 @@ class Constraints(object):
 
 
 class ConstrainedDataset(object):
+  """Constrained Dataset
+
+  This is what weakly supervised metric learning algorithms take as input. It
+  wraps a dataset ``X`` and some constraints ``c``. It mocks a 3D array of
+  shape ``(n_constraints, t, n_features)``, where each line contains t
+  samples from ``X``.
+
+  Read more in the :ref:`User Guide <wsml>`.
+
+  Parameters
+  ----------
+  X: array-like, shape=(n_samples, n_features)
+        Dataset of samples.
+
+  c: array-like or integers between 0 and n_samples, shape=(n_constraints, t)
+        Array of indexes of the ``t`` samples to consider in each constraint.
+
+  Attributes
+  ----------
+  X: array-like, shape=(n_samples, n_features)
+    The dataset ``X`` stored in the `ConstrainedDataset`.
+
+  c: array-like, shape=(n_constraints, t)
+    The current array of indices that is stored in the `ConstrainedDataset`.
+
+  shape: tuple, len==3.
+    The shape of the `ConstrainedDataset`. It is (n_constraints, t,
+    n_features), where ``t`` is the number of samples in each tuple.
+
+  Examples
+  --------
+  X is a regular array-like dataset, with 4 samples of 3 features each. Let
+  us say we also have pair constraints.
+
+  >>> X = [[1., 5., 6.], [7., 5., 2.], [9., 2., 0.], [2., 8., 4.]]
+  >>> constraints = [[0, 2], [1, 3], [2, 3]]
+
+  The first element of the new dataset will be the pair of sample 0 and
+  sample 2. We can later have a labels array ``y_constraints`` which will
+  say if this pair is positive (similar samples) or negative.
+
+  >>> X_constrained = ConstrainedDataset(X, constraints)
+  >>> X_constrained.toarray()
+  array([[[ 1.,  5.,  6.],
+          [ 9.,  2.,  0.]],
+         [[ 7.,  5.,  2.],
+          [ 2.,  8.,  4.]],
+         [[ 9.,  2.,  0.],
+          [ 2.,  8.,  4.]]])
+
+  """
 
   def __init__(self, X, c):
     # we convert the data to a suitable format
@@ -104,7 +155,9 @@ class ConstrainedDataset(object):
                          ensure_2d=False, ensure_min_samples=False,
                          ensure_min_features=False, warn_on_dtype=True)
     self._check_index(self.X.shape[0], self.c)
-    self.shape = (len(c) if hasattr(c, '__len__') else 0, self.X.shape[1])
+    self.shape = (len(c) if hasattr(c, '__len__') else 0, self.c.shape[1] if
+    (len(self.c.shape) > 1 if hasattr(c, 'shape') else 0) else 0,
+                  self.X.shape[1])
 
   def __getitem__(self, item):
     return ConstrainedDataset(self.X, self.c[item])

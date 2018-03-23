@@ -23,7 +23,7 @@ class BaseMetricLearner(BaseEstimator):
     X : array-like of shape [n_samples, n_features], or ConstrainedDataset
         Training set.
 
-    y : numpy array of shape [n_samples] or 4-tuple of arrays
+    y : numpy array of shape [n_samples] or quadruplet of arrays
         Target values, or constraints (a, b, c, d) indices into X, with
         (a, b) specifying similar and (c,d) dissimilar pairs).
 
@@ -70,7 +70,7 @@ class BaseMetricLearner(BaseEstimator):
 
     Parameters
     ----------
-    X : (n x d) matrix or ConstrainedDataset, optional
+    X : (n x d) matrix or `ConstrainedDataset` , optional
         Data to transform. If not supplied, the training data will be used.
         In the case of a ConstrainedDataset, X_constrained.X is used.
 
@@ -113,9 +113,6 @@ class WeaklySupervisedMixin(object):
     raise NotImplementedError('WeaklySupervisedMixin should not be '
                               'instantiated')
 
-  def fit(self, X, constraints, **kwargs):
-    return self._fit(X, constraints, **kwargs)
-
   def decision_function(self, X_constrained):
       return self.predict(X_constrained)
 
@@ -125,15 +122,72 @@ class PairsMixin(WeaklySupervisedMixin):
   def __init__(self):
     raise NotImplementedError('PairsMixin should not be instantiated')
 
+  def fit(self, X_constrained, y_constraints, **kwargs):
+    """Fit a pairs based metric learner.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 2, n_features)
+      Training `ConstrainedDataset`.
+
+    y_constraints : array-like, shape=(n_constraints,)
+      Labels of constraints (0 for similar pairs, 1 for dissimilar).
+
+    kwargs : Any
+      Algorithm specific parameters.
+
+    Returns
+    -------
+    self : The fitted estimator.
+    """
+    return self._fit(X_constrained, y_constraints, **kwargs)
+
   def predict(self, X_constrained):
+    """Predicts the learned similarity between input pairs
+
+    Returns the learned metric value between samples in every pair. It should
+    ideally be low for similar samples and high for dissimilar samples.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 2, n_features)
+      A constrained dataset of paired samples.
+
+    Returns
+    -------
+    y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
+      The predicted learned metric value between samples in every pair.
+    """
     # TODO: provide better implementation
     pairwise_diffs = (X_constrained.X[X_constrained.c[:, 0]] -
                       X_constrained.X[X_constrained.c[:, 1]])
     return np.sqrt(np.sum(pairwise_diffs.dot(self.metric()) * pairwise_diffs,
                                   axis=1))
 
-  def score(self, X_constrained, y):
-      return roc_auc_score(y, self.decision_function(X_constrained))
+  def score(self, X_constrained, y_constraints):
+    """Computes score of pairs similarity prediction.
+
+    Returns the ``roc_auc`` score of the fitted metric learner. It is
+    computed in the following way: for every value of a threshold
+    ``t`` we classify all pairs of samples where the predicted distance is
+    inferior to ``t`` as belonging to the "similar" class, and the other as
+    belonging to the "dissimilar" class, and we count false positive and
+    true positives as in a classical ``roc_auc`` curve.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 2, n_features)
+      Constrained dataset of paired samples.
+
+    y_constraints : array-like, shape=(n_constraints,)
+      The corresponding labels.
+
+    Returns
+    -------
+    score : float
+      The ``roc_auc`` score.
+    """
+    return roc_auc_score(y_constraints, self.decision_function(X_constrained))
 
 
 class TripletsMixin(WeaklySupervisedMixin):
@@ -142,7 +196,45 @@ class TripletsMixin(WeaklySupervisedMixin):
     raise NotImplementedError('TripletsMixin should not be '
                               'instantiated')
 
+  def fit(self, X_constrained, y=None, **kwargs):
+    """Fit a triplets based metric learner.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 3, n_features)
+      Training `ConstrainedDataset`. To give the right supervision to the
+      algorithm, the first two points should be more similar than the first
+      and the third.
+
+    y : Ignored, for scikit-learn compatibility.
+
+    kwargs : Any
+      Algorithm specific parameters.
+
+    Returns
+    -------
+    self : The fitted estimator.
+    """
+    return self._fit(X_constrained, **kwargs)
+
+
   def predict(self, X_constrained):
+    """Predict the difference between samples similarities in input triplets.
+
+    For each triplet of samples in ``X_constrained``, returns the
+    difference between the learned similarity between the first and the
+    second point, minus the similarity between the first and the third point.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 3, n_features)
+      Input constrained dataset.
+
+    Returns
+    -------
+    prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
+      Predictions for each triplet.
+    """
     # TODO: provide better implementation
     similar_diffs = X_constrained.X[X_constrained.c[:, 0]] - \
                     X_constrained.X[X_constrained.c[:, 1]]
@@ -154,6 +246,24 @@ class TripletsMixin(WeaklySupervisedMixin):
                           dissimilar_diffs, axis=1))
 
   def score(self, X_constrained, y=None):
+    """Computes score of triplets similarity prediction.
+
+    Returns the accuracy score of the following classification task: a record
+    is correctly classified if the predicted similarity between the first two
+    samples is higher than that between the first and the third.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 3, n_features)
+      Constrained dataset of triplets of samples.
+
+    y: Ignored (for scikit-learn compatibility).
+
+    Returns
+    -------
+    score: float
+      The triplets score.
+    """
     predicted_sign = self.decision_function(X_constrained) < 0
     return np.sum(predicted_sign) / predicted_sign.shape[0]
 
@@ -165,10 +275,43 @@ class QuadrupletsMixin(WeaklySupervisedMixin):
     raise NotImplementedError('QuadrupletsMixin should not be '
                               'instantiated')
 
-  def fit(self, X, constraints=None, **kwargs):
-    return self._fit(X, **kwargs)
+  def fit(self, X_constrained, y=None, **kwargs):
+    """Fit a quadruplets based metric learner.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 4, n_features)
+      Training `ConstrainedDataset`. To give the right supervision to the
+      algorithm, the first two points should be more similar than the last two.
+
+    y : Ignored, for scikit-learn compatibility.
+
+    kwargs : Any
+      Algorithm specific parameters.
+
+    Returns
+    -------
+    self : The fitted estimator.
+    """
+    return self._fit(X_constrained, **kwargs)
 
   def predict(self, X_constrained):
+    """Predicts differences between sample similarities in input quadruplets.
+
+    For each quadruplet of samples in ``X_constrained``, computes the
+    difference between the learned metric of the first pair minus the learned
+    metric of the second pair.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 4, n_features)
+      Input constrained dataset.
+
+    Returns
+    -------
+    prediction : np.ndarray of floats, shape=(n_constraints,)
+      Metric differences.
+    """
     similar_diffs = X_constrained.X[X_constrained.c[:, 0]] - \
                     X_constrained.X[X_constrained.c[:, 1]]
     dissimilar_diffs = X_constrained.X[X_constrained.c[:, 2]] - \
@@ -182,5 +325,23 @@ class QuadrupletsMixin(WeaklySupervisedMixin):
       return self.predict(X_constrained)
 
   def score(self, X_constrained, y=None):
+    """Computes score on an input constrained dataset
+
+    Returns the accuracy score of the following classification task: a record
+    is correctly classified if the predicted similarity between the first two
+    samples is higher than that of the last two.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, 4, n_features)
+      Input constrained dataset.
+
+    y : Ignored, for scikit-learn compatibility.
+
+    Returns
+    -------
+    score : float
+      The quadruplets score.
+    """
     predicted_sign = self.decision_function(X_constrained) < 0
     return np.sum(predicted_sign) / predicted_sign.shape[0]

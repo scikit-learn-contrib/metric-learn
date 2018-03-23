@@ -62,8 +62,9 @@ class TestConstrainedDataset(unittest.TestCase):
         self.assertEqual(str(X_constrained), str(X[c]))
 
     def test_shape(self):
-        self.assertEqual(X_constrained.shape, (c.shape[0], X.shape[1]))
-        self.assertEqual(X_constrained[0, 0].shape, (0, X.shape[1]))
+        self.assertEqual(X_constrained.shape, (c.shape[0], c.shape[1],
+                                               X.shape[1]))
+        self.assertEqual(X_constrained[0, 0].shape, (0, 0, X.shape[1]))
 
     def test_len(self):
         self.assertEqual(len(X_constrained),c.shape[0])

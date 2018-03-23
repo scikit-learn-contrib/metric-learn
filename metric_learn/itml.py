@@ -73,19 +73,19 @@ class _ITML(BaseMetricLearner):
       self.A_ = check_array(self.A0)
     return a,b,c,d
 
-  def _fit(self, X_constrained, y, bounds=None):
+  def _fit(self, X_constrained, y_constraints, bounds=None):
     """Learn the ITML model.
 
     Parameters
     ----------
     X_constrained : ConstrainedDataset
         with constraints being an array of shape [n_constraints, 2]
-    y : array-like, shape (n_constraints x 1)
+    y_constraints : array-like, shape (n_constraints x 1)
         labels of the constraints
     bounds : list (pos,neg) pairs, optional
         bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
     """
-    X, constraints = unwrap_pairs(X_constrained, y)
+    X, constraints = unwrap_pairs(X_constrained, y_constraints)
     a,b,c,d = self._process_inputs(X, constraints, bounds)
     gamma = self.gamma
     num_pos = len(a)

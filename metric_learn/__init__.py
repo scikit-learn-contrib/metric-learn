@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from .constraints import Constraints
+from .constraints import Constraints, ConstrainedDataset
 from .covariance import Covariance
 from .itml import ITML, ITML_Supervised
 from .lmnn import LMNN

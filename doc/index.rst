@@ -14,17 +14,34 @@ This package contains efficient Python implementations of several popular
 metric learning algorithms.
 
 .. toctree::
-   :caption: Algorithms
+   :caption: Unsupervised Algorithms
    :maxdepth: 1
 
    metric_learn.covariance
-   metric_learn.lmnn
+
+.. toctree::
+   :caption: Weakly Supervised algorithms
+   :maxdepth: 1
+
+   metric_learn.weakly_supervised
+   metric_learn.mmc
    metric_learn.itml
    metric_learn.sdml
    metric_learn.lsml
+
+Note that all Weakly Supervised Metric Learners have a supervised version. See
+:ref:`this section<supervised_version>` for more details.
+
+
+.. toctree::
+   :caption: Supervised algorithms
+   :maxdepth: 1
+
+   metric_learn.lmnn
    metric_learn.nca
    metric_learn.lfda
    metric_learn.rca
+   metric_learn.mlkr
 
 Each metric supports the following methods:
 
@@ -34,6 +51,9 @@ Each metric supports the following methods:
    data matrix :math:`X \in \mathbb{R}^{n \times d}` to the
    :math:`D`-dimensional learned metric space :math:`X L^{\top}`,
    in which standard Euclidean distances may be used.
+
+.. _transform_ml:
+
 -  ``transform(X)``, which applies the aforementioned transformation.
 -  ``metric()``, which returns a Mahalanobis matrix
    :math:`M = L^{\top}L` such that distance between vectors ``x`` and

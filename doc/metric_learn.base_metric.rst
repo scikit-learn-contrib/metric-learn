@@ -5,3 +5,4 @@ metric_learn.base_metric module
     :members:
     :undoc-members:
     :show-inheritance:
+

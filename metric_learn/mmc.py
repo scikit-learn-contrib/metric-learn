@@ -58,17 +58,17 @@ class _MMC(BaseMetricLearner):
     self.diagonal_c = diagonal_c
     self.verbose = verbose
 
-  def _fit(self, X_constrained, y):
+  def _fit(self, X_constrained, y_constraints):
     """Learn the MMC model.
 
     Parameters
     ----------
     X_constrained : ConstrainedDataset
         with constraints being an array of shape [n_constraints, 2]
-    y : array-like, shape (n_constraints x 1)
+    y_constraints : array-like, shape (n_constraints x 1)
         labels of the constraints
     """
-    X, constraints = unwrap_pairs(X_constrained, y)
+    X, constraints = unwrap_pairs(X_constrained, y_constraints)
     constraints = self._process_inputs(X, constraints)
     if self.diagonal:
       return self._fit_diag(X, constraints)
