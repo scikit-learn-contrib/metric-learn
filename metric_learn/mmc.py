@@ -247,7 +247,7 @@ class MMC(BaseMetricLearner):
     reduction = 2.0
     w = np.diag(self.A_).copy()
 
-    while error > self.convergence_threshold:
+    while error > self.convergence_threshold and it < self.max_iter:
 
       fD0, fD_1st_d, fD_2nd_d = self._D_constraint(X, c, d, w)
       obj_initial = np.dot(s_sum, w) + self.diagonal_c * fD0
