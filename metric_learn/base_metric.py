@@ -2,7 +2,7 @@ from sklearn.metrics import roc_auc_score
 
 from metric_learn.constraints import ConstrainedDataset
 from numpy.linalg import cholesky
-from sklearn.base import BaseEstimator
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 import numpy as np
 
@@ -10,37 +10,6 @@ class BaseMetricLearner(BaseEstimator):
 
   def __init__(self):
     raise NotImplementedError('BaseMetricLearner should not be instantiated')
-
-
-  def fit_transform(self, X, y=None, **fit_params):
-    """Fit to data, then transform it.
-
-    Fits transformer to X and y with optional parameters fit_params
-    and returns a transformed version of X.
-
-    Parameters
-    ----------
-    X : array-like of shape [n_samples, n_features], or ConstrainedDataset
-        Training set.
-
-    y : numpy array of shape [n_samples] or quadruplet of arrays
-        Target values, or constraints (a, b, c, d) indices into X, with
-        (a, b) specifying similar and (c,d) dissimilar pairs).
-
-    Returns
-    -------
-    X_new : numpy array of shape [n_samples, n_features_new]
-        Transformed array.
-
-    """
-    # non-optimized default implementation; override when a better
-    # method is possible for a given clustering algorithm
-    if y is None:
-      # fit method of arity 1 (unsupervised transformation)
-      return self.fit(X, **fit_params).transform(X)
-    else:
-      # fit method of arity 2 (supervised transformation)
-      return self.fit(X, y, **fit_params).transform(X)
 
   def metric(self):
     """Computes the Mahalanobis matrix from the transformation matrix.
@@ -89,7 +58,7 @@ class BaseMetricLearner(BaseEstimator):
     return X.dot(L.T)
 
 
-class SupervisedMixin(object):
+class SupervisedMixin(TransformerMixin):
 
   def __init__(self):
     raise NotImplementedError('UnsupervisedMixin should not be instantiated')
@@ -98,7 +67,7 @@ class SupervisedMixin(object):
     return NotImplementedError
 
 
-class UnsupervisedMixin(object):
+class UnsupervisedMixin(TransformerMixin):
 
   def __init__(self):
     raise NotImplementedError('UnsupervisedMixin should not be instantiated')
@@ -112,6 +81,26 @@ class WeaklySupervisedMixin(object):
   def __init__(self):
     raise NotImplementedError('WeaklySupervisedMixin should not be '
                               'instantiated')
+
+  def fit_transform(self, X_constrained, y=None, **fit_params):
+    """Fit to data, then transform it.
+
+    Fits transformer to X and y with optional parameters fit_params
+    and returns a transformed version of X.
+
+    Parameters
+    ----------
+    X_constrained : `ConstrainedDataset`, shape=(n_constraints, t, n_features)
+        Training set of ``n_constraints`` tuples of samples.
+    y : None, or numpy array of shape [n_constraints]
+        Constraints labels.
+    """
+    if y is None:
+      # fit method of arity 1 (unsupervised transformation)
+      return self.fit(X_constrained, **fit_params).transform(X_constrained)
+    else:
+      # fit method of arity 2 (supervised transformation)
+      return self.fit(X_constrained, y, **fit_params).transform(X_constrained)
 
   def decision_function(self, X_constrained):
       return self.predict(X_constrained)
