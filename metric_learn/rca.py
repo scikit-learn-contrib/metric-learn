@@ -35,7 +35,7 @@ def _chunk_mean_centering(data, chunks):
   return chunk_mask, chunk_data
 
 
-class _RCA(BaseMetricLearner):
+class RCA(BaseMetricLearner, SupervisedMixin):
   """Relevant Components Analysis (RCA)"""
   def __init__(self, num_dims=None, pca_comps=None):
     """Initialize the learner.
@@ -92,7 +92,7 @@ class _RCA(BaseMetricLearner):
       dim = self.num_dims
     return dim
 
-  def _fit(self, data, chunks):
+  def fit(self, data, chunks):
     """Learn the RCA model.
 
     Parameters
@@ -135,7 +135,7 @@ def _inv_sqrtm(x):
   return (vecs / np.sqrt(vals)).dot(vecs.T)
 
 
-class RCA_Supervised(_RCA, SupervisedMixin):
+class RCA_Supervised(RCA):
   def __init__(self, num_dims=None, pca_comps=None, num_chunks=100,
                chunk_size=2):
     """Initialize the learner.
@@ -147,7 +147,7 @@ class RCA_Supervised(_RCA, SupervisedMixin):
     num_chunks: int, optional
     chunk_size: int, optional
     """
-    _RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps)
+    RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps)
     self.num_chunks = num_chunks
     self.chunk_size = chunk_size
 
@@ -165,8 +165,4 @@ class RCA_Supervised(_RCA, SupervisedMixin):
     chunks = Constraints(y).chunks(num_chunks=self.num_chunks,
                                    chunk_size=self.chunk_size,
                                    random_state=random_state)
-    return _RCA._fit(self, X, chunks)
-
-class RCA(_RCA, PairsMixin):
-
-  pass
+    return RCA.fit(self, X, chunks)

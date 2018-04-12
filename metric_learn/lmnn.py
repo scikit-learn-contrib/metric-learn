@@ -49,7 +49,7 @@ class _base_LMNN(BaseMetricLearner):
 
 
 # slower Python version
-class _python_LMNN(_base_LMNN):
+class python_LMNN(_base_LMNN, SupervisedMixin):
 
   def _process_inputs(self, X, labels):
     self.X_ = check_array(X, dtype=float)
@@ -66,7 +66,7 @@ class _python_LMNN(_base_LMNN):
       raise ValueError('not enough class labels for specified k'
                        ' (smallest class has %d)' % required_k)
 
-  def _fit(self, X, y):
+  def fit(self, X, y):
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate
@@ -244,9 +244,9 @@ try:
   from modshogun import LMNN as shogun_LMNN
   from modshogun import RealFeatures, MulticlassLabels
 
-  class _LMNN(_base_LMNN):
+  class LMNN(_base_LMNN, SupervisedMixin):
 
-    def _fit(self, X, y):
+    def fit(self, X, y):
       self.X_, y = check_X_y(X, y, dtype=float)
       labels = MulticlassLabels(y)
       self._lmnn = shogun_LMNN(RealFeatures(self.X_.T), labels, self.k)
@@ -262,17 +262,6 @@ try:
       return self
 
 
-  class LMNN(_LMNN, SupervisedMixin):
-
-    def fit(self, X, y):
-      return self._fit(X, y)
-
-
 except ImportError:
-
-  class python_LMNN(_python_LMNN, SupervisedMixin):
-
-    def fit(self, X, y):
-      return self._fit(X, y)
 
   LMNN = python_LMNN

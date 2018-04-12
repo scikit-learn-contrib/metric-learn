@@ -21,7 +21,7 @@ from sklearn.utils.validation import check_X_y
 from .base_metric import BaseMetricLearner, SupervisedMixin
 
 
-class _LFDA(BaseMetricLearner):
+class LFDA(BaseMetricLearner, SupervisedMixin):
   '''
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
   Sugiyama, ICML 2006
@@ -77,7 +77,7 @@ class _LFDA(BaseMetricLearner):
 
     return self.X_, y, num_classes, n, d, dim, k
 
-  def _fit(self, X, y):
+  def fit(self, X, y):
     '''Fit the LFDA model.
 
     Parameters
@@ -146,19 +146,3 @@ def _eigh(a, b, dim):
   except np.linalg.LinAlgError:
     pass
   return scipy.linalg.eig(a, b)
-
-
-class LFDA(_LFDA, SupervisedMixin):
-
-  def fit(self, X, y):
-    '''Fit the LFDA model.
-
-    Parameters
-    ----------
-    X : (n, d) array-like
-        Input data.
-
-    y : (n,) array-like
-        Class labels, one per point of data.
-    '''
-    return self._fit(X, y)

@@ -18,7 +18,7 @@ from .base_metric import BaseMetricLearner, SupervisedMixin
 EPS = np.finfo(float).eps
 
 
-class _MLKR(BaseMetricLearner):
+class MLKR(BaseMetricLearner, SupervisedMixin):
   """Metric Learning for Kernel Regression (MLKR)"""
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
                max_iter=1000):
@@ -68,7 +68,7 @@ class _MLKR(BaseMetricLearner):
               m, d, A.shape))
       return self.X_, y, A
 
-  def _fit(self, X, y):
+  def fit(self, X, y):
       """
       Fit MLKR model
 
@@ -111,16 +111,3 @@ def _loss(flatA, X, y, dX):
   grad = 2 * A.dot(M)
   return cost, grad.ravel()
 
-
-class MLKR(_MLKR, SupervisedMixin):
-
-    def fit(self, X, y):
-        """
-        Fit MLKR model
-
-        Parameters
-        ----------
-        X : (n x d) array of samples
-        y : (n) data labels
-        """
-        return self._fit(X, y)

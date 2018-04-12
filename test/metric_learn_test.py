@@ -66,7 +66,7 @@ class TestLMNN(MetricTestCase):
     # Test both impls, if available.
     for LMNN_cls in set((LMNN, python_LMNN)):
       lmnn = LMNN_cls(k=5, learn_rate=1e-6, verbose=False)
-      lmnn._fit(self.iris_points, self.iris_labels)
+      lmnn.fit(self.iris_points, self.iris_labels)
 
       csep = class_separation(lmnn.transform(), self.iris_labels)
       self.assertLess(csep, 0.25)
