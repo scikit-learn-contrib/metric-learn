@@ -159,3 +159,6 @@ class TestSparseConstrainedDataset(_BaseTestConstrainedDataset):
                                                             group_i):
                         self.check_indexing(train_idx)
                         self.check_indexing(test_idx)
+
+if __name__=='__main__':
+    unittest.main()

@@ -1,6 +1,7 @@
 import unittest
 from sklearn import clone
 from sklearn.cluster import KMeans
+from sklearn.datasets import load_iris
 from sklearn.model_selection import cross_val_score
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
@@ -10,38 +11,31 @@ from sklearn.utils.testing import set_random_state, assert_true, \
     assert_allclose_dense_sparse, assert_dict_equal, assert_false
 
 from metric_learn import ITML, LSML, MMC, SDML
-from metric_learn.constraints import ConstrainedDataset
-from sklearn.utils import check_random_state
+from metric_learn.constraints import ConstrainedDataset, Constraints, \
+    wrap_pairs
+from sklearn.utils import check_random_state, shuffle
 import numpy as np
 
-num_points = 100
-num_features = 5
-num_constraints = 100
-
-RNG = check_random_state(0)
-
-X = RNG.randn(num_points, num_features)
-y = RNG.randint(0, 2, num_constraints)
-group = RNG.randint(0, 3, num_constraints)
-
-
-class _TestWeaklySupervisedBase(unittest.TestCase):
+class _TestWeaklySupervisedBase(object):
 
     def setUp(self):
-        self.c = RNG.randint(0, num_points, (num_constraints,
-                                             self.num_points_in_constraint))
-        self.X_constrained = ConstrainedDataset(X, self.c)
-        self.X_constrained_train, self.X_constrained_test, self.y_train, \
-        self.y_test = train_test_split(self.X_constrained, y)
-        set_random_state(self.estimator) # sets the algorithm random seed (if
-        #  any)
+        self.RNG = check_random_state(0)
+        set_random_state(self.estimator)
+        dataset = load_iris()
+        self.X, y = shuffle(dataset.data, dataset.target, random_state=self.RNG)
+        self.X, y = self.X[:20], y[:20]
+        num_constraints = 20
+        constraints = Constraints.random_subset(y, random_state=self.RNG)
+        self.pairs = constraints.positive_negative_pairs(num_constraints,
+                        same_length=True,
+                        random_state=self.RNG)
 
     def test_cross_validation(self):
         # test that you can do cross validation on a ConstrainedDataset with
         #  a WeaklySupervisedMetricLearner
         estimator = clone(self.estimator)
         self.assertTrue(np.isfinite(cross_val_score(estimator,
-                                    self.X_constrained, y)).all())
+                                    self.X_constrained, self.y)).all())
 
     def check_score(self, estimator, X_constrained, y):
         score = estimator.score(X_constrained, y)
@@ -74,7 +68,7 @@ class _TestWeaklySupervisedBase(unittest.TestCase):
         self.check_transform(pipe, self.X_constrained_test)
         # we cannot use check_predict because in this case the shape of the
         # output is the shape of X_constrained.X, not X_constrained
-        y_predicted = estimator.predict(self.X_constrained)
+        y_predicted = pipe.predict(self.X_constrained)
         self.assertEqual(len(y_predicted), len(self.X_constrained.X))
 
         # test in a pipeline with PCA
@@ -105,15 +99,15 @@ class _TestWeaklySupervisedBase(unittest.TestCase):
         """Check if self is returned when calling fit"""
         # From scikit-learn
         estimator = clone(self.estimator)
-        assert_true(estimator.fit(self.X_constrained, y) is estimator)
+        assert_true(estimator.fit(self.X_constrained, self.y) is estimator)
 
     def test_pipeline_consistency(self):
         # From scikit learn
         # check that make_pipeline(est) gives same score as est
         estimator = clone(self.estimator)
         pipeline = make_pipeline(estimator)
-        estimator.fit(self.X_constrained, y)
-        pipeline.fit(self.X_constrained, y)
+        estimator.fit(self.X_constrained, self.y)
+        pipeline.fit(self.X_constrained, self.y)
 
         funcs = ["score", "fit_transform"]
 
@@ -121,8 +115,8 @@ class _TestWeaklySupervisedBase(unittest.TestCase):
             func = getattr(estimator, func_name, None)
             if func is not None:
                 func_pipeline = getattr(pipeline, func_name)
-                result = func(self.X_constrained, y)
-                result_pipe = func_pipeline(self.X_constrained, y)
+                result = func(self.X_constrained, self.y)
+                result_pipe = func_pipeline(self.X_constrained, self.y)
                 assert_allclose_dense_sparse(result, result_pipe)
 
     def test_dict_unchanged(self):
@@ -130,7 +124,7 @@ class _TestWeaklySupervisedBase(unittest.TestCase):
         estimator = clone(self.estimator)
         if hasattr(estimator, "n_components"):
             estimator.n_components = 1
-        estimator.fit(self.X_constrained, y)
+        estimator.fit(self.X_constrained, self.y)
         for method in ["predict", "transform", "decision_function",
                        "predict_proba"]:
             if hasattr(estimator, method):
@@ -148,7 +142,7 @@ class _TestWeaklySupervisedBase(unittest.TestCase):
             estimator.n_components = 1
         dict_before_fit = estimator.__dict__.copy()
 
-        estimator.fit(self.X_constrained, y)
+        estimator.fit(self.X_constrained, self.y)
         dict_after_fit = estimator.__dict__
 
         public_keys_after_fit = [key for key in dict_after_fit.keys()
@@ -179,43 +173,57 @@ class _TestWeaklySupervisedBase(unittest.TestCase):
                      ' or ended with _, but'
                      ' %s changed' % ', '.join(attrs_changed_by_fit)))
 
+
 class _TestPairsBase(_TestWeaklySupervisedBase):
-    
+
     def setUp(self):
-        self.num_points_in_constraint = 2
         super(_TestPairsBase, self).setUp()
+        self.X_constrained, self.y = wrap_pairs(self.X, self.pairs)
+        self.X_constrained, self.y = shuffle(self.X_constrained, self.y,
+                                             random_state=self.RNG)
+        self.X_constrained_train, self.X_constrained_test, self.y_train, \
+            self.y_test = train_test_split(self.X_constrained, self.y)
 
 
 class _TestQuadrupletsBase(_TestWeaklySupervisedBase):
 
     def setUp(self):
-        self.num_points_in_constraint = 4
         super(_TestQuadrupletsBase, self).setUp()
+        c = np.column_stack(self.pairs)
+        self.X_constrained = ConstrainedDataset(self.X, c)
+        self.X_constrained = shuffle(self.X_constrained)
+        self.y, self.y_train, self.y_test = None, None, None
+        self.X_constrained_train, self.X_constrained_test = train_test_split(
+            self.X_constrained)
 
 
-class TestITML(_TestPairsBase):
+class TestITML(_TestPairsBase, unittest.TestCase):
     
     def setUp(self):
         self.estimator = ITML()
         super(TestITML, self).setUp()
 
 
-class TestLSML(_TestQuadrupletsBase):
+class TestLSML(_TestQuadrupletsBase, unittest.TestCase):
 
     def setUp(self):
         self.estimator = LSML()
         super(TestLSML, self).setUp()
 
 
-class TestMMC(_TestPairsBase):
+class TestMMC(_TestPairsBase, unittest.TestCase):
     
     def setUp(self):
         self.estimator = MMC()
         super(TestMMC, self).setUp()
 
         
-class TestSDML(_TestPairsBase):
+class TestSDML(_TestPairsBase, unittest.TestCase):
     
     def setUp(self):
         self.estimator = SDML()
         super(TestSDML, self).setUp()
+
+
+if __name__ == '__main__':
+    unittest.main()
