@@ -9,7 +9,7 @@ from sklearn.utils.testing import assert_raise_message
 from sklearn.utils.mocking import MockDataFrame
 
 
-class _BaseTestConstrainedDataset(unittest.TestCase):
+class _BaseTestConstrainedDataset(object):
 
     def setUp(self):
         self.num_points = 20
@@ -97,7 +97,8 @@ class _BaseTestConstrainedDataset(unittest.TestCase):
                         self.check_indexing(test_idx)
 
 
-class TestDenseConstrainedDataset(_BaseTestConstrainedDataset):
+class TestDenseConstrainedDataset(_BaseTestConstrainedDataset,
+                                  unittest.TestCase):
 
     def setUp(self):
         super(TestDenseConstrainedDataset, self).setUp()
@@ -116,7 +117,8 @@ class TestDenseConstrainedDataset(_BaseTestConstrainedDataset):
                 X_constrained = ConstrainedDataset(X, c)
 
 
-class TestSparseConstrainedDataset(_BaseTestConstrainedDataset):
+class TestSparseConstrainedDataset(_BaseTestConstrainedDataset,
+                                   unittest.TestCase):
 
     def setUp(self):
         super(TestSparseConstrainedDataset, self).setUp()
