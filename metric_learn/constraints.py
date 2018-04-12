@@ -5,7 +5,7 @@ from supervised data labels.
 import numpy as np
 import warnings
 from six.moves import xrange
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix, issparse
 from sklearn.utils import check_array
 
 __all__ = ['Constraints', 'ConstrainedDataset']
@@ -172,7 +172,12 @@ class ConstrainedDataset(object):
     return self.toarray().__repr__()
 
   def toarray(self):
-    return self.X[self.c]
+    if issparse(self.X):
+      # if X is sparse we convert it to dense because sparse arrays cannot
+      # be 3D
+      return self.X.A[self.c]
+    else:
+      return self.X[self.c]
 
   @staticmethod
   def _check_index(length, indices):
