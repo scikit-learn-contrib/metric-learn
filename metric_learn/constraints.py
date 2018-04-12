@@ -105,10 +105,10 @@ class ConstrainedDataset(object):
   Parameters
   ----------
   X: array-like, shape=(n_samples, n_features)
-        Dataset of samples.
+    Dataset of samples.
 
   c: array-like of integers between 0 and n_samples, shape=(n_constraints, t)
-        Array of indexes of the ``t`` samples to consider in each constraint.
+    Array of indexes of the ``t`` samples to consider in each constraint.
 
   Attributes
   ----------
