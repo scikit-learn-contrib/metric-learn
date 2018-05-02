@@ -29,7 +29,8 @@ Run ``pip install metric-learn`` to download and install from PyPI.
 
 Run ``python setup.py install`` for default installation.
 
-Run ``python setup.py test`` to run all tests.
+Run ``pytest test`` to run all tests (you will need to have the ``pytest``
+package installed).
 
 **Usage**
 
