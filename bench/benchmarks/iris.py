@@ -17,22 +17,22 @@ CLASSES = {
 }
 
 try:
-  from metric_learn.lmnn import python_LMNN
-  if python_LMNN is not metric_learn.LMNN:
-    CLASSES['python_LMNN'] = python_LMNN(k=5, learn_rate=1e-6, verbose=False)
+    from metric_learn.lmnn import python_LMNN
+    if python_LMNN is not metric_learn.LMNN:
+        CLASSES['python_LMNN'] = python_LMNN(k=5, learn_rate=1e-6, verbose=False)
 except ImportError:
-  pass
+    pass
 
 
 class IrisDataset(object):
-  params = [sorted(CLASSES)]
-  param_names = ['alg']
+    params = [sorted(CLASSES)]
+    param_names = ['alg']
 
-  def setup(self, alg):
-    iris_data = load_iris()
-    self.iris_points = iris_data['data']
-    self.iris_labels = iris_data['target']
+    def setup(self, alg):
+        iris_data = load_iris()
+        self.iris_points = iris_data['data']
+        self.iris_labels = iris_data['target']
 
-  def time_fit(self, alg):
-    np.random.seed(5555)
-    CLASSES[alg].fit(self.iris_points, self.iris_labels)
+    def time_fit(self, alg):
+        np.random.seed(5555)
+        CLASSES[alg].fit(self.iris_points, self.iris_labels)

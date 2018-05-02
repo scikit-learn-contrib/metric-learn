@@ -16,21 +16,21 @@ from .base_metric import BaseMetricLearner
 
 
 class Covariance(BaseMetricLearner):
-  def __init__(self):
-    pass
+    def __init__(self):
+        pass
 
-  def metric(self):
-    return self.M_
+    def metric(self):
+        return self.M_
 
-  def fit(self, X, y=None):
-    """
-    X : data matrix, (n x d)
-    y : unused
-    """
-    self.X_ = check_array(X, ensure_min_samples=2)
-    self.M_ = np.cov(self.X_, rowvar = False)
-    if self.M_.ndim == 0:
-      self.M_ = 1./self.M_
-    else:
-      self.M_ = np.linalg.inv(self.M_)
-    return self
+    def fit(self, X, y=None):
+        """
+        X : data matrix, (n x d)
+        y : unused
+        """
+        self.X_ = check_array(X, ensure_min_samples=2)
+        self.M_ = np.cov(self.X_, rowvar = False)
+        if self.M_.ndim == 0:
+            self.M_ = 1./self.M_
+        else:
+            self.M_ = np.linalg.inv(self.M_)
+        return self
