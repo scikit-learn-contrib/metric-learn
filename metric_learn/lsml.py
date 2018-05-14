@@ -14,7 +14,7 @@ from six.moves import xrange
 from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .constraints import Constraints, wrap_pairs
 
 
 class LSML(BaseMetricLearner):
@@ -35,11 +35,13 @@ class LSML(BaseMetricLearner):
     self.max_iter = max_iter
     self.verbose = verbose
 
-  def _prepare_inputs(self, X, constraints, weights):
-    self.X_ = X = check_array(X)
-    a,b,c,d = constraints
-    self.vab_ = X[a] - X[b]
-    self.vcd_ = X[c] - X[d]
+  def _prepare_quadruplets(self, quadruplets, weights):
+    pairs = check_array(quadruplets, accept_sparse=False,
+                                      ensure_2d=False, allow_nd=True)
+
+    # check to make sure that no two constrained vectors are identical
+    self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
+    self.vcd_ = quadruplets[:, 2, :] - quadruplets[:, 3, :]
     if self.vab_.shape != self.vcd_.shape:
       raise ValueError('Constraints must have same length')
     if weights is None:
@@ -48,6 +50,7 @@ class LSML(BaseMetricLearner):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     if self.prior is None:
+      X = np.unique(pairs.reshape(-1, pairs.shape[2]), axis=0)
       self.prior_inv_ = np.atleast_2d(np.cov(X, rowvar=False))
       self.M_ = np.linalg.inv(self.prior_inv_)
     else:
@@ -57,7 +60,7 @@ class LSML(BaseMetricLearner):
   def metric(self):
     return self.M_
 
-  def fit(self, X, constraints, weights=None):
+  def fit(self, quadruplets, weights=None):
     """Learn the LSML model.
 
     Parameters
@@ -69,7 +72,7 @@ class LSML(BaseMetricLearner):
     weights : (m,) array of floats, optional
         scale factor for each constraint
     """
-    self._prepare_inputs(X, constraints, weights)
+    self._prepare_quadruplets(quadruplets, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
     l_best = 0
@@ -179,6 +182,6 @@ class LSML_Supervised(LSML):
 
     c = Constraints.random_subset(y, self.num_labeled,
                                   random_state=random_state)
-    pairs = c.positive_negative_pairs(num_constraints, same_length=True,
+    pos_neg = c.positive_negative_pairs(num_constraints, same_length=True,
                                       random_state=random_state)
-    return LSML.fit(self, X, pairs, weights=self.weights)
+    return LSML.fit(self, X[np.column_stack(pos_neg)], weights=self.weights)

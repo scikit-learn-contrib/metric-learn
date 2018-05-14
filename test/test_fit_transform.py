@@ -30,7 +30,7 @@ class TestFitTransform(unittest.TestCase):
     seed = np.random.RandomState(1234)
     lsml = LSML_Supervised(num_constraints=200)
     lsml.fit(self.X, self.y, random_state=seed)
-    res_1 = lsml.transform()
+    res_1 = lsml.transform(self.X)
 
     seed = np.random.RandomState(1234)
     lsml = LSML_Supervised(num_constraints=200)
@@ -42,7 +42,7 @@ class TestFitTransform(unittest.TestCase):
     seed = np.random.RandomState(1234)
     itml = ITML_Supervised(num_constraints=200)
     itml.fit(self.X, self.y, random_state=seed)
-    res_1 = itml.transform()
+    res_1 = itml.transform(self.X)
 
     seed = np.random.RandomState(1234)
     itml = ITML_Supervised(num_constraints=200)
@@ -64,7 +64,7 @@ class TestFitTransform(unittest.TestCase):
     seed = np.random.RandomState(1234)
     sdml = SDML_Supervised(num_constraints=1500)
     sdml.fit(self.X, self.y, random_state=seed)
-    res_1 = sdml.transform()
+    res_1 = sdml.transform(self.X)
 
     seed = np.random.RandomState(1234)
     sdml = SDML_Supervised(num_constraints=1500)
@@ -122,7 +122,7 @@ class TestFitTransform(unittest.TestCase):
     seed = np.random.RandomState(1234)
     mmc = MMC_Supervised(num_constraints=200)
     mmc.fit(self.X, self.y, random_state=seed)
-    res_1 = mmc.transform()
+    res_1 = mmc.transform(self.X)
 
     seed = np.random.RandomState(1234)
     mmc = MMC_Supervised(num_constraints=200)

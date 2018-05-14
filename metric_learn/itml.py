@@ -20,7 +20,7 @@ from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
@@ -51,16 +51,20 @@ class ITML(BaseMetricLearner):
     self.A0 = A0
     self.verbose = verbose
 
-  def _process_inputs(self, X, constraints, bounds):
-    self.X_ = X = check_array(X)
+  def _process_pairs(self, pairs, y, bounds):
+    pairs, y = check_X_y(pairs, y, accept_sparse=False,
+                                      ensure_2d=False, allow_nd=True)
+    y = y.astype(bool)
+
     # check to make sure that no two constrained vectors are identical
-    a,b,c,d = constraints
-    no_ident = vector_norm(X[a] - X[b]) > 1e-9
-    a, b = a[no_ident], b[no_ident]
-    no_ident = vector_norm(X[c] - X[d]) > 1e-9
-    c, d = c[no_ident], d[no_ident]
+    pos_pairs, neg_pairs = pairs[y], pairs[~y]
+    pos_no_ident = vector_norm(pos_pairs[:, 0, :] - pos_pairs[:, 1, :]) > 1e-9
+    pos_pairs = pos_pairs[pos_no_ident]
+    neg_no_ident = vector_norm(neg_pairs[:, 0, :] - neg_pairs[:, 1, :]) > 1e-9
+    neg_pairs = neg_pairs[neg_no_ident]
     # init bounds
     if bounds is None:
+      X = np.unique(pairs.reshape(-1, pairs.shape[2]), axis=0)
       self.bounds_ = np.percentile(pairwise_distances(X), (5, 95))
     else:
       assert len(bounds) == 2
@@ -68,12 +72,16 @@ class ITML(BaseMetricLearner):
     self.bounds_[self.bounds_==0] = 1e-9
     # init metric
     if self.A0 is None:
-      self.A_ = np.identity(X.shape[1])
+      self.A_ = np.identity(pairs.shape[2])
     else:
       self.A_ = check_array(self.A0)
-    return a,b,c,d
+    pairs = np.vstack([pos_pairs, neg_pairs])
+    y = np.hstack([np.ones(len(pos_pairs)), np.zeros(len(neg_pairs))])
+    y = y.astype(bool)
+    return pairs, y
 
-  def fit(self, X, constraints, bounds=None):
+
+  def fit(self, pairs, y, bounds=None):
     """Learn the ITML model.
 
     Parameters
@@ -86,17 +94,18 @@ class ITML(BaseMetricLearner):
     bounds : list (pos,neg) pairs, optional
         bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
     """
-    a,b,c,d = self._process_inputs(X, constraints, bounds)
+    pairs, y = self._process_pairs(pairs, y, bounds)
     gamma = self.gamma
-    num_pos = len(a)
-    num_neg = len(c)
+    pos_pairs, neg_pairs = pairs[y], pairs[~y]
+    num_pos = len(pos_pairs)
+    num_neg = len(neg_pairs)
     _lambda = np.zeros(num_pos + num_neg)
     lambdaold = np.zeros_like(_lambda)
     gamma_proj = 1. if gamma is np.inf else gamma/(gamma+1.)
     pos_bhat = np.zeros(num_pos) + self.bounds_[0]
     neg_bhat = np.zeros(num_neg) + self.bounds_[1]
-    pos_vv = self.X_[a] - self.X_[b]
-    neg_vv = self.X_[c] - self.X_[d]
+    pos_vv = pos_pairs[:, 0, :] - pos_pairs[:, 1, :]
+    neg_vv = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
     A = self.A_
 
     for it in xrange(self.max_iter):
@@ -195,4 +204,5 @@ class ITML_Supervised(ITML):
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    return ITML.fit(self, X, pos_neg, bounds=self.bounds)
+    pairs, y = wrap_pairs(X, pos_neg)
+    return ITML.fit(self, pairs, y, bounds=self.bounds)

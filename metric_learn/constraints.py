@@ -100,3 +100,13 @@ class Constraints(object):
     partial_labels = np.array(all_labels, copy=True)
     partial_labels[idx] = -1
     return Constraints(partial_labels)
+
+def wrap_pairs(X, constraints):
+  a = np.array(constraints[0])
+  b = np.array(constraints[1])
+  c = np.array(constraints[2])
+  d = np.array(constraints[3])
+  constraints = np.vstack((np.column_stack((a, b)), np.column_stack((c, d))))
+  y = np.vstack([np.ones((len(a), 1)), np.zeros((len(c), 1))])
+  pairs = X[constraints]
+  return pairs, y
