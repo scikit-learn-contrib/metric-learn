@@ -139,10 +139,11 @@ def _sum_outer(x):
 def _eigh(a, b, dim):
   try:
     return scipy.sparse.linalg.eigsh(a, k=dim, M=b, which='LA')
-  except (ValueError, scipy.sparse.linalg.ArpackNoConvergence):
-    pass
-  try:
-    return scipy.linalg.eigh(a, b)
   except np.linalg.LinAlgError:
-    pass
+    pass  # scipy already tried eigh for us
+  except (ValueError, scipy.sparse.linalg.ArpackNoConvergence):
+    try:
+      return scipy.linalg.eigh(a, b)
+    except np.linalg.LinAlgError:
+      pass
   return scipy.linalg.eig(a, b)
