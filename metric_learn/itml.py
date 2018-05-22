@@ -64,7 +64,7 @@ class ITML(BaseMetricLearner):
     neg_pairs = neg_pairs[neg_no_ident]
     # init bounds
     if bounds is None:
-      X = np.unique(pairs.reshape(-1, pairs.shape[2]), axis=0)
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
       self.bounds_ = np.percentile(pairwise_distances(X), (5, 95))
     else:
       assert len(bounds) == 2

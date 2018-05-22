@@ -50,7 +50,7 @@ class LSML(BaseMetricLearner):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     if self.prior is None:
-      X = np.unique(pairs.reshape(-1, pairs.shape[2]), axis=0)
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
       self.prior_inv_ = np.atleast_2d(np.cov(X, rowvar=False))
       self.M_ = np.linalg.inv(self.prior_inv_)
     else:

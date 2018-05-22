@@ -47,7 +47,7 @@ class SDML(BaseMetricLearner):
                                       ensure_2d=False, allow_nd=True)
     # set up prior M
     if self.use_cov:
-      X = np.unique(pairs.reshape(-1, pairs.shape[2]), axis=0)
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
       self.M_ = pinvh(np.cov(X, rowvar = False))
     else:
       self.M_ = np.identity(pairs.shape[2])
