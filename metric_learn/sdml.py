@@ -62,10 +62,10 @@ class SDML(BaseMetricLearner):
 
     Parameters
     ----------
-    X : array-like, shape (n, d)
-        data matrix, where each row corresponds to a single instance
-    W : array-like, shape (n, n)
-        connectivity graph, with +1 for positive pairs and -1 for negative
+    pairs: array-like, shape=(n_constraints, 2, n_features)
+        Array of pairs. Each row corresponds to two points.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be 0 for dissimilar pair, 1 for similar.
 
     Returns
     -------

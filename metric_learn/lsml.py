@@ -65,12 +65,18 @@ class LSML(BaseMetricLearner):
 
     Parameters
     ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
-    weights : (m,) array of floats, optional
+    quadruplets : array-like, shape=(n_constraints, 4, n_features)
+        Each row corresponds to 4 points. In order to supervise the
+        algorithm in the right way, we should have the four samples ordered
+        in a way such that: d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3])
+        for all 0 <= i < n_constraints.
+    weights : (n_constraints,) array of floats, optional
         scale factor for each constraint
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
     """
     self._prepare_quadruplets(quadruplets, weights)
     step_sizes = np.logspace(-10, 0, 10)

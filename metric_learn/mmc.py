@@ -64,11 +64,15 @@ class MMC(BaseMetricLearner):
 
     Parameters
     ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)
-        dissimilar pairs
+    pairs: array-like, shape=(n_constraints, 2, n_features)
+        Array of pairs. Each row corresponds to two points.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be 0 for dissimilar pair, 1 for similar.
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
     """
     pairs, y = self._process_pairs(pairs, y)
     if self.diagonal:
