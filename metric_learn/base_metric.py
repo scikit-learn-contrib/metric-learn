@@ -21,9 +21,6 @@ class BaseMetricLearner(BaseEstimator):
     L = self.transformer()
     return L.T.dot(L)
 
-
-class MetricTransformer(TransformerMixin):
-
   def transformer(self):
     """Computes the transformation matrix from the Mahalanobis matrix.
 
@@ -34,6 +31,9 @@ class MetricTransformer(TransformerMixin):
     L : upper triangular (d x d) matrix
     """
     return cholesky(self.metric()).T
+
+
+class MetricTransformer(TransformerMixin):
 
   def transform(self, X=None):
     """Applies the metric transformation.
