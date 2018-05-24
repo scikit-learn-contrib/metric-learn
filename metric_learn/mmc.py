@@ -67,7 +67,7 @@ class MMC(BaseMetricLearner):
     pairs: array-like, shape=(n_constraints, 2, n_features)
         Array of pairs. Each row corresponds to two points.
     y: array-like, of shape (n_constraints,)
-        Labels of constraints. Should be 0 for dissimilar pair, 1 for similar.
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 
     Returns
     -------
