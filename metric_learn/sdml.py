@@ -135,5 +135,4 @@ class SDML_Supervised(SDML):
     pos_neg = c.positive_negative_pairs(num_constraints,
                                               random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)
-    y = 2 * y - 1
     return SDML.fit(self, pairs, y)

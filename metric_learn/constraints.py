@@ -107,6 +107,6 @@ def wrap_pairs(X, constraints):
   c = np.array(constraints[2])
   d = np.array(constraints[3])
   constraints = np.vstack((np.column_stack((a, b)), np.column_stack((c, d))))
-  y = np.vstack([np.ones((len(a), 1)), np.zeros((len(c), 1))])
+  y = np.vstack([np.ones((len(a), 1)), - np.ones((len(c), 1))])
   pairs = X[constraints]
   return pairs, y
