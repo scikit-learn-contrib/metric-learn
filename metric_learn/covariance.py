@@ -12,10 +12,10 @@ from __future__ import absolute_import
 import numpy as np
 from sklearn.utils.validation import check_array
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MetricTransformer
 
 
-class Covariance(BaseMetricLearner):
+class Covariance(BaseMetricLearner, MetricTransformer):
   def __init__(self):
     pass
 

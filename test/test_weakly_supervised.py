@@ -86,11 +86,6 @@ def check_predict(estimator, X_constrained):
   assert len(y_predicted), len(X_constrained)
 
 
-def check_transform(estimator, X_constrained):
-  X_transformed = estimator.transform(X_constrained)
-  assert len(X_transformed), len(X_constrained.X)
-
-
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_simple_estimator(estimator, build_dataset):
@@ -102,35 +97,6 @@ def test_simple_estimator(estimator, build_dataset):
   estimator.fit(X_constrained_train, y_train)
   check_score(estimator, X_constrained_test, y_test)
   check_predict(estimator, X_constrained_test)
-  check_transform(estimator, X_constrained_test)
-
-
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
-def test_pipelining_with_transformer(estimator, build_dataset):
-  """
-  Test that weakly supervised estimators fit well into pipelines
-  """
-  # test in a pipeline with KMeans
-  (X_constrained, y, X_constrained_train, X_constrained_test,
-   y_train, y_test) = build_dataset()
-  estimator = clone(estimator)
-  set_random_state(estimator)
-
-  pipe = make_pipeline(estimator, KMeans())
-  pipe.fit(X_constrained_train, y_train)
-  check_score(pipe, X_constrained_test, y_test)
-  check_transform(pipe, X_constrained_test)
-  # we cannot use check_predict because in this case the shape of the
-  # output is the shape of X_constrained.X, not X_constrained
-  y_predicted = pipe.predict(X_constrained)
-  assert len(y_predicted) == len(X_constrained.X)
-
-  # test in a pipeline with PCA
-  estimator = clone(estimator)
-  pipe = make_pipeline(estimator, PCA())
-  pipe.fit(X_constrained_train, y_train)
-  check_transform(pipe, X_constrained_test)
 
 
 @pytest.mark.parametrize('estimator', [est[0] for est in list_estimators],

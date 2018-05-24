@@ -19,12 +19,13 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import (BaseMetricLearner, _PairsClassifierMixin,
+                          MetricTransformer)
 from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
-class ITML(BaseMetricLearner):
+class _BaseITML(BaseMetricLearner):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False):
@@ -80,8 +81,7 @@ class ITML(BaseMetricLearner):
     y = y.astype(bool)
     return pairs, y
 
-
-  def fit(self, pairs, y, bounds=None):
+  def _fit(self, pairs, y, bounds=None):
     """Learn the ITML model.
 
     Parameters
@@ -153,7 +153,13 @@ class ITML(BaseMetricLearner):
     return self.A_
 
 
-class ITML_Supervised(ITML):
+class ITML(_BaseITML, _PairsClassifierMixin):
+
+  def fit(self, pairs, y, bounds=None):
+    return self._fit(pairs, y, bounds=bounds)
+
+
+class ITML_Supervised(_BaseITML, MetricTransformer):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
@@ -177,9 +183,9 @@ class ITML_Supervised(ITML):
     verbose : bool, optional
         if True, prints information while learning
     """
-    ITML.__init__(self, gamma=gamma, max_iter=max_iter,
-                  convergence_threshold=convergence_threshold,
-                  A0=A0, verbose=verbose)
+    _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
+                       convergence_threshold=convergence_threshold,
+                       A0=A0, verbose=verbose)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds
@@ -209,4 +215,4 @@ class ITML_Supervised(ITML):
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)
-    return ITML.fit(self, pairs, y, bounds=self.bounds)
+    return _BaseITML._fit(self, pairs, y, bounds=self.bounds)
