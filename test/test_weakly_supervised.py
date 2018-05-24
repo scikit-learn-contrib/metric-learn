@@ -1,7 +1,5 @@
 import pytest
-from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
-from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
 from sklearn.utils import shuffle, check_random_state
 from sklearn.utils.estimator_checks import is_public_parameter
@@ -116,7 +114,7 @@ def test_no_fit_attributes_set_in_init(estimator):
            "should not be initialized in the constructor of an "
            "estimator but in the fit method. Attribute {!r} "
            "was found in estimator {}".format(
-             attr, type(estimator).__name__))
+               attr, type(estimator).__name__))
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,

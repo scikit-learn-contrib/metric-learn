@@ -1,4 +1,4 @@
-from numpy.linalg import inv, cholesky
+from numpy.linalg import cholesky
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 from sklearn.metrics import roc_auc_score

@@ -15,7 +15,7 @@ from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import (BaseMetricLearner, _QuadrupletsClassifierMixin,
                           MetricTransformer)
-from .constraints import Constraints, wrap_pairs
+from .constraints import Constraints
 
 
 class _BaseLSML(BaseMetricLearner):
