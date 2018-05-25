@@ -59,6 +59,18 @@ class _BaseSDML(BaseMetricLearner):
     return self.M_
 
   def _fit(self, pairs, y):
+    loss_matrix = self._prepare_pairs(pairs, y)
+    P = self.M_ + self.balance_param * loss_matrix
+    emp_cov = pinvh(P)
+    # hack: ensure positive semidefinite
+    emp_cov = emp_cov.T.dot(emp_cov)
+    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
+    return self
+
+
+class SDML(_BaseSDML, _PairsClassifierMixin):
+
+  def fit(self, pairs, y):
     """Learn the SDML model.
 
     Parameters
@@ -73,18 +85,6 @@ class _BaseSDML(BaseMetricLearner):
     self : object
         Returns the instance.
     """
-    loss_matrix = self._prepare_pairs(pairs, y)
-    P = self.M_ + self.balance_param * loss_matrix
-    emp_cov = pinvh(P)
-    # hack: ensure positive semidefinite
-    emp_cov = emp_cov.T.dot(emp_cov)
-    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
-    return self
-
-
-class SDML(_BaseSDML, _PairsClassifierMixin):
-
-  def fit(self, pairs, y):
     return self._fit(pairs, y)
 
 

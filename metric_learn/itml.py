@@ -80,22 +80,6 @@ class _BaseITML(BaseMetricLearner):
     return pairs, y
 
   def _fit(self, pairs, y, bounds=None):
-    """Learn the ITML model.
-
-    Parameters
-    ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
-    y: array-like, of shape (n_constraints,)
-        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
-    bounds : list (pos,neg) pairs, optional
-        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
-
-    Returns
-    -------
-    self : object
-        Returns the instance.
-    """
     pairs, y = self._process_pairs(pairs, y, bounds)
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -154,6 +138,22 @@ class _BaseITML(BaseMetricLearner):
 class ITML(_BaseITML, _PairsClassifierMixin):
 
   def fit(self, pairs, y, bounds=None):
+    """Learn the ITML model.
+
+    Parameters
+    ----------
+    pairs: array-like, shape=(n_constraints, 2, n_features)
+        Array of pairs. Each row corresponds to two points.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+    bounds : list (pos,neg) pairs, optional
+        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
+    """
     return self._fit(pairs, y, bounds=bounds)
 
 

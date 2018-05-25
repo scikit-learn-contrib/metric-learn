@@ -62,23 +62,6 @@ class _BaseLSML(BaseMetricLearner):
     return self.M_
 
   def _fit(self, quadruplets, weights=None):
-    """Learn the LSML model.
-
-    Parameters
-    ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features)
-        Each row corresponds to 4 points. In order to supervise the
-        algorithm in the right way, we should have the four samples ordered
-        in a way such that: d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3])
-        for all 0 <= i < n_constraints.
-    weights : (n_constraints,) array of floats, optional
-        scale factor for each constraint
-
-    Returns
-    -------
-    self : object
-        Returns the instance.
-    """
     self._prepare_quadruplets(quadruplets, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -144,6 +127,23 @@ class _BaseLSML(BaseMetricLearner):
 class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
   def fit(self, quadruplets, weights=None):
+    """Learn the LSML model.
+
+    Parameters
+    ----------
+    quadruplets : array-like, shape=(n_constraints, 4, n_features)
+        Each row corresponds to 4 points. In order to supervise the
+        algorithm in the right way, we should have the four samples ordered
+        in a way such that: d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3])
+        for all 0 <= i < n_constraints.
+    weights : (n_constraints,) array of floats, optional
+        scale factor for each constraint
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
+    """
     return self._fit(quadruplets, weights=weights)
 
 
