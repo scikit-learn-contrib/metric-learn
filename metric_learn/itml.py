@@ -55,10 +55,9 @@ class _BaseITML(BaseMetricLearner):
   def _process_pairs(self, pairs, y, bounds):
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
                                       ensure_2d=False, allow_nd=True)
-    y = y.astype(bool)
 
     # check to make sure that no two constrained vectors are identical
-    pos_pairs, neg_pairs = pairs[y], pairs[~y]
+    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
     pos_no_ident = vector_norm(pos_pairs[:, 0, :] - pos_pairs[:, 1, :]) > 1e-9
     pos_pairs = pos_pairs[pos_no_ident]
     neg_no_ident = vector_norm(neg_pairs[:, 0, :] - neg_pairs[:, 1, :]) > 1e-9
@@ -77,8 +76,7 @@ class _BaseITML(BaseMetricLearner):
     else:
       self.A_ = check_array(self.A0)
     pairs = np.vstack([pos_pairs, neg_pairs])
-    y = np.hstack([np.ones(len(pos_pairs)), np.zeros(len(neg_pairs))])
-    y = y.astype(bool)
+    y = np.hstack([np.ones(len(pos_pairs)), - np.ones(len(neg_pairs))])
     return pairs, y
 
   def _fit(self, pairs, y, bounds=None):
@@ -89,7 +87,7 @@ class _BaseITML(BaseMetricLearner):
     pairs: array-like, shape=(n_constraints, 2, n_features)
         Array of pairs. Each row corresponds to two points.
     y: array-like, of shape (n_constraints,)
-        Labels of constraints. Should be 0 for dissimilar pair, 1 for similar.
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
     bounds : list (pos,neg) pairs, optional
         bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
 
@@ -100,7 +98,7 @@ class _BaseITML(BaseMetricLearner):
     """
     pairs, y = self._process_pairs(pairs, y, bounds)
     gamma = self.gamma
-    pos_pairs, neg_pairs = pairs[y], pairs[~y]
+    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
     num_pos = len(pos_pairs)
     num_neg = len(neg_pairs)
     _lambda = np.zeros(num_pos + num_neg)

@@ -66,7 +66,7 @@ class _BaseSDML(BaseMetricLearner):
     pairs: array-like, shape=(n_constraints, 2, n_features)
         Array of pairs. Each row corresponds to two points.
     y: array-like, of shape (n_constraints,)
-        Labels of constraints. Should be 0 for dissimilar pair, 1 for similar.
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 
     Returns
     -------
@@ -142,5 +142,4 @@ class SDML_Supervised(_BaseSDML, MetricTransformer):
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)
-    y = 2 * y - 1
     return _BaseSDML._fit(self, pairs, y)
