@@ -13,10 +13,10 @@ import numpy as np
 from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .constraints import Constraints, wrap_pairs
 
 
 class SDML(BaseMetricLearner):
@@ -42,36 +42,37 @@ class SDML(BaseMetricLearner):
     self.use_cov = use_cov
     self.verbose = verbose
 
-  def _prepare_inputs(self, X, W):
-    self.X_ = X = check_array(X)
-    W = check_array(W, accept_sparse=True)
+  def _prepare_pairs(self, pairs, y):
+    pairs, y = check_X_y(pairs, y, accept_sparse=False,
+                                      ensure_2d=False, allow_nd=True)
     # set up prior M
     if self.use_cov:
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
       self.M_ = pinvh(np.cov(X, rowvar = False))
     else:
-      self.M_ = np.identity(X.shape[1])
-    L = laplacian(W, normed=False)
-    return X.T.dot(L.dot(X))
+      self.M_ = np.identity(pairs.shape[2])
+    diff = pairs[:, 0] - pairs[:, 1]
+    return (diff.T * y).dot(diff)
 
   def metric(self):
     return self.M_
 
-  def fit(self, X, W):
+  def fit(self, pairs, y):
     """Learn the SDML model.
 
     Parameters
     ----------
-    X : array-like, shape (n, d)
-        data matrix, where each row corresponds to a single instance
-    W : array-like, shape (n, n)
-        connectivity graph, with +1 for positive pairs and -1 for negative
+    pairs: array-like, shape=(n_constraints, 2, n_features)
+        Array of pairs. Each row corresponds to two points.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 
     Returns
     -------
     self : object
         Returns the instance.
     """
-    loss_matrix = self._prepare_inputs(X, W)
+    loss_matrix = self._prepare_pairs(pairs, y)
     P = self.M_ + self.balance_param * loss_matrix
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite
@@ -131,5 +132,7 @@ class SDML_Supervised(SDML):
 
     c = Constraints.random_subset(y, self.num_labeled,
                                   random_state=random_state)
-    adj = c.adjacency_matrix(num_constraints, random_state=random_state)
-    return SDML.fit(self, X, adj)
+    pos_neg = c.positive_negative_pairs(num_constraints,
+                                              random_state=random_state)
+    pairs, y = wrap_pairs(X, pos_neg)
+    return SDML.fit(self, pairs, y)

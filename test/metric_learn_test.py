@@ -9,6 +9,7 @@ from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR, MMC,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
 # Import this specially for testing.
+from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
 
 
@@ -47,7 +48,7 @@ class TestLSML(MetricTestCase):
     lsml = LSML_Supervised(num_constraints=200)
     lsml.fit(self.iris_points, self.iris_labels)
 
-    csep = class_separation(lsml.transform(), self.iris_labels)
+    csep = class_separation(lsml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible
 
 
@@ -56,7 +57,7 @@ class TestITML(MetricTestCase):
     itml = ITML_Supervised(num_constraints=200)
     itml.fit(self.iris_points, self.iris_labels)
 
-    csep = class_separation(itml.transform(), self.iris_labels)
+    csep = class_separation(itml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.2)
 
 
@@ -79,7 +80,7 @@ class TestSDML(MetricTestCase):
 
     sdml = SDML_Supervised(num_constraints=1500)
     sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
-    csep = class_separation(sdml.transform(), self.iris_labels)
+    csep = class_separation(sdml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.25)
 
 
@@ -160,7 +161,7 @@ class TestMMC(MetricTestCase):
 
     # Full metric
     mmc = MMC(convergence_threshold=0.01)
-    mmc.fit(self.iris_points, [a,b,c,d])
+    mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
     expected = [[+0.00046504, +0.00083371, -0.00111959, -0.00165265],
                 [+0.00083371, +0.00149466, -0.00200719, -0.00296284],
                 [-0.00111959, -0.00200719, +0.00269546, +0.00397881],
@@ -169,20 +170,20 @@ class TestMMC(MetricTestCase):
 
     # Diagonal metric
     mmc = MMC(diagonal=True)
-    mmc.fit(self.iris_points, [a,b,c,d])
+    mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
     expected = [0, 0, 1.21045968, 1.22552608]
     assert_array_almost_equal(np.diag(expected), mmc.metric(), decimal=6)
     
     # Supervised Full
     mmc = MMC_Supervised()
     mmc.fit(self.iris_points, self.iris_labels)
-    csep = class_separation(mmc.transform(), self.iris_labels)
+    csep = class_separation(mmc.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.15)
     
     # Supervised Diagonal
     mmc = MMC_Supervised(diagonal=True)
     mmc.fit(self.iris_points, self.iris_labels)
-    csep = class_separation(mmc.transform(), self.iris_labels)
+    csep = class_separation(mmc.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.2)
 
 
