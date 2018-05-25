@@ -16,12 +16,12 @@ import scipy
 import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_X_y
+from sklearn.utils.validation import check_X_y, check_is_fitted
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MahalanobisMixin
 
 
-class LFDA(BaseMetricLearner):
+class LFDA(BaseMetricLearner, MahalanobisMixin):
   '''
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
   Sugiyama, ICML 2006
@@ -53,6 +53,11 @@ class LFDA(BaseMetricLearner):
 
   def transformer(self):
     return self.transformer_
+
+  @property
+  def metric_(self):
+    check_is_fitted(self, 'transformer_')
+    return self.transformer_.T.dot(self.transformer_)
 
   def _process_inputs(self, X, y):
     unique_classes, y = np.unique(y, return_inverse=True)

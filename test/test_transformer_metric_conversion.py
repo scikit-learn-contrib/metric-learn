@@ -20,60 +20,60 @@ class TestTransformerMetricConversion(unittest.TestCase):
     cov = Covariance()
     cov.fit(self.X)
     L = cov.transformer()
-    assert_array_almost_equal(L.T.dot(L), cov.metric())
+    assert_array_almost_equal(L.T.dot(L), cov.metric_)
 
   def test_lsml_supervised(self):
     seed = np.random.RandomState(1234)
     lsml = LSML_Supervised(num_constraints=200)
     lsml.fit(self.X, self.y, random_state=seed)
     L = lsml.transformer()
-    assert_array_almost_equal(L.T.dot(L), lsml.metric())
+    assert_array_almost_equal(L.T.dot(L), lsml.metric_)
 
   def test_itml_supervised(self):
     seed = np.random.RandomState(1234)
     itml = ITML_Supervised(num_constraints=200)
     itml.fit(self.X, self.y, random_state=seed)
     L = itml.transformer()
-    assert_array_almost_equal(L.T.dot(L), itml.metric())
+    assert_array_almost_equal(L.T.dot(L), itml.metric_)
 
   def test_lmnn(self):
     lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
     lmnn.fit(self.X, self.y)
     L = lmnn.transformer()
-    assert_array_almost_equal(L.T.dot(L), lmnn.metric())
+    assert_array_almost_equal(L.T.dot(L), lmnn.metric_)
 
   def test_sdml_supervised(self):
     seed = np.random.RandomState(1234)
     sdml = SDML_Supervised(num_constraints=1500)
     sdml.fit(self.X, self.y, random_state=seed)
     L = sdml.transformer()
-    assert_array_almost_equal(L.T.dot(L), sdml.metric())
+    assert_array_almost_equal(L.T.dot(L), sdml.metric_)
 
   def test_nca(self):
     n = self.X.shape[0]
     nca = NCA(max_iter=(100000//n), learning_rate=0.01)
     nca.fit(self.X, self.y)
     L = nca.transformer()
-    assert_array_almost_equal(L.T.dot(L), nca.metric())
+    assert_array_almost_equal(L.T.dot(L), nca.metric_)
 
   def test_lfda(self):
     lfda = LFDA(k=2, num_dims=2)
     lfda.fit(self.X, self.y)
     L = lfda.transformer()
-    assert_array_almost_equal(L.T.dot(L), lfda.metric())
+    assert_array_almost_equal(L.T.dot(L), lfda.metric_)
 
   def test_rca_supervised(self):
     seed = np.random.RandomState(1234)
     rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
     rca.fit(self.X, self.y, random_state=seed)
     L = rca.transformer()
-    assert_array_almost_equal(L.T.dot(L), rca.metric())
+    assert_array_almost_equal(L.T.dot(L), rca.metric_)
 
   def test_mlkr(self):
     mlkr = MLKR(num_dims=2)
     mlkr.fit(self.X, self.y)
     L = mlkr.transformer()
-    assert_array_almost_equal(L.T.dot(L), mlkr.metric())
+    assert_array_almost_equal(L.T.dot(L), mlkr.metric_)
 
 
 if __name__ == '__main__':

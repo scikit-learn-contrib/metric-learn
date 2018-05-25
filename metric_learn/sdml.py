@@ -13,13 +13,13 @@ import numpy as np
 from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
-from sklearn.utils.validation import check_array, check_X_y
+from sklearn.utils.validation import check_array, check_X_y, check_is_fitted
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 
 
-class SDML(BaseMetricLearner):
+class SDML(BaseMetricLearner, MahalanobisMixin):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False):
     """
@@ -54,7 +54,9 @@ class SDML(BaseMetricLearner):
     diff = pairs[:, 0] - pairs[:, 1]
     return (diff.T * y).dot(diff)
 
-  def metric(self):
+  @property
+  def metric_(self):
+    check_is_fitted(self, 'M_')
     return self.M_
 
   def fit(self, pairs, y):

@@ -6,14 +6,14 @@ Ported to Python from https://github.com/vomjom/nca
 from __future__ import absolute_import
 import numpy as np
 from six.moves import xrange
-from sklearn.utils.validation import check_X_y
+from sklearn.utils.validation import check_X_y, check_is_fitted
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MahalanobisMixin
 
 EPS = np.finfo(float).eps
 
 
-class NCA(BaseMetricLearner):
+class NCA(BaseMetricLearner, MahalanobisMixin):
   def __init__(self, num_dims=None, max_iter=100, learning_rate=0.01):
     self.num_dims = num_dims
     self.max_iter = max_iter
@@ -21,6 +21,11 @@ class NCA(BaseMetricLearner):
 
   def transformer(self):
     return self.A_
+
+  @property
+  def metric_(self):
+    check_is_fitted(self, 'A_')
+    return self.A_.T.dot(self.A_)
 
   def fit(self, X, y):
     """

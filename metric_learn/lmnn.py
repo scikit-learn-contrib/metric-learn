@@ -14,14 +14,14 @@ import numpy as np
 import warnings
 from collections import Counter
 from six.moves import xrange
-from sklearn.utils.validation import check_X_y, check_array
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.metrics import euclidean_distances
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MahalanobisMixin
 
 
 # commonality between LMNN implementations
-class _base_LMNN(BaseMetricLearner):
+class _base_LMNN(BaseMetricLearner, MahalanobisMixin):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001, use_pca=True,
                verbose=False):
@@ -46,6 +46,11 @@ class _base_LMNN(BaseMetricLearner):
 
   def transformer(self):
     return self.L_
+
+  @property
+  def metric_(self):
+    check_is_fitted(self, 'L_')
+    return self.L_.T.dot(self.L_)
 
 
 # slower Python version

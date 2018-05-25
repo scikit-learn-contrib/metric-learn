@@ -11,14 +11,15 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.spatial.distance import pdist, squareform
 from sklearn.decomposition import PCA
-from sklearn.utils.validation import check_X_y
+from sklearn.exceptions import NotFittedError
+from sklearn.utils.validation import check_X_y, check_array
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MahalanobisMixin
 
 EPS = np.finfo(float).eps
 
 
-class MLKR(BaseMetricLearner):
+class MLKR(BaseMetricLearner, MahalanobisMixin):
   """Metric Learning for Kernel Regression (MLKR)"""
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
                max_iter=1000):
@@ -92,6 +93,20 @@ class MLKR(BaseMetricLearner):
 
   def transformer(self):
       return self.transformer_
+
+  @property
+  def metric_(self):
+    if hasattr(self, 'transformer_'):
+      return self.transformer_.T.dot(self.transformer_)  # in this case the
+      # estimator is fitted
+    elif self.A0 is not None:
+      return check_array(self.A0.T.dot(self.A0))
+    else:  # extracted from scikit-learn's check_is_fitted function
+      msg = ("This %(name)s instance is not fitted yet, and is neither "
+             "initialized with an explicit matrix. Call 'fit' with appropriate"
+             " arguments before using this method, or initialize the metric_ "
+             "with ``A0`` equals a matrix, not None.")
+      raise NotFittedError(msg % {'name': type(self).__name__})
 
 
 def _loss(flatA, X, y, dX):

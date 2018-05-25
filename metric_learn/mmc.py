@@ -19,16 +19,17 @@ Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/co
 from __future__ import print_function, absolute_import, division
 import numpy as np
 from six.moves import xrange
+from sklearn.exceptions import NotFittedError
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
 
-class MMC(BaseMetricLearner):
+class MMC(BaseMetricLearner, MahalanobisMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
@@ -366,8 +367,18 @@ class MMC(BaseMetricLearner):
       sum_deri2 / sum_dist - np.outer(sum_deri1, sum_deri1) / (sum_dist * sum_dist)
     )
 
-  def metric(self):
-    return self.A_
+  @property
+  def metric_(self):
+    if hasattr(self, 'A_'):
+      return self.A_  # in this case the estimator is fitted
+    elif self.A0 is not None:
+      return check_array(self.A0)
+    else:  # extracted from scikit-learn's check_is_fitted function
+      msg = ("This %(name)s instance is not fitted yet, and is neither "
+             "initialized with an explicit matrix. Call 'fit' with appropriate"
+             " arguments before using this method, or initialize the metric_ "
+             "with ``A0`` equals a matrix, not None.")
+      raise NotFittedError(msg % {'name': type(self).__name__})
 
   def transformer(self):
     """Computes the transformation matrix from the Mahalanobis matrix.

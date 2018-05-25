@@ -18,13 +18,14 @@ import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
+from sklearn.exceptions import NotFittedError
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
-class ITML(BaseMetricLearner):
+class ITML(BaseMetricLearner, MahalanobisMixin):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False):
@@ -147,8 +148,18 @@ class ITML(BaseMetricLearner):
     self.n_iter_ = it
     return self
 
-  def metric(self):
-    return self.A_
+  @property
+  def metric_(self):
+    if hasattr(self, 'A_'):
+      return self.A_  # in this case the estimator is fitted
+    elif self.A0 is not None:
+      return check_array(self.A0)
+    else:  # extracted from scikit-learn's check_is_fitted function
+      msg = ("This %(name)s instance is not fitted yet, and is neither "
+             "initialized with an explicit matrix. Call 'fit' with appropriate"
+             " arguments before using this method, or initialize the metric_ "
+             "with ``A0`` equals a matrix, not None.")
+      raise NotFittedError(msg % {'name': type(self).__name__})
 
 
 class ITML_Supervised(ITML):

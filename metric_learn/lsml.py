@@ -11,13 +11,14 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
+from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 
 
-class LSML(BaseMetricLearner):
+class LSML(BaseMetricLearner, MahalanobisMixin):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
     """Initialize LSML.
 
@@ -57,8 +58,18 @@ class LSML(BaseMetricLearner):
       self.M_ = self.prior
       self.prior_inv_ = np.linalg.inv(self.prior)
 
-  def metric(self):
-    return self.M_
+  @property
+  def metric_(self):
+    if hasattr(self, 'M_'):
+      return self.M_  # in this case the estimator is fitted
+    elif self.prior is not None:
+      return check_array(self.prior)
+    else:  # extracted from scikit-learn's check_is_fitted function
+      msg = ("This %(name)s instance is not fitted yet, and is neither "
+             "initialized with an explicit matrix. Call 'fit' with appropriate"
+             " arguments before using this method, or initialize the metric_ "
+             "with ``prior`` equals a matrix, not None.")
+      raise NotFittedError(msg % {'name': type(self).__name__})
 
   def fit(self, quadruplets, weights=None):
     """Learn the LSML model.
