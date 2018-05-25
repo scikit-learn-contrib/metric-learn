@@ -1,6 +1,8 @@
 from numpy.linalg import inv, cholesky
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
+from abc import ABCMeta, abstractmethod
+import six
 
 
 class BaseMetricLearner(BaseEstimator, TransformerMixin):
@@ -49,3 +51,23 @@ class BaseMetricLearner(BaseEstimator, TransformerMixin):
       X = check_array(X, accept_sparse=True)
     L = self.transformer()
     return X.dot(L.T)
+
+
+class MahalanobisMixin(six.with_metaclass(ABCMeta)):
+  """Mahalanobis metric learning algorithms.
+
+  Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x')`,
+  defined between two column vectors :math:`x` and :math:`x'` by:
+  :math:`d_M(x, x') = \sqrt{(x-x')^T M (x-x')}`, where :math:`M` is the
+  learned square matrix.
+
+  Attributes
+  ----------
+  metric_: `np.ndarray`, shape=(n_features, n_features)
+      The learned Mahalanobis matrix.
+  """
+
+  @property
+  @abstractmethod
+  def metric_(self):
+    pass
