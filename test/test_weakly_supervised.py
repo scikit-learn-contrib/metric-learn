@@ -26,27 +26,27 @@ def build_data():
 
 
 def build_pairs():
-  # test that you can do cross validation on a ConstrainedDataset with
+  # test that you can do cross validation on tuples of points with
   #  a WeaklySupervisedMetricLearner
   X, pairs = build_data()
-  X_constrained, y = wrap_pairs(X, pairs)
-  X_constrained, y = shuffle(X_constrained, y)
-  (X_constrained_train, X_constrained_test, y_train,
-   y_test) = train_test_split(X_constrained, y)
-  return (X_constrained, y, X_constrained_train, X_constrained_test,
+  pairs, y = wrap_pairs(X, pairs)
+  pairs, y = shuffle(pairs, y)
+  (pairs_train, pairs_test, y_train,
+   y_test) = train_test_split(pairs, y)
+  return (pairs, y, pairs_train, pairs_test,
           y_train, y_test)
 
 
 def build_quadruplets():
-  # test that you can do cross validation on a ConstrainedDataset with
+  # test that you can do cross validation on a tuples of points with
   #  a WeaklySupervisedMetricLearner
   X, pairs = build_data()
   c = np.column_stack(pairs)
-  X_constrained = X[c]
-  X_constrained = shuffle(X_constrained)
+  quadruplets = X[c]
+  quadruplets = shuffle(quadruplets)
   y = y_train = y_test = None
-  X_constrained_train, X_constrained_test = train_test_split(X_constrained)
-  return (X_constrained, y, X_constrained_train, X_constrained_test,
+  quadruplets_train, quadruplets_test = train_test_split(quadruplets)
+  return (quadruplets, y, quadruplets_train, quadruplets_test,
           y_train, y_test)
 
 
@@ -66,35 +66,35 @@ ids_estimators = ['itml',
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_cross_validation(estimator, build_dataset):
-  (X_constrained, y, X_constrained_train, X_constrained_test,
+  (tuples, y, tuples_train, tuples_test,
    y_train, y_test) = build_dataset()
   estimator = clone(estimator)
   set_random_state(estimator)
 
-  assert np.isfinite(cross_val_score(estimator, X_constrained, y)).all()
+  assert np.isfinite(cross_val_score(estimator, tuples, y)).all()
 
 
-def check_score(estimator, X_constrained, y):
-  score = estimator.score(X_constrained, y)
+def check_score(estimator, tuples, y):
+  score = estimator.score(tuples, y)
   assert np.isfinite(score)
 
 
-def check_predict(estimator, X_constrained):
-  y_predicted = estimator.predict(X_constrained)
-  assert len(y_predicted), len(X_constrained)
+def check_predict(estimator, tuples):
+  y_predicted = estimator.predict(tuples)
+  assert len(y_predicted), len(tuples)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_simple_estimator(estimator, build_dataset):
-  (X_constrained, y, X_constrained_train, X_constrained_test,
+  (tuples, y, tuples_train, tuples_test,
    y_train, y_test) = build_dataset()
   estimator = clone(estimator)
   set_random_state(estimator)
 
-  estimator.fit(X_constrained_train, y_train)
-  check_score(estimator, X_constrained_test, y_test)
-  check_predict(estimator, X_constrained_test)
+  estimator.fit(tuples_train, y_train)
+  check_score(estimator, tuples_test, y_test)
+  check_predict(estimator, tuples_test)
 
 
 @pytest.mark.parametrize('estimator', [est[0] for est in list_estimators],
@@ -122,10 +122,10 @@ def test_no_fit_attributes_set_in_init(estimator):
 def test_estimators_fit_returns_self(estimator, build_dataset):
   """Check if self is returned when calling fit"""
   # From scikit-learn
-  (X_constrained, y, X_constrained_train, X_constrained_test,
+  (tuples, y, tuples_train, tuples_test,
    y_train, y_test) = build_dataset()
   estimator = clone(estimator)
-  assert estimator.fit(X_constrained, y) is estimator
+  assert estimator.fit(tuples, y) is estimator
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
@@ -133,12 +133,12 @@ def test_estimators_fit_returns_self(estimator, build_dataset):
 def test_pipeline_consistency(estimator, build_dataset):
   # From scikit learn
   # check that make_pipeline(est) gives same score as est
-  (X_constrained, y, X_constrained_train, X_constrained_test,
+  (tuples, y, tuples_train, tuples_test,
    y_train, y_test) = build_dataset()
   estimator = clone(estimator)
   pipeline = make_pipeline(estimator)
-  estimator.fit(X_constrained, y)
-  pipeline.fit(X_constrained, y)
+  estimator.fit(tuples, y)
+  pipeline.fit(tuples, y)
 
   funcs = ["score", "fit_transform"]
 
@@ -146,8 +146,8 @@ def test_pipeline_consistency(estimator, build_dataset):
     func = getattr(estimator, func_name, None)
     if func is not None:
       func_pipeline = getattr(pipeline, func_name)
-      result = func(X_constrained, y)
-      result_pipe = func_pipeline(X_constrained, y)
+      result = func(tuples, y)
+      result_pipe = func_pipeline(tuples, y)
       assert_allclose_dense_sparse(result, result_pipe)
 
 
@@ -155,17 +155,17 @@ def test_pipeline_consistency(estimator, build_dataset):
                          ids=ids_estimators)
 def test_dict_unchanged(estimator, build_dataset):
   # From scikit-learn
-  (X_constrained, y, X_constrained_train, X_constrained_test,
+  (tuples, y, tuples_train, tuples_test,
    y_train, y_test) = build_dataset()
   estimator = clone(estimator)
   if hasattr(estimator, "n_components"):
     estimator.n_components = 1
-  estimator.fit(X_constrained, y)
+  estimator.fit(tuples, y)
   for method in ["predict", "transform", "decision_function",
                  "predict_proba"]:
     if hasattr(estimator, method):
       dict_before = estimator.__dict__.copy()
-      getattr(estimator, method)(X_constrained)
+      getattr(estimator, method)(tuples)
       assert estimator.__dict__ == dict_before, \
           ("Estimator changes __dict__ during %s"
            % method)
@@ -176,14 +176,14 @@ def test_dict_unchanged(estimator, build_dataset):
 def test_dont_overwrite_parameters(estimator, build_dataset):
   # From scikit-learn
   # check that fit method only changes or sets private attributes
-  (X_constrained, y, X_constrained_train, X_constrained_test,
+  (tuples, y, tuples_train, tuples_test,
    y_train, y_test) = build_dataset()
   estimator = clone(estimator)
   if hasattr(estimator, "n_components"):
     estimator.n_components = 1
   dict_before_fit = estimator.__dict__.copy()
 
-  estimator.fit(X_constrained, y)
+  estimator.fit(tuples, y)
   dict_after_fit = estimator.__dict__
 
   public_keys_after_fit = [key for key in dict_after_fit.keys()

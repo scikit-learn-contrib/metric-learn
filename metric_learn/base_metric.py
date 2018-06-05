@@ -59,7 +59,7 @@ class MetricTransformer(TransformerMixin):
 class _PairsClassifierMixin:
 
   def predict(self, pairs):
-    """Predicts the learned similarity between input pairs.
+    """Predicts the learned metric between input pairs.
 
     Returns the learned metric value between samples in every pair. It should
     ideally be low for similar samples and high for dissimilar samples.
@@ -67,7 +67,7 @@ class _PairsClassifierMixin:
     Parameters
     ----------
     pairs : array-like, shape=(n_constraints, 2, n_features)
-      A constrained dataset of paired samples.
+      Input pairs.
 
     Returns
     -------
@@ -110,7 +110,7 @@ class _PairsClassifierMixin:
 class _QuadrupletsClassifierMixin:
 
   def predict(self, quadruplets):
-    """Predicts differences between sample similarities in input quadruplets.
+    """Predicts differences between sample distances in input quadruplets.
 
     For each quadruplet of samples, computes the difference between the learned
     metric of the first pair minus the learned metric of the second pair.
@@ -122,7 +122,7 @@ class _QuadrupletsClassifierMixin:
 
     Returns
     -------
-    prediction : np.ndarray of floats, shape=(n_constraints,)
+    prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
     similar_diffs = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -136,7 +136,7 @@ class _QuadrupletsClassifierMixin:
     return self.predict(quadruplets)
 
   def score(self, quadruplets, y=None):
-    """Computes score on an input constrained dataset
+    """Computes score on input quadruplets
 
     Returns the accuracy score of the following classification task: a record
     is correctly classified if the predicted similarity between the first two
@@ -154,5 +154,4 @@ class _QuadrupletsClassifierMixin:
     score : float
       The quadruplets score.
     """
-    predicted_sign = self.decision_function(quadruplets) < 0
-    return np.sum(predicted_sign) / predicted_sign.shape[0]
+    return - np.mean(np.sign(self.decision_function(quadruplets)))
