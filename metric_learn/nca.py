@@ -8,12 +8,12 @@ import numpy as np
 from six.moves import xrange
 from sklearn.utils.validation import check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import BaseMetricLearner, MetricTransformer
 
 EPS = np.finfo(float).eps
 
 
-class NCA(BaseMetricLearner):
+class NCA(BaseMetricLearner, MetricTransformer):
   def __init__(self, num_dims=None, max_iter=100, learning_rate=0.01):
     self.num_dims = num_dims
     self.max_iter = max_iter

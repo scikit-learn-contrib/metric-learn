@@ -19,12 +19,13 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import (BaseMetricLearner, _PairsClassifierMixin,
+                          MetricTransformer)
 from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
-class ITML(BaseMetricLearner):
+class _BaseITML(BaseMetricLearner):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False):
@@ -78,24 +79,7 @@ class ITML(BaseMetricLearner):
     y = np.hstack([np.ones(len(pos_pairs)), - np.ones(len(neg_pairs))])
     return pairs, y
 
-
-  def fit(self, pairs, y, bounds=None):
-    """Learn the ITML model.
-
-    Parameters
-    ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
-    y: array-like, of shape (n_constraints,)
-        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
-    bounds : list (pos,neg) pairs, optional
-        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
-
-    Returns
-    -------
-    self : object
-        Returns the instance.
-    """
+  def _fit(self, pairs, y, bounds=None):
     pairs, y = self._process_pairs(pairs, y, bounds)
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -151,7 +135,29 @@ class ITML(BaseMetricLearner):
     return self.A_
 
 
-class ITML_Supervised(ITML):
+class ITML(_BaseITML, _PairsClassifierMixin):
+
+  def fit(self, pairs, y, bounds=None):
+    """Learn the ITML model.
+
+    Parameters
+    ----------
+    pairs: array-like, shape=(n_constraints, 2, n_features)
+        Array of pairs. Each row corresponds to two points.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+    bounds : list (pos,neg) pairs, optional
+        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
+    """
+    return self._fit(pairs, y, bounds=bounds)
+
+
+class ITML_Supervised(_BaseITML, MetricTransformer):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
@@ -175,9 +181,9 @@ class ITML_Supervised(ITML):
     verbose : bool, optional
         if True, prints information while learning
     """
-    ITML.__init__(self, gamma=gamma, max_iter=max_iter,
-                  convergence_threshold=convergence_threshold,
-                  A0=A0, verbose=verbose)
+    _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
+                       convergence_threshold=convergence_threshold,
+                       A0=A0, verbose=verbose)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds
@@ -207,4 +213,4 @@ class ITML_Supervised(ITML):
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)
-    return ITML.fit(self, pairs, y, bounds=self.bounds)
+    return _BaseITML._fit(self, pairs, y, bounds=self.bounds)

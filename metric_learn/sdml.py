@@ -15,11 +15,12 @@ from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner
+from .base_metric import (BaseMetricLearner, _PairsClassifierMixin,
+                          MetricTransformer)
 from .constraints import Constraints, wrap_pairs
 
 
-class SDML(BaseMetricLearner):
+class _BaseSDML(BaseMetricLearner):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False):
     """
@@ -57,6 +58,18 @@ class SDML(BaseMetricLearner):
   def metric(self):
     return self.M_
 
+  def _fit(self, pairs, y):
+    loss_matrix = self._prepare_pairs(pairs, y)
+    P = self.M_ + self.balance_param * loss_matrix
+    emp_cov = pinvh(P)
+    # hack: ensure positive semidefinite
+    emp_cov = emp_cov.T.dot(emp_cov)
+    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
+    return self
+
+
+class SDML(_BaseSDML, _PairsClassifierMixin):
+
   def fit(self, pairs, y):
     """Learn the SDML model.
 
@@ -72,16 +85,10 @@ class SDML(BaseMetricLearner):
     self : object
         Returns the instance.
     """
-    loss_matrix = self._prepare_pairs(pairs, y)
-    P = self.M_ + self.balance_param * loss_matrix
-    emp_cov = pinvh(P)
-    # hack: ensure positive semidefinite
-    emp_cov = emp_cov.T.dot(emp_cov)
-    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
-    return self
+    return self._fit(pairs, y)
 
 
-class SDML_Supervised(SDML):
+class SDML_Supervised(_BaseSDML, MetricTransformer):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
     """
@@ -100,9 +107,9 @@ class SDML_Supervised(SDML):
     verbose : bool, optional
         if True, prints information while learning
     """
-    SDML.__init__(self, balance_param=balance_param,
-                  sparsity_param=sparsity_param, use_cov=use_cov,
-                  verbose=verbose)
+    _BaseSDML.__init__(self, balance_param=balance_param,
+                       sparsity_param=sparsity_param, use_cov=use_cov,
+                       verbose=verbose)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
@@ -133,6 +140,6 @@ class SDML_Supervised(SDML):
     c = Constraints.random_subset(y, self.num_labeled,
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints,
-                                              random_state=random_state)
+                                        random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)
-    return SDML.fit(self, pairs, y)
+    return _BaseSDML._fit(self, pairs, y)
