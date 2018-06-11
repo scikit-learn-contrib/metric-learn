@@ -17,7 +17,7 @@ from sklearn.utils.validation import (check_array, check_X_y,
                                       check_is_fitted)
 
 from .base_metric import (BaseMetricLearner, MahalanobisMixin,
-                          MetricTransformer)
+                          MetricTransformer, _PairsClassifierMixin)
 from .constraints import Constraints, wrap_pairs
 
 
