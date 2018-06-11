@@ -4,7 +4,8 @@ from sklearn.pipeline import make_pipeline
 from sklearn.utils import shuffle, check_random_state
 from sklearn.utils.estimator_checks import is_public_parameter
 from sklearn.utils.testing import (assert_allclose_dense_sparse,
-                                   set_random_state, _get_args)
+                                   set_random_state)
+from sklearn.utils.fixes import signature
 
 from metric_learn import ITML, MMC, SDML, LSML
 from metric_learn.constraints import wrap_pairs, Constraints
@@ -222,3 +223,23 @@ def test_dont_overwrite_parameters(estimator, build_dataset):
      " to change attributes started"
      " or ended with _, but"
      " %s changed" % ', '.join(attrs_changed_by_fit))
+
+
+def _get_args(function, varargs=False):
+    """Helper to get function arguments"""
+
+    try:
+        params = signature(function).parameters
+    except ValueError:
+        # Error on builtin C function
+        return []
+    args = [key for key, param in params.items()
+            if param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD)]
+    if varargs:
+        varargs = [param.name for param in params.values()
+                   if param.kind == param.VAR_POSITIONAL]
+        if len(varargs) == 0:
+            varargs = None
+        return args, varargs
+    else:
+        return args
