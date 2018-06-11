@@ -4,7 +4,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.utils import shuffle, check_random_state
 from sklearn.utils.estimator_checks import is_public_parameter
 from sklearn.utils.testing import (assert_allclose_dense_sparse,
-                                   set_random_state)
+                                   set_random_state, _get_args)
 
 from metric_learn import ITML, MMC, SDML, LSML
 from metric_learn.constraints import wrap_pairs, Constraints
@@ -99,22 +99,32 @@ def test_simple_estimator(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator', [est[0] for est in list_estimators],
                          ids=ids_estimators)
-def test_no_fit_attributes_set_in_init(estimator):
-  """Check that Estimator.__init__ doesn't set trailing-_ attributes."""
-  # From scikit-learn
-  estimator = clone(estimator)
-  for attr in dir(estimator):
-    if attr.endswith("_") and not attr.startswith("__"):
-      # This check is for properties, they can be listed in dir
-      # while at the same time have hasattr return False as long
-      # as the property getter raises an AttributeError
-      assert hasattr(estimator, attr), \
-          ("By convention, attributes ending with '_' are "
-           "estimated from data in scikit-learn. Consequently they "
-           "should not be initialized in the constructor of an "
-           "estimator but in the fit method. Attribute {!r} "
-           "was found in estimator {}".format(
-               attr, type(estimator).__name__))
+def test_no_attributes_set_in_init(estimator):
+    """Check setting during init.  Taken from scikit-learn."""
+    estimator = clone(estimator)
+    if hasattr(type(estimator).__init__, "deprecated_original"):
+        return
+
+    init_params = _get_args(type(estimator).__init__)
+    parents_init_params = [param for params_parent in
+                           (_get_args(parent) for parent in
+                            type(estimator).__mro__)
+                           for param in params_parent]
+
+    # Test for no setting apart from parameters during init
+    invalid_attr = (set(vars(estimator)) - set(init_params) -
+                    set(parents_init_params))
+    assert not invalid_attr, \
+        ("Estimator %s should not set any attribute apart"
+         " from parameters during init. Found attributes %s."
+         % (type(estimator).__name__, sorted(invalid_attr)))
+    # Ensure that each parameter is set in init
+    invalid_attr = (set(init_params) - set(vars(estimator)) -
+                    set(["self"]))
+    assert not invalid_attr, \
+        ("Estimator %s should store all parameters"
+         " as an attribute during init. Did not find "
+         "attributes %s." % (type(estimator).__name__, sorted(invalid_attr)))
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
