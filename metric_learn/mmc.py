@@ -23,13 +23,13 @@ from sklearn.exceptions import NotFittedError
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner, MahalanobisMixin
+from .base_metric import (BaseMetricLearner, _PairsClassifierMixin,
+                          MahalanobisMixin, MetricTransformer)
 from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
-
-class MMC(BaseMetricLearner, MahalanobisMixin):
+class _BaseMMC(BaseMetricLearner, MahalanobisMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
@@ -59,22 +59,7 @@ class MMC(BaseMetricLearner, MahalanobisMixin):
     self.diagonal_c = diagonal_c
     self.verbose = verbose
 
-
-  def fit(self, pairs, y):
-    """Learn the MMC model.
-
-    Parameters
-    ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
-    y: array-like, of shape (n_constraints,)
-        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
-
-    Returns
-    -------
-    self : object
-        Returns the instance.
-    """
+  def _fit(self, pairs, y):
     pairs, y = self._process_pairs(pairs, y)
     if self.diagonal:
       return self._fit_diag(pairs, y)
@@ -399,7 +384,27 @@ class MMC(BaseMetricLearner, MahalanobisMixin):
       return V.T * np.sqrt(np.maximum(0, w[:,None]))
 
 
-class MMC_Supervised(MMC):
+class MMC(_BaseMMC, _PairsClassifierMixin):
+
+  def fit(self, pairs, y):
+    """Learn the MMC model.
+
+    Parameters
+    ----------
+    pairs: array-like, shape=(n_constraints, 2, n_features)
+        Array of pairs. Each row corresponds to two points.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
+    """
+    return self._fit(pairs, y)
+
+
+class MMC_Supervised(_BaseMMC, MetricTransformer):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
@@ -427,10 +432,10 @@ class MMC_Supervised(MMC):
     verbose : bool, optional
         if True, prints information while learning
     """
-    MMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
-                 convergence_threshold=convergence_threshold,
-                 A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
-                 verbose=verbose)
+    _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
+                      convergence_threshold=convergence_threshold,
+                      A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
+                      verbose=verbose)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
@@ -457,4 +462,4 @@ class MMC_Supervised(MMC):
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)
-    return MMC.fit(self, pairs, y)
+    return _BaseMMC._fit(self, pairs, y)

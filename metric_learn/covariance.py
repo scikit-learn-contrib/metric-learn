@@ -12,10 +12,12 @@ from __future__ import absolute_import
 import numpy as np
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from .base_metric import BaseMetricLearner, MahalanobisMixin
+from .base_metric import (BaseMetricLearner, MahalanobisMixin,
+                          MetricTransformer)
 
 
-class Covariance(BaseMetricLearner, MahalanobisMixin):
+class Covariance(BaseMetricLearner, MetricTransformer,
+                 MahalanobisMixin):
   def __init__(self):
     pass
 

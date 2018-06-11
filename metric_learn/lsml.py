@@ -14,11 +14,12 @@ from six.moves import xrange
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import BaseMetricLearner, MahalanobisMixin
+from .base_metric import (BaseMetricLearner, _QuadrupletsClassifierMixin,
+                          MetricTransformer, MahalanobisMixin)
 from .constraints import Constraints, wrap_pairs
 
 
-class LSML(BaseMetricLearner, MahalanobisMixin):
+class _BaseLSML(BaseMetricLearner, MahalanobisMixin):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
     """Initialize LSML.
 
@@ -71,24 +72,7 @@ class LSML(BaseMetricLearner, MahalanobisMixin):
              "with ``prior`` equals a matrix, not None.")
       raise NotFittedError(msg % {'name': type(self).__name__})
 
-  def fit(self, quadruplets, weights=None):
-    """Learn the LSML model.
-
-    Parameters
-    ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features)
-        Each row corresponds to 4 points. In order to supervise the
-        algorithm in the right way, we should have the four samples ordered
-        in a way such that: d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3])
-        for all 0 <= i < n_constraints.
-    weights : (n_constraints,) array of floats, optional
-        scale factor for each constraint
-
-    Returns
-    -------
-    self : object
-        Returns the instance.
-    """
+  def _fit(self, quadruplets, weights=None):
     self._prepare_quadruplets(quadruplets, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -151,7 +135,30 @@ class LSML(BaseMetricLearner, MahalanobisMixin):
     return dMetric
 
 
-class LSML_Supervised(LSML):
+class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
+
+  def fit(self, quadruplets, weights=None):
+    """Learn the LSML model.
+
+    Parameters
+    ----------
+    quadruplets : array-like, shape=(n_constraints, 4, n_features)
+        Each row corresponds to 4 points. In order to supervise the
+        algorithm in the right way, we should have the four samples ordered
+        in a way such that: d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3])
+        for all 0 <= i < n_constraints.
+    weights : (n_constraints,) array of floats, optional
+        scale factor for each constraint
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
+    """
+    return self._fit(quadruplets, weights=weights)
+
+
+class LSML_Supervised(_BaseLSML, MetricTransformer):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
                num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.
@@ -171,8 +178,8 @@ class LSML_Supervised(LSML):
     verbose : bool, optional
         if True, prints information while learning
     """
-    LSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
-                  verbose=verbose)
+    _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
+                       verbose=verbose)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights
@@ -200,5 +207,6 @@ class LSML_Supervised(LSML):
     c = Constraints.random_subset(y, self.num_labeled,
                                   random_state=random_state)
     pos_neg = c.positive_negative_pairs(num_constraints, same_length=True,
-                                      random_state=random_state)
-    return LSML.fit(self, X[np.column_stack(pos_neg)], weights=self.weights)
+                                        random_state=random_state)
+    return _BaseLSML._fit(self, X[np.column_stack(pos_neg)],
+                          weights=self.weights)
