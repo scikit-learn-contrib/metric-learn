@@ -50,19 +50,31 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta)):
   """Mahalanobis metric learning algorithms.
 
   Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x')`,
-  defined between two column vectors :math:`x` and :math:`x'` by:
-  :math:`d_M(x, x') = \sqrt{(x-x')^T M (x-x')}`, where :math:`M` is the
-  learned square matrix.
+  defined between two column vectors :math:`x` and :math:`x'` by: :math:`d_M(x,
+  x') = \sqrt{(x-x')^T M (x-x')}`, where :math:`M` is a learned symmetric
+  positive semi-definite (PSD) matrix. The metric between points can then be
+  expressed as the euclidean distance between points embedded in a new space
+  through a linear transformation. Indeed, the above matrix can be decomposed
+  into the product of two transpose matrices (through SVD or Cholesky
+  decomposition): :math:`d_M(x, x')^2 = (x-x')^T M (x-x') = (x-x')^T L^T L
+  (x-x') = (L x - L x')^T (L x- L x')`
 
   Attributes
   ----------
-  metric_: `np.ndarray`, shape=(n_features, n_features)
-      The learned Mahalanobis matrix.
+  metric_: `np.ndarray`, shape=(n_features_out, n_features)
+    The learned metric ``M``.
+  transformer_: `np.ndarray`, shape=(n_features_out, n_features)
+    The learned linear transformation ``L``.
   """
 
   @property
   @abstractmethod
   def metric_(self):
+    pass
+
+  @property
+  @abstractmethod
+  def transformer_(self):
     pass
 
 
