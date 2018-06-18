@@ -50,21 +50,12 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta)):
 
   Attributes
   ----------
-  metric_: `np.ndarray`, shape=(n_features_out, n_features)
-    The learned metric ``M``.
   transformer_: `np.ndarray`, shape=(n_features_out, n_features)
     The learned linear transformation ``L``.
   """
 
-  @property
-  @abstractmethod
-  def metric_(self):
-    pass
-
-  @property
-  @abstractmethod
-  def transformer_(self):
-    pass
+  def metric(self):
+    return self.transformer_.T.dot(self.transformer_)
 
   def transformer_from_metric(self, metric):
     """Computes the transformation matrix from the Mahalanobis matrix.
