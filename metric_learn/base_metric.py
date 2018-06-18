@@ -11,17 +11,6 @@ class BaseMetricLearner(BaseEstimator):
   def __init__(self):
     raise NotImplementedError('BaseMetricLearner should not be instantiated')
 
-  def transformer(self):
-    """Computes the transformation matrix from the Mahalanobis matrix.
-
-    L = cholesky(M).T
-
-    Returns
-    -------
-    L : upper triangular (d x d) matrix
-    """
-    return cholesky(self.metric_).T
-
 
 class MetricTransformer(TransformerMixin):
 
@@ -76,6 +65,17 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta)):
   @abstractmethod
   def transformer_(self):
     pass
+
+  def transformer_from_metric(self, metric):
+    """Computes the transformation matrix from the Mahalanobis matrix.
+
+    L = cholesky(M).T
+
+    Returns
+    -------
+    L : upper triangular (d x d) matrix
+    """
+    return cholesky(metric).T
 
 
 class _PairsClassifierMixin:
