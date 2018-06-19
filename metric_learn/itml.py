@@ -130,20 +130,9 @@ class _BaseITML(BaseMetricLearner, MahalanobisMixin):
     if self.verbose:
       print('itml converged at iter: %d, conv = %f' % (it, conv))
     self.n_iter_ = it
-    return self
 
-  @property
-  def metric_(self):
-    if hasattr(self, 'A_'):
-      return self.A_  # in this case the estimator is fitted
-    elif self.A0 is not None:
-      return check_array(self.A0)
-    else:  # extracted from scikit-learn's check_is_fitted function
-      msg = ("This %(name)s instance is not fitted yet, and is neither "
-             "initialized with an explicit matrix. Call 'fit' with appropriate"
-             " arguments before using this method, or initialize the metric_ "
-             "with ``A0`` equals a matrix, not None.")
-      raise NotFittedError(msg % {'name': type(self).__name__})
+    self.transformer_ = self.transformer_from_metric(self.A_)
+    return self
 
 
 class ITML(_BaseITML, _PairsClassifierMixin):

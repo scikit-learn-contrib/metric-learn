@@ -21,14 +21,6 @@ class NCA(BaseMetricLearner, MahalanobisMixin,
     self.max_iter = max_iter
     self.learning_rate = learning_rate
 
-  def transformer(self):
-    return self.A_
-
-  @property
-  def metric_(self):
-    check_is_fitted(self, 'A_')
-    return self.A_.T.dot(self.A_)
-
   def fit(self, X, y):
     """
     X: data matrix, (n x d)
@@ -61,6 +53,6 @@ class NCA(BaseMetricLearner, MahalanobisMixin,
         A += self.learning_rate * A.dot(d)
 
     self.X_ = X
-    self.A_ = A
+    self.transformer_ = A
     self.n_iter_ = it
     return self

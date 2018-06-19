@@ -53,14 +53,6 @@ class LFDA(BaseMetricLearner, MahalanobisMixin,
     self.embedding_type = embedding_type
     self.k = k
 
-  def transformer(self):
-    return self.transformer_
-
-  @property
-  def metric_(self):
-    check_is_fitted(self, 'transformer_')
-    return self.transformer_.T.dot(self.transformer_)
-
   def _process_inputs(self, X, y):
     unique_classes, y = np.unique(y, return_inverse=True)
     self.X_, y = check_X_y(X, y)

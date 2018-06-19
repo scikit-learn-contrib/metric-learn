@@ -31,7 +31,7 @@ class MetricTransformer(TransformerMixin):
       X = self.X_
     else:
       X = check_array(X, accept_sparse=True)
-    L = self.transformer()
+    L = self.transformer_
     return X.dot(L.T)
 
 
@@ -88,7 +88,7 @@ class _PairsClassifierMixin:
       The predicted learned metric value between samples in every pair.
     """
     pairwise_diffs = pairs[:, 0, :] - pairs[:, 1, :]
-    return np.sqrt(np.sum(pairwise_diffs.dot(self.metric_) * pairwise_diffs,
+    return np.sqrt(np.sum(pairwise_diffs.dot(self.metric()) * pairwise_diffs,
                           axis=1))
 
   def decision_function(self, pairs):
@@ -140,9 +140,9 @@ class _QuadrupletsClassifierMixin:
     """
     similar_diffs = quadruplets[:, 0, :] - quadruplets[:, 1, :]
     dissimilar_diffs = quadruplets[:, 2, :] - quadruplets[:, 3, :]
-    return (np.sqrt(np.sum(similar_diffs.dot(self.metric_) *
+    return (np.sqrt(np.sum(similar_diffs.dot(self.metric()) *
                            similar_diffs, axis=1)) -
-            np.sqrt(np.sum(dissimilar_diffs.dot(self.metric_) *
+            np.sqrt(np.sum(dissimilar_diffs.dot(self.metric()) *
                            dissimilar_diffs, axis=1)))
 
   def decision_function(self, quadruplets):

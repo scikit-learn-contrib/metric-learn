@@ -93,23 +93,6 @@ class MLKR(BaseMetricLearner, MahalanobisMixin,
       self.n_iter_ = res.nit
       return self
 
-  def transformer(self):
-      return self.transformer_
-
-  @property
-  def metric_(self):
-    if hasattr(self, 'transformer_'):
-      return self.transformer_.T.dot(self.transformer_)  # in this case the
-      # estimator is fitted
-    elif self.A0 is not None:
-      return check_array(self.A0.T.dot(self.A0))
-    else:  # extracted from scikit-learn's check_is_fitted function
-      msg = ("This %(name)s instance is not fitted yet, and is neither "
-             "initialized with an explicit matrix. Call 'fit' with appropriate"
-             " arguments before using this method, or initialize the metric_ "
-             "with ``A0`` equals a matrix, not None.")
-      raise NotFittedError(msg % {'name': type(self).__name__})
-
 
 def _loss(flatA, X, y, dX):
   A = flatA.reshape((-1, X.shape[1]))

@@ -46,14 +46,6 @@ class _base_LMNN(BaseMetricLearner, MahalanobisMixin,
     self.use_pca = use_pca
     self.verbose = verbose
 
-  def transformer(self):
-    return self.L_
-
-  @property
-  def metric_(self):
-    check_is_fitted(self, 'L_')
-    return self.L_.T.dot(self.L_)
-
 
 # slower Python version
 class python_LMNN(_base_LMNN):
@@ -67,7 +59,7 @@ class python_LMNN(_base_LMNN):
     self.labels_ = np.arange(len(unique_labels))
     if self.use_pca:
       warnings.warn('use_pca does nothing for the python_LMNN implementation')
-    self.L_ = np.eye(num_dims)
+    self.transformer_ = np.eye(num_dims)
     required_k = np.bincount(self.label_inds_).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'
@@ -99,7 +91,7 @@ class python_LMNN(_base_LMNN):
 
     # initialize gradient and L
     G = dfG * reg + df * (1-reg)
-    L = self.L_
+    L = self.transformer_
     objective = np.inf
 
     # main loop
@@ -184,7 +176,7 @@ class python_LMNN(_base_LMNN):
         print("LMNN didn't converge in %d steps." % self.max_iter)
 
     # store the last L
-    self.L_ = L
+    self.transformer_ = L
     self.n_iter_ = it
     return self
 

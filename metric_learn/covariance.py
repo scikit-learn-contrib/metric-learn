@@ -21,11 +21,6 @@ class Covariance(BaseMetricLearner, MetricTransformer,
   def __init__(self):
     pass
 
-  @property
-  def metric_(self):
-    check_is_fitted(self, 'M_')
-    return self.M_
-
   def fit(self, X, y=None):
     """
     X : data matrix, (n x d)
@@ -37,4 +32,6 @@ class Covariance(BaseMetricLearner, MetricTransformer,
       self.M_ = 1./self.M_
     else:
       self.M_ = np.linalg.inv(self.M_)
+
+    self.transformer_ = self.transformer_from_metric(check_array(self.M_))
     return self

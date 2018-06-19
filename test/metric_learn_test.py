@@ -97,7 +97,7 @@ class TestNCA(MetricTestCase):
                 [+0.2532,   0.5835, -0.8461, -0.8915],
                 [-0.729,   -0.6386,  1.767,   1.832],
                 [-0.9405,  -0.8461,  2.281,   2.794]]
-    assert_array_almost_equal(expected, nca.transformer(), decimal=3)
+    assert_array_almost_equal(expected, nca.transformer_, decimal=3)
 
     # With dimension reduction
     nca = NCA(max_iter=(100000//n), learning_rate=0.01, num_dims=2)
@@ -114,8 +114,8 @@ class TestLFDA(MetricTestCase):
     self.assertLess(csep, 0.15)
 
     # Sanity checks for learned matrices.
-    self.assertEqual(lfda.metric_.shape, (4, 4))
-    self.assertEqual(lfda.transformer().shape, (2, 4))
+    self.assertEqual(lfda.metric().shape, (4, 4))
+    self.assertEqual(lfda.transformer_.shape, (2, 4))
 
 
 class TestRCA(MetricTestCase):
@@ -166,13 +166,13 @@ class TestMMC(MetricTestCase):
                 [+0.00083371, +0.00149466, -0.00200719, -0.00296284],
                 [-0.00111959, -0.00200719, +0.00269546, +0.00397881],
                 [-0.00165265, -0.00296284, +0.00397881, +0.00587320]]
-    assert_array_almost_equal(expected, mmc.metric_, decimal=6)
+    assert_array_almost_equal(expected, mmc.metric(), decimal=6)
 
     # Diagonal metric
     mmc = MMC(diagonal=True)
     mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
     expected = [0, 0, 1.21045968, 1.22552608]
-    assert_array_almost_equal(np.diag(expected), mmc.metric_, decimal=6)
+    assert_array_almost_equal(np.diag(expected), mmc.metric(), decimal=6)
     
     # Supervised Full
     mmc = MMC_Supervised()

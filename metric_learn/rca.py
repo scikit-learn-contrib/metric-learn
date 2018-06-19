@@ -57,14 +57,6 @@ class RCA(BaseMetricLearner, MahalanobisMixin,
     self.num_dims = num_dims
     self.pca_comps = pca_comps
 
-  def transformer(self):
-    return self.transformer_
-
-  @property
-  def metric_(self):
-    check_is_fitted(self, 'transformer_')
-    return self.transformer_.T.dot(self.transformer_)
-
   def _process_data(self, X):
     self.X_ = X = check_array(X)
 

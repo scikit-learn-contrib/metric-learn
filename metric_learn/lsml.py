@@ -59,19 +59,6 @@ class _BaseLSML(BaseMetricLearner, MahalanobisMixin):
       self.M_ = self.prior
       self.prior_inv_ = np.linalg.inv(self.prior)
 
-  @property
-  def metric_(self):
-    if hasattr(self, 'M_'):
-      return self.M_  # in this case the estimator is fitted
-    elif self.prior is not None:
-      return check_array(self.prior)
-    else:  # extracted from scikit-learn's check_is_fitted function
-      msg = ("This %(name)s instance is not fitted yet, and is neither "
-             "initialized with an explicit matrix. Call 'fit' with appropriate"
-             " arguments before using this method, or initialize the metric_ "
-             "with ``prior`` equals a matrix, not None.")
-      raise NotFittedError(msg % {'name': type(self).__name__})
-
   def _fit(self, quadruplets, weights=None):
     self._prepare_quadruplets(quadruplets, weights)
     step_sizes = np.logspace(-10, 0, 10)
@@ -107,6 +94,8 @@ class _BaseLSML(BaseMetricLearner, MahalanobisMixin):
       if self.verbose:
         print("Didn't converge after", it, "iterations. Final loss:", s_best)
     self.n_iter_ = it
+
+    self.transformer_ = self.transformer_from_metric(self.M_)
     return self
 
   def _comparison_loss(self, metric):

@@ -215,6 +215,8 @@ class _BaseMMC(BaseMetricLearner, MahalanobisMixin):
         print('mmc converged at iter %d, conv = %f' % (cycle, delta))
     self.A_[:] = A_old
     self.n_iter_ = cycle
+
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
   def _fit_diag(self, pairs, y):
@@ -273,6 +275,8 @@ class _BaseMMC(BaseMetricLearner, MahalanobisMixin):
       it += 1
 
     self.A_ = np.diag(w)
+
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
   def _fD(self, neg_pairs, A):
@@ -352,20 +356,7 @@ class _BaseMMC(BaseMetricLearner, MahalanobisMixin):
       sum_deri2 / sum_dist - np.outer(sum_deri1, sum_deri1) / (sum_dist * sum_dist)
     )
 
-  @property
-  def metric_(self):
-    if hasattr(self, 'A_'):
-      return self.A_  # in this case the estimator is fitted
-    elif self.A0 is not None:
-      return check_array(self.A0)
-    else:  # extracted from scikit-learn's check_is_fitted function
-      msg = ("This %(name)s instance is not fitted yet, and is neither "
-             "initialized with an explicit matrix. Call 'fit' with appropriate"
-             " arguments before using this method, or initialize the metric_ "
-             "with ``A0`` equals a matrix, not None.")
-      raise NotFittedError(msg % {'name': type(self).__name__})
-
-  def transformer(self):
+  def transformer_from_metric(self, metric):
     """Computes the transformation matrix from the Mahalanobis matrix.
     L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with
     the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.
@@ -378,9 +369,9 @@ class _BaseMMC(BaseMetricLearner, MahalanobisMixin):
     L : (d x d) matrix
     """
     if self.diagonal:
-      return np.sqrt(self.A_)
+      return np.sqrt(metric)
     else:
-      w, V = np.linalg.eigh(self.A_)
+      w, V = np.linalg.eigh(metric)
       return V.T * np.sqrt(np.maximum(0, w[:,None]))
 
 
