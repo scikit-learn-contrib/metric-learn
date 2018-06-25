@@ -16,10 +16,9 @@ import numpy as np
 import warnings
 from six.moves import xrange
 from sklearn import decomposition
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils.validation import check_array
 
-from .base_metric import (BaseMetricLearner, MahalanobisMixin,
-                          MetricTransformer)
+from .base_metric import MahalanobisMixin, MetricTransformer
 from .constraints import Constraints
 
 
@@ -36,8 +35,7 @@ def _chunk_mean_centering(data, chunks):
   return chunk_mask, chunk_data
 
 
-class RCA(BaseMetricLearner, MahalanobisMixin,
-          MetricTransformer):
+class RCA(MahalanobisMixin, MetricTransformer):
   """Relevant Components Analysis (RCA)"""
   def __init__(self, num_dims=None, pca_comps=None):
     """Initialize the learner.

@@ -11,17 +11,15 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.spatial.distance import pdist, squareform
 from sklearn.decomposition import PCA
-from sklearn.exceptions import NotFittedError
-from sklearn.utils.validation import check_X_y, check_array
 
-from .base_metric import (BaseMetricLearner, MahalanobisMixin,
-                          MetricTransformer)
+from sklearn.utils.validation import check_X_y
+
+from .base_metric import MahalanobisMixin, MetricTransformer
 
 EPS = np.finfo(float).eps
 
 
-class MLKR(BaseMetricLearner, MahalanobisMixin,
-           MetricTransformer):
+class MLKR(MahalanobisMixin, MetricTransformer):
   """Metric Learning for Kernel Regression (MLKR)"""
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
                max_iter=1000):

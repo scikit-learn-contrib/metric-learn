@@ -10,18 +10,16 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 
 from __future__ import absolute_import
 import numpy as np
-from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
-from sklearn.utils.validation import (check_array, check_X_y,
-                                      check_is_fitted)
+from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import (BaseMetricLearner, MahalanobisMixin,
-                          MetricTransformer, _PairsClassifierMixin)
+from .base_metric import (MahalanobisMixin, MetricTransformer,
+                          _PairsClassifierMixin)
 from .constraints import Constraints, wrap_pairs
 
 
-class _BaseSDML(BaseMetricLearner, MahalanobisMixin):
+class _BaseSDML(MahalanobisMixin):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False):
     """

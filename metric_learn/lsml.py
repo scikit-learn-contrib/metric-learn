@@ -11,15 +11,15 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
-from sklearn.exceptions import NotFittedError
+
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import (BaseMetricLearner, _QuadrupletsClassifierMixin,
-                          MetricTransformer, MahalanobisMixin)
-from .constraints import Constraints, wrap_pairs
+from .base_metric import (_QuadrupletsClassifierMixin, MetricTransformer,
+                          MahalanobisMixin)
+from .constraints import Constraints
 
 
-class _BaseLSML(BaseMetricLearner, MahalanobisMixin):
+class _BaseLSML(MahalanobisMixin):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
     """Initialize LSML.
 

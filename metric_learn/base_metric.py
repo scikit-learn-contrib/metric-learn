@@ -11,6 +11,22 @@ class BaseMetricLearner(BaseEstimator):
   def __init__(self):
     raise NotImplementedError('BaseMetricLearner should not be instantiated')
 
+  @abstractmethod
+  def score_pairs(self, pairs):
+    """Returns the score between pairs
+    (can be a similarity, or a distance/metric depending on the algorithm)
+
+    Parameters
+    ----------
+    pairs : `numpy.ndarray`, shape=(n_samples, [2,] n_features)
+      3D array of pairs, or 2D array of one pair.
+
+    Returns
+    -------
+    scores: `numpy.ndarray` of shape=(n_pairs,) or scalar
+      The score of every pair.
+    """
+
 
 class MetricTransformer(TransformerMixin):
 
@@ -35,7 +51,7 @@ class MetricTransformer(TransformerMixin):
     return X.dot(L.T)
 
 
-class MahalanobisMixin(six.with_metaclass(ABCMeta)):
+class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner)):
   """Mahalanobis metric learning algorithms.
 
   Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x')`,
@@ -50,9 +66,34 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta)):
 
   Attributes
   ----------
-  transformer_: `np.ndarray`, shape=(n_features_out, n_features)
+  transformer_ : `np.ndarray`, shape=(n_features_out, n_features)
     The learned linear transformation ``L``.
   """
+
+  def score_pairs(self, pairs):
+    """Returns the learned Mahalanobis distance between pairs.
+
+    This distance is defined as: :math:`d_M(x, x') = \sqrt{(x-x')^T M (x-x')}`
+    where ``M`` is the learned Mahalanobis matrix, for every pair of points
+    ``x`` and ``x'``. This corresponds to the euclidean distance between
+    embeddings of the points in a new space, obtained through a linear
+    transformation. Indeed, we have also: :math:`d_M(x, x') = \sqrt{(x_e -
+    x_e')^T (x_e- x_e')}`, with :math:`x_e = L x` (See
+    :class:`MahalanobisMixin`).
+
+    Parameters
+    ----------
+    pairs : `numpy.ndarray`, shape=(n_samples, [2,] n_features)
+      3D array of pairs, or 2D array of one pair.
+
+    Returns
+    -------
+    scores: `numpy.ndarray` of shape=(n_pairs,) or scalar
+      The learned Mahalanobis distance for every pair.
+    """
+    pairwise_diffs = pairs[..., 1, :] - pairs[..., 0, :]
+    return np.sqrt(np.sum(pairwise_diffs.dot(self.metric()) * pairwise_diffs,
+                          axis=-1))
 
   def metric(self):
     return self.transformer_.T.dot(self.transformer_)
@@ -69,7 +110,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta)):
     return cholesky(metric).T
 
 
-class _PairsClassifierMixin:
+class _PairsClassifierMixin(BaseMetricLearner):
 
   def predict(self, pairs):
     """Predicts the learned metric between input pairs.
@@ -87,9 +128,7 @@ class _PairsClassifierMixin:
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    pairwise_diffs = pairs[:, 0, :] - pairs[:, 1, :]
-    return np.sqrt(np.sum(pairwise_diffs.dot(self.metric()) * pairwise_diffs,
-                          axis=1))
+    return self.score_pairs(pairs)
 
   def decision_function(self, pairs):
     return self.predict(pairs)
@@ -120,7 +159,7 @@ class _PairsClassifierMixin:
     return roc_auc_score(y, self.decision_function(pairs))
 
 
-class _QuadrupletsClassifierMixin:
+class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
   def predict(self, quadruplets):
     """Predicts differences between sample distances in input quadruplets.
@@ -138,12 +177,8 @@ class _QuadrupletsClassifierMixin:
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
-    similar_diffs = quadruplets[:, 0, :] - quadruplets[:, 1, :]
-    dissimilar_diffs = quadruplets[:, 2, :] - quadruplets[:, 3, :]
-    return (np.sqrt(np.sum(similar_diffs.dot(self.metric()) *
-                           similar_diffs, axis=1)) -
-            np.sqrt(np.sum(dissimilar_diffs.dot(self.metric()) *
-                           dissimilar_diffs, axis=1)))
+    return (self.score_pairs(quadruplets[:, 0:1, :]) -
+            self.score_pairs(quadruplets[:, 2:3, :]))
 
   def decision_function(self, quadruplets):
     return self.predict(quadruplets)

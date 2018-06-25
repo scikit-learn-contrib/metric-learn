@@ -10,14 +10,12 @@ On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
 from __future__ import absolute_import
 import numpy as np
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils.validation import check_array
 
-from .base_metric import (BaseMetricLearner, MahalanobisMixin,
-                          MetricTransformer)
+from .base_metric import MahalanobisMixin, MetricTransformer
 
 
-class Covariance(BaseMetricLearner, MetricTransformer,
-                 MahalanobisMixin):
+class Covariance(MetricTransformer, MahalanobisMixin):
   def __init__(self):
     pass
 

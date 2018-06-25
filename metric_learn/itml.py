@@ -18,15 +18,13 @@ import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
-from sklearn.exceptions import NotFittedError
-
-from .base_metric import (BaseMetricLearner, _PairsClassifierMixin,
-                          MetricTransformer, MahalanobisMixin)
+from .base_metric import (_PairsClassifierMixin, MetricTransformer,
+                          MahalanobisMixin)
 from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
-class _BaseITML(BaseMetricLearner, MahalanobisMixin):
+class _BaseITML(MahalanobisMixin):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False):

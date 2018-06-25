@@ -16,14 +16,12 @@ import scipy
 import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_X_y, check_is_fitted
+from sklearn.utils.validation import check_X_y
 
-from .base_metric import (BaseMetricLearner, MahalanobisMixin,
-                          MetricTransformer)
+from .base_metric import MahalanobisMixin, MetricTransformer
 
 
-class LFDA(BaseMetricLearner, MahalanobisMixin,
-           MetricTransformer):
+class LFDA(MahalanobisMixin, MetricTransformer):
   '''
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
   Sugiyama, ICML 2006
