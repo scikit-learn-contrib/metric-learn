@@ -70,7 +70,7 @@ ids_estimators = ['covariance',
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_score_matrix(estimator, build_dataset):
+def test_score_pairwise(estimator, build_dataset):
   # Computing pairwise scores should return an euclidean distance matrix.
   inputs, labels = build_dataset()
   X, _ = load_iris(return_X_y=True)
@@ -87,6 +87,24 @@ def test_score_matrix(estimator, build_dataset):
   # a necessary condition for euclidean distances matrix: (see
   # https://en.wikipedia.org/wiki/Euclidean_distance_matrix)
   assert np.linalg.matrix_rank(pairwise**2) <= min(X.shape) + 2
+
+
+@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
+                         ids=ids_estimators)
+def test_score_toy_example(estimator, build_dataset):
+    # Checks that score_pairs works on a toy example
+    inputs, labels = build_dataset()
+    X, _ = load_iris(return_X_y=True)
+    n_samples = 20
+    X = X[:n_samples]
+    model = clone(estimator)
+    model.fit(inputs, labels)
+    pairs = np.stack([X[:10], X[10:20]], axis=1)
+    embedded_pairs = pairs.dot(model.transformer_.T)
+    distances = np.sqrt(np.sum((embedded_pairs[:, 1] -
+                               embedded_pairs[:, 0])**2,
+                               axis=1))
+    np.array_equal(model.score_pairs(pairs), distances)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
@@ -117,7 +135,7 @@ def tests_score_dim(estimator, build_dataset):
 
 def check_is_distance_matrix(pairwise):
   assert (pairwise >= 0).all()  # positivity
-  assert (pairwise == pairwise.T).all()  # symmetry
+  assert np.array_equal(pairwise, pairwise.T)  # symmetry
   assert (pairwise.diagonal() == 0).all()  # identity
   # triangular inequality
   for i in range(pairwise.shape[1]):
