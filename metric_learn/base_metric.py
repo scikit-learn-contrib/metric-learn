@@ -91,9 +91,29 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner)):
     scores: `numpy.ndarray` of shape=(n_pairs,) or scalar
       The learned Mahalanobis distance for every pair.
     """
-    pairwise_diffs = pairs[..., 1, :] - pairs[..., 0, :]
-    return np.sqrt(np.sum(pairwise_diffs.dot(self.metric()) * pairwise_diffs,
-                          axis=-1))
+    pairwise_diffs = self.embed(pairs[..., 1, :] - pairs[..., 0, :])  # (for
+    #  MahalanobisMixin, the embedding is linear so we can just embed the
+    # difference)
+    return np.sqrt(np.sum(pairwise_diffs**2, axis=-1))
+
+  def embed(self, X):
+    """Embeds data points in the learned linear embedding space.
+
+    Transforms samples in ``X`` into ``X_embedded``, samples inside a new
+    embedding space such that: ``X_embedded = X.dot(L.T)``, where ``L`` is
+    the learned linear transformation (See :class:`MahalanobisMixin`).
+
+    Parameters
+    ----------
+    X : `numpy.ndarray`, shape=(n_samples, n_features)
+      The data points to embed.
+
+    Returns
+    -------
+    X_embedded : `numpy.ndarray`, shape=(n_samples, n_features_out)
+      The embedded data points.
+    """
+    return X.dot(self.transformer_.T)
 
   def metric(self):
     return self.transformer_.T.dot(self.transformer_)

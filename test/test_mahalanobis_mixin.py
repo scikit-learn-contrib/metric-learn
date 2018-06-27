@@ -2,6 +2,7 @@ from itertools import product
 
 import pytest
 import numpy as np
+from numpy.testing import assert_array_almost_equal
 from sklearn import clone
 from sklearn.datasets import load_iris
 from sklearn.utils import check_random_state, shuffle
@@ -103,8 +104,8 @@ def test_score_toy_example(estimator, build_dataset):
     embedded_pairs = pairs.dot(model.transformer_.T)
     distances = np.sqrt(np.sum((embedded_pairs[:, 1] -
                                embedded_pairs[:, 0])**2,
-                               axis=1))
-    np.array_equal(model.score_pairs(pairs), distances)
+                               axis=-1))
+    assert_array_almost_equal(model.score_pairs(pairs), distances)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
@@ -143,3 +144,60 @@ def check_is_distance_matrix(pairwise):
       for k in range(pairwise.shape[1]):
         assert (pairwise[i, j] - (pairwise[i, k] + pairwise[k, j]) <= 0 +
                 1e-3).all()
+
+
+@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
+                         ids=ids_estimators)
+def test_embed_toy_example(estimator, build_dataset):
+    # Checks that embed works on a toy example
+    inputs, labels = build_dataset()
+    X, _ = load_iris(return_X_y=True)
+    n_samples = 20
+    X = X[:n_samples]
+    model = clone(estimator)
+    model.fit(inputs, labels)
+    embedded_points = X.dot(model.transformer_.T)
+    assert_array_almost_equal(model.embed(X), embedded_points)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
+                         ids=ids_estimators)
+def tests_embed_dim(estimator, build_dataset):
+  # Checks that the the dimension of the output space is as expected
+  inputs, labels = build_dataset()
+  model = clone(estimator)
+  model.fit(inputs, labels)
+  X, _ = load_iris(return_X_y=True)
+  assert model.embed(X).shape == X.shape
+  assert model.embed(X[0, :]).shape == (len(X[0]),)
+  # we test that the shape is also OK when doing dimensionality reduction
+  if type(model).__name__ in {'LFDA', 'MLKR', 'NCA', 'RCA'}:
+      model.set_params(num_dims=2)
+      model.fit(inputs, labels)
+      assert model.embed(X).shape == (X.shape[0], 2)
+      assert model.embed(X[0, :]).shape == (2,)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
+                         ids=ids_estimators)
+def test_embed_finite(estimator, build_dataset):
+  # Checks that embed returns vectors with finite values
+  inputs, labels = build_dataset()
+  model = clone(estimator)
+  model.fit(inputs, labels)
+  X, _ = load_iris(return_X_y=True)
+  assert np.isfinite(model.embed(X)).all()
+
+
+@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
+                         ids=ids_estimators)
+def test_embed_is_linear(estimator, build_dataset):
+  # Checks that the embedding is linear
+  inputs, labels = build_dataset()
+  model = clone(estimator)
+  model.fit(inputs, labels)
+  X, _ = load_iris(return_X_y=True)
+  assert_array_almost_equal(model.embed(X[:10] + X[10:20]),
+                            model.embed(X[:10]) + model.embed(X[10:20]))
+  assert_array_almost_equal(model.embed(5 * X[:10]),
+                            5 * model.embed(X[:10]))
