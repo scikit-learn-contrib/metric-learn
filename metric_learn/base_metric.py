@@ -18,12 +18,12 @@ class BaseMetricLearner(BaseEstimator):
 
     Parameters
     ----------
-    pairs : `numpy.ndarray`, shape=(n_samples, [2,] n_features)
-      3D array of pairs, or 2D array of one pair.
+    pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
+      3D array of pairs.
 
     Returns
     -------
-    scores: `numpy.ndarray` of shape=(n_pairs,) or scalar
+    scores: `numpy.ndarray` of shape=(n_pairs,)
       The score of every pair.
     """
 
