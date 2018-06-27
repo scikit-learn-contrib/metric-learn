@@ -31,7 +31,7 @@ def build_pairs():
   X, pairs = build_data()
   pairs, y = wrap_pairs(X, pairs)
   pairs, y = shuffle(pairs, y)
-  return (pairs, y)
+  return pairs, y
 
 
 def build_quadruplets():
@@ -41,7 +41,7 @@ def build_quadruplets():
   c = np.column_stack(pairs)
   quadruplets = X[c]
   quadruplets = shuffle(quadruplets)
-  return (quadruplets, None)
+  return quadruplets, None
 
 
 list_estimators = [(Covariance(), build_data),
@@ -122,7 +122,7 @@ def test_score_pairs_finite(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def tests_score_pairs_dim(estimator, build_dataset):
+def test_score_pairs_dim(estimator, build_dataset):
   # scoring of 3D arrays should return 1D array (several tuples),
   # and scoring of 2D arrays (one tuple) should return a scalar (0D array).
   inputs, labels = build_dataset()
@@ -162,7 +162,7 @@ def test_embed_toy_example(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def tests_embed_dim(estimator, build_dataset):
+def test_embed_dim(estimator, build_dataset):
   # Checks that the the dimension of the output space is as expected
   inputs, labels = build_dataset()
   model = clone(estimator)
