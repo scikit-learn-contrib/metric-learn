@@ -83,12 +83,12 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner)):
 
     Parameters
     ----------
-    pairs : `numpy.ndarray`, shape=(n_samples, [2,] n_features)
+    pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
       3D array of pairs, or 2D array of one pair.
 
     Returns
     -------
-    scores: `numpy.ndarray` of shape=(n_pairs,) or scalar
+    scores: `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
     """
     pairwise_diffs = self.embed(pairs[..., 1, :] - pairs[..., 0, :])  # (for

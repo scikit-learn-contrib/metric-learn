@@ -71,7 +71,7 @@ ids_estimators = ['covariance',
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_score_pairwise(estimator, build_dataset):
+def test_score_pairs_pairwise(estimator, build_dataset):
   # Computing pairwise scores should return an euclidean distance matrix.
   inputs, labels = build_dataset()
   X, _ = load_iris(return_X_y=True)
@@ -92,7 +92,7 @@ def test_score_pairwise(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_score_toy_example(estimator, build_dataset):
+def test_score_pairs_toy_example(estimator, build_dataset):
     # Checks that score_pairs works on a toy example
     inputs, labels = build_dataset()
     X, _ = load_iris(return_X_y=True)
@@ -110,7 +110,7 @@ def test_score_toy_example(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_score_finite(estimator, build_dataset):
+def test_score_pairs_finite(estimator, build_dataset):
   # tests that the score is finite
   inputs, labels = build_dataset()
   model = clone(estimator)
@@ -122,16 +122,16 @@ def test_score_finite(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def tests_score_dim(estimator, build_dataset):
-  # scoring of 3D arrays should return 1D array (several pairs),
-  # and scoring of 2D arrays (one pair) should return a scalar (0D array).
+def tests_score_pairs_dim(estimator, build_dataset):
+  # scoring of 3D arrays should return 1D array (several tuples),
+  # and scoring of 2D arrays (one tuple) should return a scalar (0D array).
   inputs, labels = build_dataset()
   model = clone(estimator)
   model.fit(inputs, labels)
   X, _ = load_iris(return_X_y=True)
-  pairs = np.array(list(product(X, X)))
-  assert model.score_pairs(pairs).shape == (pairs.shape[0],)
-  assert np.isscalar(model.score_pairs(pairs[1]))
+  tuples = np.array(list(product(X, X)))
+  assert model.score_pairs(tuples).shape == (tuples.shape[0],)
+  assert np.isscalar(model.score_pairs(tuples[1]))
 
 
 def check_is_distance_matrix(pairwise):
