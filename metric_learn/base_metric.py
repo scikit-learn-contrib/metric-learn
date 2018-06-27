@@ -197,8 +197,8 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
-    return (self.score_pairs(quadruplets[:, 0:1, :]) -
-            self.score_pairs(quadruplets[:, 2:3, :]))
+    return (self.score_pairs(quadruplets[..., :2, :]) -
+            self.score_pairs(quadruplets[..., 2:, :]))
 
   def decision_function(self, quadruplets):
     return self.predict(quadruplets)
