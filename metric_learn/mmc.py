@@ -371,7 +371,7 @@ class _BaseMMC(MahalanobisMixin):
       return np.sqrt(metric)
     else:
       w, V = np.linalg.eigh(metric)
-      return V.T * np.sqrt(np.maximum(0, w[:,None]))
+      return V.T * np.sqrt(np.maximum(0, w[:, None]))
 
 
 class MMC(_BaseMMC, _PairsClassifierMixin):
