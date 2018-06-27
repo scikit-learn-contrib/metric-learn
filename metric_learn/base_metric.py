@@ -66,7 +66,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner)):
 
   Attributes
   ----------
-  transformer_ : `np.ndarray`, shape=(n_features_out, n_features)
+  transformer_ : `np.ndarray`, shape=(num_dims, n_features)
     The learned linear transformation ``L``.
   """
 
@@ -110,7 +110,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner)):
 
     Returns
     -------
-    X_embedded : `numpy.ndarray`, shape=(n_samples, n_features_out)
+    X_embedded : `numpy.ndarray`, shape=(n_samples, num_dims)
       The embedded data points.
     """
     return X.dot(self.transformer_.T)
