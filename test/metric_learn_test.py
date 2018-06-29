@@ -1,9 +1,11 @@
 import unittest
 import numpy as np
+from scipy.optimize import check_grad
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, make_classification
 from numpy.testing import assert_array_almost_equal
+from sklearn.utils.testing import assert_warns_message
 
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR, MMC,
@@ -88,21 +90,64 @@ class TestNCA(MetricTestCase):
     n = self.iris_points.shape[0]
 
     # Without dimension reduction
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01)
-    nca.fit(self.iris_points, self.iris_labels)
-    # Result copied from Iris example at
-    # https://github.com/vomjom/nca/blob/master/README.mkd
-    expected = [[-0.09935, -0.2215,  0.3383,  0.443],
-                [+0.2532,   0.5835, -0.8461, -0.8915],
-                [-0.729,   -0.6386,  1.767,   1.832],
-                [-0.9405,  -0.8461,  2.281,   2.794]]
-    assert_array_almost_equal(expected, nca.transformer(), decimal=3)
-
-    # With dimension reduction
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01, num_dims=2)
+    nca = NCA(max_iter=(100000//n))
     nca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(nca.transform(), self.iris_labels)
     self.assertLess(csep, 0.15)
+
+    # With dimension reduction
+    nca = NCA(max_iter=(100000//n), num_dims=2)
+    nca.fit(self.iris_points, self.iris_labels)
+    csep = class_separation(nca.transform(), self.iris_labels)
+    self.assertLess(csep, 0.15)
+
+  def test_finite_differences(self):
+    """Test gradient of loss function
+
+    Assert that the gradient is almost equal to its finite differences
+    approximation.
+    """
+    # Initialize the transformation `M`, as well as `X` and `y` and `NCA`
+    X, y = make_classification()
+    M = np.random.randn(np.random.randint(1, X.shape[1] + 1), X.shape[1])
+    mask = y[:, np.newaxis] == y[np.newaxis, :]
+
+    def fun(M):
+      return NCA._loss_grad_lbfgs(M, X, mask)[0]
+
+    def grad(M):
+      return NCA._loss_grad_lbfgs(M, X, mask)[1].ravel()
+
+    # compute relative error
+    rel_diff = check_grad(fun, grad, M.ravel()) / np.linalg.norm(grad(M))
+    np.testing.assert_almost_equal(rel_diff, 0., decimal=6)
+
+  def test_simple_example(self):
+    """Test on a simple example.
+
+    Puts four points in the input space where the opposite labels points are
+    next to each other. After transform the same labels points should be next
+    to each other.
+
+    """
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    nca = NCA(num_dims=2,)
+    nca.fit(X, y)
+    Xansformed = nca.transform(X)
+    np.testing.assert_equal(pairwise_distances(Xansformed).argsort()[:, 1],
+                            np.array([2, 3, 0, 1]))
+
+  def test_deprecation(self):
+    # test that the right deprecation message is thrown.
+    # TODO: remove in v.0.5
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    nca = NCA(num_dims=2, learning_rate=0.01)
+    msg = ('"learning_rate" parameter is not used.'
+           ' It has been deprecated in version 0.4 and will be'
+           'removed in 0.5')
+    assert_warns_message(DeprecationWarning, msg, nca.fit, X, y)
 
 
 class TestLFDA(MetricTestCase):
