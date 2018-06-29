@@ -26,13 +26,13 @@ EPS = np.finfo(float).eps
 
 class NCA(BaseMetricLearner):
   def __init__(self, num_dims=None, max_iter=100, learning_rate='deprecated',
-               init='auto', random_state=0, verbose=False):
+               init='auto', random_state=0, tol=None):
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.learning_rate = learning_rate  # TODO: remove in v.0.5.0
     self.init = init
-    self.random_state = 0
-    self.verbose = 0
+    self.random_state = random_state
+    self.tol = tol
 
   def transformer(self):
     return self.A_
@@ -56,7 +56,9 @@ class NCA(BaseMetricLearner):
     if num_dims is None:
         num_dims = d
 
-    A = self._initialize(X, y, self.init)
+    # Initialize A to a scaling matrix
+    A = np.zeros((num_dims, d))
+    np.fill_diagonal(A, 1./(np.maximum(X.max(axis=0)-X.min(axis=0), EPS)))
 
     # Run NCA
     mask = y[:, np.newaxis] == y[np.newaxis, :]
@@ -66,13 +68,14 @@ class NCA(BaseMetricLearner):
                         'jac': True,
                         'x0': A.ravel(),
                         'options': dict(maxiter=self.max_iter),
+                        'tol': self.tol
                         }
 
     # Call the optimizer
     opt_result = minimize(**optimizer_params)
 
     self.X_ = X
-    self.A_ = opt_result.x.reshape(num_dims, -1)
+    self.A_ = opt_result.x.reshape(-1, X.shape[1])
     self.n_iter_ = opt_result.nit
     return self
 
@@ -96,68 +99,3 @@ class NCA(BaseMetricLearner):
     gradient = 2 * (X_embedded.T.dot(weighted_p_ij + weighted_p_ij.T) -
                     X_embedded.T * np.sum(weighted_p_ij, axis=0)).dot(X)
     return sign * loss, sign * gradient.ravel()
-
-  def _initialize(self, X, y, init):
-    """Initialize the transformation.
-
-    Parameters
-    ----------
-    X : array-like, shape (n_samples, n_features)
-        The training samples.
-
-    y : array-like, shape (n_samples,)
-        The training labels.
-
-    init : string or numpy array of shape (n_features_a, n_features_b)
-        The validated initialization of the linear transformation.
-
-    Returns
-    -------
-    transformation : array, shape (n_components, n_features)
-        The initialized linear transformation.
-
-    """
-
-    transformation = init
-
-    if isinstance(init, np.ndarray):
-      pass
-    else:
-      n_samples, n_features = X.shape
-      n_components = self.num_dims or n_features
-      if init == 'auto':
-        n_classes = len(np.unique(y))
-        if num_dims <= n_classes:
-          init = 'lda'
-        elif num_dims < min(n_features, n_samples):
-          init = 'pca'
-        else:
-          init = 'identity'
-      if init == 'identity':
-        transformation = np.eye(num_dims, X.shape[1])
-      elif init == 'random':
-        transformation = self.random_state_.randn(num_dims,
-                                                  X.shape[1])
-      elif init in {'pca', 'lda'}:
-        init_time = time.time()
-        if init == 'pca':
-          pca = PCA(n_components=num_dims,
-                    random_state=self.random_state_)
-          if self.verbose:
-            print('Finding principal components... ', end='')
-            sys.stdout.flush()
-          pca.fit(X)
-          transformation = pca.components_
-        elif init == 'lda':
-          from sklearn.discriminant_analysis import (
-            LinearDiscriminantAnalysis)
-          lda = LinearDiscriminantAnalysis(n_components=n_components)
-          if self.verbose:
-            print('Finding most discriminative components... ',
-                  end='')
-            sys.stdout.flush()
-          lda.fit(X, y)
-          transformation = lda.scalings_.T[:n_components]
-        if self.verbose:
-          print('done in {:5.2f}s'.format(time.time() - init_time))
-    return transformation

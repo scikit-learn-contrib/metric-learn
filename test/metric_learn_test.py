@@ -7,10 +7,9 @@ from sklearn.datasets import load_iris, make_classification
 from numpy.testing import assert_array_almost_equal
 from sklearn.utils.testing import assert_warns_message
 
-from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
-# Import this specially for testing.
+from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+                          LSML_Supervised, ITML_Supervised, SDML_Supervised,
+                          RCA_Supervised, MMC_Supervised)
 from metric_learn.lmnn import python_LMNN
 
 
@@ -96,7 +95,7 @@ class TestNCA(MetricTestCase):
     self.assertLess(csep, 0.15)
 
     # With dimension reduction
-    nca = NCA(max_iter=(100000//n), num_dims=2)
+    nca = NCA(max_iter=(100000//n), num_dims=2, tol=1e-9)
     nca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(nca.transform(), self.iris_labels)
     self.assertLess(csep, 0.15)
