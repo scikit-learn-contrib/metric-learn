@@ -61,7 +61,7 @@ class NCA(BaseMetricLearner):
     np.fill_diagonal(A, 1./(np.maximum(X.max(axis=0)-X.min(axis=0), EPS)))
 
     # Run NCA
-    mask = y[:, np.newaxis] == y[np.newaxis, :]
+    mask = labels[:, np.newaxis] == labels[np.newaxis, :]
     optimizer_params = {'method': 'L-BFGS-B',
                         'fun': self._loss_grad_lbfgs,
                         'args': (X, mask, -1.0),

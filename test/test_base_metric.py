@@ -16,7 +16,9 @@ class TestStringRepr(unittest.TestCase):
 
   def test_nca(self):
     self.assertEqual(str(metric_learn.NCA()),
-                     "NCA(learning_rate=0.01, max_iter=100, num_dims=None)")
+                     ("NCA(init='auto', learning_rate='deprecated', "
+                      "max_iter=100, num_dims=None,\n  random_state=0, "
+                      "tol=None)"))
 
   def test_lfda(self):
     self.assertEqual(str(metric_learn.LFDA()),
