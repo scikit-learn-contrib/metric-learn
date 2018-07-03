@@ -1,8 +1,11 @@
 import unittest
+import re
+import sys
 import numpy as np
 from six.moves import xrange
+from sklearn.externals.six import StringIO
 from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, make_classification
 from numpy.testing import assert_array_almost_equal
 
 from metric_learn import (
@@ -69,6 +72,40 @@ class TestLMNN(MetricTestCase):
 
       csep = class_separation(lmnn.transform(), self.iris_labels)
       self.assertLess(csep, 0.25)
+
+  def test_convergence_simple_example(self):
+    # LMNN should converge on this simple example, which it did not with
+    # this issue: https://github.com/metric-learn/metric-learn/issues/88
+    X, y = make_classification(random_state=0)
+    old_stdout = sys.stdout
+    sys.stdout = StringIO()
+    lmnn = LMNN(verbose=True)
+    try:
+        lmnn.fit(X, y)
+    finally:
+        out = sys.stdout.getvalue()
+        sys.stdout.close()
+        sys.stdout = old_stdout
+    assert ("LMNN converged with objective" in out)
+
+  def test_no_twice_same_objective(self):
+    # test that the objective function never has twice the same value
+    # see https://github.com/metric-learn/metric-learn/issues/88
+    X, y = make_classification(random_state=0)
+    old_stdout = sys.stdout
+    sys.stdout = StringIO()
+    lmnn = LMNN(verbose=True)
+    try:
+      lmnn.fit(X, y)
+    finally:
+      out = sys.stdout.getvalue()
+      sys.stdout.close()
+      sys.stdout = old_stdout
+    lines = re.split("\n+", out)
+    objectives = [re.search("\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
+                  for s in lines]
+    objectives = [match.group(1) for match in objectives if match is not None]
+    assert len(objectives) == len(set(objectives))
 
 
 class TestSDML(MetricTestCase):
