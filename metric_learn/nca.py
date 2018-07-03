@@ -24,6 +24,27 @@ EPS = np.finfo(float).eps
 class NCA(BaseMetricLearner):
   def __init__(self, num_dims=None, max_iter=100, learning_rate='deprecated',
                tol=None):
+    """Neighborhood Components Analysis
+
+    Parameters
+    ----------
+    num_dims : int, optional (default=None)
+      Embedding dimensionality. If None, will be set to ``n_features``
+      (``d``) at fit time.
+
+    max_iter : int, optional (default=100)
+      Maximum number of iterations done by the optimization algorithm.
+
+    learning_rate : Not used
+
+      .. deprecated:: 0.4.0
+        `learning_rate` was deprecated in version 0.4.0 and will
+        be removed in 0.5.0. The current optimization algorithm does not need
+        to fix a learning rate.
+
+    tol : float, optional (default=None)
+        Convergence tolerance for the optimization.
+    """
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.learning_rate = learning_rate  # TODO: remove in v.0.5.0
