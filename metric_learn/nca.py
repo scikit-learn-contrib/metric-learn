@@ -26,11 +26,10 @@ EPS = np.finfo(float).eps
 
 class NCA(BaseMetricLearner):
   def __init__(self, num_dims=None, max_iter=100, learning_rate='deprecated',
-               init='auto', random_state=0, tol=None):
+               random_state=0, tol=None):
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.learning_rate = learning_rate  # TODO: remove in v.0.5.0
-    self.init = init
     self.random_state = random_state
     self.tol = tol
 
