@@ -5,14 +5,11 @@ Ported to Python from https://github.com/vomjom/nca
 
 from __future__ import absolute_import
 
-import sys
-import time
 import warnings
 import numpy as np
 from scipy.optimize import minimize
-from sklearn.decomposition import PCA
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_X_y, check_random_state
+from sklearn.utils.validation import check_X_y
 
 try:  # scipy.misc.logsumexp is deprecated in scipy 1.0.0
     from scipy.special import logsumexp
@@ -26,11 +23,10 @@ EPS = np.finfo(float).eps
 
 class NCA(BaseMetricLearner):
   def __init__(self, num_dims=None, max_iter=100, learning_rate='deprecated',
-               random_state=0, tol=None):
+               tol=None):
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.learning_rate = learning_rate  # TODO: remove in v.0.5.0
-    self.random_state = random_state
     self.tol = tol
 
   def transformer(self):
@@ -45,9 +41,6 @@ class NCA(BaseMetricLearner):
       warnings.warn('"learning_rate" parameter is not used.'
                     ' It has been deprecated in version 0.4 and will be'
                     'removed in 0.5', DeprecationWarning)
-
-    # Initialize the random generator
-    self.random_state_ = check_random_state(self.random_state)
 
     X, labels = check_X_y(X, y)
     n, d = X.shape
