@@ -4,7 +4,7 @@ from scipy.optimize import check_grad
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris, make_classification
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
 
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
@@ -147,6 +147,60 @@ class TestNCA(MetricTestCase):
            ' It has been deprecated in version 0.4 and will be'
            'removed in 0.5')
     assert_warns_message(DeprecationWarning, msg, nca.fit, X, y)
+
+  def test_singleton_class(self):
+      X = self.iris_points
+      y = self.iris_labels
+
+      # one singleton class: test fitting works
+      singleton_class = 1
+      ind_singleton, = np.where(y == singleton_class)
+      y[ind_singleton] = 2
+      y[ind_singleton[0]] = singleton_class
+
+      nca = NCA(max_iter=30)
+      nca.fit(X, y)
+
+      # One non-singleton class: test fitting works
+      ind_1, = np.where(y == 1)
+      ind_2, = np.where(y == 2)
+      y[ind_1] = 0
+      y[ind_1[0]] = 1
+      y[ind_2] = 0
+      y[ind_2[0]] = 2
+
+      nca = NCA(max_iter=30)
+      nca.fit(X, y)
+
+      # Only singleton classes: test fitting does nothing (the gradient
+      # must be null in this case, so the final matrix must stay like
+      # the initialization)
+      ind_0, = np.where(y == 0)
+      ind_1, = np.where(y == 1)
+      ind_2, = np.where(y == 2)
+      X = X[[ind_0[0], ind_1[0], ind_2[0]]]
+      y = y[[ind_0[0], ind_1[0], ind_2[0]]]
+
+      EPS = np.finfo(float).eps
+      A = np.zeros((X.shape[1], X.shape[1]))
+      np.fill_diagonal(A,
+                       1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
+      nca = NCA(max_iter=30, num_dims=X.shape[1])
+      nca.fit(X, y)
+      assert_array_equal(nca.A_, A)
+
+  def test_one_class(self):
+      # if there is only one class the gradient is null, so the final matrix
+      #  must stay like the initialization
+      X = self.iris_points[self.iris_labels == 0]
+      y = self.iris_labels[self.iris_labels == 0]
+      EPS = np.finfo(float).eps
+      A = np.zeros((X.shape[1], X.shape[1]))
+      np.fill_diagonal(A,
+                       1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
+      nca = NCA(max_iter=30, num_dims=X.shape[1])
+      nca.fit(X, y)
+      assert_array_equal(nca.A_, A)
 
 
 class TestLFDA(MetricTestCase):
