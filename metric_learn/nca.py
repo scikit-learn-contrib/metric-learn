@@ -104,11 +104,11 @@ class NCA(BaseMetricLearner):
 
     # Compute loss
     masked_p_ij = p_ij * mask
-    p = np.sum(masked_p_ij, axis=1, keepdims=True)  # (n_samples, 1)
-    loss = np.sum(p)
+    p = masked_p_ij.sum(axis=1, keepdims=True)  # (n_samples, 1)
+    loss = p.sum()
 
     # Compute gradient of loss w.r.t. `transform`
     weighted_p_ij = masked_p_ij - p_ij * p
     gradient = 2 * (X_embedded.T.dot(weighted_p_ij + weighted_p_ij.T) -
-                    X_embedded.T * np.sum(weighted_p_ij, axis=0)).dot(X)
+                    X_embedded.T * weighted_p_ij.sum(axis=0)).dot(X)
     return sign * loss, sign * gradient.ravel()
