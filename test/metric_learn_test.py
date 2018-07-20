@@ -105,7 +105,8 @@ class TestLMNN(MetricTestCase):
     objectives = [re.search("\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
                   for s in lines]
     objectives = [match.group(1) for match in objectives if match is not None]
-    assert len(objectives) == len(set(objectives))
+    # we remove the last element because it can be equal to the penultimate
+    assert len(objectives[:-1]) == len(set(objectives[:-1]))
 
 
 class TestSDML(MetricTestCase):

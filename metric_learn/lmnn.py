@@ -90,97 +90,45 @@ class python_LMNN(_base_LMNN):
       a1[nn_idx] = np.array([])
       a2[nn_idx] = np.array([])
 
-    # initialize gradient and L
-    G = dfG * reg + df * (1-reg)
+    # initialize L
     L = self.L_
-    objective = np.inf
 
-    # we initialize the roll back
-    L_old = L.copy()
-    G_old = G.copy()
-    df_old = df.copy()
-    a1_old = [a.copy() for a in a1]
-    a2_old = [a.copy() for a in a2]
-    objective_old = objective
+    # first iteration
+    G, objective, total_active, df, a1, a2 = (
+        self._loss_grad(L, dfG, impostors, 1, k, reg, target_neighbors, df, a1,
+                        a2))
+    for it in xrange(2, self.max_iter):
+      # we first try to find a value of L that has better objective than the
+      #  previous L, following the gradient:
 
-    # main loop
-    for it in xrange(1, self.max_iter):
-      # Compute pairwise distances under current metric
-      Lx = L.dot(self.X_.T).T
-      g0 = _inplace_paired_L2(*Lx[impostors])
-      Ni = 1 + _inplace_paired_L2(Lx[target_neighbors], Lx[:,None,:])
-      g1,g2 = Ni[impostors]
-
-      # compute the gradient
-      total_active = 0
-      for nn_idx in reversed(xrange(k)):
-        act1 = g0 < g1[:,nn_idx]
-        act2 = g0 < g2[:,nn_idx]
-        total_active += act1.sum() + act2.sum()
-
-        if it > 1:
-          plus1 = act1 & ~a1[nn_idx]
-          minus1 = a1[nn_idx] & ~act1
-          plus2 = act2 & ~a2[nn_idx]
-          minus2 = a2[nn_idx] & ~act2
-        else:
-          plus1 = act1
-          plus2 = act2
-          minus1 = np.zeros(0, dtype=int)
-          minus2 = np.zeros(0, dtype=int)
-
-        targets = target_neighbors[:,nn_idx]
-        PLUS, pweight = _count_edges(plus1, plus2, impostors, targets)
-        df += _sum_outer_products(self.X_, PLUS[:,0], PLUS[:,1], pweight)
-        MINUS, mweight = _count_edges(minus1, minus2, impostors, targets)
-        df -= _sum_outer_products(self.X_, MINUS[:,0], MINUS[:,1], mweight)
-
-        in_imp, out_imp = impostors
-        df += _sum_outer_products(self.X_, in_imp[minus1], out_imp[minus1])
-        df += _sum_outer_products(self.X_, in_imp[minus2], out_imp[minus2])
-
-        df -= _sum_outer_products(self.X_, in_imp[plus1], out_imp[plus1])
-        df -= _sum_outer_products(self.X_, in_imp[plus2], out_imp[plus2])
-
-        a1[nn_idx] = act1
-        a2[nn_idx] = act2
-
-      # do the gradient update
-      assert not np.isnan(df).any()
-      G = dfG * reg + df * (1-reg)
-
-      # compute the objective function
-      objective = total_active * (1-reg)
-      objective += G.flatten().dot(L.T.dot(L).flatten())
-      assert not np.isnan(objective)
-      delta_obj = objective - objective_old
+      # we want to enter the loop for the first try, with the original
+      # learning rate (hence * 2 since it will be / 2)
+      delta_obj = 1
+      learn_rate *= 2
+      while delta_obj > 0:
+        # we keep looking until the L has a better objective, retrying with a
+        # smaller update if necessary (reducing the learning rate)
+        learn_rate /= 2
+        # the next point next_L is found by a gradient step
+        L_next = L - 2 * learn_rate * G
+        # we compute the objective at next point
+        # we copy variables that can be modified by _loss_grad, because if we
+        # retry we don t want to modify them several times
+        (G_next, objective_next, total_active_next, df_next, a1_next,
+         a2_next) = (
+            self._loss_grad(L_next, dfG, impostors, it, k, reg,
+                            target_neighbors, df.copy(), a1.copy(), a2.copy()))
+        assert not np.isnan(objective)
+        delta_obj = objective_next - objective
+      # when the good L is found, we start from here before doing next
+      # iteration, and we increase slightly the learning rate
+      L = L_next
+      G, df, objective, total_active, a1, a2 = (
+          G_next, df_next, objective_next, total_active_next, a1_next, a2_next)
+      learn_rate *= 1.01
 
       if self.verbose:
         print(it, objective, delta_obj, total_active, learn_rate)
-
-      # update step size
-      if delta_obj > 0:
-        # we're getting worse... roll back!
-        learn_rate /= 2.0
-        L = L_old
-        G = G_old
-        df = df_old
-        a1 = a1_old
-        a2 = a2_old
-        objective = objective_old
-      else:
-        # We did good. We store this point as reference in case we do
-        # worse next time.
-        objective_old = objective
-        L_old = L.copy()
-        G_old = G.copy()
-        df_old = df.copy()
-        a1_old = [a.copy() for a in a1]
-        a2_old = [a.copy() for a in a2]
-      # we update L and will see in the next iteration if it does indeed
-      # better
-      L -= learn_rate * 2 * L.dot(G)
-      learn_rate *= 1.01
 
       # check for convergence
       if it > self.min_iter and abs(delta_obj) < self.convergence_tol:
@@ -192,9 +140,57 @@ class python_LMNN(_base_LMNN):
         print("LMNN didn't converge in %d steps." % self.max_iter)
 
     # store the last L
-    self.L_ = L_old
+    self.L_ = L
     self.n_iter_ = it
     return self
+
+  def _loss_grad(self, L, dfG, impostors, it, k, reg, target_neighbors, df, a1,
+                 a2):
+    # Compute pairwise distances under current metric
+    Lx = L.dot(self.X_.T).T
+    g0 = _inplace_paired_L2(*Lx[impostors])
+    Ni = 1 + _inplace_paired_L2(Lx[target_neighbors], Lx[:, None, :])
+    g1, g2 = Ni[impostors]
+    # compute the gradient
+    total_active = 0
+    for nn_idx in reversed(xrange(k)):
+      act1 = g0 < g1[:, nn_idx]
+      act2 = g0 < g2[:, nn_idx]
+      total_active += act1.sum() + act2.sum()
+
+      if it > 1:
+        plus1 = act1 & ~a1[nn_idx]
+        minus1 = a1[nn_idx] & ~act1
+        plus2 = act2 & ~a2[nn_idx]
+        minus2 = a2[nn_idx] & ~act2
+      else:
+        plus1 = act1
+        plus2 = act2
+        minus1 = np.zeros(0, dtype=int)
+        minus2 = np.zeros(0, dtype=int)
+
+      targets = target_neighbors[:, nn_idx]
+      PLUS, pweight = _count_edges(plus1, plus2, impostors, targets)
+      df += _sum_outer_products(self.X_, PLUS[:, 0], PLUS[:, 1], pweight)
+      MINUS, mweight = _count_edges(minus1, minus2, impostors, targets)
+      df -= _sum_outer_products(self.X_, MINUS[:, 0], MINUS[:, 1], mweight)
+
+      in_imp, out_imp = impostors
+      df += _sum_outer_products(self.X_, in_imp[minus1], out_imp[minus1])
+      df += _sum_outer_products(self.X_, in_imp[minus2], out_imp[minus2])
+
+      df -= _sum_outer_products(self.X_, in_imp[plus1], out_imp[plus1])
+      df -= _sum_outer_products(self.X_, in_imp[plus2], out_imp[plus2])
+
+      a1[nn_idx] = act1
+      a2[nn_idx] = act2
+    # do the gradient update
+    assert not np.isnan(df).any()
+    G = dfG * reg + df * (1 - reg)
+    # compute the objective function
+    objective = total_active * (1 - reg)
+    objective += G.flatten().dot(L.T.dot(L).flatten())
+    return G, objective, total_active, df, a1, a2
 
   def _select_targets(self):
     target_neighbors = np.empty((self.X_.shape[0], self.k), dtype=int)
