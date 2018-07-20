@@ -73,20 +73,15 @@ class TestLMNN(MetricTestCase):
       csep = class_separation(lmnn.transform(), self.iris_labels)
       self.assertLess(csep, 0.25)
 
-  def test_convergence_simple_example(self):
-    # LMNN should converge on this simple example, which it did not with
-    # this issue: https://github.com/metric-learn/metric-learn/issues/88
-    X, y = make_classification(random_state=0)
-    old_stdout = sys.stdout
-    sys.stdout = StringIO()
-    lmnn = python_LMNN(verbose=True)
-    try:
-        lmnn.fit(X, y)
-    finally:
-        out = sys.stdout.getvalue()
-        sys.stdout.close()
-        sys.stdout = old_stdout
-    assert "LMNN converged with objective" in out
+
+def test_convergence_simple_example(capsys):
+  # LMNN should converge on this simple example, which it did not with
+  # this issue: https://github.com/metric-learn/metric-learn/issues/88
+  X, y = make_classification(random_state=0)
+  lmnn = python_LMNN(verbose=True)
+  lmnn.fit(X, y)
+  out, _ = capsys.readouterr()
+  assert "LMNN converged with objective" in out
 
 
 def test_no_twice_same_objective(capsys):
@@ -95,7 +90,7 @@ def test_no_twice_same_objective(capsys):
   X, y = make_classification(random_state=0)
   lmnn = python_LMNN(verbose=True)
   lmnn.fit(X, y)
-  out, err = capsys.readouterr()
+  out, _ = capsys.readouterr()
   lines = re.split("\n+", out)
   # we get only objectives from each line:
   # the regexp matches a float that follows an integer (the iteration
