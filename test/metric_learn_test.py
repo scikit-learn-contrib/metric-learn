@@ -79,34 +79,35 @@ class TestLMNN(MetricTestCase):
     X, y = make_classification(random_state=0)
     old_stdout = sys.stdout
     sys.stdout = StringIO()
-    lmnn = LMNN(verbose=True)
+    lmnn = python_LMNN(verbose=True)
     try:
         lmnn.fit(X, y)
     finally:
         out = sys.stdout.getvalue()
         sys.stdout.close()
         sys.stdout = old_stdout
-    assert ("LMNN converged with objective" in out)
+    assert "LMNN converged with objective" in out
 
-  def test_no_twice_same_objective(self):
-    # test that the objective function never has twice the same value
-    # see https://github.com/metric-learn/metric-learn/issues/88
-    X, y = make_classification(random_state=0)
-    old_stdout = sys.stdout
-    sys.stdout = StringIO()
-    lmnn = LMNN(verbose=True)
-    try:
-      lmnn.fit(X, y)
-    finally:
-      out = sys.stdout.getvalue()
-      sys.stdout.close()
-      sys.stdout = old_stdout
-    lines = re.split("\n+", out)
-    objectives = [re.search("\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
-                  for s in lines]
-    objectives = [match.group(1) for match in objectives if match is not None]
-    # we remove the last element because it can be equal to the penultimate
-    assert len(objectives[:-1]) == len(set(objectives[:-1]))
+
+def test_no_twice_same_objective(capsys):
+  # test that the objective function never has twice the same value
+  # see https://github.com/metric-learn/metric-learn/issues/88
+  X, y = make_classification(random_state=0)
+  lmnn = python_LMNN(verbose=True)
+  lmnn.fit(X, y)
+  out, err = capsys.readouterr()
+  lines = re.split("\n+", out)
+  # we get only objectives from each line:
+  # the regexp matches a float that follows an integer (the iteration
+  # number), and which is followed by a (signed) float (delta obj). It
+  # matches for instance:  
+  # 3 **1113.7665747189938** -3.182774197440267 46431.0200999999999998e-06
+  objectives = [re.search("\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
+                for s in lines]
+  objectives = [match.group(1) for match in objectives if match is not None]
+  # we remove the last element because it can be equal to the penultimate
+  # if the last gradient update is null
+  assert len(objectives[:-1]) == len(set(objectives[:-1]))
 
 
 class TestSDML(MetricTestCase):
