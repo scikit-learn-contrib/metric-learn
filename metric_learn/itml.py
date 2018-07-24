@@ -21,7 +21,7 @@ from sklearn.utils.validation import check_array, check_X_y
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm
+from ._util import vector_norm, check_tuples
 
 
 class _BaseITML(MahalanobisMixin):
@@ -52,8 +52,11 @@ class _BaseITML(MahalanobisMixin):
     self.verbose = verbose
 
   def _process_pairs(self, pairs, y, bounds):
+    # for now we check_X_y and check_tuples but we should only
+    # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
                          ensure_2d=False, allow_nd=True)
+    pairs = check_tuples(pairs)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]

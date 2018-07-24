@@ -13,6 +13,7 @@ import scipy.linalg
 from six.moves import xrange
 from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_array, check_X_y
+from ._util import check_tuples
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
@@ -37,8 +38,11 @@ class _BaseLSML(MahalanobisMixin):
     self.verbose = verbose
 
   def _prepare_quadruplets(self, quadruplets, weights):
-    pairs = check_array(quadruplets, accept_sparse=False,
-                                      ensure_2d=False, allow_nd=True)
+    # for now we check_array and check_tuples but we should only
+    # check_tuples in the future (with enhanced check_tuples)
+    quadruplets = check_array(quadruplets, accept_sparse=False,
+                              ensure_2d=False, allow_nd=True)
+    quadruplets = check_tuples(quadruplets)
 
     # check to make sure that no two constrained vectors are identical
     self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -51,7 +55,8 @@ class _BaseLSML(MahalanobisMixin):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     if self.prior is None:
-      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
+      X = np.vstack({tuple(row) for row in
+                     quadruplets.reshape(-1, quadruplets.shape[2])})
       self.prior_inv_ = np.atleast_2d(np.cov(X, rowvar=False))
       self.M_ = np.linalg.inv(self.prior_inv_)
     else:

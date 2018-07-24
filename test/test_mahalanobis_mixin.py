@@ -128,14 +128,21 @@ def test_score_pairs_finite(estimator, build_dataset):
                          ids=ids_estimators)
 def test_score_pairs_dim(estimator, build_dataset):
   # scoring of 3D arrays should return 1D array (several tuples),
-  # and scoring of 2D arrays (one tuple) should return a scalar (0D array).
+  # and scoring of 2D arrays (one tuple) should return an error (like
+  # scikit-learn's error when scoring 1D arrays)
   inputs, labels = build_dataset()
   model = clone(estimator)
   model.fit(inputs, labels)
   X, _ = load_iris(return_X_y=True)
   tuples = np.array(list(product(X, X)))
   assert model.score_pairs(tuples).shape == (tuples.shape[0],)
-  assert np.isscalar(model.score_pairs(tuples[1]))
+  msg = ("Expected 3D array, got 2D array instead:\ntuples={}.\n"
+         "Reshape your data either using tuples.reshape(-1, {}, 1) if "
+         "your data has a single feature or tuples.reshape(1, {}, -1) "
+         "if it contains a single tuple.".format(tuples, tuples.shape[1],
+                                                 tuples.shape[0]))
+  with pytest.raises(ValueError, message=msg):
+    model.score_pairs(tuples[1])
 
 
 def check_is_distance_matrix(pairwise):
@@ -174,13 +181,22 @@ def test_embed_dim(estimator, build_dataset):
   model.fit(inputs, labels)
   X, _ = load_iris(return_X_y=True)
   assert model.transform(X).shape == X.shape
-  assert model.transform(X[0, :]).shape == (len(X[0]),)
+
+  # assert that ValueError is thrown if input shape is 1D
+  err_msg = ("Expected 2D array, got 1D array instead:\narray={}.\n"
+             "Reshape your data either using array.reshape(-1, 1) if "
+             "your data has a single feature or array.reshape(1, -1) "
+             "if it contains a single sample.".format(X))
+  with pytest.raises(ValueError, message=err_msg):
+    model.score_pairs(model.transform(X[0, :]))
   # we test that the shape is also OK when doing dimensionality reduction
   if type(model).__name__ in {'LFDA', 'MLKR', 'NCA', 'RCA'}:
     model.set_params(num_dims=2)
     model.fit(inputs, labels)
     assert model.transform(X).shape == (X.shape[0], 2)
-    assert model.transform(X[0, :]).shape == (2,)
+    # assert that ValueError is thrown if input shape is 1D
+    with pytest.raises(ValueError, message=err_msg):
+        model.transform(model.transform(X[0, :]))
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,

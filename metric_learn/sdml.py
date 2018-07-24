@@ -17,6 +17,7 @@ from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
+from ._util import check_tuples
 
 
 class _BaseSDML(MahalanobisMixin):
@@ -43,8 +44,12 @@ class _BaseSDML(MahalanobisMixin):
     self.verbose = verbose
 
   def _prepare_pairs(self, pairs, y):
+    # for now we check_X_y and check_tuples but we should only
+    # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                                      ensure_2d=False, allow_nd=True)
+                         ensure_2d=False, allow_nd=True)
+    pairs = check_tuples(pairs)
+
     # set up prior M
     if self.use_cov:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})

@@ -169,17 +169,24 @@ def test_dict_unchanged(estimator, build_dataset):
   (tuples, y, tuples_train, tuples_test,
    y_train, y_test) = build_dataset()
   estimator = clone(estimator)
-  if hasattr(estimator, "n_components"):
-    estimator.n_components = 1
+  if hasattr(estimator, "num_dims"):
+    estimator.num_dims = 1
   estimator.fit(tuples, y)
-  for method in ["predict", "transform", "decision_function",
-                 "predict_proba"]:
+  for method in ["predict", "decision_function", "predict_proba"]:
     if hasattr(estimator, method):
       dict_before = estimator.__dict__.copy()
       getattr(estimator, method)(tuples)
       assert estimator.__dict__ == dict_before, \
           ("Estimator changes __dict__ during %s"
            % method)
+    for method in ["transform"]:
+        if hasattr(estimator, method):
+            dict_before = estimator.__dict__.copy()
+            # we transform only 2D arrays (dataset of points)
+            getattr(estimator, method)(tuples[:, 0, :])
+            assert estimator.__dict__ == dict_before, \
+                ("Estimator changes __dict__ during %s"
+                 % method)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
@@ -190,8 +197,8 @@ def test_dont_overwrite_parameters(estimator, build_dataset):
   (tuples, y, tuples_train, tuples_test,
    y_train, y_test) = build_dataset()
   estimator = clone(estimator)
-  if hasattr(estimator, "n_components"):
-    estimator.n_components = 1
+  if hasattr(estimator, "num_dims"):
+    estimator.num_dims = 1
   dict_before_fit = estimator.__dict__.copy()
 
   estimator.fit(tuples, y)

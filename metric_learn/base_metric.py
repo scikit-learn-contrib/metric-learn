@@ -5,6 +5,7 @@ from sklearn.metrics import roc_auc_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
+from ._util import check_tuples
 
 
 class BaseMetricLearner(BaseEstimator):
@@ -86,7 +87,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
     """
-    pairwise_diffs = self.transform(pairs[..., 1, :] - pairs[..., 0, :])
+    pairs = check_tuples(pairs)
+    pairwise_diffs = self.transform(pairs[:, 1, :] - pairs[:, 0, :])
     # (for MahalanobisMixin, the embedding is linear so we can just embed the
     # difference)
     return np.sqrt(np.sum(pairwise_diffs**2, axis=-1))
@@ -108,7 +110,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     X_embedded : `numpy.ndarray`, shape=(n_samples, num_dims)
       The embedded data points.
     """
-    X_checked = check_array(X, accept_sparse=True, ensure_2d=False)
+    X_checked = check_array(X, accept_sparse=True)
     return X_checked.dot(self.transformer_.T)
 
   def metric(self):
@@ -159,9 +161,11 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
+    pairs = check_tuples(pairs)
     return self.score_pairs(pairs)
 
   def decision_function(self, pairs):
+    pairs = check_tuples(pairs)
     return self.predict(pairs)
 
   def score(self, pairs, y):
@@ -187,6 +191,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     score : float
       The ``roc_auc`` score.
     """
+    pairs = check_tuples(pairs)
     return roc_auc_score(y, self.decision_function(pairs))
 
 
@@ -208,6 +213,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
+    quadruplets = check_tuples(quadruplets)
     return np.sign(self.decision_function(quadruplets))
 
   def decision_function(self, quadruplets):
@@ -226,8 +232,9 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
-    return (self.score_pairs(quadruplets[..., :2, :]) -
-            self.score_pairs(quadruplets[..., 2:, :]))
+    quadruplets = check_tuples(quadruplets)
+    return (self.score_pairs(quadruplets[:, :2, :]) -
+            self.score_pairs(quadruplets[:, 2:, :]))
 
   def score(self, quadruplets, y=None):
     """Computes score on input quadruplets
@@ -248,4 +255,5 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     score : float
       The quadruplets score.
     """
+    quadruplets = check_tuples(quadruplets)
     return - np.mean(self.predict(quadruplets))
