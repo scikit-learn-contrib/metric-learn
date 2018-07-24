@@ -38,7 +38,7 @@ def check_tuples(tuples):
       "Expected 3D array, got 1D array instead:\ntuples={}.\n"
       "Reshape your data using tuples.reshape(1, -1, 1) if it contains a "
       "single tuple and the points in the tuple have a single "
-      "feature.").format(tuples)
+      "feature.".format(tuples))
   # If input is 2D raise error
   if len(tuples.shape) == 2:
     raise ValueError(
