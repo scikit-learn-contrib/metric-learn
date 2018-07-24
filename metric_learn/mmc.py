@@ -19,11 +19,10 @@ Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/co
 from __future__ import print_function, absolute_import, division
 import numpy as np
 from six.moves import xrange
-
+from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import (_PairsClassifierMixin, MahalanobisMixin,
-                          MetricTransformer)
+from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
@@ -215,7 +214,7 @@ class _BaseMMC(MahalanobisMixin):
     self.A_[:] = A_old
     self.n_iter_ = cycle
 
-    self.transformer_ = self.transformer_from_metric(self.A_)
+    self.transformer_ = self._transformer_from_metric(self.A_)
     return self
 
   def _fit_diag(self, pairs, y):
@@ -275,7 +274,7 @@ class _BaseMMC(MahalanobisMixin):
 
     self.A_ = np.diag(w)
 
-    self.transformer_ = self.transformer_from_metric(self.A_)
+    self.transformer_ = self._transformer_from_metric(self.A_)
     return self
 
   def _fD(self, neg_pairs, A):
@@ -355,24 +354,6 @@ class _BaseMMC(MahalanobisMixin):
       sum_deri2 / sum_dist - np.outer(sum_deri1, sum_deri1) / (sum_dist * sum_dist)
     )
 
-  def transformer_from_metric(self, metric):
-    """Computes the transformation matrix from the Mahalanobis matrix.
-    L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with
-    the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.
-
-    The Cholesky decomposition cannot be applied here, since MMC learns only a positive
-    *semi*-definite Mahalanobis matrix.
-
-    Returns
-    -------
-    L : (d x d) matrix
-    """
-    if self.diagonal:
-      return np.sqrt(metric)
-    else:
-      w, V = np.linalg.eigh(metric)
-      return V.T * np.sqrt(np.maximum(0, w[:, None]))
-
 
 class MMC(_BaseMMC, _PairsClassifierMixin):
 
@@ -394,7 +375,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
     return self._fit(pairs, y)
 
 
-class MMC_Supervised(_BaseMMC, MetricTransformer):
+class MMC_Supervised(_BaseMMC, TransformerMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,

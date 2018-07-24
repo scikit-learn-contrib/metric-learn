@@ -11,11 +11,12 @@ On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 from __future__ import absolute_import
 import numpy as np
 from sklearn.utils.validation import check_array
+from sklearn.base import TransformerMixin
 
-from .base_metric import MahalanobisMixin, MetricTransformer
+from .base_metric import MahalanobisMixin
 
 
-class Covariance(MetricTransformer, MahalanobisMixin):
+class Covariance(MahalanobisMixin, TransformerMixin):
   def __init__(self):
     pass
 
@@ -31,5 +32,5 @@ class Covariance(MetricTransformer, MahalanobisMixin):
     else:
       self.M_ = np.linalg.inv(self.M_)
 
-    self.transformer_ = self.transformer_from_metric(check_array(self.M_))
+    self.transformer_ = self._transformer_from_metric(check_array(self.M_))
     return self

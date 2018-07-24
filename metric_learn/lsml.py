@@ -11,11 +11,10 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
-
+from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import (_QuadrupletsClassifierMixin, MetricTransformer,
-                          MahalanobisMixin)
+from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
 
 
@@ -95,7 +94,7 @@ class _BaseLSML(MahalanobisMixin):
         print("Didn't converge after", it, "iterations. Final loss:", s_best)
     self.n_iter_ = it
 
-    self.transformer_ = self.transformer_from_metric(self.M_)
+    self.transformer_ = self._transformer_from_metric(self.M_)
     return self
 
   def _comparison_loss(self, metric):
@@ -147,7 +146,7 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
     return self._fit(quadruplets, weights=weights)
 
 
-class LSML_Supervised(_BaseLSML, MetricTransformer):
+class LSML_Supervised(_BaseLSML, TransformerMixin):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
                num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.

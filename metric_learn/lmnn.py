@@ -16,12 +16,12 @@ from collections import Counter
 from six.moves import xrange
 from sklearn.utils.validation import check_X_y, check_array
 from sklearn.metrics import euclidean_distances
-
-from .base_metric import MahalanobisMixin, MetricTransformer
+from sklearn.base import TransformerMixin
+from .base_metric import MahalanobisMixin
 
 
 # commonality between LMNN implementations
-class _base_LMNN(MahalanobisMixin, MetricTransformer):
+class _base_LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001, use_pca=True,
                verbose=False):
@@ -189,7 +189,7 @@ class python_LMNN(_base_LMNN):
     return target_neighbors
 
   def _find_impostors(self, furthest_neighbors):
-    Lx = self.transform()
+    Lx = self.transform(self.X_)
     margin_radii = 1 + _inplace_paired_L2(Lx[furthest_neighbors], Lx)
     impostors = []
     for label in self.labels_[:-1]:
@@ -256,7 +256,7 @@ try:
         self._lmnn.train()
       else:
         self._lmnn.train(np.eye(X.shape[1]))
-      self.L_ = self._lmnn.get_linear_transform()
+      self.L_ = self._lmnn.get_linear_transform(X)
       return self
 
 except ImportError:

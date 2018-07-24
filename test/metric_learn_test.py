@@ -38,7 +38,7 @@ class TestCovariance(MetricTestCase):
     cov = Covariance()
     cov.fit(self.iris_points)
 
-    csep = class_separation(cov.transform(), self.iris_labels)
+    csep = class_separation(cov.transform(self.iris_points), self.iris_labels)
     # deterministic result
     self.assertAlmostEqual(csep, 0.73068122)
 
@@ -68,7 +68,8 @@ class TestLMNN(MetricTestCase):
       lmnn = LMNN_cls(k=5, learn_rate=1e-6, verbose=False)
       lmnn.fit(self.iris_points, self.iris_labels)
 
-      csep = class_separation(lmnn.transform(), self.iris_labels)
+      csep = class_separation(lmnn.transform(self.iris_points),
+                              self.iris_labels)
       self.assertLess(csep, 0.25)
 
 
@@ -102,7 +103,7 @@ class TestNCA(MetricTestCase):
     # With dimension reduction
     nca = NCA(max_iter=(100000//n), learning_rate=0.01, num_dims=2)
     nca.fit(self.iris_points, self.iris_labels)
-    csep = class_separation(nca.transform(), self.iris_labels)
+    csep = class_separation(nca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.15)
 
 
@@ -110,7 +111,7 @@ class TestLFDA(MetricTestCase):
   def test_iris(self):
     lfda = LFDA(k=2, num_dims=2)
     lfda.fit(self.iris_points, self.iris_labels)
-    csep = class_separation(lfda.transform(), self.iris_labels)
+    csep = class_separation(lfda.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.15)
 
     # Sanity checks for learned matrices.
@@ -122,7 +123,7 @@ class TestRCA(MetricTestCase):
   def test_iris(self):
     rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
-    csep = class_separation(rca.transform(), self.iris_labels)
+    csep = class_separation(rca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.25)
 
   def test_feature_null_variance(self):
@@ -131,14 +132,14 @@ class TestRCA(MetricTestCase):
     # Apply PCA with the number of components
     rca = RCA_Supervised(num_dims=2, pca_comps=3, num_chunks=30, chunk_size=2)
     rca.fit(X, self.iris_labels)
-    csep = class_separation(rca.transform(), self.iris_labels)
+    csep = class_separation(rca.transform(X), self.iris_labels)
     self.assertLess(csep, 0.30)
 
     # Apply PCA with the minimum variance ratio
     rca = RCA_Supervised(num_dims=2, pca_comps=0.95, num_chunks=30,
                          chunk_size=2)
     rca.fit(X, self.iris_labels)
-    csep = class_separation(rca.transform(), self.iris_labels)
+    csep = class_separation(rca.transform(X), self.iris_labels)
     self.assertLess(csep, 0.30)
 
 
@@ -146,7 +147,7 @@ class TestMLKR(MetricTestCase):
   def test_iris(self):
     mlkr = MLKR()
     mlkr.fit(self.iris_points, self.iris_labels)
-    csep = class_separation(mlkr.transform(), self.iris_labels)
+    csep = class_separation(mlkr.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.25)
 
 

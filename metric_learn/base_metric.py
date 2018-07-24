@@ -1,5 +1,5 @@
 from numpy.linalg import cholesky
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_array
 from sklearn.metrics import roc_auc_score
 import numpy as np
@@ -28,9 +28,9 @@ class BaseMetricLearner(BaseEstimator):
     """
 
 
-class MetricTransformer(TransformerMixin):
+class MetricTransformer():
 
-  def transform(self, X=None):
+  def transform(self, X):
     """Applies the metric transformation.
 
     Parameters
@@ -43,15 +43,10 @@ class MetricTransformer(TransformerMixin):
     transformed : (n x d) matrix
         Input data transformed to the metric space by :math:`XL^{\\top}`
     """
-    if X is None:
-      X = self.X_
-    else:
-      X = check_array(X, accept_sparse=True)
-    L = self.transformer_
-    return X.dot(L.T)
 
 
-class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner)):
+class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
+                                          MetricTransformer)):
   """Mahalanobis metric learning algorithms.
 
   Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x')`,
@@ -91,12 +86,12 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner)):
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
     """
-    pairwise_diffs = self.embed(pairs[..., 1, :] - pairs[..., 0, :])  # (for
-    #  MahalanobisMixin, the embedding is linear so we can just embed the
+    pairwise_diffs = self.transform(pairs[..., 1, :] - pairs[..., 0, :])
+    # (for MahalanobisMixin, the embedding is linear so we can just embed the
     # difference)
     return np.sqrt(np.sum(pairwise_diffs**2, axis=-1))
 
-  def embed(self, X):
+  def transform(self, X):
     """Embeds data points in the learned linear embedding space.
 
     Transforms samples in ``X`` into ``X_embedded``, samples inside a new
@@ -113,21 +108,37 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner)):
     X_embedded : `numpy.ndarray`, shape=(n_samples, num_dims)
       The embedded data points.
     """
-    return X.dot(self.transformer_.T)
+    X_checked = check_array(X, accept_sparse=True, ensure_2d=False)
+    return X_checked.dot(self.transformer_.T)
 
   def metric(self):
     return self.transformer_.T.dot(self.transformer_)
 
-  def transformer_from_metric(self, metric):
+  def _transformer_from_metric(self, metric):
     """Computes the transformation matrix from the Mahalanobis matrix.
 
-    L = cholesky(M).T
+    Since by definition the metric `M` is positive semi-definite (PSD), it
+    admits a Cholesky decomposition: L = cholesky(M).T. However, currently the
+    computation of the Cholesky decomposition used does not support
+    non-definite matrices. If the metric is not definite, this method will
+    return L = V.T w^( -1/2), with M = V*w*V.T being the eigenvector
+    decomposition of M with the eigenvalues in the diagonal matrix w and the
+    columns of V being the eigenvectors. If M is diagonal, this method will
+    just return its elementwise square root (since the diagonalization of
+    the matrix is itself).
 
     Returns
     -------
-    L : upper triangular (d x d) matrix
+    L : (d x d) matrix
     """
-    return cholesky(metric).T
+
+    if np.allclose(metric, np.diag(np.diag(metric))):
+      return np.sqrt(metric)
+    elif not np.isclose(np.linalg.det(metric), 0):
+      return cholesky(metric).T
+    else:
+      w, V = np.linalg.eigh(metric)
+      return V.T * np.sqrt(np.maximum(0, w[:, None]))
 
 
 class _PairsClassifierMixin(BaseMetricLearner):
@@ -182,6 +193,24 @@ class _PairsClassifierMixin(BaseMetricLearner):
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
   def predict(self, quadruplets):
+    """Predicts the ordering between sample distances in input quadruplets.
+
+    For each quadruplet, returns 1 if the quadruplet is in the right order (
+    first pair is more similar than second pair), and -1 if not.
+
+    Parameters
+    ----------
+    quadruplets : array-like, shape=(n_constraints, 4, n_features)
+      Input quadruplets.
+
+    Returns
+    -------
+    prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
+      Predictions of the ordering of pairs, for each quadruplet.
+    """
+    return np.sign(self.decision_function(quadruplets))
+
+  def decision_function(self, quadruplets):
     """Predicts differences between sample distances in input quadruplets.
 
     For each quadruplet of samples, computes the difference between the learned
@@ -194,14 +223,11 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Returns
     -------
-    prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
+    decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
     return (self.score_pairs(quadruplets[..., :2, :]) -
             self.score_pairs(quadruplets[..., 2:, :]))
-
-  def decision_function(self, quadruplets):
-    return self.predict(quadruplets)
 
   def score(self, quadruplets, y=None):
     """Computes score on input quadruplets
@@ -222,4 +248,4 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     score : float
       The quadruplets score.
     """
-    return - np.mean(np.sign(self.decision_function(quadruplets)))
+    return - np.mean(self.predict(quadruplets))

@@ -10,16 +10,17 @@ from __future__ import division, print_function
 import numpy as np
 from scipy.optimize import minimize
 from scipy.spatial.distance import pdist, squareform
+from sklearn.base import TransformerMixin
 from sklearn.decomposition import PCA
 
 from sklearn.utils.validation import check_X_y
 
-from .base_metric import MahalanobisMixin, MetricTransformer
+from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
 
 
-class MLKR(MahalanobisMixin, MetricTransformer):
+class MLKR(MahalanobisMixin, TransformerMixin):
   """Metric Learning for Kernel Regression (MLKR)"""
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
                max_iter=1000):

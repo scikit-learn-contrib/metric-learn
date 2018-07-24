@@ -10,12 +10,12 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 
 from __future__ import absolute_import
 import numpy as np
+from sklearn.base import TransformerMixin
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import (MahalanobisMixin, MetricTransformer,
-                          _PairsClassifierMixin)
+from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
 
 
@@ -62,7 +62,7 @@ class _BaseSDML(MahalanobisMixin):
     emp_cov = emp_cov.T.dot(emp_cov)
     _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
 
-    self.transformer_ = self.transformer_from_metric(self.M_)
+    self.transformer_ = self._transformer_from_metric(self.M_)
     return self
 
 
@@ -86,7 +86,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
     return self._fit(pairs, y)
 
 
-class SDML_Supervised(_BaseSDML, MetricTransformer):
+class SDML_Supervised(_BaseSDML, TransformerMixin):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
     """
