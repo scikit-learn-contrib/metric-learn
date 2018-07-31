@@ -117,7 +117,7 @@ class python_LMNN(_base_LMNN):
         (G_next, objective_next, total_active_next, df_next, a1_next,
          a2_next) = (
             self._loss_grad(L_next, dfG, impostors, it, k, reg,
-                            target_neighbors, df.copy(), a1.copy(), a2.copy()))
+                            target_neighbors, df.copy(), list(a1), list(a2)))
         assert not np.isnan(objective)
         delta_obj = objective_next - objective
       # when the good L is found, we start from here before doing next
