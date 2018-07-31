@@ -94,8 +94,8 @@ def test_no_twice_same_objective(capsys):
   lines = re.split("\n+", out)
   # we get only objectives from each line:
   # the regexp matches a float that follows an integer (the iteration
-  # number), and which is followed by a (signed) float (delta obj). It
-  # matches for instance:  
+  # number), and which is followed by a (signed) float (delta obj). It
+  # matches for instance:
   # 3 **1113.7665747189938** -3.182774197440267 46431.0200999999999998e-06
   objectives = [re.search("\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
                 for s in lines]
