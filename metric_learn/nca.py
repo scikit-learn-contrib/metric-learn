@@ -6,10 +6,13 @@ Ported to Python from https://github.com/vomjom/nca
 from __future__ import absolute_import
 
 import warnings
+import time
+import sys
 import numpy as np
 from scipy.optimize import minimize
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_X_y
+from sklearn.exceptions import ConvergenceWarning
 
 try:  # scipy.misc.logsumexp is deprecated in scipy 1.0.0
     from scipy.special import logsumexp
@@ -23,7 +26,7 @@ EPS = np.finfo(float).eps
 
 class NCA(BaseMetricLearner):
   def __init__(self, num_dims=None, max_iter=100, learning_rate='deprecated',
-               tol=None):
+               tol=None, verbose=False):
     """Neighborhood Components Analysis
 
     Parameters
@@ -44,11 +47,15 @@ class NCA(BaseMetricLearner):
 
     tol : float, optional (default=None)
         Convergence tolerance for the optimization.
+
+    verbose : bool, optional (default=False)
+      Whether to print progress messages or not.
     """
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.learning_rate = learning_rate  # TODO: remove in v.0.5.0
     self.tol = tol
+    self.verbose = verbose
 
   def transformer(self):
     return self.A_
@@ -69,6 +76,9 @@ class NCA(BaseMetricLearner):
     if num_dims is None:
         num_dims = d
 
+    # Measure the total training time
+    t_train = time.time()
+
     # Initialize A to a scaling matrix
     A = np.zeros((num_dims, d))
     np.fill_diagonal(A, 1./(np.maximum(X.max(axis=0)-X.min(axis=0), EPS)))
@@ -85,15 +95,38 @@ class NCA(BaseMetricLearner):
                         }
 
     # Call the optimizer
+    self.n_iter_ = 0
     opt_result = minimize(**optimizer_params)
 
     self.X_ = X
     self.A_ = opt_result.x.reshape(-1, X.shape[1])
     self.n_iter_ = opt_result.nit
+    if self.verbose:
+      cls_name = self.__class__.__name__
+
+      # Warn the user if the algorithm did not converge
+      if not opt_result.success:
+        warnings.warn('[{}] NCA did not converge: {}'.format(
+            cls_name, opt_result.message), ConvergenceWarning)
+
+      print('[{}] Training took {:8.2f}s.'.format(cls_name, t_train))
+
     return self
 
-  @staticmethod
-  def _loss_grad_lbfgs(A, X, mask, sign=1.0):
+  def _loss_grad_lbfgs(self, A, X, mask, sign=1.0):
+
+    if self.n_iter_ == 0:
+      if self.verbose:
+        header_fields = ['Iteration', 'Objective Value', 'Time(s)']
+        header_fmt = '{:>10} {:>20} {:>10}'
+        header = header_fmt.format(*header_fields)
+        cls_name = self.__class__.__name__
+        print('[{}]'.format(cls_name))
+        print('[{}] {}\n[{}] {}'.format(cls_name, header,
+                                        cls_name, '-' * len(header)))
+
+    t_funcall = time.time()
+
     A = A.reshape(-1, X.shape[1])
     X_embedded = np.dot(X, A.T)  # (n_samples, num_dims)
     # Compute softmax distances
@@ -111,4 +144,14 @@ class NCA(BaseMetricLearner):
     weighted_p_ij = masked_p_ij - p_ij * p
     gradient = 2 * (X_embedded.T.dot(weighted_p_ij + weighted_p_ij.T) -
                     X_embedded.T * weighted_p_ij.sum(axis=0)).dot(X)
+
+    if self.verbose:
+        t_funcall = time.time() - t_funcall
+        values_fmt = '[{}] {:>10} {:>20.6e} {:>10.2f}'
+        print(values_fmt.format(self.__class__.__name__, self.n_iter_,
+                                loss, t_funcall))
+        sys.stdout.flush()
+
+    self.n_iter_ += 1
+
     return sign * loss, sign * gradient.ravel()

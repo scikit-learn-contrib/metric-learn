@@ -1,3 +1,4 @@
+import re
 import unittest
 import numpy as np
 from scipy.optimize import check_grad
@@ -110,12 +111,14 @@ class TestNCA(MetricTestCase):
     X, y = make_classification()
     M = np.random.randn(np.random.randint(1, X.shape[1] + 1), X.shape[1])
     mask = y[:, np.newaxis] == y[np.newaxis, :]
+    nca = NCA()
+    nca.n_iter_ = 0
 
     def fun(M):
-      return NCA._loss_grad_lbfgs(M, X, mask)[0]
+      return nca._loss_grad_lbfgs(M, X, mask)[0]
 
     def grad(M):
-      return NCA._loss_grad_lbfgs(M, X, mask)[1].ravel()
+      return nca._loss_grad_lbfgs(M, X, mask)[1].ravel()
 
     # compute relative error
     rel_diff = check_grad(fun, grad, M.ravel()) / np.linalg.norm(grad(M))
@@ -201,6 +204,38 @@ class TestNCA(MetricTestCase):
       nca = NCA(max_iter=30, num_dims=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.A_, A)
+
+
+def test_verbose(capsys):
+  # assert there is proper output when verbose = True
+  iris_data, iris_target = load_iris(return_X_y=True)
+  nca = NCA(verbose=True)
+  nca.fit(iris_data, iris_target)
+  out, _ = capsys.readouterr()
+
+  # check output
+  lines = re.split('\n+', out)
+  header = '{:>10} {:>20} {:>10}'.format('Iteration', 'Objective Value',
+                                         'Time(s)')
+  assert lines[0] == '[NCA]'
+  assert lines[1] == '[NCA] {}'.format(header)
+  assert lines[2] == '[NCA] {}'.format('-' * len(header))
+  for line in lines[3:-2]:
+    # The following regex will match for instance:
+    # '[NCA]          0         6.988936e+01       0.01'
+    assert re.match("\[NCA\]\ *\d+\ *\d\.\d{6}e[+|-]\d+\ *\d+\.\d{2}", line)
+  assert re.match("\[NCA\] Training took\ *\d+\.\d{2}s\.", lines[-2])
+  assert lines[-1] == ''
+
+
+def test_no_verbose(capsys):
+  # assert by default there is no output (verbose=False)
+  iris_data, iris_target = load_iris(return_X_y=True)
+  nca = NCA()
+  nca.fit(iris_data, iris_target)
+  out, _ = capsys.readouterr()
+  # check output
+  assert (out == '')
 
 
 class TestLFDA(MetricTestCase):
