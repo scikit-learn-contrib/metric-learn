@@ -1,10 +1,11 @@
 import re
 import unittest
+import pytest
 import numpy as np
 from scipy.optimize import check_grad
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris, make_classification
+from sklearn.datasets import load_iris, make_classification, make_regression
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
 
@@ -206,38 +207,6 @@ class TestNCA(MetricTestCase):
       assert_array_equal(nca.A_, A)
 
 
-def test_verbose(capsys):
-  # assert there is proper output when verbose = True
-  iris_data, iris_target = load_iris(return_X_y=True)
-  nca = NCA(verbose=True)
-  nca.fit(iris_data, iris_target)
-  out, _ = capsys.readouterr()
-
-  # check output
-  lines = re.split('\n+', out)
-  header = '{:>10} {:>20} {:>10}'.format('Iteration', 'Objective Value',
-                                         'Time(s)')
-  assert lines[0] == '[NCA]'
-  assert lines[1] == '[NCA] {}'.format(header)
-  assert lines[2] == '[NCA] {}'.format('-' * len(header))
-  for line in lines[3:-2]:
-    # The following regex will match for instance:
-    # '[NCA]          0         6.988936e+01       0.01'
-    assert re.match("\[NCA\]\ *\d+\ *\d\.\d{6}e[+|-]\d+\ *\d+\.\d{2}", line)
-  assert re.match("\[NCA\] Training took\ *\d+\.\d{2}s\.", lines[-2])
-  assert lines[-1] == ''
-
-
-def test_no_verbose(capsys):
-  # assert by default there is no output (verbose=False)
-  iris_data, iris_target = load_iris(return_X_y=True)
-  nca = NCA()
-  nca.fit(iris_data, iris_target)
-  out, _ = capsys.readouterr()
-  # check output
-  assert (out == '')
-
-
 class TestLFDA(MetricTestCase):
   def test_iris(self):
     lfda = LFDA(k=2, num_dims=2)
@@ -317,6 +286,44 @@ class TestMMC(MetricTestCase):
     mmc.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mmc.transform(), self.iris_labels)
     self.assertLess(csep, 0.2)
+
+
+@pytest.mark.parametrize(('algo_class', 'dataset'),
+                         [(NCA, make_classification()),
+                          (MLKR, make_regression())])
+def test_verbose(algo_class, dataset, capsys):
+  # assert there is proper output when verbose = True
+  X, y = dataset
+  model = algo_class(verbose=True)
+  model.fit(X, y)
+  out, _ = capsys.readouterr()
+
+  # check output
+  lines = re.split('\n+', out)
+  header = '{:>10} {:>20} {:>10}'.format('Iteration', 'Objective Value',
+                                         'Time(s)')
+  assert lines[0] == '[{}]'.format(algo_class.__name__)
+  assert lines[1] == '[{}] {}'.format(algo_class.__name__, header)
+  assert lines[2] == '[{}] {}'.format(algo_class.__name__, '-' * len(header))
+  for line in lines[3:-2]:
+    # The following regex will match for instance:
+    # '[NCA]          0         6.988936e+01       0.01'
+    assert re.match("\[" + algo_class.__name__ + "\]\ *\d+\ *\d\.\d{6}e[+|-]"
+                    "\d+\ *\d+\.\d{2}", line)
+  assert re.match("\[" + algo_class.__name__ + "\] Training took\ *"
+                  "\d+\.\d{2}s\.", lines[-2])
+  assert lines[-1] == ''
+
+
+@pytest.mark.parametrize('algo_class', [NCA, MLKR])
+def test_no_verbose(algo_class, capsys):
+  # assert by default there is no output (verbose=False)
+  iris_data, iris_target = load_iris(return_X_y=True)
+  model = algo_class()
+  model.fit(iris_data, iris_target)
+  out, _ = capsys.readouterr()
+  # check output
+  assert (out == '')
 
 
 if __name__ == '__main__':
