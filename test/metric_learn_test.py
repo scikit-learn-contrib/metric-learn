@@ -8,6 +8,7 @@ from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris, make_classification, make_regression
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
+from sklearn.exceptions import ConvergenceWarning
 
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
@@ -315,15 +316,29 @@ def test_verbose(algo_class, dataset, capsys):
   assert lines[-1] == ''
 
 
-@pytest.mark.parametrize('algo_class', [NCA, MLKR])
-def test_no_verbose(algo_class, capsys):
+@pytest.mark.parametrize(('algo_class', 'dataset'),
+                         [(NCA, make_classification()),
+                          (MLKR, ())])
+def test_no_verbose(dataset, algo_class, capsys):
   # assert by default there is no output (verbose=False)
-  iris_data, iris_target = load_iris(return_X_y=True)
+  X, y = dataset
   model = algo_class()
-  model.fit(iris_data, iris_target)
+  model.fit(X, y)
   out, _ = capsys.readouterr()
   # check output
   assert (out == '')
+
+
+@pytest.mark.parametrize(('algo_class', 'dataset'),
+                         [(NCA, make_classification()),
+                          (MLKR, make_regression())])
+def test_convergence_warning(dataset, algo_class):
+    X, y = dataset
+    model = algo_class(max_iter=2, verbose=True)
+    cls_name = model.__class__.__name__
+    assert_warns_message(ConvergenceWarning,
+                         '[{}] {} did not converge'.format(cls_name, cls_name),
+                         model.fit, X, y)
 
 
 if __name__ == '__main__':

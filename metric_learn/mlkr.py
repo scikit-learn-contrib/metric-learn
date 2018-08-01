@@ -108,7 +108,6 @@ class MLKR(BaseMetricLearner):
                             .format(cls_name, res.message), ConvergenceWarning)
           print('[{}] Training took {:8.2f}s.'.format(cls_name, t_train))
 
-      self.n_iter_ += 1
       return self
 
   def transformer(self):
