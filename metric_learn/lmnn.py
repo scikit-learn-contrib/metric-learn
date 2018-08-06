@@ -93,23 +93,17 @@ class python_LMNN(_base_LMNN):
     # initialize L
     L = self.L_
 
-    # first iteration
+    # first iteration: we compute variables (including objective and gradient)
+    #  at initialization point
     G, objective, total_active, df, a1, a2 = (
         self._loss_grad(L, dfG, impostors, 1, k, reg, target_neighbors, df, a1,
                         a2))
-    for it in xrange(2, self.max_iter):
-      # we first try to find a value of L that has better objective than the
-      #  previous L, following the gradient:
 
-      # we want to enter the loop for the first try, with the original
-      # learning rate (hence * 2 since it will be / 2)
-      delta_obj = 1
-      learn_rate *= 2
-      while delta_obj > 0:
-        # we keep looking until the L has a better objective, retrying with a
-        # smaller update if necessary (reducing the learning rate)
-        learn_rate /= 2
-        # the next point next_L is found by a gradient step
+    for it in xrange(2, self.max_iter):
+      # then at each iteration, we try to find a value of L that has better
+      # objective than the previous L, following the gradient:
+      while True:
+        # the next point next_L to try out is found by a gradient step
         L_next = L - 2 * learn_rate * G
         # we compute the objective at next point
         # we copy variables that can be modified by _loss_grad, because if we
@@ -120,8 +114,17 @@ class python_LMNN(_base_LMNN):
                             target_neighbors, df.copy(), list(a1), list(a2)))
         assert not np.isnan(objective)
         delta_obj = objective_next - objective
-      # when the good L is found, we start from here before doing next
-      # iteration, and we increase slightly the learning rate
+        if delta_obj > 0:
+          # if we did not find a better objective, we retry with an L closer to
+          # the starting point, by decreasing the learning rate (making the
+          # gradient step smaller)
+          learn_rate /= 2
+        else:
+          # otherwise, if we indeed found a better obj, we get out of the loop
+          break
+      # when the better L is found (and the related variables), we set the
+      # old variables to these new ones before next iteration and we
+      # slightly increase the learning rate
       L = L_next
       G, df, objective, total_active, a1, a2 = (
           G_next, df_next, objective_next, total_active_next, a1_next, a2_next)
