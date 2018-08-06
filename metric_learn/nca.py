@@ -115,17 +115,17 @@ class NCA(BaseMetricLearner):
 
   def _loss_grad_lbfgs(self, A, X, mask, sign=1.0):
 
-    if self.n_iter_ == 0:
-      if self.verbose:
-        header_fields = ['Iteration', 'Objective Value', 'Time(s)']
-        header_fmt = '{:>10} {:>20} {:>10}'
-        header = header_fmt.format(*header_fields)
-        cls_name = self.__class__.__name__
-        print('[{}]'.format(cls_name))
-        print('[{}] {}\n[{}] {}'.format(cls_name, header,
-                                        cls_name, '-' * len(header)))
+    if self.n_iter_ == 0 and self.verbose:
+      header_fields = ['Iteration', 'Objective Value', 'Time(s)']
+      header_fmt = '{:>10} {:>20} {:>10}'
+      header = header_fmt.format(*header_fields)
+      cls_name = self.__class__.__name__
+      print('[{cls}]'.format(cls=cls_name))
+      print('[{cls}] {header}\n[{cls}] {sep}'.format(cls=cls_name,
+                                                     header=header,
+                                                     sep='-' * len(header)))
 
-    t_funcall = time.time()
+    start_time = time.time()
 
     A = A.reshape(-1, X.shape[1])
     X_embedded = np.dot(X, A.T)  # (n_samples, num_dims)
@@ -146,10 +146,11 @@ class NCA(BaseMetricLearner):
                     X_embedded.T * weighted_p_ij.sum(axis=0)).dot(X)
 
     if self.verbose:
-        t_funcall = time.time() - t_funcall
-        values_fmt = '[{}] {:>10} {:>20.6e} {:>10.2f}'
-        print(values_fmt.format(self.__class__.__name__, self.n_iter_,
-                                loss, t_funcall))
+        start_time = time.time() - start_time
+        values_fmt = '[{cls}] {n_iter:>10} {loss:>20.6e} {start_time:>10.2f}'
+        print(values_fmt.format(cls=self.__class__.__name__,
+                                n_iter=self.n_iter_, loss=loss,
+                                start_time=start_time))
         sys.stdout.flush()
 
     self.n_iter_ += 1
