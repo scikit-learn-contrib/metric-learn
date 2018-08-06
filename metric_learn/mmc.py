@@ -263,7 +263,7 @@ class MMC(BaseMetricLearner):
       w_tmp = np.maximum(0, w - lambd * step)
       obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
       assert_all_finite(obj)
-      obj_previous = obj + 1.1  # just to get the while-loop started
+      obj_previous = obj + 1  # just to get the while-loop started
 
       inner_it = 0
       while obj < obj_previous:
