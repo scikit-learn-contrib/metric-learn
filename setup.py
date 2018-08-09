@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup
-import metric_learn
 
-version = metric_learn.__version__
+version = "0.4.0"
 setup(name='metric-learn',
       version=version,
       description='Python implementations of metric learning algorithms',
