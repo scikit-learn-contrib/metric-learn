@@ -88,7 +88,7 @@ class MLKR(BaseMetricLearner):
       X, y, A = self._process_inputs(X, y)
 
       # Measure the total training time
-      t_train = time.time()
+      train_time = time.time()
 
       # note: this line takes (n*n*d) memory!
       # for larger datasets, we'll need to compute dX as we go
@@ -100,13 +100,15 @@ class MLKR(BaseMetricLearner):
                      options=dict(maxiter=self.max_iter, eps=self.epsilon))
       self.transformer_ = res.x.reshape(A.shape)
 
+      # Stop timer
+      train_time = time.time() - train_time
       if self.verbose:
           cls_name = self.__class__.__name__
           # Warn the user if the algorithm did not converge
           if not res.success:
               warnings.warn('[{}] MLKR did not converge: {}'
                             .format(cls_name, res.message), ConvergenceWarning)
-          print('[{}] Training took {:8.2f}s.'.format(cls_name, t_train))
+          print('[{}] Training took {:8.2f}s.'.format(cls_name, train_time))
 
       return self
 

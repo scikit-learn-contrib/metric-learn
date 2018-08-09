@@ -77,7 +77,7 @@ class NCA(BaseMetricLearner):
         num_dims = d
 
     # Measure the total training time
-    t_train = time.time()
+    train_time = time.time()
 
     # Initialize A to a scaling matrix
     A = np.zeros((num_dims, d))
@@ -101,6 +101,9 @@ class NCA(BaseMetricLearner):
     self.X_ = X
     self.A_ = opt_result.x.reshape(-1, X.shape[1])
     self.n_iter_ = opt_result.nit
+
+    # Stop timer
+    train_time = time.time() - train_time
     if self.verbose:
       cls_name = self.__class__.__name__
 
@@ -109,7 +112,7 @@ class NCA(BaseMetricLearner):
         warnings.warn('[{}] NCA did not converge: {}'.format(
             cls_name, opt_result.message), ConvergenceWarning)
 
-      print('[{}] Training took {:8.2f}s.'.format(cls_name, t_train))
+      print('[{}] Training took {:8.2f}s.'.format(cls_name, train_time))
 
     return self
 
