@@ -106,7 +106,7 @@ def _loss(flatA, X, y, dX):
   cost = (ydiff**2).sum()
 
   # also compute the gradient
-  W = 2 * softmax * (ydiff[:, np.newaxis] * (yhat[:, np.newaxis] - y))
+  W = 2 * softmax * ydiff[:, np.newaxis] * (yhat[:, np.newaxis] - y)
   # note: this is the part that the matlab impl drops to C for
   M = (dX.T * W.ravel()).dot(dX)
   grad = 2 * A.dot(M)
