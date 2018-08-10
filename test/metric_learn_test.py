@@ -318,7 +318,7 @@ def test_verbose(algo_class, dataset, capsys):
 
 @pytest.mark.parametrize(('algo_class', 'dataset'),
                          [(NCA, make_classification()),
-                          (MLKR, ())])
+                          (MLKR, make_regression())])
 def test_no_verbose(dataset, algo_class, capsys):
   # assert by default there is no output (verbose=False)
   X, y = dataset
