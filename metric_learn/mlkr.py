@@ -98,14 +98,14 @@ def _loss(flatA, X, y, dX):
   A = flatA.reshape((-1, X.shape[1]))
   dist = pdist(X, metric='mahalanobis', VI=A.T.dot(A))
   K = squareform(np.exp(-dist**2))
+  np.fill_diagonal(K, 0)
   denom = np.maximum(K.sum(axis=0), EPS)
   yhat = K.dot(y) / denom
   ydiff = yhat - y
   cost = (ydiff**2).sum()
 
   # also compute the gradient
-  np.fill_diagonal(K, 1)
-  W = 2 * K * (np.outer(ydiff, ydiff) / denom)
+  W = 2 * K * ((ydiff / denom)[:, np.newaxis] * (yhat[:, np.newaxis] - y))
   # note: this is the part that the matlab impl drops to C for
   M = (dX.T * W.ravel()).dot(dX)
   grad = 2 * A.dot(M)
