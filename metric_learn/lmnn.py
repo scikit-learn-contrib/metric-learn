@@ -116,7 +116,7 @@ class python_LMNN(_base_LMNN):
         delta_obj = objective_next - objective
         if delta_obj > 0:
           # if we did not find a better objective, we retry with an L closer to
-          # the starting point, by decreasing the learning rate (making the
+          # the starting point, by decreasing the learning rate (making the
           # gradient step smaller)
           learn_rate /= 2
         else:
