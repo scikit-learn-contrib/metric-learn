@@ -80,11 +80,7 @@ class MLKR(BaseMetricLearner):
       """
       X, y, A = self._process_inputs(X, y)
 
-      # note: this line takes (n*n*d) memory!
-      # for larger datasets, we'll need to compute dX as we go
-      dX = (X[None] - X[:, None]).reshape((-1, X.shape[1]))
-
-      res = minimize(_loss, A.ravel(), (X, y, dX), method='CG', jac=True,
+      res = minimize(_loss, A.ravel(), (X, y), method='CG', jac=True,
                      tol=self.alpha,
                      options=dict(maxiter=self.max_iter, eps=self.epsilon))
       self.transformer_ = res.x.reshape(A.shape)
@@ -95,7 +91,7 @@ class MLKR(BaseMetricLearner):
       return self.transformer_
 
 
-def _loss(flatA, X, y, dX):
+def _loss(flatA, X, y):
   A = flatA.reshape((-1, X.shape[1]))
   dist = pdist(X, metric='mahalanobis', VI=A.T.dot(A))
   dist = squareform(dist ** 2)
@@ -106,8 +102,7 @@ def _loss(flatA, X, y, dX):
   cost = (ydiff**2).sum()
 
   # also compute the gradient
-  W = 2 * softmax * ydiff[:, np.newaxis] * (yhat[:, np.newaxis] - y)
-  # note: this is the part that the matlab impl drops to C for
-  M = (dX.T * W.ravel()).dot(dX)
-  grad = 2 * A.dot(M)
+  W = softmax * ydiff[:, np.newaxis] * (yhat[:, np.newaxis] - y)
+  X_emb_t = A.dot(X.T)
+  grad = 4 * (X_emb_t * W.sum(axis=0) - X_emb_t.dot(W + W.T)).dot(X)
   return cost, grad.ravel()

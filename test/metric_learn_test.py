@@ -253,19 +253,17 @@ class TestMLKR(MetricTestCase):
     Assert that the gradient is almost equal to its finite differences
     approximation.
     """
-    # Initialize the transformation `M`, as well as `X`, `dX` and `y`
-    # and `MLKR`
+    # Initialize the transformation `M`, as well as `X`, and `y` and `MLKR`
     X, y = make_regression(n_features=4, random_state=1, n_samples=20)
     X, y = check_X_y(X, y)
     M = np.random.randn(2, X.shape[1])
-    dX = (X[None] - X[:, None]).reshape((-1, X.shape[1]))
     from metric_learn.mlkr import _loss
 
     def fun(M):
-      return _loss(M, X, y, dX)[0]
+      return _loss(M, X, y)[0]
 
     def grad_fn(M):
-      return _loss(M, X, y, dX)[1].ravel()
+      return _loss(M, X, y)[1].ravel()
 
     # compute relative error
     rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
