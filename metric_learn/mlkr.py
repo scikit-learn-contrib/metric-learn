@@ -24,8 +24,8 @@ EPS = np.finfo(float).eps
 
 class MLKR(BaseMetricLearner):
   """Metric Learning for Kernel Regression (MLKR)"""
-  def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
-               max_iter=1000, verbose=False):
+  def __init__(self, num_dims=None, A0=None, tol=None, max_iter=1000,
+               verbose=False):
     """
     Initialize MLKR.
 
@@ -37,11 +37,8 @@ class MLKR(BaseMetricLearner):
     A0: array-like, optional
         Initialization of transformation matrix. Defaults to PCA loadings.
 
-    epsilon: float, optional
-        Step size for congujate gradient descent.
-
-    alpha: float, optional
-        Stopping criterion for congujate gradient descent.
+    tol: float, optional (default=None)
+        Convergence tolerance for the optimization.
 
     max_iter: int, optional
         Cap on number of congugate gradient iterations.
@@ -51,8 +48,7 @@ class MLKR(BaseMetricLearner):
     """
     self.num_dims = num_dims
     self.A0 = A0
-    self.epsilon = epsilon
-    self.alpha = alpha
+    self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
 
@@ -96,8 +92,8 @@ class MLKR(BaseMetricLearner):
 
       self.n_iter_ = 0
       res = minimize(self._loss, A.ravel(), (X, y, dX), method='L-BFGS-B',
-                     jac=True, tol=self.alpha,
-                     options=dict(maxiter=self.max_iter, eps=self.epsilon))
+                     jac=True, tol=self.tol,
+                     options=dict(maxiter=self.max_iter))
       self.transformer_ = res.x.reshape(A.shape)
 
       # Stop timer
