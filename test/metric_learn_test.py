@@ -318,7 +318,7 @@ def test_verbose(algo_class, dataset, capsys):
 
 @pytest.mark.parametrize(('algo_class', 'dataset'),
                          [(NCA, make_classification()),
-                          (MLKR, make_regression())])
+                          (MLKR, make_regression(n_features=10))])
 def test_no_verbose(dataset, algo_class, capsys):
   # assert by default there is no output (verbose=False)
   X, y = dataset
@@ -331,7 +331,7 @@ def test_no_verbose(dataset, algo_class, capsys):
 
 @pytest.mark.parametrize(('algo_class', 'dataset'),
                          [(NCA, make_classification()),
-                          (MLKR, make_regression())])
+                          (MLKR, make_regression(n_features=10))])
 def test_convergence_warning(dataset, algo_class):
     X, y = dataset
     model = algo_class(max_iter=2, verbose=True)

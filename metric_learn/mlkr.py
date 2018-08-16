@@ -95,8 +95,8 @@ class MLKR(BaseMetricLearner):
       dX = (X[None] - X[:, None]).reshape((-1, X.shape[1]))
 
       self.n_iter_ = 0
-      res = minimize(self._loss, A.ravel(), (X, y, dX), method='CG', jac=True,
-                     tol=self.alpha,
+      res = minimize(self._loss, A.ravel(), (X, y, dX), method='L-BFGS-B',
+                     jac=True, tol=self.alpha,
                      options=dict(maxiter=self.max_iter, eps=self.epsilon))
       self.transformer_ = res.x.reshape(A.shape)
 
