@@ -10,8 +10,8 @@ from __future__ import division, print_function
 import numpy as np
 from sklearn.utils.fixes import logsumexp
 from scipy.optimize import minimize
-from scipy.spatial.distance import pdist, squareform
 from sklearn.decomposition import PCA
+from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_X_y
 
 from .base_metric import BaseMetricLearner
@@ -93,8 +93,8 @@ class MLKR(BaseMetricLearner):
 
 def _loss(flatA, X, y):
   A = flatA.reshape((-1, X.shape[1]))
-  dist = pdist(X, metric='mahalanobis', VI=A.T.dot(A))
-  dist = squareform(dist ** 2)
+  X_embedded = np.dot(X, A.T)
+  dist = pairwise_distances(X_embedded, squared=True)
   np.fill_diagonal(dist, np.inf)
   softmax = np.exp(- dist - logsumexp(- dist, axis=1)[:, np.newaxis])
   yhat = softmax.dot(y)
@@ -102,7 +102,8 @@ def _loss(flatA, X, y):
   cost = (ydiff**2).sum()
 
   # also compute the gradient
-  W = softmax * ydiff[:, np.newaxis] * (yhat[:, np.newaxis] - y)
-  X_emb_t = A.dot(X.T)
-  grad = 4 * (X_emb_t * W.sum(axis=0) - X_emb_t.dot(W + W.T)).dot(X)
+  W = softmax * ydiff[:, np.newaxis] * (y - yhat[:, np.newaxis])
+  W_sym = W + W.T
+  np.fill_diagonal(W_sym, - W.sum(axis=0))
+  grad = 4 * (X_embedded.T.dot(W_sym)).dot(X)
   return cost, grad.ravel()

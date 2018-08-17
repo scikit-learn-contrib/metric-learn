@@ -10,6 +10,7 @@ import numpy as np
 from scipy.optimize import minimize
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_X_y
+from numpy.linalg import multi_dot
 
 try:  # scipy.misc.logsumexp is deprecated in scipy 1.0.0
     from scipy.special import logsumexp
@@ -109,6 +110,7 @@ class NCA(BaseMetricLearner):
 
     # Compute gradient of loss w.r.t. `transform`
     weighted_p_ij = masked_p_ij - p_ij * p
-    gradient = 2 * (X_embedded.T.dot(weighted_p_ij + weighted_p_ij.T) -
-                    X_embedded.T * weighted_p_ij.sum(axis=0)).dot(X)
+    weighted_p_ij_sym = weighted_p_ij + weighted_p_ij.T
+    np.fill_diagonal(weighted_p_ij_sym, - weighted_p_ij.sum(axis=0))
+    gradient = 2 * (X_embedded.T.dot(weighted_p_ij_sym)).dot(X)
     return sign * loss, sign * gradient.ravel()
