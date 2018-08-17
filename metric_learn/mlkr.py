@@ -13,6 +13,7 @@ from scipy.optimize import minimize
 from scipy.spatial.distance import pdist, squareform
 from sklearn.decomposition import PCA
 from sklearn.utils.validation import check_X_y
+from numpy.linalg import multi_dot
 
 from .base_metric import BaseMetricLearner
 
@@ -102,7 +103,8 @@ def _loss(flatA, X, y):
   cost = (ydiff**2).sum()
 
   # also compute the gradient
-  W = softmax * ydiff[:, np.newaxis] * (yhat[:, np.newaxis] - y)
-  X_emb_t = A.dot(X.T)
-  grad = 4 * (X_emb_t * W.sum(axis=0) - X_emb_t.dot(W + W.T)).dot(X)
+  W = softmax * ydiff[:, np.newaxis] * (y - yhat[:, np.newaxis])
+  W_sym = W + W.T
+  np.fill_diagonal(W_sym, - W.sum(axis=0))
+  grad = 4 * multi_dot([A, X.T, W_sym, X])
   return cost, grad.ravel()
