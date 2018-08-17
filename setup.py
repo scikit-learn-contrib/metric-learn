@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup
+import os
 
-version = "0.4.0"
+version = {}
+with open(os.path.join('metric_learn', '_version.py')) as fp:
+  exec(fp.read(), version)
+
 setup(name='metric-learn',
-      version=version,
+      version=version['__version__'],
       description='Python implementations of metric learning algorithms',
       author=['CJ Carey', 'Yuan Tang'],
       author_email='ccarey@cs.umass.edu',
