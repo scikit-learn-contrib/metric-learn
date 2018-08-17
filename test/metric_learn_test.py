@@ -1,7 +1,5 @@
-import re
 import unittest
 import re
-import sys
 import pytest
 import numpy as np
 from scipy.optimize import check_grad
