@@ -262,13 +262,14 @@ class TestMLKR(MetricTestCase):
     X, y = make_regression(n_features=4, random_state=1, n_samples=20)
     X, y = check_X_y(X, y)
     M = np.random.randn(2, X.shape[1])
-    from metric_learn.mlkr import _loss
+    mlkr = MLKR()
+    mlkr.n_iter_ = 0
 
     def fun(M):
-      return _loss(M, X, y)[0]
+      return mlkr._loss(M, X, y)[0]
 
     def grad_fn(M):
-      return _loss(M, X, y)[1].ravel()
+      return mlkr._loss(M, X, y)[1].ravel()
 
     # compute relative error
     rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
