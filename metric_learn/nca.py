@@ -145,8 +145,9 @@ class NCA(BaseMetricLearner):
 
     # Compute gradient of loss w.r.t. `transform`
     weighted_p_ij = masked_p_ij - p_ij * p
-    gradient = 2 * (X_embedded.T.dot(weighted_p_ij + weighted_p_ij.T) -
-                    X_embedded.T * weighted_p_ij.sum(axis=0)).dot(X)
+    weighted_p_ij_sym = weighted_p_ij + weighted_p_ij.T
+    np.fill_diagonal(weighted_p_ij_sym, - weighted_p_ij.sum(axis=0))
+    gradient = 2 * (X_embedded.T.dot(weighted_p_ij_sym)).dot(X)
 
     if self.verbose:
         start_time = time.time() - start_time
@@ -157,5 +158,4 @@ class NCA(BaseMetricLearner):
         sys.stdout.flush()
 
     self.n_iter_ += 1
-
     return sign * loss, sign * gradient.ravel()
