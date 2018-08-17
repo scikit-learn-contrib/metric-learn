@@ -25,6 +25,8 @@ metric learning algorithms.
    metric_learn.nca
    metric_learn.lfda
    metric_learn.rca
+   metric_learn.mmc
+   metric_learn.mlkr
 
 Each metric supports the following methods:
 
