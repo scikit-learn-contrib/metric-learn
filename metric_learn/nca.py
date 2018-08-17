@@ -112,5 +112,5 @@ class NCA(BaseMetricLearner):
     weighted_p_ij = masked_p_ij - p_ij * p
     weighted_p_ij_sym = weighted_p_ij + weighted_p_ij.T
     np.fill_diagonal(weighted_p_ij_sym, - weighted_p_ij.sum(axis=0))
-    gradient = 2 * multi_dot([A, X.T, weighted_p_ij_sym, X])
+    gradient = 2 * (X_embedded.T.dot(weighted_p_ij_sym)).dot(X)
     return sign * loss, sign * gradient.ravel()
