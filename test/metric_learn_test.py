@@ -9,6 +9,7 @@ from sklearn.datasets import load_iris, make_classification, make_regression
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.utils.validation import check_X_y
 
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
@@ -250,6 +251,28 @@ class TestMLKR(MetricTestCase):
     mlkr.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mlkr.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
+
+  def test_finite_differences(self):
+    """Test gradient of loss function
+
+    Assert that the gradient is almost equal to its finite differences
+    approximation.
+    """
+    # Initialize the transformation `M`, as well as `X`, and `y` and `MLKR`
+    X, y = make_regression(n_features=4, random_state=1, n_samples=20)
+    X, y = check_X_y(X, y)
+    M = np.random.randn(2, X.shape[1])
+    from metric_learn.mlkr import _loss
+
+    def fun(M):
+      return _loss(M, X, y)[0]
+
+    def grad_fn(M):
+      return _loss(M, X, y)[1].ravel()
+
+    # compute relative error
+    rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
+    np.testing.assert_almost_equal(rel_diff, 0.)
 
 
 class TestMMC(MetricTestCase):
