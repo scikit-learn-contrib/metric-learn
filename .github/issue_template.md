@@ -39,7 +39,7 @@ import scipy; print("SciPy", scipy.__version__)
 import sklearn; print("Scikit-Learn", sklearn.__version__)
 import metric_learn; print("metric_learn", metric_learn.__version__)
 
-(If you installed a version <=0.3.0 using pip, you should instead type in a terminal:
+(If the last statement returns "AttributeError: 'module' object has no attribute '__version__'", you can instead run this in a terminal:
 $ pip show metric_learn | grep Version
 )
 -->
