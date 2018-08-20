@@ -26,6 +26,7 @@ points from different classes far away from each other.
    metric_learn.lmnn
    metric_learn.nca
    metric_learn.lfda
+   metric_learn.mlkr
 
 Semi-Supervised Algorithms
 --------------------------
@@ -42,7 +43,6 @@ data.
    metric_learn.sdml
    metric_learn.rca
    metric_learn.mmc
-   metric_learn.mlkr
 
 Note that each semi-supervised algorithm has a supervised version of the form
 `*_Supervised` where information about similarities is generated from
