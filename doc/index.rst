@@ -13,20 +13,40 @@ metrics.
 This package contains efficient Python implementations of several popular
 metric learning algorithms.
 
+Supervised Algorithms
+---------------------
+Supervised metric learning algorithms take as inputs points `X` and targets
+`y`, and learn to make points from the same class close to each other, and
+points from different classes far away from each other.
+
 .. toctree::
-   :caption: Algorithms
    :maxdepth: 1
 
    metric_learn.covariance
    metric_learn.lmnn
-   metric_learn.itml
-   metric_learn.sdml
-   metric_learn.lsml
    metric_learn.nca
    metric_learn.lfda
+
+Semi-Supervised Algorithms
+--------------------------
+Semi-supervised algorithms do the same, but work on a weaker information about
+similarities between data points, for instance pairs of similar and dissimilar
+points. See each of the following algorithm for its particular form of input
+data.
+
+.. toctree::
+   :maxdepth: 1
+
+   metric_learn.itml
+   metric_learn.lsml
+   metric_learn.sdml
    metric_learn.rca
 
-Each metric supports the following methods:
+Note that each semi-supervised algorithm has a supervised version of the form
+`*_Supervised` where information about similarities is generated from
+the labels information and passed to the underlying algorithm.
+
+Each metric learning algorithm supports the following methods:
 
 -  ``fit(...)``, which learns the model.
 -  ``transformer()``, which returns a transformation matrix

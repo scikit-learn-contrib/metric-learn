@@ -83,7 +83,12 @@ class SDML(BaseMetricLearner):
 class SDML_Supervised(SDML):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
-    """
+    """Initialize the supervised version of `SDML`
+
+    `SDML_Supervised` creates pairs of similar sample by taking same class
+    samples, and pairs of dissimilar samples by taking different class
+    samples. It then passes these pairs to `SDML` for training.
+
     Parameters
     ----------
     balance_param : float, optional
@@ -92,8 +97,9 @@ class SDML_Supervised(SDML):
         trade off between optimizer and sparseness (see graph_lasso)
     use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
-    num_labeled : int, optional
-        number of labels to preserve for training
+    num_labeled : int, optional (default=np.inf)
+        number of labels to preserve for training. If np.inf (default),
+        uses all the labels.
     num_constraints : int, optional
         number of constraints to generate
     verbose : bool, optional
