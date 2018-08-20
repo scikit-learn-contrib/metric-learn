@@ -41,6 +41,8 @@ data.
    metric_learn.lsml
    metric_learn.sdml
    metric_learn.rca
+   metric_learn.mmc
+   metric_learn.mlkr
 
 Note that each semi-supervised algorithm has a supervised version of the form
 `*_Supervised` where information about similarities is generated from
