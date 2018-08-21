@@ -45,7 +45,7 @@ data.
    metric_learn.mmc
 
 Note that each semi-supervised algorithm has a supervised version of the form
-`*_Supervised` where information about similarities is generated from
+`*_Supervised` where similarity constraints are generated from
 the labels information and passed to the underlying algorithm.
 
 Each metric learning algorithm supports the following methods:

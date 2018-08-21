@@ -137,9 +137,9 @@ class LSML_Supervised(LSML):
     """Initialize the supervised version of `LSML`
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
-    samples from the same class, and two samples from a different class, and
-    concatenating them. This way it builds quadruplets where the two first points
-    must be more similar than the two last points.
+    samples from the same class, and two samples from different classes, and
+    concatenating them. This way it builds quadruplets where the two first
+    points must be more similar than the two last points.
 
     Parameters
     ----------
