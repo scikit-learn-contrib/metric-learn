@@ -22,7 +22,7 @@ from ._util import check_tuples
 
 class _BaseSDML(MahalanobisMixin):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               verbose=False):
+               verbose=False, preprocessor=None):
     """
     Parameters
     ----------
@@ -37,18 +37,26 @@ class _BaseSDML(MahalanobisMixin):
 
     verbose : bool, optional
         if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
     """
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
     self.use_cov = use_cov
     self.verbose = verbose
+    super(_BaseSDML, self).__init__(preprocessor)
 
   def _prepare_pairs(self, pairs, y):
     # for now we check_X_y and check_tuples but we should only
     # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
                          ensure_2d=False, allow_nd=True)
-    pairs = check_tuples(pairs)
+    self.check_preprocessor()
+    pairs = check_tuples(pairs, preprocessor=self.preprocessor, t=2,
+                         estimator=self)
+    pairs = self.format_input(pairs)
 
     # set up prior M
     if self.use_cov:
@@ -78,8 +86,11 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 

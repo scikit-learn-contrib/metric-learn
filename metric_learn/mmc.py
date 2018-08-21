@@ -30,7 +30,8 @@ from ._util import vector_norm, check_tuples
 class _BaseMMC(MahalanobisMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
+               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
+               preprocessor=None):
     """Initialize MMC.
     Parameters
     ----------
@@ -48,6 +49,9 @@ class _BaseMMC(MahalanobisMixin):
         metric learning
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
     """
     self.max_iter = max_iter
     self.max_proj = max_proj
@@ -56,8 +60,10 @@ class _BaseMMC(MahalanobisMixin):
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
     self.verbose = verbose
+    super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
+    self.check_preprocessor()
     pairs, y = self._process_pairs(pairs, y)
     if self.diagonal:
       return self._fit_diag(pairs, y)
@@ -69,7 +75,9 @@ class _BaseMMC(MahalanobisMixin):
     # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
                          ensure_2d=False, allow_nd=True)
-    pairs = check_tuples(pairs)
+    pairs = check_tuples(pairs, preprocessor=self.preprocessor, t=2,
+                         estimator=self)
+    pairs = self.format_input(pairs)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -365,8 +373,11 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 

@@ -27,7 +27,7 @@ from ._util import vector_norm, check_tuples
 class _BaseITML(MahalanobisMixin):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               A0=None, verbose=False):
+               A0=None, verbose=False, preprocessor=None):
     """Initialize ITML.
 
     Parameters
@@ -44,19 +44,28 @@ class _BaseITML(MahalanobisMixin):
 
     verbose : bool, optional
         if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
     self.A0 = A0
     self.verbose = verbose
+    super(_BaseITML, self).__init__(preprocessor)
 
   def _process_pairs(self, pairs, y, bounds):
     # for now we check_X_y and check_tuples but we should only
     # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
                          ensure_2d=False, allow_nd=True)
-    pairs = check_tuples(pairs)
+    self.check_preprocessor()
+    pairs = check_tuples(pairs, preprocessor=self.preprocessor, t=2,
+                         estimator=self)
+    #  pairs classifiers and for quadruplets classifiers
+    pairs = self.format_input(pairs)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -143,8 +152,11 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
     bounds : list (pos,neg) pairs, optional

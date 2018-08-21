@@ -20,7 +20,8 @@ from .constraints import Constraints
 
 
 class _BaseLSML(MahalanobisMixin):
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False,
+               preprocessor=None):
     """Initialize LSML.
 
     Parameters
@@ -31,18 +32,25 @@ class _BaseLSML(MahalanobisMixin):
         guess at a metric [default: inv(covariance(X))]
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.prior = prior
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
+    super(_BaseLSML, self).__init__(preprocessor)
 
   def _prepare_quadruplets(self, quadruplets, weights):
     # for now we check_array and check_tuples but we should only
     # check_tuples in the future (with enhanced check_tuples)
     quadruplets = check_array(quadruplets, accept_sparse=False,
                               ensure_2d=False, allow_nd=True)
-    quadruplets = check_tuples(quadruplets)
+    self.check_preprocessor()
+    quadruplets = check_tuples(quadruplets, preprocessor=self.preprocessor,
+                               t=4, estimator=self)
+    quadruplets = self.format_input(quadruplets)
 
     # check to make sure that no two constrained vectors are identical
     self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -135,11 +143,14 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features)
-        Each row corresponds to 4 points. In order to supervise the
-        algorithm in the right way, we should have the four samples ordered
-        in a way such that: d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3])
-        for all 0 <= i < n_constraints.
+    quadruplets : array-like, shape=(n_constraints, 4, n_features) or
+                  (n_constraints, 4)
+        3D array with each row (element took from the first dimension)
+        corresponding to 4 points. In order to supervise the algorithm in the
+        right way, we should have the four samples ordered in a way such that:
+        d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3]) for all 0 <= i <
+        n_constraints. If the instance was created with a preprocessor, it can
+        also be fitted on 2D arrays of indices of quadruplets.
     weights : (n_constraints,) array of floats, optional
         scale factor for each constraint
 
