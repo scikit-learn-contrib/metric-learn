@@ -145,7 +145,7 @@ class ITML_Supervised(ITML):
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
                verbose=False):
-    """Initialize the supervised version of `ITML`
+    """Initialize the supervised version of `ITML`.
 
     `ITML_Supervised` creates pairs of similar sample by taking same class
     samples, and pairs of dissimilar samples by taking different class

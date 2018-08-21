@@ -134,7 +134,7 @@ class LSML(BaseMetricLearner):
 class LSML_Supervised(LSML):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
                num_constraints=None, weights=None, verbose=False):
-    """Initialize the supervised version of `LSML`
+    """Initialize the supervised version of `LSML`.
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
     samples from the same class, and two samples from different classes, and
