@@ -3,8 +3,7 @@
 
 #### Steps/Code to Reproduce
 <!-- Please provide a **minimal** highlighted code example for
-reproduction. (See
-https://help.github.com/articles/creating-and-highlighting-code-blocks/
+reproduction. (See https://help.github.com/articles/creating-and-highlighting-code-blocks/
 for code blocks highlighting, and https://stackoverflow.com/help/mcve
 for what is a minimal reproducible code.)
 
@@ -26,8 +25,7 @@ it in the issue: https://gist.github.com
 <!-- Example: No error is thrown. Please paste or describe the expected results.-->
 
 #### Actual Results
-<!-- Please paste or specifically describe the actual output or traceback. You 
-can use ```ptb for python traceback formatting-->
+<!-- Please paste or specifically describe the actual output or traceback. You can use ```ptb for python traceback formatting-->
 
 #### Versions
 <!-- Please run the following snippet and paste the output below.
@@ -37,7 +35,7 @@ import sys; print("Python", sys.version)
 import numpy; print("NumPy", numpy.__version__)
 import scipy; print("SciPy", scipy.__version__)
 import sklearn; print("Scikit-Learn", sklearn.__version__)
-import metric_learn; print("metric_learn", metric_learn.__version__)
+import metric_learn; print("Metric-Learn", metric_learn.__version__)
 
 (If the last statement returns "AttributeError: 'module' object has no attribute '__version__'", you can instead run this in a terminal:
 $ pip show metric_learn | grep Version
