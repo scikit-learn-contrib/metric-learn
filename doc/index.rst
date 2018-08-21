@@ -15,9 +15,11 @@ metric learning algorithms.
 
 Supervised Algorithms
 ---------------------
-Supervised metric learning algorithms take as inputs points `X` and targets
-`y`, and learn to make points from the same class close to each other, and
-points from different classes far away from each other.
+Supervised metric learning algorithms take as inputs points `X` and target
+labels `y`, and learn to make points from the same class (for classification)
+or with close target value (for regression) close to each other, and points
+from different classes or with distant target values far away from each
+other.
 
 .. toctree::
    :maxdepth: 1
