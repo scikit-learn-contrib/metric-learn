@@ -116,7 +116,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   def metric(self):
     return self.transformer_.T.dot(self.transformer_)
 
-  def _transformer_from_metric(self, metric):
+  def transformer_from_metric(self, metric):
     """Computes the transformation matrix from the Mahalanobis matrix.
 
     Since by definition the metric `M` is positive semi-definite (PSD), it
