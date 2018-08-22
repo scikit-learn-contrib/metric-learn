@@ -15,6 +15,14 @@ EPS = np.finfo(float).eps
 
 
 class NCA(MahalanobisMixin, TransformerMixin):
+  """Neighborhood Components Analysis (NCA)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
   def __init__(self, num_dims=None, max_iter=100, learning_rate=0.01):
     self.num_dims = num_dims
     self.max_iter = max_iter

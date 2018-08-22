@@ -243,6 +243,13 @@ try:
   from modshogun import RealFeatures, MulticlassLabels
 
   class LMNN(_base_LMNN):
+    """Large Margin Nearest Neighbor (LMNN)
+
+    Attributes
+    ----------
+    transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+        The learned linear transformation ``L``.
+    """
 
     def fit(self, X, y):
       self.X_, y = check_X_y(X, y, dtype=float)
