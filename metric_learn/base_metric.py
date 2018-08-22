@@ -62,8 +62,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
   Attributes
   ----------
-  transformer_ : `np.ndarray`, shape=(num_dims, n_features)
-    The learned linear transformation ``L``.
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
   """
 
   def score_pairs(self, pairs):
