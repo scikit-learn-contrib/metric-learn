@@ -87,7 +87,7 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
                        ensure_min_samples=ensure_min_samples,
                        # ensure_min_features only works if ndim=2, so we will
                        # have to check again if input is 3D (see below)
-                       ensure_min_features = 0,
+                       ensure_min_features=0,
                        # if 2D and preprocessor, no notion of
                        # "features". If 3D and no preprocessor, min_features
                        # is checked below
