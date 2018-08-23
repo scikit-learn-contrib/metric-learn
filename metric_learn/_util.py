@@ -98,8 +98,13 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
     check_t(tuples, t, context)
   elif tuples.ndim == 3:
     # if the dimension is 3 we still have to check that the num_features is OK
-    check_array(tuples[:, 0, :], ensure_min_features=ensure_min_features,
-                estimator=context)
+    if ensure_min_features > 0:
+      n_features = array.shape[2]
+      if n_features < ensure_min_features:
+        raise ValueError("Found array with %d feature(s) (shape=%s) while"
+                         " a minimum of %d is required%s."
+                         % (n_features, shape_repr, ensure_min_features,
+                            context))
     # then we should also check that t is OK
     check_t(tuples, t, context)
   else:
