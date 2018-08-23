@@ -78,7 +78,8 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
   if dtype == "auto":
       dtype = 'numeric' if preprocessor else None
 
-  context = make_name(estimator, preprocessor)
+  name = make_name(estimator, preprocessor)
+  context = ' by ' + name if name is not None else ''
   tuples = check_array(tuples, dtype=dtype, accept_sparse=False, copy=copy,
                        force_all_finite=force_all_finite,
                        order=order,
@@ -91,7 +92,7 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
                        # if 2D and preprocessor, no notion of
                        # "features". If 3D and no preprocessor, min_features
                        # is checked below
-                       estimator=context,
+                       estimator=name,
                        warn_on_dtype=warn_on_dtype)
 
   if tuples.ndim == 2:  # in this case there is left to check if t is OK
@@ -99,17 +100,17 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
   elif tuples.ndim == 3:
     # if the dimension is 3 we still have to check that the num_features is OK
     if ensure_min_features > 0:
-      n_features = array.shape[2]
+      n_features = tuples.shape[2]
       if n_features < ensure_min_features:
-        raise ValueError("Found array with %d feature(s) (shape=%s) while"
-                         " a minimum of %d is required%s."
-                         % (n_features, shape_repr, ensure_min_features,
-                            context))
+        raise ValueError("Found array with {} feature(s) (shape={}) while"
+                         " a minimum of {} is required{}."
+                         .format(n_features, tuples.shape, ensure_min_features,
+                                 context))
     # then we should also check that t is OK
     check_t(tuples, t, context)
   else:
     expected_shape = 2 if preprocessor else 3
-    raise ValueError("{} expected {}D array. Found {}D array "
+    raise ValueError("{}D array expected{}. Found {}D array "
                      "instead:\ninput={}.\n"
                      .format(context, expected_shape, tuples.ndim, tuples))
   return tuples
