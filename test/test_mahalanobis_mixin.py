@@ -7,19 +7,20 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn import clone
 from sklearn.datasets import load_iris
 from sklearn.utils import check_random_state, shuffle
+from sklearn.utils.testing import set_random_state
 
 from metric_learn import (Constraints, ITML, LSML, MMC, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, RCA)
 from metric_learn.constraints import wrap_pairs
 from functools import partial
 
+RNG = check_random_state(0)
 
 def build_data():
-  RNG = check_random_state(0)
   dataset = load_iris()
   X, y = shuffle(dataset.data, dataset.target, random_state=RNG)
   num_constraints = 20
-  constraints = Constraints.random_subset(y)
+  constraints = Constraints.random_subset(y, random_state=RNG)
   pairs = constraints.positive_negative_pairs(num_constraints,
                                               same_length=True,
                                               random_state=RNG)
@@ -31,7 +32,7 @@ def build_pairs():
   #  a WeaklySupervisedMetricLearner
   X, pairs = build_data()
   pairs, y = wrap_pairs(X, pairs)
-  pairs, y = shuffle(pairs, y)
+  pairs, y = shuffle(pairs, y, random_state=RNG)
   return pairs, y
 
 
@@ -41,7 +42,7 @@ def build_quadruplets():
   X, pairs = build_data()
   c = np.column_stack(pairs)
   quadruplets = X[c]
-  quadruplets = shuffle(quadruplets)
+  quadruplets = shuffle(quadruplets, random_state=RNG)
   return quadruplets, None
 
 
@@ -79,6 +80,7 @@ def test_score_pairs_pairwise(estimator, build_dataset):
   n_samples = 20
   X = X[:n_samples]
   model = clone(estimator)
+  set_random_state(model)
   model.fit(inputs, labels)
 
   pairwise = model.score_pairs(np.array(list(product(X, X))))\
@@ -103,6 +105,7 @@ def test_score_pairs_toy_example(estimator, build_dataset):
     n_samples = 20
     X = X[:n_samples]
     model = clone(estimator)
+    set_random_state(model)
     model.fit(inputs, labels)
     pairs = np.stack([X[:10], X[10:20]], axis=1)
     embedded_pairs = pairs.dot(model.transformer_.T)
@@ -118,6 +121,7 @@ def test_score_pairs_finite(estimator, build_dataset):
   # tests that the score is finite
   inputs, labels = build_dataset()
   model = clone(estimator)
+  set_random_state(model)
   model.fit(inputs, labels)
   X, _ = load_iris(return_X_y=True)
   pairs = np.array(list(product(X, X)))
@@ -132,6 +136,7 @@ def test_score_pairs_dim(estimator, build_dataset):
   # scikit-learn's error when scoring 1D arrays)
   inputs, labels = build_dataset()
   model = clone(estimator)
+  set_random_state(model)
   model.fit(inputs, labels)
   X, _ = load_iris(return_X_y=True)
   tuples = np.array(list(product(X, X)))
@@ -164,6 +169,7 @@ def test_embed_toy_example(estimator, build_dataset):
     n_samples = 20
     X = X[:n_samples]
     model = clone(estimator)
+    set_random_state(model)
     model.fit(inputs, labels)
     embedded_points = X.dot(model.transformer_.T)
     assert_array_almost_equal(model.transform(X), embedded_points)
@@ -175,6 +181,7 @@ def test_embed_dim(estimator, build_dataset):
   # Checks that the the dimension of the output space is as expected
   inputs, labels = build_dataset()
   model = clone(estimator)
+  set_random_state(model)
   model.fit(inputs, labels)
   X, _ = load_iris(return_X_y=True)
   assert model.transform(X).shape == X.shape
@@ -202,6 +209,7 @@ def test_embed_finite(estimator, build_dataset):
   # Checks that embed returns vectors with finite values
   inputs, labels = build_dataset()
   model = clone(estimator)
+  set_random_state(model)
   model.fit(inputs, labels)
   X, _ = load_iris(return_X_y=True)
   assert np.isfinite(model.transform(X)).all()
@@ -213,6 +221,7 @@ def test_embed_is_linear(estimator, build_dataset):
   # Checks that the embedding is linear
   inputs, labels = build_dataset()
   model = clone(estimator)
+  set_random_state(model)
   model.fit(inputs, labels)
   X, _ = load_iris(return_X_y=True)
   assert_array_almost_equal(model.transform(X[:10] + X[10:20]),
