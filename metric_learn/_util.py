@@ -58,11 +58,10 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
       axis (rows for a 2D array).
 
   ensure_min_features : int (default=1)
-      Make sure that the 2D array has some minimum number of features
-      (columns). The default value of 1 rejects empty datasets.
-      This check is only enforced when X has effectively 2 dimensions or
-      is originally 1D and ``ensure_2d`` is True. Setting to 0 disables
-      this check.
+      Only used when using no preprocessor. Make sure that each point in the 3D
+      array of tuples has some minimum number of features (axis=2). The default
+      value of 1 rejects empty datasets. This check is only enforced when X has
+      effectively 3 dimensions. Setting to 0 disables this check.
 
   warn_on_dtype : boolean (default=False)
       Raise DataConversionWarning if the dtype of the input data structure
@@ -79,7 +78,7 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
   if dtype == "auto":
       dtype = 'numeric' if preprocessor else None
 
-  context = make_context(estimator, preprocessor)
+  context = make_name(estimator, preprocessor)
   tuples = check_array(tuples, dtype=dtype, accept_sparse=False, copy=copy,
                        force_all_finite=force_all_finite,
                        order=order,
@@ -88,7 +87,10 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
                        ensure_min_samples=ensure_min_samples,
                        # ensure_min_features only works if ndim=2, so we will
                        # have to check again if input is 3D (see below)
-                       ensure_min_features=ensure_min_features,
+                       ensure_min_features = 0,
+                       # if 2D and preprocessor, no notion of
+                       # "features". If 3D and no preprocessor, min_features
+                       # is checked below
                        estimator=context,
                        warn_on_dtype=warn_on_dtype)
 
@@ -102,37 +104,36 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
     check_t(tuples, t, context)
   else:
     expected_shape = 2 if preprocessor else 3
-    raise ValueError("{}D array expected{}. Found {}D array "
+    raise ValueError("{} expected {}D array. Found {}D array "
                      "instead:\ninput={}.\n"
-                     .format(expected_shape, context, tuples.ndim, tuples))
+                     .format(context, expected_shape, tuples.ndim, tuples))
   return tuples
 
 
-def make_context(estimator, preprocessor):
-  """Helper function to create a string with estimator name and tell if
-  it is using a preprocessor. For instance if using NCA and preprocessor it
-  will return 'NCA when using a preprocessor'"""
+def make_name(estimator, preprocessor):
+  """Helper function to create a string with the estimator name and tell if
+  it is using a preprocessor. Will return the following for instance:
+  NCA + preprocessor: 'NCA's preprocessor'
+  NCA + no preprocessor: 'NCA'
+  None + preprocessor: 'a preprocessor'
+  None + None: None"""
   if estimator is not None:
+      with_preprocessor = "'s preprocessor" if preprocessor else ''
       if isinstance(estimator, six.string_types):
-          estimator_name = estimator
+          estimator_name = estimator + with_preprocessor
       else:
-          estimator_name = estimator.__class__.__name__
+          estimator_name = estimator.__class__.__name__ + with_preprocessor
   else:
-      estimator_name = None
-  context = ("by {}".format(estimator_name) if estimator_name is not None
-             else "")
-  with_preprocessor = ('when using {} preprocessor'
-                       .format('a' if preprocessor else 'no'))
-  context += with_preprocessor
-  return context
+      estimator_name = None if not preprocessor else 'a preprocessor'
+  return estimator_name
 
 
 def check_t(tuples, t, context):
   """Helper function to check that the number of points in each tuple is
   equal to t (e.g. 2 for pairs), and raise a `ValueError` otherwise"""
   if t is not None and tuples.shape[1] != t:
-    msg_t = (("Tuples of {} elements expected{}. Got tuples of {} "
-             "elements instead (shape={}):\ninput={}.\n")
+    msg_t = (("Tuples of {} element(s) expected{}. Got tuples of {} "
+             "element(s) instead (shape={}):\ninput={}.\n")
              .format(t, context, tuples.shape[1], tuples.shape, tuples))
     raise ValueError(msg_t)
 
