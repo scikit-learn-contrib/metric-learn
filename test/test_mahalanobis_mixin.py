@@ -150,13 +150,9 @@ def check_is_distance_matrix(pairwise):
   assert np.array_equal(pairwise, pairwise.T)  # symmetry
   assert (pairwise.diagonal() == 0).all()  # identity
   # triangular inequality
-  rows, cols = pairwise.shape
-  tol = np.finfo(float).eps
-  for i in range(rows):
-    for j in range(i, cols):
-      direct_dist = pairwise[i, j]
-      triangle_dist = np.add.outer(pairwise[i], pairwise[:, j])
-      assert (direct_dist <= triangle_dist + tol).all()
+  tol = 1e-15
+  assert (pairwise <= pairwise[:, :, np.newaxis]
+          + pairwise[:, np.newaxis, :] + tol).all()
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
