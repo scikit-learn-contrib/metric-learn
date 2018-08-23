@@ -7,7 +7,7 @@ def test_check_tuples():
   X = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
   check_tuples(X)
 
-  X = np.array(5)
+  X = 5
   msg = ("Expected 3D array, got scalar instead. Cannot apply this function "
          "on scalars.")
   with pytest.raises(ValueError, message=msg):
