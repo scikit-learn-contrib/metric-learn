@@ -29,7 +29,7 @@ class BaseMetricLearner(BaseEstimator):
     """
 
 
-class MetricTransformer():
+class MetricTransformer(object):
 
   def transform(self, X):
     """Applies the metric transformation.
@@ -256,4 +256,4 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
       The quadruplets score.
     """
     quadruplets = check_tuples(quadruplets)
-    return - np.mean(self.predict(quadruplets))
+    return -np.mean(self.predict(quadruplets))
