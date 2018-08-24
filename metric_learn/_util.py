@@ -95,9 +95,10 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
                        estimator=name,
                        warn_on_dtype=warn_on_dtype)
 
-  if tuples.ndim == 2:  # in this case there is left to check if t is OK
+  if tuples.ndim == 2 and preprocessor:  # in this case there is left to check
+      # if t is OK
     check_t(tuples, t, context)
-  elif tuples.ndim == 3:
+  elif tuples.ndim == 3 and not preprocessor:
     # if the dimension is 3 we still have to check that the num_features is OK
     if ensure_min_features > 0:
       n_features = tuples.shape[2]
