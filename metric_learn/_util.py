@@ -76,7 +76,7 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
     The validated tuples.
   """
   if dtype == "auto":
-      dtype = 'numeric' if preprocessor else None
+    dtype = 'numeric' if not preprocessor else None
 
   name = make_name(estimator, preprocessor)
   context = ' by ' + name if name is not None else ''
