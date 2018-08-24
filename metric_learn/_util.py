@@ -113,7 +113,7 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
     expected_shape = 2 if preprocessor else 3
     raise ValueError("{}D array expected{}. Found {}D array "
                      "instead:\ninput={}.\n"
-                     .format(context, expected_shape, tuples.ndim, tuples))
+                     .format(expected_shape, context, tuples.ndim, tuples))
   return tuples
 
 
