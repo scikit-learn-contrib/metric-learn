@@ -48,7 +48,8 @@ class _BaseLSML(MahalanobisMixin):
     quadruplets = check_array(quadruplets, accept_sparse=False,
                               ensure_2d=False, allow_nd=True)
     self.check_preprocessor()
-    quadruplets = check_tuples(quadruplets, preprocessor=self.preprocessor,
+    quadruplets = check_tuples(quadruplets,
+                               preprocessor=self.preprocessor_ is not None,
                                t=4, estimator=self)
     quadruplets = self.format_input(quadruplets)
 

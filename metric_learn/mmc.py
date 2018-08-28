@@ -75,8 +75,8 @@ class _BaseMMC(MahalanobisMixin):
     # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
                          ensure_2d=False, allow_nd=True)
-    pairs = check_tuples(pairs, preprocessor=self.preprocessor, t=2,
-                         estimator=self)
+    pairs = check_tuples(pairs, preprocessor=self.preprocessor_ is not None,
+                         t=2, estimator=self)
     pairs = self.format_input(pairs)
 
     # check to make sure that no two constrained vectors are identical

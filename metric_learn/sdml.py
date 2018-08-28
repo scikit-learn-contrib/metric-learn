@@ -54,8 +54,8 @@ class _BaseSDML(MahalanobisMixin):
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
                          ensure_2d=False, allow_nd=True)
     self.check_preprocessor()
-    pairs = check_tuples(pairs, preprocessor=self.preprocessor, t=2,
-                         estimator=self)
+    pairs = check_tuples(pairs, preprocessor=self.preprocessor_ is not None,
+                         t=2, estimator=self)
     pairs = self.format_input(pairs)
 
     # set up prior M
