@@ -47,7 +47,7 @@ particular form of input data.
    metric_learn.rca
    metric_learn.mmc
 
-Note that each semi-supervised algorithm has a supervised version of the form
+Note that each weakly-supervised algorithm has a supervised version of the form
 `*_Supervised` where similarity constraints are generated from
 the labels information and passed to the underlying algorithm.
 
