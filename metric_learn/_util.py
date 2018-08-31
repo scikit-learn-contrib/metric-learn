@@ -131,7 +131,7 @@ def make_name(estimator, preprocessor):
       else:
           estimator_name = estimator.__class__.__name__ + with_preprocessor
   else:
-      estimator_name = None if not preprocessor else 'the preprocessor'
+      estimator_name = None if not preprocessor else 'a preprocessor'
   return estimator_name
 
 
