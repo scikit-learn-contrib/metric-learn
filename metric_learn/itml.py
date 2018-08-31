@@ -14,6 +14,7 @@ Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
 """
 
 from __future__ import print_function, absolute_import
+import warnings
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
@@ -143,7 +144,8 @@ class ITML(BaseMetricLearner):
 class ITML_Supervised(ITML):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               num_constraints=None, bounds=None, A0=None, verbose=False):
+               num_labeled='deprecated', num_constraints=None, bounds=None,
+               A0=None, verbose=False):
     """Initialize the supervised version of `ITML`.
 
     `ITML_Supervised` creates pairs of similar sample by taking same class
@@ -156,6 +158,10 @@ class ITML_Supervised(ITML):
         value for slack variables
     max_iter : int, optional
     convergence_threshold : float, optional
+    num_labeled : Not used
+          .. deprecated:: 0.4.0
+        `num_labeled` was deprecated in version 0.4.0 and will
+        be removed in 0.5.0.
     num_constraints: int, optional
         number of constraints to generate
     bounds : list (pos,neg) pairs, optional
@@ -164,10 +170,12 @@ class ITML_Supervised(ITML):
         initial regularization matrix, defaults to identity
     verbose : bool, optional
         if True, prints information while learning
+        learning_rate : Not used
     """
     ITML.__init__(self, gamma=gamma, max_iter=max_iter,
                   convergence_threshold=convergence_threshold,
                   A0=A0, verbose=verbose)
+    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds
 
@@ -185,6 +193,10 @@ class ITML_Supervised(ITML):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
+    if self.num_labeled != 'deprecated':
+      warnings.warn('"num_labeled" parameter is not used.'
+                    ' It has been deprecated in version 0.4 and will be'
+                    'removed in 0.5', DeprecationWarning)
     X, y = check_X_y(X, y)
     num_constraints = self.num_constraints
     if num_constraints is None:

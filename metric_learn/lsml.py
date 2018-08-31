@@ -8,6 +8,7 @@ Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
 """
 
 from __future__ import print_function, absolute_import, division
+import warnings
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
@@ -133,7 +134,8 @@ class LSML(BaseMetricLearner):
 
 class LSML_Supervised(LSML):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,
-               num_constraints=None, weights=None, verbose=False):
+               num_labeled='deprecated', num_constraints=None, weights=None,
+               verbose=False):
     """Initialize the supervised version of `LSML`.
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
@@ -147,6 +149,10 @@ class LSML_Supervised(LSML):
     max_iter : int, optional
     prior : (d x d) matrix, optional
         guess at a metric [default: covariance(X)]
+    num_labeled : Not used
+      .. deprecated:: 0.4.0
+         `num_labeled` was deprecated in version 0.4.0 and will
+         be removed in 0.5.0.
     num_constraints: int, optional
         number of constraints to generate
     weights : (m,) array of floats, optional
@@ -156,6 +162,7 @@ class LSML_Supervised(LSML):
     """
     LSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                   verbose=verbose)
+    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights
 
@@ -173,6 +180,10 @@ class LSML_Supervised(LSML):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
+    if self.num_labeled != 'deprecated':
+      warnings.warn('"num_labeled" parameter is not used.'
+                    ' It has been deprecated in version 0.4 and will be'
+                    'removed in 0.5', DeprecationWarning)
     X, y = check_X_y(X, y)
     num_constraints = self.num_constraints
     if num_constraints is None:

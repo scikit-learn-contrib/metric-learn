@@ -30,7 +30,8 @@ ITML(A0=None, convergence_threshold=0.001, gamma=1.0, max_iter=1000,
 """.strip('\n'))
     self.assertEqual(str(metric_learn.ITML_Supervised()), """
 ITML_Supervised(A0=None, bounds=None, convergence_threshold=0.001, gamma=1.0,
-        max_iter=1000, num_constraints=None, verbose=False)
+        max_iter=1000, num_constraints=None, num_labeled='deprecated',
+        verbose=False)
 """.strip('\n'))
 
   def test_lsml(self):
@@ -38,8 +39,8 @@ ITML_Supervised(A0=None, bounds=None, convergence_threshold=0.001, gamma=1.0,
         str(metric_learn.LSML()),
         "LSML(max_iter=1000, prior=None, tol=0.001, verbose=False)")
     self.assertEqual(str(metric_learn.LSML_Supervised()), """
-LSML_Supervised(max_iter=1000, num_constraints=None, prior=None, tol=0.001,
-        verbose=False, weights=None)
+LSML_Supervised(max_iter=1000, num_constraints=None, num_labeled='deprecated',
+        prior=None, tol=0.001, verbose=False, weights=None)
 """.strip('\n'))
 
   def test_sdml(self):
@@ -47,8 +48,9 @@ LSML_Supervised(max_iter=1000, num_constraints=None, prior=None, tol=0.001,
                      "SDML(balance_param=0.5, sparsity_param=0.01, "
                      "use_cov=True, verbose=False)")
     self.assertEqual(str(metric_learn.SDML_Supervised()), """
-SDML_Supervised(balance_param=0.5, num_constraints=None, sparsity_param=0.01,
-        use_cov=True, verbose=False)
+SDML_Supervised(balance_param=0.5, num_constraints=None,
+        num_labeled='deprecated', sparsity_param=0.01, use_cov=True,
+        verbose=False)
 """.strip('\n'))
 
   def test_rca(self):
@@ -71,7 +73,7 @@ MMC(A0=None, convergence_threshold=0.001, diagonal=False, diagonal_c=1.0,
     self.assertEqual(str(metric_learn.MMC_Supervised()), """
 MMC_Supervised(A0=None, convergence_threshold=1e-06, diagonal=False,
         diagonal_c=1.0, max_iter=100, max_proj=10000, num_constraints=None,
-        verbose=False)
+        num_labeled='deprecated', verbose=False)
 """.strip('\n'))
 
 if __name__ == '__main__':

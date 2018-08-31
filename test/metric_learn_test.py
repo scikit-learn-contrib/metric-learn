@@ -55,6 +55,17 @@ class TestLSML(MetricTestCase):
     csep = class_separation(lsml.transform(), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible
 
+  def test_deprecation(self):
+    # test that the right deprecation message is thrown.
+    # TODO: remove in v.0.5
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    lsml_supervised = LSML_Supervised(num_labeled=np.inf)
+    msg = ('"num_labeled" parameter is not used.'
+           ' It has been deprecated in version 0.4 and will be'
+           'removed in 0.5')
+    assert_warns_message(DeprecationWarning, msg, lsml_supervised.fit, X, y)
+
 
 class TestITML(MetricTestCase):
   def test_iris(self):
@@ -63,6 +74,17 @@ class TestITML(MetricTestCase):
 
     csep = class_separation(itml.transform(), self.iris_labels)
     self.assertLess(csep, 0.2)
+
+  def test_deprecation(self):
+    # test that the right deprecation message is thrown.
+    # TODO: remove in v.0.5
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    itml_supervised = ITML_Supervised(num_labeled=np.inf)
+    msg = ('"num_labeled" parameter is not used.'
+           ' It has been deprecated in version 0.4 and will be'
+           'removed in 0.5')
+    assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
 
 
 class TestLMNN(MetricTestCase):
@@ -117,6 +139,17 @@ class TestSDML(MetricTestCase):
     sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
     csep = class_separation(sdml.transform(), self.iris_labels)
     self.assertLess(csep, 0.25)
+
+  def test_deprecation(self):
+    # test that the right deprecation message is thrown.
+    # TODO: remove in v.0.5
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    sdml_supervised = SDML_Supervised(num_labeled=np.inf)
+    msg = ('"num_labeled" parameter is not used.'
+           ' It has been deprecated in version 0.4 and will be'
+           'removed in 0.5')
+    assert_warns_message(DeprecationWarning, msg, sdml_supervised.fit, X, y)
 
 
 class TestNCA(MetricTestCase):
@@ -342,6 +375,17 @@ class TestMMC(MetricTestCase):
     mmc.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mmc.transform(), self.iris_labels)
     self.assertLess(csep, 0.2)
+
+  def test_deprecation(self):
+    # test that the right deprecation message is thrown.
+    # TODO: remove in v.0.5
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mmc_supervised = MMC_Supervised(num_labeled=np.inf)
+    msg = ('"num_labeled" parameter is not used.'
+           ' It has been deprecated in version 0.4 and will be'
+           'removed in 0.5')
+    assert_warns_message(DeprecationWarning, msg, mmc_supervised.fit, X, y)
 
 
 @pytest.mark.parametrize(('algo_class', 'dataset'),

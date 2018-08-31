@@ -9,6 +9,7 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 """
 
 from __future__ import absolute_import
+import warnings
 import numpy as np
 from scipy.sparse.csgraph import laplacian
 from sklearn.covariance import graph_lasso
@@ -82,7 +83,7 @@ class SDML(BaseMetricLearner):
 
 class SDML_Supervised(SDML):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_constraints=None, verbose=False):
+               num_labeled='deprecated', num_constraints=None, verbose=False):
     """Initialize the supervised version of `SDML`.
 
     `SDML_Supervised` creates pairs of similar sample by taking same class
@@ -97,6 +98,10 @@ class SDML_Supervised(SDML):
         trade off between optimizer and sparseness (see graph_lasso)
     use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
+    num_labeled : Not used
+      .. deprecated:: 0.4.0
+         `num_labeled` was deprecated in version 0.4.0 and will
+         be removed in 0.5.0.
     num_constraints : int, optional
         number of constraints to generate
     verbose : bool, optional
@@ -105,6 +110,7 @@ class SDML_Supervised(SDML):
     SDML.__init__(self, balance_param=balance_param,
                   sparsity_param=sparsity_param, use_cov=use_cov,
                   verbose=verbose)
+    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
   def fit(self, X, y, random_state=np.random):
@@ -125,6 +131,10 @@ class SDML_Supervised(SDML):
     self : object
         Returns the instance.
     """
+    if self.num_labeled != 'deprecated':
+      warnings.warn('"num_labeled" parameter is not used.'
+                    ' It has been deprecated in version 0.4 and will be'
+                    'removed in 0.5', DeprecationWarning)
     y = check_array(y, ensure_2d=False)
     num_constraints = self.num_constraints
     if num_constraints is None:

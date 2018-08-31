@@ -17,6 +17,7 @@ Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/co
 """
 
 from __future__ import print_function, absolute_import, division
+import warnings
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
@@ -384,8 +385,8 @@ class MMC(BaseMetricLearner):
 class MMC_Supervised(MMC):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_constraints=None, A0=None, diagonal=False,
-               diagonal_c=1.0, verbose=False):
+               num_labeled='deprecated', num_constraints=None, A0=None,
+               diagonal=False, diagonal_c=1.0, verbose=False):
     """Initialize the supervised version of `MMC`.
 
     `MMC_Supervised` creates pairs of similar sample by taking same class
@@ -397,6 +398,10 @@ class MMC_Supervised(MMC):
     max_iter : int, optional
     max_proj : int, optional
     convergence_threshold : float, optional
+    num_labeled : Not used
+      .. deprecated:: 0.4.0
+         `num_labeled` was deprecated in version 0.4.0 and will
+         be removed in 0.5.0.
     num_constraints: int, optional
         number of constraints to generate
     A0 : (d x d) matrix, optional
@@ -415,6 +420,7 @@ class MMC_Supervised(MMC):
                  convergence_threshold=convergence_threshold,
                  A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
                  verbose=verbose)
+    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
   def fit(self, X, y, random_state=np.random):
@@ -429,6 +435,10 @@ class MMC_Supervised(MMC):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
+    if self.num_labeled != 'deprecated':
+      warnings.warn('"num_labeled" parameter is not used.'
+                    ' It has been deprecated in version 0.4 and will be'
+                    'removed in 0.5', DeprecationWarning)
     X, y = check_X_y(X, y)
     num_constraints = self.num_constraints
     if num_constraints is None:
