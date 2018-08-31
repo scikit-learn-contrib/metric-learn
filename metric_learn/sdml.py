@@ -82,7 +82,7 @@ class SDML(BaseMetricLearner):
 
 class SDML_Supervised(SDML):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_labeled=np.inf, num_constraints=None, verbose=False):
+               num_constraints=None, verbose=False):
     """
     Parameters
     ----------
@@ -92,8 +92,6 @@ class SDML_Supervised(SDML):
         trade off between optimizer and sparseness (see graph_lasso)
     use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
-    num_labeled : int, optional
-        number of labels to preserve for training
     num_constraints : int, optional
         number of constraints to generate
     verbose : bool, optional
@@ -102,7 +100,6 @@ class SDML_Supervised(SDML):
     SDML.__init__(self, balance_param=balance_param,
                   sparsity_param=sparsity_param, use_cov=use_cov,
                   verbose=verbose)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
   def fit(self, X, y, random_state=np.random):
@@ -129,7 +126,6 @@ class SDML_Supervised(SDML):
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
-    c = Constraints.random_subset(y, self.num_labeled,
-                                  random_state=random_state)
+    c = Constraints(y)
     adj = c.adjacency_matrix(num_constraints, random_state=random_state)
     return SDML.fit(self, X, adj)

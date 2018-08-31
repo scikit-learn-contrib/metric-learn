@@ -384,8 +384,8 @@ class MMC(BaseMetricLearner):
 class MMC_Supervised(MMC):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_labeled=np.inf, num_constraints=None,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
+               num_constraints=None, A0=None, diagonal=False,
+               diagonal_c=1.0, verbose=False):
     """Initialize the learner.
 
     Parameters
@@ -393,8 +393,6 @@ class MMC_Supervised(MMC):
     max_iter : int, optional
     max_proj : int, optional
     convergence_threshold : float, optional
-    num_labeled : int, optional
-        number of labels to preserve for training
     num_constraints: int, optional
         number of constraints to generate
     A0 : (d x d) matrix, optional
@@ -413,7 +411,6 @@ class MMC_Supervised(MMC):
                  convergence_threshold=convergence_threshold,
                  A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
                  verbose=verbose)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
   def fit(self, X, y, random_state=np.random):
@@ -434,8 +431,7 @@ class MMC_Supervised(MMC):
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
-    c = Constraints.random_subset(y, self.num_labeled,
-                                  random_state=random_state)
+    c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     return MMC.fit(self, X, pos_neg)

@@ -132,7 +132,7 @@ class LSML(BaseMetricLearner):
 
 
 class LSML_Supervised(LSML):
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
                num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.
 
@@ -142,8 +142,6 @@ class LSML_Supervised(LSML):
     max_iter : int, optional
     prior : (d x d) matrix, optional
         guess at a metric [default: covariance(X)]
-    num_labeled : int, optional
-        number of labels to preserve for training
     num_constraints: int, optional
         number of constraints to generate
     weights : (m,) array of floats, optional
@@ -153,7 +151,6 @@ class LSML_Supervised(LSML):
     """
     LSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                   verbose=verbose)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights
 
@@ -177,8 +174,7 @@ class LSML_Supervised(LSML):
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
-    c = Constraints.random_subset(y, self.num_labeled,
-                                  random_state=random_state)
+    c = Constraints(y)
     pairs = c.positive_negative_pairs(num_constraints, same_length=True,
                                       random_state=random_state)
     return LSML.fit(self, X, pairs, weights=self.weights)

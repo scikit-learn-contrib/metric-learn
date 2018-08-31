@@ -143,8 +143,7 @@ class ITML(BaseMetricLearner):
 class ITML_Supervised(ITML):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
-               verbose=False):
+               num_constraints=None, bounds=None, A0=None, verbose=False):
     """Initialize the learner.
 
     Parameters
@@ -153,8 +152,6 @@ class ITML_Supervised(ITML):
         value for slack variables
     max_iter : int, optional
     convergence_threshold : float, optional
-    num_labeled : int, optional
-        number of labels to preserve for training
     num_constraints: int, optional
         number of constraints to generate
     bounds : list (pos,neg) pairs, optional
@@ -167,7 +164,6 @@ class ITML_Supervised(ITML):
     ITML.__init__(self, gamma=gamma, max_iter=max_iter,
                   convergence_threshold=convergence_threshold,
                   A0=A0, verbose=verbose)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds
 
@@ -191,8 +187,7 @@ class ITML_Supervised(ITML):
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
-    c = Constraints.random_subset(y, self.num_labeled,
-                                  random_state=random_state)
+    c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     return ITML.fit(self, X, pos_neg, bounds=self.bounds)
