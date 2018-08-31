@@ -386,15 +386,21 @@ class MMC_Supervised(MMC):
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
-    """Initialize the learner.
+    """Initialize the supervised version of `MMC`.
+
+    `MMC_Supervised` creates pairs of similar sample by taking same class
+    samples, and pairs of dissimilar samples by taking different class
+    samples. It then passes these pairs to `MMC` for training.
 
     Parameters
     ----------
     max_iter : int, optional
     max_proj : int, optional
     convergence_threshold : float, optional
-    num_labeled : int, optional
-        number of labels to preserve for training
+    num_labeled : int, optional (default=np.inf)
+        number of labeled points to keep for building pairs. Extra
+        labeled points will be considered unlabeled, and ignored as such.
+        Use np.inf (default) to use all labeled points.
     num_constraints: int, optional
         number of constraints to generate
     A0 : (d x d) matrix, optional
