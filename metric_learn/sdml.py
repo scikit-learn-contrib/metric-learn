@@ -83,7 +83,12 @@ class SDML(BaseMetricLearner):
 class SDML_Supervised(SDML):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_constraints=None, verbose=False):
-    """
+    """Initialize the supervised version of `SDML`.
+
+    `SDML_Supervised` creates pairs of similar sample by taking same class
+    samples, and pairs of dissimilar samples by taking different class
+    samples. It then passes these pairs to `SDML` for training.
+
     Parameters
     ----------
     balance_param : float, optional

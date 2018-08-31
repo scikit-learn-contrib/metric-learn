@@ -6,6 +6,7 @@ Metric Learning for Kernel Regression (MLKR)
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :special-members: __init__
 
 Example Code
 ------------

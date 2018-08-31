@@ -386,7 +386,11 @@ class MMC_Supervised(MMC):
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_constraints=None, A0=None, diagonal=False,
                diagonal_c=1.0, verbose=False):
-    """Initialize the learner.
+    """Initialize the supervised version of `MMC`.
+
+    `MMC_Supervised` creates pairs of similar sample by taking same class
+    samples, and pairs of dissimilar samples by taking different class
+    samples. It then passes these pairs to `MMC` for training.
 
     Parameters
     ----------

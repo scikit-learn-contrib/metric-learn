@@ -134,7 +134,12 @@ class LSML(BaseMetricLearner):
 class LSML_Supervised(LSML):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,
                num_constraints=None, weights=None, verbose=False):
-    """Initialize the learner.
+    """Initialize the supervised version of `LSML`.
+
+    `LSML_Supervised` creates quadruplets from labeled samples by taking two
+    samples from the same class, and two samples from different classes.
+    This way it builds quadruplets where the two first points must be more
+    similar than the two last points.
 
     Parameters
     ----------
