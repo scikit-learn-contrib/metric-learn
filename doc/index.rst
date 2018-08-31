@@ -16,10 +16,10 @@ metric learning algorithms.
 Supervised Algorithms
 ---------------------
 Supervised metric learning algorithms take as inputs points `X` and target
-labels `y`, and learn to make points from the same class (for classification)
-or with close target value (for regression) close to each other, and points
-from different classes or with distant target values far away from each
-other.
+labels `y`, and learn a distance matrix that make points from the same class
+(for classification) or with close target value (for regression) close to
+each other, and points from different classes or with distant target values
+far away from each other.
 
 .. toctree::
    :maxdepth: 1
@@ -30,12 +30,13 @@ other.
    metric_learn.lfda
    metric_learn.mlkr
 
-Semi-Supervised Algorithms
+Weakly-Supervised Algorithms
 --------------------------
-Semi-supervised algorithms do the same, but work on a weaker information about
-similarities between data points, for instance pairs of similar and dissimilar
-points. See each of the following algorithm for its particular form of input
-data.
+Weakly supervised algorithms work on weaker information about the data points
+than supervised algorithms. Rather than labeled points, they take as input
+similarity judgments on tuples of data points, for instance pairs of similar
+and dissimilar points. Refer to the documentation of each algorithm for its
+particular form of input data.
 
 .. toctree::
    :maxdepth: 1

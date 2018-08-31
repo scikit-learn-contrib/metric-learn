@@ -137,9 +137,9 @@ class LSML_Supervised(LSML):
     """Initialize the supervised version of `LSML`.
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
-    samples from the same class, and two samples from different classes, and
-    concatenating them. This way it builds quadruplets where the two first
-    points must be more similar than the two last points.
+    samples from the same class, and two samples from different classes.
+    This way it builds quadruplets where the two first points must be more
+    similar than the two last points.
 
     Parameters
     ----------
@@ -148,8 +148,9 @@ class LSML_Supervised(LSML):
     prior : (d x d) matrix, optional
         guess at a metric [default: covariance(X)]
     num_labeled : int, optional (default=np.inf)
-        number of labels to preserve for training. If np.inf (default),
-        uses all the labels.
+        number of labeled points to keep for building quadruplets. Extra
+        labeled points will be considered unlabeled, and ignored as such.
+        Use np.inf (default) to use all labeled points.
     num_constraints: int, optional
         number of constraints to generate
     weights : (m,) array of floats, optional

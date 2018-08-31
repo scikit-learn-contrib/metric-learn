@@ -158,8 +158,9 @@ class ITML_Supervised(ITML):
     max_iter : int, optional
     convergence_threshold : float, optional
     num_labeled : int, optional (default=np.inf)
-        number of labels to preserve for training. If np.inf (default),
-        uses all the labels.
+        number of labeled points to keep for building pairs. Extra
+        labeled points will be considered unlabeled, and ignored as such.
+        Use np.inf (default) to use all labeled points.
     num_constraints: int, optional
         number of constraints to generate
     bounds : list (pos,neg) pairs, optional
