@@ -31,13 +31,14 @@ class BaseMetricLearner(BaseEstimator):
 
 class MetricTransformer():
 
+  @abstractmethod
   def transform(self, X):
     """Applies the metric transformation.
 
     Parameters
     ----------
-    X : (n x d) matrix, optional
-        Data to transform. If not supplied, the training data will be used.
+    X : (n x d) matrix
+        Data to transform.
 
     Returns
     -------
