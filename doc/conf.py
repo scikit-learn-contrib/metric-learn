@@ -15,7 +15,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'metric-learn'
-copyright = u'2015-2017, CJ Carey and Yuan Tang'
+copyright = u'2015-2018, CJ Carey and Yuan Tang'
 author = u'CJ Carey and Yuan Tang'
 version = '0.4.0'
 release = '0.4.0'
