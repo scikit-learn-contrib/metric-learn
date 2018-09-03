@@ -29,7 +29,7 @@ class BaseMetricLearner(BaseEstimator):
     """
 
 
-class MetricTransformer():
+class MetricTransformer(object):
 
   @abstractmethod
   def transform(self, X):
@@ -63,8 +63,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
   Attributes
   ----------
-  transformer_ : `np.ndarray`, shape=(num_dims, n_features)
-    The learned linear transformation ``L``.
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
   """
 
   def score_pairs(self, pairs):
@@ -117,7 +117,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   def metric(self):
     return self.transformer_.T.dot(self.transformer_)
 
-  def _transformer_from_metric(self, metric):
+  def transformer_from_metric(self, metric):
     """Computes the transformation matrix from the Mahalanobis matrix.
 
     Since by definition the metric `M` is positive semi-definite (PSD), it
@@ -257,4 +257,4 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
       The quadruplets score.
     """
     quadruplets = check_tuples(quadruplets)
-    return - np.mean(self.predict(quadruplets))
+    return -np.mean(self.predict(quadruplets))

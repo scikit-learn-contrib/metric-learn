@@ -132,11 +132,19 @@ class _BaseITML(MahalanobisMixin):
       print('itml converged at iter: %d, conv = %f' % (it, conv))
     self.n_iter_ = it
 
-    self.transformer_ = self._transformer_from_metric(self.A_)
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
 
 class ITML(_BaseITML, _PairsClassifierMixin):
+  """Information Theoretic Metric Learning (ITML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
 
   def fit(self, pairs, y, bounds=None):
     """Learn the ITML model.
@@ -159,7 +167,15 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
 
 class ITML_Supervised(_BaseITML, TransformerMixin):
-  """Information Theoretic Metric Learning (ITML)"""
+  """Supervised version of Information Theoretic Metric Learning (ITML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See `transformer_from_metric`.)
+  """
+
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
                verbose=False):
@@ -191,6 +207,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   def fit(self, X, y, random_state=np.random):
     """Create constraints from labels and learn the ITML model.
+
 
     Parameters
     ----------

@@ -37,7 +37,14 @@ def _chunk_mean_centering(data, chunks):
 
 
 class RCA(MahalanobisMixin, TransformerMixin):
-  """Relevant Components Analysis (RCA)"""
+  """Relevant Components Analysis (RCA)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
   def __init__(self, num_dims=None, pca_comps=None):
     """Initialize the learner.
 
@@ -134,6 +141,14 @@ def _inv_sqrtm(x):
 
 
 class RCA_Supervised(RCA):
+  """Supervised version of Relevant Components Analysis (RCA)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
   def __init__(self, num_dims=None, pca_comps=None, num_chunks=100,
                chunk_size=2):
     """Initialize the learner.

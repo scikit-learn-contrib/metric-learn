@@ -28,7 +28,7 @@ def check_tuples(tuples):
     The validated input.
   """
   # If input is scalar raise error
-  if len(tuples.shape) == 0:
+  if np.isscalar(tuples):
     raise ValueError(
       "Expected 3D array, got scalar instead. Cannot apply this function on "
       "scalars.")
