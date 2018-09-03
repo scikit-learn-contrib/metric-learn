@@ -99,9 +99,9 @@ class SDML_Supervised(SDML):
     use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
     num_labeled : Not used
-      .. deprecated:: 0.4.0
-         `num_labeled` was deprecated in version 0.4.0 and will
-         be removed in 0.5.0.
+      .. deprecated:: 0.5.0
+         `num_labeled` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0.
     num_constraints : int, optional
         number of constraints to generate
     verbose : bool, optional
