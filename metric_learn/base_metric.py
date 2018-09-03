@@ -8,7 +8,7 @@ import six
 from ._util import check_tuples
 
 
-class BaseMetricLearner(BaseEstimator):
+class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
   def __init__(self):
     raise NotImplementedError('BaseMetricLearner should not be instantiated')
 
@@ -29,7 +29,7 @@ class BaseMetricLearner(BaseEstimator):
     """
 
 
-class MetricTransformer(object):
+class MetricTransformer(six.with_metaclass(ABCMeta)):
 
   @abstractmethod
   def transform(self, X):
