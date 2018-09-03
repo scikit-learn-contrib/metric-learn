@@ -9,8 +9,6 @@ from ._util import check_tuples
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
-  def __init__(self):
-    raise NotImplementedError('BaseMetricLearner should not be instantiated')
 
   @abstractmethod
   def score_pairs(self, pairs):
