@@ -108,7 +108,7 @@ class _BaseLSML(MahalanobisMixin):
         print("Didn't converge after", it, "iterations. Final loss:", s_best)
     self.n_iter_ = it
 
-    self.transformer_ = self._transformer_from_metric(self.M_)
+    self.transformer_ = self.transformer_from_metric(self.M_)
     return self
 
   def _comparison_loss(self, metric):
@@ -138,6 +138,14 @@ class _BaseLSML(MahalanobisMixin):
 
 
 class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
+  """Least Squared-residual Metric Learning (LSML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
 
   def fit(self, quadruplets, weights=None):
     """Learn the LSML model.
@@ -164,6 +172,15 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
 
 class LSML_Supervised(_BaseLSML, TransformerMixin):
+  """Supervised version of Least Squared-residual Metric Learning (LSML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
                num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.

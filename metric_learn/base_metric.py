@@ -3,12 +3,12 @@ from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_array, _is_arraylike
 from sklearn.metrics import roc_auc_score
 import numpy as np
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 import six
 from ._util import check_tuples, SimplePreprocessor
 
 
-class BaseMetricLearner(BaseEstimator):
+class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
 
   def __init__(self, preprocessor=None):
     """
@@ -21,26 +21,50 @@ class BaseMetricLearner(BaseEstimator):
     """
     self.preprocessor = preprocessor
 
+  @abstractmethod
+  def score_pairs(self, pairs):
+      """Returns the score between pairs
+      (can be a similarity, or a distance/metric depending on the algorithm)
+
+      Parameters
+      ----------
+      pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
+        3D array of pairs.
+
+      Returns
+      -------
+      scores: `numpy.ndarray` of shape=(n_pairs,)
+        The score of every pair.
+      """
+
   def check_preprocessor(self):
     if _is_arraylike(self.preprocessor):
       self.preprocessor_ = SimplePreprocessor(self.preprocessor)
     else:
       self.preprocessor_ = self.preprocessor
 
-  def score_pairs(self, pairs):
-    """Returns the score between pairs
-    (can be a similarity, or a distance/metric depending on the algorithm)
+  def metric(self):
+    """Computes the Mahalanobis matrix from the transformation matrix.
 
-    Parameters
-    ----------
-    pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
-      3D array of pairs.
+    .. math:: M = L^{\\top} L
 
     Returns
     -------
-    scores: `numpy.ndarray` of shape=(n_pairs,)
-      The score of every pair.
+    M : (d x d) matrix
     """
+    L = self.transformer()
+    return L.T.dot(L)
+
+  def transformer(self):
+    """Computes the transformation matrix from the Mahalanobis matrix.
+
+    L = cholesky(M).T
+
+    Returns
+    -------
+    L : upper triangular (d x d) matrix
+    """
+    return cholesky(self.metric()).T
 
   def format_input(self, input):
     if self.preprocessor is not None:
@@ -48,16 +72,16 @@ class BaseMetricLearner(BaseEstimator):
     else:
       return input
 
+class MetricTransformer(six.with_metaclass(ABCMeta)):
 
-class MetricTransformer():
-
+  @abstractmethod
   def transform(self, X):
     """Applies the metric transformation.
 
     Parameters
     ----------
-    X : (n x d) matrix, optional
-        Data to transform. If not supplied, the training data will be used.
+    X : (n x d) matrix
+        Data to transform.
 
     Returns
     -------
@@ -82,7 +106,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
   Attributes
   ----------
-  transformer_ : `np.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
     The learned linear transformation ``L``.
   """
 
@@ -140,7 +164,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   def metric(self):
     return self.transformer_.T.dot(self.transformer_)
 
-  def _transformer_from_metric(self, metric):
+  def transformer_from_metric(self, metric):
     """Computes the transformation matrix from the Mahalanobis matrix.
 
     Since by definition the metric `M` is positive semi-definite (PSD), it
@@ -162,7 +186,6 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       return np.sqrt(metric)
     elif not np.isclose(np.linalg.det(metric), 0):
       return cholesky(metric).T
-    else:
       w, V = np.linalg.eigh(metric)
       return V.T * np.sqrt(np.maximum(0, w[:, None]))
 
@@ -246,33 +269,13 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     """
     quadruplets = check_tuples(quadruplets,
                                preprocessor=self.preprocessor_ is not None)
-    return np.sign(self.decision_function(quadruplets))
-
-  def decision_function(self, quadruplets):
-    """Predicts differences between sample distances in input quadruplets.
-
-    For each quadruplet of samples, computes the difference between the learned
-    metric of the first pair minus the learned metric of the second pair.
-
-    Parameters
-    ----------
-    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
-                  (n_quadruplets, 4)
-        3D Array of quadruplets to evaluate, with each row corresponding to
-        four points, or 2D array of indices of quadruplets if the metric
-        learner uses a preprocessor.
-
-    Returns
-    -------
-    decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
-      Metric differences.
-    """
-    quadruplets = check_tuples(quadruplets,
-                               preprocessor=self.preprocessor_ is not None)
     # we broadcast with ... because here we allow quadruplets to be
     # either a 3D array of points or 2D array of indices
     return (self.score_pairs(quadruplets[:, :2, ...]) -
             self.score_pairs(quadruplets[:, 2:, ...]))
+
+  def decision_function(self, quadruplets):
+    return self.predict(quadruplets)
 
   def score(self, quadruplets, y=None):
     """Computes score on input quadruplets
@@ -298,4 +301,4 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     """
     quadruplets = check_tuples(quadruplets,
                                preprocessor=self.preprocessor_ is not None)
-    return - np.mean(self.predict(quadruplets))
+    return -np.mean(self.predict(quadruplets))

@@ -225,7 +225,7 @@ class _BaseMMC(MahalanobisMixin):
     self.A_[:] = A_old
     self.n_iter_ = cycle
 
-    self.transformer_ = self._transformer_from_metric(self.A_)
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
   def _fit_diag(self, pairs, y):
@@ -285,7 +285,7 @@ class _BaseMMC(MahalanobisMixin):
 
     self.A_ = np.diag(w)
 
-    self.transformer_ = self._transformer_from_metric(self.A_)
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
   def _fD(self, neg_pairs, A):
@@ -367,6 +367,14 @@ class _BaseMMC(MahalanobisMixin):
 
 
 class MMC(_BaseMMC, _PairsClassifierMixin):
+  """Mahalanobis Metric for Clustering (MMC)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
 
   def fit(self, pairs, y):
     """Learn the MMC model.
@@ -390,7 +398,15 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
 
 
 class MMC_Supervised(_BaseMMC, TransformerMixin):
-  """Mahalanobis Metric for Clustering (MMC)"""
+  """Supervised version of Mahalanobis Metric for Clustering (MMC)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):

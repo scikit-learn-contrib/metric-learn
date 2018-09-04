@@ -21,7 +21,14 @@ EPS = np.finfo(float).eps
 
 
 class MLKR(MahalanobisMixin, TransformerMixin):
-  """Metric Learning for Kernel Regression (MLKR)"""
+  """Metric Learning for Kernel Regression (MLKR)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
                max_iter=1000):
     """

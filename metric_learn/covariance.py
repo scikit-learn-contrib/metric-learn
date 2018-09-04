@@ -17,6 +17,15 @@ from .base_metric import MahalanobisMixin
 
 
 class Covariance(MahalanobisMixin, TransformerMixin):
+  """Covariance metric (baseline method)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self):
     pass
 
@@ -32,5 +41,5 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     else:
       self.M_ = np.linalg.inv(self.M_)
 
-    self.transformer_ = self._transformer_from_metric(check_array(self.M_))
+    self.transformer_ = self.transformer_from_metric(check_array(self.M_))
     return self

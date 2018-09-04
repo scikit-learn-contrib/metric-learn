@@ -75,11 +75,19 @@ class _BaseSDML(MahalanobisMixin):
     emp_cov = emp_cov.T.dot(emp_cov)
     _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
 
-    self.transformer_ = self._transformer_from_metric(self.M_)
+    self.transformer_ = self.transformer_from_metric(self.M_)
     return self
 
 
 class SDML(_BaseSDML, _PairsClassifierMixin):
+  """Sparse Distance Metric Learning (SDML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
 
   def fit(self, pairs, y):
     """Learn the SDML model.
@@ -103,6 +111,15 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
 
 class SDML_Supervised(_BaseSDML, TransformerMixin):
+  """Supervised version of Sparse Distance Metric Learning (SDML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
     """

@@ -13,13 +13,13 @@ from sklearn import clone
 import numpy as np
 from sklearn.model_selection import cross_val_score, train_test_split
 
+RNG = check_random_state(0)
 
 def build_data():
-  RNG = check_random_state(0)
   dataset = load_iris()
   X, y = shuffle(dataset.data, dataset.target, random_state=RNG)
   num_constraints = 20
-  constraints = Constraints.random_subset(y)
+  constraints = Constraints.random_subset(y, random_state=RNG)
   pairs = constraints.positive_negative_pairs(num_constraints,
                                               same_length=True,
                                               random_state=RNG)
@@ -31,9 +31,9 @@ def build_pairs():
   #  a WeaklySupervisedMetricLearner
   X, pairs = build_data()
   pairs, y = wrap_pairs(X, pairs)
-  pairs, y = shuffle(pairs, y)
+  pairs, y = shuffle(pairs, y, random_state=RNG)
   (pairs_train, pairs_test, y_train,
-   y_test) = train_test_split(pairs, y)
+   y_test) = train_test_split(pairs, y, random_state=RNG)
   return (pairs, y, pairs_train, pairs_test,
           y_train, y_test)
 
@@ -44,9 +44,10 @@ def build_quadruplets():
   X, pairs = build_data()
   c = np.column_stack(pairs)
   quadruplets = X[c]
-  quadruplets = shuffle(quadruplets)
+  quadruplets = shuffle(quadruplets, random_state=RNG)
   y = y_train = y_test = None
-  quadruplets_train, quadruplets_test = train_test_split(quadruplets)
+  quadruplets_train, quadruplets_test = train_test_split(quadruplets,
+                                                         random_state=RNG)
   return (quadruplets, y, quadruplets_train, quadruplets_test,
           y_train, y_test)
 
