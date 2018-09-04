@@ -19,15 +19,15 @@ Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/co
 from __future__ import print_function, absolute_import, division
 import numpy as np
 from six.moves import xrange
+from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import (BaseMetricLearner, _PairsClassifierMixin,
-                          MetricTransformer)
+from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm
+from ._util import vector_norm, check_tuples
 
 
-class _BaseMMC(BaseMetricLearner):
+class _BaseMMC(MahalanobisMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
@@ -65,8 +65,11 @@ class _BaseMMC(BaseMetricLearner):
       return self._fit_full(pairs, y)
 
   def _process_pairs(self, pairs, y):
+    # for now we check_X_y and check_tuples but we should only
+    # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                                      ensure_2d=False, allow_nd=True)
+                         ensure_2d=False, allow_nd=True)
+    pairs = check_tuples(pairs)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -213,6 +216,8 @@ class _BaseMMC(BaseMetricLearner):
         print('mmc converged at iter %d, conv = %f' % (cycle, delta))
     self.A_[:] = A_old
     self.n_iter_ = cycle
+
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
   def _fit_diag(self, pairs, y):
@@ -271,6 +276,8 @@ class _BaseMMC(BaseMetricLearner):
       it += 1
 
     self.A_ = np.diag(w)
+
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
   def _fD(self, neg_pairs, A):
@@ -350,29 +357,16 @@ class _BaseMMC(BaseMetricLearner):
       sum_deri2 / sum_dist - np.outer(sum_deri1, sum_deri1) / (sum_dist * sum_dist)
     )
 
-  def metric(self):
-    return self.A_
-
-  def transformer(self):
-    """Computes the transformation matrix from the Mahalanobis matrix.
-    L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with
-    the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.
-
-    The Cholesky decomposition cannot be applied here, since MMC learns only a positive
-    *semi*-definite Mahalanobis matrix.
-
-    Returns
-    -------
-    L : (d x d) matrix
-    """
-    if self.diagonal:
-      return np.sqrt(self.A_)
-    else:
-      w, V = np.linalg.eigh(self.A_)
-      return V.T * np.sqrt(np.maximum(0, w[:,None]))
-
 
 class MMC(_BaseMMC, _PairsClassifierMixin):
+  """Mahalanobis Metric for Clustering (MMC)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
 
   def fit(self, pairs, y):
     """Learn the MMC model.
@@ -392,8 +386,16 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
     return self._fit(pairs, y)
 
 
-class MMC_Supervised(_BaseMMC, MetricTransformer):
-  """Mahalanobis Metric for Clustering (MMC)"""
+class MMC_Supervised(_BaseMMC, TransformerMixin):
+  """Supervised version of Mahalanobis Metric for Clustering (MMC)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False):

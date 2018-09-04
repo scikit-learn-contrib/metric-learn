@@ -18,14 +18,13 @@ import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_X_y
-
-from .base_metric import (BaseMetricLearner, _PairsClassifierMixin,
-                          MetricTransformer)
+from sklearn.base import TransformerMixin
+from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm
+from ._util import vector_norm, check_tuples
 
 
-class _BaseITML(BaseMetricLearner):
+class _BaseITML(MahalanobisMixin):
   """Information Theoretic Metric Learning (ITML)"""
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False):
@@ -53,8 +52,11 @@ class _BaseITML(BaseMetricLearner):
     self.verbose = verbose
 
   def _process_pairs(self, pairs, y, bounds):
+    # for now we check_X_y and check_tuples but we should only
+    # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                                      ensure_2d=False, allow_nd=True)
+                         ensure_2d=False, allow_nd=True)
+    pairs = check_tuples(pairs)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -129,13 +131,20 @@ class _BaseITML(BaseMetricLearner):
     if self.verbose:
       print('itml converged at iter: %d, conv = %f' % (it, conv))
     self.n_iter_ = it
-    return self
 
-  def metric(self):
-    return self.A_
+    self.transformer_ = self.transformer_from_metric(self.A_)
+    return self
 
 
 class ITML(_BaseITML, _PairsClassifierMixin):
+  """Information Theoretic Metric Learning (ITML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
 
   def fit(self, pairs, y, bounds=None):
     """Learn the ITML model.
@@ -157,8 +166,16 @@ class ITML(_BaseITML, _PairsClassifierMixin):
     return self._fit(pairs, y, bounds=bounds)
 
 
-class ITML_Supervised(_BaseITML, MetricTransformer):
-  """Information Theoretic Metric Learning (ITML)"""
+class ITML_Supervised(_BaseITML, TransformerMixin):
+  """Supervised version of Information Theoretic Metric Learning (ITML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See `transformer_from_metric`.)
+  """
+
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
                verbose=False):
@@ -190,6 +207,7 @@ class ITML_Supervised(_BaseITML, MetricTransformer):
 
   def fit(self, X, y, random_state=np.random):
     """Create constraints from labels and learn the ITML model.
+
 
     Parameters
     ----------

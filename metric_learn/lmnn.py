@@ -16,12 +16,12 @@ from collections import Counter
 from six.moves import xrange
 from sklearn.utils.validation import check_X_y, check_array
 from sklearn.metrics import euclidean_distances
-
-from .base_metric import BaseMetricLearner, MetricTransformer
+from sklearn.base import TransformerMixin
+from .base_metric import MahalanobisMixin
 
 
 # commonality between LMNN implementations
-class _base_LMNN(BaseMetricLearner, MetricTransformer):
+class _base_LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001, use_pca=True,
                verbose=False):
@@ -44,9 +44,6 @@ class _base_LMNN(BaseMetricLearner, MetricTransformer):
     self.use_pca = use_pca
     self.verbose = verbose
 
-  def transformer(self):
-    return self.L_
-
 
 # slower Python version
 class python_LMNN(_base_LMNN):
@@ -60,7 +57,7 @@ class python_LMNN(_base_LMNN):
     self.labels_ = np.arange(len(unique_labels))
     if self.use_pca:
       warnings.warn('use_pca does nothing for the python_LMNN implementation')
-    self.L_ = np.eye(num_dims)
+    self.transformer_ = np.eye(num_dims)
     required_k = np.bincount(self.label_inds_).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'
@@ -92,7 +89,7 @@ class python_LMNN(_base_LMNN):
 
     # initialize gradient and L
     G = dfG * reg + df * (1-reg)
-    L = self.L_
+    L = self.transformer_
     objective = np.inf
 
     # main loop
@@ -177,7 +174,7 @@ class python_LMNN(_base_LMNN):
         print("LMNN didn't converge in %d steps." % self.max_iter)
 
     # store the last L
-    self.L_ = L
+    self.transformer_ = L
     self.n_iter_ = it
     return self
 
@@ -192,7 +189,7 @@ class python_LMNN(_base_LMNN):
     return target_neighbors
 
   def _find_impostors(self, furthest_neighbors):
-    Lx = self.transform()
+    Lx = self.transform(self.X_)
     margin_radii = 1 + _inplace_paired_L2(Lx[furthest_neighbors], Lx)
     impostors = []
     for label in self.labels_[:-1]:
@@ -246,6 +243,13 @@ try:
   from modshogun import RealFeatures, MulticlassLabels
 
   class LMNN(_base_LMNN):
+    """Large Margin Nearest Neighbor (LMNN)
+
+    Attributes
+    ----------
+    transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+        The learned linear transformation ``L``.
+    """
 
     def fit(self, X, y):
       self.X_, y = check_X_y(X, y, dtype=float)
@@ -259,7 +263,7 @@ try:
         self._lmnn.train()
       else:
         self._lmnn.train(np.eye(X.shape[1]))
-      self.L_ = self._lmnn.get_linear_transform()
+      self.L_ = self._lmnn.get_linear_transform(X)
       return self
 
 except ImportError:

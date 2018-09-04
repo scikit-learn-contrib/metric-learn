@@ -17,15 +17,21 @@ import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_X_y
+from sklearn.base import TransformerMixin
+from .base_metric import MahalanobisMixin
 
-from .base_metric import BaseMetricLearner, MetricTransformer
 
-
-class LFDA(BaseMetricLearner, MetricTransformer):
+class LFDA(MahalanobisMixin, TransformerMixin):
   '''
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
   Sugiyama, ICML 2006
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
   '''
+
   def __init__(self, num_dims=None, k=None, embedding_type='weighted'):
     '''
     Initialize LFDA.
@@ -50,9 +56,6 @@ class LFDA(BaseMetricLearner, MetricTransformer):
     self.num_dims = num_dims
     self.embedding_type = embedding_type
     self.k = k
-
-  def transformer(self):
-    return self.transformer_
 
   def _process_inputs(self, X, y):
     unique_classes, y = np.unique(y, return_inverse=True)

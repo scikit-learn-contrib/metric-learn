@@ -10,17 +10,17 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 
 from __future__ import absolute_import
 import numpy as np
-from scipy.sparse.csgraph import laplacian
+from sklearn.base import TransformerMixin
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
 from sklearn.utils.validation import check_array, check_X_y
 
-from .base_metric import (BaseMetricLearner, _PairsClassifierMixin,
-                          MetricTransformer)
+from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
+from ._util import check_tuples
 
 
-class _BaseSDML(BaseMetricLearner):
+class _BaseSDML(MahalanobisMixin):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False):
     """
@@ -44,8 +44,12 @@ class _BaseSDML(BaseMetricLearner):
     self.verbose = verbose
 
   def _prepare_pairs(self, pairs, y):
+    # for now we check_X_y and check_tuples but we should only
+    # check_tuples_y in the future
     pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                                      ensure_2d=False, allow_nd=True)
+                         ensure_2d=False, allow_nd=True)
+    pairs = check_tuples(pairs)
+
     # set up prior M
     if self.use_cov:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
@@ -55,9 +59,6 @@ class _BaseSDML(BaseMetricLearner):
     diff = pairs[:, 0] - pairs[:, 1]
     return (diff.T * y).dot(diff)
 
-  def metric(self):
-    return self.M_
-
   def _fit(self, pairs, y):
     loss_matrix = self._prepare_pairs(pairs, y)
     P = self.M_ + self.balance_param * loss_matrix
@@ -65,10 +66,20 @@ class _BaseSDML(BaseMetricLearner):
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
     _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
+
+    self.transformer_ = self.transformer_from_metric(self.M_)
     return self
 
 
 class SDML(_BaseSDML, _PairsClassifierMixin):
+  """Sparse Distance Metric Learning (SDML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
 
   def fit(self, pairs, y):
     """Learn the SDML model.
@@ -88,7 +99,16 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
     return self._fit(pairs, y)
 
 
-class SDML_Supervised(_BaseSDML, MetricTransformer):
+class SDML_Supervised(_BaseSDML, TransformerMixin):
+  """Supervised version of Sparse Distance Metric Learning (SDML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                num_labeled=np.inf, num_constraints=None, verbose=False):
     """

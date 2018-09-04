@@ -16,9 +16,10 @@ import numpy as np
 import warnings
 from six.moves import xrange
 from sklearn import decomposition
+from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_array
 
-from .base_metric import BaseMetricLearner, MetricTransformer
+from .base_metric import MahalanobisMixin
 from .constraints import Constraints
 
 
@@ -35,8 +36,15 @@ def _chunk_mean_centering(data, chunks):
   return chunk_mask, chunk_data
 
 
-class RCA(BaseMetricLearner, MetricTransformer):
-  """Relevant Components Analysis (RCA)"""
+class RCA(MahalanobisMixin, TransformerMixin):
+  """Relevant Components Analysis (RCA)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
   def __init__(self, num_dims=None, pca_comps=None):
     """Initialize the learner.
 
@@ -54,9 +62,6 @@ class RCA(BaseMetricLearner, MetricTransformer):
     """
     self.num_dims = num_dims
     self.pca_comps = pca_comps
-
-  def transformer(self):
-    return self.transformer_
 
   def _process_data(self, X):
     self.X_ = X = check_array(X)
@@ -136,6 +141,14 @@ def _inv_sqrtm(x):
 
 
 class RCA_Supervised(RCA):
+  """Supervised version of Relevant Components Analysis (RCA)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
   def __init__(self, num_dims=None, pca_comps=None, num_chunks=100,
                chunk_size=2):
     """Initialize the learner.

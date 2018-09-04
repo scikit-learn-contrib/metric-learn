@@ -10,16 +10,25 @@ from __future__ import division, print_function
 import numpy as np
 from scipy.optimize import minimize
 from scipy.spatial.distance import pdist, squareform
+from sklearn.base import TransformerMixin
 from sklearn.decomposition import PCA
+
 from sklearn.utils.validation import check_X_y
 
-from .base_metric import BaseMetricLearner, MetricTransformer
+from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
 
 
-class MLKR(BaseMetricLearner, MetricTransformer):
-  """Metric Learning for Kernel Regression (MLKR)"""
+class MLKR(MahalanobisMixin, TransformerMixin):
+  """Metric Learning for Kernel Regression (MLKR)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
                max_iter=1000):
     """
@@ -89,9 +98,6 @@ class MLKR(BaseMetricLearner, MetricTransformer):
       self.transformer_ = res.x.reshape(A.shape)
       self.n_iter_ = res.nit
       return self
-
-  def transformer(self):
-      return self.transformer_
 
 
 def _loss(flatA, X, y, dX):

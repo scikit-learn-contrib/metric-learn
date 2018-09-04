@@ -11,14 +11,15 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
+from sklearn.base import TransformerMixin
 from sklearn.utils.validation import check_array, check_X_y
+from ._util import check_tuples
 
-from .base_metric import (BaseMetricLearner, _QuadrupletsClassifierMixin,
-                          MetricTransformer)
+from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
 
 
-class _BaseLSML(BaseMetricLearner):
+class _BaseLSML(MahalanobisMixin):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
     """Initialize LSML.
 
@@ -37,8 +38,11 @@ class _BaseLSML(BaseMetricLearner):
     self.verbose = verbose
 
   def _prepare_quadruplets(self, quadruplets, weights):
-    pairs = check_array(quadruplets, accept_sparse=False,
-                                      ensure_2d=False, allow_nd=True)
+    # for now we check_array and check_tuples but we should only
+    # check_tuples in the future (with enhanced check_tuples)
+    quadruplets = check_array(quadruplets, accept_sparse=False,
+                              ensure_2d=False, allow_nd=True)
+    quadruplets = check_tuples(quadruplets)
 
     # check to make sure that no two constrained vectors are identical
     self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -51,15 +55,13 @@ class _BaseLSML(BaseMetricLearner):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     if self.prior is None:
-      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
+      X = np.vstack({tuple(row) for row in
+                     quadruplets.reshape(-1, quadruplets.shape[2])})
       self.prior_inv_ = np.atleast_2d(np.cov(X, rowvar=False))
       self.M_ = np.linalg.inv(self.prior_inv_)
     else:
       self.M_ = self.prior
       self.prior_inv_ = np.linalg.inv(self.prior)
-
-  def metric(self):
-    return self.M_
 
   def _fit(self, quadruplets, weights=None):
     self._prepare_quadruplets(quadruplets, weights)
@@ -96,6 +98,8 @@ class _BaseLSML(BaseMetricLearner):
       if self.verbose:
         print("Didn't converge after", it, "iterations. Final loss:", s_best)
     self.n_iter_ = it
+
+    self.transformer_ = self.transformer_from_metric(self.M_)
     return self
 
   def _comparison_loss(self, metric):
@@ -125,6 +129,14 @@ class _BaseLSML(BaseMetricLearner):
 
 
 class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
+  """Least Squared-residual Metric Learning (LSML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
 
   def fit(self, quadruplets, weights=None):
     """Learn the LSML model.
@@ -147,7 +159,16 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
     return self._fit(quadruplets, weights=weights)
 
 
-class LSML_Supervised(_BaseLSML, MetricTransformer):
+class LSML_Supervised(_BaseLSML, TransformerMixin):
+  """Supervised version of Least Squared-residual Metric Learning (LSML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
                num_constraints=None, weights=None, verbose=False):
     """Initialize the learner.
