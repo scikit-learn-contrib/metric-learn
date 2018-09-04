@@ -25,8 +25,9 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
   tuples : object
     The tuples to check.
 
-  t : int
-    The number of elements in a tuple (e.g. 2 for pairs).
+  t : int or None (default=None)
+    The number of elements to ensure there is in every tuple (e.g. 2 for
+    pairs). If None, the number of tuples is not checked.
 
   dtype : string, type, list of types or None (default="auto")
       Data type of result. If None, the dtype of the input is preserved.
