@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn package &mdash; metric-learn 0.3.0 documentation</title>
+  <title>metric_learn package &mdash; metric-learn 0.4.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -30,9 +32,12 @@
   
 
   
-    <link rel="top" title="metric-learn 0.3.0 documentation" href="index.html"/>
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="metric-learn 0.4.0 documentation" href="index.html"/>
         <link rel="next" title="metric_learn.base_metric module" href="metric_learn.base_metric.html"/>
-        <link rel="prev" title="Relative Components Analysis (RCA)" href="metric_learn.rca.html"/> 
+        <link rel="prev" title="Mahalanobis Metric Learning for Clustering (MMC)" href="metric_learn.mmc.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -41,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -60,7 +66,7 @@
             
             
               <div class="version">
-                0.3.0
+                0.4.0
               </div>
             
           
@@ -81,16 +87,22 @@
           
             
             
-                <p class="caption"><span class="caption-text">Algorithms</span></p>
-<ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Package Overview</a><ul>
@@ -100,6 +112,8 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
@@ -120,8 +134,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">metric-learn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">metric-learn</a>
+        
       </nav>
 
 
@@ -130,23 +146,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>metric_learn package</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>metric_learn package</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/metric_learn.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/metric_learn.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -179,6 +212,16 @@
 <li class="toctree-l2"><a class="reference internal" href="metric_learn.lsml.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metric_learn.mlkr.html#example-code">Example Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metric_learn.mlkr.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metric_learn.mmc.html#example-code">Example Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metric_learn.mmc.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="metric_learn.nca.html#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="metric_learn.nca.html#references">References</a></li>
@@ -204,15 +247,18 @@
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.base_metric.html" class="btn btn-neutral float-right" title="metric_learn.base_metric module" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.base_metric.html" class="btn btn-neutral float-right" title="metric_learn.base_metric module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metric_learn.rca.html" class="btn btn-neutral" title="Relative Components Analysis (RCA)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="metric_learn.mmc.html" class="btn btn-neutral" title="Mahalanobis Metric Learning for Clustering (MMC)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -221,7 +267,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2016, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
 
     </p>
   </div>
@@ -243,16 +289,17 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

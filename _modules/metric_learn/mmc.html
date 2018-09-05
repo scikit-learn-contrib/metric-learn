@@ -1,0 +1,684 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>metric_learn.mmc &mdash; metric-learn 0.4.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="metric-learn 0.4.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> metric-learn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Overview</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">metric-learn</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>metric_learn.mmc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for metric_learn.mmc</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Mahalanobis Metric Learning with Application for Clustering with Side-Information, Xing et al., NIPS 2002</span>
+
+<span class="sd">MMC minimizes the sum of squared distances between similar examples,</span>
+<span class="sd">while enforcing the sum of distances between dissimilar examples to be</span>
+<span class="sd">greater than a certain margin.</span>
+<span class="sd">This leads to a convex and, thus, local-minima-free optimization problem</span>
+<span class="sd">that can be solved efficiently.</span>
+<span class="sd">However, the algorithm involves the computation of eigenvalues, which is the</span>
+<span class="sd">main speed-bottleneck.</span>
+<span class="sd">Since it has initially been designed for clustering applications, one of the</span>
+<span class="sd">implicit assumptions of MMC is that all classes form a compact set, i.e.,</span>
+<span class="sd">follow a unimodal distribution, which restricts the possible use-cases of</span>
+<span class="sd">this method. However, it is one of the earliest and a still often cited technique.</span>
+
+<span class="sd">Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">pairwise_distances</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">check_array</span><span class="p">,</span> <span class="n">check_X_y</span><span class="p">,</span> <span class="n">assert_all_finite</span>
+
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">BaseMetricLearner</span>
+<span class="kn">from</span> <span class="nn">.constraints</span> <span class="k">import</span> <span class="n">Constraints</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">vector_norm</span>
+
+
+
+<div class="viewcode-block" id="MMC"><a class="viewcode-back" href="../../metric_learn.mmc.html#metric_learn.mmc.MMC">[docs]</a><span class="k">class</span> <span class="nc">MMC</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Mahalanobis Metric for Clustering (MMC)&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MMC.__init__"><a class="viewcode-back" href="../../metric_learn.mmc.html#metric_learn.mmc.MMC.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+               <span class="n">A0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diagonal_c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize MMC.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_iter : int, optional</span>
+<span class="sd">    max_proj : int, optional</span>
+<span class="sd">    convergence_threshold : float, optional</span>
+<span class="sd">    A0 : (d x d) matrix, optional</span>
+<span class="sd">        initial metric, defaults to identity</span>
+<span class="sd">        only the main diagonal is taken if `diagonal == True`</span>
+<span class="sd">    diagonal : bool, optional</span>
+<span class="sd">        if True, a diagonal metric will be learned,</span>
+<span class="sd">        i.e., a simple scaling of dimensions</span>
+<span class="sd">    diagonal_c : float, optional</span>
+<span class="sd">        weight of the dissimilarity constraint for diagonal</span>
+<span class="sd">        metric learning</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        if True, prints information while learning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_proj</span> <span class="o">=</span> <span class="n">max_proj</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span> <span class="o">=</span> <span class="n">convergence_threshold</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">A0</span> <span class="o">=</span> <span class="n">A0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span> <span class="o">=</span> <span class="n">diagonal</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">=</span> <span class="n">diagonal_c</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span></div>
+
+<div class="viewcode-block" id="MMC.fit"><a class="viewcode-back" href="../../metric_learn.mmc.html#metric_learn.mmc.MMC.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Learn the MMC model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) data matrix</span>
+<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">    constraints : 4-tuple of arrays</span>
+<span class="sd">        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
+<span class="sd">        dissimilar pairs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_diag</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_full</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span></div>
+
+  <span class="k">def</span> <span class="nf">_process_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="n">X</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="c1"># check to make sure that no two constrained vectors are identical</span>
+    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">constraints</span>
+    <span class="n">no_ident</span> <span class="o">=</span> <span class="n">vector_norm</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">b</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1e-9</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">no_ident</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="n">no_ident</span><span class="p">]</span>
+    <span class="n">no_ident</span> <span class="o">=</span> <span class="n">vector_norm</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">d</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mf">1e-9</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">no_ident</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="n">no_ident</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No non-trivial similarity constraints given for MMC.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No non-trivial dissimilarity constraints given for MMC.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># init metric</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">A0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span><span class="p">:</span>
+        <span class="c1"># Don&#39;t know why division by 10... it&#39;s in the original code</span>
+        <span class="c1"># and seems to affect the overall scale of the learned metric.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">/=</span> <span class="mf">10.0</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span>
+
+  <span class="k">def</span> <span class="nf">_fit_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Learn full metric using MMC.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) data matrix</span>
+<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">    constraints : 4-tuple of arrays</span>
+<span class="sd">        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
+<span class="sd">        dissimilar pairs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">constraints</span>
+    <span class="n">num_pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">num_neg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_dim</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">error1</span> <span class="o">=</span> <span class="n">error2</span> <span class="o">=</span> <span class="mf">1e10</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.01</span>        <span class="c1"># error-bound of iterative projection on C1 and C2</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_</span>
+
+    <span class="c1"># Create weight vector from similar samples</span>
+    <span class="n">pos_diff</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span> <span class="n">pos_diff</span><span class="p">,</span> <span class="n">pos_diff</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="c1"># `w` is the sum of all outer products of the rows in `pos_diff`.</span>
+    <span class="c1"># The above `einsum` is equivalent to the much more inefficient:</span>
+    <span class="c1"># w = np.apply_along_axis(</span>
+    <span class="c1">#         lambda x: np.outer(x,x).ravel(),</span>
+    <span class="c1">#         1,</span>
+    <span class="c1">#         X[a] - X[b]</span>
+    <span class="c1">#     ).sum(axis = 0)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span> <span class="o">/</span> <span class="mf">100.0</span>
+
+    <span class="n">w_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">w1</span> <span class="o">=</span> <span class="n">w</span> <span class="o">/</span> <span class="n">w_norm</span>  <span class="c1"># make `w` a unit vector</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">t</span> <span class="o">/</span> <span class="n">w_norm</span>  <span class="c1"># distance from origin to `w^T*x=t` plane</span>
+
+    <span class="n">cycle</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># initial step size along gradient</span>
+
+    <span class="n">grad1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fS1</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>            <span class="c1"># gradient of similarity constraint function</span>
+    <span class="n">grad2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD1</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>            <span class="c1"># gradient of dissimilarity constraint function</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad_projection</span><span class="p">(</span><span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">)</span>  <span class="c1"># gradient of fD1 orthogonal to fS1</span>
+
+    <span class="n">A_old</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">):</span>
+
+      <span class="c1"># projection of constraints C1 and C2</span>
+      <span class="n">satisfy</span> <span class="o">=</span> <span class="kc">False</span>
+
+      <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_proj</span><span class="p">):</span>
+
+        <span class="c1"># First constraint:</span>
+        <span class="c1"># f(A) = \sum_{i,j \in S} d_ij&#39; A d_ij &lt;= t              (1)</span>
+        <span class="c1"># (1) can be rewritten as a linear constraint: w^T x = t,</span>
+        <span class="c1"># where x is the unrolled matrix of A,</span>
+        <span class="c1"># w is also an unrolled matrix of W where</span>
+        <span class="c1"># W_{kl}= \sum_{i,j \in S}d_ij^k * d_ij^l</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">:</span>
+          <span class="n">x</span> <span class="o">=</span> <span class="n">x0</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">x</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="p">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">w1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span> <span class="o">*</span> <span class="n">w1</span>
+          <span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_dim</span><span class="p">,</span> <span class="n">num_dim</span><span class="p">)</span>
+
+        <span class="c1"># Second constraint:</span>
+        <span class="c1"># PSD constraint A &gt;= 0</span>
+        <span class="c1"># project A onto domain A&gt;0</span>
+        <span class="n">l</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">((</span><span class="n">A</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]),</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+        <span class="n">fDC2</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+        <span class="n">error2</span> <span class="o">=</span> <span class="p">(</span><span class="n">fDC2</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span>
+        <span class="k">if</span> <span class="n">error2</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span>
+          <span class="n">satisfy</span> <span class="o">=</span> <span class="kc">True</span>
+          <span class="k">break</span>
+
+      <span class="c1"># third constraint: gradient ascent</span>
+      <span class="c1"># max: g(A) &gt;= 1</span>
+      <span class="c1"># here we suppose g(A) = fD(A) = \sum_{I,J \in D} sqrt(d_ij&#39; A d_ij)</span>
+
+      <span class="n">obj_previous</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">A_old</span><span class="p">)</span>  <span class="c1"># g(A_old)</span>
+      <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>               <span class="c1"># g(A)</span>
+
+      <span class="k">if</span> <span class="n">satisfy</span> <span class="ow">and</span> <span class="p">(</span><span class="n">obj</span> <span class="o">&gt;</span> <span class="n">obj_previous</span> <span class="ow">or</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="c1"># If projection of 1 and 2 is successful, and such projection</span>
+        <span class="c1"># improves objective function, slightly increase learning rate</span>
+        <span class="c1"># and update from the current A.</span>
+        <span class="n">alpha</span> <span class="o">*=</span> <span class="mf">1.05</span>
+        <span class="n">A_old</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="n">grad2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fS1</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+        <span class="n">grad1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD1</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad_projection</span><span class="p">(</span><span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">+=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">M</span>
+
+      <span class="k">else</span><span class="p">:</span>
+
+        <span class="c1"># If projection of 1 and 2 failed, or obj &lt;= obj_previous due</span>
+        <span class="c1"># to projection of 1 and 2, shrink learning rate and re-update</span>
+        <span class="c1"># from the previous A.</span>
+        <span class="n">alpha</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A_old</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">M</span>
+
+      <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A_old</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span><span class="p">:</span>
+        <span class="k">break</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc iter: </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">, projections = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">it</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">converged_</span> <span class="o">=</span> <span class="kc">False</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc did not converge, conv = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">delta</span><span class="p">,))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">converged_</span> <span class="o">=</span> <span class="kc">True</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc converged at iter </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="n">delta</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A_old</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_iter_</span> <span class="o">=</span> <span class="n">cycle</span>
+    <span class="k">return</span> <span class="bp">self</span>
+
+  <span class="k">def</span> <span class="nf">_fit_diag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Learn diagonal metric using MMC.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) data matrix</span>
+<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">    constraints : 4-tuple of arrays</span>
+<span class="sd">        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
+<span class="sd">        dissimilar pairs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span> <span class="o">=</span> <span class="n">constraints</span>
+    <span class="n">num_pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">num_neg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">num_samples</span><span class="p">,</span> <span class="n">num_dim</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="n">s_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">X</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">b</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-6</span>
+    <span class="n">reduction</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="n">error</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span> <span class="ow">and</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">:</span>
+
+      <span class="n">fD0</span><span class="p">,</span> <span class="n">fD_1st_d</span><span class="p">,</span> <span class="n">fD_2nd_d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D_constraint</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+      <span class="n">obj_initial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s_sum</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD0</span>
+      <span class="n">fS_1st_d</span> <span class="o">=</span> <span class="n">s_sum</span>  <span class="c1"># first derivative of the similarity constraints</span>
+
+      <span class="n">gradient</span> <span class="o">=</span> <span class="n">fS_1st_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD_1st_d</span>               <span class="c1"># gradient of the objective</span>
+      <span class="n">hessian</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD_2nd_d</span> <span class="o">+</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_dim</span><span class="p">)</span>  <span class="c1"># Hessian of the objective</span>
+      <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">hessian</span><span class="p">),</span> <span class="n">gradient</span><span class="p">);</span>
+
+      <span class="c1"># Newton-Rapshon update</span>
+      <span class="c1"># search over optimal lambda</span>
+      <span class="n">lambd</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># initial step-size</span>
+      <span class="n">w_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">lambd</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span>
+      <span class="n">obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s_sum</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D_objective</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">)</span>
+      <span class="n">assert_all_finite</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+      <span class="n">obj_previous</span> <span class="o">=</span> <span class="n">obj</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># just to get the while-loop started</span>
+
+      <span class="n">inner_it</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="k">while</span> <span class="n">obj</span> <span class="o">&lt;</span> <span class="n">obj_previous</span><span class="p">:</span>
+        <span class="n">obj_previous</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="n">w_previous</span> <span class="o">=</span> <span class="n">w_tmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">lambd</span> <span class="o">/=</span> <span class="n">reduction</span>
+        <span class="n">w_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">lambd</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s_sum</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D_objective</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">)</span>
+        <span class="n">inner_it</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">assert_all_finite</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+      <span class="n">w</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">w_previous</span>
+      <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">obj_previous</span> <span class="o">-</span> <span class="n">obj_initial</span><span class="p">)</span> <span class="o">/</span> <span class="n">obj_previous</span><span class="p">)</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc iter: </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
+      <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span>
+
+  <span class="k">def</span> <span class="nf">_fD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The value of the dissimilarity constraint function.</span>
+
+<span class="sd">    f = f(\sum_{ij \in D} distance(x_i, x_j))</span>
+<span class="sd">    i.e. distance can be L1:  \sqrt{(x_i-x_j)A(x_i-x_j)&#39;}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">diff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_fD1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The gradient of the dissimilarity constraint function w.r.t. A.</span>
+
+<span class="sd">    For example, let distance by L1 norm:</span>
+<span class="sd">    f = f(\sum_{ij \in D} \sqrt{(x_i-x_j)A(x_i-x_j)&#39;})</span>
+<span class="sd">    df/dA_{kl} = f&#39;* d(\sum_{ij \in D} \sqrt{(x_i-x_j)^k*(x_i-x_j)^l})/dA_{kl}</span>
+
+<span class="sd">    Note that d_ij*A*d_ij&#39; = tr(d_ij*A*d_ij&#39;) = tr(d_ij&#39;*d_ij*A)</span>
+<span class="sd">    so, d(d_ij*A*d_ij&#39;)/dA = d_ij&#39;*d_ij</span>
+<span class="sd">        df/dA = f&#39;(\sum_{ij \in D} \sqrt{tr(d_ij&#39;*d_ij*A)})</span>
+<span class="sd">                * 0.5*(\sum_{ij \in D} (1/sqrt{tr(d_ij&#39;*d_ij*A)})*(d_ij&#39;*d_ij))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+    <span class="c1"># outer products of all rows in `diff`</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;ijk&#39;</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+    <span class="c1"># faster version of: dist = np.sqrt(np.sum(M * A[None,:,:], axis=(1,2)))</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,jk&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+    <span class="c1"># faster version of: sum_deri = np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis=0)</span>
+    <span class="n">sum_deri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,i-&gt;jk&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="p">(</span><span class="n">dist</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">))</span>
+    <span class="n">sum_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sum_deri</span> <span class="o">/</span> <span class="p">(</span><span class="n">sum_dist</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_fS1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The gradient of the similarity constraint function w.r.t. A.</span>
+
+<span class="sd">    f = \sum_{ij}(x_i-x_j)A(x_i-x_j)&#39; = \sum_{ij}d_ij*A*d_ij&#39;</span>
+<span class="sd">    df/dA = d(d_ij*A*d_ij&#39;)/dA</span>
+
+<span class="sd">    Note that d_ij*A*d_ij&#39; = tr(d_ij*A*d_ij&#39;) = tr(d_ij&#39;*d_ij*A)</span>
+<span class="sd">    so, d(d_ij*A*d_ij&#39;)/dA = d_ij&#39;*d_ij</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>  <span class="c1"># sum of outer products of all rows in `diff`</span>
+
+  <span class="k">def</span> <span class="nf">_grad_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">):</span>
+    <span class="n">grad2</span> <span class="o">=</span> <span class="n">grad2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">grad2</span><span class="p">)</span>
+    <span class="n">gtemp</span> <span class="o">=</span> <span class="n">grad1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad1</span> <span class="o">*</span> <span class="n">grad2</span><span class="p">)</span> <span class="o">*</span> <span class="n">grad2</span>
+    <span class="n">gtemp</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">gtemp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gtemp</span>
+
+  <span class="k">def</span> <span class="nf">_D_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(((</span><span class="n">X</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">d</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">w</span><span class="p">[</span><span class="kc">None</span><span class="p">,:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)))</span>
+
+  <span class="k">def</span> <span class="nf">_D_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the value, 1st derivative, second derivative (Hessian) of</span>
+<span class="sd">    a dissimilarity constraint function gF(sum_ij distance(d_ij A d_ij))</span>
+<span class="sd">    where A is a diagonal matrix (in the form of a column vector &#39;w&#39;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+    <span class="n">diff_sq</span> <span class="o">=</span> <span class="n">diff</span> <span class="o">*</span> <span class="n">diff</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diff_sq</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
+    <span class="n">sum_deri1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,i&#39;</span><span class="p">,</span> <span class="n">diff_sq</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">))</span>
+    <span class="n">sum_deri2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+        <span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span>
+        <span class="n">diff_sq</span><span class="p">,</span>
+        <span class="n">diff_sq</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">dist</span><span class="o">**</span><span class="mi">3</span><span class="p">))[:,</span><span class="kc">None</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">sum_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sum_dist</span><span class="p">),</span>
+      <span class="n">sum_deri1</span> <span class="o">/</span> <span class="n">sum_dist</span><span class="p">,</span>
+      <span class="n">sum_deri2</span> <span class="o">/</span> <span class="n">sum_dist</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">sum_deri1</span><span class="p">,</span> <span class="n">sum_deri1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sum_dist</span> <span class="o">*</span> <span class="n">sum_dist</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="MMC.metric"><a class="viewcode-back" href="../../metric_learn.mmc.html#metric_learn.mmc.MMC.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_</span></div>
+
+<div class="viewcode-block" id="MMC.transformer"><a class="viewcode-back" href="../../metric_learn.mmc.html#metric_learn.mmc.MMC.transformer">[docs]</a>  <span class="k">def</span> <span class="nf">transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the transformation matrix from the Mahalanobis matrix.</span>
+<span class="sd">    L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with</span>
+<span class="sd">    the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.</span>
+
+<span class="sd">    The Cholesky decomposition cannot be applied here, since MMC learns only a positive</span>
+<span class="sd">    *semi*-definite Mahalanobis matrix.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    L : (d x d) matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">w</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]))</span></div></div>
+
+
+<div class="viewcode-block" id="MMC_Supervised"><a class="viewcode-back" href="../../metric_learn.mmc.html#metric_learn.mmc.MMC_Supervised">[docs]</a><span class="k">class</span> <span class="nc">MMC_Supervised</span><span class="p">(</span><span class="n">MMC</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Mahalanobis Metric for Clustering (MMC)&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MMC_Supervised.__init__"><a class="viewcode-back" href="../../metric_learn.mmc.html#metric_learn.mmc.MMC_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+               <span class="n">num_labeled</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">num_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">A0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diagonal_c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize the supervised version of `MMC`.</span>
+
+<span class="sd">    `MMC_Supervised` creates pairs of similar sample by taking same class</span>
+<span class="sd">    samples, and pairs of dissimilar samples by taking different class</span>
+<span class="sd">    samples. It then passes these pairs to `MMC` for training.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    max_iter : int, optional</span>
+<span class="sd">    max_proj : int, optional</span>
+<span class="sd">    convergence_threshold : float, optional</span>
+<span class="sd">    num_labeled : int, optional (default=np.inf)</span>
+<span class="sd">        number of labeled points to keep for building pairs. Extra</span>
+<span class="sd">        labeled points will be considered unlabeled, and ignored as such.</span>
+<span class="sd">        Use np.inf (default) to use all labeled points.</span>
+<span class="sd">    num_constraints: int, optional</span>
+<span class="sd">        number of constraints to generate</span>
+<span class="sd">    A0 : (d x d) matrix, optional</span>
+<span class="sd">        initial metric, defaults to identity</span>
+<span class="sd">        only the main diagonal is taken if `diagonal == True`</span>
+<span class="sd">    diagonal : bool, optional</span>
+<span class="sd">        if True, a diagonal metric will be learned,</span>
+<span class="sd">        i.e., a simple scaling of dimensions</span>
+<span class="sd">    diagonal_c : float, optional</span>
+<span class="sd">        weight of the dissimilarity constraint for diagonal</span>
+<span class="sd">        metric learning</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        if True, prints information while learning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">MMC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="n">max_proj</span><span class="p">,</span>
+                 <span class="n">convergence_threshold</span><span class="o">=</span><span class="n">convergence_threshold</span><span class="p">,</span>
+                 <span class="n">A0</span><span class="o">=</span><span class="n">A0</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="n">diagonal</span><span class="p">,</span> <span class="n">diagonal_c</span><span class="o">=</span><span class="n">diagonal_c</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_labeled</span> <span class="o">=</span> <span class="n">num_labeled</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_constraints</span> <span class="o">=</span> <span class="n">num_constraints</span></div>
+
+<div class="viewcode-block" id="MMC_Supervised.fit"><a class="viewcode-back" href="../../metric_learn.mmc.html#metric_learn.mmc.MMC_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create constraints from labels and learn the MMC model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) matrix</span>
+<span class="sd">        Input data, where each row corresponds to a single instance.</span>
+<span class="sd">    y : (n) array-like</span>
+<span class="sd">        Data labels.</span>
+<span class="sd">    random_state : numpy.random.RandomState, optional</span>
+<span class="sd">        If provided, controls random number generation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_constraints</span>
+    <span class="k">if</span> <span class="n">num_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+      <span class="n">num_constraints</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">num_classes</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Constraints</span><span class="o">.</span><span class="n">random_subset</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_labeled</span><span class="p">,</span>
+                                  <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">pos_neg</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">positive_negative_pairs</span><span class="p">(</span><span class="n">num_constraints</span><span class="p">,</span>
+                                        <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MMC</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">pos_neg</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.4.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

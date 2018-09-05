@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.base_metric module &mdash; metric-learn 0.3.0 documentation</title>
+  <title>metric_learn.base_metric module &mdash; metric-learn 0.4.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -30,7 +32,10 @@
   
 
   
-    <link rel="top" title="metric-learn 0.3.0 documentation" href="index.html"/>
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="metric-learn 0.4.0 documentation" href="index.html"/>
         <link rel="up" title="metric_learn package" href="metric_learn.html"/>
         <link rel="prev" title="metric_learn package" href="metric_learn.html"/> 
 
@@ -41,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -60,7 +66,7 @@
             
             
               <div class="version">
-                0.3.0
+                0.4.0
               </div>
             
           
@@ -81,16 +87,22 @@
           
             
             
-                <p class="caption"><span class="caption-text">Algorithms</span></p>
-<ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="metric_learn.html">Package Overview</a><ul class="current">
@@ -100,6 +112,8 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
@@ -120,8 +134,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">metric-learn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">metric-learn</a>
+        
       </nav>
 
 
@@ -130,25 +146,42 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
           <li><a href="metric_learn.html">metric_learn package</a> &raquo;</li>
-      
-    <li>metric_learn.base_metric module</li>
+        
+      <li>metric_learn.base_metric module</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/metric_learn.base_metric.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/metric_learn.base_metric.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -159,58 +192,18 @@
 <dl class="class">
 <dt id="metric_learn.base_metric.BaseMetricLearner">
 <em class="property">class </em><code class="descclassname">metric_learn.base_metric.</code><code class="descname">BaseMetricLearner</code><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="metric_learn.base_metric.BaseMetricLearner.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner.get_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.get_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get parameters for this metric learner.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
-<blockquote>
-<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
-scikit-learn has this on BaseEstimator.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : mapping of string to any</p>
-<blockquote class="last">
-<div><p>Parameter names mapped to their values.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
 <dl class="method">
 <dt id="metric_learn.base_metric.BaseMetricLearner.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[M = L^{\top} L\]</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>M</strong> : (d x d) matrix</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="metric_learn.base_metric.BaseMetricLearner.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the parameters of this metric learner.</p>
-<p>Overwrites any default parameters or parameters specified in constructor.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">self</td>
 </tr>
 </tbody>
 </table>
@@ -232,7 +225,7 @@ scikit-learn has this on BaseEstimator.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transformed</strong> : (n x d) matrix</p>
 <blockquote class="last">
-<div><p>Input data transformed to the metric space by <span class="math">\(XL^{\top}\)</span></p>
+<div><p>Input data transformed to the metric space by <span class="math notranslate nohighlight">\(XL^{\top}\)</span></p>
 </div></blockquote>
 </td>
 </tr>
@@ -244,12 +237,12 @@ scikit-learn has this on BaseEstimator.</p>
 <dt id="metric_learn.base_metric.BaseMetricLearner.transformer">
 <code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/base_metric.html#BaseMetricLearner.transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
-<p>L = inv(cholesky(M))</p>
+<p>L = cholesky(M).T</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : (d x d) matrix</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : upper triangular (d x d) matrix</td>
 </tr>
 </tbody>
 </table>
@@ -261,13 +254,16 @@ scikit-learn has this on BaseEstimator.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="metric_learn.html" class="btn btn-neutral" title="metric_learn package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="metric_learn.html" class="btn btn-neutral" title="metric_learn package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -276,7 +272,7 @@ scikit-learn has this on BaseEstimator.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2016, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
 
     </p>
   </div>
@@ -298,16 +294,17 @@ scikit-learn has this on BaseEstimator.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

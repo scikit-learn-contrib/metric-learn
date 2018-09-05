@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Relative Components Analysis (RCA) &mdash; metric-learn 0.3.0 documentation</title>
+  <title>Relative Components Analysis (RCA) &mdash; metric-learn 0.4.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -30,9 +32,12 @@
   
 
   
-    <link rel="top" title="metric-learn 0.3.0 documentation" href="index.html"/>
-        <link rel="next" title="metric_learn package" href="metric_learn.html"/>
-        <link rel="prev" title="Local Fisher Discriminant Analysis (LFDA)" href="metric_learn.lfda.html"/> 
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="metric-learn 0.4.0 documentation" href="index.html"/>
+        <link rel="next" title="Mahalanobis Metric Learning for Clustering (MMC)" href="metric_learn.mmc.html"/>
+        <link rel="prev" title="Sparse Determinant Metric Learning (SDML)" href="metric_learn.sdml.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -41,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -60,7 +66,7 @@
             
             
               <div class="version">
-                0.3.0
+                0.4.0
               </div>
             
           
@@ -81,20 +87,26 @@
           
             
             
-                <p class="caption"><span class="caption-text">Algorithms</span></p>
-<ul class="current">
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Relative Components Analysis (RCA)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="metric_learn.html">Package Overview</a><ul class="current">
@@ -104,6 +116,8 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Relative Components Analysis (RCA)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
@@ -128,8 +142,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">metric-learn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">metric-learn</a>
+        
       </nav>
 
 
@@ -138,23 +154,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Relative Components Analysis (RCA)</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Relative Components Analysis (RCA)</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/metric_learn.rca.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/metric_learn.rca.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -167,14 +200,41 @@
 weighted sum of in-class covariance matrices.
 It applies a global linear transformation to assign large weights to
 relevant dimensions and low weights to irrelevant dimensions.
-Those relevant dimensions are estimated using &#8220;chunklets&#8221;,
+Those relevant dimensions are estimated using “chunklets”,
 subsets of points that are known to belong to the same class.</p>
-<p>&#8216;Learning distance functions using equivalence relations&#8217;, ICML 2003</p>
+<p>‘Learning distance functions using equivalence relations’, ICML 2003
+‘Learning a Mahalanobis metric from equivalence constraints’, JMLR 2005</p>
 <dl class="class">
 <dt id="metric_learn.rca.RCA">
-<em class="property">class </em><code class="descclassname">metric_learn.rca.</code><code class="descname">RCA</code><span class="sig-paren">(</span><em>dim=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
+<em class="property">class </em><code class="descclassname">metric_learn.rca.</code><code class="descname">RCA</code><span class="sig-paren">(</span><em>num_dims=None</em>, <em>pca_comps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
 <p>Relevant Components Analysis (RCA)</p>
+<dl class="method">
+<dt id="metric_learn.rca.RCA.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num_dims=None</em>, <em>pca_comps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the learner.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>num_dims</strong> : int, optional</p>
+<blockquote>
+<div><p>embedding dimension (default: original dimension of data)</p>
+</div></blockquote>
+<p><strong>pca_comps</strong> : int, float, None or string</p>
+<blockquote class="last">
+<div><p>Number of components to keep during PCA preprocessing.
+If None (default), does not perform PCA.
+If <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">pca_comps</span> <span class="pre">&lt;</span> <span class="pre">1</span></code>, it is used as
+the minimum explained variance ratio.
+See sklearn.decomposition.PCA for more details.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="metric_learn.rca.RCA.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>data</em>, <em>chunks</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA.fit" title="Permalink to this definition">¶</a></dt>
@@ -183,14 +243,44 @@ subsets of points that are known to belong to the same class.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : (n x d) data matrix</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : (n x d) data matrix</p>
 <blockquote>
-<div><p>each row corresponds to a single instance</p>
+<div><p>Each row corresponds to a single instance</p>
 </div></blockquote>
 <p><strong>chunks</strong> : (n,) array of ints</p>
 <blockquote class="last">
-<div><p>when <code class="docutils literal"><span class="pre">chunks[i]</span> <span class="pre">==</span> <span class="pre">-1</span></code>, point i doesn&#8217;t belong to any chunklet,
-when <code class="docutils literal"><span class="pre">chunks[i]</span> <span class="pre">==</span> <span class="pre">j</span></code>, point i belongs to chunklet j.</p>
+<div><p>When <code class="docutils literal notranslate"><span class="pre">chunks[i]</span> <span class="pre">==</span> <span class="pre">-1</span></code>, point i doesn’t belong to any chunklet.
+When <code class="docutils literal notranslate"><span class="pre">chunks[i]</span> <span class="pre">==</span> <span class="pre">j</span></code>, point i belongs to chunklet j.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.rca.RCA.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit to data, then transform it.</p>
+<p>Fits transformer to X and y with optional parameters fit_params
+and returns a transformed version of X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : numpy array of shape [n_samples, n_features]</p>
+<blockquote>
+<div><p>Training set.</p>
+</div></blockquote>
+<p><strong>y</strong> : numpy array of shape [n_samples]</p>
+<blockquote>
+<div><p>Target values.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>X_new</strong> : numpy array of shape [n_samples, n_features_new]</p>
+<blockquote class="last">
+<div><p>Transformed array.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -200,16 +290,16 @@ when <code class="docutils literal"><span class="pre">chunks[i]</span> <span cla
 
 <dl class="method">
 <dt id="metric_learn.rca.RCA.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA.get_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get parameters for this metric learner.</p>
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep</strong> : boolean, optional</p>
 <blockquote>
-<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
-scikit-learn has this on BaseEstimator.</p>
+<div><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -227,7 +317,7 @@ scikit-learn has this on BaseEstimator.</p>
 <dt id="metric_learn.rca.RCA.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA.metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[M = L^{\top} L\]</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -241,9 +331,12 @@ scikit-learn has this on BaseEstimator.</p>
 
 <dl class="method">
 <dt id="metric_learn.rca.RCA.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the parameters of this metric learner.</p>
-<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -270,7 +363,7 @@ scikit-learn has this on BaseEstimator.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transformed</strong> : (n x d) matrix</p>
 <blockquote class="last">
-<div><p>Input data transformed to the metric space by <span class="math">\(XL^{\top}\)</span></p>
+<div><p>Input data transformed to the metric space by <span class="math notranslate nohighlight">\(XL^{\top}\)</span></p>
 </div></blockquote>
 </td>
 </tr>
@@ -281,18 +374,51 @@ scikit-learn has this on BaseEstimator.</p>
 <dl class="method">
 <dt id="metric_learn.rca.RCA.transformer">
 <code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA.transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA.transformer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
+<p>L = cholesky(M).T</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : upper triangular (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="metric_learn.rca.RCA_Supervised">
-<em class="property">class </em><code class="descclassname">metric_learn.rca.</code><code class="descname">RCA_Supervised</code><span class="sig-paren">(</span><em>dim=None</em>, <em>num_chunks=100</em>, <em>chunk_size=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA_Supervised"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA_Supervised" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#metric_learn.rca.RCA" title="metric_learn.rca.RCA"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.rca.RCA</span></code></a></p>
+<em class="property">class </em><code class="descclassname">metric_learn.rca.</code><code class="descname">RCA_Supervised</code><span class="sig-paren">(</span><em>num_dims=None</em>, <em>pca_comps=None</em>, <em>num_chunks=100</em>, <em>chunk_size=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA_Supervised"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA_Supervised" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#metric_learn.rca.RCA" title="metric_learn.rca.RCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.rca.RCA</span></code></a></p>
+<dl class="method">
+<dt id="metric_learn.rca.RCA_Supervised.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num_dims=None</em>, <em>pca_comps=None</em>, <em>num_chunks=100</em>, <em>chunk_size=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA_Supervised.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the supervised version of <cite>RCA</cite>.</p>
+<p><cite>RCA_Supervised</cite> creates chunks of similar points by first sampling a
+class, taking <cite>chunk_size</cite> elements in it, and repeating the process
+<cite>num_chunks</cite> times.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>num_dims</strong> : int, optional</p>
+<blockquote>
+<div><p>embedding dimension (default: original dimension of data)</p>
+</div></blockquote>
+<p><strong>num_chunks: int, optional</strong></p>
+<p class="last"><strong>chunk_size: int, optional</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="metric_learn.rca.RCA_Supervised.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>labels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create constraints from labels and learn the LSML model.
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>random_state=&lt;module 'numpy.random' from '/home/will/anaconda3/envs/sklearn-dev/lib/python3.6/site-packages/numpy/random/__init__.py'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/rca.html#RCA_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create constraints from labels and learn the RCA model.
 Needs num_constraints specified in constructor.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -302,7 +428,38 @@ Needs num_constraints specified in constructor.</p>
 <blockquote>
 <div><p>each row corresponds to a single instance</p>
 </div></blockquote>
-<p class="last"><strong>labels</strong> : (n) data labels</p>
+<p><strong>y</strong> : (n) data labels</p>
+<p class="last"><strong>random_state</strong> : a random.seed object to fix the random_state if needed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.rca.RCA_Supervised.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit to data, then transform it.</p>
+<p>Fits transformer to X and y with optional parameters fit_params
+and returns a transformed version of X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : numpy array of shape [n_samples, n_features]</p>
+<blockquote>
+<div><p>Training set.</p>
+</div></blockquote>
+<p><strong>y</strong> : numpy array of shape [n_samples]</p>
+<blockquote>
+<div><p>Target values.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>X_new</strong> : numpy array of shape [n_samples, n_features_new]</p>
+<blockquote class="last">
+<div><p>Transformed array.</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
@@ -311,16 +468,16 @@ Needs num_constraints specified in constructor.</p>
 
 <dl class="method">
 <dt id="metric_learn.rca.RCA_Supervised.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get parameters for this metric learner.</p>
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep</strong> : boolean, optional</p>
 <blockquote>
-<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
-scikit-learn has this on BaseEstimator.</p>
+<div><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -338,7 +495,7 @@ scikit-learn has this on BaseEstimator.</p>
 <dt id="metric_learn.rca.RCA_Supervised.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[M = L^{\top} L\]</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -352,9 +509,12 @@ scikit-learn has this on BaseEstimator.</p>
 
 <dl class="method">
 <dt id="metric_learn.rca.RCA_Supervised.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the parameters of this metric learner.</p>
-<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -381,7 +541,7 @@ scikit-learn has this on BaseEstimator.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transformed</strong> : (n x d) matrix</p>
 <blockquote class="last">
-<div><p>Input data transformed to the metric space by <span class="math">\(XL^{\top}\)</span></p>
+<div><p>Input data transformed to the metric space by <span class="math notranslate nohighlight">\(XL^{\top}\)</span></p>
 </div></blockquote>
 </td>
 </tr>
@@ -392,18 +552,28 @@ scikit-learn has this on BaseEstimator.</p>
 <dl class="method">
 <dt id="metric_learn.rca.RCA_Supervised.transformer">
 <code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.rca.RCA_Supervised.transformer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
+<p>L = cholesky(M).T</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : upper triangular (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">RCA_Supervised</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">RCA_Supervised</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
 
 <span class="n">rca</span> <span class="o">=</span> <span class="n">RCA_Supervised</span><span class="p">(</span><span class="n">num_chunks</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">rca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
@@ -418,15 +588,18 @@ scikit-learn has this on BaseEstimator.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.html" class="btn btn-neutral float-right" title="metric_learn package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.mmc.html" class="btn btn-neutral float-right" title="Mahalanobis Metric Learning for Clustering (MMC)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metric_learn.lfda.html" class="btn btn-neutral" title="Local Fisher Discriminant Analysis (LFDA)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="metric_learn.sdml.html" class="btn btn-neutral" title="Sparse Determinant Metric Learning (SDML)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -435,7 +608,7 @@ scikit-learn has this on BaseEstimator.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2016, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
 
     </p>
   </div>
@@ -457,16 +630,17 @@ scikit-learn has this on BaseEstimator.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Information Theoretic Metric Learning (ITML) &mdash; metric-learn 0.4.0 documentation</title>
+  <title>Mahalanobis Metric Learning for Clustering (MMC) &mdash; metric-learn 0.4.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="metric-learn 0.4.0 documentation" href="index.html"/>
-        <link rel="next" title="Least Squares Metric Learning (LSML)" href="metric_learn.lsml.html"/>
-        <link rel="prev" title="Metric Learning for Kernel Regression (MLKR)" href="metric_learn.mlkr.html"/> 
+        <link rel="next" title="metric_learn package" href="metric_learn.html"/>
+        <link rel="prev" title="Relative Components Analysis (RCA)" href="metric_learn.rca.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -98,30 +98,30 @@
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Information Theoretic Metric Learning (ITML)</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Mahalanobis Metric Learning for Clustering (MMC)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="metric_learn.html">Package Overview</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="metric_learn.html#submodules">Submodules</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.html">metric_learn.base_metric module</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Information Theoretic Metric Learning (ITML)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Mahalanobis Metric Learning for Clustering (MMC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
@@ -174,13 +174,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Information Theoretic Metric Learning (ITML)</li>
+      <li>Mahalanobis Metric Learning for Clustering (MMC)</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/metric_learn.itml.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/metric_learn.mmc.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -193,55 +193,55 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-metric_learn.itml">
-<span id="information-theoretic-metric-learning-itml"></span><h1>Information Theoretic Metric Learning (ITML)<a class="headerlink" href="#module-metric_learn.itml" title="Permalink to this headline">¶</a></h1>
-<p>Information Theoretic Metric Learning, Kulis et al., ICML 2007</p>
-<p>ITML minimizes the differential relative entropy between two multivariate
-Gaussians under constraints on the distance function,
-which can be formulated into a Bregman optimization problem by minimizing the
-LogDet divergence subject to linear constraints.
-This algorithm can handle a wide variety of constraints and can optionally
-incorporate a prior on the distance function.
-Unlike some other methods, ITML does not rely on an eigenvalue computation
-or semi-definite programming.</p>
-<p>Adapted from Matlab code at <a class="reference external" href="http://www.cs.utexas.edu/users/pjain/itml/">http://www.cs.utexas.edu/users/pjain/itml/</a></p>
+  <div class="section" id="module-metric_learn.mmc">
+<span id="mahalanobis-metric-learning-for-clustering-mmc"></span><h1>Mahalanobis Metric Learning for Clustering (MMC)<a class="headerlink" href="#module-metric_learn.mmc" title="Permalink to this headline">¶</a></h1>
+<p>Mahalanobis Metric Learning with Application for Clustering with Side-Information, Xing et al., NIPS 2002</p>
+<p>MMC minimizes the sum of squared distances between similar examples,
+while enforcing the sum of distances between dissimilar examples to be
+greater than a certain margin.
+This leads to a convex and, thus, local-minima-free optimization problem
+that can be solved efficiently.
+However, the algorithm involves the computation of eigenvalues, which is the
+main speed-bottleneck.
+Since it has initially been designed for clustering applications, one of the
+implicit assumptions of MMC is that all classes form a compact set, i.e.,
+follow a unimodal distribution, which restricts the possible use-cases of
+this method. However, it is one of the earliest and a still often cited technique.</p>
+<p>Adapted from Matlab code at <a class="reference external" href="http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz">http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz</a></p>
 <dl class="class">
-<dt id="metric_learn.itml.ITML">
-<em class="property">class </em><code class="descclassname">metric_learn.itml.</code><code class="descname">ITML</code><span class="sig-paren">(</span><em>gamma=1.0</em>, <em>max_iter=1000</em>, <em>convergence_threshold=0.001</em>, <em>A0=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC">
+<em class="property">class </em><code class="descclassname">metric_learn.mmc.</code><code class="descname">MMC</code><span class="sig-paren">(</span><em>max_iter=100</em>, <em>max_proj=10000</em>, <em>convergence_threshold=0.001</em>, <em>A0=None</em>, <em>diagonal=False</em>, <em>diagonal_c=1.0</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mmc.html#MMC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mmc.MMC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
-<p>Information Theoretic Metric Learning (ITML)</p>
+<p>Mahalanobis Metric for Clustering (MMC)</p>
 <dl class="method">
-<dt id="metric_learn.itml.ITML.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>gamma=1.0</em>, <em>max_iter=1000</em>, <em>convergence_threshold=0.001</em>, <em>A0=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize ITML.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>gamma</strong> : float, optional</p>
+<dt id="metric_learn.mmc.MMC.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>max_iter=100</em>, <em>max_proj=10000</em>, <em>convergence_threshold=0.001</em>, <em>A0=None</em>, <em>diagonal=False</em>, <em>diagonal_c=1.0</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mmc.html#MMC.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mmc.MMC.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize MMC.
+Parameters
+———-
+max_iter : int, optional
+max_proj : int, optional
+convergence_threshold : float, optional
+A0 : (d x d) matrix, optional</p>
 <blockquote>
-<div><p>value for slack variables</p>
-</div></blockquote>
-<p><strong>max_iter</strong> : int, optional</p>
-<p><strong>convergence_threshold</strong> : float, optional</p>
-<p><strong>A0</strong> : (d x d) matrix, optional</p>
-<blockquote>
-<div><p>initial regularization matrix, defaults to identity</p>
-</div></blockquote>
-<p><strong>verbose</strong> : bool, optional</p>
-<blockquote class="last">
-<div><p>if True, prints information while learning</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<div>initial metric, defaults to identity
+only the main diagonal is taken if <cite>diagonal == True</cite></div></blockquote>
+<dl class="docutils">
+<dt>diagonal <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd>if True, a diagonal metric will be learned,
+i.e., a simple scaling of dimensions</dd>
+<dt>diagonal_c <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
+<dd>weight of the dissimilarity constraint for diagonal
+metric learning</dd>
+<dt>verbose <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd>if True, prints information while learning</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>constraints</em>, <em>bounds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Learn the ITML model.</p>
+<dt id="metric_learn.mmc.MMC.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mmc.html#MMC.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mmc.MMC.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Learn the MMC model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -251,13 +251,9 @@ or semi-definite programming.</p>
 <div><p>each row corresponds to a single instance</p>
 </div></blockquote>
 <p><strong>constraints</strong> : 4-tuple of arrays</p>
-<blockquote>
-<div><p>(a,b,c,d) indices into X, with (a,b) specifying positive and (c,d)
-negative pairs</p>
-</div></blockquote>
-<p><strong>bounds</strong> : list (pos,neg) pairs, optional</p>
 <blockquote class="last">
-<div><p>bounds on similarity, s.t. d(X[a],X[b]) &lt; pos and d(X[c],X[d]) &gt; neg</p>
+<div><p>(a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)
+dissimilar pairs</p>
 </div></blockquote>
 </td>
 </tr>
@@ -266,8 +262,8 @@ negative pairs</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML.fit_transform">
-<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit to data, then transform it.</p>
 <p>Fits transformer to X and y with optional parameters fit_params
 and returns a transformed version of X.</p>
@@ -296,8 +292,8 @@ and returns a transformed version of X.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML.get_params" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -321,8 +317,8 @@ contained subobjects that are estimators.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML.metric">
-<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML.metric" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC.metric">
+<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mmc.html#MMC.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mmc.MMC.metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
 <div class="math notranslate nohighlight">
 \[M = L^{\top} L\]</div>
@@ -337,8 +333,8 @@ contained subobjects that are estimators.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML.set_params" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC.set_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
 (such as pipelines). The latter have parameters of the form
@@ -355,8 +351,8 @@ component of a nested object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML.transform" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the metric transformation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -379,15 +375,18 @@ component of a nested object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML.transformer">
-<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML.transformer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
-<p>L = cholesky(M).T</p>
+<dt id="metric_learn.mmc.MMC.transformer">
+<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mmc.html#MMC.transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mmc.MMC.transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the transformation matrix from the Mahalanobis matrix.
+L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with
+the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.</p>
+<p>The Cholesky decomposition cannot be applied here, since MMC learns only a positive
+<em>semi</em>-definite Mahalanobis matrix.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : upper triangular (d x d) matrix</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : (d x d) matrix</td>
 </tr>
 </tbody>
 </table>
@@ -396,26 +395,23 @@ component of a nested object.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="metric_learn.itml.ITML_Supervised">
-<em class="property">class </em><code class="descclassname">metric_learn.itml.</code><code class="descname">ITML_Supervised</code><span class="sig-paren">(</span><em>gamma=1.0</em>, <em>max_iter=1000</em>, <em>convergence_threshold=0.001</em>, <em>num_labeled=inf</em>, <em>num_constraints=None</em>, <em>bounds=None</em>, <em>A0=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML_Supervised"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML_Supervised" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#metric_learn.itml.ITML" title="metric_learn.itml.ITML"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.itml.ITML</span></code></a></p>
-<p>Information Theoretic Metric Learning (ITML)</p>
+<dt id="metric_learn.mmc.MMC_Supervised">
+<em class="property">class </em><code class="descclassname">metric_learn.mmc.</code><code class="descname">MMC_Supervised</code><span class="sig-paren">(</span><em>max_iter=100</em>, <em>max_proj=10000</em>, <em>convergence_threshold=1e-06</em>, <em>num_labeled=inf</em>, <em>num_constraints=None</em>, <em>A0=None</em>, <em>diagonal=False</em>, <em>diagonal_c=1.0</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mmc.html#MMC_Supervised"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#metric_learn.mmc.MMC" title="metric_learn.mmc.MMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.mmc.MMC</span></code></a></p>
+<p>Mahalanobis Metric for Clustering (MMC)</p>
 <dl class="method">
-<dt id="metric_learn.itml.ITML_Supervised.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>gamma=1.0</em>, <em>max_iter=1000</em>, <em>convergence_threshold=0.001</em>, <em>num_labeled=inf</em>, <em>num_constraints=None</em>, <em>bounds=None</em>, <em>A0=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML_Supervised.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize the supervised version of <cite>ITML</cite>.</p>
-<p><cite>ITML_Supervised</cite> creates pairs of similar sample by taking same class
+<dt id="metric_learn.mmc.MMC_Supervised.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>max_iter=100</em>, <em>max_proj=10000</em>, <em>convergence_threshold=1e-06</em>, <em>num_labeled=inf</em>, <em>num_constraints=None</em>, <em>A0=None</em>, <em>diagonal=False</em>, <em>diagonal_c=1.0</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mmc.html#MMC_Supervised.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the supervised version of <cite>MMC</cite>.</p>
+<p><cite>MMC_Supervised</cite> creates pairs of similar sample by taking same class
 samples, and pairs of dissimilar samples by taking different class
-samples. It then passes these pairs to <cite>ITML</cite> for training.</p>
+samples. It then passes these pairs to <cite>MMC</cite> for training.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>gamma</strong> : float, optional</p>
-<blockquote>
-<div><p>value for slack variables</p>
-</div></blockquote>
-<p><strong>max_iter</strong> : int, optional</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>max_iter</strong> : int, optional</p>
+<p><strong>max_proj</strong> : int, optional</p>
 <p><strong>convergence_threshold</strong> : float, optional</p>
 <p><strong>num_labeled</strong> : int, optional (default=np.inf)</p>
 <blockquote>
@@ -427,13 +423,20 @@ Use np.inf (default) to use all labeled points.</p>
 <blockquote>
 <div><p>number of constraints to generate</p>
 </div></blockquote>
-<p><strong>bounds</strong> : list (pos,neg) pairs, optional</p>
-<blockquote>
-<div><p>bounds on similarity, s.t. d(X[a],X[b]) &lt; pos and d(X[c],X[d]) &gt; neg</p>
-</div></blockquote>
 <p><strong>A0</strong> : (d x d) matrix, optional</p>
 <blockquote>
-<div><p>initial regularization matrix, defaults to identity</p>
+<div><p>initial metric, defaults to identity
+only the main diagonal is taken if <cite>diagonal == True</cite></p>
+</div></blockquote>
+<p><strong>diagonal</strong> : bool, optional</p>
+<blockquote>
+<div><p>if True, a diagonal metric will be learned,
+i.e., a simple scaling of dimensions</p>
+</div></blockquote>
+<p><strong>diagonal_c</strong> : float, optional</p>
+<blockquote>
+<div><p>weight of the dissimilarity constraint for diagonal
+metric learning</p>
 </div></blockquote>
 <p><strong>verbose</strong> : bool, optional</p>
 <blockquote class="last">
@@ -446,9 +449,9 @@ Use np.inf (default) to use all labeled points.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML_Supervised.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>random_state=&lt;module 'numpy.random' from '/home/will/anaconda3/envs/sklearn-dev/lib/python3.6/site-packages/numpy/random/__init__.py'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/itml.html#ITML_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create constraints from labels and learn the ITML model.</p>
+<dt id="metric_learn.mmc.MMC_Supervised.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>random_state=&lt;module 'numpy.random' from '/home/will/anaconda3/envs/sklearn-dev/lib/python3.6/site-packages/numpy/random/__init__.py'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mmc.html#MMC_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create constraints from labels and learn the MMC model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -472,8 +475,8 @@ Use np.inf (default) to use all labeled points.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML_Supervised.fit_transform">
-<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC_Supervised.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit to data, then transform it.</p>
 <p>Fits transformer to X and y with optional parameters fit_params
 and returns a transformed version of X.</p>
@@ -502,8 +505,8 @@ and returns a transformed version of X.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML_Supervised.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC_Supervised.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -527,8 +530,8 @@ contained subobjects that are estimators.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML_Supervised.metric">
-<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.metric" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC_Supervised.metric">
+<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised.metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
 <div class="math notranslate nohighlight">
 \[M = L^{\top} L\]</div>
@@ -543,8 +546,8 @@ contained subobjects that are estimators.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML_Supervised.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC_Supervised.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
 (such as pipelines). The latter have parameters of the form
@@ -561,8 +564,8 @@ component of a nested object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML_Supervised.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.transform" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mmc.MMC_Supervised.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the metric transformation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -585,15 +588,18 @@ component of a nested object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.itml.ITML_Supervised.transformer">
-<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.itml.ITML_Supervised.transformer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
-<p>L = cholesky(M).T</p>
+<dt id="metric_learn.mmc.MMC_Supervised.transformer">
+<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mmc.MMC_Supervised.transformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the transformation matrix from the Mahalanobis matrix.
+L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with
+the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.</p>
+<p>The Cholesky decomposition cannot be applied here, since MMC learns only a positive
+<em>semi</em>-definite Mahalanobis matrix.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : upper triangular (d x d) matrix</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : (d x d) matrix</td>
 </tr>
 </tbody>
 </table>
@@ -603,21 +609,21 @@ component of a nested object.</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">ITML_Supervised</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MMC_Supervised</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
 <span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
 
-<span class="n">itml</span> <span class="o">=</span> <span class="n">ITML_Supervised</span><span class="p">(</span><span class="n">num_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
-<span class="n">itml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">mmc</span> <span class="o">=</span> <span class="n">MMC_Supervised</span><span class="p">(</span><span class="n">num_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="http://machinelearning.wustl.edu/mlpapers/paper_files/icml2007_DavisKJSD07.pdf">Information-theoretic Metric Learning</a> Jason V. Davis, et al.</p>
+<p><a class="reference external" href="http://papers.nips.cc/paper/2164-distance-metric-learning-with-application-to-clustering-with-side-information.pdf">Distance metric learning with application to clustering with side-information</a> Xing, Jordan, Russell, Ng.</p>
 </div>
 </div>
 
@@ -631,10 +637,10 @@ component of a nested object.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.lsml.html" class="btn btn-neutral float-right" title="Least Squares Metric Learning (LSML)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.html" class="btn btn-neutral float-right" title="metric_learn package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metric_learn.mlkr.html" class="btn btn-neutral" title="Metric Learning for Kernel Regression (MLKR)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="metric_learn.rca.html" class="btn btn-neutral" title="Relative Components Analysis (RCA)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

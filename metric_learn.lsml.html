@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Least Squares Metric Learning (LSML) &mdash; metric-learn 0.3.0 documentation</title>
+  <title>Least Squares Metric Learning (LSML) &mdash; metric-learn 0.4.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -30,9 +32,12 @@
   
 
   
-    <link rel="top" title="metric-learn 0.3.0 documentation" href="index.html"/>
-        <link rel="next" title="Neighborhood Components Analysis (NCA)" href="metric_learn.nca.html"/>
-        <link rel="prev" title="Sparse Determinant Metric Learning (SDML)" href="metric_learn.sdml.html"/> 
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="metric-learn 0.4.0 documentation" href="index.html"/>
+        <link rel="next" title="Sparse Determinant Metric Learning (SDML)" href="metric_learn.sdml.html"/>
+        <link rel="prev" title="Information Theoretic Metric Learning (ITML)" href="metric_learn.itml.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -41,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -60,7 +66,7 @@
             
             
               <div class="version">
-                0.3.0
+                0.4.0
               </div>
             
           
@@ -81,20 +87,26 @@
           
             
             
-                <p class="caption"><span class="caption-text">Algorithms</span></p>
-<ul class="current">
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+</ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Least Squares Metric Learning (LSML)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="metric_learn.html">Package Overview</a><ul class="current">
@@ -108,6 +120,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
@@ -128,8 +142,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">metric-learn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">metric-learn</a>
+        
       </nav>
 
 
@@ -138,23 +154,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Least Squares Metric Learning (LSML)</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Least Squares Metric Learning (LSML)</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/metric_learn.lsml.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/metric_learn.lsml.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -163,17 +196,41 @@
   <div class="section" id="module-metric_learn.lsml">
 <span id="least-squares-metric-learning-lsml"></span><h1>Least Squares Metric Learning (LSML)<a class="headerlink" href="#module-metric_learn.lsml" title="Permalink to this headline">¶</a></h1>
 <p>Liu et al.
-&#8220;Metric Learning from Relative Comparisons by Minimizing Squared Residual&#8221;.
+“Metric Learning from Relative Comparisons by Minimizing Squared Residual”.
 ICDM 2012.</p>
 <p>Adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439917">https://gist.github.com/kcarnold/5439917</a>
 Paper: <a class="reference external" href="http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf">http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf</a></p>
 <dl class="class">
 <dt id="metric_learn.lsml.LSML">
-<em class="property">class </em><code class="descclassname">metric_learn.lsml.</code><code class="descname">LSML</code><span class="sig-paren">(</span><em>tol=0.001</em>, <em>max_iter=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
+<em class="property">class </em><code class="descclassname">metric_learn.lsml.</code><code class="descname">LSML</code><span class="sig-paren">(</span><em>tol=0.001</em>, <em>max_iter=1000</em>, <em>prior=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
+<dl class="method">
+<dt id="metric_learn.lsml.LSML.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>tol=0.001</em>, <em>max_iter=1000</em>, <em>prior=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize LSML.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tol</strong> : float, optional</p>
+<p><strong>max_iter</strong> : int, optional</p>
+<p><strong>prior</strong> : (d x d) matrix, optional</p>
+<blockquote>
+<div><p>guess at a metric [default: inv(covariance(X))]</p>
+</div></blockquote>
+<p><strong>verbose</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>if True, prints information while learning</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="metric_learn.lsml.LSML.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>constraints</em>, <em>weights=None</em>, <em>prior=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML.fit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>constraints</em>, <em>weights=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Learn the LSML model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -188,12 +245,38 @@ Paper: <a class="reference external" href="http://www.cs.ucla.edu/~weiwang/paper
 <div><p>(a,b,c,d) indices into X, such that d(X[a],X[b]) &lt; d(X[c],X[d])</p>
 </div></blockquote>
 <p><strong>weights</strong> : (m,) array of floats, optional</p>
-<blockquote>
+<blockquote class="last">
 <div><p>scale factor for each constraint</p>
 </div></blockquote>
-<p><strong>prior</strong> : (d x d) matrix, optional</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.lsml.LSML.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit to data, then transform it.</p>
+<p>Fits transformer to X and y with optional parameters fit_params
+and returns a transformed version of X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : numpy array of shape [n_samples, n_features]</p>
+<blockquote>
+<div><p>Training set.</p>
+</div></blockquote>
+<p><strong>y</strong> : numpy array of shape [n_samples]</p>
+<blockquote>
+<div><p>Target values.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>X_new</strong> : numpy array of shape [n_samples, n_features_new]</p>
 <blockquote class="last">
-<div><p>guess at a metric [default: covariance(X)]</p>
+<div><p>Transformed array.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -203,16 +286,16 @@ Paper: <a class="reference external" href="http://www.cs.ucla.edu/~weiwang/paper
 
 <dl class="method">
 <dt id="metric_learn.lsml.LSML.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML.get_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get parameters for this metric learner.</p>
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep</strong> : boolean, optional</p>
 <blockquote>
-<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
-scikit-learn has this on BaseEstimator.</p>
+<div><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -229,13 +312,27 @@ scikit-learn has this on BaseEstimator.</p>
 <dl class="method">
 <dt id="metric_learn.lsml.LSML.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML.metric" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
+<div class="math notranslate nohighlight">
+\[M = L^{\top} L\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>M</strong> : (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="metric_learn.lsml.LSML.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the parameters of this metric learner.</p>
-<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -262,7 +359,7 @@ scikit-learn has this on BaseEstimator.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transformed</strong> : (n x d) matrix</p>
 <blockquote class="last">
-<div><p>Input data transformed to the metric space by <span class="math">\(XL^{\top}\)</span></p>
+<div><p>Input data transformed to the metric space by <span class="math notranslate nohighlight">\(XL^{\top}\)</span></p>
 </div></blockquote>
 </td>
 </tr>
@@ -274,12 +371,12 @@ scikit-learn has this on BaseEstimator.</p>
 <dt id="metric_learn.lsml.LSML.transformer">
 <code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML.transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
-<p>L = inv(cholesky(M))</p>
+<p>L = cholesky(M).T</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : (d x d) matrix</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : upper triangular (d x d) matrix</td>
 </tr>
 </tbody>
 </table>
@@ -290,21 +387,99 @@ scikit-learn has this on BaseEstimator.</p>
 <dl class="class">
 <dt id="metric_learn.lsml.LSML_Supervised">
 <em class="property">class </em><code class="descclassname">metric_learn.lsml.</code><code class="descname">LSML_Supervised</code><span class="sig-paren">(</span><em>tol=0.001</em>, <em>max_iter=1000</em>, <em>prior=None</em>, <em>num_labeled=inf</em>, <em>num_constraints=None</em>, <em>weights=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML_Supervised"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#metric_learn.lsml.LSML" title="metric_learn.lsml.LSML"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.lsml.LSML</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#metric_learn.lsml.LSML" title="metric_learn.lsml.LSML"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.lsml.LSML</span></code></a></p>
 <dl class="method">
-<dt id="metric_learn.lsml.LSML_Supervised.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>labels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create constraints from labels and learn the LSML model.
-Needs num_constraints specified in constructor.</p>
+<dt id="metric_learn.lsml.LSML_Supervised.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>tol=0.001</em>, <em>max_iter=1000</em>, <em>prior=None</em>, <em>num_labeled=inf</em>, <em>num_constraints=None</em>, <em>weights=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML_Supervised.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the supervised version of <cite>LSML</cite>.</p>
+<p><cite>LSML_Supervised</cite> creates quadruplets from labeled samples by taking two
+samples from the same class, and two samples from different classes.
+This way it builds quadruplets where the two first points must be more
+similar than the two last points.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : (n x d) data matrix</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tol</strong> : float, optional</p>
+<p><strong>max_iter</strong> : int, optional</p>
+<p><strong>prior</strong> : (d x d) matrix, optional</p>
 <blockquote>
-<div><p>each row corresponds to a single instance</p>
+<div><p>guess at a metric [default: covariance(X)]</p>
 </div></blockquote>
-<p class="last"><strong>labels</strong> : (n) data labels</p>
+<p><strong>num_labeled</strong> : int, optional (default=np.inf)</p>
+<blockquote>
+<div><p>number of labeled points to keep for building quadruplets. Extra
+labeled points will be considered unlabeled, and ignored as such.
+Use np.inf (default) to use all labeled points.</p>
+</div></blockquote>
+<p><strong>num_constraints: int, optional</strong></p>
+<blockquote>
+<div><p>number of constraints to generate</p>
+</div></blockquote>
+<p><strong>weights</strong> : (m,) array of floats, optional</p>
+<blockquote>
+<div><p>scale factor for each constraint</p>
+</div></blockquote>
+<p><strong>verbose</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>if True, prints information while learning</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.lsml.LSML_Supervised.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em>, <em>random_state=&lt;module 'numpy.random' from '/home/will/anaconda3/envs/sklearn-dev/lib/python3.6/site-packages/numpy/random/__init__.py'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lsml.html#LSML_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create constraints from labels and learn the LSML model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : (n x d) matrix</p>
+<blockquote>
+<div><p>Input data, where each row corresponds to a single instance.</p>
+</div></blockquote>
+<p><strong>y</strong> : (n) array-like</p>
+<blockquote>
+<div><p>Data labels.</p>
+</div></blockquote>
+<p><strong>random_state</strong> : numpy.random.RandomState, optional</p>
+<blockquote class="last">
+<div><p>If provided, controls random number generation.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.lsml.LSML_Supervised.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit to data, then transform it.</p>
+<p>Fits transformer to X and y with optional parameters fit_params
+and returns a transformed version of X.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : numpy array of shape [n_samples, n_features]</p>
+<blockquote>
+<div><p>Training set.</p>
+</div></blockquote>
+<p><strong>y</strong> : numpy array of shape [n_samples]</p>
+<blockquote>
+<div><p>Target values.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>X_new</strong> : numpy array of shape [n_samples, n_features_new]</p>
+<blockquote class="last">
+<div><p>Transformed array.</p>
+</div></blockquote>
 </td>
 </tr>
 </tbody>
@@ -313,16 +488,16 @@ Needs num_constraints specified in constructor.</p>
 
 <dl class="method">
 <dt id="metric_learn.lsml.LSML_Supervised.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get parameters for this metric learner.</p>
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep</strong> : boolean, optional</p>
 <blockquote>
-<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
-scikit-learn has this on BaseEstimator.</p>
+<div><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -339,13 +514,27 @@ scikit-learn has this on BaseEstimator.</p>
 <dl class="method">
 <dt id="metric_learn.lsml.LSML_Supervised.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.metric" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
+<div class="math notranslate nohighlight">
+\[M = L^{\top} L\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>M</strong> : (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="metric_learn.lsml.LSML_Supervised.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the parameters of this metric learner.</p>
-<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -372,7 +561,7 @@ scikit-learn has this on BaseEstimator.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transformed</strong> : (n x d) matrix</p>
 <blockquote class="last">
-<div><p>Input data transformed to the metric space by <span class="math">\(XL^{\top}\)</span></p>
+<div><p>Input data transformed to the metric space by <span class="math notranslate nohighlight">\(XL^{\top}\)</span></p>
 </div></blockquote>
 </td>
 </tr>
@@ -384,12 +573,12 @@ scikit-learn has this on BaseEstimator.</p>
 <dt id="metric_learn.lsml.LSML_Supervised.transformer">
 <code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lsml.LSML_Supervised.transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
-<p>L = inv(cholesky(M))</p>
+<p>L = cholesky(M).T</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : (d x d) matrix</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : upper triangular (d x d) matrix</td>
 </tr>
 </tbody>
 </table>
@@ -399,15 +588,15 @@ scikit-learn has this on BaseEstimator.</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">LSML_Supervised</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">LSML_Supervised</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
-<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
 
 <span class="n">lsml</span> <span class="o">=</span> <span class="n">LSML_Supervised</span><span class="p">(</span><span class="n">num_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
-<span class="n">isml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">lsml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -418,15 +607,18 @@ scikit-learn has this on BaseEstimator.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.nca.html" class="btn btn-neutral float-right" title="Neighborhood Components Analysis (NCA)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.sdml.html" class="btn btn-neutral float-right" title="Sparse Determinant Metric Learning (SDML)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metric_learn.sdml.html" class="btn btn-neutral" title="Sparse Determinant Metric Learning (SDML)" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="metric_learn.itml.html" class="btn btn-neutral" title="Information Theoretic Metric Learning (ITML)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -435,7 +627,7 @@ scikit-learn has this on BaseEstimator.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2016, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
 
     </p>
   </div>
@@ -457,16 +649,17 @@ scikit-learn has this on BaseEstimator.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

@@ -11,6 +11,8 @@ Submodules
    metric_learn.lfda
    metric_learn.lmnn
    metric_learn.lsml
+   metric_learn.mlkr
+   metric_learn.mmc
    metric_learn.nca
    metric_learn.rca
    metric_learn.sdml

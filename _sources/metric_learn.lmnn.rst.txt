@@ -6,6 +6,7 @@ Large Margin Nearest Neighbor (LMNN)
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :special-members: __init__
 
 Example Code
 ------------

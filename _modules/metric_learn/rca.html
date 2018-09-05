@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.rca &mdash; metric-learn 0.3.0 documentation</title>
+  <title>metric_learn.rca &mdash; metric-learn 0.4.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -30,7 +32,10 @@
   
 
   
-    <link rel="top" title="metric-learn 0.3.0 documentation" href="../../index.html"/>
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="metric-learn 0.4.0 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -40,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -59,7 +65,7 @@
             
             
               <div class="version">
-                0.3.0
+                0.4.0
               </div>
             
           
@@ -80,16 +86,22 @@
           
             
             
-                <p class="caption"><span class="caption-text">Algorithms</span></p>
-<ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Overview</a></li>
@@ -105,8 +117,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../index.html">metric-learn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">metric-learn</a>
+        
       </nav>
 
 
@@ -119,19 +133,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      
-    <li>metric_learn.rca</li>
+        
+      <li>metric_learn.rca</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -148,86 +179,123 @@
 <span class="sd">subsets of points that are known to belong to the same class.</span>
 
 <span class="sd">&#39;Learning distance functions using equivalence relations&#39;, ICML 2003</span>
+<span class="sd">&#39;Learning a Mahalanobis metric from equivalence constraints&#39;, JMLR 2005</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">decomposition</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">check_array</span>
 
 <span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">BaseMetricLearner</span>
 <span class="kn">from</span> <span class="nn">.constraints</span> <span class="k">import</span> <span class="n">Constraints</span>
 
 
+<span class="c1"># mean center each chunklet separately</span>
+<span class="k">def</span> <span class="nf">_chunk_mean_centering</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">chunks</span><span class="p">):</span>
+  <span class="n">num_chunks</span> <span class="o">=</span> <span class="n">chunks</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+  <span class="n">chunk_mask</span> <span class="o">=</span> <span class="n">chunks</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+  <span class="n">chunk_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">]</span>
+  <span class="n">chunk_labels</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">]</span>
+  <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">):</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">chunk_labels</span> <span class="o">==</span> <span class="n">c</span>
+    <span class="n">chunk_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-=</span> <span class="n">chunk_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">chunk_mask</span><span class="p">,</span> <span class="n">chunk_data</span>
+
+
 <div class="viewcode-block" id="RCA"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA">[docs]</a><span class="k">class</span> <span class="nc">RCA</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Relevant Components Analysis (RCA)&quot;&quot;&quot;</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="RCA.__init__"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pca_comps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initialize the learner.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dim : int, optional</span>
+<span class="sd">    num_dims : int, optional</span>
 <span class="sd">        embedding dimension (default: original dimension of data)</span>
+
+<span class="sd">    pca_comps : int, float, None or string</span>
+<span class="sd">        Number of components to keep during PCA preprocessing.</span>
+<span class="sd">        If None (default), does not perform PCA.</span>
+<span class="sd">        If ``0 &lt; pca_comps &lt; 1``, it is used as</span>
+<span class="sd">        the minimum explained variance ratio.</span>
+<span class="sd">        See sklearn.decomposition.PCA for more details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="n">dim</span><span class="p">,</span>
-    <span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">=</span> <span class="n">num_dims</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pca_comps</span> <span class="o">=</span> <span class="n">pca_comps</span></div>
 
 <div class="viewcode-block" id="RCA.transformer"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA.transformer">[docs]</a>  <span class="k">def</span> <span class="nf">transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span></div>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_</span></div>
 
-  <span class="k">def</span> <span class="nf">_process_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
-    <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+  <span class="k">def</span> <span class="nf">_process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="n">X</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
-    <span class="k">elif</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">:</span>
-      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid embedding dimension, must be in [1,</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">d</span><span class="p">)</span>
+    <span class="c1"># PCA projection to remove noise and redundant information.</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca_comps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">pca</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pca_comps</span><span class="p">)</span>
+      <span class="n">X</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+      <span class="n">M_pca</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">components_</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">X</span> <span class="o">-=</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+      <span class="n">M_pca</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
-    <span class="n">num_chunks</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">M_pca</span>
 
-    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">d</span>
+  <span class="k">def</span> <span class="nf">_check_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The inner covariance matrix is not invertible, &#39;</span>
+                    <span class="s1">&#39;so the transformation matrix may contain Nan values. &#39;</span>
+                    <span class="s1">&#39;You should adjust pca_comps to remove noise and &#39;</span>
+                    <span class="s1">&#39;redundant information.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">dim</span> <span class="o">=</span> <span class="n">d</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid embedding dimension: must be greater than 0.&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">:</span>
+      <span class="n">dim</span> <span class="o">=</span> <span class="n">d</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;num_dims (</span><span class="si">%d</span><span class="s1">) must be smaller than &#39;</span>
+                    <span class="s1">&#39;the data dimension (</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span>
+    <span class="k">return</span> <span class="n">dim</span>
 
 <div class="viewcode-block" id="RCA.fit"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">chunks</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Learn the RCA model.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    X : (n x d) data matrix</span>
-<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">    data : (n x d) data matrix</span>
+<span class="sd">        Each row corresponds to a single instance</span>
 <span class="sd">    chunks : (n,) array of ints</span>
-<span class="sd">        when ``chunks[i] == -1``, point i doesn&#39;t belong to any chunklet,</span>
-<span class="sd">        when ``chunks[i] == j``, point i belongs to chunklet j.</span>
+<span class="sd">        When ``chunks[i] == -1``, point i doesn&#39;t belong to any chunklet.</span>
+<span class="sd">        When ``chunks[i] == j``, point i belongs to chunklet j.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_inputs</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">M_pca</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="c1"># mean center</span>
-    <span class="n">data</span> <span class="o">-=</span> <span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">chunk_mask</span><span class="p">,</span> <span class="n">chunked_data</span> <span class="o">=</span> <span class="n">_chunk_mean_centering</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span>
 
-    <span class="c1"># mean center each chunklet separately</span>
-    <span class="n">chunk_mask</span> <span class="o">=</span> <span class="n">chunks</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="n">chunk_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">]</span>
-    <span class="n">chunk_labels</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">):</span>
-      <span class="n">mask</span> <span class="o">=</span> <span class="n">chunk_labels</span> <span class="o">==</span> <span class="n">c</span>
-      <span class="n">chunk_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-=</span> <span class="n">chunk_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-    <span class="c1"># &quot;inner&quot; covariance of chunk deviations</span>
-    <span class="n">inner_cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">chunk_data</span><span class="p">,</span> <span class="n">rowvar</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">inner_cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">chunked_data</span><span class="p">,</span> <span class="n">rowvar</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_dimension</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">inner_cov</span><span class="p">))</span>
 
     <span class="c1"># Fisher Linear Discriminant projection</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">dim</span> <span class="o">&lt;</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
       <span class="n">total_cov</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">],</span> <span class="n">rowvar</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
       <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">total_cov</span><span class="p">,</span> <span class="n">inner_cov</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
       <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-      <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">vals</span><span class="p">)[:</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]]</span>
-      <span class="n">A</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span><span class="n">inds</span><span class="p">]</span>
+      <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">vals</span><span class="p">)[:</span><span class="n">dim</span><span class="p">]</span>
+      <span class="n">A</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="n">inds</span><span class="p">]</span>
       <span class="n">inner_cov</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inner_cov</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span> <span class="o">=</span> <span class="n">_inv_sqrtm</span><span class="p">(</span><span class="n">inner_cov</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">transformer_</span> <span class="o">=</span> <span class="n">_inv_sqrtm</span><span class="p">(</span><span class="n">inner_cov</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_transformer</span> <span class="o">=</span> <span class="n">_inv_sqrtm</span><span class="p">(</span><span class="n">inner_cov</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">transformer_</span> <span class="o">=</span> <span class="n">_inv_sqrtm</span><span class="p">(</span><span class="n">inner_cov</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">if</span> <span class="n">M_pca</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformer_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">M_pca</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="bp">self</span></div></div>
 
@@ -239,34 +307,45 @@
 
 
 <div class="viewcode-block" id="RCA_Supervised"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA_Supervised">[docs]</a><span class="k">class</span> <span class="nc">RCA_Supervised</span><span class="p">(</span><span class="n">RCA</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Initialize the learner.</span>
+<div class="viewcode-block" id="RCA_Supervised.__init__"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pca_comps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+               <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize the supervised version of `RCA`.</span>
+
+<span class="sd">    `RCA_Supervised` creates chunks of similar points by first sampling a</span>
+<span class="sd">    class, taking `chunk_size` elements in it, and repeating the process</span>
+<span class="sd">    `num_chunks` times.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    dim : int, optional</span>
+<span class="sd">    num_dims : int, optional</span>
 <span class="sd">        embedding dimension (default: original dimension of data)</span>
 <span class="sd">    num_chunks: int, optional</span>
 <span class="sd">    chunk_size: int, optional</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">RCA</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">num_chunks</span><span class="o">=</span><span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">)</span>
+    <span class="n">RCA</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="n">num_dims</span><span class="p">,</span> <span class="n">pca_comps</span><span class="o">=</span><span class="n">pca_comps</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_chunks</span> <span class="o">=</span> <span class="n">num_chunks</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span> <span class="o">=</span> <span class="n">chunk_size</span></div>
 
-<div class="viewcode-block" id="RCA_Supervised.fit"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create constraints from labels and learn the LSML model.</span>
+<div class="viewcode-block" id="RCA_Supervised.fit"><a class="viewcode-back" href="../../metric_learn.rca.html#metric_learn.rca.RCA_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create constraints from labels and learn the RCA model.</span>
 <span class="sd">    Needs num_constraints specified in constructor.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    X : (n x d) data matrix</span>
 <span class="sd">        each row corresponds to a single instance</span>
-<span class="sd">    labels : (n) data labels</span>
+<span class="sd">    y : (n) data labels</span>
+<span class="sd">    random_state : a random.seed object to fix the random_state if needed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">chunks</span> <span class="o">=</span> <span class="n">Constraints</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">chunks</span><span class="p">(</span><span class="n">num_chunks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;num_chunks&#39;</span><span class="p">],</span>
-                                        <span class="n">chunk_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;chunk_size&#39;</span><span class="p">])</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="n">Constraints</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">chunks</span><span class="p">(</span><span class="n">num_chunks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_chunks</span><span class="p">,</span>
+                                   <span class="n">chunk_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
+                                   <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">RCA</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span></div></div>
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
@@ -276,7 +355,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2016, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
 
     </p>
   </div>
@@ -298,16 +377,17 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

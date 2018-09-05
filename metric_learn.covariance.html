@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Covariance metric (baseline method) &mdash; metric-learn 0.3.0 documentation</title>
+  <title>Covariance metric (baseline method) &mdash; metric-learn 0.4.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -30,7 +32,10 @@
   
 
   
-    <link rel="top" title="metric-learn 0.3.0 documentation" href="index.html"/>
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="metric-learn 0.4.0 documentation" href="index.html"/>
         <link rel="next" title="Large Margin Nearest Neighbor (LMNN)" href="metric_learn.lmnn.html"/>
         <link rel="prev" title="metric-learn: Metric Learning in Python" href="index.html"/> 
 
@@ -41,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -60,7 +66,7 @@
             
             
               <div class="version">
-                0.3.0
+                0.4.0
               </div>
             
           
@@ -81,19 +87,25 @@
           
             
             
-                <p class="caption"><span class="caption-text">Algorithms</span></p>
-<ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Covariance metric (baseline method)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.html">Package Overview</a></li>
@@ -109,8 +121,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">metric-learn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">metric-learn</a>
+        
       </nav>
 
 
@@ -119,23 +133,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Covariance metric (baseline method)</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Covariance metric (baseline method)</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/metric_learn.covariance.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/metric_learn.covariance.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -144,33 +175,69 @@
   <div class="section" id="module-metric_learn.covariance">
 <span id="covariance-metric-baseline-method"></span><h1>Covariance metric (baseline method)<a class="headerlink" href="#module-metric_learn.covariance" title="Permalink to this headline">¶</a></h1>
 <p>Covariance metric (baseline method)</p>
-<p>This method does not &#8220;learn&#8221; anything, rather it calculates
+<p>This method does not “learn” anything, rather it calculates
 the covariance matrix of the input data.</p>
 <p>This is a simple baseline method first introduced in
 On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936</p>
 <dl class="class">
 <dt id="metric_learn.covariance.Covariance">
 <em class="property">class </em><code class="descclassname">metric_learn.covariance.</code><code class="descname">Covariance</code><a class="reference internal" href="_modules/metric_learn/covariance.html#Covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.covariance.Covariance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
 <dl class="method">
-<dt id="metric_learn.covariance.Covariance.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/covariance.html#Covariance.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.covariance.Covariance.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>X: data matrix, (n x d)
-y: unused, optional</p>
+<dt id="metric_learn.covariance.Covariance.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/covariance.html#Covariance.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.covariance.Covariance.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.covariance.Covariance.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.covariance.Covariance.get_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get parameters for this metric learner.</p>
+<dt id="metric_learn.covariance.Covariance.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/covariance.html#Covariance.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.covariance.Covariance.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>X : data matrix, (n x d)
+y : unused</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.covariance.Covariance.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.covariance.Covariance.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit to data, then transform it.</p>
+<p>Fits transformer to X and y with optional parameters fit_params
+and returns a transformed version of X.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep: boolean, optional</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : numpy array of shape [n_samples, n_features]</p>
 <blockquote>
-<div><p>&#64;WARNING doesn&#8217;t do anything, only exists because
-scikit-learn has this on BaseEstimator.</p>
+<div><p>Training set.</p>
+</div></blockquote>
+<p><strong>y</strong> : numpy array of shape [n_samples]</p>
+<blockquote>
+<div><p>Target values.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>X_new</strong> : numpy array of shape [n_samples, n_features_new]</p>
+<blockquote class="last">
+<div><p>Transformed array.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="metric_learn.covariance.Covariance.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.covariance.Covariance.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>deep</strong> : boolean, optional</p>
+<blockquote>
+<div><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -187,13 +254,27 @@ scikit-learn has this on BaseEstimator.</p>
 <dl class="method">
 <dt id="metric_learn.covariance.Covariance.metric">
 <code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/covariance.html#Covariance.metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.covariance.Covariance.metric" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
+<div class="math notranslate nohighlight">
+\[M = L^{\top} L\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>M</strong> : (d x d) matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="metric_learn.covariance.Covariance.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**kwarg</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.covariance.Covariance.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the parameters of this metric learner.</p>
-<p>Overwrites any default parameters or parameters specified in constructor.</p>
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.covariance.Covariance.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -220,7 +301,7 @@ scikit-learn has this on BaseEstimator.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>transformed</strong> : (n x d) matrix</p>
 <blockquote class="last">
-<div><p>Input data transformed to the metric space by <span class="math">\(XL^{\top}\)</span></p>
+<div><p>Input data transformed to the metric space by <span class="math notranslate nohighlight">\(XL^{\top}\)</span></p>
 </div></blockquote>
 </td>
 </tr>
@@ -232,12 +313,12 @@ scikit-learn has this on BaseEstimator.</p>
 <dt id="metric_learn.covariance.Covariance.transformer">
 <code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.covariance.Covariance.transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
-<p>L = inv(cholesky(M))</p>
+<p>L = cholesky(M).T</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : (d x d) matrix</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>L</strong> : upper triangular (d x d) matrix</td>
 </tr>
 </tbody>
 </table>
@@ -247,7 +328,7 @@ scikit-learn has this on BaseEstimator.</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">Covariance</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">Covariance</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
@@ -261,15 +342,18 @@ scikit-learn has this on BaseEstimator.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.lmnn.html" class="btn btn-neutral float-right" title="Large Margin Nearest Neighbor (LMNN)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.lmnn.html" class="btn btn-neutral float-right" title="Large Margin Nearest Neighbor (LMNN)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="metric-learn: Metric Learning in Python" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral" title="metric-learn: Metric Learning in Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -278,7 +362,7 @@ scikit-learn has this on BaseEstimator.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2016, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
 
     </p>
   </div>
@@ -300,16 +384,17 @@ scikit-learn has this on BaseEstimator.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

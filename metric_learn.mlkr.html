@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Large Margin Nearest Neighbor (LMNN) &mdash; metric-learn 0.4.0 documentation</title>
+  <title>Metric Learning for Kernel Regression (MLKR) &mdash; metric-learn 0.4.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="metric-learn 0.4.0 documentation" href="index.html"/>
-        <link rel="next" title="Neighborhood Components Analysis (NCA)" href="metric_learn.nca.html"/>
-        <link rel="prev" title="Covariance metric (baseline method)" href="metric_learn.covariance.html"/> 
+        <link rel="next" title="Information Theoretic Metric Learning (ITML)" href="metric_learn.itml.html"/>
+        <link rel="prev" title="Local Fisher Discriminant Analysis (LFDA)" href="metric_learn.lfda.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -92,14 +92,14 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Large Margin Nearest Neighbor (LMNN)</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metric Learning for Kernel Regression (MLKR)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
@@ -114,13 +114,13 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.html">metric_learn.base_metric module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Large Margin Nearest Neighbor (LMNN)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Metric Learning for Kernel Regression (MLKR)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example-code">Example Code</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
@@ -174,13 +174,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Large Margin Nearest Neighbor (LMNN)</li>
+      <li>Metric Learning for Kernel Regression (MLKR)</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/metric_learn.lmnn.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/metric_learn.mlkr.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -193,39 +193,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-metric_learn.lmnn">
-<span id="large-margin-nearest-neighbor-lmnn"></span><h1>Large Margin Nearest Neighbor (LMNN)<a class="headerlink" href="#module-metric_learn.lmnn" title="Permalink to this headline">¶</a></h1>
-<p>Large-margin nearest neighbor metric learning. (Weinberger 2005)</p>
-<p>LMNN learns a Mahanalobis distance metric in the kNN classification setting
-using semidefinite programming.
-The learned metric attempts to keep k-nearest neighbors in the same class,
-while keeping examples from different classes separated by a large margin.
-This algorithm makes no assumptions about the distribution of the data.</p>
-<dl class="attribute">
-<dt id="metric_learn.lmnn.LMNN">
-<code class="descclassname">metric_learn.lmnn.</code><code class="descname">LMNN</code><a class="reference internal" href="_modules/metric_learn/lmnn.html#LMNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.LMNN" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="#metric_learn.lmnn.python_LMNN" title="metric_learn.lmnn.python_LMNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.lmnn.python_LMNN</span></code></a></p>
-</dd></dl>
-
+  <div class="section" id="module-metric_learn.mlkr">
+<span id="metric-learning-for-kernel-regression-mlkr"></span><h1>Metric Learning for Kernel Regression (MLKR)<a class="headerlink" href="#module-metric_learn.mlkr" title="Permalink to this headline">¶</a></h1>
+<p>Metric Learning for Kernel Regression (MLKR), Weinberger et al.,</p>
+<p>MLKR is an algorithm for supervised metric learning, which learns a distance
+function by directly minimising the leave-one-out regression error. This
+algorithm can also be viewed as a supervised variation of PCA and can be used
+for dimensionality reduction and high dimensional data visualization.</p>
 <dl class="class">
-<dt id="metric_learn.lmnn.python_LMNN">
-<em class="property">class </em><code class="descclassname">metric_learn.lmnn.</code><code class="descname">python_LMNN</code><span class="sig-paren">(</span><em>k=3</em>, <em>min_iter=50</em>, <em>max_iter=1000</em>, <em>learn_rate=1e-07</em>, <em>regularization=0.5</em>, <em>convergence_tol=0.001</em>, <em>use_pca=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.lmnn._base_LMNN</span></code></p>
+<dt id="metric_learn.mlkr.MLKR">
+<em class="property">class </em><code class="descclassname">metric_learn.mlkr.</code><code class="descname">MLKR</code><span class="sig-paren">(</span><em>num_dims=None</em>, <em>A0=None</em>, <em>tol=None</em>, <em>max_iter=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mlkr.html#MLKR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mlkr.MLKR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="metric_learn.base_metric.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-class docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></p>
+<p>Metric Learning for Kernel Regression (MLKR)</p>
 <dl class="method">
-<dt id="metric_learn.lmnn.python_LMNN.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>k=3</em>, <em>min_iter=50</em>, <em>max_iter=1000</em>, <em>learn_rate=1e-07</em>, <em>regularization=0.5</em>, <em>convergence_tol=0.001</em>, <em>use_pca=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize the LMNN object.</p>
+<dt id="metric_learn.mlkr.MLKR.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>num_dims=None</em>, <em>A0=None</em>, <em>tol=None</em>, <em>max_iter=1000</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mlkr.html#MLKR.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mlkr.MLKR.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize MLKR.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>k</strong> : int, optional</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>num_dims</strong> : int, optional</p>
 <blockquote>
-<div><p>Number of neighbors to consider, not including self-edges.</p>
+<div><p>Dimensionality of reduced space (defaults to dimension of X)</p>
 </div></blockquote>
-<p><strong>regularization: float, optional</strong></p>
+<p><strong>A0: array-like, optional</strong></p>
+<blockquote>
+<div><p>Initialization of transformation matrix. Defaults to PCA loadings.</p>
+</div></blockquote>
+<p><strong>tol: float, optional (default=None)</strong></p>
+<blockquote>
+<div><p>Convergence tolerance for the optimization.</p>
+</div></blockquote>
+<p><strong>max_iter: int, optional</strong></p>
+<blockquote>
+<div><p>Cap on number of congugate gradient iterations.</p>
+</div></blockquote>
+<p><strong>verbose</strong> : bool, optional (default=False)</p>
 <blockquote class="last">
-<div><p>Weighting of pull and push terms, with 0.5 meaning equal weight.</p>
+<div><p>Whether to print progress messages or not.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -234,13 +240,24 @@ This algorithm makes no assumptions about the distribution of the data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.lmnn.python_LMNN.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/lmnn.html#python_LMNN.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.fit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="metric_learn.mlkr.MLKR.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mlkr.html#MLKR.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mlkr.MLKR.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit MLKR model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>X</strong> : (n x d) array of samples</p>
+<p class="last"><strong>y</strong> : (n) data labels</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.lmnn.python_LMNN.fit_transform">
-<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mlkr.MLKR.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>y=None</em>, <em>**fit_params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mlkr.MLKR.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit to data, then transform it.</p>
 <p>Fits transformer to X and y with optional parameters fit_params
 and returns a transformed version of X.</p>
@@ -269,8 +286,8 @@ and returns a transformed version of X.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.lmnn.python_LMNN.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.get_params" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mlkr.MLKR.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mlkr.MLKR.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -294,8 +311,8 @@ contained subobjects that are estimators.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.lmnn.python_LMNN.metric">
-<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.metric" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mlkr.MLKR.metric">
+<code class="descname">metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mlkr.MLKR.metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Mahalanobis matrix from the transformation matrix.</p>
 <div class="math notranslate nohighlight">
 \[M = L^{\top} L\]</div>
@@ -310,8 +327,8 @@ contained subobjects that are estimators.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.lmnn.python_LMNN.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.set_params" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mlkr.MLKR.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mlkr.MLKR.set_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
 (such as pipelines). The latter have parameters of the form
@@ -328,8 +345,8 @@ component of a nested object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.lmnn.python_LMNN.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.transform" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mlkr.MLKR.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.mlkr.MLKR.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies the metric transformation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -352,8 +369,8 @@ component of a nested object.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="metric_learn.lmnn.python_LMNN.transformer">
-<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.lmnn.python_LMNN.transformer" title="Permalink to this definition">¶</a></dt>
+<dt id="metric_learn.mlkr.MLKR.transformer">
+<code class="descname">transformer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/metric_learn/mlkr.html#MLKR.transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.mlkr.MLKR.transformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the transformation matrix from the Mahalanobis matrix.</p>
 <p>L = cholesky(M).T</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -370,26 +387,21 @@ component of a nested object.</p>
 
 <div class="section" id="example-code">
 <h2>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">LMNN</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MLKR</span>
 <span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
 <span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
 
-<span class="n">lmnn</span> <span class="o">=</span> <span class="n">LMNN</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
-<span class="n">lmnn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">mlkr</span> <span class="o">=</span> <span class="n">MLKR</span><span class="p">()</span>
+<span class="n">mlkr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If a recent version of the Shogun Python modular (<code class="docutils literal notranslate"><span class="pre">modshogun</span></code>) library
-is available, the LMNN implementation will use the fast C++ version from
-there. Otherwise, the included pure-Python version will be used.
-The two implementations differ slightly, and the C++ version is more complete.</p>
 </div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="http://papers.nips.cc/paper/2795-distance-metric-learning-for-large-margin-nearest-neighbor-classification">Distance Metric Learning for Large Margin Nearest Neighbor Classification</a> Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul</p>
+<p><a class="reference external" href="http://machinelearning.wustl.edu/mlpapers/paper_files/icml2007_DavisKJSD07.pdf">Information-theoretic Metric Learning</a> Jason V. Davis, et al.</p>
 </div>
 </div>
 
@@ -403,10 +415,10 @@ The two implementations differ slightly, and the C++ version is more complete.</
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.nca.html" class="btn btn-neutral float-right" title="Neighborhood Components Analysis (NCA)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.itml.html" class="btn btn-neutral float-right" title="Information Theoretic Metric Learning (ITML)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metric_learn.covariance.html" class="btn btn-neutral" title="Covariance metric (baseline method)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="metric_learn.lfda.html" class="btn btn-neutral" title="Local Fisher Discriminant Analysis (LFDA)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

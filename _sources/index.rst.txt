@@ -13,20 +13,45 @@ metrics.
 This package contains efficient Python implementations of several popular
 metric learning algorithms.
 
+Supervised Algorithms
+---------------------
+Supervised metric learning algorithms take as inputs points `X` and target
+labels `y`, and learn a distance matrix that make points from the same class
+(for classification) or with close target value (for regression) close to
+each other, and points from different classes or with distant target values
+far away from each other.
+
 .. toctree::
-   :caption: Algorithms
    :maxdepth: 1
 
    metric_learn.covariance
    metric_learn.lmnn
-   metric_learn.itml
-   metric_learn.sdml
-   metric_learn.lsml
    metric_learn.nca
    metric_learn.lfda
-   metric_learn.rca
+   metric_learn.mlkr
 
-Each metric supports the following methods:
+Weakly-Supervised Algorithms
+--------------------------
+Weakly supervised algorithms work on weaker information about the data points
+than supervised algorithms. Rather than labeled points, they take as input
+similarity judgments on tuples of data points, for instance pairs of similar
+and dissimilar points. Refer to the documentation of each algorithm for its
+particular form of input data.
+
+.. toctree::
+   :maxdepth: 1
+
+   metric_learn.itml
+   metric_learn.lsml
+   metric_learn.sdml
+   metric_learn.rca
+   metric_learn.mmc
+
+Note that each weakly-supervised algorithm has a supervised version of the form
+`*_Supervised` where similarity constraints are generated from
+the labels information and passed to the underlying algorithm.
+
+Each metric learning algorithm supports the following methods:
 
 -  ``fit(...)``, which learns the model.
 -  ``transformer()``, which returns a transformation matrix
@@ -63,7 +88,7 @@ is available, the LMNN implementation will use the fast C++ version from
 there. The two implementations differ slightly, and the C++ version is
 more complete.
 
-Naviagtion
+Navigation
 ----------
 
 :ref:`genindex` | :ref:`modindex` | :ref:`search`

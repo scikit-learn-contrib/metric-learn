@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric-learn: Metric Learning in Python &mdash; metric-learn 0.3.0 documentation</title>
+  <title>metric-learn: Metric Learning in Python &mdash; metric-learn 0.4.0 documentation</title>
   
 
+  
+  
   
   
 
@@ -30,7 +32,10 @@
   
 
   
-    <link rel="top" title="metric-learn 0.3.0 documentation" href="#"/>
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="metric-learn 0.4.0 documentation" href="#"/>
         <link rel="next" title="Covariance metric (baseline method)" href="metric_learn.covariance.html"/> 
 
   
@@ -40,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -59,7 +65,7 @@
             
             
               <div class="version">
-                0.3.0
+                0.4.0
               </div>
             
           
@@ -80,16 +86,22 @@
           
             
             
-                <p class="caption"><span class="caption-text">Algorithms</span></p>
-<ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.html">Package Overview</a></li>
@@ -105,8 +117,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">metric-learn</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">metric-learn</a>
+        
       </nav>
 
 
@@ -115,23 +129,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="#">Docs</a> &raquo;</li>
-      
-    <li>metric-learn: Metric Learning in Python</li>
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>metric-learn: Metric Learning in Python</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -149,40 +180,64 @@ machine learning dedicated to automatically constructing optimal distance
 metrics.</p>
 <p>This package contains efficient Python implementations of several popular
 metric learning algorithms.</p>
-<div class="toctree-wrapper compound" id="algorithms">
-<p class="caption"><span class="caption-text">Algorithms</span><a class="headerlink" href="#algorithms" title="Permalink to this toctree">¶</a></p>
+<div class="section" id="supervised-algorithms">
+<h2>Supervised Algorithms<a class="headerlink" href="#supervised-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>Supervised metric learning algorithms take as inputs points <cite>X</cite> and target
+labels <cite>y</cite>, and learn a distance matrix that make points from the same class
+(for classification) or with close target value (for regression) close to
+each other, and points from different classes or with distant target values
+far away from each other.</p>
+<div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
 </ul>
 </div>
-<p>Each metric supports the following methods:</p>
-<ul class="simple">
-<li><code class="docutils literal"><span class="pre">fit(...)</span></code>, which learns the model.</li>
-<li><code class="docutils literal"><span class="pre">transformer()</span></code>, which returns a transformation matrix
-<span class="math">\(L \in \mathbb{R}^{D \times d}\)</span>, which can be used to convert a
-data matrix <span class="math">\(X \in \mathbb{R}^{n \times d}\)</span> to the
-<span class="math">\(D\)</span>-dimensional learned metric space <span class="math">\(X L^{\top}\)</span>,
-in which standard Euclidean distances may be used.</li>
-<li><code class="docutils literal"><span class="pre">transform(X)</span></code>, which applies the aforementioned transformation.</li>
-<li><code class="docutils literal"><span class="pre">metric()</span></code>, which returns a Mahalanobis matrix
-<span class="math">\(M = L^{\top}L\)</span> such that distance between vectors <code class="docutils literal"><span class="pre">x</span></code> and
-<code class="docutils literal"><span class="pre">y</span></code> can be computed as <span class="math">\(\left(x-y\right)M\left(x-y\right)\)</span>.</li>
+</div>
+<div class="section" id="weakly-supervised-algorithms">
+<h2>Weakly-Supervised Algorithms<a class="headerlink" href="#weakly-supervised-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>Weakly supervised algorithms work on weaker information about the data points
+than supervised algorithms. Rather than labeled points, they take as input
+similarity judgments on tuples of data points, for instance pairs of similar
+and dissimilar points. Refer to the documentation of each algorithm for its
+particular form of input data.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
 </ul>
+</div>
+<p>Note that each weakly-supervised algorithm has a supervised version of the form
+<cite>*_Supervised</cite> where similarity constraints are generated from
+the labels information and passed to the underlying algorithm.</p>
+<p>Each metric learning algorithm supports the following methods:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">fit(...)</span></code>, which learns the model.</li>
+<li><code class="docutils literal notranslate"><span class="pre">transformer()</span></code>, which returns a transformation matrix
+<span class="math notranslate nohighlight">\(L \in \mathbb{R}^{D \times d}\)</span>, which can be used to convert a
+data matrix <span class="math notranslate nohighlight">\(X \in \mathbb{R}^{n \times d}\)</span> to the
+<span class="math notranslate nohighlight">\(D\)</span>-dimensional learned metric space <span class="math notranslate nohighlight">\(X L^{\top}\)</span>,
+in which standard Euclidean distances may be used.</li>
+<li><code class="docutils literal notranslate"><span class="pre">transform(X)</span></code>, which applies the aforementioned transformation.</li>
+<li><code class="docutils literal notranslate"><span class="pre">metric()</span></code>, which returns a Mahalanobis matrix
+<span class="math notranslate nohighlight">\(M = L^{\top}L\)</span> such that distance between vectors <code class="docutils literal notranslate"><span class="pre">x</span></code> and
+<code class="docutils literal notranslate"><span class="pre">y</span></code> can be computed as <span class="math notranslate nohighlight">\(\left(x-y\right)M\left(x-y\right)\)</span>.</li>
+</ul>
+</div>
 </div>
 <div class="section" id="installation-and-setup">
 <h1>Installation and Setup<a class="headerlink" href="#installation-and-setup" title="Permalink to this headline">¶</a></h1>
-<p>Run <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">metric-learn</span></code> to download and install from PyPI.</p>
+<p>Run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">metric-learn</span></code> to download and install from PyPI.</p>
 <p>Alternately, download the source repository and run:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> for default installation.</li>
-<li><code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">test</span></code> to run all tests.</li>
+<li><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> for default installation.</li>
+<li><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">test</span></code> to run all tests.</li>
 </ul>
 <p><strong>Dependencies</strong></p>
 <ul class="simple">
@@ -191,12 +246,12 @@ in which standard Euclidean distances may be used.</li>
 <li>(for running the examples only: matplotlib)</li>
 </ul>
 <p><strong>Notes</strong></p>
-<p>If a recent version of the Shogun Python modular (<code class="docutils literal"><span class="pre">modshogun</span></code>) library
+<p>If a recent version of the Shogun Python modular (<code class="docutils literal notranslate"><span class="pre">modshogun</span></code>) library
 is available, the LMNN implementation will use the fast C++ version from
 there. The two implementations differ slightly, and the C++ version is
 more complete.</p>
-<div class="section" id="naviagtion">
-<h2>Naviagtion<a class="headerlink" href="#naviagtion" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="navigation">
+<h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a> | <a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a> | <a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p>
 <div class="toctree-wrapper compound">
 </div>
@@ -205,12 +260,15 @@ more complete.</p>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.covariance.html" class="btn btn-neutral float-right" title="Covariance metric (baseline method)" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metric_learn.covariance.html" class="btn btn-neutral float-right" title="Covariance metric (baseline method)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
@@ -220,7 +278,7 @@ more complete.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2016, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
 
     </p>
   </div>
@@ -242,16 +300,17 @@ more complete.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
