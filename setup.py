@@ -12,7 +12,7 @@ setup(name='metric-learn',
       description='Python implementations of metric learning algorithms',
       author=['CJ Carey', 'Yuan Tang'],
       author_email='ccarey@cs.umass.edu',
-      url='http://github.com/all-umass/metric-learn',
+      url='http://github.com/metric-learn/metric-learn',
       license='MIT',
       classifiers=[
           'Development Status :: 4 - Beta',
@@ -40,5 +40,9 @@ setup(name='metric-learn',
           'Information Theoretic Metric Learning',
           'Sparse Determinant Metric Learning',
           'Least Squares Metric Learning',
-          'Neighborhood Components Analysis'
+          'Neighborhood Components Analysis',
+          'Local Fisher Discriminant Analysis',
+          'Relative Components Analysis',
+          'Mahalanobis Metric for Clustering',
+          'Metric Learning for Kernel Regression'
       ])
