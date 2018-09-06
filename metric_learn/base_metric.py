@@ -186,6 +186,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       return np.sqrt(metric)
     elif not np.isclose(np.linalg.det(metric), 0):
       return cholesky(metric).T
+    else:
       w, V = np.linalg.eigh(metric)
       return V.T * np.sqrt(np.maximum(0, w[:, None]))
 
