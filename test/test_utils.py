@@ -21,84 +21,30 @@ def X_no_prep():
     return X
 
 
-@pytest.mark.parametrize('estimator, expected', [(NCA(), " by NCA"),
-                                                 ('NCA', " by NCA"),
-                                                 (None, "")])
+@pytest.mark.parametrize('estimator, expected',
+                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
 def test_make_context(estimator, expected):
     """test the make_name function"""
     assert make_context(estimator) == expected
 
 
-@pytest.mark.parametrize('estimator, preprocessor, by_context, load_X',
-                         [(NCA(), True, " by NCA", X_prep),
-                          ('NCA', True, " by NCA", X_prep),
-                          (NCA(), False, " by NCA", X_no_prep),
-                          ('NCA', False, " by NCA", X_no_prep),
-                          (None, True, "", X_prep),
-                          (None, False, "", X_no_prep)])
-def test_check_tuples_name_name_in_messages(estimator, preprocessor,
-                                            by_context, load_X):
-  """Checks that exceptions/warnings include the name of the estimator"""
-
-  X = load_X()
-
-  # if t is different than expected
-  msg = ("Tuples of 1 element(s) expected{}. Got tuples of 2 element(s) "
-         "instead (shape={}):\ninput={}.\n").format(by_context, X.shape, X)
-  with pytest.raises(ValueError) as raised_error:
-    check_tuples(X, t=1, preprocessor=preprocessor, estimator=estimator)
-  assert str(raised_error.value) == msg
-
-  # if shape not 2D or 3D
-  four_d_array = [[[[3]]]]
-  msg = ("{}D array expected{}{}. Found 4D array instead:\ninput=[[[[3]]]].\n"
-         .format(2 if preprocessor else 3, by_context,
-                 ' when using {} preprocessor'
-                 .format('a' if preprocessor else 'no')))
-  with pytest.raises(ValueError) as raised_error:
-    check_tuples(four_d_array, preprocessor=preprocessor, estimator=estimator)
-  assert str(raised_error.value) == msg
-
-  # if n_features too small
-  if not preprocessor:  # n_features is checked only if using no preprocessor
-    msg = ("Found array with 2 feature(s) (shape=(2, 2, 2)) while"
-           " a minimum of 3 is required{}.").format(by_context)
-    with pytest.raises(ValueError) as raised_error:
-      check_tuples(X, preprocessor=preprocessor, estimator=estimator,
-                   ensure_min_features=3)
-  assert str(raised_error.value) == msg
-
-  # if n_samples too small
-  msg = ("Found array with 2 sample(s) (shape={}) while"
-         " a minimum of 3 is required{}.").format(X.shape, by_context)
-  with pytest.raises(ValueError) as raised_error:
-    check_tuples(X, preprocessor=preprocessor, estimator=estimator,
-                 ensure_min_samples=3)
-  assert str(raised_error.value) == msg
-
-  # if dtype different than required but convertible, and warn_on_dtype == True
-  X_object = X.astype(object)
-  msg = ("Data with input dtype object was converted to float64{}."
-         .format(by_context))
-  with pytest.warns(DataConversionWarning) as raised_warning:
-    check_tuples(X_object, preprocessor=preprocessor, estimator=estimator,
-                 dtype=float, warn_on_dtype=True)
-  assert str(raised_warning[0].message) == msg
-
-
+@pytest.mark.parametrize('estimator, context',
+                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
 @pytest.mark.parametrize('load_X, preprocessor',
                          [(X_prep, True), (X_no_prep, False)])
-def test_check_tuples_invalid_t(load_X, preprocessor):
+def test_check_tuples_invalid_t(estimator, context, load_X, preprocessor):
   """Checks that the exception are raised if t is not the one expected"""
   X = load_X()
-  expected_msg = ("Tuples of 3 element(s) expected. Got tuples of 2 "
+  expected_msg = ("Tuples of 3 element(s) expected{}. Got tuples of 2 "
                   "element(s) instead (shape={}):\ninput={}.\n"
-                  .format(X.shape, X))
+                  .format(context, X.shape, X))
   with pytest.raises(ValueError) as raised_error:
-    check_tuples(X, t=3, preprocessor=preprocessor)
+    check_tuples(X, t=3, preprocessor=preprocessor, estimator=estimator)
   assert str(raised_error.value) == expected_msg
 
 
+@pytest.mark.parametrize('estimator, context',
+                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
 @pytest.mark.parametrize('X, found, expected, preprocessor',
                          [(5, '0', '2', True),
                           (5, '0', '3', False),
@@ -108,52 +54,65 @@ def test_check_tuples_invalid_t(load_X, preprocessor):
                           ([[[[5]]]], '4', '3', False),
                           ([[1], [3]], '2', '3', False),
                           ([[[1], [3]]], '3', '2', True)])
-def test_check_tuples_invalid_shape(X, found, expected, preprocessor):
+def test_check_tuples_invalid_shape(estimator, context, X, found, expected,
+                                    preprocessor):
   """Checks that a value error with the appropriate message is raised if
   shape is invalid (not 2D with preprocessor or 3D with no preprocessor)
   """
   X = np.array(X)
-  msg = ("{}D array expected when using {} preprocessor. Found {}D array "
+  msg = ("{}D array expected{} when using {} preprocessor. Found {}D array "
          "instead:\ninput={}.\n"
-         .format(expected, 'a' if preprocessor else 'no', found, X))
+         .format(expected, context, 'a' if preprocessor else 'no', found, X))
   with pytest.raises(ValueError) as raised_error:
-      check_tuples(X, preprocessor=preprocessor, ensure_min_samples=0)
+      check_tuples(X, preprocessor=preprocessor, ensure_min_samples=0,
+                   estimator=estimator)
   assert str(raised_error.value) == msg
 
 
-def test_check_tuples_invalid_n_features(X_no_prep):
+@pytest.mark.parametrize('estimator, context',
+                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
+def test_check_tuples_invalid_n_features(estimator, context, X_no_prep):
   """Checks that the right warning is printed if not enough features
   Here we only test if no preprocessor (otherwise we don't ensure this)
   """
-  msg = ("Found array with 2 feature(s) (shape=(2, 2, 2)) while"
-         " a minimum of 3 is required.")
+  msg = ("Found array with 2 feature(s) (shape={}) while"
+         " a minimum of 3 is required{}.".format(X_no_prep.shape, context))
   with pytest.raises(ValueError) as raised_error:
-      check_tuples(X_no_prep, preprocessor=False, ensure_min_features=3)
+      check_tuples(X_no_prep, preprocessor=False, ensure_min_features=3,
+                   estimator=estimator)
   assert str(raised_error.value) == msg
 
 
+@pytest.mark.parametrize('estimator, context',
+                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
 @pytest.mark.parametrize('load_X, preprocessor',
                          [(X_prep, True), (X_no_prep, False)])
-def test_check_tuples_invalid_n_samples(load_X, preprocessor):
+def test_check_tuples_invalid_n_samples(estimator, context, load_X,
+                                        preprocessor):
   """Checks that the right warning is printed if n_samples is too small"""
   X = load_X()
   msg = ("Found array with 2 sample(s) (shape={}) while a minimum of 3 "
-         "is required.".format(X.shape))
+         "is required{}.".format(X.shape, context))
   with pytest.raises(ValueError) as raised_error:
-    check_tuples(X, preprocessor=preprocessor, ensure_min_samples=3)
+    check_tuples(X, preprocessor=preprocessor, ensure_min_samples=3,
+                 estimator=estimator)
   assert str(raised_error.value) == msg
 
 
+@pytest.mark.parametrize('estimator, context',
+                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
 @pytest.mark.parametrize('load_X, preprocessor',
                          [(X_prep, True), (X_no_prep, False)])
-def test_check_tuples_invalid_dtype_convertible(load_X, preprocessor):
+def test_check_tuples_invalid_dtype_convertible(estimator, context, load_X,
+                                                preprocessor):
   """Checks that a warning is raised if a convertible input is converted to
   float"""
   X = load_X().astype(object)
-  msg = ("Data with input dtype object was converted to float64.")
+  msg = ("Data with input dtype object was converted to float64{}."
+         .format(context))
   with pytest.warns(DataConversionWarning) as raised_warning:
     check_tuples(X, preprocessor=preprocessor, dtype=np.float64,
-                 warn_on_dtype=True)
+                 warn_on_dtype=True, estimator=estimator)
   assert str(raised_warning[0].message) == msg
 
 
