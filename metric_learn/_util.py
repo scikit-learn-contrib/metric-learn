@@ -79,8 +79,7 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
   if dtype == "auto":
     dtype = 'numeric' if not preprocessor else None
 
-  name = make_name(estimator, preprocessor)
-  context = ' by ' + name if name is not None else ''
+  context = make_context(estimator)
   tuples = check_array(tuples, dtype=dtype, accept_sparse=False, copy=copy,
                        force_all_finite=force_all_finite,
                        order=order,
@@ -93,7 +92,7 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
                        # if 2D and preprocessor, no notion of
                        # "features". If 3D and no preprocessor, min_features
                        # is checked below
-                       estimator=name,
+                       estimator=estimator,
                        warn_on_dtype=warn_on_dtype)
 
   if tuples.ndim == 2 and preprocessor:  # in this case there is left to check
@@ -112,28 +111,32 @@ def check_tuples(tuples, preprocessor=False, t=None, dtype="auto",
     check_t(tuples, t, context)
   else:
     expected_shape = 2 if preprocessor else 3
-    raise ValueError("{}D array expected{}. Found {}D array "
+    with_prep = (' when using {} preprocessor'.format('a' if preprocessor
+                 else 'no'))
+    raise ValueError("{}D array expected{}{}. Found {}D array "
                      "instead:\ninput={}.\n"
-                     .format(expected_shape, context, tuples.ndim, tuples))
+                     .format(expected_shape, context, with_prep,
+                             tuples.ndim, tuples))
   return tuples
 
 
-def make_name(estimator, preprocessor):
-  """Helper function to create a string with the estimator name and tell if
-  it is using a preprocessor. Will return the following for instance:
-  NCA + preprocessor: 'NCA's preprocessor'
-  NCA + no preprocessor: 'NCA'
-  None + preprocessor: 'a preprocessor'
-  None + None: None"""
+def make_context(estimator):
+  """Helper function to create a string with the estimator name.
+  Taken from check_array function in scikit-learn.
+  Will return the following for instance:
+  NCA: ' by NCA'
+  'NCA': ' by NCA'
+  None: ''
+  """
   if estimator is not None:
-      with_preprocessor = "'s preprocessor" if preprocessor else ''
-      if isinstance(estimator, six.string_types):
-          estimator_name = estimator + with_preprocessor
-      else:
-          estimator_name = estimator.__class__.__name__ + with_preprocessor
+    if isinstance(estimator, six.string_types):
+      estimator_name = estimator
+    else:
+      estimator_name = estimator.__class__.__name__
   else:
-      estimator_name = None if not preprocessor else 'a preprocessor'
-  return estimator_name
+    estimator_name = None
+  context = ' by ' + estimator_name if estimator_name is not None else ''
+  return context
 
 
 def check_t(tuples, t, context):
