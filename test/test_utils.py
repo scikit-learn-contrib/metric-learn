@@ -5,7 +5,7 @@ from metric_learn import NCA
 from metric_learn._util import check_tuples, make_context
 
 
-@pytest.fixture()
+@pytest.fixture
 def X_prep():
     """Basic array for testing when using a preprocessor"""
     X = np.array([[1, 2],
@@ -13,7 +13,7 @@ def X_prep():
     return X
 
 
-@pytest.fixture()
+@pytest.fixture
 def X_no_prep():
     """Basic array for testing when using no preprocessor"""
     X = np.array([[[1., 2.3], [2.3, 5.3]],
