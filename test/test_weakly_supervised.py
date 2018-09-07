@@ -15,6 +15,9 @@ from sklearn.model_selection import cross_val_score, train_test_split
 
 RNG = check_random_state(0)
 
+# ---------------------- Test scikit-learn compatibility ----------------------
+
+
 def build_data():
   dataset = load_iris()
   X, y = shuffle(dataset.data, dataset.target, random_state=RNG)
@@ -277,3 +280,70 @@ def _get_args(function, varargs=False):
         return args, varargs
     else:
         return args
+
+
+# ----------------------------- Test preprocessor -----------------------------
+
+
+X = np.array([[0.89, 0.11, 1.48, 0.12],
+              [2.63, 1.08, 1.68, 0.46],
+              [1.00, 0.59, 0.62, 1.15]])
+
+
+class MockFileLoader:
+  """Preprocessor that takes a root file path at construction and simulates
+  fetching the file in the specific root folder when given the name of the
+  file"""
+
+  def __init__(self, root):
+    self.root = root
+    self.folders = {'fake_root': {'img0.png': X[0],
+                                  'img1.png': X[1],
+                                  'img2.png': X[2]
+                                  },
+                    'other_folder': {}  # empty folder
+                    }
+
+  def __call__(self, path_list):
+    images = list()
+    for path in path_list:
+      images.append(self.folders[self.root][path])
+    return np.array(images)
+
+
+def mock_id_loader(list_of_indicators):
+    """A preprocessor as a function that takes indicators (strings) and
+    returns the corresponding samples"""
+    points = []
+    for indicator in list_of_indicators:
+        points.append(X[int(indicator[2:])])
+    return np.array(points)
+
+
+tuples_list = [np.array([[0, 1],
+                         [2, 1]]),
+
+               np.array([['img0.png', 'img1.png'],
+                         ['img2.png', 'img1.png']]),
+
+               np.array([['id0', 'id1'],
+                         ['id2', 'id1']])
+               ]
+
+preprocessors = [X, MockFileLoader('fake_root'), mock_id_loader]
+
+
+@pytest.fixture
+def y_tuples():
+  y = [-1, 1]
+  return y
+
+
+@pytest.mark.parametrize('preprocessor, tuples', zip(preprocessors,
+                                                     tuples_list))
+def test_preprocessor(preprocessor, tuples, y_tuples):
+  """Tests different ways to use the preprocessor argument: an array,
+  a class callable, and a function callable
+  """
+  nca = ITML(preprocessor=preprocessor)
+  nca.fit(tuples, y_tuples)
