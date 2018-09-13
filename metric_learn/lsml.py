@@ -48,9 +48,7 @@ class _BaseLSML(MahalanobisMixin):
     quadruplets = check_array(quadruplets, accept_sparse=False,
                               ensure_2d=False, allow_nd=True)
     self.check_preprocessor()
-    quadruplets = check_tuples(quadruplets,
-                               preprocessor=self.preprocessor_ is not None,
-                               t=4, estimator=self)
+    quadruplets = self._check_tuples(quadruplets)
     quadruplets = self.preprocess_tuples(quadruplets)
 
     # check to make sure that no two constrained vectors are identical

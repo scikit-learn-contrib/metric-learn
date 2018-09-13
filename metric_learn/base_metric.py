@@ -49,6 +49,10 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     else:
       return tuples
 
+  def _check_tuples(self, tuples, t=None):
+    return check_tuples(tuples, preprocessor=self.preprocessor_ is not None,
+                        estimator=self.__class__.__name__, t=t)
+
 
 class MetricTransformer(six.with_metaclass(ABCMeta)):
 
@@ -174,8 +178,7 @@ class _WeaklySupervisedMixin(BaseMetricLearner):
   _t = None  # number of points in a tuple, None by default
 
   def _check_tuples(self, tuples):
-    return check_tuples(tuples, preprocessor=self.preprocessor_ is not None,
-                        estimator=self.__class__.__name__, t=self._t)
+    return super(_WeaklySupervisedMixin, self)._check_tuples(tuples, t=self._t)
 
 
 class _PairsClassifierMixin(_WeaklySupervisedMixin):
