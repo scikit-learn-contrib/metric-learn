@@ -43,11 +43,12 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     else:
       self.preprocessor_ = self.preprocessor
 
-  def format_input(self, input):
+  def preprocess_tuples(self, tuples):
     if self.preprocessor is not None:
-      return np.apply_along_axis(self.preprocessor_, 1, input)
+      return np.apply_along_axis(self.preprocessor_, 1, tuples)
     else:
-      return input
+      return tuples
+
 
 class MetricTransformer(six.with_metaclass(ABCMeta)):
 
