@@ -43,29 +43,6 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     else:
       self.preprocessor_ = self.preprocessor
 
-  def metric(self):
-    """Computes the Mahalanobis matrix from the transformation matrix.
-
-    .. math:: M = L^{\\top} L
-
-    Returns
-    -------
-    M : (d x d) matrix
-    """
-    L = self.transformer()
-    return L.T.dot(L)
-
-  def transformer(self):
-    """Computes the transformation matrix from the Mahalanobis matrix.
-
-    L = cholesky(M).T
-
-    Returns
-    -------
-    L : upper triangular (d x d) matrix
-    """
-    return cholesky(self.metric()).T
-
   def format_input(self, input):
     if self.preprocessor is not None:
       return np.apply_along_axis(self.preprocessor_, 1, input)
