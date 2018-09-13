@@ -32,7 +32,8 @@ class LFDA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   '''
 
-  def __init__(self, num_dims=None, k=None, embedding_type='weighted'):
+  def __init__(self, num_dims=None, k=None, embedding_type='weighted',
+               preprocessor=None):
     '''
     Initialize LFDA.
 
@@ -56,6 +57,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     self.num_dims = num_dims
     self.embedding_type = embedding_type
     self.k = k
+    super(LFDA, self).__init__(preprocessor)
 
   def _process_inputs(self, X, y):
     unique_classes, y = np.unique(y, return_inverse=True)
@@ -91,6 +93,8 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     y : (n,) array-like
         Class labels, one per point of data.
     '''
+    self.check_preprocessor()
+
     X, y, num_classes, n, d, dim, k_ = self._process_inputs(X, y)
     tSb = np.zeros((d,d))
     tSw = np.zeros((d,d))

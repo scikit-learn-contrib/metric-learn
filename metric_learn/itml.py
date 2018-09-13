@@ -65,7 +65,7 @@ class _BaseITML(MahalanobisMixin):
     pairs = check_tuples(pairs, preprocessor=self.preprocessor_ is not None,
                          t=2, estimator=self)
     #  pairs classifiers and for quadruplets classifiers
-    pairs = self.format_input(pairs)
+    pairs = self.preprocess_tuples(pairs)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -190,7 +190,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
-               verbose=False):
+               verbose=False, preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -212,7 +212,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     """
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
-                       A0=A0, verbose=verbose)
+                       A0=A0, verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds

@@ -51,7 +51,7 @@ class _BaseLSML(MahalanobisMixin):
     quadruplets = check_tuples(quadruplets,
                                preprocessor=self.preprocessor_ is not None,
                                t=4, estimator=self)
-    quadruplets = self.format_input(quadruplets)
+    quadruplets = self.preprocess_tuples(quadruplets)
 
     # check to make sure that no two constrained vectors are identical
     self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -182,7 +182,8 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   """
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
-               num_constraints=None, weights=None, verbose=False):
+               num_constraints=None, weights=None, verbose=False,
+               preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -201,7 +202,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
         if True, prints information while learning
     """
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
-                       verbose=verbose)
+                       verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights

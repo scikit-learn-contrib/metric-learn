@@ -45,7 +45,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, pca_comps=None):
+  def __init__(self, num_dims=None, pca_comps=None, preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -62,6 +62,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
     """
     self.num_dims = num_dims
     self.pca_comps = pca_comps
+    super(RCA, self).__init__(preprocessor)
 
   def _process_data(self, X):
     self.X_ = X = check_array(X)
@@ -108,6 +109,8 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
+    self.check_preprocessor()
+
     data, M_pca = self._process_data(data)
 
     chunks = np.asanyarray(chunks, dtype=int)
@@ -150,7 +153,7 @@ class RCA_Supervised(RCA):
   """
 
   def __init__(self, num_dims=None, pca_comps=None, num_chunks=100,
-               chunk_size=2):
+               chunk_size=2, preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -160,7 +163,8 @@ class RCA_Supervised(RCA):
     num_chunks: int, optional
     chunk_size: int, optional
     """
-    RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps)
+    RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps,
+                 preprocessor=preprocessor)
     self.num_chunks = num_chunks
     self.chunk_size = chunk_size
 

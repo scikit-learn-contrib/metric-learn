@@ -23,16 +23,21 @@ class NCA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, max_iter=100, learning_rate=0.01):
+  def __init__(self, num_dims=None, max_iter=100, learning_rate=0.01,
+               preprocessor=None):
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.learning_rate = learning_rate
+    super(NCA, self).__init__(preprocessor)
+
 
   def fit(self, X, y):
     """
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
+    self.check_preprocessor()
+
     X, labels = check_X_y(X, y)
     n, d = X.shape
     num_dims = self.num_dims

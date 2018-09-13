@@ -26,14 +26,16 @@ class Covariance(MahalanobisMixin, TransformerMixin):
       metric (See :meth:`transformer_from_metric`.)
   """
 
-  def __init__(self):
-    pass
+  def __init__(self, preprocessor=None):
+    super(Covariance, self).__init__(preprocessor)
 
   def fit(self, X, y=None):
     """
     X : data matrix, (n x d)
     y : unused
     """
+    self.check_preprocessor()
+
     self.X_ = check_array(X, ensure_min_samples=2)
     self.M_ = np.cov(self.X_, rowvar = False)
     if self.M_.ndim == 0:

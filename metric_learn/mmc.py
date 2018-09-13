@@ -77,7 +77,7 @@ class _BaseMMC(MahalanobisMixin):
                          ensure_2d=False, allow_nd=True)
     pairs = check_tuples(pairs, preprocessor=self.preprocessor_ is not None,
                          t=2, estimator=self)
-    pairs = self.format_input(pairs)
+    pairs = self.preprocess_tuples(pairs)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -409,7 +409,8 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
+               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
+               preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -436,7 +437,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,
                       A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
-                      verbose=verbose)
+                      verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 

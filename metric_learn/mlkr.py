@@ -30,7 +30,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   """
 
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
-               max_iter=1000):
+               max_iter=1000, preprocessor=None):
     """
     Initialize MLKR.
 
@@ -56,6 +56,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     self.epsilon = epsilon
     self.alpha = alpha
     self.max_iter = max_iter
+    super(MLKR, self).__init__(preprocessor)
 
   def _process_inputs(self, X, y):
       self.X_, y = check_X_y(X, y)
@@ -86,6 +87,8 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       X : (n x d) array of samples
       y : (n) data labels
       """
+      self.check_preprocessor()
+
       X, y, A = self._process_inputs(X, y)
 
       # note: this line takes (n*n*d) memory!

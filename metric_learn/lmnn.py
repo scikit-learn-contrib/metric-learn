@@ -24,7 +24,7 @@ from .base_metric import MahalanobisMixin
 class _base_LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001, use_pca=True,
-               verbose=False):
+               verbose=False, preprocessor=None):
     """Initialize the LMNN object.
 
     Parameters
@@ -43,6 +43,7 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     self.convergence_tol = convergence_tol
     self.use_pca = use_pca
     self.verbose = verbose
+    super(_base_LMNN, self).__init__(preprocessor)
 
 
 # slower Python version
@@ -64,6 +65,8 @@ class python_LMNN(_base_LMNN):
                        ' (smallest class has %d)' % required_k)
 
   def fit(self, X, y):
+    self.check_preprocessor()
+
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate

@@ -56,7 +56,7 @@ class _BaseSDML(MahalanobisMixin):
     self.check_preprocessor()
     pairs = check_tuples(pairs, preprocessor=self.preprocessor_ is not None,
                          t=2, estimator=self)
-    pairs = self.format_input(pairs)
+    pairs = self.preprocess_tuples(pairs)
 
     # set up prior M
     if self.use_cov:
@@ -121,7 +121,8 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   """
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_labeled=np.inf, num_constraints=None, verbose=False):
+               num_labeled=np.inf, num_constraints=None, verbose=False,
+               preprocessor=None):
     """
     Parameters
     ----------
@@ -140,7 +141,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     """
     _BaseSDML.__init__(self, balance_param=balance_param,
                        sparsity_param=sparsity_param, use_cov=use_cov,
-                       verbose=verbose)
+                       verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
