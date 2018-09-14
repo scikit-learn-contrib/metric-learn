@@ -5,7 +5,7 @@ from sklearn.metrics import roc_auc_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
-from ._util import check_tuples, SimplePreprocessor
+from ._util import check_tuples, ArrayIndexer
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
@@ -39,7 +39,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
 
   def check_preprocessor(self):
     if _is_arraylike(self.preprocessor):
-      self.preprocessor_ = SimplePreprocessor(self.preprocessor)
+      self.preprocessor_ = ArrayIndexer(self.preprocessor)
     else:
       self.preprocessor_ = self.preprocessor
 

@@ -149,7 +149,7 @@ def check_t(tuples, t, context):
     raise ValueError(msg_t)
 
 
-class SimplePreprocessor():
+class ArrayIndexer():
 
   def __init__(self, X):
     self.X = X
