@@ -5,9 +5,9 @@ from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
-from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
+from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+                          LSML_Supervised, ITML_Supervised, SDML_Supervised,
+                          RCA_Supervised, MMC_Supervised)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN

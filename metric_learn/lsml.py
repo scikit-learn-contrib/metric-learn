@@ -12,14 +12,17 @@ import numpy as np
 import scipy.linalg
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_array, check_X_y
-from ._util import check_tuples
+from ._util import (check_tuples, check_points_y, preprocess_points,
+                    preprocess_tuples)
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
 
 
 class _BaseLSML(MahalanobisMixin):
+
+  _t = 4  # constraints are quadruplets
+
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False,
                preprocessor=None):
     """Initialize LSML.
@@ -45,11 +48,11 @@ class _BaseLSML(MahalanobisMixin):
   def _prepare_quadruplets(self, quadruplets, weights):
     # for now we check_array and check_tuples but we should only
     # check_tuples in the future (with enhanced check_tuples)
-    quadruplets = check_array(quadruplets, accept_sparse=False,
-                              ensure_2d=False, allow_nd=True)
     self.check_preprocessor()
-    quadruplets = self._check_tuples(quadruplets)
-    quadruplets = self.preprocess_tuples(quadruplets)
+    quadruplets = check_tuples(quadruplets, estimator=self, t=self._t,
+                               preprocessor=self.preprocessor is not None)
+    quadruplets = preprocess_tuples(quadruplets, estimator=self,
+                                    preprocessor=self.preprocessor_)
 
     # check to make sure that no two constrained vectors are identical
     self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -219,7 +222,10 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    X, y = check_X_y(X, y)
+    self.check_preprocessor()
+    X, y = check_points_y(X, y, preprocessor=self.preprocessor is not None,
+                          estimator=self)
+    X = preprocess_points(X, estimator=self, preprocessor=self.preprocessor_)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

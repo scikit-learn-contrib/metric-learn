@@ -7,8 +7,8 @@ from __future__ import absolute_import
 import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_X_y
 
+from metric_learn._util import check_points_y, preprocess_points
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -30,7 +30,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
     self.learning_rate = learning_rate
     super(NCA, self).__init__(preprocessor)
 
-
   def fit(self, X, y):
     """
     X: data matrix, (n x d)
@@ -38,7 +37,10 @@ class NCA(MahalanobisMixin, TransformerMixin):
     """
     self.check_preprocessor()
 
-    X, labels = check_X_y(X, y)
+    X, labels = check_points_y(X, y, estimator=self,
+                               preprocessor=self.preprocessor is not None)
+    X = preprocess_points(X, estimator=self,
+                          preprocessor=self.preprocessor_)
     n, d = X.shape
     num_dims = self.num_dims
     if num_dims is None:

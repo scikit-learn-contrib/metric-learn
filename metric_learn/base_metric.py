@@ -1,11 +1,12 @@
 from numpy.linalg import cholesky
 from sklearn.base import BaseEstimator
-from sklearn.utils.validation import check_array, _is_arraylike
+from sklearn.utils.validation import _is_arraylike
 from sklearn.metrics import roc_auc_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
-from ._util import check_tuples, ArrayIndexer
+from ._util import (check_tuples, ArrayIndexer, preprocess_tuples,
+                    check_points, preprocess_points)
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
@@ -42,16 +43,6 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
       self.preprocessor_ = ArrayIndexer(self.preprocessor)
     else:
       self.preprocessor_ = self.preprocessor
-
-  def preprocess_tuples(self, tuples):
-    if self.preprocessor is not None:
-      return np.apply_along_axis(self.preprocessor_, 1, tuples)
-    else:
-      return tuples
-
-  def _check_tuples(self, tuples, t=None):
-    return check_tuples(tuples, preprocessor=self.preprocessor_ is not None,
-                        estimator=self.__class__.__name__, t=t)
 
 
 class MetricTransformer(six.with_metaclass(ABCMeta)):
@@ -115,9 +106,10 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
     """
-    pairs = check_tuples(pairs, preprocessor=self.preprocessor_ is not None)
-    # TODO: add a check (and a test) to only be able to score if t is OK
-    pairs = self.preprocess_tuples(pairs)
+    pairs = check_tuples(pairs, preprocessor=self.preprocessor is not None,
+                         estimator=self, t=2)
+    pairs = preprocess_tuples(pairs, preprocessor=self.preprocessor_,
+                              estimator=self)
     pairwise_diffs = self.transform(pairs[:, 1, :] - pairs[:, 0, :])
     # (for MahalanobisMixin, the embedding is linear so we can just embed the
     # difference)
@@ -140,7 +132,11 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     X_embedded : `numpy.ndarray`, shape=(n_samples, num_dims)
       The embedded data points.
     """
-    X_checked = check_array(X, accept_sparse=True)
+    X_checked = check_points(X, estimator=self,
+                             preprocessor=self.preprocessor is not None,
+                             accept_sparse=True)
+    X_checked = preprocess_points(X_checked, preprocessor=self.preprocessor_,
+                                  estimator=self)
     return X_checked.dot(self.transformer_.T)
 
   def metric(self):
@@ -173,15 +169,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       return V.T * np.sqrt(np.maximum(0, w[:, None]))
 
 
-class _WeaklySupervisedMixin(BaseMetricLearner):
-
-  _t = None  # number of points in a tuple, None by default
-
-  def _check_tuples(self, tuples):
-    return super(_WeaklySupervisedMixin, self)._check_tuples(tuples, t=self._t)
-
-
-class _PairsClassifierMixin(_WeaklySupervisedMixin):
+class _PairsClassifierMixin(BaseMetricLearner):
 
   _t = 2  # number of points in a tuple, 2 for pairs
 
@@ -203,11 +191,14 @@ class _PairsClassifierMixin(_WeaklySupervisedMixin):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    pairs = self._check_tuples(pairs)
+    pairs = check_tuples(pairs, preprocessor=self.preprocessor is not None,
+                         estimator=self, t=self._t)
+    # no need to preprocess_tuples since it is done in score_pairs
     return self.score_pairs(pairs)
 
   def decision_function(self, pairs):
-    pairs = self._check_tuples(pairs)
+    # no need to check_tuples and preprocess_tuples since it is done in
+    # predict->score_pairs
     return self.predict(pairs)
 
   def score(self, pairs, y):
@@ -235,11 +226,12 @@ class _PairsClassifierMixin(_WeaklySupervisedMixin):
     score : float
       The ``roc_auc`` score.
     """
-    pairs = self._check_tuples(pairs)
+    # no need to check_tuples and preprocess_tuples since it is done in
+    # predict->score_pairs
     return roc_auc_score(y, self.decision_function(pairs))
 
 
-class _QuadrupletsClassifierMixin(_WeaklySupervisedMixin):
+class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
   _t = 4  # number of points in a tuple, 4 for quadruplets
 
@@ -262,13 +254,18 @@ class _QuadrupletsClassifierMixin(_WeaklySupervisedMixin):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
-    quadruplets = self._check_tuples(quadruplets)
+    quadruplets = check_tuples(quadruplets,
+                               preprocessor=self.preprocessor is not None,
+                               estimator=self, t=self._t)
+    # no need to preprocess_tuples since it is done in score_pairs
     # we broadcast with ... because here we allow quadruplets to be
     # either a 3D array of points or 2D array of indices
     return (self.score_pairs(quadruplets[:, :2, ...]) -
             self.score_pairs(quadruplets[:, 2:, ...]))
 
   def decision_function(self, quadruplets):
+    # no need to check_tuples and preprocess_tuples since it is done in
+    # predict->score_pairs
     return self.predict(quadruplets)
 
   def score(self, quadruplets, y=None):
@@ -293,5 +290,6 @@ class _QuadrupletsClassifierMixin(_WeaklySupervisedMixin):
     score : float
       The quadruplets score.
     """
-    quadruplets = self._check_tuples(quadruplets)
+    # no need to check_tuples and preprocess_tuples since it is done in
+    # predict->score_pairs
     return -np.mean(self.predict(quadruplets))

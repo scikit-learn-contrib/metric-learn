@@ -3,9 +3,9 @@ import numpy as np
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal
 
-from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
+from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR,
+                          LSML_Supervised, ITML_Supervised, SDML_Supervised,
+                          RCA_Supervised, MMC_Supervised)
 
 
 class TestFitTransform(unittest.TestCase):

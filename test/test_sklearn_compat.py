@@ -2,9 +2,9 @@ import numpy as np
 import unittest
 from sklearn.utils.estimator_checks import check_estimator
 
-from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
+from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR,
+                          LSML_Supervised, ITML_Supervised, SDML_Supervised,
+                          RCA_Supervised, MMC_Supervised)
 
 
 # Wrap the _Supervised methods with a deterministic wrapper for testing.

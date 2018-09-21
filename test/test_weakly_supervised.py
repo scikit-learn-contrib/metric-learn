@@ -1,5 +1,5 @@
 import pytest
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, make_regression, make_blobs
 from sklearn.pipeline import make_pipeline
 from sklearn.utils import shuffle, check_random_state
 from sklearn.utils.estimator_checks import is_public_parameter
@@ -7,11 +7,14 @@ from sklearn.utils.testing import (assert_allclose_dense_sparse,
                                    set_random_state)
 from sklearn.utils.fixes import signature
 
-from metric_learn import ITML, MMC, SDML, LSML
+from metric_learn import (ITML, LFDA, LMNN, LSML, MLKR, MMC, NCA, RCA, SDML,
+                          ITML_Supervised, LSML_Supervised, MMC_Supervised,
+                          SDML_Supervised)
 from metric_learn.constraints import wrap_pairs, Constraints
 from sklearn import clone
 import numpy as np
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import (cross_val_score, cross_val_predict,
+                                     train_test_split)
 
 RNG = check_random_state(0)
 
@@ -21,7 +24,7 @@ RNG = check_random_state(0)
 def build_data():
   dataset = load_iris()
   X, y = shuffle(dataset.data, dataset.target, random_state=RNG)
-  num_constraints = 20
+  num_constraints = 50
   constraints = Constraints.random_subset(y, random_state=RNG)
   pairs = constraints.positive_negative_pairs(num_constraints,
                                               same_length=True,
@@ -29,17 +32,35 @@ def build_data():
   return X, pairs
 
 
+def build_classification(preprocessor):
+    # test that you can do cross validation on tuples of points with
+    #  a WeaklySupervisedMetricLearner
+    X, y = shuffle(*make_blobs(), random_state=RNG)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
+    return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
+
+
+def build_regression(preprocessor):
+    # test that you can do cross validation on tuples of points with
+    #  a WeaklySupervisedMetricLearner
+    X, y = shuffle(*make_regression(n_samples=100, n_features=10),
+                   random_state=RNG)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
+    return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
+
+
 def build_pairs(preprocessor):
   # test that you can do cross validation on tuples of points with
   #  a WeaklySupervisedMetricLearner
-  X, pairs = build_data()
+  X, indices = build_data()
   if preprocessor is not None:
     # if preprocessor, we build a 2D array of pairs of indices
-    _, y = wrap_pairs(X, pairs)
-    pairs = np.vstack([np.column_stack(pairs[:2]), np.column_stack(pairs[2:])])
+    _, y = wrap_pairs(X, indices)
+    pairs = np.vstack([np.column_stack(indices[:2]),
+                       np.column_stack(indices[2:])])
   else:
     # if not, we build a 3D array of pairs of samples
-    pairs, y = wrap_pairs(X, pairs)
+    pairs, y = wrap_pairs(X, indices)
   pairs, y = shuffle(pairs, y, random_state=RNG)
   (pairs_train, pairs_test, y_train,
    y_test) = train_test_split(pairs, y, random_state=RNG)
@@ -50,8 +71,8 @@ def build_pairs(preprocessor):
 def build_quadruplets(preprocessor):
   # test that you can do cross validation on a tuples of points with
   #  a WeaklySupervisedMetricLearner
-  X, pairs = build_data()
-  c = np.column_stack(pairs)
+  X, indices = build_data()
+  c = np.column_stack(indices)
   if preprocessor is not None:
     # if preprocessor, we build a 2D array of quadruplets of indices
     quadruplets = c
@@ -67,16 +88,34 @@ def build_quadruplets(preprocessor):
 
 
 list_estimators = [(ITML(), build_pairs),
+                   (LFDA(), build_classification),
+                   (LMNN(), build_classification),
                    (LSML(), build_quadruplets),
+                   (MLKR(), build_regression),
                    (MMC(max_iter=2), build_pairs),  # max_iter=2 for faster
                    # testing
-                   (SDML(), build_pairs)
+                   (NCA(), build_classification),
+                   (RCA(), build_classification),
+                   (SDML(), build_pairs),
+                   (ITML_Supervised(), build_classification),
+                   (LSML_Supervised(), build_classification),
+                   (MMC_Supervised(), build_classification),
+                   (SDML_Supervised(), build_classification)
                    ]
 
 ids_estimators = ['itml',
+                  'lfda',
+                  'lmnn',
                   'lsml',
+                  'mlkr',
                   'mmc',
+                  'nca',
+                  'rca',
                   'sdml',
+                  'itml_supervised',
+                  'lsml_supervised',
+                  'mmc_supervised',
+                  'sdml_supervised'
                   ]
 
 
@@ -84,38 +123,44 @@ ids_estimators = ['itml',
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_cross_validation(estimator, build_dataset, preprocessor):
-  (X, tuples, y, tuples_train, tuples_test,
-   y_train, y_test, preprocessor) = build_dataset(preprocessor)
-  estimator = clone(estimator)
-  estimator.set_params(preprocessor=preprocessor)
-  set_random_state(estimator)
-
-  assert np.isfinite(cross_val_score(estimator, tuples, y)).all()
+  if any(hasattr(estimator, method) for method in ["predict", "score"]):
+    (X, tuples, y, tuples_train, tuples_test,
+     y_train, y_test, preprocessor) = build_dataset(preprocessor)
+    estimator = clone(estimator)
+    estimator.set_params(preprocessor=preprocessor)
+    set_random_state(estimator)
+    if hasattr(estimator, "score"):
+      assert np.isfinite(cross_val_score(estimator, tuples, y)).all()
+    if hasattr(estimator, "predict"):
+      assert np.isfinite(cross_val_predict(estimator, tuples, y)).all()
 
 
 def check_score(estimator, tuples, y):
-  score = estimator.score(tuples, y)
-  assert np.isfinite(score)
+  if hasattr(estimator, "score"):
+    score = estimator.score(tuples, y)
+    assert np.isfinite(score)
 
 
 def check_predict(estimator, tuples):
-  y_predicted = estimator.predict(tuples)
-  assert len(y_predicted), len(tuples)
+  if hasattr(estimator, "predict"):
+    y_predicted = estimator.predict(tuples)
+    assert len(y_predicted), len(tuples)
 
 
 @pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_simple_estimator(estimator, build_dataset, preprocessor):
-  (X, tuples, y, tuples_train, tuples_test,
-   y_train, y_test, preprocessor) = build_dataset(preprocessor)
-  estimator = clone(estimator)
-  estimator.set_params(preprocessor=preprocessor)
-  set_random_state(estimator)
+  if any(hasattr(estimator, method) for method in ["predict", "score"]):
+    (X, tuples, y, tuples_train, tuples_test,
+     y_train, y_test, preprocessor) = build_dataset(preprocessor)
+    estimator = clone(estimator)
+    estimator.set_params(preprocessor=preprocessor)
+    set_random_state(estimator)
 
-  estimator.fit(tuples_train, y_train)
-  check_score(estimator, tuples_test, y_test)
-  check_predict(estimator, tuples_test)
+    estimator.fit(tuples_train, y_train)
+    check_score(estimator, tuples_test, y_test)
+    check_predict(estimator, tuples_test)
 
 
 @pytest.mark.parametrize('estimator', [est[0] for est in list_estimators],
@@ -217,6 +262,83 @@ def test_dict_unchanged(estimator, build_dataset, preprocessor):
            % method)
 
 
+@pytest.mark.parametrize('estimator, build_dataset',
+                         [(ITML(), build_pairs),
+                          (LSML(), build_quadruplets),
+                          (MMC(max_iter=2), build_pairs),
+                          (SDML(), build_pairs)],
+                         ids=['itml', 'lsml', 'mmc', 'sdml'])
+def test_same_result_with_or_without_preprocessor(estimator, build_dataset):
+  (X, tuples, y, tuples_train, tuples_test, y_train,
+   y_test, _) = build_dataset(preprocessor=True)
+  formed_tuples_train = X[tuples_train]
+  formed_tuples_test = X[tuples_test]
+
+  estimator_with_preprocessor = clone(estimator)
+  set_random_state(estimator_with_preprocessor)
+  estimator_with_preprocessor.set_params(preprocessor=X)
+  if estimator.__class__.__name__ == 'LSML':
+    estimator_with_preprocessor.fit(tuples_train)
+  else:
+    estimator_with_preprocessor.fit(tuples_train, y_train)
+
+  estimator_without_preprocessor = clone(estimator)
+  set_random_state(estimator_without_preprocessor)
+  estimator_without_preprocessor.set_params(preprocessor=None)
+  if estimator.__class__.__name__ == 'LSML':
+    estimator_without_preprocessor.fit(formed_tuples_train)
+  else:
+    estimator_without_preprocessor.fit(formed_tuples_train, y_train)
+
+  estimator_with_prep_formed = clone(estimator)
+  set_random_state(estimator_with_prep_formed)
+  estimator_with_prep_formed.set_params(preprocessor=X)
+  if estimator.__class__.__name__ == 'LSML':
+    estimator_with_prep_formed.fit(tuples_train)
+  else:
+    estimator_with_prep_formed.fit(tuples_train, y_train)
+
+  # test prediction methods
+  for method in ["predict", "decision_function"]:
+    if hasattr(estimator, method):
+      output_with_prep = getattr(estimator_with_preprocessor,
+                                 method)(tuples_test)
+      output_without_prep = getattr(estimator_without_preprocessor,
+                                    method)(formed_tuples_test)
+      assert np.array(output_with_prep == output_without_prep).all()
+      output_with_prep = getattr(estimator_with_preprocessor,
+                                 method)(tuples_test)
+      output_with_prep_formed = getattr(estimator_with_prep_formed,
+                                        method)(formed_tuples_test)
+      assert np.array(output_with_prep == output_with_prep_formed).all()
+
+  # test score_pairs
+  output_with_prep = estimator_with_preprocessor.score_pairs(
+      tuples_test[:, :2])
+  output_without_prep = estimator_without_preprocessor.score_pairs(
+      formed_tuples_test[:, :2])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  output_with_prep = estimator_with_preprocessor.score_pairs(
+      tuples_test[:, :2])
+  output_without_prep = estimator_with_prep_formed.score_pairs(
+      formed_tuples_test[:, :2])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  # test transform
+  output_with_prep = estimator_with_preprocessor.transform(
+      tuples_test[:, 0])
+  output_without_prep = estimator_without_preprocessor.transform(
+      formed_tuples_test[:, 0])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  output_with_prep = estimator_with_preprocessor.transform(
+      tuples_test[:, 0])
+  output_without_prep = estimator_with_prep_formed.transform(
+      formed_tuples_test[:, 0])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+
 @pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
@@ -263,87 +385,20 @@ def test_dont_overwrite_parameters(estimator, build_dataset, preprocessor):
 
 
 def _get_args(function, varargs=False):
-    """Helper to get function arguments"""
+  """Helper to get function arguments"""
 
-    try:
-        params = signature(function).parameters
-    except ValueError:
-        # Error on builtin C function
-        return []
-    args = [key for key, param in params.items()
-            if param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD)]
-    if varargs:
-        varargs = [param.name for param in params.values()
-                   if param.kind == param.VAR_POSITIONAL]
-        if len(varargs) == 0:
-            varargs = None
-        return args, varargs
-    else:
-        return args
-
-
-# ----------------------------- Test preprocessor -----------------------------
-
-
-X = np.array([[0.89, 0.11, 1.48, 0.12],
-              [2.63, 1.08, 1.68, 0.46],
-              [1.00, 0.59, 0.62, 1.15]])
-
-
-class MockFileLoader:
-  """Preprocessor that takes a root file path at construction and simulates
-  fetching the file in the specific root folder when given the name of the
-  file"""
-
-  def __init__(self, root):
-    self.root = root
-    self.folders = {'fake_root': {'img0.png': X[0],
-                                  'img1.png': X[1],
-                                  'img2.png': X[2]
-                                  },
-                    'other_folder': {}  # empty folder
-                    }
-
-  def __call__(self, path_list):
-    images = list()
-    for path in path_list:
-      images.append(self.folders[self.root][path])
-    return np.array(images)
-
-
-def mock_id_loader(list_of_indicators):
-    """A preprocessor as a function that takes indicators (strings) and
-    returns the corresponding samples"""
-    points = []
-    for indicator in list_of_indicators:
-        points.append(X[int(indicator[2:])])
-    return np.array(points)
-
-
-tuples_list = [np.array([[0, 1],
-                         [2, 1]]),
-
-               np.array([['img0.png', 'img1.png'],
-                         ['img2.png', 'img1.png']]),
-
-               np.array([['id0', 'id1'],
-                         ['id2', 'id1']])
-               ]
-
-preprocessors = [X, MockFileLoader('fake_root'), mock_id_loader]
-
-
-@pytest.fixture
-def y_tuples():
-  y = [-1, 1]
-  return y
-
-
-@pytest.mark.parametrize('preprocessor, tuples', zip(preprocessors,
-                                                     tuples_list))
-def test_preprocessor(preprocessor, tuples, y_tuples):
-  """Tests different ways to use the preprocessor argument: an array,
-  a class callable, and a function callable
-  """
-  nca = ITML(preprocessor=preprocessor)
-  nca.fit(tuples, y_tuples)
+  try:
+    params = signature(function).parameters
+  except ValueError:
+    # Error on builtin C function
+    return []
+  args = [key for key, param in params.items()
+          if param.kind not in (param.VAR_POSITIONAL, param.VAR_KEYWORD)]
+  if varargs:
+    varargs = [param.name for param in params.values()
+               if param.kind == param.VAR_POSITIONAL]
+    if len(varargs) == 0:
+        varargs = None
+    return args, varargs
+  else:
+    return args

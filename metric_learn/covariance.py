@@ -13,6 +13,7 @@ import numpy as np
 from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 
+from metric_learn._util import preprocess_points, check_points
 from .base_metric import MahalanobisMixin
 
 
@@ -35,8 +36,10 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     y : unused
     """
     self.check_preprocessor()
-
-    self.X_ = check_array(X, ensure_min_samples=2)
+    self.X_ = check_points(X, ensure_min_samples=2, estimator=self,
+                           preprocessor=self.preprocessor is not None)
+    self.X_ = preprocess_points(self.X_, preprocessor=self.preprocessor_,
+                                estimator=self)
     self.M_ = np.cov(self.X_, rowvar = False)
     if self.M_.ndim == 0:
       self.M_ = 1./self.M_

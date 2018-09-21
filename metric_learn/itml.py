@@ -17,15 +17,19 @@ from __future__ import print_function, absolute_import
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_array, check_X_y
+from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm, check_tuples
+from ._util import (vector_norm, check_points_y, check_tuples_y,
+                    preprocess_tuples, preprocess_points)
 
 
 class _BaseITML(MahalanobisMixin):
   """Information Theoretic Metric Learning (ITML)"""
+
+  _t = 2  # constraints are pairs
+
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False, preprocessor=None):
     """Initialize ITML.
@@ -57,14 +61,11 @@ class _BaseITML(MahalanobisMixin):
     super(_BaseITML, self).__init__(preprocessor)
 
   def _process_pairs(self, pairs, y, bounds):
-    # for now we check_X_y and check_tuples but we should only
-    # check_tuples_y in the future
-    pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                         ensure_2d=False, allow_nd=True)
     self.check_preprocessor()
-    pairs = self._check_tuples(pairs)
-    #  pairs classifiers and for quadruplets classifiers
-    pairs = self.preprocess_tuples(pairs)
+    pairs, y = check_tuples_y(pairs, y, estimator=self, t=self._t,
+                              preprocessor=self.preprocessor is not None)
+    pairs = preprocess_tuples(pairs, preprocessor=self.preprocessor_,
+                              estimator=self)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -231,7 +232,11 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    X, y = check_X_y(X, y)
+    self.check_preprocessor()
+    X, y = check_points_y(X, y, preprocessor=self.preprocessor is not None,
+                          estimator=self)
+    X = preprocess_points(X, preprocessor=self.preprocessor_,
+                          estimator=self)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

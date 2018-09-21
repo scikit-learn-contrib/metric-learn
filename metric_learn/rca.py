@@ -17,8 +17,8 @@ import warnings
 from six.moves import xrange
 from sklearn import decomposition
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_array
 
+from metric_learn._util import check_points_y, check_points, preprocess_points
 from .base_metric import MahalanobisMixin
 from .constraints import Constraints
 
@@ -65,7 +65,10 @@ class RCA(MahalanobisMixin, TransformerMixin):
     super(RCA, self).__init__(preprocessor)
 
   def _process_data(self, X):
-    self.X_ = X = check_array(X)
+    self.check_preprocessor()
+    X = check_points(X, preprocessor=self.preprocessor is not None,
+                     estimator=self)
+    X = preprocess_points(X, preprocessor=self.preprocessor_, estimator=self)
 
     # PCA projection to remove noise and redundant information.
     if self.pca_comps is not None:
@@ -78,8 +81,8 @@ class RCA(MahalanobisMixin, TransformerMixin):
 
     return X, M_pca
 
-  def _check_dimension(self, rank):
-    d = self.X_.shape[1]
+  def _check_dimension(self, rank, X):
+    d = X.shape[1]
     if rank < d:
       warnings.warn('The inner covariance matrix is not invertible, '
                     'so the transformation matrix may contain Nan values. '
@@ -109,7 +112,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
-    self.check_preprocessor()
 
     data, M_pca = self._process_data(data)
 
@@ -117,7 +119,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
     chunk_mask, chunked_data = _chunk_mean_centering(data, chunks)
 
     inner_cov = np.cov(chunked_data, rowvar=0, bias=1)
-    dim = self._check_dimension(np.linalg.matrix_rank(inner_cov))
+    dim = self._check_dimension(np.linalg.matrix_rank(inner_cov), data)
 
     # Fisher Linear Discriminant projection
     if dim < data.shape[1]:
@@ -179,6 +181,11 @@ class RCA_Supervised(RCA):
     y : (n) data labels
     random_state : a random.seed object to fix the random_state if needed.
     """
+    self.check_preprocessor()
+    X, y = check_points_y(X, y, estimator=self,
+                          preprocessor=self.preprocessor is not None)
+    X = preprocess_points(X, preprocessor=self.preprocessor_,
+                          estimator=self)
     chunks = Constraints(y).chunks(num_chunks=self.num_chunks,
                                    chunk_size=self.chunk_size,
                                    random_state=random_state)

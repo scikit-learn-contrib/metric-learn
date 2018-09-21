@@ -13,8 +13,8 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.base import TransformerMixin
 from sklearn.decomposition import PCA
 
-from sklearn.utils.validation import check_X_y
 
+from metric_learn._util import check_points_y, preprocess_points
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -59,7 +59,11 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     super(MLKR, self).__init__(preprocessor)
 
   def _process_inputs(self, X, y):
-      self.X_, y = check_X_y(X, y)
+      self.check_preprocessor()
+      self.X_, y = check_points_y(X, y, y_numeric=True, estimator=self,
+                                  preprocessor=self.preprocessor is not None)
+      self.X_ = preprocess_points(self.X_, estimator=self,
+                                  preprocessor=self.preprocessor_)
       n, d = self.X_.shape
       if y.shape[0] != n:
           raise ValueError('Data and label lengths mismatch: %d != %d'
@@ -72,7 +76,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       if A is None:
           # initialize to PCA transformation matrix
           # note: not the same as n_components=m !
-          A = PCA().fit(X).components_.T[:m]
+          A = PCA().fit(self.X_).components_.T[:m]
       elif A.shape != (m, d):
           raise ValueError('A0 needs shape (%d,%d) but got %s' % (
               m, d, A.shape))
@@ -87,7 +91,6 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       X : (n x d) array of samples
       y : (n) data labels
       """
-      self.check_preprocessor()
 
       X, y, A = self._process_inputs(X, y)
 

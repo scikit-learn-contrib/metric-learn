@@ -13,14 +13,18 @@ import numpy as np
 from sklearn.base import TransformerMixin
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
-from sklearn.utils.validation import check_array, check_X_y
 
+from metric_learn._util import (preprocess_points, preprocess_tuples,
+                                check_tuples_y)
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import check_tuples
+from ._util import check_points_y
 
 
 class _BaseSDML(MahalanobisMixin):
+
+  _t = 2  # constraints are pairs
+
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False, preprocessor=None):
     """
@@ -49,13 +53,11 @@ class _BaseSDML(MahalanobisMixin):
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _prepare_pairs(self, pairs, y):
-    # for now we check_X_y and check_tuples but we should only
-    # check_tuples_y in the future
-    pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                         ensure_2d=False, allow_nd=True)
     self.check_preprocessor()
-    pairs = self._check_tuples(pairs)
-    pairs = self.preprocess_tuples(pairs)
+    pairs, y = check_tuples_y(pairs, y, estimator=self, t=self._t,
+                              preprocessor=self.preprocessor is not None)
+    pairs = preprocess_tuples(pairs, preprocessor=self.preprocessor_,
+                              estimator=self)
 
     # set up prior M
     if self.use_cov:
@@ -162,7 +164,10 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     self : object
         Returns the instance.
     """
-    y = check_array(y, ensure_2d=False)
+    self.check_preprocessor()
+    X, y = check_points_y(X, y, estimator=self,
+                          preprocessor=self.preprocessor is not None)
+    X = preprocess_points(X, estimator=self, preprocessor=self.preprocessor_)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
