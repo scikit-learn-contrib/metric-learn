@@ -734,22 +734,31 @@ def test_same_with_or_without_preprocessor(estimator, dataset):
                                               dataset.points_indicators,
                                               random_state=RNG)
 
+  def make_random_state(estimator):
+    rs = {}
+    if estimator.__class__.__name__[-11:] == '_Supervised':
+      rs['random_state'] = check_random_state(0)
+    return rs
+
   estimator_without_prep = clone(estimator)
   set_random_state(estimator_without_prep)
   estimator_without_prep.set_params(preprocessor=None)
-  estimator_without_prep.fit(formed_points_train, y_train)
+  estimator_without_prep.fit(formed_points_train, y_train,
+                             **make_random_state(estimator))
   embedding_without_prep = estimator_without_prep.transform(formed_points_test)
 
   estimator_with_prep = clone(estimator)
   set_random_state(estimator_with_prep)
   estimator_with_prep.set_params(preprocessor=dataset.data)
-  estimator_with_prep.fit(points_indicators_train, y_train)
+  estimator_with_prep.fit(points_indicators_train, y_train,
+                          **make_random_state(estimator))
   embedding_with_prep = estimator_with_prep.transform(points_indicators_test)
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=dataset.data)
-  estimator_with_prep_formed.fit(formed_points_train, y_train)
+  estimator_with_prep_formed.fit(formed_points_train, y_train,
+                                 **make_random_state(estimator))
   embedding_with_prep_formed = estimator_with_prep_formed.transform(
       formed_points_test)
 
