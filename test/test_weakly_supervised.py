@@ -1,4 +1,5 @@
 import pytest
+from sklearn.base import TransformerMixin
 from sklearn.datasets import load_iris, make_regression, make_blobs
 from sklearn.pipeline import make_pipeline
 from sklearn.utils import shuffle, check_random_state
@@ -214,22 +215,38 @@ def test_estimators_fit_returns_self(estimator, build_dataset, preprocessor):
 def test_pipeline_consistency(estimator, build_dataset, preprocessor):
   # Adapted from scikit learn
   # check that make_pipeline(est) gives same score as est
-  (X, tuples, y, tuples_train, tuples_test,
-   y_train, y_test, preprocessor) = build_dataset(preprocessor)
+  (_, inputs, y, _, _,  _, _, preprocessor) = build_dataset(preprocessor)
+
+  def make_random_state(estimator, in_pipeline):
+    rs = {}
+    name_estimator = estimator.__class__.__name__
+    if name_estimator[-11:] == '_Supervised':
+      name_param = 'random_state'
+      if in_pipeline:
+          name_param = name_estimator.lower() + '__' + name_param
+      rs[name_param] = check_random_state(0)
+    return rs
+
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   pipeline = make_pipeline(estimator)
-  estimator.fit(tuples, y)
-  pipeline.fit(tuples, y)
+  estimator.fit(inputs, y, **make_random_state(estimator, False))
+  pipeline.fit(inputs, y, **make_random_state(estimator, True))
 
-  funcs = ["score", "fit_transform"]
+  if hasattr(estimator, 'score'):
+    result = estimator.score(inputs, y)
+    result_pipe = pipeline.score(inputs, y)
+    assert_allclose_dense_sparse(result, result_pipe)
 
-  for func_name in funcs:
-    func = getattr(estimator, func_name, None)
-    if func is not None:
-      func_pipeline = getattr(pipeline, func_name)
-      result = func(tuples, y)
-      result_pipe = func_pipeline(tuples, y)
+  if hasattr(estimator, 'predict'):
+    result = estimator.predict(inputs)
+    result_pipe = pipeline.predict(inputs)
+    assert_allclose_dense_sparse(result, result_pipe)
+
+  if issubclass(estimator.__class__, TransformerMixin):
+    if hasattr(estimator, 'transform'):
+      result = estimator.transform(inputs)
+      result_pipe = pipeline.transform(inputs)
       assert_allclose_dense_sparse(result, result_pipe)
 
 
