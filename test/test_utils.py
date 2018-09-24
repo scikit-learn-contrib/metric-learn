@@ -584,7 +584,7 @@ def test_progress_message_preprocessor_tuples(capsys):
                      [4, 5]])
 
   def fun(row):
-    return [[1, 1], [3, 3], [4, 4]]
+    return np.array([[1, 1], [3, 3], [4, 4]])
 
   preprocess_tuples(tuples, preprocessor=fun)
   out, _ = capsys.readouterr()
