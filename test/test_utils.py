@@ -1,7 +1,7 @@
 import pytest
 from collections import namedtuple
 import numpy as np
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_random_state, shuffle
 from sklearn.utils.testing import set_random_state
