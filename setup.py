@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 import os
+import io
 
 version = {}
-with open(os.path.join('metric_learn', '_version.py')) as fp:
+with io.open(os.path.join('metric_learn', '_version.py')) as fp:
   exec(fp.read(), version)
 
 # Get the long description from README.md
-with open('README.rst', encoding='utf-8') as f:
+with io.open('README.rst', encoding='utf-8') as f:
   long_description = f.read()
 
 setup(name='metric-learn',
