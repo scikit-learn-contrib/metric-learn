@@ -44,7 +44,7 @@ class TestCovariance(MetricTestCase):
 
     csep = class_separation(cov.transform(), self.iris_labels)
     # deterministic result
-    self.assertAlmostEqual(csep, 0.73068122)
+    self.assertAlmostEqual(csep, 0.72981476)
 
 
 class TestLSML(MetricTestCase):
@@ -319,16 +319,16 @@ class TestMMC(MetricTestCase):
     # Full metric
     mmc = MMC(convergence_threshold=0.01)
     mmc.fit(self.iris_points, [a,b,c,d])
-    expected = [[0.000465,  0.000834, -0.00112, -0.001653],
-                [0.000834, 0.001495, -0.002007, -0.002963],
-                [-0.00112, -0.002007,  0.002695,  0.003979],
-                [-0.001653, -0.002963,  0.003979,  0.005873]]
+    expected = [[ 0.000514,  0.000868, -0.001195, -0.001703],
+                [ 0.000868,  0.001468, -0.002021, -0.002879],
+                [-0.001195, -0.002021,  0.002782,  0.003964],
+                [-0.001703, -0.002879,  0.003964,  0.005648]]
     assert_array_almost_equal(expected, mmc.metric(), decimal=6)
 
     # Diagonal metric
     mmc = MMC(diagonal=True)
     mmc.fit(self.iris_points, [a,b,c,d])
-    expected = [0, 0, 1.210460, 1.225526]
+    expected = [0, 0, 1.210220, 1.228596]
 
     assert_array_almost_equal(np.diag(expected), mmc.metric(), decimal=6)
     
