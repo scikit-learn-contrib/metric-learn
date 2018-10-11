@@ -434,7 +434,7 @@ class MMC_Supervised(MMC):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    X, y = check_X_y(X, y)
+    X, y = check_X_y(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
