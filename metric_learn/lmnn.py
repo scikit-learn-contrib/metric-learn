@@ -52,7 +52,7 @@ class _base_LMNN(BaseMetricLearner):
 class python_LMNN(_base_LMNN):
 
   def _process_inputs(self, X, labels):
-    self.X_ = check_array(X, dtype=float)
+    self.X_ = check_array(X, dtype=float, ensure_min_samples=2)
     num_pts, num_dims = self.X_.shape
     unique_labels, self.label_inds_ = np.unique(labels, return_inverse=True)
     if len(self.label_inds_) != num_pts:
