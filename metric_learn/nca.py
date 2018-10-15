@@ -8,7 +8,7 @@ import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
 
-from metric_learn._util import check_points_y, preprocess_points
+from metric_learn._util import check_input
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -37,10 +37,8 @@ class NCA(MahalanobisMixin, TransformerMixin):
     """
     self.check_preprocessor()
 
-    X, labels = check_points_y(X, y, estimator=self,
-                               preprocessor=self.preprocessor is not None)
-    X = preprocess_points(X, estimator=self,
-                          preprocessor=self.preprocessor_)
+    X, labels = check_input(X, y, type_of_inputs='classic', estimator=self,
+                               preprocessor=self.preprocessor_)
     n, d = X.shape
     num_dims = self.num_dims
     if num_dims is None:

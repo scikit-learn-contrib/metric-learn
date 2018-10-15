@@ -14,7 +14,7 @@ from sklearn.base import TransformerMixin
 from sklearn.decomposition import PCA
 
 
-from metric_learn._util import check_points_y, preprocess_points
+from metric_learn._util import check_input
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -60,10 +60,9 @@ class MLKR(MahalanobisMixin, TransformerMixin):
 
   def _process_inputs(self, X, y):
       self.check_preprocessor()
-      self.X_, y = check_points_y(X, y, y_numeric=True, estimator=self,
-                                  preprocessor=self.preprocessor is not None)
-      self.X_ = preprocess_points(self.X_, estimator=self,
-                                  preprocessor=self.preprocessor_)
+      self.X_, y = check_input(X, y, type_of_inputs='classic',
+                               y_numeric=True, estimator=self,
+                               preprocessor=self.preprocessor_)
       n, d = self.X_.shape
       if y.shape[0] != n:
           raise ValueError('Data and label lengths mismatch: %d != %d'

@@ -16,7 +16,7 @@ from collections import Counter
 from six.moves import xrange
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
-from metric_learn._util import preprocess_points, check_points_y
+from metric_learn._util import check_input
 from .base_metric import MahalanobisMixin
 
 
@@ -51,14 +51,11 @@ class python_LMNN(_base_LMNN):
 
   def _process_inputs(self, X, labels):
     self.check_preprocessor()
-    self.X_, labels = check_points_y(X, labels,
-                                     preprocessor=self.preprocessor is not
-                                     None,
-                                     estimator=self)
-    self.X_ = preprocess_points(self.X_, estimator=self,
-                                preprocessor=self.preprocessor_)
+    self.X_, labels = check_input(X, labels, type_of_inputs='classic',
+                                  preprocessor=self.preprocessor_,
+                                  estimator=self)
     self.X_ = self.X_.astype(float)  # todo: remove the conversion here and
-    # integrate it into check_points_y
+    # integrate it into check_input
     num_pts, num_dims = self.X_.shape
     unique_labels, self.label_inds_ = np.unique(labels, return_inverse=True)
     if len(self.label_inds_) != num_pts:
@@ -263,12 +260,12 @@ try:
 
     def fit(self, X, y):
       self.check_preprocessor()
-      self.X_, y = check_points_y(X, y, estimator=self,
-                                  preprocessor=self.preprocessor is not None)
+      self.X_, y = check_input(X, y, type_of_inputs='classic',
+                               estimator=self,
+                               preprocessor=self.preprocessor_)
       self.X_ = self.X_.astype(float)  # todo: remove the conversion here and
-      # integrate it into check_points_y
-      self.X_ = preprocess_points(self.X_, estimator=self,
-                                  preprocessor=self.preprocessor_)
+      # integrate it into check_input
+      self.X_ = self.X_, preprocessor=self.preprocessor_
       labels = MulticlassLabels(y)
       self._lmnn = shogun_LMNN(RealFeatures(self.X_.T), labels, self.k)
       self._lmnn.set_maxiter(self.max_iter)

@@ -146,8 +146,9 @@ def test_score_pairs_dim(estimator, build_dataset):
          "your data has a single feature or tuples.reshape(1, {}, -1) "
          "if it contains a single tuple.".format(tuples, tuples.shape[1],
                                                  tuples.shape[0]))
-  with pytest.raises(ValueError, message=msg):
+  with pytest.raises(ValueError) as raised_error:
     model.score_pairs(tuples[1])
+  assert str(raised_error.value) == msg
 
 
 def check_is_distance_matrix(pairwise):
@@ -191,16 +192,18 @@ def test_embed_dim(estimator, build_dataset):
              "Reshape your data either using array.reshape(-1, 1) if "
              "your data has a single feature or array.reshape(1, -1) "
              "if it contains a single sample.".format(X))
-  with pytest.raises(ValueError, message=err_msg):
+  with pytest.raises(ValueError) as raised_error:
     model.score_pairs(model.transform(X[0, :]))
+  assert str(raised_error.value) == err_msg
   # we test that the shape is also OK when doing dimensionality reduction
   if type(model).__name__ in {'LFDA', 'MLKR', 'NCA', 'RCA'}:
     model.set_params(num_dims=2)
     model.fit(inputs, labels)
     assert model.transform(X).shape == (X.shape[0], 2)
     # assert that ValueError is thrown if input shape is 1D
-    with pytest.raises(ValueError, message=err_msg):
+    with pytest.raises(ValueError) as raised_error:
         model.transform(model.transform(X[0, :]))
+    assert str(raised_error.value) == err_msg
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,

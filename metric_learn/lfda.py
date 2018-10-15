@@ -18,7 +18,7 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.base import TransformerMixin
 
-from metric_learn._util import check_points_y, preprocess_points
+from metric_learn._util import check_input
 from .base_metric import MahalanobisMixin
 
 
@@ -63,9 +63,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
   def _process_inputs(self, X, y):
     unique_classes, y = np.unique(y, return_inverse=True)
     self.check_preprocessor()
-    self.X_, y = check_points_y(X, y, estimator=self,
-                                preprocessor=self.preprocessor is not None)
-    self.X_ = preprocess_points(self.X_, estimator=self,
+    self.X_, y = check_input(X, y, type_of_inputs='classic', estimator=self,
                                 preprocessor=self.preprocessor_)
     n, d = self.X_.shape
     num_classes = len(unique_classes)

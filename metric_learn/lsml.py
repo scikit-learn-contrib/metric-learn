@@ -12,8 +12,7 @@ import numpy as np
 import scipy.linalg
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from ._util import (check_tuples, check_points_y, preprocess_points,
-                    preprocess_tuples)
+from ._util import check_input
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
@@ -46,13 +45,10 @@ class _BaseLSML(MahalanobisMixin):
     super(_BaseLSML, self).__init__(preprocessor)
 
   def _prepare_quadruplets(self, quadruplets, weights):
-    # for now we check_array and check_tuples but we should only
-    # check_tuples in the future (with enhanced check_tuples)
     self.check_preprocessor()
-    quadruplets = check_tuples(quadruplets, estimator=self, t=self._t,
-                               preprocessor=self.preprocessor is not None)
-    quadruplets = preprocess_tuples(quadruplets, estimator=self,
-                                    preprocessor=self.preprocessor_)
+    quadruplets = check_input(quadruplets, type_of_inputs='tuples',
+                              estimator=self, t=self._t,
+                              preprocessor=self.preprocessor_)
 
     # check to make sure that no two constrained vectors are identical
     self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -223,9 +219,9 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
         If provided, controls random number generation.
     """
     self.check_preprocessor()
-    X, y = check_points_y(X, y, preprocessor=self.preprocessor is not None,
-                          estimator=self)
-    X = preprocess_points(X, estimator=self, preprocessor=self.preprocessor_)
+    X, y = check_input(X, y, type_of_inputs='classic',
+                       preprocessor=self.preprocessor_,
+                       estimator=self)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

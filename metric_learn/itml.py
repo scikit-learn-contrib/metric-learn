@@ -21,8 +21,7 @@ from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import (vector_norm, check_points_y, check_tuples_y,
-                    preprocess_tuples, preprocess_points)
+from ._util import vector_norm, check_input
 
 
 class _BaseITML(MahalanobisMixin):
@@ -62,10 +61,9 @@ class _BaseITML(MahalanobisMixin):
 
   def _process_pairs(self, pairs, y, bounds):
     self.check_preprocessor()
-    pairs, y = check_tuples_y(pairs, y, estimator=self, t=self._t,
-                              preprocessor=self.preprocessor is not None)
-    pairs = preprocess_tuples(pairs, preprocessor=self.preprocessor_,
-                              estimator=self)
+    pairs, y = check_input(pairs, y, type_of_inputs='tuples',
+                           estimator=self, t=self._t,
+                           preprocessor=self.preprocessor_)
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -233,10 +231,9 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
         If provided, controls random number generation.
     """
     self.check_preprocessor()
-    X, y = check_points_y(X, y, preprocessor=self.preprocessor is not None,
-                          estimator=self)
-    X = preprocess_points(X, preprocessor=self.preprocessor_,
-                          estimator=self)
+    X, y = check_input(X, y, type_of_inputs='classic',
+                       preprocessor=self.preprocessor_,
+                       estimator=self)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

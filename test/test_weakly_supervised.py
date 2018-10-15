@@ -19,6 +19,12 @@ from sklearn.model_selection import (cross_val_score, cross_val_predict,
 
 RNG = check_random_state(0)
 
+def mock_preprocessor(indices):
+  """A preprocessor for testing purposes that returns an all ones 3D array
+  """
+  return np.ones((indices.shape[0], 3))
+
+
 # ---------------------- Test scikit-learn compatibility ----------------------
 
 
@@ -287,7 +293,7 @@ def test_dict_unchanged(estimator, build_dataset, preprocessor):
                          ids=['itml', 'lsml', 'mmc', 'sdml'])
 def test_same_result_with_or_without_preprocessor(estimator, build_dataset):
   (X, tuples, y, tuples_train, tuples_test, y_train,
-   y_test, _) = build_dataset(preprocessor=True)
+   y_test, _) = build_dataset(preprocessor=mock_preprocessor)
   formed_tuples_train = X[tuples_train]
   formed_tuples_test = X[tuples_test]
 

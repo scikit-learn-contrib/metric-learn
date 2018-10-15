@@ -5,8 +5,7 @@ from sklearn.metrics import roc_auc_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
-from ._util import (check_tuples, ArrayIndexer, preprocess_tuples,
-                    check_points, preprocess_points)
+from ._util import ArrayIndexer, check_input
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
@@ -106,10 +105,9 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
     """
-    pairs = check_tuples(pairs, preprocessor=self.preprocessor is not None,
-                         estimator=self, t=2)
-    pairs = preprocess_tuples(pairs, preprocessor=self.preprocessor_,
-                              estimator=self)
+    pairs = check_input(pairs, type_of_inputs='tuples',
+                        preprocessor=self.preprocessor_,
+                        estimator=self, t=2)
     pairwise_diffs = self.transform(pairs[:, 1, :] - pairs[:, 0, :])
     # (for MahalanobisMixin, the embedding is linear so we can just embed the
     # difference)
@@ -132,11 +130,9 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     X_embedded : `numpy.ndarray`, shape=(n_samples, num_dims)
       The embedded data points.
     """
-    X_checked = check_points(X, estimator=self,
-                             preprocessor=self.preprocessor is not None,
+    X_checked = check_input(X, type_of_inputs='classic', estimator=self,
+                             preprocessor=self.preprocessor_,
                              accept_sparse=True)
-    X_checked = preprocess_points(X_checked, preprocessor=self.preprocessor_,
-                                  estimator=self)
     return X_checked.dot(self.transformer_.T)
 
   def metric(self):
@@ -191,13 +187,13 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    pairs = check_tuples(pairs, preprocessor=self.preprocessor is not None,
+    pairs = check_input(pairs, type_of_inputs='tuples',
+                        preprocessor=self.preprocessor_,
                          estimator=self, t=self._t)
-    # no need to preprocess_tuples since it is done in score_pairs
     return self.score_pairs(pairs)
 
   def decision_function(self, pairs):
-    # no need to check_tuples and preprocess_tuples since it is done in
+    # no need to check_input since it is done in
     # predict->score_pairs
     return self.predict(pairs)
 
@@ -226,7 +222,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     score : float
       The ``roc_auc`` score.
     """
-    # no need to check_tuples and preprocess_tuples since it is done in
+    # no need to check_input since it is done in
     # predict->score_pairs
     return roc_auc_score(y, self.decision_function(pairs))
 
@@ -254,17 +250,16 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
-    quadruplets = check_tuples(quadruplets,
-                               preprocessor=self.preprocessor is not None,
+    quadruplets = check_input(quadruplets, type_of_inputs='tuples',
+                               preprocessor=self.preprocessor_,
                                estimator=self, t=self._t)
-    # no need to preprocess_tuples since it is done in score_pairs
     # we broadcast with ... because here we allow quadruplets to be
     # either a 3D array of points or 2D array of indices
     return (self.score_pairs(quadruplets[:, :2, ...]) -
             self.score_pairs(quadruplets[:, 2:, ...]))
 
   def decision_function(self, quadruplets):
-    # no need to check_tuples and preprocess_tuples since it is done in
+    # no need to check_input since it is done in
     # predict->score_pairs
     return self.predict(quadruplets)
 
@@ -290,6 +285,6 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     score : float
       The quadruplets score.
     """
-    # no need to check_tuples and preprocess_tuples since it is done in
+    # no need to check_input since it is done in
     # predict->score_pairs
     return -np.mean(self.predict(quadruplets))
