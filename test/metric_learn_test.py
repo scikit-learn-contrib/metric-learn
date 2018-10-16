@@ -90,7 +90,7 @@ class TestNCA(MetricTestCase):
     n = self.iris_points.shape[0]
 
     # Without dimension reduction
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01)
+    nca = NCA(max_iter=(100000//n), num_dims=2, tol=1e-9)
     nca.fit(self.iris_points, self.iris_labels)
     # Result copied from Iris example at
     # https://github.com/vomjom/nca/blob/master/README.mkd
