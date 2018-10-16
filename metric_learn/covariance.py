@@ -45,5 +45,7 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     else:
       self.M_ = np.linalg.inv(self.M_)
 
-    self.transformer_ = self.transformer_from_metric(check_array(self.M_))
+    self.transformer_ = self.transformer_from_metric(
+      check_array(self.M_, ensure_min_samples=0,ensure_min_features=0,
+                  ensure_2d=False))
     return self

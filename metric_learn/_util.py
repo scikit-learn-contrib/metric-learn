@@ -63,7 +63,10 @@ def check_input(input, y=None, preprocessor=None,
                             ensure_min_features=ensure_min_features,
                             warn_on_dtype=warn_on_dtype, estimator=estimator)
   if y is None:
-    input = np.array(input, copy=False)
+    input = check_array(input, ensure_2d=False, allow_nd=True,
+                        copy=False, force_all_finite=False,
+                        accept_sparse=True, dtype=None,
+                        ensure_min_features=0, ensure_min_samples=0)
   else:
     input, y = check_X_y(input, y, ensure_2d=False, allow_nd=True,
                          copy=False, force_all_finite=False,
