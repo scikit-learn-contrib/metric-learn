@@ -40,7 +40,7 @@ class TestCovariance(MetricTestCase):
 
     csep = class_separation(cov.transform(self.iris_points), self.iris_labels)
     # deterministic result
-    self.assertAlmostEqual(csep, 0.73068122)
+    self.assertAlmostEqual(csep, 0.72981476)
 
 
 class TestLSML(MetricTestCase):
@@ -104,7 +104,7 @@ class TestNCA(MetricTestCase):
     nca = NCA(max_iter=(100000//n), learning_rate=0.01, num_dims=2)
     nca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(nca.transform(self.iris_points), self.iris_labels)
-    self.assertLess(csep, 0.15)
+    self.assertLess(csep, 0.20)
 
 
 class TestLFDA(MetricTestCase):
@@ -163,16 +163,16 @@ class TestMMC(MetricTestCase):
     # Full metric
     mmc = MMC(convergence_threshold=0.01)
     mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
-    expected = [[+0.00046504, +0.00083371, -0.00111959, -0.00165265],
-                [+0.00083371, +0.00149466, -0.00200719, -0.00296284],
-                [-0.00111959, -0.00200719, +0.00269546, +0.00397881],
-                [-0.00165265, -0.00296284, +0.00397881, +0.00587320]]
+    expected = [[ 0.000514,  0.000868, -0.001195, -0.001703],
+                [ 0.000868,  0.001468, -0.002021, -0.002879],
+                [-0.001195, -0.002021,  0.002782,  0.003964],
+                [-0.001703, -0.002879,  0.003964,  0.005648]]
     assert_array_almost_equal(expected, mmc.metric(), decimal=6)
 
     # Diagonal metric
     mmc = MMC(diagonal=True)
     mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
-    expected = [0, 0, 1.21045968, 1.22552608]
+    expected = [0, 0, 1.210220, 1.228596]
     assert_array_almost_equal(np.diag(expected), mmc.metric(), decimal=6)
     
     # Supervised Full

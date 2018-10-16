@@ -53,7 +53,7 @@ class python_LMNN(_base_LMNN):
     self.check_preprocessor()
     self.X_, labels = check_input(X, labels, type_of_inputs='classic',
                                   preprocessor=self.preprocessor_,
-                                  estimator=self)
+                                  estimator=self, ensure_min_samples=2)
     self.X_ = self.X_.astype(float)  # todo: remove the conversion here and
     # integrate it into check_input
     num_pts, num_dims = self.X_.shape

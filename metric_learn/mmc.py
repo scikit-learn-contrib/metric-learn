@@ -455,7 +455,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     self.check_preprocessor()
     X, y = check_input(X, y, type_of_inputs='classic',
                        preprocessor=self.preprocessor_,
-                       estimator=self)
+                       estimator=self, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
