@@ -72,15 +72,18 @@ def check_input(input, y=None, preprocessor=None,
                          multi_output=multi_output,
                          y_numeric=y_numeric)
     # we try to allow the more possible stuff here
+  preprocessor_has_been_applied = False
 
   if type_of_inputs == 'classic':
     if input.ndim == 1:
         if preprocessor is not None:
                 input = preprocess_points(input, preprocessor)
+                preprocessor_has_been_applied = True
         else:
-            raise ValueError('Using no preprocessor, a 2D array of formed '
-                             'points is expected{}. Reshape your data '
-                             'and/or use a preprocessor'.format(context))
+          raise ValueError('2D array of formed points expected{}. Found {}D array '
+                  'instead:\ninput={}. Reshape '
+                  'your data and/or use a preprocessor.\n'.format(
+                      context, input.ndim, input))
     elif input.ndim == 2:
         pass # OK
     else:
@@ -93,30 +96,40 @@ def check_input(input, y=None, preprocessor=None,
                        .format(with_prep[0], context, with_prep[1],
                                input.ndim, input))
 
-    input = check_array(input, allow_nd=True, ensure_2d=True,
+    input = check_array(input, allow_nd=True, ensure_2d=False,
                         # arguments that come from before
                         **args_for_sk_checks)
+    if input.ndim != 2:  # we have to ensure this because check_array above
+        # does not
+
+      raise ValueError('2D array of formed points expected{}{}. '
+              'Found {}D array '
+              'instead:\ninput={}. Reshape your data '
+              'and/or use a preprocessor.\n'.format(context,
+                  ' after the preprocessor has been applied' if
+                  preprocessor_has_been_applied else '',
+                  input.ndim, input))
 
   elif type_of_inputs == 'tuples':
 
-    if input.ndim == 2:
-        if preprocessor is not None:
-            check_t(input, t, context)
-            input = preprocess_points(input, preprocessor)
-        else:
+    check_t(input, t, context)
 
-            raise ValueError('Using no preprocessor, a 3D array of points '
-                             'indicators is expected{}. Reshape your data '
-                             'and/or use a preprocessor'.format(context))
+    if input.ndim == 2:
+      if preprocessor is not None:
+          input = preprocess_tuples(input, preprocessor)
+          preprocessor_has_been_applied = True
+      else:
+
+          raise ValueError('3D array of formed tuples expected{}. '
+                  'Found {}D array '
+                  'instead:\ninput={}. '
+                  'Reshape your data '
+                  'and/or use a preprocessor.\n'.format(context,
+                      input.ndim,
+                      input))
     elif input.ndim == 3:  # we should check_num_features which is not checked
-      #  after
-      if ensure_min_features > 0:
-        n_features = input.shape[2]
-        if n_features < ensure_min_features:
-            raise ValueError("Found array with {} feature(s) (shape={}) while"
-                             " a minimum of {} is required{}."
-                             .format(n_features, input.shape,
-                                     ensure_min_features, context))
+        #  after
+        pass
     else:
 
       with_prep =(('2D array of indicators or 3D array of formed tuples',
@@ -128,26 +141,43 @@ def check_input(input, y=None, preprocessor=None,
                        .format(with_prep[0], context, with_prep[1],
                                input.ndim, input))
 
-    check_t(input, t, context)
     input = check_array(input, allow_nd=True, ensure_2d=False,
-                        # arguments that come from before
-                        **args_for_sk_checks)
+                      # arguments that come from before
+                      **args_for_sk_checks)
+    if ensure_min_features > 0:
+      n_features = input.shape[2]
+      if n_features < ensure_min_features:
+          raise ValueError("Found array with {} feature(s) (shape={}) while"
+                  " a minimum of {} is required{}."
+                  .format(n_features, input.shape,
+                      ensure_min_features, context))
+                  #  normally we don't need to check_t too because t should'nt be able to
+    # be modified by any preprocessor
     if input.ndim != 3:  # we have to ensure this because check_array above
       # does not
-      raise ValueError("Invalid data.")  # TODO put a better error message
+
+      raise ValueError('3D array of formed tuples expected{}{}. '
+                       'Found {}D array '
+                       'instead:\ninput={}. Reshape your data '
+                       'and/or use a preprocessor.\n'.format(context,
+                       ' after the preprocessor has been applied' if
+                        preprocessor_has_been_applied else '',
+                        input.ndim, input))
 
   return input if y is None else (input, y)
 
 
 def preprocess_tuples(tuples, preprocessor):
+  print("Preprocessing tuples...")
   tuples = np.column_stack([preprocessor(tuples[:, i])[:, np.newaxis] for
-                            i in range(tuples.shape[1])])
+      i in range(tuples.shape[1])])
   return tuples
 
 
 def preprocess_points(points, preprocessor):
   """form points if there is a preprocessor else keep them as such (assumes
   that check_points has already been called)"""
+  print("Preprocessing points...")
   points = preprocessor(points)
   return points
 

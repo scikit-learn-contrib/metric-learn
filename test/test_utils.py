@@ -92,7 +92,8 @@ def test_check_input_invalid_shape(estimator, context, tuples, found,
          "data{}.\n"
          .format(expected, context, ' when using a preprocessor'
                  if preprocessor else '', found, tuples,
-                 ' and/or use a preprocessor' if not preprocessor else ''))
+                 ' and/or use a preprocessor' if
+                 (not preprocessor and tuples.ndim == 2) else ''))
   with pytest.raises(ValueError) as raised_error:
       check_input(tuples, type_of_inputs='tuples',
                   preprocessor=preprocessor, ensure_min_samples=0,
@@ -127,7 +128,10 @@ def test_check_input_invalid_n_samples(estimator, context, load_tuples,
   """Checks that the right warning is printed if n_samples is too small"""
   tuples = load_tuples()
   msg = ("Found array with 2 sample(s) (shape={}) while a minimum of 3 "
-         "is required{}.".format(tuples.shape, context))
+         "is required{}.".format((preprocess_tuples(tuples, preprocessor)
+                                 if (preprocessor is not None and
+                                    tuples.ndim == 2) else tuples).shape,
+                                 context))
   with pytest.raises(ValueError) as raised_error:
     check_input(tuples, type_of_inputs='tuples',
                 preprocessor=preprocessor,
@@ -145,7 +149,16 @@ def test_check_input_invalid_dtype_convertible(estimator, context,
                                                 load_tuples, preprocessor):
   """Checks that a warning is raised if a convertible input is converted to
   float"""
-  tuples = load_tuples().astype(object)
+  tuples = load_tuples().astype(object)  # here the object conversion is
+  # useless for the tuples_prep case, but this allows to test the
+  # tuples_prep case
+
+  if preprocessor is not None:  # if the preprocessor is not None we
+  # overwrite it to have a preprocessor that returns objects
+    def preprocessor(indices):  #
+      # preprocessor that returns objects
+      return np.ones((indices.shape[0], 3)).astype(object)
+
   msg = ("Data with input dtype object was converted to float64{}."
          .format(context))
   with pytest.warns(DataConversionWarning) as raised_warning:
@@ -155,18 +168,30 @@ def test_check_input_invalid_dtype_convertible(estimator, context,
   assert str(raised_warning[0].message) == msg
 
 
-@pytest.mark.parametrize('preprocessor, tuples',
-                         [(mock_preprocessor, np.array([['a', 'b'],
-                                                        ['e', 'b']])),
-                          (None, np.array([[['b', 'v'], ['a', 'd']],
-                                            [['x', 'u'], ['c', 'a']]]))])
-def test_check_input_invalid_dtype_not_convertible(preprocessor, tuples):
+def test_check_input_invalid_dtype_not_convertible_with_preprocessor(
+        tuples_prep):
   """Checks that a value error is thrown if attempting to convert an
-  input not convertible to float
+  input not convertible to float, when using a preprocessor
   """
+
+  def preprocessor(indices):
+    # preprocessor that returns objects
+    return np.full((indices.shape[0], 3), 'a')
+
+  with pytest.raises(ValueError):
+    check_input(tuples_prep, type_of_inputs='tuples',
+                preprocessor=preprocessor, dtype=np.float64)
+
+
+def test_check_input_invalid_dtype_not_convertible_without_preprocessor(
+        tuples_no_prep):
+  """Checks that a value error is thrown if attempting to convert an
+  input not convertible to float, when using no preprocessor
+  """
+  tuples = np.full_like(tuples_no_prep, 'a', dtype=object)
   with pytest.raises(ValueError):
     check_input(tuples, type_of_inputs='tuples',
-                preprocessor=preprocessor, dtype=np.float64)
+                preprocessor=None, dtype=np.float64)
 
 
 @pytest.mark.parametrize('t', [2, None])
@@ -222,7 +247,7 @@ def test_check_input_valid_with_preprocessor(tuples):
 def test_check_input_valid_without_preprocessor(tuples):
   """Test that valid inputs when using no preprocessor raises no warning"""
   with pytest.warns(None) as record:
-    check_input(tuples, preprocessor=None)
+    check_input(tuples, type_of_inputs='tuples', preprocessor=None)
   assert len(record) == 0
 
 
@@ -300,7 +325,8 @@ def test_check_input_points_invalid_shape(estimator, context, points, found,
          "data{}.\n"
          .format(expected, context, ' when using a preprocessor'
                  if preprocessor else '', found, points,
-                 ' and/or use a preprocessor' if not preprocessor else ''))
+                 ' and/or use a preprocessor' if
+                 (not preprocessor and points.ndim == 1) else ''))
   with pytest.raises(ValueError) as raised_error:
     check_input(points, type_of_inputs='classic', preprocessor=preprocessor,
                 ensure_min_samples=0,
@@ -335,7 +361,12 @@ def test_check_input_point_invalid_n_samples(estimator, context, load_points,
   """Checks that the right warning is printed if n_samples is too small"""
   points = load_points()
   msg = ("Found array with 2 sample(s) (shape={}) while a minimum of 3 "
-         "is required{}.".format(points.shape, context))
+         "is required{}.".format((preprocess_points(points,
+                                                   preprocessor)
+                                 if preprocessor is not None and
+                                    points.ndim == 1 else
+                                 points).shape,
+                                 context))
   with pytest.raises(ValueError) as raised_error:
     check_input(points, type_of_inputs='classic',preprocessor=preprocessor,
                 ensure_min_samples=3,
@@ -353,7 +384,16 @@ def test_check_input_point_invalid_dtype_convertible(estimator, context,
                                                 load_points, preprocessor):
   """Checks that a warning is raised if a convertible input is converted to
   float"""
-  points = load_points().astype(object)
+  points = load_points().astype(object)  # here the object conversion is
+  # useless for the points_prep case, but this allows to test the
+  # points_prep case
+
+  if preprocessor is not None:  # if the preprocessor is not None we
+  # overwrite it to have a preprocessor that returns objects
+    def preprocessor(indices):  #
+      # preprocessor that returns objects
+      return np.ones((indices.shape[0], 3)).astype(object)
+
   msg = ("Data with input dtype object was converted to float64{}."
          .format(context))
   with pytest.warns(DataConversionWarning) as raised_warning:
@@ -543,19 +583,15 @@ def test_preprocess_tuples_invalid_message(estimator):
   """Checks that if the preprocessor does some weird stuff, the preprocessed
   input is detected as weird. Checks this for preprocess_tuples."""
 
-  if estimator is not None:
-    estimator_name = make_name(estimator) + (' after the preprocessor '
+  context = make_context(estimator) + (' after the preprocessor '
                                              'has been applied')
-  else:
-    estimator_name = ('objects that will use preprocessed tuples')
-  context = make_context(estimator_name)
 
   def preprocessor(sequence):
     return np.ones((len(sequence), 2, 2))  # returns a 3D array instead of 2D
 
   with pytest.raises(ValueError) as raised_error:
       check_input(np.ones((3, 2)), type_of_inputs='tuples',
-                  preprocessor=preprocessor)
+                  preprocessor=preprocessor, estimator=estimator)
   expected_msg = ("3D array of formed tuples expected{}. Found 4D "
                   "array instead:\ninput={}. Reshape your data{}.\n"
                   .format(context, np.ones((3, 2, 2, 2)),
@@ -569,18 +605,15 @@ def test_preprocess_points_invalid_message(estimator):
   """Checks that if the preprocessor does some weird stuff, the preprocessed
   input is detected as weird. Checks this for preprocess_points."""
 
-  if estimator is not None:
-    estimator_name = make_name(estimator) + (' after the preprocessor '
+  context = make_context(estimator) + (' after the preprocessor '
                                              'has been applied')
-  else:
-    estimator_name = ('objects that will use preprocessed points')
-  context = make_context(estimator_name)
 
   def preprocessor(sequence):
     return np.ones((len(sequence), 2, 2))  # returns a 3D array instead of 2D
 
   with pytest.raises(ValueError) as raised_error:
-      preprocess_points(np.ones((3,)), preprocessor=preprocessor)
+      check_input(np.ones((3,)), type_of_inputs='classic',
+                  preprocessor=preprocessor, estimator=estimator)
   expected_msg = ("2D array of formed points expected{}. "
                   "Found 3D array instead:\ninput={}. Reshape your data{}.\n"
                   .format(context, np.ones((3, 2, 2)),
