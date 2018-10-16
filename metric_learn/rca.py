@@ -73,13 +73,13 @@ class RCA(MahalanobisMixin, TransformerMixin):
     # PCA projection to remove noise and redundant information.
     if self.pca_comps is not None:
       pca = decomposition.PCA(n_components=self.pca_comps)
-      X = pca.fit_transform(X)
+      X_transformed = pca.fit_transform(X)
       M_pca = pca.components_
     else:
-      X -= X.mean(axis=0)
+      X_transformed = X - X.mean(axis=0)
       M_pca = None
 
-    return X, M_pca
+    return X_transformed, M_pca
 
   def _check_dimension(self, rank, X):
     d = X.shape[1]
