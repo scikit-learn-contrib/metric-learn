@@ -111,9 +111,6 @@ def check_input(input, y=None, preprocessor=None,
                   input.ndim, input))
 
   elif type_of_inputs == 'tuples':
-
-    check_t(input, t, context)
-
     if input.ndim == 2:
       if preprocessor is not None:
           input = preprocess_tuples(input, preprocessor)
@@ -163,6 +160,8 @@ def check_input(input, y=None, preprocessor=None,
                        ' after the preprocessor has been applied' if
                         preprocessor_has_been_applied else '',
                         input.ndim, input))
+
+    check_t(input, t, context)
 
   return input if y is None else (input, y)
 

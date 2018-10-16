@@ -11,6 +11,7 @@ from sklearn.utils.testing import set_random_state
 
 from metric_learn import (Constraints, ITML, LSML, MMC, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, RCA)
+from metric_learn._util import make_context
 from metric_learn.constraints import wrap_pairs
 from functools import partial
 
@@ -141,11 +142,10 @@ def test_score_pairs_dim(estimator, build_dataset):
   X, _ = load_iris(return_X_y=True)
   tuples = np.array(list(product(X, X)))
   assert model.score_pairs(tuples).shape == (tuples.shape[0],)
-  msg = ("Expected 3D array, got 2D array instead:\ntuples={}.\n"
-         "Reshape your data either using tuples.reshape(-1, {}, 1) if "
-         "your data has a single feature or tuples.reshape(1, {}, -1) "
-         "if it contains a single tuple.".format(tuples, tuples.shape[1],
-                                                 tuples.shape[0]))
+  context = make_context(estimator)
+  msg = ("3D array of formed tuples expected{}. Found 2D array "
+         "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
+         .format(context, tuples[1]))
   with pytest.raises(ValueError) as raised_error:
     model.score_pairs(tuples[1])
   assert str(raised_error.value) == msg
@@ -188,10 +188,10 @@ def test_embed_dim(estimator, build_dataset):
   assert model.transform(X).shape == X.shape
 
   # assert that ValueError is thrown if input shape is 1D
-  err_msg = ("Expected 2D array, got 1D array instead:\narray={}.\n"
-             "Reshape your data either using array.reshape(-1, 1) if "
-             "your data has a single feature or array.reshape(1, -1) "
-             "if it contains a single sample.".format(X))
+  context = make_context(estimator)
+  err_msg = ("2D array of formed points expected{}. Found 1D array "
+         "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
+         .format(context, X[0]))
   with pytest.raises(ValueError) as raised_error:
     model.score_pairs(model.transform(X[0, :]))
   assert str(raised_error.value) == err_msg
