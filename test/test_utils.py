@@ -59,9 +59,13 @@ def test_make_name(estimator, expected):
 def test_check_input_invalid_t(estimator, context, load_tuples, preprocessor):
   """Checks that the exception are raised if t is not the one expected"""
   tuples = load_tuples()
+  preprocessed_tuples = (preprocess_tuples(tuples, preprocessor)
+                         if (preprocessor is not None and
+                         tuples.ndim == 2) else tuples)
   expected_msg = ("Tuples of 3 element(s) expected{}. Got tuples of 2 "
                   "element(s) instead (shape={}):\ninput={}.\n"
-                  .format(context, tuples.shape, tuples))
+                  .format(context, preprocessed_tuples.shape,
+                          preprocessed_tuples))
   with pytest.raises(ValueError) as raised_error:
     check_input(tuples, type_of_inputs='tuples', t=3,
                 preprocessor=preprocessor, estimator=estimator)
