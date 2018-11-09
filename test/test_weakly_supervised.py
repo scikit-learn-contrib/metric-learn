@@ -19,6 +19,7 @@ from sklearn.model_selection import (cross_val_score, cross_val_predict,
 
 RNG = check_random_state(0)
 
+
 def mock_preprocessor(indices):
   """A preprocessor for testing purposes that returns an all ones 3D array
   """

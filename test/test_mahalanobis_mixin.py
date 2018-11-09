@@ -190,8 +190,8 @@ def test_embed_dim(estimator, build_dataset):
   # assert that ValueError is thrown if input shape is 1D
   context = make_context(estimator)
   err_msg = ("2D array of formed points expected{}. Found 1D array "
-         "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
-         .format(context, X[0]))
+             "instead:\ninput={}. Reshape your data and/or use a "
+             "preprocessor.\n".format(context, X[0]))
   with pytest.raises(ValueError) as raised_error:
     model.score_pairs(model.transform(X[0, :]))
   assert str(raised_error.value) == err_msg

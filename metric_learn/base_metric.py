@@ -189,7 +189,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     """
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
-                         estimator=self, t=self._t)
+                        estimator=self, t=self._t)
     return self.score_pairs(pairs)
 
   def decision_function(self, pairs):
@@ -251,8 +251,8 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
       Predictions of the ordering of pairs, for each quadruplet.
     """
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
-                               preprocessor=self.preprocessor_,
-                               estimator=self, t=self._t)
+                              preprocessor=self.preprocessor_,
+                              estimator=self, t=self._t)
     # we broadcast with ... because here we allow quadruplets to be
     # either a 3D array of points or 2D array of indices
     return (self.score_pairs(quadruplets[:, :2, ...]) -

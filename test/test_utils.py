@@ -13,12 +13,14 @@ from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised)
 from sklearn.datasets import make_regression, make_blobs
 
+
 def mock_preprocessor(indices):
   """A preprocessor for testing purposes that returns an all ones 3D array
   """
   return np.ones((indices.shape[0], 3))
 
 #  ---------------------------- test check_input ----------------------------
+
 
 @pytest.fixture
 def tuples_prep():
@@ -82,12 +84,13 @@ def test_check_input_invalid_t(estimator, context, load_tuples, preprocessor):
                                         'of formed tuples', mock_preprocessor),
                           ([1, 2], '1', '3D array of formed tuples', None),
                           ([[[[5]]]], '4', '2D array of indicators or 3D array'
-                                           ' of formed tuples', mock_preprocessor),
+                                           ' of formed tuples',
+                           mock_preprocessor),
                           ([[[[5]]]], '4', '3D array of formed tuples', None),
                           ([[1], [3]], '2', '3D array of formed '
                                             'tuples', None)])
 def test_check_input_invalid_shape(estimator, context, tuples, found,
-                                    expected, preprocessor):
+                                   expected, preprocessor):
   """Checks that a value error with the appropriate message is raised if
   shape is invalid (not 2D with preprocessor or 3D with no preprocessor)
   """
@@ -128,13 +131,13 @@ def test_check_input_invalid_n_features(estimator, context, tuples_no_prep):
                           (tuples_no_prep, None),
                           (tuples_no_prep, mock_preprocessor)])
 def test_check_input_invalid_n_samples(estimator, context, load_tuples,
-                                        preprocessor):
+                                       preprocessor):
   """Checks that the right warning is printed if n_samples is too small"""
   tuples = load_tuples()
   msg = ("Found array with 2 sample(s) (shape={}) while a minimum of 3 "
          "is required{}.".format((preprocess_tuples(tuples, preprocessor)
                                  if (preprocessor is not None and
-                                    tuples.ndim == 2) else tuples).shape,
+                                 tuples.ndim == 2) else tuples).shape,
                                  context))
   with pytest.raises(ValueError) as raised_error:
     check_input(tuples, type_of_inputs='tuples',
@@ -150,7 +153,7 @@ def test_check_input_invalid_n_samples(estimator, context, load_tuples,
                           (tuples_no_prep, None),
                           (tuples_no_prep, mock_preprocessor)])
 def test_check_input_invalid_dtype_convertible(estimator, context,
-                                                load_tuples, preprocessor):
+                                               load_tuples, preprocessor):
   """Checks that a warning is raised if a convertible input is converted to
   float"""
   tuples = load_tuples().astype(object)  # here the object conversion is
@@ -158,7 +161,7 @@ def test_check_input_invalid_dtype_convertible(estimator, context,
   # tuples_prep case
 
   if preprocessor is not None:  # if the preprocessor is not None we
-  # overwrite it to have a preprocessor that returns objects
+    # overwrite it to have a preprocessor that returns objects
     def preprocessor(indices):  #
       # preprocessor that returns objects
       return np.ones((indices.shape[0], 3)).astype(object)
@@ -319,7 +322,7 @@ def points_no_prep():
                            mock_preprocessor),
                           ([[[5]]], '3', '2D array of formed points', None)])
 def test_check_input_points_invalid_shape(estimator, context, points, found,
-                                    expected, preprocessor):
+                                          expected, preprocessor):
   """Checks that a value error with the appropriate message is raised if
   shape is invalid (valid being 1D or 2D with preprocessor or 2D with no
   preprocessor)
@@ -340,7 +343,8 @@ def test_check_input_points_invalid_shape(estimator, context, points, found,
 
 @pytest.mark.parametrize('estimator, context',
                          [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-def test_check_input_invalid_n_features(estimator, context, points_no_prep):
+def test_check_input_point_invalid_n_features(estimator, context,
+                                              points_no_prep):
   """Checks that the right warning is printed if not enough features
   Here we only test if no preprocessor (otherwise we don't ensure this)
   """
@@ -350,7 +354,7 @@ def test_check_input_invalid_n_features(estimator, context, points_no_prep):
   with pytest.raises(ValueError) as raised_error:
       check_input(points_no_prep, type_of_inputs='classic', preprocessor=None,
                   ensure_min_features=3,
-                   estimator=estimator)
+                  estimator=estimator)
   assert str(raised_error.value) == msg
 
 
@@ -361,18 +365,18 @@ def test_check_input_invalid_n_features(estimator, context, points_no_prep):
                           (points_no_prep, None),
                           (points_no_prep, mock_preprocessor)])
 def test_check_input_point_invalid_n_samples(estimator, context, load_points,
-                                        preprocessor):
+                                             preprocessor):
   """Checks that the right warning is printed if n_samples is too small"""
   points = load_points()
   msg = ("Found array with 2 sample(s) (shape={}) while a minimum of 3 "
          "is required{}.".format((preprocess_points(points,
-                                                   preprocessor)
+                                                    preprocessor)
                                  if preprocessor is not None and
-                                    points.ndim == 1 else
+                                 points.ndim == 1 else
                                  points).shape,
                                  context))
   with pytest.raises(ValueError) as raised_error:
-    check_input(points, type_of_inputs='classic',preprocessor=preprocessor,
+    check_input(points, type_of_inputs='classic', preprocessor=preprocessor,
                 ensure_min_samples=3,
                 estimator=estimator)
   assert str(raised_error.value) == msg
@@ -385,7 +389,8 @@ def test_check_input_point_invalid_n_samples(estimator, context, load_points,
                           (points_no_prep, None),
                           (points_no_prep, mock_preprocessor)])
 def test_check_input_point_invalid_dtype_convertible(estimator, context,
-                                                load_points, preprocessor):
+                                                     load_points,
+                                                     preprocessor):
   """Checks that a warning is raised if a convertible input is converted to
   float"""
   points = load_points().astype(object)  # here the object conversion is
@@ -393,8 +398,8 @@ def test_check_input_point_invalid_dtype_convertible(estimator, context,
   # points_prep case
 
   if preprocessor is not None:  # if the preprocessor is not None we
-  # overwrite it to have a preprocessor that returns objects
-    def preprocessor(indices):  #
+    # overwrite it to have a preprocessor that returns objects
+    def preprocessor(indices):
       # preprocessor that returns objects
       return np.ones((indices.shape[0], 3)).astype(object)
 
@@ -588,7 +593,7 @@ def test_preprocess_tuples_invalid_message(estimator):
   input is detected as weird. Checks this for preprocess_tuples."""
 
   context = make_context(estimator) + (' after the preprocessor '
-                                             'has been applied')
+                                       'has been applied')
 
   def preprocessor(sequence):
     return np.ones((len(sequence), 2, 2))  # returns a 3D array instead of 2D
@@ -610,7 +615,7 @@ def test_preprocess_points_invalid_message(estimator):
   input is detected as weird. Checks this for preprocess_points."""
 
   context = make_context(estimator) + (' after the preprocessor '
-                                             'has been applied')
+                                       'has been applied')
 
   def preprocessor(sequence):
     return np.ones((len(sequence), 2, 2))  # returns a 3D array instead of 2D
