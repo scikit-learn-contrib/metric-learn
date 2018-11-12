@@ -34,10 +34,7 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     X : data matrix, (n x d)
     y : unused
     """
-    self.check_preprocessor()
-    self.X_ = check_input(X, type_of_inputs='classic',
-                          ensure_min_samples=2, estimator=self,
-                          preprocessor=self.preprocessor_)
+    self.X_ = self.initialize_and_check_inputs(X, ensure_min_samples=2)
     self.M_ = np.cov(self.X_, rowvar = False)
     if self.M_.ndim == 0:
       self.M_ = 1./self.M_

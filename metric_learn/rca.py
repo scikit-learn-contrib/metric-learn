@@ -65,10 +65,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
     super(RCA, self).__init__(preprocessor)
 
   def _process_data(self, X):
-    self.check_preprocessor()
-    X = check_input(X, type_of_inputs='classic',
-                    preprocessor=self.preprocessor_,
-                    estimator=self)
+    X = self.initialize_and_check_inputs(X)
 
     # PCA projection to remove noise and redundant information.
     if self.pca_comps is not None:
@@ -181,9 +178,7 @@ class RCA_Supervised(RCA):
     y : (n) data labels
     random_state : a random.seed object to fix the random_state if needed.
     """
-    self.check_preprocessor()
-    X, y = check_input(X, y, type_of_inputs='classic', estimator=self,
-                       preprocessor=self.preprocessor_)
+    X, y = self.initialize_and_check_inputs(X, y)
     chunks = Constraints(y).chunks(num_chunks=self.num_chunks,
                                    chunk_size=self.chunk_size,
                                    random_state=random_state)

@@ -50,10 +50,8 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
 class python_LMNN(_base_LMNN):
 
   def _process_inputs(self, X, labels):
-    self.check_preprocessor()
-    self.X_, labels = check_input(X, labels, type_of_inputs='classic',
-                                  preprocessor=self.preprocessor_,
-                                  estimator=self, ensure_min_samples=2)
+    self.X_, labels = self.initialize_and_check_inputs(X, labels,
+                                                       ensure_min_samples=2)
     self.X_ = self.X_.astype(float)  # todo: remove the conversion here and
     # integrate it into check_input
     num_pts, num_dims = self.X_.shape

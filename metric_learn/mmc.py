@@ -66,7 +66,6 @@ class _BaseMMC(MahalanobisMixin):
     super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
-    self.check_preprocessor()
     pairs, y = self._process_pairs(pairs, y)
     if self.diagonal:
       return self._fit_diag(pairs, y)
@@ -74,9 +73,8 @@ class _BaseMMC(MahalanobisMixin):
       return self._fit_full(pairs, y)
 
   def _process_pairs(self, pairs, y):
-    pairs, y = check_input(pairs, y, type_of_inputs='tuples',
-                           estimator=self, t=self._t,
-                           preprocessor=self.preprocessor_)
+    pairs, y = self.initialize_and_check_inputs(pairs, y,
+                                                type_of_inputs='tuples')
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -452,10 +450,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    self.check_preprocessor()
-    X, y = check_input(X, y, type_of_inputs='classic',
-                       preprocessor=self.preprocessor_,
-                       estimator=self, ensure_min_samples=2)
+    X, y = self.initialize_and_check_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

@@ -37,11 +37,19 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
         The score of every pair.
       """
 
-  def check_preprocessor(self):
+  def initialize_and_check_inputs(self, X, y=None,
+                                  type_of_inputs='classic',
+                                  **kwargs):
     if _is_arraylike(self.preprocessor):
       self.preprocessor_ = ArrayIndexer(self.preprocessor)
     else:
       self.preprocessor_ = self.preprocessor
+    return check_input(X, y,
+                       type_of_inputs=type_of_inputs,
+                       preprocessor=self.preprocessor_,
+                       estimator=self,
+                       t=self._t if hasattr(self, '_t') else None,
+                       **kwargs)
 
 
 class MetricTransformer(six.with_metaclass(ABCMeta)):

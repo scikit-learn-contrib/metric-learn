@@ -51,10 +51,8 @@ class _BaseSDML(MahalanobisMixin):
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _prepare_pairs(self, pairs, y):
-    self.check_preprocessor()
-    pairs, y = check_input(pairs, y, type_of_inputs='tuples',
-                           estimator=self, t=self._t,
-                           preprocessor=self.preprocessor_)
+    pairs, y = self.initialize_and_check_inputs(pairs, y,
+                                                type_of_inputs='tuples')
 
     # set up prior M
     if self.use_cov:
@@ -161,9 +159,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     self : object
         Returns the instance.
     """
-    self.check_preprocessor()
-    X, y = check_input(X, y, type_of_inputs='classic', estimator=self,
-                          preprocessor=self.preprocessor_)
+    X, y = self.initialize_and_check_inputs(X, y)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

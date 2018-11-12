@@ -154,7 +154,7 @@ def make_error_input(code, input, context):
               'possible_preprocessor': {'0': '',
                                         '1': ' and/or use a preprocessor'
                                         }}
-  code_list = list(str(code))
+  code_list = str(code)
   err_args = dict(expected_input=code_str['expected_input'][code_list[0]],
                   additional_context=code_str['additional_context']
                   [code_list[1]],

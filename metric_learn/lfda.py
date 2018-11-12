@@ -62,9 +62,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
 
   def _process_inputs(self, X, y):
     unique_classes, y = np.unique(y, return_inverse=True)
-    self.check_preprocessor()
-    self.X_, y = check_input(X, y, type_of_inputs='classic', estimator=self,
-                                preprocessor=self.preprocessor_)
+    self.X_, y = self.initialize_and_check_inputs(X, y)
     n, d = self.X_.shape
     num_classes = len(unique_classes)
 
