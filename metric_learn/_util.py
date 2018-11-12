@@ -165,8 +165,7 @@ def make_error_input(code, input, context):
              '{context}{additional_context}. Found {found_size}D array '
              'instead:\ninput={input}. Reshape your data'
              '{possible_preprocessor}.\n')
-  raise ValueError(err_msg.format_map(err_args))
-  # raise ValueError(code, err_msg.format_map(err_args))
+  raise ValueError(err_msg.format(**err_args))
 
 
 def preprocess_tuples(tuples, preprocessor):
