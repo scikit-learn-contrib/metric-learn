@@ -83,32 +83,23 @@ def check_input(input, y=None, preprocessor=None,
                 input = preprocess_points(input, preprocessor)
                 preprocessor_has_been_applied = True
         else:
-          raise ValueError('2D array of formed points expected{}. '
-                           'Found {}D array instead:\ninput={}. Reshape '
-                           'your data and/or use a preprocessor.\n'
-                           .format(context, input.ndim, input))
+          make_error_input(101, input, context)
     elif input.ndim == 2:
         pass  # OK
     else:
-      with_prep = (('1D array of indicators or 2D array of formed points',
-                    ' when using a preprocessor')
-                   if preprocessor is not None else
-                   ('2D array of formed points', ''))
-      raise ValueError("{} expected{}{}. Found {}D array "
-                       "instead:\ninput={}. Reshape your data.\n"
-                       .format(with_prep[0], context, with_prep[1],
-                               input.ndim, input))
+      if preprocessor is not None:
+        make_error_input(320, input, context)
+      else:
+        make_error_input(100, input, context)
 
     input = check_array(input, allow_nd=True, ensure_2d=False,
                         **args_for_sk_checks)
     if input.ndim != 2:  # we have to ensure this because check_array above
                          # does not
-      raise ValueError('2D array of formed points expected{}{}. '
-                       'Found {}D array instead:\ninput={}. Reshape your data '
-                       'and/or use a preprocessor.\n'
-                       .format(context, ' after the preprocessor has been '
-                               'applied' if preprocessor_has_been_applied
-                               else '', input.ndim, input))
+      if preprocessor_has_been_applied:
+        make_error_input(111, input, context)
+      else:
+        make_error_input(101, input, context)
 
   elif type_of_inputs == 'tuples':
     if input.ndim == 2:
@@ -116,24 +107,15 @@ def check_input(input, y=None, preprocessor=None,
           input = preprocess_tuples(input, preprocessor)
           preprocessor_has_been_applied = True
       else:
-
-          raise ValueError('3D array of formed tuples expected{}. '
-                           'Found {}D array instead:\ninput={}. '
-                           'Reshape your data and/or use a preprocessor.\n'
-                           .format(context, input.ndim, input))
+          make_error_input(201, input, context)
     elif input.ndim == 3:  # we should check_num_features which is not checked
                            #  after
         pass
     else:
-
-      with_prep = (('2D array of indicators or 3D array of formed tuples',
-                    ' when using a preprocessor')
-                   if preprocessor is not None else
-                   ('3D array of formed tuples', ''))
-      raise ValueError("{} expected{}{}. Found {}D array "
-                       "instead:\ninput={}. Reshape your data.\n"
-                       .format(with_prep[0], context, with_prep[1],
-                               input.ndim, input))
+      if preprocessor is not None:
+        make_error_input(420, input, context)
+      else:
+        make_error_input(200, input, context)
 
     input = check_array(input, allow_nd=True, ensure_2d=False,
                         **args_for_sk_checks)
@@ -148,15 +130,43 @@ def check_input(input, y=None, preprocessor=None,
     # be modified by any preprocessor
     if input.ndim != 3:  # we have to ensure this because check_array above
       # does not
-      raise ValueError('3D array of formed tuples expected{}{}. '
-                       'Found {}D array instead:\ninput={}. Reshape your data '
-                       'and/or use a preprocessor.\n'
-                       .format(context, ' after the preprocessor has been '
-                               'applied' if preprocessor_has_been_applied
-                               else '', input.ndim, input))
+       if preprocessor_has_been_applied:
+         make_error_input(211, input, context)
+       else:
+         make_error_input(201, input, context)
     check_t(input, t, context)
 
   return input if y is None else (input, y)
+
+
+def make_error_input(code, input, context):
+
+  code_str = {'expected_input': {'1': '2D array of formed points',
+                                 '2': '3D array of formed tuples',
+                                 '3': ('1D array of indicators or 2D array of '
+                                       'formed points'),
+                                 '4': ('2D array of indicators or 3D array '
+                                       'of formed tuples')},
+              'additional_context': {'0': '',
+                                     '2': ' when using a preprocessor',
+                                     '1': (' after the preprocessor has been '
+                                           'applied')},
+              'possible_preprocessor': {'0': '',
+                                        '1': ' and/or use a preprocessor'
+                                        }}
+  code_list = list(str(code))
+  err_args = dict(expected_input=code_str['expected_input'][code_list[0]],
+                  additional_context=code_str['additional_context']
+                  [code_list[1]],
+                  possible_preprocessor=code_str['possible_preprocessor']
+                  [code_list[2]],
+                  input=input, context=context, found_size=input.ndim)
+  err_msg = ('{expected_input} expected'
+             '{context}{additional_context}. Found {found_size}D array '
+             'instead:\ninput={input}. Reshape your data'
+             '{possible_preprocessor}.\n')
+  raise ValueError(err_msg.format_map(err_args))
+  # raise ValueError(code, err_msg.format_map(err_args))
 
 
 def preprocess_tuples(tuples, preprocessor):
