@@ -21,38 +21,83 @@ def check_input(input, y=None, preprocessor=None,
                 multi_output=False, ensure_min_samples=1,
                 ensure_min_features=1, y_numeric=False,
                 warn_on_dtype=False, estimator=None):
-  """Checks that the input format is valid and does conversions if specified
+  """Checks that the input format is valid, and converts it if specified
   (this is the equivalent of scikit-learn's `check_array` or `check_X_y`).
-  All arguments following t are scikit-learn's `check_array` or `check_X_y`
-  arguments that will be enforced on the output array
+  All arguments following t are scikit-learn's `check_X_y`
+  arguments that will be enforced on the data and labels array. If
+  indicators are given as an input data array, the returned data array
+  will be the formed points/tuples, using the given preprocessor.
 
   Parameters
   ----------
-  input : object
-    The input to check
-  y : object (optional, default=None)
-    The
-  preprocessor
-  type_of_inputs
-  t
-  accept_sparse
-  dtype
-  order
-  copy
-  force_all_finite
-  multi_output
-  ensure_min_samples
-  ensure_min_features
-  y_numeric
-  warn_on_dtype
-  estimator
+  input: array-like
+    The input to check.
+
+  preprocessor: callable (default=None)
+    The preprocessor to use. If None, no preprocessor is used.
+
+  type_of_inputs: `str` {'classic', 'tuples'}
+    The type of inputs to check. If 'classic', the input should be
+    a 2D array-like of points or a 1D array like of indicators of points. If
+    'tuples', the input should be a 3D array-like of tuples or a 2D
+    array-like of indicators of tuples.
+
+  accept_sparse: `bool`
+    Set to true to allow sparse inputs (only works for sparse inputs with
+    dim < 3).
+
+  t : int
+    The number of elements in a tuple (e.g. 2 for pairs).
+
+  dtype : string, type, list of types or None (default="auto")
+     Data type of result. If None, the dtype of the input is preserved.
+     If "numeric", dtype is preserved unless array.dtype is object.
+     If dtype is a list of types, conversion on the first type is only
+     performed if the dtype of the input is not in the list. If
+     "auto", will we be set to "numeric" if `preprocessor=True`,
+     else to None.
+
+  order : 'F', 'C' or None (default=None)
+     Whether an array will be forced to be fortran or c-style.
+
+  copy : boolean (default=False)
+     Whether a forced copy will be triggered. If copy=False, a copy might
+     be triggered by a conversion.
+
+  force_all_finite : boolean or 'allow-nan', (default=True)
+     Whether to raise an error on np.inf and np.nan in X. This parameter
+     does not influence whether y can have np.inf or np.nan values.
+     The possibilities are:
+      - True: Force all values of X to be finite.
+     - False: accept both np.inf and np.nan in X.
+     - 'allow-nan':  accept  only  np.nan  values in  X.  Values  cannot  be
+       infinite.
+
+  ensure_min_samples : int (default=1)
+     Make sure that X has a minimum number of samples in its first
+     axis (rows for a 2D array).
+
+  ensure_min_features : int (default=1)
+     Make sure that the 2D array has some minimum number of features
+     (columns). The default value of 1 rejects empty datasets.
+     This check is only enforced when X has effectively 2 dimensions or
+     is originally 1D and ``ensure_2d`` is True. Setting to 0 disables
+     this check.
+
+  warn_on_dtype : boolean (default=False)
+     Raise DataConversionWarning if the dtype of the input data structure
+     does not match the requested dtype, causing a memory copy.
+
+  estimator : str or estimator instance (default=None)
+     If passed, include the name of the estimator in warning messages.
 
   Returns
   -------
-
+  X : `numpy.ndarray`
+    The checked input data array.
+  y: `numpy.ndarray` (optional)
+    The checked input labels array.
   """
-  # todo: faire attention a la copie
-  # todo: faire attention aux trucs sparses
 
   context = make_context(estimator)
 
@@ -140,7 +185,6 @@ def check_input(input, y=None, preprocessor=None,
 
 
 def make_error_input(code, input, context):
-
   code_str = {'expected_input': {'1': '2D array of formed points',
                                  '2': '3D array of formed tuples',
                                  '3': ('1D array of indicators or 2D array of '

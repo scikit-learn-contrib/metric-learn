@@ -257,12 +257,7 @@ try:
     """
 
     def fit(self, X, y):
-      self.check_preprocessor()
-      self.X_, y = check_input(X, y, type_of_inputs='classic',
-                               estimator=self,
-                               preprocessor=self.preprocessor_)
-      self.X_ = self.X_.astype(float)  # todo: remove the conversion here and
-      # integrate it into check_input
+      self.X_, y = self.initialize_and_check_inputs(X, y, dtype=float)
       self.X_ = self.X_, preprocessor=self.preprocessor_
       labels = MulticlassLabels(y)
       self._lmnn = shogun_LMNN(RealFeatures(self.X_.T), labels, self.k)

@@ -37,13 +37,16 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
         The score of every pair.
       """
 
-  def initialize_and_check_inputs(self, X, y=None,
-                                  type_of_inputs='classic',
-                                  **kwargs):
+  def check_preprocessor(self):
     if _is_arraylike(self.preprocessor):
       self.preprocessor_ = ArrayIndexer(self.preprocessor)
     else:
       self.preprocessor_ = self.preprocessor
+
+  def initialize_and_check_inputs(self, X, y=None,
+                                  type_of_inputs='classic',
+                                  **kwargs):
+    self.check_preprocessor()
     return check_input(X, y,
                        type_of_inputs=type_of_inputs,
                        preprocessor=self.preprocessor_,
