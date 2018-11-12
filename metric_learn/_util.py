@@ -31,7 +31,10 @@ def check_input(input, y=None, preprocessor=None,
   Parameters
   ----------
   input: array-like
-    The input to check.
+    The input data array to check.
+
+  y : array-like
+    The input labels array to check.
 
   preprocessor: callable (default=None)
     The preprocessor to use. If None, no preprocessor is used.
@@ -95,6 +98,7 @@ def check_input(input, y=None, preprocessor=None,
   -------
   X : `numpy.ndarray`
     The checked input data array.
+
   y: `numpy.ndarray` (optional)
     The checked input labels array.
   """

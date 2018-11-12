@@ -38,14 +38,42 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
       """
 
   def check_preprocessor(self):
+    """Initializes the preprocessor"""
     if _is_arraylike(self.preprocessor):
       self.preprocessor_ = ArrayIndexer(self.preprocessor)
     else:
       self.preprocessor_ = self.preprocessor
 
-  def initialize_and_check_inputs(self, X, y=None,
-                                  type_of_inputs='classic',
+  def initialize_and_check_inputs(self, X, y=None, type_of_inputs='classic',
                                   **kwargs):
+    """Initializes the preprocessor and processes inputs. See `check_input`
+    for more details.
+
+    Parameters
+    ----------
+    input: array-like
+      The input data array to check.
+
+    y : array-like
+      The input labels array to check.
+
+    type_of_inputs: `str` {'classic', 'tuples'}
+      The type of inputs to check. If 'classic', the input should be
+      a 2D array-like of points or a 1D array like of indicators of points. If
+      'tuples', the input should be a 3D array-like of tuples or a 2D
+      array-like of indicators of tuples.
+
+    **kwargs: dict
+      Arguments to pass to check_input.
+
+    Returns
+    -------
+    X : `numpy.ndarray`
+      The checked input data array.
+
+    y: `numpy.ndarray` (optional)
+      The checked input labels array.
+    """
     self.check_preprocessor()
     return check_input(X, y,
                        type_of_inputs=type_of_inputs,
