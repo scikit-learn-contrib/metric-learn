@@ -12,6 +12,7 @@ from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised)
 from sklearn.datasets import make_regression, make_blobs
+from .test_sklearn_compat import build_pairs, build_quadruplets
 
 
 def mock_preprocessor(indices):
@@ -792,8 +793,8 @@ ids_estimators = list(map(lambda x: x.__class__.__name__, classifiers +
 
 @pytest.mark.parametrize('estimator, dataset', estimators,
                          ids=ids_estimators)
-def test_same_with_or_without_preprocessor(estimator, dataset):
-  """test that supervised algorithms using a preprocessor behave consistently
+def test_same_with_or_without_preprocessor_classic(estimator, dataset):
+  """Test that supervised algorithms using a preprocessor behave consistently
   with their no-preprocessor equivalent.
   """
   (formed_points_train, formed_points_test,
@@ -846,3 +847,83 @@ def test_same_with_or_without_preprocessor(estimator, dataset):
           points_indicators_test[np.array([[0, 2], [5, 3]])]) ==
       estimator_with_prep_formed.score_pairs(
           formed_points_test[np.array([[0, 2], [5, 3]])])).all()
+
+
+@pytest.mark.parametrize('estimator, build_dataset',
+                         [(ITML(), build_pairs),
+                          (LSML(), build_quadruplets),
+                          (MMC(max_iter=2), build_pairs),
+                          (SDML(), build_pairs)],
+                         ids=['itml', 'lsml', 'mmc', 'sdml'])
+def test_same_with_or_without_preprocessor_tuples(estimator, build_dataset):
+  """For weakly supervised algorithms, test that using a preprocessor or not
+  (with the appropriate corresponding inputs) give the same result.
+  """
+  (X, tuples, y, tuples_train, tuples_test, y_train,
+   y_test, _) = build_dataset(preprocessor=mock_preprocessor)
+  formed_tuples_train = X[tuples_train]
+  formed_tuples_test = X[tuples_test]
+
+  estimator_with_preprocessor = clone(estimator)
+  set_random_state(estimator_with_preprocessor)
+  estimator_with_preprocessor.set_params(preprocessor=X)
+  if estimator.__class__.__name__ == 'LSML':
+    estimator_with_preprocessor.fit(tuples_train)
+  else:
+    estimator_with_preprocessor.fit(tuples_train, y_train)
+
+  estimator_without_preprocessor = clone(estimator)
+  set_random_state(estimator_without_preprocessor)
+  estimator_without_preprocessor.set_params(preprocessor=None)
+  if estimator.__class__.__name__ == 'LSML':
+    estimator_without_preprocessor.fit(formed_tuples_train)
+  else:
+    estimator_without_preprocessor.fit(formed_tuples_train, y_train)
+
+  estimator_with_prep_formed = clone(estimator)
+  set_random_state(estimator_with_prep_formed)
+  estimator_with_prep_formed.set_params(preprocessor=X)
+  if estimator.__class__.__name__ == 'LSML':
+    estimator_with_prep_formed.fit(tuples_train)
+  else:
+    estimator_with_prep_formed.fit(tuples_train, y_train)
+
+  # test prediction methods
+  for method in ["predict", "decision_function"]:
+    if hasattr(estimator, method):
+      output_with_prep = getattr(estimator_with_preprocessor,
+                                 method)(tuples_test)
+      output_without_prep = getattr(estimator_without_preprocessor,
+                                    method)(formed_tuples_test)
+      assert np.array(output_with_prep == output_without_prep).all()
+      output_with_prep = getattr(estimator_with_preprocessor,
+                                 method)(tuples_test)
+      output_with_prep_formed = getattr(estimator_with_prep_formed,
+                                        method)(formed_tuples_test)
+      assert np.array(output_with_prep == output_with_prep_formed).all()
+
+  # test score_pairs
+  output_with_prep = estimator_with_preprocessor.score_pairs(
+      tuples_test[:, :2])
+  output_without_prep = estimator_without_preprocessor.score_pairs(
+      formed_tuples_test[:, :2])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  output_with_prep = estimator_with_preprocessor.score_pairs(
+      tuples_test[:, :2])
+  output_without_prep = estimator_with_prep_formed.score_pairs(
+      formed_tuples_test[:, :2])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  # test transform
+  output_with_prep = estimator_with_preprocessor.transform(
+      tuples_test[:, 0])
+  output_without_prep = estimator_without_preprocessor.transform(
+      formed_tuples_test[:, 0])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  output_with_prep = estimator_with_preprocessor.transform(
+      tuples_test[:, 0])
+  output_without_prep = estimator_with_prep_formed.transform(
+      formed_tuples_test[:, 0])
+  assert np.array(output_with_prep == output_without_prep).all()
