@@ -16,26 +16,26 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     Parameters
     ----------
     preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be gotten like this: X[indices].
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be gotten like this: X[indices].
     """
     self.preprocessor = preprocessor
 
   @abstractmethod
   def score_pairs(self, pairs):
-      """Returns the score between pairs
-      (can be a similarity, or a distance/metric depending on the algorithm)
+    """Returns the score between pairs
+    (can be a similarity, or a distance/metric depending on the algorithm)
 
-      Parameters
-      ----------
-      pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
-        3D array of pairs.
+    Parameters
+    ----------
+    pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
+      3D array of pairs.
 
-      Returns
-      -------
-      scores: `numpy.ndarray` of shape=(n_pairs,)
-        The score of every pair.
-      """
+    Returns
+    -------
+    scores: `numpy.ndarray` of shape=(n_pairs,)
+      The score of every pair.
+    """
 
   def check_preprocessor(self):
     """Initializes the preprocessor"""
@@ -135,9 +135,9 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     Parameters
     ----------
     pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
-        3D Array of pairs to score, with each row corresponding to two points,
-        or 2D array of indices of pairs if the metric learner uses a
-        preprocessor.
+      3D Array of pairs to score, with each row corresponding to two points,
+      for 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
 
     Returns
     -------
@@ -217,9 +217,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
     Parameters
     ----------
     pairs: array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
-        3D Array of pairs to predict, with each row corresponding to two
-        points, or 2D array of indices of pairs if the metric learner uses a
-        preprocessor.
+      3D Array of pairs to predict, with each row corresponding to two
+      points, or 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
 
     Returns
     -------
@@ -249,9 +249,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
     Parameters
     ----------
     pairs: array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
-        3D Array of pairs, with each row corresponding to two points,
-        or 2D array of indices of pairs if the metric learner uses a
-        preprocessor.
+      3D Array of pairs, with each row corresponding to two points,
+      or 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
 
     y : array-like, shape=(n_constraints,)
       The corresponding labels.
@@ -280,9 +280,9 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     ----------
     quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
                   (n_quadruplets, 4)
-        3D Array of quadruplets to predict, with each row corresponding to four
-        points, or 2D array of indices of quadruplets if the metric learner
-        uses a preprocessor.
+      3D Array of quadruplets to predict, with each row corresponding to four
+      points, or 2D array of indices of quadruplets if the metric learner
+      uses a preprocessor.
 
     Returns
     -------
@@ -313,9 +313,9 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     ----------
     quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
                   (n_quadruplets, 4)
-        3D Array of quadruplets to score, with each row corresponding to four
-        points, or 2D array of indices of quadruplets if the metric learner
-        uses a preprocessor.
+      3D Array of quadruplets to score, with each row corresponding to four
+      points, or 2D array of indices of quadruplets if the metric learner
+      uses a preprocessor.
 
     y : Ignored, for scikit-learn compatibility.
 

@@ -41,20 +41,20 @@ def build_data():
 
 
 def build_classification(preprocessor):
-    # test that you can do cross validation on tuples of points with
-    #  a WeaklySupervisedMetricLearner
-    X, y = shuffle(*make_blobs(), random_state=RNG)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
-    return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
+  # test that you can do cross validation on tuples of points with
+  #  a WeaklySupervisedMetricLearner
+  X, y = shuffle(*make_blobs(), random_state=RNG)
+  X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
+  return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
 
 
 def build_regression(preprocessor):
-    # test that you can do cross validation on tuples of points with
-    #  a WeaklySupervisedMetricLearner
-    X, y = shuffle(*make_regression(n_samples=100, n_features=10),
-                   random_state=RNG)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
-    return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
+  # test that you can do cross validation on tuples of points with
+  #  a WeaklySupervisedMetricLearner
+  X, y = shuffle(*make_regression(n_samples=100, n_features=10),
+                  random_state=RNG)
+  X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
+  return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
 
 
 def build_pairs(preprocessor):
@@ -175,32 +175,32 @@ def test_simple_estimator(estimator, build_dataset, preprocessor):
                          ids=ids_estimators)
 @pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
 def test_no_attributes_set_in_init(estimator, preprocessor):
-    """Check setting during init. Adapted from scikit-learn."""
-    estimator = clone(estimator)
-    estimator.set_params(preprocessor=preprocessor)
-    if hasattr(type(estimator).__init__, "deprecated_original"):
-        return
+  """Check setting during init. Adapted from scikit-learn."""
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  if hasattr(type(estimator).__init__, "deprecated_original"):
+      return
 
-    init_params = _get_args(type(estimator).__init__)
-    parents_init_params = [param for params_parent in
-                           (_get_args(parent) for parent in
-                            type(estimator).__mro__)
-                           for param in params_parent]
+  init_params = _get_args(type(estimator).__init__)
+  parents_init_params = [param for params_parent in
+                         (_get_args(parent) for parent in
+                          type(estimator).__mro__)
+                         for param in params_parent]
 
-    # Test for no setting apart from parameters during init
-    invalid_attr = (set(vars(estimator)) - set(init_params) -
-                    set(parents_init_params))
-    assert not invalid_attr, \
-        ("Estimator %s should not set any attribute apart"
-         " from parameters during init. Found attributes %s."
-         % (type(estimator).__name__, sorted(invalid_attr)))
-    # Ensure that each parameter is set in init
-    invalid_attr = (set(init_params) - set(vars(estimator)) -
-                    set(["self"]))
-    assert not invalid_attr, \
-        ("Estimator %s should store all parameters"
-         " as an attribute during init. Did not find "
-         "attributes %s." % (type(estimator).__name__, sorted(invalid_attr)))
+  # Test for no setting apart from parameters during init
+  invalid_attr = (set(vars(estimator)) - set(init_params) -
+                  set(parents_init_params))
+  assert not invalid_attr, \
+      ("Estimator %s should not set any attribute apart"
+       " from parameters during init. Found attributes %s."
+       % (type(estimator).__name__, sorted(invalid_attr)))
+  # Ensure that each parameter is set in init
+  invalid_attr = (set(init_params) - set(vars(estimator)) -
+                  set(["self"]))
+  assert not invalid_attr, \
+      ("Estimator %s should store all parameters"
+       " as an attribute during init. Did not find "
+       "attributes %s." % (type(estimator).__name__, sorted(invalid_attr)))
 
 
 @pytest.mark.parametrize('preprocessor', [None, build_data()[0]])

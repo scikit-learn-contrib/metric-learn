@@ -297,17 +297,17 @@ def test_check_input_invalid_complex_data():
 
 @pytest.fixture
 def points_prep():
-    """Basic array for testing when using a preprocessor"""
-    points = np.array([1, 2])
-    return points
+  """Basic array for testing when using a preprocessor"""
+  points = np.array([1, 2])
+  return points
 
 
 @pytest.fixture
 def points_no_prep():
-    """Basic array for testing when using no preprocessor"""
-    points = np.array([[1., 2.3],
-                       [2.3, 4.3]])
-    return points
+  """Basic array for testing when using no preprocessor"""
+  points = np.array([[1., 2.3],
+                     [2.3, 4.3]])
+  return points
 
 
 @pytest.mark.parametrize('estimator, context',
@@ -556,14 +556,14 @@ preprocessors = [X, MockFileLoader('fake_root'), mock_id_loader]
 
 @pytest.fixture
 def y_tuples():
-    y = [-1, 1]
-    return y
+  y = [-1, 1]
+  return y
 
 
 @pytest.fixture
 def y_points():
-    y = [0, 1, 0, 0]
-    return y
+  y = [0, 1, 0, 0]
+  return y
 
 
 @pytest.mark.parametrize('preprocessor, tuples', zip(preprocessors,
@@ -621,8 +621,8 @@ def test_preprocess_points_invalid_message(estimator):
     return np.ones((len(sequence), 2, 2))  # returns a 3D array instead of 2D
 
   with pytest.raises(ValueError) as raised_error:
-      check_input(np.ones((3,)), type_of_inputs='classic',
-                  preprocessor=preprocessor, estimator=estimator)
+    check_input(np.ones((3,)), type_of_inputs='classic',
+                preprocessor=preprocessor, estimator=estimator)
   expected_msg = ("2D array of formed points expected{}. "
                   "Found 3D array instead:\ninput={}. Reshape your data{}.\n"
                   .format(context, np.ones((3, 2, 2)),

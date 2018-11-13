@@ -53,46 +53,46 @@ def check_input(input, y=None, preprocessor=None,
     The number of elements in a tuple (e.g. 2 for pairs).
 
   dtype : string, type, list of types or None (default="auto")
-     Data type of result. If None, the dtype of the input is preserved.
-     If "numeric", dtype is preserved unless array.dtype is object.
-     If dtype is a list of types, conversion on the first type is only
-     performed if the dtype of the input is not in the list. If
-     "auto", will we be set to "numeric" if `preprocessor=True`,
-     else to None.
+    Data type of result. If None, the dtype of the input is preserved.
+    If "numeric", dtype is preserved unless array.dtype is object.
+    If dtype is a list of types, conversion on the first type is only
+    performed if the dtype of the input is not in the list. If
+    "auto", will we be set to "numeric" if `preprocessor=True`,
+    else to None.
 
   order : 'F', 'C' or None (default=None)
-     Whether an array will be forced to be fortran or c-style.
+    Whether an array will be forced to be fortran or c-style.
 
   copy : boolean (default=False)
-     Whether a forced copy will be triggered. If copy=False, a copy might
-     be triggered by a conversion.
+    Whether a forced copy will be triggered. If copy=False, a copy might
+    be triggered by a conversion.
 
   force_all_finite : boolean or 'allow-nan', (default=True)
-     Whether to raise an error on np.inf and np.nan in X. This parameter
-     does not influence whether y can have np.inf or np.nan values.
-     The possibilities are:
-      - True: Force all values of X to be finite.
+    Whether to raise an error on np.inf and np.nan in X. This parameter
+    does not influence whether y can have np.inf or np.nan values.
+    The possibilities are:
+     - True: Force all values of X to be finite.
      - False: accept both np.inf and np.nan in X.
      - 'allow-nan':  accept  only  np.nan  values in  X.  Values  cannot  be
        infinite.
 
   ensure_min_samples : int (default=1)
-     Make sure that X has a minimum number of samples in its first
-     axis (rows for a 2D array).
+    Make sure that X has a minimum number of samples in its first
+    axis (rows for a 2D array).
 
   ensure_min_features : int (default=1)
-     Make sure that the 2D array has some minimum number of features
-     (columns). The default value of 1 rejects empty datasets.
-     This check is only enforced when X has effectively 2 dimensions or
-     is originally 1D and ``ensure_2d`` is True. Setting to 0 disables
-     this check.
+    Make sure that the 2D array has some minimum number of features
+    (columns). The default value of 1 rejects empty datasets.
+    This check is only enforced when X has effectively 2 dimensions or
+    is originally 1D and ``ensure_2d`` is True. Setting to 0 disables
+    this check.
 
   warn_on_dtype : boolean (default=False)
-     Raise DataConversionWarning if the dtype of the input data structure
-     does not match the requested dtype, causing a memory copy.
+    Raise DataConversionWarning if the dtype of the input data structure
+    does not match the requested dtype, causing a memory copy.
 
   estimator : str or estimator instance (default=None)
-     If passed, include the name of the estimator in warning messages.
+    If passed, include the name of the estimator in warning messages.
 
   Returns
   -------
@@ -128,13 +128,13 @@ def check_input(input, y=None, preprocessor=None,
 
   if type_of_inputs == 'classic':
     if input.ndim == 1:
-        if preprocessor is not None:
-                input = preprocess_points(input, preprocessor)
-                preprocessor_has_been_applied = True
-        else:
-          make_error_input(101, input, context)
+      if preprocessor is not None:
+        input = preprocess_points(input, preprocessor)
+        preprocessor_has_been_applied = True
+      else:
+        make_error_input(101, input, context)
     elif input.ndim == 2:
-        pass  # OK
+      pass  # OK
     else:
       if preprocessor is not None:
         make_error_input(320, input, context)
@@ -153,13 +153,13 @@ def check_input(input, y=None, preprocessor=None,
   elif type_of_inputs == 'tuples':
     if input.ndim == 2:
       if preprocessor is not None:
-          input = preprocess_tuples(input, preprocessor)
-          preprocessor_has_been_applied = True
+        input = preprocess_tuples(input, preprocessor)
+        preprocessor_has_been_applied = True
       else:
-          make_error_input(201, input, context)
+        make_error_input(201, input, context)
     elif input.ndim == 3:  # we should check_num_features which is not checked
                            #  after
-        pass
+      pass
     else:
       if preprocessor is not None:
         make_error_input(420, input, context)
@@ -171,18 +171,18 @@ def check_input(input, y=None, preprocessor=None,
     if ensure_min_features > 0:
       n_features = input.shape[2]
       if n_features < ensure_min_features:
-          raise ValueError("Found array with {} feature(s) (shape={}) while"
-                           " a minimum of {} is required{}."
-                           .format(n_features, input.shape,
-                                   ensure_min_features, context))
+        raise ValueError("Found array with {} feature(s) (shape={}) while"
+                         " a minimum of {} is required{}."
+                         .format(n_features, input.shape,
+                                 ensure_min_features, context))
     #  normally we don't need to check_t too because t should'nt be able to
     # be modified by any preprocessor
     if input.ndim != 3:  # we have to ensure this because check_array above
       # does not
-       if preprocessor_has_been_applied:
-         make_error_input(211, input, context)
-       else:
-         make_error_input(201, input, context)
+      if preprocessor_has_been_applied:
+        make_error_input(211, input, context)
+      else:
+        make_error_input(201, input, context)
     check_t(input, t, context)
 
   return input if y is None else (input, y)
