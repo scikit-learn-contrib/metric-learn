@@ -33,6 +33,10 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
 
     regularization : float, optional
         Weighting of pull and push terms, with 0.5 meaning equal weight.
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.k = k
     self.min_iter = min_iter

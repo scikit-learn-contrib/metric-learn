@@ -49,6 +49,10 @@ class MLKR(MahalanobisMixin, TransformerMixin):
 
     max_iter : int, optional
         Cap on number of congugate gradient iterations.
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.num_dims = num_dims
     self.A0 = A0

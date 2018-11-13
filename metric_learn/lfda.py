@@ -50,6 +50,10 @@ class LFDA(MahalanobisMixin, TransformerMixin):
           'weighted'        - weighted eigenvectors
           'orthonormalized' - orthonormalized
           'plain'           - raw eigenvectors
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     '''
     if embedding_type not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid embedding_type: %r' % embedding_type)

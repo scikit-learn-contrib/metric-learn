@@ -134,6 +134,9 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
         number of constraints to generate
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     _BaseSDML.__init__(self, balance_param=balance_param,
                        sparsity_param=sparsity_param, use_cov=use_cov,

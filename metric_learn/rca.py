@@ -59,6 +59,10 @@ class RCA(MahalanobisMixin, TransformerMixin):
         If ``0 < pca_comps < 1``, it is used as
         the minimum explained variance ratio.
         See sklearn.decomposition.PCA for more details.
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.num_dims = num_dims
     self.pca_comps = pca_comps
@@ -160,6 +164,9 @@ class RCA_Supervised(RCA):
         embedding dimension (default: original dimension of data)
     num_chunks : int, optional
     chunk_size : int, optional
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps,
                  preprocessor=preprocessor)
