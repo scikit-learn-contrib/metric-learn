@@ -14,9 +14,9 @@ import numpy as np
 import warnings
 from collections import Counter
 from six.moves import xrange
+from metric_learn._util import check_input
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
-from metric_learn._util import check_input
 from .base_metric import MahalanobisMixin
 
 
@@ -68,7 +68,6 @@ class python_LMNN(_base_LMNN):
                        ' (smallest class has %d)' % required_k)
 
   def fit(self, X, y):
-
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate

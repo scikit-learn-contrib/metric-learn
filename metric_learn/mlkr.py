@@ -87,7 +87,6 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       X : (n x d) array of samples
       y : (n) data labels
       """
-
       X, y, A = self._process_inputs(X, y)
 
       # note: this line takes (n*n*d) memory!

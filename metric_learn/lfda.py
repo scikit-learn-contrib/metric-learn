@@ -16,9 +16,8 @@ import scipy
 import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.base import TransformerMixin
-
 from metric_learn._util import check_input
+from sklearn.base import TransformerMixin
 from .base_metric import MahalanobisMixin
 
 
@@ -94,7 +93,6 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     y : (n,) array-like
         Class labels, one per point of data.
     '''
-
     X, y, num_classes, n, d, dim, k_ = self._process_inputs(X, y)
     tSb = np.zeros((d,d))
     tSw = np.zeros((d,d))

@@ -118,7 +118,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
-    The learned linear transformation ``L``.
+      The learned linear transformation ``L``.
   """
 
   def score_pairs(self, pairs):
@@ -294,13 +294,13 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
                               estimator=self, t=self._t)
     # we broadcast with ... because here we allow quadruplets to be
     # either a 3D array of points or 2D array of indices
-    return (self.score_pairs(quadruplets[:, :2, ...]) -
-            self.score_pairs(quadruplets[:, 2:, ...]))
+    return np.sign(self.decision_function(quadruplets))
 
   def decision_function(self, quadruplets):
     # no need to check_input since it is done in
     # predict->score_pairs
-    return self.predict(quadruplets)
+    return (self.score_pairs(quadruplets[:, :2, :]) -
+            self.score_pairs(quadruplets[:, 2:, :]))
 
   def score(self, quadruplets, y=None):
     """Computes score on input quadruplets

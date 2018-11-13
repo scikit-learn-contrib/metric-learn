@@ -13,8 +13,8 @@ import numpy as np
 from sklearn.base import TransformerMixin
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
-
 from metric_learn._util import check_input
+
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
 

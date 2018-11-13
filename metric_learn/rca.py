@@ -17,8 +17,8 @@ import warnings
 from six.moves import xrange
 from sklearn import decomposition
 from sklearn.base import TransformerMixin
-
 from metric_learn._util import check_input
+
 from .base_metric import MahalanobisMixin
 from .constraints import Constraints
 
@@ -109,7 +109,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
-
     data, M_pca = self._process_data(data)
 
     chunks = np.asanyarray(chunks, dtype=int)

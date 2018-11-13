@@ -7,8 +7,8 @@ from __future__ import absolute_import
 import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-
 from metric_learn._util import check_input
+
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
