@@ -52,7 +52,7 @@ def build_regression(preprocessor):
   # test that you can do cross validation on tuples of points with
   #  a WeaklySupervisedMetricLearner
   X, y = shuffle(*make_regression(n_samples=100, n_features=10),
-                  random_state=RNG)
+                 random_state=RNG)
   X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
   return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
 
