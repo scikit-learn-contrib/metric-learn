@@ -41,16 +41,14 @@ def build_data():
 
 
 def build_classification(preprocessor):
-  # test that you can do cross validation on tuples of points with
-  #  a WeaklySupervisedMetricLearner
+  # builds a toy classification problem
   X, y = shuffle(*make_blobs(), random_state=RNG)
   X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
   return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
 
 
 def build_regression(preprocessor):
-  # test that you can do cross validation on tuples of points with
-  #  a WeaklySupervisedMetricLearner
+  # builds a toy regression problem
   X, y = shuffle(*make_regression(n_samples=100, n_features=10),
                  random_state=RNG)
   X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
@@ -58,8 +56,7 @@ def build_regression(preprocessor):
 
 
 def build_pairs(preprocessor):
-  # test that you can do cross validation on tuples of points with
-  #  a WeaklySupervisedMetricLearner
+  # builds a toy pairs problem
   X, indices = build_data()
   if preprocessor is not None:
     # if preprocessor, we build a 2D array of pairs of indices
@@ -77,8 +74,7 @@ def build_pairs(preprocessor):
 
 
 def build_quadruplets(preprocessor):
-  # test that you can do cross validation on a tuples of points with
-  #  a WeaklySupervisedMetricLearner
+  # builds a toy quadruplets problem
   X, indices = build_data()
   c = np.column_stack(indices)
   if preprocessor is not None:
@@ -131,6 +127,8 @@ ids_estimators = ['itml',
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_cross_validation(estimator, build_dataset, preprocessor):
+  """Tests that you can do cross validation on metric-learn estimators
+  """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
     (X, tuples, y, tuples_train, tuples_test,
      y_train, y_test, preprocessor) = build_dataset(preprocessor)
@@ -159,6 +157,8 @@ def check_predict(estimator, tuples):
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_simple_estimator(estimator, build_dataset, preprocessor):
+  """Tests that fit, predict and scoring works.
+  """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
     (X, tuples, y, tuples_train, tuples_test,
      y_train, y_test, preprocessor) = build_dataset(preprocessor)
@@ -293,6 +293,9 @@ def test_dict_unchanged(estimator, build_dataset, preprocessor):
                           (SDML(), build_pairs)],
                          ids=['itml', 'lsml', 'mmc', 'sdml'])
 def test_same_result_with_or_without_preprocessor(estimator, build_dataset):
+  """For weakly supervised algorithms, test that using a preprocessor or not
+  (with the appropriate corresponding inputs) give the same result.
+  """
   (X, tuples, y, tuples_train, tuples_test, y_train,
    y_test, _) = build_dataset(preprocessor=mock_preprocessor)
   formed_tuples_train = X[tuples_train]

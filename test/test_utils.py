@@ -19,7 +19,7 @@ def mock_preprocessor(indices):
   """
   return np.ones((indices.shape[0], 3))
 
-#  ---------------------------- test check_input ----------------------------
+#  ---------------- test check_input with 'tuples' type_of_input' ------------
 
 
 @pytest.fixture
@@ -58,7 +58,7 @@ def test_make_name(estimator, expected):
                          [(tuples_prep, mock_preprocessor),
                           (tuples_no_prep, None),
                           (tuples_no_prep, mock_preprocessor)])
-def test_check_input_invalid_t(estimator, context, load_tuples, preprocessor):
+def test_check_tuples_invalid_t(estimator, context, load_tuples, preprocessor):
   """Checks that the exception are raised if t is not the one expected"""
   tuples = load_tuples()
   preprocessed_tuples = (preprocess_tuples(tuples, preprocessor)
@@ -89,8 +89,8 @@ def test_check_input_invalid_t(estimator, context, load_tuples, preprocessor):
                           ([[[[5]]]], '4', '3D array of formed tuples', None),
                           ([[1], [3]], '2', '3D array of formed '
                                             'tuples', None)])
-def test_check_input_invalid_shape(estimator, context, tuples, found,
-                                   expected, preprocessor):
+def test_check_tuples_invalid_shape(estimator, context, tuples, found,
+                                    expected, preprocessor):
   """Checks that a value error with the appropriate message is raised if
   shape is invalid (not 2D with preprocessor or 3D with no preprocessor)
   """
@@ -110,7 +110,7 @@ def test_check_input_invalid_shape(estimator, context, tuples, found,
 
 @pytest.mark.parametrize('estimator, context',
                          [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-def test_check_input_invalid_n_features(estimator, context, tuples_no_prep):
+def test_check_tuples_invalid_n_features(estimator, context, tuples_no_prep):
   """Checks that the right warning is printed if not enough features
   Here we only test if no preprocessor (otherwise we don't ensure this)
   """
@@ -130,8 +130,8 @@ def test_check_input_invalid_n_features(estimator, context, tuples_no_prep):
                          [(tuples_prep, mock_preprocessor),
                           (tuples_no_prep, None),
                           (tuples_no_prep, mock_preprocessor)])
-def test_check_input_invalid_n_samples(estimator, context, load_tuples,
-                                       preprocessor):
+def test_check_tuples_invalid_n_samples(estimator, context, load_tuples,
+                                        preprocessor):
   """Checks that the right warning is printed if n_samples is too small"""
   tuples = load_tuples()
   msg = ("Found array with 2 sample(s) (shape={}) while a minimum of 3 "
@@ -152,8 +152,8 @@ def test_check_input_invalid_n_samples(estimator, context, load_tuples,
                          [(tuples_prep, mock_preprocessor),
                           (tuples_no_prep, None),
                           (tuples_no_prep, mock_preprocessor)])
-def test_check_input_invalid_dtype_convertible(estimator, context,
-                                               load_tuples, preprocessor):
+def test_check_tuples_invalid_dtype_convertible(estimator, context,
+                                                load_tuples, preprocessor):
   """Checks that a warning is raised if a convertible input is converted to
   float"""
   tuples = load_tuples().astype(object)  # here the object conversion is
@@ -175,7 +175,7 @@ def test_check_input_invalid_dtype_convertible(estimator, context,
   assert str(raised_warning[0].message) == msg
 
 
-def test_check_input_invalid_dtype_not_convertible_with_preprocessor(
+def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor(
         tuples_prep):
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float, when using a preprocessor
@@ -190,7 +190,7 @@ def test_check_input_invalid_dtype_not_convertible_with_preprocessor(
                 preprocessor=preprocessor, dtype=np.float64)
 
 
-def test_check_input_invalid_dtype_not_convertible_without_preprocessor(
+def test_check_tuples_invalid_dtype_not_convertible_without_preprocessor(
         tuples_no_prep):
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float, when using no preprocessor
@@ -202,10 +202,10 @@ def test_check_input_invalid_dtype_not_convertible_without_preprocessor(
 
 
 @pytest.mark.parametrize('t', [2, None])
-def test_check_input_valid_t(t, tuples_prep, tuples_no_prep):
+def test_check_tuples_valid_t(t, tuples_prep, tuples_no_prep):
   """For inputs that have the right matrix dimension (2D or 3D for instance),
   checks that checking the number of tuples (pairs, quadruplets, etc) raises
-  no warning
+  no warning if there is the right number of points in a tuple.
   """
   with pytest.warns(None) as record:
     check_input(tuples_prep, type_of_inputs='tuples',
@@ -230,7 +230,7 @@ def test_check_input_valid_t(t, tuples_prep, tuples_no_prep):
                            (1, 4, 9)),
                           np.array([[[1.2, 2.2], [1.4, 3.3]],
                                     [[2.6, 2.3], [3.4, 5.0]]])])
-def test_check_input_valid_with_preprocessor(tuples):
+def test_check_tuples_valid_with_preprocessor(tuples):
   """Test that valid inputs when using a preprocessor raises no warning"""
   with pytest.warns(None) as record:
     check_input(tuples, type_of_inputs='tuples',
@@ -251,14 +251,14 @@ def test_check_input_valid_with_preprocessor(tuples):
                           (((2, 1), (0, 2), (2, 3)),
                            ((1, 2), (4, 4), (9, 3)),
                            ((3, 1), (4, 4), (29, 4)))])
-def test_check_input_valid_without_preprocessor(tuples):
+def test_check_tuples_valid_without_preprocessor(tuples):
   """Test that valid inputs when using no preprocessor raises no warning"""
   with pytest.warns(None) as record:
     check_input(tuples, type_of_inputs='tuples', preprocessor=None)
   assert len(record) == 0
 
 
-def test_check_input_behaviour_auto_dtype(tuples_no_prep):
+def test_check_tuples_behaviour_auto_dtype(tuples_no_prep):
   """Checks that check_tuples allows by default every type if using a
   preprocessor, and numeric types if using no preprocessor"""
   tuples_prep = [['img1.png', 'img2.png'], ['img3.png', 'img5.png']]
@@ -279,7 +279,7 @@ def test_check_input_behaviour_auto_dtype(tuples_no_prep):
       check_input(tuples_no_prep, type_of_inputs='tuples')
 
 
-def test_check_input_invalid_complex_data():
+def test_check_tuples_invalid_complex_data():
   """Checks that the right error message is thrown if given complex data (
   this comes from sklearn's check_array's message)"""
   tuples = np.array([[[1 + 2j, 3 + 4j], [5 + 7j, 5 + 7j]],
@@ -291,8 +291,7 @@ def test_check_input_invalid_complex_data():
   assert str(raised_error.value) == msg
 
 
-#  ---------------------------- test check_input with points type
-# ----------------------------
+# ------------- test check_input with 'classic' type_of_inputs ----------------
 
 
 @pytest.fixture
@@ -321,8 +320,8 @@ def points_no_prep():
                                          'array of formed points',
                            mock_preprocessor),
                           ([[[5]]], '3', '2D array of formed points', None)])
-def test_check_input_points_invalid_shape(estimator, context, points, found,
-                                          expected, preprocessor):
+def test_check_classic_invalid_shape(estimator, context, points, found,
+                                     expected, preprocessor):
   """Checks that a value error with the appropriate message is raised if
   shape is invalid (valid being 1D or 2D with preprocessor or 2D with no
   preprocessor)
@@ -343,8 +342,8 @@ def test_check_input_points_invalid_shape(estimator, context, points, found,
 
 @pytest.mark.parametrize('estimator, context',
                          [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-def test_check_input_point_invalid_n_features(estimator, context,
-                                              points_no_prep):
+def test_check_classic_invalid_n_features(estimator, context,
+                                          points_no_prep):
   """Checks that the right warning is printed if not enough features
   Here we only test if no preprocessor (otherwise we don't ensure this)
   """
@@ -364,8 +363,8 @@ def test_check_input_point_invalid_n_features(estimator, context,
                          [(points_prep, mock_preprocessor),
                           (points_no_prep, None),
                           (points_no_prep, mock_preprocessor)])
-def test_check_input_point_invalid_n_samples(estimator, context, load_points,
-                                             preprocessor):
+def test_check_classic_invalid_n_samples(estimator, context, load_points,
+                                         preprocessor):
   """Checks that the right warning is printed if n_samples is too small"""
   points = load_points()
   msg = ("Found array with 2 sample(s) (shape={}) while a minimum of 3 "
@@ -388,9 +387,9 @@ def test_check_input_point_invalid_n_samples(estimator, context, load_points,
                          [(points_prep, mock_preprocessor),
                           (points_no_prep, None),
                           (points_no_prep, mock_preprocessor)])
-def test_check_input_point_invalid_dtype_convertible(estimator, context,
-                                                     load_points,
-                                                     preprocessor):
+def test_check_classic_invalid_dtype_convertible(estimator, context,
+                                                 load_points,
+                                                 preprocessor):
   """Checks that a warning is raised if a convertible input is converted to
   float"""
   points = load_points().astype(object)  # here the object conversion is
@@ -417,7 +416,7 @@ def test_check_input_point_invalid_dtype_convertible(estimator, context,
                                                         ['e', 'b']])),
                           (None, np.array([[['b', 'v'], ['a', 'd']],
                                            [['x', 'u'], ['c', 'a']]]))])
-def test_check_input_point_invalid_dtype_not_convertible(preprocessor, points):
+def test_check_classic_invalid_dtype_not_convertible(preprocessor, points):
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float
   """
@@ -435,7 +434,7 @@ def test_check_input_point_invalid_dtype_not_convertible(preprocessor, points):
                           (2, 0, 2),
                           np.array([[1.2, 2.2],
                                     [2.6, 2.3]])])
-def test_check_input_point_valid_with_preprocessor(points):
+def test_check_classic_valid_with_preprocessor(points):
   """Test that valid inputs when using a preprocessor raises no warning"""
   with pytest.warns(None) as record:
     check_input(points, type_of_inputs='classic',
@@ -456,14 +455,14 @@ def test_check_input_point_valid_with_preprocessor(points):
                           ((2, 1, 0, 2, 2, 3),
                            (1, 2, 4, 4, 9, 3),
                            (3, 1, 4, 4, 29, 4))])
-def test_check_input_point_valid_without_preprocessor(points):
+def test_check_classic_valid_without_preprocessor(points):
   """Test that valid inputs when using no preprocessor raises no warning"""
   with pytest.warns(None) as record:
     check_input(points, type_of_inputs='classic', preprocessor=None)
   assert len(record) == 0
 
 
-def test_check_input_point_behaviour_auto_dtype(points_no_prep):
+def test_check_classic_behaviour_auto_dtype(points_no_prep):
   """Checks that check_input (for points) allows by default every type if
   using a preprocessor, and numeric types if using no preprocessor"""
   points_prep = ['img1.png', 'img2.png', 'img3.png', 'img5.png']
@@ -484,7 +483,7 @@ def test_check_input_point_behaviour_auto_dtype(points_no_prep):
       check_input(points_no_prep, type_of_inputs='classic')
 
 
-def test_check_input_point_invalid_complex_data():
+def test_check_classic_invalid_complex_data():
   """Checks that the right error message is thrown if given complex data (
   this comes from sklearn's check_array's message)"""
   points = np.array([[[1 + 2j, 3 + 4j], [5 + 7j, 5 + 7j]],
@@ -612,7 +611,7 @@ def test_preprocess_tuples_invalid_message(estimator):
 @pytest.mark.parametrize('estimator', ['NCA', NCA(), None])
 def test_preprocess_points_invalid_message(estimator):
   """Checks that if the preprocessor does some weird stuff, the preprocessed
-  input is detected as weird. Checks this for preprocess_points."""
+  input is detected as weird."""
 
   context = make_context(estimator) + (' after the preprocessor '
                                        'has been applied')
@@ -645,7 +644,7 @@ def test_progress_message_preprocessor_points(capsys):
 
 
 def test_progress_message_preprocessor_tuples(capsys):
-  """Tests that when using a preprocessor on points, a message is printed
+  """Tests that when using a preprocessor on tuples, a message is printed
   """
   tuples = np.array([[1, 2],
                      [2, 3],
@@ -794,7 +793,9 @@ ids_estimators = list(map(lambda x: x.__class__.__name__, classifiers +
 @pytest.mark.parametrize('estimator, dataset', estimators,
                          ids=ids_estimators)
 def test_same_with_or_without_preprocessor(estimator, dataset):
-
+  """test that supervised algorithms using a preprocessor behave consistently
+  with their no-preprocessor equivalent.
+  """
   (formed_points_train, formed_points_test,
    y_train, y_test, points_indicators_train,
    points_indicators_test) = train_test_split(dataset.formed_points,
