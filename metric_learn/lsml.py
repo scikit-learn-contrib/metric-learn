@@ -44,8 +44,8 @@ class _BaseLSML(MahalanobisMixin):
     super(_BaseLSML, self).__init__(preprocessor)
 
   def _prepare_quadruplets(self, quadruplets, weights):
-    quadruplets = self.initialize_and_check_inputs(quadruplets,
-                                                   type_of_inputs='tuples')
+    quadruplets = self._prepare_inputs(quadruplets,
+                                       type_of_inputs='tuples')
 
     # check to make sure that no two constrained vectors are identical
     self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -217,7 +217,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    X, y = self.initialize_and_check_inputs(X, y, ensure_min_samples=2)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

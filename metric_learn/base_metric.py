@@ -44,8 +44,8 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     else:
       self.preprocessor_ = self.preprocessor
 
-  def initialize_and_check_inputs(self, X, y=None, type_of_inputs='classic',
-                                  **kwargs):
+  def _prepare_inputs(self, X, y=None, type_of_inputs='classic',
+                      **kwargs):
     """Initializes the preprocessor and processes inputs. See `check_input`
     for more details.
 

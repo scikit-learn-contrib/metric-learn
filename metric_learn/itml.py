@@ -60,8 +60,8 @@ class _BaseITML(MahalanobisMixin):
     super(_BaseITML, self).__init__(preprocessor)
 
   def _process_pairs(self, pairs, y, bounds):
-    pairs, y = self.initialize_and_check_inputs(pairs, y,
-                                                type_of_inputs='tuples')
+    pairs, y = self._prepare_inputs(pairs, y,
+                                    type_of_inputs='tuples')
 
     # check to make sure that no two constrained vectors are identical
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -231,7 +231,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    X, y = self.initialize_and_check_inputs(X, y, ensure_min_samples=2)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
