@@ -30,22 +30,22 @@ def check_input(input, y=None, preprocessor=None,
 
   Parameters
   ----------
-  input: array-like
+  input : array-like
     The input data array to check.
 
   y : array-like
     The input labels array to check.
 
-  preprocessor: callable (default=None)
+  preprocessor : callable (default=None)
     The preprocessor to use. If None, no preprocessor is used.
 
-  type_of_inputs: `str` {'classic', 'tuples'}
+  type_of_inputs : `str` {'classic', 'tuples'}
     The type of inputs to check. If 'classic', the input should be
     a 2D array-like of points or a 1D array like of indicators of points. If
     'tuples', the input should be a 3D array-like of tuples or a 2D
     array-like of indicators of tuples.
 
-  accept_sparse: `bool`
+  accept_sparse : `bool`
     Set to true to allow sparse inputs (only works for sparse inputs with
     dim < 3).
 

@@ -31,7 +31,7 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     k : int, optional
         Number of neighbors to consider, not including self-edges.
 
-    regularization: float, optional
+    regularization : float, optional
         Weighting of pull and push terms, with 0.5 meaning equal weight.
     """
     self.k = k

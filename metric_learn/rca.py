@@ -158,8 +158,8 @@ class RCA_Supervised(RCA):
     ----------
     num_dims : int, optional
         embedding dimension (default: original dimension of data)
-    num_chunks: int, optional
-    chunk_size: int, optional
+    num_chunks : int, optional
+    chunk_size : int, optional
     """
     RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps,
                  preprocessor=preprocessor)
