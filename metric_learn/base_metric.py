@@ -232,8 +232,6 @@ class _PairsClassifierMixin(BaseMetricLearner):
     return self.score_pairs(pairs)
 
   def decision_function(self, pairs):
-    # no need to check_input since it is done in
-    # predict->score_pairs
     return self.predict(pairs)
 
   def score(self, pairs, y):
@@ -261,8 +259,6 @@ class _PairsClassifierMixin(BaseMetricLearner):
     score : float
       The ``roc_auc`` score.
     """
-    # no need to check_input since it is done in
-    # predict->score_pairs
     return roc_auc_score(y, self.decision_function(pairs))
 
 
@@ -297,10 +293,10 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     return np.sign(self.decision_function(quadruplets))
 
   def decision_function(self, quadruplets):
-    # no need to check_input since it is done in
-    # predict->score_pairs
-    return (self.score_pairs(quadruplets[:, :2, :]) -
-            self.score_pairs(quadruplets[:, 2:, :]))
+    # we broadcast with ... because here we allow quadruplets to be
+    # either a 3D array of points or 2D array of indices
+    return (self.score_pairs(quadruplets[:, :2, ...]) -
+            self.score_pairs(quadruplets[:, 2:, ...]))
 
   def score(self, quadruplets, y=None):
     """Computes score on input quadruplets
@@ -324,6 +320,4 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     score : float
       The quadruplets score.
     """
-    # no need to check_input since it is done in
-    # predict->score_pairs
     return -np.mean(self.predict(quadruplets))
