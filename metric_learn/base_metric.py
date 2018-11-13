@@ -216,7 +216,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
       3D Array of pairs to predict, with each row corresponding to two
       points, or 2D array of indices of pairs if the metric learner uses a
       preprocessor.
@@ -246,7 +246,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
       3D Array of pairs, with each row corresponding to two points,
       or 2D array of indices of pairs if the metric learner uses a
       preprocessor.

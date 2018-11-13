@@ -38,16 +38,16 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     num_dims : int, optional
         Dimensionality of reduced space (defaults to dimension of X)
 
-    A0 : array-like, optional
+    A0: array-like, optional
         Initialization of transformation matrix. Defaults to PCA loadings.
 
-    epsilon : float, optional
+    epsilon: float, optional
         Step size for congujate gradient descent.
 
-    alpha : float, optional
+    alpha: float, optional
         Stopping criterion for congujate gradient descent.
 
-    max_iter : int, optional
+    max_iter: int, optional
         Cap on number of congugate gradient iterations.
 
     preprocessor : array-like, shape=(n_samples, n_features) or callable

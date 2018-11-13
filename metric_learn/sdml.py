@@ -89,12 +89,12 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs : array-like, shape=(n_constraints, 2, n_features) or
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
            (n_constraints, 2)
         3D Array of pairs with each row corresponding to two points,
         or 2D array of indices of pairs if the metric learner uses a
         preprocessor.
-    y : array-like, of shape (n_constraints,)
+    y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 
     Returns

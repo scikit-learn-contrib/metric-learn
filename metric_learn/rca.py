@@ -161,8 +161,8 @@ class RCA_Supervised(RCA):
     ----------
     num_dims : int, optional
         embedding dimension (default: original dimension of data)
-    num_chunks : int, optional
-    chunk_size : int, optional
+    num_chunks: int, optional
+    chunk_size: int, optional
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
