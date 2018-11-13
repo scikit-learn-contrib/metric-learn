@@ -14,7 +14,6 @@ import numpy as np
 import warnings
 from collections import Counter
 from six.moves import xrange
-from metric_learn._util import check_input
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
 from .base_metric import MahalanobisMixin

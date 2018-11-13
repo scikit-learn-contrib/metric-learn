@@ -14,7 +14,6 @@ from sklearn.base import TransformerMixin
 from sklearn.decomposition import PCA
 
 
-from metric_learn._util import check_input
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps

@@ -12,7 +12,6 @@ import numpy as np
 import scipy.linalg
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from ._util import check_input
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
@@ -149,9 +148,9 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
     ----------
     quadruplets : array-like, shape=(n_constraints, 4, n_features) or
                   (n_constraints, 4)
-        3D array-like of quadruplets of points or 2D array of quadruplets of 
-	indicators. In order to supervise the algorithm in the right way, we 
-	should have the four samples ordered in a way such that:
+        3D array-like of quadruplets of points or 2D array of quadruplets of
+        indicators. In order to supervise the algorithm in the right way, we
+        should have the four samples ordered in a way such that:
         d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3]) for all 0 <= i <
         n_constraints.
     weights : (n_constraints,) array of floats, optional

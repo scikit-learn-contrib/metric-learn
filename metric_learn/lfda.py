@@ -16,7 +16,6 @@ import scipy
 import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from metric_learn._util import check_input
 from sklearn.base import TransformerMixin
 from .base_metric import MahalanobisMixin
 

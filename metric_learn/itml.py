@@ -21,7 +21,7 @@ from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm, check_input
+from ._util import vector_norm
 
 
 class _BaseITML(MahalanobisMixin):
