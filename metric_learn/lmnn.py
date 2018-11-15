@@ -53,10 +53,8 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
 class python_LMNN(_base_LMNN):
 
   def _process_inputs(self, X, labels):
-    self.X_, labels = self._prepare_inputs(X, labels,
+    self.X_, labels = self._prepare_inputs(X, labels, dtype=float,
                                            ensure_min_samples=2)
-    self.X_ = self.X_.astype(float)  # todo: remove the conversion here and
-    # integrate it into check_input
     num_pts, num_dims = self.X_.shape
     unique_labels, self.label_inds_ = np.unique(labels, return_inverse=True)
     if len(self.label_inds_) != num_pts:
@@ -260,7 +258,6 @@ try:
 
     def fit(self, X, y):
       self.X_, y = self._prepare_inputs(X, y, dtype=float)
-      self.X_ = self.X_, preprocessor=self.preprocessor_
       labels = MulticlassLabels(y)
       self._lmnn = shogun_LMNN(RealFeatures(self.X_.T), labels, self.k)
       self._lmnn.set_maxiter(self.max_iter)
