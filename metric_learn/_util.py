@@ -14,7 +14,7 @@ else:
     return np.linalg.norm(X, axis=1)
 
 
-def check_input(input, y=None, preprocessor=None,
+def check_input(input_data, y=None, preprocessor=None,
                 type_of_inputs='classic', t=None, accept_sparse=False,
                 dtype="numeric", order=None,
                 copy=False, force_all_finite=True,
@@ -112,83 +112,83 @@ def check_input(input, y=None, preprocessor=None,
                             ensure_min_features=ensure_min_features,
                             warn_on_dtype=warn_on_dtype, estimator=estimator)
   if y is None:
-    input = check_array(input, ensure_2d=False, allow_nd=True,
-                        copy=False, force_all_finite=False,
-                        accept_sparse=True, dtype=None,
-                        ensure_min_features=0, ensure_min_samples=0)
+    input_data = check_array(input_data, ensure_2d=False, allow_nd=True,
+                             copy=False, force_all_finite=False,
+                             accept_sparse=True, dtype=None,
+                             ensure_min_features=0, ensure_min_samples=0)
   else:
-    input, y = check_X_y(input, y, ensure_2d=False, allow_nd=True,
-                         copy=False, force_all_finite=False,
-                         accept_sparse=True, dtype=None,
-                         ensure_min_features=0, ensure_min_samples=0,
-                         multi_output=multi_output,
-                         y_numeric=y_numeric)
+    input_data, y = check_X_y(input_data, y, ensure_2d=False, allow_nd=True,
+                              copy=False, force_all_finite=False,
+                              accept_sparse=True, dtype=None,
+                              ensure_min_features=0, ensure_min_samples=0,
+                              multi_output=multi_output,
+                              y_numeric=y_numeric)
     # we try to allow the more possible stuff here
   preprocessor_has_been_applied = False
 
   if type_of_inputs == 'classic':
-    if input.ndim == 1:
+    if input_data.ndim == 1:
       if preprocessor is not None:
-        input = preprocess_points(input, preprocessor)
+        input_data = preprocess_points(input_data, preprocessor)
         preprocessor_has_been_applied = True
       else:
-        make_error_input(101, input, context)
-    elif input.ndim == 2:
+        make_error_input(101, input_data, context)
+    elif input_data.ndim == 2:
       pass  # OK
     else:
       if preprocessor is not None:
-        make_error_input(320, input, context)
+        make_error_input(320, input_data, context)
       else:
-        make_error_input(100, input, context)
+        make_error_input(100, input_data, context)
 
-    input = check_array(input, allow_nd=True, ensure_2d=False,
-                        **args_for_sk_checks)
-    if input.ndim != 2:  # we have to ensure this because check_array above
-                         # does not
+    input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
+                             **args_for_sk_checks)
+    if input_data.ndim != 2:  # we have to ensure this because check_array above
+                              # does not
       if preprocessor_has_been_applied:
-        make_error_input(111, input, context)
+        make_error_input(111, input_data, context)
       else:
-        make_error_input(101, input, context)
+        make_error_input(101, input_data, context)
 
   elif type_of_inputs == 'tuples':
-    if input.ndim == 2:
+    if input_data.ndim == 2:
       if preprocessor is not None:
-        input = preprocess_tuples(input, preprocessor)
+        input_data = preprocess_tuples(input_data, preprocessor)
         preprocessor_has_been_applied = True
       else:
-        make_error_input(201, input, context)
-    elif input.ndim == 3:  # we should check_num_features which is not checked
-                           #  after
+        make_error_input(201, input_data, context)
+    elif input_data.ndim == 3:  # we should check_num_features which is not checked
+                                #  after
       pass
     else:
       if preprocessor is not None:
-        make_error_input(420, input, context)
+        make_error_input(420, input_data, context)
       else:
-        make_error_input(200, input, context)
+        make_error_input(200, input_data, context)
 
-    input = check_array(input, allow_nd=True, ensure_2d=False,
-                        **args_for_sk_checks)
+    input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
+                             **args_for_sk_checks)
     if ensure_min_features > 0:
-      n_features = input.shape[2]
+      n_features = input_data.shape[2]
       if n_features < ensure_min_features:
         raise ValueError("Found array with {} feature(s) (shape={}) while"
                          " a minimum of {} is required{}."
-                         .format(n_features, input.shape,
+                         .format(n_features, input_data.shape,
                                  ensure_min_features, context))
     #  normally we don't need to check_t too because t should'nt be able to
     # be modified by any preprocessor
-    if input.ndim != 3:  # we have to ensure this because check_array above
-      # does not
+    if input_data.ndim != 3:  # we have to ensure this because check_array
+      # above does not
       if preprocessor_has_been_applied:
-        make_error_input(211, input, context)
+        make_error_input(211, input_data, context)
       else:
-        make_error_input(201, input, context)
-    check_t(input, t, context)
+        make_error_input(201, input_data, context)
+    check_t(input_data, t, context)
 
-  return input if y is None else (input, y)
+  return input_data if y is None else (input_data, y)
 
 
-def make_error_input(code, input, context):
+def make_error_input(code, input_data, context):
   code_str = {'expected_input': {'1': '2D array of formed points',
                                  '2': '3D array of formed tuples',
                                  '3': ('1D array of indicators or 2D array of '
@@ -208,10 +208,11 @@ def make_error_input(code, input, context):
                   [code_list[1]],
                   possible_preprocessor=code_str['possible_preprocessor']
                   [code_list[2]],
-                  input=input, context=context, found_size=input.ndim)
+                  input_data=input_data, context=context,
+                  found_size=input_data.ndim)
   err_msg = ('{expected_input} expected'
              '{context}{additional_context}. Found {found_size}D array '
-             'instead:\ninput={input}. Reshape your data'
+             'instead:\ninput={input_data}. Reshape your data'
              '{possible_preprocessor}.\n')
   raise ValueError(err_msg.format(**err_args))
 

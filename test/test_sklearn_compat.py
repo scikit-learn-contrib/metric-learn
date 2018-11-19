@@ -290,7 +290,7 @@ def test_estimators_fit_returns_self(estimator, build_dataset, preprocessor):
 def test_pipeline_consistency(estimator, build_dataset, preprocessor):
   # Adapted from scikit learn
   # check that make_pipeline(est) gives same score as est
-  (_, inputs, y, _, _, _, _, preprocessor) = build_dataset(preprocessor)
+  (_, input_data, y, _, _, _, _, preprocessor) = build_dataset(preprocessor)
 
   def make_random_state(estimator, in_pipeline):
     rs = {}
@@ -305,23 +305,23 @@ def test_pipeline_consistency(estimator, build_dataset, preprocessor):
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   pipeline = make_pipeline(estimator)
-  estimator.fit(inputs, y, **make_random_state(estimator, False))
-  pipeline.fit(inputs, y, **make_random_state(estimator, True))
+  estimator.fit(input_data, y, **make_random_state(estimator, False))
+  pipeline.fit(input_data, y, **make_random_state(estimator, True))
 
   if hasattr(estimator, 'score'):
-    result = estimator.score(inputs, y)
-    result_pipe = pipeline.score(inputs, y)
+    result = estimator.score(input_data, y)
+    result_pipe = pipeline.score(input_data, y)
     assert_allclose_dense_sparse(result, result_pipe)
 
   if hasattr(estimator, 'predict'):
-    result = estimator.predict(inputs)
-    result_pipe = pipeline.predict(inputs)
+    result = estimator.predict(input_data)
+    result_pipe = pipeline.predict(input_data)
     assert_allclose_dense_sparse(result, result_pipe)
 
   if issubclass(estimator.__class__, TransformerMixin):
     if hasattr(estimator, 'transform'):
-      result = estimator.transform(inputs)
-      result_pipe = pipeline.transform(inputs)
+      result = estimator.transform(input_data)
+      result_pipe = pipeline.transform(input_data)
       assert_allclose_dense_sparse(result, result_pipe)
 
 
