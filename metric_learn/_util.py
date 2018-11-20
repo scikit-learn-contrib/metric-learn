@@ -146,8 +146,8 @@ def check_input(input_data, y=None, preprocessor=None,
 
     input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
                              **args_for_sk_checks)
-    if input_data.ndim != 2:  # we have to ensure this because check_array above
-                              # does not
+    if input_data.ndim != 2:  # we have to ensure this because check_array
+                              # above does not
       if preprocessor_has_been_applied:
         make_error_input(111, input_data, context)
       else:
@@ -160,8 +160,7 @@ def check_input(input_data, y=None, preprocessor=None,
         preprocessor_has_been_applied = True
       else:
         make_error_input(201, input_data, context)
-    elif input_data.ndim == 3:  # we should check_num_features which is not checked
-                                #  after
+    elif input_data.ndim == 3:
       pass
     else:
       if preprocessor is not None:
@@ -171,6 +170,8 @@ def check_input(input_data, y=None, preprocessor=None,
 
     input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
                              **args_for_sk_checks)
+    # we need to check num_features because check_array does not check it
+    # for 3D inputs:
     if ensure_min_features > 0:
       n_features = input_data.shape[2]
       if n_features < ensure_min_features:
