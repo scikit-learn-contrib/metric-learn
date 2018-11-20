@@ -111,6 +111,10 @@ def check_input(input_data, y=None, preprocessor=None,
                             ensure_min_samples=ensure_min_samples,
                             ensure_min_features=ensure_min_features,
                             warn_on_dtype=warn_on_dtype, estimator=estimator)
+
+  # We need to convert input_data into a numpy.ndarray if possible, before
+  # any further checks or conversions, and deal with y if needed. Therefore
+  # we use check_array/check_X_y with fixed permissive arguments.
   if y is None:
     input_data = check_array(input_data, ensure_2d=False, allow_nd=True,
                              copy=False, force_all_finite=False,
@@ -123,7 +127,6 @@ def check_input(input_data, y=None, preprocessor=None,
                               ensure_min_features=0, ensure_min_samples=0,
                               multi_output=multi_output,
                               y_numeric=y_numeric)
-    # we try to allow the more possible stuff here
   preprocessor_has_been_applied = False
 
   if type_of_inputs == 'classic':
