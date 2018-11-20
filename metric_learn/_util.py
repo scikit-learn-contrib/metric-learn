@@ -15,7 +15,7 @@ else:
 
 
 def check_input(input_data, y=None, preprocessor=None,
-                type_of_inputs='classic', t=None, accept_sparse=False,
+                type_of_inputs='classic', tuple_size=None, accept_sparse=False,
                 dtype="numeric", order=None,
                 copy=False, force_all_finite=True,
                 multi_output=False, ensure_min_samples=1,
@@ -49,7 +49,7 @@ def check_input(input_data, y=None, preprocessor=None,
     Set to true to allow sparse inputs (only works for sparse inputs with
     dim < 3).
 
-  t : int
+  tuple_size : int
     The number of elements in a tuple (e.g. 2 for pairs).
 
   dtype : string, type, list of types or None (default="auto")
@@ -187,7 +187,7 @@ def check_input(input_data, y=None, preprocessor=None,
         make_error_input(211, input_data, context)
       else:
         make_error_input(201, input_data, context)
-    check_t(input_data, t, context)
+    check_t(input_data, tuple_size, context)
 
   return input_data if y is None else (input_data, y)
 

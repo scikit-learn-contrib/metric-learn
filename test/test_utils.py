@@ -70,7 +70,7 @@ def test_check_tuples_invalid_t(estimator, context, load_tuples, preprocessor):
                   .format(context, preprocessed_tuples.shape,
                           preprocessed_tuples))
   with pytest.raises(ValueError) as raised_error:
-    check_input(tuples, type_of_inputs='tuples', t=3,
+    check_input(tuples, type_of_inputs='tuples', tuple_size=3,
                 preprocessor=preprocessor, estimator=estimator)
   assert str(raised_error.value) == expected_msg
 
@@ -210,9 +210,9 @@ def test_check_tuples_valid_t(t, tuples_prep, tuples_no_prep):
   """
   with pytest.warns(None) as record:
     check_input(tuples_prep, type_of_inputs='tuples',
-                preprocessor=mock_preprocessor, t=t)
+                preprocessor=mock_preprocessor, tuple_size=t)
     check_input(tuples_no_prep, type_of_inputs='tuples', preprocessor=None,
-                t=t)
+                tuple_size=t)
   assert len(record) == 0
 
 

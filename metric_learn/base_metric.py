@@ -79,7 +79,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
                        type_of_inputs=type_of_inputs,
                        preprocessor=self.preprocessor_,
                        estimator=self,
-                       t=self._t if hasattr(self, '_t') else None,
+                       tuple_size=self._t if hasattr(self, '_t') else None,
                        **kwargs)
 
 
@@ -146,7 +146,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     """
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
-                        estimator=self, t=2)
+                        estimator=self, tuple_size=2)
     pairwise_diffs = self.transform(pairs[:, 1, :] - pairs[:, 0, :])
     # (for MahalanobisMixin, the embedding is linear so we can just embed the
     # difference)
@@ -206,7 +206,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
 class _PairsClassifierMixin(BaseMetricLearner):
 
-  _t = 2  # number of points in a tuple, 2 for pairs
+  _tuple_size = 2  # number of points in a tuple, 2 for pairs
 
   def predict(self, pairs):
     """Predicts the learned metric between input pairs.
@@ -228,7 +228,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     """
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
-                        estimator=self, t=self._t)
+                        estimator=self, tuple_size=self._tuple_size)
     return self.score_pairs(pairs)
 
   def decision_function(self, pairs):
@@ -264,7 +264,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
-  _t = 4  # number of points in a tuple, 4 for quadruplets
+  _tuple_size = 4  # number of points in a tuple, 4 for quadruplets
 
   def predict(self, quadruplets):
     """Predicts the ordering between sample distances in input quadruplets.
@@ -287,7 +287,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     """
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
-                              estimator=self, t=self._t)
+                              estimator=self, tuple_size=self._tuple_size)
     # we broadcast with ... because here we allow quadruplets to be
     # either a 3D array of points or 2D array of indices
     return np.sign(self.decision_function(quadruplets))
