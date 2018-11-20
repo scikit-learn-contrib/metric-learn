@@ -209,7 +209,28 @@ class _PairsClassifierMixin(BaseMetricLearner):
   _tuple_size = 2  # number of points in a tuple, 2 for pairs
 
   def predict(self, pairs):
-    """Predicts the learned metric between input pairs.
+    """Predicts the learned metric between input pairs. (For now it just
+    calls decision function).
+
+    Returns the learned metric value between samples in every pair. It should
+    ideally be low for similar samples and high for dissimilar samples.
+
+    Parameters
+    ----------
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to predict, with each row corresponding to two
+      points, or 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
+
+    Returns
+    -------
+    y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
+      The predicted learned metric value between samples in every pair.
+    """
+    return self.decision_function(pairs)
+
+  def decision_function(self, pairs):
+    """Returns the learned metric between input pairs.
 
     Returns the learned metric value between samples in every pair. It should
     ideally be low for similar samples and high for dissimilar samples.
@@ -230,9 +251,6 @@ class _PairsClassifierMixin(BaseMetricLearner):
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=self._tuple_size)
     return self.score_pairs(pairs)
-
-  def decision_function(self, pairs):
-    return self.predict(pairs)
 
   def score(self, pairs, y):
     """Computes score of pairs similarity prediction.
@@ -291,6 +309,21 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     return np.sign(self.decision_function(quadruplets))
 
   def decision_function(self, quadruplets):
+    """Predicts differences between sample distances in input quadruplets.
+
+    For each quadruplet of samples, computes the difference between the learned
+    metric of the first pair minus the learned metric of the second pair.
+
+    Parameters
+    ----------
+    quadruplets : array-like, shape=(n_constraints, 4, n_features)
+      Input quadruplets.
+
+    Returns
+    -------
+    decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
+      Metric differences.
+    """
     # we broadcast with ... because here we allow quadruplets to be
     # either a 3D array of points or 2D array of indices
     return (self.score_pairs(quadruplets[:, :2, ...]) -
