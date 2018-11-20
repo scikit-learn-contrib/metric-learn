@@ -338,14 +338,13 @@ def test_dict_unchanged(estimator, build_dataset, preprocessor):
       assert estimator.__dict__ == dict_before, \
           ("Estimator changes __dict__ during %s"
            % method)
-  for method in ["transform"]:
-    if hasattr(estimator, method):
-      dict_before = estimator.__dict__.copy()
-      # we transform only 2D arrays (dataset of points)
-      getattr(estimator, method)(X)
-      assert estimator.__dict__ == dict_before, \
-          ("Estimator changes __dict__ during %s"
-           % method)
+  if hasattr(estimator, "transform"):
+    dict_before = estimator.__dict__.copy()
+    # we transform only 2D arrays (dataset of points)
+    estimator.transform(X)
+    assert estimator.__dict__ == dict_before, \
+        ("Estimator changes __dict__ during %s"
+         % method)
 
 
 @pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
