@@ -316,18 +316,19 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features)
-      Input quadruplets.
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+                  (n_quadruplets, 4)
+      3D Array of quadruplets to predict, with each row corresponding to four
+      points, or 2D array of indices of quadruplets if the metric learner
+      uses a preprocessor.
 
     Returns
     -------
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
-    # we broadcast with ... because here we allow quadruplets to be
-    # either a 3D array of points or 2D array of indices
-    return (self.score_pairs(quadruplets[:, :2, ...]) -
-            self.score_pairs(quadruplets[:, 2:, ...]))
+    return (self.score_pairs(quadruplets[:, :2]) -
+            self.score_pairs(quadruplets[:, 2:]))
 
   def score(self, quadruplets, y=None):
     """Computes score on input quadruplets
