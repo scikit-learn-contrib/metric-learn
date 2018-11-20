@@ -52,7 +52,10 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
 # slower Python version
 class python_LMNN(_base_LMNN):
 
-  def _process_inputs(self, X, labels):
+  def _check_inputs_params_compatibility(self, X, labels):
+    """Process inputs and raise appropriate error messages if input
+    parameters are not those expected with respect to inputs.
+    """
     self.X_, labels = self._prepare_inputs(X, labels, dtype=float,
                                            ensure_min_samples=2)
     num_pts, num_dims = self.X_.shape
@@ -72,7 +75,7 @@ class python_LMNN(_base_LMNN):
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate
-    self._process_inputs(X, y)
+    self._check_inputs_params_compatibility(X, y)
 
     target_neighbors = self._select_targets()
     impostors = self._find_impostors(target_neighbors[:,-1])
