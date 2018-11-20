@@ -224,7 +224,7 @@ def make_error_input(code, input_data, context):
 def preprocess_tuples(tuples, preprocessor):
   print("Preprocessing tuples...")
   tuples = np.column_stack([preprocessor(tuples[:, i])[:, np.newaxis] for
-                           i in range(tuples.shape[1])])
+                            i in range(tuples.shape[1])])
   return tuples
 
 
