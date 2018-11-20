@@ -36,7 +36,7 @@ def check_input(input_data, y=None, preprocessor=None,
   y : array-like
     The input labels array to check.
 
-  preprocessor : callable (default=None)
+  preprocessor : callable (default=`None`)
     The preprocessor to use. If None, no preprocessor is used.
 
   type_of_inputs : `str` {'classic', 'tuples'}
@@ -60,7 +60,7 @@ def check_input(input_data, y=None, preprocessor=None,
     "auto", will we be set to "numeric" if `preprocessor=True`,
     else to None.
 
-  order : 'F', 'C' or None (default=None)
+  order : 'F', 'C' or None (default=`None`)
     Whether an array will be forced to be fortran or c-style.
 
   copy : boolean (default=False)
@@ -91,7 +91,7 @@ def check_input(input_data, y=None, preprocessor=None,
     Raise DataConversionWarning if the dtype of the input data structure
     does not match the requested dtype, causing a memory copy.
 
-  estimator : str or estimator instance (default=None)
+  estimator : str or estimator instance (default=`None`)
     If passed, include the name of the estimator in warning messages.
 
   Returns
