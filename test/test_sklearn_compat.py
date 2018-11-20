@@ -331,20 +331,20 @@ def test_dict_unchanged(estimator, build_dataset, preprocessor):
   if hasattr(estimator, "num_dims"):
     estimator.num_dims = 1
   estimator.fit(tuples, y)
+
+  def check_dict():
+    assert estimator.__dict__ == dict_before, (
+        "Estimator changes __dict__ during %s" % method)
   for method in ["predict", "decision_function", "predict_proba"]:
     if hasattr(estimator, method):
       dict_before = estimator.__dict__.copy()
       getattr(estimator, method)(tuples)
-      assert estimator.__dict__ == dict_before, \
-          ("Estimator changes __dict__ during %s"
-           % method)
+      check_dict()
   if hasattr(estimator, "transform"):
     dict_before = estimator.__dict__.copy()
     # we transform only 2D arrays (dataset of points)
     estimator.transform(X)
-    assert estimator.__dict__ == dict_before, \
-        ("Estimator changes __dict__ during %s"
-         % method)
+    check_dict()
 
 
 @pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
