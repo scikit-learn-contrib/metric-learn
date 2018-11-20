@@ -19,7 +19,7 @@ from .constraints import Constraints
 
 class _BaseLSML(MahalanobisMixin):
 
-  _t = 4  # constraints are quadruplets
+  _tuple_size = 4  # constraints are quadruplets
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False,
                preprocessor=None):

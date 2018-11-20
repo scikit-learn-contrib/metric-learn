@@ -20,7 +20,7 @@ from .constraints import Constraints, wrap_pairs
 
 class _BaseSDML(MahalanobisMixin):
 
-  _t = 2  # constraints are pairs
+  _tuple_size = 2  # constraints are pairs
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
                verbose=False, preprocessor=None):

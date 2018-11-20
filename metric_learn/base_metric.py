@@ -79,7 +79,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
                        type_of_inputs=type_of_inputs,
                        preprocessor=self.preprocessor_,
                        estimator=self,
-                       tuple_size=self._t if hasattr(self, '_t') else None,
+                       tuple_size=getattr(self, '_tuple_size', None),
                        **kwargs)
 
 

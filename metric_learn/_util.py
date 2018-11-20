@@ -23,7 +23,7 @@ def check_input(input_data, y=None, preprocessor=None,
                 warn_on_dtype=False, estimator=None):
   """Checks that the input format is valid, and converts it if specified
   (this is the equivalent of scikit-learn's `check_array` or `check_X_y`).
-  All arguments following t are scikit-learn's `check_X_y`
+  All arguments following tuple_size are scikit-learn's `check_X_y`
   arguments that will be enforced on the data and labels array. If
   indicators are given as an input data array, the returned data array
   will be the formed points/tuples, using the given preprocessor.
@@ -179,15 +179,15 @@ def check_input(input_data, y=None, preprocessor=None,
                          " a minimum of {} is required{}."
                          .format(n_features, input_data.shape,
                                  ensure_min_features, context))
-    #  normally we don't need to check_t too because t should'nt be able to
-    # be modified by any preprocessor
+    #  normally we don't need to check_tuple_size too because tuple_size
+    # should'nt be able to be modified by any preprocessor
     if input_data.ndim != 3:  # we have to ensure this because check_array
       # above does not
       if preprocessor_has_been_applied:
         make_error_input(211, input_data, context)
       else:
         make_error_input(201, input_data, context)
-    check_t(input_data, tuple_size, context)
+    check_tuple_size(input_data, tuple_size, context)
 
   return input_data if y is None else (input_data, y)
 
@@ -263,13 +263,14 @@ def make_name(estimator):
   return estimator_name
 
 
-def check_t(tuples, t, context):
+def check_tuple_size(tuples, tuple_size, context):
   """Helper function to check that the number of points in each tuple is
-  equal to t (e.g. 2 for pairs), and raise a `ValueError` otherwise"""
-  if t is not None and tuples.shape[1] != t:
+  equal to tuple_size (e.g. 2 for pairs), and raise a `ValueError` otherwise"""
+  if tuple_size is not None and tuples.shape[1] != tuple_size:
     msg_t = (("Tuples of {} element(s) expected{}. Got tuples of {} "
              "element(s) instead (shape={}):\ninput={}.\n")
-             .format(t, context, tuples.shape[1], tuples.shape, tuples))
+             .format(tuple_size, context, tuples.shape[1], tuples.shape,
+                     tuples))
     raise ValueError(msg_t)
 
 

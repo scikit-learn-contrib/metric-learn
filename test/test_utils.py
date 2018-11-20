@@ -59,8 +59,10 @@ def test_make_name(estimator, expected):
                          [(tuples_prep, mock_preprocessor),
                           (tuples_no_prep, None),
                           (tuples_no_prep, mock_preprocessor)])
-def test_check_tuples_invalid_t(estimator, context, load_tuples, preprocessor):
-  """Checks that the exception are raised if t is not the one expected"""
+def test_check_tuples_invalid_tuple_size(estimator, context, load_tuples,
+                                         preprocessor):
+  """Checks that the exception are raised if tuple_size is not the one
+  expected"""
   tuples = load_tuples()
   preprocessed_tuples = (preprocess_tuples(tuples, preprocessor)
                          if (preprocessor is not None and
@@ -202,17 +204,17 @@ def test_check_tuples_invalid_dtype_not_convertible_without_preprocessor(
                 preprocessor=None, dtype=np.float64)
 
 
-@pytest.mark.parametrize('t', [2, None])
-def test_check_tuples_valid_t(t, tuples_prep, tuples_no_prep):
+@pytest.mark.parametrize('tuple_size', [2, None])
+def test_check_tuples_valid_tuple_size(tuple_size, tuples_prep, tuples_no_prep):
   """For inputs that have the right matrix dimension (2D or 3D for instance),
   checks that checking the number of tuples (pairs, quadruplets, etc) raises
   no warning if there is the right number of points in a tuple.
   """
   with pytest.warns(None) as record:
     check_input(tuples_prep, type_of_inputs='tuples',
-                preprocessor=mock_preprocessor, tuple_size=t)
+                preprocessor=mock_preprocessor, tuple_size=tuple_size)
     check_input(tuples_no_prep, type_of_inputs='tuples', preprocessor=None,
-                tuple_size=t)
+                tuple_size=tuple_size)
   assert len(record) == 0
 
 
@@ -661,7 +663,7 @@ def test_progress_message_preprocessor_tuples(capsys):
 
 @pytest.mark.parametrize('estimator', [ITML(), LSML(), MMC(), SDML()],
                          ids=['ITML', 'LSML', 'MMC', 'SDML'])
-def test_error_message_t(estimator):
+def test_error_message_tuple_size(estimator):
   """Tests that if a tuples learner is not given the good number of points
   per tuple, it throws an error message"""
   estimator = clone(estimator)
@@ -673,7 +675,7 @@ def test_error_message_t(estimator):
     estimator.fit(invalid_pairs, y)
   expected_msg = ("Tuples of {} element(s) expected{}. Got tuples of 3 "
                   "element(s) instead (shape=(2, 3, 2)):\ninput={}.\n"
-                  .format(estimator._t, make_context(estimator),
+                  .format(estimator._tuple_size, make_context(estimator),
                           invalid_pairs))
   assert str(raised_err.value) == expected_msg
 

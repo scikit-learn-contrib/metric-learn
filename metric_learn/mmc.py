@@ -30,7 +30,7 @@ from ._util import vector_norm
 class _BaseMMC(MahalanobisMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
 
-  _t = 2  # constraints are pairs
+  _tuple_size = 2  # constraints are pairs
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False,

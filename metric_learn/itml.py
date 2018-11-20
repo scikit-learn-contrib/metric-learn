@@ -27,7 +27,7 @@ from ._util import vector_norm
 class _BaseITML(MahalanobisMixin):
   """Information Theoretic Metric Learning (ITML)"""
 
-  _t = 2  # constraints are pairs
+  _tuple_size = 2  # constraints are pairs
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                A0=None, verbose=False, preprocessor=None):
