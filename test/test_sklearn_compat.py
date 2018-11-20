@@ -84,12 +84,6 @@ class TestSklearnCompat(unittest.TestCase):
 RNG = check_random_state(0)
 
 
-def mock_preprocessor(indices):
-  """A preprocessor for testing purposes that returns an all ones 3D array
-  """
-  return np.ones((indices.shape[0], 3))
-
-
 # ---------------------- Test scikit-learn compatibility ----------------------
 
 
