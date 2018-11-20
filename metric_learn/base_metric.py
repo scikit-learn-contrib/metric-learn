@@ -288,8 +288,6 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)
-    # we broadcast with ... because here we allow quadruplets to be
-    # either a 3D array of points or 2D array of indices
     return np.sign(self.decision_function(quadruplets))
 
   def decision_function(self, quadruplets):
