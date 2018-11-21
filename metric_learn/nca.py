@@ -34,7 +34,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
-    X, labels = self._prepare_inputs(X, y)
+    X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
     num_dims = self.num_dims
     if num_dims is None:

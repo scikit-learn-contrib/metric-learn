@@ -260,7 +260,8 @@ try:
     """
 
     def fit(self, X, y):
-      self.X_, y = self._prepare_inputs(X, y, dtype=float)
+      self.X_, y = self._prepare_inputs(X, y, dtype=float,
+                                        ensure_min_samples=2)
       labels = MulticlassLabels(y)
       self._lmnn = shogun_LMNN(RealFeatures(self.X_.T), labels, self.k)
       self._lmnn.set_maxiter(self.max_iter)

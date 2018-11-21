@@ -161,7 +161,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     self : object
         Returns the instance.
     """
-    X, y = self._prepare_inputs(X, y)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

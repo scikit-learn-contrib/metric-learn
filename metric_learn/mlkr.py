@@ -62,7 +62,8 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     super(MLKR, self).__init__(preprocessor)
 
   def _process_inputs(self, X, y):
-      self.X_, y = self._prepare_inputs(X, y, y_numeric=True)
+      self.X_, y = self._prepare_inputs(X, y, y_numeric=True,
+                                        ensure_min_samples=2)
       n, d = self.X_.shape
       if y.shape[0] != n:
           raise ValueError('Data and label lengths mismatch: %d != %d'
