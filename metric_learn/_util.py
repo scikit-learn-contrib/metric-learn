@@ -127,69 +127,83 @@ def check_input(input_data, y=None, preprocessor=None,
                               ensure_min_features=0, ensure_min_samples=0,
                               multi_output=multi_output,
                               y_numeric=y_numeric)
-  preprocessor_has_been_applied = False
 
   if type_of_inputs == 'classic':
-    if input_data.ndim == 1:
-      if preprocessor is not None:
-        input_data = preprocess_points(input_data, preprocessor)
-        preprocessor_has_been_applied = True
-      else:
-        make_error_input(101, input_data, context)
-    elif input_data.ndim == 2:
-      pass  # OK
-    else:
-      if preprocessor is not None:
-        make_error_input(320, input_data, context)
-      else:
-        make_error_input(100, input_data, context)
-
-    input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
-                             **args_for_sk_checks)
-    if input_data.ndim != 2:  # we have to ensure this because check_array
-                              # above does not
-      if preprocessor_has_been_applied:
-        make_error_input(111, input_data, context)
-      else:
-        make_error_input(101, input_data, context)
+    input_data = check_input_classic(input_data, context, preprocessor,
+                                     args_for_sk_checks)
 
   elif type_of_inputs == 'tuples':
-    if input_data.ndim == 2:
-      if preprocessor is not None:
-        input_data = preprocess_tuples(input_data, preprocessor)
-        preprocessor_has_been_applied = True
-      else:
-        make_error_input(201, input_data, context)
-    elif input_data.ndim == 3:
-      pass
-    else:
-      if preprocessor is not None:
-        make_error_input(420, input_data, context)
-      else:
-        make_error_input(200, input_data, context)
-
-    input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
-                             **args_for_sk_checks)
-    # we need to check num_features because check_array does not check it
-    # for 3D inputs:
-    if ensure_min_features > 0:
-      n_features = input_data.shape[2]
-      if n_features < ensure_min_features:
-        raise ValueError("Found array with {} feature(s) (shape={}) while"
-                         " a minimum of {} is required{}."
-                         .format(n_features, input_data.shape,
-                                 ensure_min_features, context))
-    #  normally we don't need to check_tuple_size too because tuple_size
-    # should'nt be able to be modified by any preprocessor
-    if input_data.ndim != 3:  # we have to ensure this because check_array
-      # above does not
-      if preprocessor_has_been_applied:
-        make_error_input(211, input_data, context)
-      else:
-        make_error_input(201, input_data, context)
-    check_tuple_size(input_data, tuple_size, context)
+    input_data = check_input_tuples(input_data, context, preprocessor,
+                                    args_for_sk_checks, tuple_size)
 
   return input_data if y is None else (input_data, y)
+
+
+def check_input_tuples(input_data, context, preprocessor, args_for_sk_checks,
+                       tuple_size):
+  preprocessor_has_been_applied = False
+  if input_data.ndim == 2:
+    if preprocessor is not None:
+      input_data = preprocess_tuples(input_data, preprocessor)
+      preprocessor_has_been_applied = True
+    else:
+      make_error_input(201, input_data, context)
+  elif input_data.ndim == 3:
+    pass
+  else:
+    if preprocessor is not None:
+      make_error_input(420, input_data, context)
+    else:
+      make_error_input(200, input_data, context)
+  input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
+                           **args_for_sk_checks)
+  # we need to check num_features because check_array does not check it
+  # for 3D inputs:
+  if args_for_sk_checks['ensure_min_features'] > 0:
+    n_features = input_data.shape[2]
+    if n_features < args_for_sk_checks['ensure_min_features']:
+      raise ValueError("Found array with {} feature(s) (shape={}) while"
+                       " a minimum of {} is required{}."
+                       .format(n_features, input_data.shape,
+                               args_for_sk_checks['ensure_min_features'],
+                               context))
+  #  normally we don't need to check_tuple_size too because tuple_size
+  # should'nt be able to be modified by any preprocessor
+  if input_data.ndim != 3:  # we have to ensure this because check_array
+    # above does not
+    if preprocessor_has_been_applied:
+      make_error_input(211, input_data, context)
+    else:
+      make_error_input(201, input_data, context)
+  check_tuple_size(input_data, tuple_size, context)
+  return input_data
+
+
+def check_input_classic(input_data, context, preprocessor, args_for_sk_checks):
+  preprocessor_has_been_applied = False
+  if input_data.ndim == 1:
+    if preprocessor is not None:
+      input_data = preprocess_points(input_data, preprocessor)
+      preprocessor_has_been_applied = True
+    else:
+      make_error_input(101, input_data, context)
+  elif input_data.ndim == 2:
+    pass  # OK
+  else:
+    if preprocessor is not None:
+      make_error_input(320, input_data, context)
+    else:
+      make_error_input(100, input_data, context)
+
+  input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
+                           **args_for_sk_checks)
+  if input_data.ndim != 2:  # we have to ensure this because check_array
+                            # above does not
+    if preprocessor_has_been_applied:
+      make_error_input(111, input_data, context)
+    else:
+      make_error_input(101, input_data, context)
+  return input_data
 
 
 def make_error_input(code, input_data, context):
