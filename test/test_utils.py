@@ -11,6 +11,8 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised)
+from metric_learn.base_metric import ArrayIndexer
+from metric_learn.exceptions import PreprocessorError
 from sklearn.datasets import make_regression, make_blobs
 from .test_sklearn_compat import build_pairs, build_quadruplets
 
@@ -659,6 +661,24 @@ def test_progress_message_preprocessor_tuples(capsys):
   preprocess_tuples(tuples, preprocessor=fun)
   out, _ = capsys.readouterr()
   assert out == "Preprocessing tuples...\n"
+
+
+def test_preprocessor_error_message():
+  """Tests whether the preprocessor returns a preprocessor error when there
+  is a problem using the preprocessor
+  """
+  preprocessor = ArrayIndexer(np.array([[1.2, 3.3], [3.1, 3.2]]))
+
+  # with tuples
+  X = np.array([[[2, 3], [3, 3]], [[2, 3], [3, 2]]])
+  # There are less samples than the max index we want to preprocess
+  with pytest.raises(PreprocessorError):
+    preprocess_tuples(X, preprocessor)
+
+  # with points
+  X = np.array([[1], [2], [3], [3]])
+  with pytest.raises(PreprocessorError):
+    preprocess_points(X, preprocessor)
 
 
 @pytest.mark.parametrize('estimator', [ITML(), LSML(), MMC(), SDML()],

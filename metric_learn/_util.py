@@ -2,6 +2,7 @@ import numpy as np
 import six
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y
+from metric_learn.exceptions import PreprocessorError
 
 # hack around lack of axis kwarg in older numpy versions
 try:
@@ -237,8 +238,11 @@ def make_error_input(code, input_data, context):
 
 def preprocess_tuples(tuples, preprocessor):
   print("Preprocessing tuples...")
-  tuples = np.column_stack([preprocessor(tuples[:, i])[:, np.newaxis] for
-                            i in range(tuples.shape[1])])
+  try:
+    tuples = np.column_stack([preprocessor(tuples[:, i])[:, np.newaxis] for
+                              i in range(tuples.shape[1])])
+  except Exception as e:
+    raise PreprocessorError(e)
   return tuples
 
 
@@ -246,7 +250,10 @@ def preprocess_points(points, preprocessor):
   """form points if there is a preprocessor else keep them as such (assumes
   that check_points has already been called)"""
   print("Preprocessing points...")
-  points = preprocessor(points)
+  try:
+    points = preprocessor(points)
+  except Exception as e:
+    raise PreprocessorError(e)
   return points
 
 
