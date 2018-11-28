@@ -216,8 +216,6 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
     (X, tuples, y, tuples_train, tuples_test,
      y_train, y_test, preprocessor) = build_dataset(preprocessor)
-    y = y.ravel() if y is not None else None  # The build dataset functions
-    # returned a vertical vector
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
