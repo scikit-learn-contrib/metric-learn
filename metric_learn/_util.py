@@ -137,6 +137,10 @@ def check_input(input_data, y=None, preprocessor=None,
     input_data = check_input_tuples(input_data, context, preprocessor,
                                     args_for_sk_checks, tuple_size)
 
+  else:
+    raise ValueError("Unknown value {} for type_of_inputs. Valid values are "
+                     "'classic' or 'tuples'.".format(type_of_inputs))
+
   return input_data if y is None else (input_data, y)
 
 

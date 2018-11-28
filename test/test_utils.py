@@ -23,6 +23,18 @@ def mock_preprocessor(indices):
   """
   return np.ones((indices.shape[0], 3))
 
+
+@pytest.mark.parametrize('type_of_inputs', ['other', 'tuple', 'classics', 2,
+                                            int, NCA()])
+def test_check_input_invalid_type_of_inputs(type_of_inputs):
+  """Tests that an invalid type of inputs in check_inputs raises an error."""
+  with pytest.raises(ValueError) as e:
+    check_input([[0.2, 2.1], [0.2, .8]], type_of_inputs=type_of_inputs)
+  msg = ("Unknown value {} for type_of_inputs. Valid values are "
+         "'classic' or 'tuples'.".format(type_of_inputs))
+  assert str(e.value) == msg
+
+
 #  ---------------- test check_input with 'tuples' type_of_input' ------------
 
 
