@@ -52,34 +52,14 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
 # slower Python version
 class python_LMNN(_base_LMNN):
 
-  def _check_inputs_params_compatibility(self, X, labels):
-    """Process inputs and raise appropriate error messages if input
-    parameters are not those expected with respect to inputs.
-    """
-    self.X_, labels = self._prepare_inputs(X, labels, dtype=float,
-                                           ensure_min_samples=2)
-    num_pts, num_dims = self.X_.shape
-    unique_labels, self.label_inds_ = np.unique(labels, return_inverse=True)
-    if len(self.label_inds_) != num_pts:
-      raise ValueError('Must have one label per point.')
-    self.labels_ = np.arange(len(unique_labels))
-    if self.use_pca:
-      warnings.warn('use_pca does nothing for the python_LMNN implementation')
-    self.transformer_ = np.eye(num_dims)
-    required_k = np.bincount(self.label_inds_).min()
-    if self.k > required_k:
-      raise ValueError('not enough class labels for specified k'
-                       ' (smallest class has %d)' % required_k)
-
   def fit(self, X, y):
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate
-    self._check_inputs_params_compatibility(X, y)
 
     X, y = self._prepare_inputs(X, y, dtype=float,
                                 ensure_min_samples=2)
-    num_pts, num_dims = self.X_.shape
+    num_pts, num_dims = X.shape
     unique_labels, self.label_inds_ = np.unique(y, return_inverse=True)
     if len(self.label_inds_) != num_pts:
       raise ValueError('Must have one label per point.')
