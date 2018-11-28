@@ -67,20 +67,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
     self.pca_comps = pca_comps
     super(RCA, self).__init__(preprocessor)
 
-  def _process_data(self, X):
-    X = self._prepare_inputs(X, ensure_min_samples=2)
-
-    # PCA projection to remove noise and redundant information.
-    if self.pca_comps is not None:
-      pca = decomposition.PCA(n_components=self.pca_comps)
-      X_transformed = pca.fit_transform(X)
-      M_pca = pca.components_
-    else:
-      X_transformed = X - X.mean(axis=0)
-      M_pca = None
-
-    return X_transformed, M_pca
-
   def _check_dimension(self, rank, X):
     d = X.shape[1]
     if rank < d:
@@ -101,7 +87,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
       dim = self.num_dims
     return dim
 
-  def fit(self, data, chunks):
+  def fit(self, X, chunks):
     """Learn the RCA model.
 
     Parameters
@@ -112,17 +98,26 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
-    data, M_pca = self._process_data(data)
+    X = self._prepare_inputs(X, ensure_min_samples=2)
+
+    # PCA projection to remove noise and redundant information.
+    if self.pca_comps is not None:
+      pca = decomposition.PCA(n_components=self.pca_comps)
+      X_t = pca.fit_transform(X)
+      M_pca = pca.components_
+    else:
+      X_t = X - X.mean(axis=0)
+      M_pca = None
 
     chunks = np.asanyarray(chunks, dtype=int)
-    chunk_mask, chunked_data = _chunk_mean_centering(data, chunks)
+    chunk_mask, chunked_data = _chunk_mean_centering(X_t, chunks)
 
     inner_cov = np.cov(chunked_data, rowvar=0, bias=1)
-    dim = self._check_dimension(np.linalg.matrix_rank(inner_cov), data)
+    dim = self._check_dimension(np.linalg.matrix_rank(inner_cov), X_t)
 
     # Fisher Linear Discriminant projection
-    if dim < data.shape[1]:
-      total_cov = np.cov(data[chunk_mask], rowvar=0)
+    if dim < X_t.shape[1]:
+      total_cov = np.cov(X_t[chunk_mask], rowvar=0)
       tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
       vals, vecs = np.linalg.eig(tmp)
       inds = np.argsort(vals)[:dim]

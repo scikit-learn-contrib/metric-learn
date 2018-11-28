@@ -62,8 +62,8 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     super(MLKR, self).__init__(preprocessor)
 
   def _process_inputs(self, X, y):
-      self.X_, y = self._prepare_inputs(X, y, y_numeric=True,
-                                        ensure_min_samples=2)
+      X, y = self._prepare_inputs(X, y, y_numeric=True,
+                                  ensure_min_samples=2)
       n, d = self.X_.shape
       if y.shape[0] != n:
           raise ValueError('Data and label lengths mismatch: %d != %d'
@@ -76,11 +76,11 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       if A is None:
           # initialize to PCA transformation matrix
           # note: not the same as n_components=m !
-          A = PCA().fit(self.X_).components_.T[:m]
+          A = PCA().fit(X).components_.T[:m]
       elif A.shape != (m, d):
           raise ValueError('A0 needs shape (%d,%d) but got %s' % (
               m, d, A.shape))
-      return self.X_, y, A
+      return X, y, A
 
   def fit(self, X, y):
       """
@@ -91,7 +91,24 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       X : (n x d) array of samples
       y : (n) data labels
       """
-      X, y, A = self._process_inputs(X, y)
+      X, y = self._prepare_inputs(X, y, y_numeric=True,
+                                  ensure_min_samples=2)
+      n, d = X.shape
+      if y.shape[0] != n:
+          raise ValueError('Data and label lengths mismatch: %d != %d'
+                           % (n, y.shape[0]))
+
+      A = self.A0
+      m = self.num_dims
+      if m is None:
+          m = d
+      if A is None:
+          # initialize to PCA transformation matrix
+          # note: not the same as n_components=m !
+          A = PCA().fit(X).components_.T[:m]
+      elif A.shape != (m, d):
+          raise ValueError('A0 needs shape (%d,%d) but got %s' % (
+              m, d, A.shape))
 
       # note: this line takes (n*n*d) memory!
       # for larger datasets, we'll need to compute dX as we go

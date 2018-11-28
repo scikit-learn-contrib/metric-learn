@@ -7,7 +7,8 @@ from sklearn.utils import check_random_state, shuffle
 from sklearn.utils.testing import set_random_state
 from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
-                                make_name, preprocess_points)
+                                make_name, preprocess_points,
+                                check_collapsed_pairs)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised)
@@ -949,3 +950,25 @@ def test_same_with_or_without_preprocessor_tuples(estimator, build_dataset):
   output_without_prep = estimator_with_prep_formed.transform(
       formed_tuples_test[:, 0])
   assert np.array(output_with_prep == output_without_prep).all()
+
+
+def test_check_collapsed_pairs_raises_no_error():
+  """Checks that check_collapsed_pairs raises no error if no collapsed pairs
+  is present"""
+  pairs_ok = np.array([[[0.1, 3.3], [3.3, 0.1]],
+                       [[0.1, 3.3], [3.3, 0.1]],
+                       [[2.5, 8.1], [0.1, 3.3]]])
+  check_collapsed_pairs(pairs_ok)
+
+
+def test_check_collapsed_pairs_raises_error():
+  """Checks that check_collapsed_pairs raises no error if no collapsed pairs
+  is present"""
+  pairs_not_ok = np.array([[[0.1, 3.3], [0.1, 3.3]],
+                           [[0.1, 3.3], [3.3, 0.1]],
+                           [[2.5, 8.1], [2.5, 8.1]]])
+  with pytest.raises(ValueError) as e:
+    check_collapsed_pairs(pairs_not_ok)
+  assert str(e.value) == ("2 collapsed pairs found (where the left element is "
+                          "the same as the right element), out of 3 pairs in"
+                          " total.")

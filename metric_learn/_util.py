@@ -302,3 +302,11 @@ class ArrayIndexer:
 
   def __call__(self, indices):
     return self.X[indices]
+
+
+def check_collapsed_pairs(pairs):
+    num_ident = (vector_norm(pairs[:, 0] - pairs[:, 1]) < 1e-9).sum()
+    if num_ident:
+      raise ValueError("{} collapsed pairs found (where the left element is "
+                       "the same as the right element), out of {} pairs "
+                       "in total.".format(num_ident, pairs.shape[0]))

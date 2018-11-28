@@ -43,7 +43,7 @@ class _BaseLSML(MahalanobisMixin):
     self.verbose = verbose
     super(_BaseLSML, self).__init__(preprocessor)
 
-  def _prepare_quadruplets(self, quadruplets, weights):
+  def _fit(self, quadruplets, weights=None):
     quadruplets = self._prepare_inputs(quadruplets,
                                        type_of_inputs='tuples')
 
@@ -66,8 +66,6 @@ class _BaseLSML(MahalanobisMixin):
       self.M_ = self.prior
       self.prior_inv_ = np.linalg.inv(self.prior)
 
-  def _fit(self, quadruplets, weights=None):
-    self._prepare_quadruplets(quadruplets, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
     l_best = 0

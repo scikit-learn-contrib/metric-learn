@@ -49,7 +49,7 @@ class _BaseSDML(MahalanobisMixin):
     self.verbose = verbose
     super(_BaseSDML, self).__init__(preprocessor)
 
-  def _prepare_pairs(self, pairs, y):
+  def _fit(self, pairs, y):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
@@ -60,10 +60,7 @@ class _BaseSDML(MahalanobisMixin):
     else:
       self.M_ = np.identity(pairs.shape[2])
     diff = pairs[:, 0] - pairs[:, 1]
-    return (diff.T * y).dot(diff)
-
-  def _fit(self, pairs, y):
-    loss_matrix = self._prepare_pairs(pairs, y)
+    loss_matrix = (diff.T * y).dot(diff)
     P = self.M_ + self.balance_param * loss_matrix
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite

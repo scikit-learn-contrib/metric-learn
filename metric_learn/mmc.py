@@ -66,26 +66,8 @@ class _BaseMMC(MahalanobisMixin):
     super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
-    pairs, y = self._process_pairs(pairs, y)
-    if self.diagonal:
-      return self._fit_diag(pairs, y)
-    else:
-      return self._fit_full(pairs, y)
-
-  def _process_pairs(self, pairs, y):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
-
-    # check to make sure that no two constrained vectors are identical
-    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
-    pos_no_ident = vector_norm(pos_pairs[:, 0, :] - pos_pairs[:, 1, :]) > 1e-9
-    pos_pairs = pos_pairs[pos_no_ident]
-    neg_no_ident = vector_norm(neg_pairs[:, 0, :] - neg_pairs[:, 1, :]) > 1e-9
-    neg_pairs = neg_pairs[neg_no_ident]
-    if len(pos_pairs) == 0:
-      raise ValueError('No non-trivial similarity constraints given for MMC.')
-    if len(neg_pairs) == 0:
-      raise ValueError('No non-trivial dissimilarity constraints given for MMC.')
 
     # init metric
     if self.A0 is None:
@@ -97,9 +79,10 @@ class _BaseMMC(MahalanobisMixin):
     else:
       self.A_ = check_array(self.A0)
 
-    pairs = np.vstack([pos_pairs, neg_pairs])
-    y = np.hstack([np.ones(len(pos_pairs)), - np.ones(len(neg_pairs))])
-    return pairs, y
+    if self.diagonal:
+      return self._fit_diag(pairs, y)
+    else:
+      return self._fit_full(pairs, y)
 
   def _fit_full(self, pairs, y):
     """Learn full metric using MMC.

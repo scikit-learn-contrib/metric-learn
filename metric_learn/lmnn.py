@@ -77,15 +77,30 @@ class python_LMNN(_base_LMNN):
     learn_rate = self.learn_rate
     self._check_inputs_params_compatibility(X, y)
 
-    target_neighbors = self._select_targets()
-    impostors = self._find_impostors(target_neighbors[:,-1])
+    X, y = self._prepare_inputs(X, y, dtype=float,
+                                ensure_min_samples=2)
+    num_pts, num_dims = self.X_.shape
+    unique_labels, self.label_inds_ = np.unique(y, return_inverse=True)
+    if len(self.label_inds_) != num_pts:
+      raise ValueError('Must have one label per point.')
+    self.labels_ = np.arange(len(unique_labels))
+    if self.use_pca:
+      warnings.warn('use_pca does nothing for the python_LMNN implementation')
+    self.transformer_ = np.eye(num_dims)
+    required_k = np.bincount(self.label_inds_).min()
+    if self.k > required_k:
+      raise ValueError('not enough class labels for specified k'
+                       ' (smallest class has %d)' % required_k)
+
+    target_neighbors = self._select_targets(X)
+    impostors = self._find_impostors(target_neighbors[:, -1], X)
     if len(impostors) == 0:
         # L has already been initialized to an identity matrix
         return
 
     # sum outer products
-    dfG = _sum_outer_products(self.X_, target_neighbors.flatten(),
-                              np.repeat(np.arange(self.X_.shape[0]), k))
+    dfG = _sum_outer_products(X, target_neighbors.flatten(),
+                              np.repeat(np.arange(X.shape[0]), k))
     df = np.zeros_like(dfG)
 
     # storage
@@ -107,7 +122,7 @@ class python_LMNN(_base_LMNN):
       a2_old = [a.copy() for a in a2]
       objective_old = objective
       # Compute pairwise distances under current metric
-      Lx = L.dot(self.X_.T).T
+      Lx = L.dot(X.T).T
       g0 = _inplace_paired_L2(*Lx[impostors])
       Ni = 1 + _inplace_paired_L2(Lx[target_neighbors], Lx[:,None,:])
       g1,g2 = Ni[impostors]
@@ -132,16 +147,16 @@ class python_LMNN(_base_LMNN):
 
         targets = target_neighbors[:,nn_idx]
         PLUS, pweight = _count_edges(plus1, plus2, impostors, targets)
-        df += _sum_outer_products(self.X_, PLUS[:,0], PLUS[:,1], pweight)
+        df += _sum_outer_products(X, PLUS[:, 0], PLUS[:, 1], pweight)
         MINUS, mweight = _count_edges(minus1, minus2, impostors, targets)
-        df -= _sum_outer_products(self.X_, MINUS[:,0], MINUS[:,1], mweight)
+        df -= _sum_outer_products(X, MINUS[:, 0], MINUS[:, 1], mweight)
 
         in_imp, out_imp = impostors
-        df += _sum_outer_products(self.X_, in_imp[minus1], out_imp[minus1])
-        df += _sum_outer_products(self.X_, in_imp[minus2], out_imp[minus2])
+        df += _sum_outer_products(X, in_imp[minus1], out_imp[minus1])
+        df += _sum_outer_products(X, in_imp[minus2], out_imp[minus2])
 
-        df -= _sum_outer_products(self.X_, in_imp[plus1], out_imp[plus1])
-        df -= _sum_outer_products(self.X_, in_imp[plus2], out_imp[plus2])
+        df -= _sum_outer_products(X, in_imp[plus1], out_imp[plus1])
+        df -= _sum_outer_products(X, in_imp[plus2], out_imp[plus2])
 
         a1[nn_idx] = act1
         a2[nn_idx] = act2
@@ -186,18 +201,18 @@ class python_LMNN(_base_LMNN):
     self.n_iter_ = it
     return self
 
-  def _select_targets(self):
-    target_neighbors = np.empty((self.X_.shape[0], self.k), dtype=int)
+  def _select_targets(self, X):
+    target_neighbors = np.empty((X.shape[0], self.k), dtype=int)
     for label in self.labels_:
       inds, = np.nonzero(self.label_inds_ == label)
-      dd = euclidean_distances(self.X_[inds], squared=True)
+      dd = euclidean_distances(X[inds], squared=True)
       np.fill_diagonal(dd, np.inf)
       nn = np.argsort(dd)[..., :self.k]
       target_neighbors[inds] = inds[nn]
     return target_neighbors
 
-  def _find_impostors(self, furthest_neighbors):
-    Lx = self.transform(self.X_)
+  def _find_impostors(self, furthest_neighbors, X):
+    Lx = self.transform(X)
     margin_radii = 1 + _inplace_paired_L2(Lx[furthest_neighbors], Lx)
     impostors = []
     for label in self.labels_[:-1]:
@@ -260,10 +275,10 @@ try:
     """
 
     def fit(self, X, y):
-      self.X_, y = self._prepare_inputs(X, y, dtype=float,
-                                        ensure_min_samples=2)
+      X, y = self._prepare_inputs(X, y, dtype=float,
+                                  ensure_min_samples=2)
       labels = MulticlassLabels(y)
-      self._lmnn = shogun_LMNN(RealFeatures(self.X_.T), labels, self.k)
+      self._lmnn = shogun_LMNN(RealFeatures(X.T), labels, self.k)
       self._lmnn.set_maxiter(self.max_iter)
       self._lmnn.set_obj_threshold(self.convergence_tol)
       self._lmnn.set_regularization(self.regularization)

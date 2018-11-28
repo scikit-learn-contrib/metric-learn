@@ -59,16 +59,9 @@ class _BaseITML(MahalanobisMixin):
     self.verbose = verbose
     super(_BaseITML, self).__init__(preprocessor)
 
-  def _process_pairs(self, pairs, y, bounds):
+  def _fit(self, pairs, y, bounds=None):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
-
-    # check to make sure that no two constrained vectors are identical
-    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
-    pos_no_ident = vector_norm(pos_pairs[:, 0, :] - pos_pairs[:, 1, :]) > 1e-9
-    pos_pairs = pos_pairs[pos_no_ident]
-    neg_no_ident = vector_norm(neg_pairs[:, 0, :] - neg_pairs[:, 1, :]) > 1e-9
-    neg_pairs = neg_pairs[neg_no_ident]
     # init bounds
     if bounds is None:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
@@ -82,12 +75,6 @@ class _BaseITML(MahalanobisMixin):
       self.A_ = np.identity(pairs.shape[2])
     else:
       self.A_ = check_array(self.A0)
-    pairs = np.vstack([pos_pairs, neg_pairs])
-    y = np.hstack([np.ones(len(pos_pairs)), - np.ones(len(neg_pairs))])
-    return pairs, y
-
-  def _fit(self, pairs, y, bounds=None):
-    pairs, y = self._process_pairs(pairs, y, bounds)
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
     num_pos = len(pos_pairs)
