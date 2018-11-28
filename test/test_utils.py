@@ -480,6 +480,12 @@ def test_check_classic_valid_without_preprocessor(points):
   assert len(record) == 0
 
 
+def test_check_classic_by_default():
+  """Checks that 'classic' is the default behaviour of check_input"""
+  assert (check_input([[2, 3], [3, 2]]) ==
+          check_input([[2, 3], [3, 2]], type_of_inputs='classic')).all()
+
+
 def test_check_classic_behaviour_auto_dtype(points_no_prep):
   """Checks that check_input (for points) allows by default every type if
   using a preprocessor, and numeric types if using no preprocessor"""
