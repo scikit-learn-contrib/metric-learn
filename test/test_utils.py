@@ -890,26 +890,17 @@ def test_same_with_or_without_preprocessor_tuples(estimator, build_dataset):
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)
   estimator_with_preprocessor.set_params(preprocessor=X)
-  if estimator.__class__.__name__ == 'LSML':
-    estimator_with_preprocessor.fit(tuples_train)
-  else:
-    estimator_with_preprocessor.fit(tuples_train, y_train)
+  estimator_with_preprocessor.fit(tuples_train, y_train)
 
   estimator_without_preprocessor = clone(estimator)
   set_random_state(estimator_without_preprocessor)
   estimator_without_preprocessor.set_params(preprocessor=None)
-  if estimator.__class__.__name__ == 'LSML':
-    estimator_without_preprocessor.fit(formed_tuples_train)
-  else:
-    estimator_without_preprocessor.fit(formed_tuples_train, y_train)
+  estimator_without_preprocessor.fit(formed_tuples_train, y_train)
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=X)
-  if estimator.__class__.__name__ == 'LSML':
-    estimator_with_prep_formed.fit(tuples_train)
-  else:
-    estimator_with_prep_formed.fit(tuples_train, y_train)
+  estimator_with_prep_formed.fit(tuples_train, y_train)
 
   # test prediction methods
   for method in ["predict", "decision_function"]:

@@ -235,27 +235,18 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
         test_slice = slice(start, stop)
         train_mask = np.ones(tuples.shape[0], bool)
         train_mask[test_slice] = False
-        if y is not None:  # for now SDML has no default for y
-          estimator.fit(tuples[train_mask], y[train_mask])
-          if hasattr(estimator, "score"):
-            scores.append(estimator.score(tuples[test_slice], y[test_slice]))
-          if hasattr(estimator, "predict"):
-            predictions[test_slice] = estimator.predict(tuples[test_slice])
-        else:
-          estimator.fit(tuples[train_mask])
-          if hasattr(estimator, "score"):
-            scores.append(estimator.score(tuples[test_slice]))
-          if hasattr(estimator, "predict"):
-            predictions[test_slice] = estimator.predict(tuples[test_slice])
+        (y_train, y_test) = ((y[train_mask], y[test_slice]) if y is not None
+                             else (None, None))
+        estimator.fit(tuples[train_mask], y_train)
+        if hasattr(estimator, "score"):
+          scores.append(estimator.score(tuples[test_slice], y_test))
+        if hasattr(estimator, "predict"):
+          predictions[test_slice] = estimator.predict(tuples[test_slice])
       if hasattr(estimator, "score"):
         assert all(scores == cross_val_score(estimator, tuples, y, cv=kfold))
       if hasattr(estimator, "predict"):
-        if y is not None:
-          assert all(predictions == cross_val_predict(estimator, tuples, y,
-                                                      cv=kfold))
-        else:
-          assert all(predictions == cross_val_predict(estimator, tuples,
-                                                      cv=kfold))
+        assert all(predictions == cross_val_predict(estimator, tuples, y,
+                                                    cv=kfold))
 
 
 def check_score(estimator, tuples, y):
