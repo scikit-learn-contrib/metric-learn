@@ -17,7 +17,7 @@ from metric_learn.constraints import wrap_pairs, Constraints
 from sklearn import clone
 import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
-                                     train_test_split)
+                                     train_test_split, KFold)
 from sklearn.utils.testing import _get_args
 
 
@@ -189,8 +189,8 @@ ids_estimators = ['covariance',
 @pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_cross_validation(estimator, build_dataset, preprocessor):
-  """Tests that you can do cross validation on metric-learn estimators
+def test_cross_validation_is_finite(estimator, build_dataset, preprocessor):
+  """Tests that validation on metric-learn estimators returns something finite
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
     (X, tuples, y, tuples_train, tuples_test,
@@ -202,6 +202,60 @@ def test_cross_validation(estimator, build_dataset, preprocessor):
       assert np.isfinite(cross_val_score(estimator, tuples, y)).all()
     if hasattr(estimator, "predict"):
       assert np.isfinite(cross_val_predict(estimator, tuples, y)).all()
+
+
+@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
+                         ids=ids_estimators)
+def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
+                                           preprocessor):
+  """Tests that if we make a manual cross-validation, the result will be the
+  same as scikit-learn's cross-validation (some code for generating the
+  folds is taken from scikit-learn).
+  """
+  if any(hasattr(estimator, method) for method in ["predict", "score"]):
+    (X, tuples, y, tuples_train, tuples_test,
+     y_train, y_test, preprocessor) = build_dataset(preprocessor)
+    y = y.ravel() if y is not None else None  # The build dataset functions
+    # returned a vertical vector
+    estimator = clone(estimator)
+    estimator.set_params(preprocessor=preprocessor)
+    set_random_state(estimator)
+    n_splits = 3
+    kfold = KFold(shuffle=False, n_splits=n_splits)
+    n_samples = tuples.shape[0]
+    fold_sizes = (n_samples // n_splits) * np.ones(n_splits, dtype=np.int)
+    fold_sizes[:n_samples % n_splits] += 1
+    current = 0
+    scores, predictions = [], np.zeros(tuples.shape[0])
+    if hasattr(estimator, "score"):
+      for fold_size in fold_sizes:
+        start, stop = current, current + fold_size
+        current = stop
+        test_slice = slice(start, stop)
+        train_mask = np.ones(tuples.shape[0], bool)
+        train_mask[test_slice] = False
+        if y is not None:  # for now SDML has no default for y
+          estimator.fit(tuples[train_mask], y[train_mask])
+          if hasattr(estimator, "score"):
+            scores.append(estimator.score(tuples[test_slice], y[test_slice]))
+          if hasattr(estimator, "predict"):
+            predictions[test_slice] = estimator.predict(tuples[test_slice])
+        else:
+          estimator.fit(tuples[train_mask])
+          if hasattr(estimator, "score"):
+            scores.append(estimator.score(tuples[test_slice]))
+          if hasattr(estimator, "predict"):
+            predictions[test_slice] = estimator.predict(tuples[test_slice])
+      if hasattr(estimator, "score"):
+        assert all(scores == cross_val_score(estimator, tuples, y, cv=kfold))
+      if hasattr(estimator, "predict"):
+        if y is not None:
+          assert all(predictions == cross_val_predict(estimator, tuples, y,
+                                                      cv=kfold))
+        else:
+          assert all(predictions == cross_val_predict(estimator, tuples,
+                                                      cv=kfold))
 
 
 def check_score(estimator, tuples, y):
