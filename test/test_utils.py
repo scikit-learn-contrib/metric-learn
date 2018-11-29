@@ -12,7 +12,7 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised)
-from metric_learn.base_metric import ArrayIndexer
+from metric_learn.base_metric import ArrayIndexer, MahalanobisMixin
 from metric_learn.exceptions import PreprocessorError
 from sklearn.datasets import make_regression, make_blobs
 from .test_sklearn_compat import build_pairs, build_quadruplets
@@ -698,6 +698,49 @@ def test_preprocessor_error_message():
   X = np.array([[1], [2], [3], [3]])
   with pytest.raises(PreprocessorError):
     preprocess_points(X, preprocessor)
+
+
+@pytest.mark.parametrize('input_data', [[[5, 3], [3, 2]],
+                                        ((5, 3), (3, 2))
+                                        ])
+@pytest.mark.parametrize('indices', [[0, 1], (1, 0)])
+def test_array_like_indexer_array_like_valid_classic(input_data, indices):
+  """Checks that any array-like is valid in the 'preprocessor' argument,
+  and in the indices, for a classic input"""
+  class MockMetricLearner(MahalanobisMixin):
+    pass
+
+  mock_algo = MockMetricLearner(preprocessor=input_data)
+  mock_algo._prepare_inputs(indices, type_of_inputs='classic')
+
+
+@pytest.mark.parametrize('input_data', [[[5, 3], [3, 2]],
+                                        ((5, 3), (3, 2))
+                                        ])
+@pytest.mark.parametrize('indices', [[[0, 1], [1, 0]], ((1, 0), (1, 0))])
+def test_array_like_indexer_array_like_valid_tuples(input_data, indices):
+  """Checks that any array-like is valid in the 'preprocessor' argument,
+  and in the indices, for a classic input"""
+  class MockMetricLearner(MahalanobisMixin):
+    pass
+
+  mock_algo = MockMetricLearner(preprocessor=input_data)
+  mock_algo._prepare_inputs(indices, type_of_inputs='tuples')
+
+
+@pytest.mark.parametrize('preprocessor', [4, NCA()])
+def test_error_message_check_preprocessor(preprocessor):
+  """Checks that if the preprocessor given is not an array-like or a
+  callable, the right error message is returned"""
+  class MockMetricLearner(MahalanobisMixin):
+    pass
+
+  mock_algo = MockMetricLearner(preprocessor=preprocessor)
+  with pytest.raises(ValueError) as e:
+    mock_algo.check_preprocessor()
+  assert str(e.value) == ("Invalid type for the preprocessor: {}. You should "
+                          "provide either an array-like object, "
+                          "or a callable.".format(type(preprocessor)))
 
 
 @pytest.mark.parametrize('estimator', [ITML(), LSML(), MMC(), SDML()],

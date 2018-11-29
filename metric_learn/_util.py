@@ -302,6 +302,18 @@ def check_tuple_size(tuples, tuple_size, context):
 class ArrayIndexer:
 
   def __init__(self, X):
+    # we check the array-like preprocessor here, and we as much permissive
+    # as possible (because the user will check for the desired
+    # format with arguments in check_input, and only this latter function
+    # should return the appropriate errors). We do this only to have a numpy
+    # array object which can be indexed by another numpy array object.
+    X = check_array(X,
+                    accept_sparse=True, dtype=None,
+                    force_all_finite=False,
+                    ensure_2d=False, allow_nd=True,
+                    ensure_min_samples=0,
+                    ensure_min_features=0,
+                    warn_on_dtype=False, estimator=None)
     self.X = X
 
   def __call__(self, indices):
