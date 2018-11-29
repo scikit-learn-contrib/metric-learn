@@ -103,6 +103,9 @@ def build_classification(preprocessor):
   # builds a toy classification problem
   X, y = shuffle(*make_blobs(), random_state=RNG)
   X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
+  # we will return twice X here for compatibility with the rest of the tests
+  # (the first X is the original dataset and the second X represent the
+  # tuples given to the models (which are in fact the original dataset here)
   return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
 
 
@@ -111,6 +114,9 @@ def build_regression(preprocessor):
   X, y = shuffle(*make_regression(n_samples=100, n_features=10),
                  random_state=RNG)
   X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
+  # we will return twice X here for compatibility with the rest of the tests
+  # (the first X is the original dataset and the second X represent the
+  # tuples given to the models (which are in fact the original dataset here)
   return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
 
 
