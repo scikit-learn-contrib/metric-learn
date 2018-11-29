@@ -496,7 +496,7 @@ def test_check_classic_behaviour_auto_dtype(points_no_prep):
   assert len(record) == 0
 
   with pytest.warns(None) as record:
-      check_input(points_no_prep, type_of_inputs='input')  # numeric type
+      check_input(points_no_prep, type_of_inputs='classic')  # numeric type
   assert len(record) == 0
 
   # not numeric type
