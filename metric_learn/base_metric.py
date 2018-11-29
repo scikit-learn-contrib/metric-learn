@@ -41,11 +41,11 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     """Initializes the preprocessor"""
     if _is_arraylike(self.preprocessor):
       self.preprocessor_ = ArrayIndexer(self.preprocessor)
-    elif callable(self.preprocessor):
+    elif callable(self.preprocessor) or self.preprocessor is None:
       self.preprocessor_ = self.preprocessor
     else:
       raise ValueError("Invalid type for the preprocessor: {}. You should "
-                       "provide either an array-like object, "
+                       "provide either None, an array-like object, "
                        "or a callable.".format(type(self.preprocessor)))
 
   def _prepare_inputs(self, X, y=None, type_of_inputs='classic',

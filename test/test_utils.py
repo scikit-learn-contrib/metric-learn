@@ -739,7 +739,7 @@ def test_error_message_check_preprocessor(preprocessor):
   with pytest.raises(ValueError) as e:
     mock_algo.check_preprocessor()
   assert str(e.value) == ("Invalid type for the preprocessor: {}. You should "
-                          "provide either an array-like object, "
+                          "provide either None, an array-like object, "
                           "or a callable.".format(type(preprocessor)))
 
 
