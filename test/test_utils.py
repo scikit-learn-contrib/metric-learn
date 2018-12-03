@@ -11,11 +11,133 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 check_collapsed_pairs)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
-                          MMC_Supervised, RCA_Supervised, SDML_Supervised)
-from metric_learn.base_metric import ArrayIndexer, MahalanobisMixin
+                          MMC_Supervised, RCA_Supervised, SDML_Supervised,
+                          Constraints)
+from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
+                                      _PairsClassifierMixin,
+                                      _QuadrupletsClassifierMixin)
 from metric_learn.exceptions import PreprocessorError
-from sklearn.datasets import make_regression, make_blobs
-from .test_sklearn_compat import build_pairs, build_quadruplets
+from sklearn.datasets import make_regression, make_blobs, load_iris
+
+
+SEED = 42
+RNG = check_random_state(SEED)
+
+Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
+# Data and target are what we will fit on. Preprocessor is the additional
+# data if we use a preprocessor (which should be the default ArrayIndexer),
+# and to_transform is some additional data that we would want to transform
+
+
+@pytest.fixture
+def build_classification(preprocessor=False):
+  """Basic array for testing when using a preprocessor"""
+  X, y = shuffle(*make_blobs(random_state=SEED),
+                 random_state=SEED)
+  indices = shuffle(np.arange(X.shape[0]), random_state=SEED).astype(int)
+  if preprocessor:
+    return Dataset(indices, y[indices], X, indices)
+  else:
+    return Dataset(X[indices], y[indices], None, X[indices])
+
+
+@pytest.fixture
+def build_regression(preprocessor=False):
+  """Basic array for testing when using a preprocessor"""
+  X, y = shuffle(*make_regression(n_samples=100, n_features=5,
+                                  random_state=SEED),
+                 random_state=SEED)
+  indices = shuffle(np.arange(X.shape[0]), random_state=SEED).astype(int)
+  if preprocessor:
+    return Dataset(indices, y[indices], X, indices)
+  else:
+    return Dataset(X[indices], y[indices], None, X[indices])
+
+
+def build_data():
+  input_data, labels = load_iris(return_X_y=True)
+  X, y = shuffle(input_data, labels, random_state=SEED)
+  num_constraints = 50
+  constraints = (
+      Constraints.random_subset(y, random_state=check_random_state(SEED)))
+  pairs = (
+      constraints
+      .positive_negative_pairs(num_constraints, same_length=True,
+                               random_state=check_random_state(SEED)))
+  return X, pairs
+
+
+def build_pairs(preprocessor=False):
+  # builds a toy pairs problem
+  X, indices = build_data()
+  c = np.vstack([np.column_stack(indices[:2]), np.column_stack(indices[2:])])
+  target = np.concatenate([np.ones(indices[0].shape[0]),
+                           - np.ones(indices[0].shape[0])])
+  if preprocessor:
+    # if preprocessor, we build a 2D array of pairs of indices
+    return Dataset(*shuffle(c, target, random_state=SEED), X, c[:, 0])
+  else:
+    # if not, we build a 3D array of pairs of samples
+    return Dataset(*shuffle(X[c], target, random_state=SEED), None, X[c[:, 0]])
+
+
+def build_quadruplets(preprocessor=False):
+  # builds a toy quadruplets problem
+  X, indices = build_data()
+  c = np.column_stack(indices)
+  target = np.ones(c.shape[0])  # quadruplets targets are not used
+  # anyways
+  if preprocessor:
+    # if preprocessor, we build a 2D array of quadruplets of indices
+    return Dataset(*shuffle(c, target, random_state=SEED), X, c[:, 0])
+  else:
+    # if not, we build a 3D array of quadruplets of samples
+    return Dataset(*shuffle(X[c], target, random_state=SEED), None, X[c[:, 0]])
+
+
+quadruplets_learners = [(LSML(), build_quadruplets)]
+ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
+                                [learner for (learner, _) in
+                                 quadruplets_learners]))
+
+pairs_learners = [(ITML(), build_pairs),
+                  (MMC(max_iter=2), build_pairs),  # max_iter=2 for faster
+                  (SDML(), build_pairs),
+                  ]
+ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
+                                [learner for (learner, _) in
+                                 pairs_learners]))
+
+classifiers =   [(Covariance(), build_classification),
+                 (LFDA(), build_classification),
+                 (LMNN(), build_classification),
+                 (NCA(), build_classification),
+                 (RCA(), build_classification),
+                 (ITML_Supervised(max_iter=5), build_classification),
+                 (LSML_Supervised(), build_classification),
+                 (MMC_Supervised(max_iter=5), build_classification),
+                 (RCA_Supervised(num_chunks=10), build_classification),
+                 (SDML_Supervised(), build_classification)
+                 ]
+ids_classifiers = list(map(lambda x: x.__class__.__name__,
+                                [learner for (learner, _) in
+                                 classifiers]))
+
+regressors = [(MLKR(), build_regression)]
+ids_regressors = list(map(lambda x: x.__class__.__name__,
+                          [learner for (learner, _) in regressors]))
+
+WeaklySupervisedClasses = (_PairsClassifierMixin,
+                           _QuadrupletsClassifierMixin)
+
+tuples_learners = pairs_learners + quadruplets_learners
+ids_tuples_learners = ids_pairs_learners + ids_quadruplets_learners
+
+supervised_learners = classifiers + regressors
+ids_supervised_learners = ids_classifiers + ids_regressors
+
+list_estimators = tuples_learners + supervised_learners
+ids_estimators = ids_tuples_learners + ids_supervised_learners
 
 
 def mock_preprocessor(indices):
@@ -762,17 +884,9 @@ def test_error_message_tuple_size(estimator):
   assert str(raised_err.value) == expected_msg
 
 
-@pytest.mark.parametrize('estimator', [ITML(), LSML(), MMC(), RCA(), SDML(),
-                                       Covariance(), LFDA(), LMNN(), MLKR(),
-                                       NCA(), ITML_Supervised(),
-                                       LSML_Supervised(), MMC_Supervised(),
-                                       RCA_Supervised(), SDML_Supervised()],
-                         ids=['ITML', 'LSML', 'MMC', 'RCA', 'SDML',
-                              'Covariance', 'LFDA', 'LMNN', 'MLKR', 'NCA',
-                              'ITML_Supervised', 'LSML_Supervised',
-                              'MMC_Supervised', 'RCA_Supervised',
-                              'SDML_Supervised'])
-def test_error_message_t_score_pairs(estimator):
+@pytest.mark.parametrize('estimator, _', list_estimators,
+                         ids=ids_estimators)
+def test_error_message_t_score_pairs(estimator, _):
   """tests that if you want to score_pairs on triplets for instance, it returns
   the right error message
   """
@@ -826,95 +940,54 @@ def test_preprocess_points_simple_example():
 # with their no-preprocessor equivalent
 
 
-Dataset = namedtuple('Dataset', 'formed_points points_indicators labels data')
-
-
-@pytest.fixture
-def build_classification(rng):
-  """Basic array for testing when using a preprocessor"""
-  X, y = shuffle(*make_blobs(random_state=rng),
-                 random_state=rng)
-  indices = shuffle(np.arange(X.shape[0]), random_state=rng)
-  indices = indices.astype(int)
-  return Dataset(X[indices], indices, y, X)
-
-
-@pytest.fixture
-def build_regression(rng):
-  """Basic array for testing when using a preprocessor"""
-  X, y = shuffle(*make_regression(n_samples=100, n_features=5,
-                                  random_state=rng),
-                 random_state=rng)
-  indices = shuffle(np.arange(X.shape[0]), random_state=rng)
-  indices = indices.astype(int)
-  return Dataset(X[indices], indices, y, X)
-
-
-RNG = check_random_state(0)
-
-classifiers = [Covariance(),
-               LFDA(),
-               LMNN(),
-               NCA(),
-               RCA(),
-               ITML_Supervised(max_iter=5),
-               LSML_Supervised(),
-               MMC_Supervised(max_iter=5),
-               RCA_Supervised(num_chunks=10),  # less chunks because we only
-               # have a few data in the test
-               SDML_Supervised()]
-
-regressors = [MLKR()]
-
-estimators = [(classifier, build_classification(RNG)) for classifier in
-              classifiers]
-estimators += [(regressor, build_regression(RNG)) for regressor in
-               regressors]
-
-ids_estimators = list(map(lambda x: x.__class__.__name__, classifiers +
-                          regressors))
-
-
-@pytest.mark.parametrize('estimator, dataset', estimators,
-                         ids=ids_estimators)
-def test_same_with_or_without_preprocessor_classic(estimator, dataset):
+@pytest.mark.parametrize('estimator, build_dataset', supervised_learners,
+                         ids=ids_supervised_learners)
+def test_same_with_or_without_preprocessor_classic(estimator, build_dataset):
   """Test that supervised algorithms using a preprocessor behave consistently
   with their no-preprocessor equivalent.
   """
-  (formed_points_train, formed_points_test,
-   y_train, y_test, points_indicators_train,
-   points_indicators_test) = train_test_split(dataset.formed_points,
-                                              dataset.labels,
-                                              dataset.points_indicators,
-                                              random_state=RNG)
+  dataset_with_preprocessor = build_dataset(preprocessor=True)
+  dataset_without_preprocessor = build_dataset(preprocessor=False)
+  preprocessor = dataset_with_preprocessor.preprocessor
+  (points_indicators_train, points_indicators_test, y_train,
+   y_test, formed_points_train,
+   formed_points_test) = train_test_split(
+                              dataset_with_preprocessor.data,
+                              dataset_with_preprocessor.target,
+                              dataset_without_preprocessor.data,
+                              random_state=SEED)
+  formed_points_to_transform = dataset_without_preprocessor.to_transform
+  points_indicators_to_transform = dataset_with_preprocessor.to_transform
 
   def make_random_state(estimator):
     rs = {}
     if estimator.__class__.__name__[-11:] == '_Supervised':
-      rs['random_state'] = check_random_state(0)
+      rs['random_state'] = check_random_state(SEED)
     return rs
 
   estimator_without_prep = clone(estimator)
-  set_random_state(estimator_without_prep)
+  set_random_state(estimator_without_prep, SEED)
   estimator_without_prep.set_params(preprocessor=None)
   estimator_without_prep.fit(formed_points_train, y_train,
                              **make_random_state(estimator))
-  embedding_without_prep = estimator_without_prep.transform(formed_points_test)
+  embedding_without_prep = estimator_without_prep.transform(
+      formed_points_to_transform)
 
   estimator_with_prep = clone(estimator)
-  set_random_state(estimator_with_prep)
-  estimator_with_prep.set_params(preprocessor=dataset.data)
+  set_random_state(estimator_with_prep, SEED)
+  estimator_with_prep.set_params(preprocessor=preprocessor)
   estimator_with_prep.fit(points_indicators_train, y_train,
                           **make_random_state(estimator))
-  embedding_with_prep = estimator_with_prep.transform(points_indicators_test)
+  embedding_with_prep = estimator_with_prep.transform(
+      points_indicators_to_transform)
 
   estimator_with_prep_formed = clone(estimator)
-  set_random_state(estimator_with_prep_formed)
-  estimator_with_prep_formed.set_params(preprocessor=dataset.data)
+  set_random_state(estimator_with_prep_formed, SEED)
+  estimator_with_prep_formed.set_params(preprocessor=preprocessor)
   estimator_with_prep_formed.fit(formed_points_train, y_train,
                                  **make_random_state(estimator))
   embedding_with_prep_formed = estimator_with_prep_formed.transform(
-      formed_points_test)
+      formed_points_to_transform)
 
   # test transform
   assert (embedding_with_prep == embedding_without_prep).all()
@@ -922,31 +995,30 @@ def test_same_with_or_without_preprocessor_classic(estimator, dataset):
 
   # test score_pairs
   assert (estimator_without_prep.score_pairs(
-      formed_points_test[np.array([[0, 2], [5, 3]])]) ==
+      formed_points_to_transform[np.array([[0, 2], [5, 3]])]) ==
       estimator_with_prep.score_pairs(
-          points_indicators_test[np.array([[0, 2], [5, 3]])])).all()
+          (points_indicators_to_transform)[np.array([[0, 2], [5, 3]])])).all()
 
   assert (
       estimator_with_prep.score_pairs(
-          points_indicators_test[np.array([[0, 2], [5, 3]])]) ==
+          (points_indicators_to_transform)[np.array([[0, 2], [5, 3]])]) ==
       estimator_with_prep_formed.score_pairs(
-          formed_points_test[np.array([[0, 2], [5, 3]])])).all()
+          (formed_points_to_transform)[np.array([[0, 2], [5, 3]])])).all()
 
 
-@pytest.mark.parametrize('estimator, build_dataset',
-                         [(ITML(), build_pairs),
-                          (LSML(), build_quadruplets),
-                          (MMC(max_iter=2), build_pairs),
-                          (SDML(), build_pairs)],
-                         ids=['itml', 'lsml', 'mmc', 'sdml'])
+@pytest.mark.parametrize('estimator, build_dataset', tuples_learners,
+                         ids=ids_tuples_learners)
 def test_same_with_or_without_preprocessor_tuples(estimator, build_dataset):
   """For weakly supervised algorithms, test that using a preprocessor or not
   (with the appropriate corresponding inputs) give the same result.
   """
-  (X, tuples, y, tuples_train, tuples_test, y_train,
-   y_test, _) = build_dataset(preprocessor=mock_preprocessor)
-  formed_tuples_train = X[tuples_train]
-  formed_tuples_test = X[tuples_test]
+  dataset = build_dataset(preprocessor=True)
+  dataset_formed = build_dataset(preprocessor=False)
+  X = dataset.preprocessor
+  (tuples_train, tuples_test, y_train, y_test, formed_tuples_train,
+   formed_tuples_test) = train_test_split(dataset.data, dataset.target,
+                                          dataset_formed.data,
+                                          random_state=SEED)
 
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)

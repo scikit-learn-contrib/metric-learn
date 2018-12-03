@@ -5,79 +5,21 @@ import numpy as np
 from numpy.testing import assert_array_almost_equal
 from scipy.spatial.distance import pdist, squareform
 from sklearn import clone
-from sklearn.datasets import load_iris
-from sklearn.utils import check_random_state, shuffle
+from sklearn.utils import check_random_state
 from sklearn.utils.testing import set_random_state
 
-from metric_learn import (Constraints, ITML, LSML, MMC, SDML, Covariance, LFDA,
-                          LMNN, MLKR, NCA, RCA)
 from metric_learn._util import make_context
-from metric_learn.constraints import wrap_pairs
-from functools import partial
+
+from test.test_utils import ids_estimators, list_estimators
 
 RNG = check_random_state(0)
-
-def build_data():
-  dataset = load_iris()
-  X, y = shuffle(dataset.data, dataset.target, random_state=RNG)
-  num_constraints = 20
-  constraints = Constraints.random_subset(y, random_state=RNG)
-  pairs = constraints.positive_negative_pairs(num_constraints,
-                                              same_length=True,
-                                              random_state=RNG)
-  return X, pairs
-
-
-def build_pairs():
-  # test that you can do cross validation on tuples of points with
-  #  a WeaklySupervisedMetricLearner
-  X, pairs = build_data()
-  pairs, y = wrap_pairs(X, pairs)
-  pairs, y = shuffle(pairs, y, random_state=RNG)
-  return pairs, y
-
-
-def build_quadruplets():
-  # test that you can do cross validation on a tuples of points with
-  #  a WeaklySupervisedMetricLearner
-  X, pairs = build_data()
-  c = np.column_stack(pairs)
-  quadruplets = X[c]
-  quadruplets = shuffle(quadruplets, random_state=RNG)
-  return quadruplets, None
-
-
-list_estimators = [(Covariance(), build_data),
-                   (ITML(), build_pairs),
-                   (LFDA(), partial(load_iris, return_X_y=True)),
-                   (LMNN(), partial(load_iris, return_X_y=True)),
-                   (LSML(), build_quadruplets),
-                   (MLKR(), partial(load_iris, return_X_y=True)),
-                   (MMC(), build_pairs),
-                   (NCA(), partial(load_iris, return_X_y=True)),
-                   (RCA(), partial(load_iris, return_X_y=True)),
-                   (SDML(), build_pairs)
-                   ]
-
-ids_estimators = ['covariance',
-                  'itml',
-                  'lfda',
-                  'lmnn',
-                  'lsml',
-                  'mlkr',
-                  'mmc',
-                  'nca',
-                  'rca',
-                  'sdml',
-                  ]
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_score_pairs_pairwise(estimator, build_dataset):
   # Computing pairwise scores should return a euclidean distance matrix.
-  input_data, labels = build_dataset()
-  X, _ = load_iris(return_X_y=True)
+  input_data, labels, _, X = build_dataset()
   n_samples = 20
   X = X[:n_samples]
   model = clone(estimator)
@@ -101,8 +43,7 @@ def test_score_pairs_pairwise(estimator, build_dataset):
                          ids=ids_estimators)
 def test_score_pairs_toy_example(estimator, build_dataset):
     # Checks that score_pairs works on a toy example
-    input_data, labels = build_dataset()
-    X, _ = load_iris(return_X_y=True)
+    input_data, labels, _, X = build_dataset()
     n_samples = 20
     X = X[:n_samples]
     model = clone(estimator)
@@ -120,11 +61,10 @@ def test_score_pairs_toy_example(estimator, build_dataset):
                          ids=ids_estimators)
 def test_score_pairs_finite(estimator, build_dataset):
   # tests that the score is finite
-  input_data, labels = build_dataset()
+  input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
   model.fit(input_data, labels)
-  X, _ = load_iris(return_X_y=True)
   pairs = np.array(list(product(X, X)))
   assert np.isfinite(model.score_pairs(pairs)).all()
 
@@ -135,11 +75,10 @@ def test_score_pairs_dim(estimator, build_dataset):
   # scoring of 3D arrays should return 1D array (several tuples),
   # and scoring of 2D arrays (one tuple) should return an error (like
   # scikit-learn's error when scoring 1D arrays)
-  input_data, labels = build_dataset()
+  input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
   model.fit(input_data, labels)
-  X, _ = load_iris(return_X_y=True)
   tuples = np.array(list(product(X, X)))
   assert model.score_pairs(tuples).shape == (tuples.shape[0],)
   context = make_context(estimator)
@@ -165,8 +104,7 @@ def check_is_distance_matrix(pairwise):
                          ids=ids_estimators)
 def test_embed_toy_example(estimator, build_dataset):
     # Checks that embed works on a toy example
-    input_data, labels = build_dataset()
-    X, _ = load_iris(return_X_y=True)
+    input_data, labels, _, X = build_dataset()
     n_samples = 20
     X = X[:n_samples]
     model = clone(estimator)
@@ -180,11 +118,10 @@ def test_embed_toy_example(estimator, build_dataset):
                          ids=ids_estimators)
 def test_embed_dim(estimator, build_dataset):
   # Checks that the the dimension of the output space is as expected
-  input_data, labels = build_dataset()
+  input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
   model.fit(input_data, labels)
-  X, _ = load_iris(return_X_y=True)
   assert model.transform(X).shape == X.shape
 
   # assert that ValueError is thrown if input shape is 1D
@@ -210,11 +147,10 @@ def test_embed_dim(estimator, build_dataset):
                          ids=ids_estimators)
 def test_embed_finite(estimator, build_dataset):
   # Checks that embed returns vectors with finite values
-  input_data, labels = build_dataset()
+  input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
   model.fit(input_data, labels)
-  X, _ = load_iris(return_X_y=True)
   assert np.isfinite(model.transform(X)).all()
 
 
@@ -222,11 +158,10 @@ def test_embed_finite(estimator, build_dataset):
                          ids=ids_estimators)
 def test_embed_is_linear(estimator, build_dataset):
   # Checks that the embedding is linear
-  input_data, labels = build_dataset()
+  input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
   model.fit(input_data, labels)
-  X, _ = load_iris(return_X_y=True)
   assert_array_almost_equal(model.transform(X[:10] + X[10:20]),
                             model.transform(X[:10]) +
                             model.transform(X[10:20]))

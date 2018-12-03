@@ -2,23 +2,22 @@ import pytest
 import unittest
 from sklearn.utils.estimator_checks import check_estimator
 from sklearn.base import TransformerMixin
-from sklearn.datasets import load_iris, make_regression, make_blobs
 from sklearn.pipeline import make_pipeline
-from sklearn.utils import shuffle, check_random_state
+from sklearn.utils import check_random_state
 from sklearn.utils.estimator_checks import is_public_parameter
 from sklearn.utils.testing import (assert_allclose_dense_sparse,
                                    set_random_state)
-from sklearn.utils.fixes import signature
 
-from metric_learn import (Covariance, ITML, LFDA, LMNN, LSML, MLKR, MMC, NCA,
-                          RCA, SDML, ITML_Supervised, LSML_Supervised,
+from metric_learn import (Covariance, LFDA, LMNN, MLKR, NCA,
+                          ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised)
-from metric_learn.constraints import wrap_pairs, Constraints
 from sklearn import clone
 import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
 from sklearn.utils.testing import _get_args
+from test.test_utils import (list_estimators, ids_estimators,
+                             mock_preprocessor)
 
 
 # Wrap the _Supervised methods with a deterministic wrapper for testing.
@@ -88,119 +87,14 @@ RNG = check_random_state(0)
 # ---------------------- Test scikit-learn compatibility ----------------------
 
 
-def build_data():
-  dataset = load_iris()
-  X, y = shuffle(dataset.data, dataset.target, random_state=RNG)
-  num_constraints = 50
-  constraints = Constraints.random_subset(y, random_state=RNG)
-  pairs = constraints.positive_negative_pairs(num_constraints,
-                                              same_length=True,
-                                              random_state=RNG)
-  return X, pairs
-
-
-def build_classification(preprocessor):
-  # builds a toy classification problem
-  X, y = shuffle(*make_blobs(), random_state=RNG)
-  X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
-  # we will return twice X here for compatibility with the rest of the tests
-  # (the first X is the original dataset and the second X represent the
-  # tuples given to the models (which are in fact the original dataset here)
-  return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
-
-
-def build_regression(preprocessor):
-  # builds a toy regression problem
-  X, y = shuffle(*make_regression(n_samples=100, n_features=10),
-                 random_state=RNG)
-  X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=RNG)
-  # we will return twice X here for compatibility with the rest of the tests
-  # (the first X is the original dataset and the second X represent the
-  # tuples given to the models (which are in fact the original dataset here)
-  return (X, X, y, X_train, X_test, y_train, y_test, preprocessor)
-
-
-def build_pairs(preprocessor):
-  # builds a toy pairs problem
-  X, indices = build_data()
-  if preprocessor is not None:
-    # if preprocessor, we build a 2D array of pairs of indices
-    _, y = wrap_pairs(X, indices)
-    pairs = np.vstack([np.column_stack(indices[:2]),
-                       np.column_stack(indices[2:])])
-  else:
-    # if not, we build a 3D array of pairs of samples
-    pairs, y = wrap_pairs(X, indices)
-  pairs, y = shuffle(pairs, y, random_state=RNG)
-  (pairs_train, pairs_test, y_train,
-   y_test) = train_test_split(pairs, y, random_state=RNG)
-  return (X, pairs, y, pairs_train, pairs_test,
-          y_train, y_test, preprocessor)
-
-
-def build_quadruplets(preprocessor):
-  # builds a toy quadruplets problem
-  X, indices = build_data()
-  c = np.column_stack(indices)
-  if preprocessor is not None:
-    # if preprocessor, we build a 2D array of quadruplets of indices
-    quadruplets = c
-  else:
-    # if not, we build a 3D array of quadruplets of samples
-    quadruplets = X[c]
-  quadruplets = shuffle(quadruplets, random_state=RNG)
-  y = y_train = y_test = None
-  quadruplets_train, quadruplets_test = train_test_split(quadruplets,
-                                                         random_state=RNG)
-  return (X, quadruplets, y, quadruplets_train, quadruplets_test,
-          y_train, y_test, preprocessor)
-
-
-list_estimators = [(Covariance(), build_classification),
-                   (ITML(), build_pairs),
-                   (LFDA(), build_classification),
-                   (LMNN(), build_classification),
-                   (LSML(), build_quadruplets),
-                   (MLKR(), build_regression),
-                   (MMC(max_iter=2), build_pairs),  # max_iter=2 for faster
-                   # testing
-                   (NCA(), build_classification),
-                   (RCA(), build_classification),
-                   (SDML(), build_pairs),
-                   (ITML_Supervised(), build_classification),
-                   (LSML_Supervised(), build_classification),
-                   (MMC_Supervised(), build_classification),
-                   (RCA_Supervised(num_chunks=10), build_classification),
-                   (SDML_Supervised(), build_classification)
-                   ]
-
-ids_estimators = ['covariance',
-                  'itml',
-                  'lfda',
-                  'lmnn',
-                  'lsml',
-                  'mlkr',
-                  'mmc',
-                  'nca',
-                  'rca',
-                  'sdml',
-                  'itml_supervised',
-                  'lsml_supervised',
-                  'mmc_supervised',
-                  'rca_supervised',
-                  'sdml_supervised'
-                  ]
-
-
-@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_cross_validation_is_finite(estimator, build_dataset, preprocessor):
   """Tests that validation on metric-learn estimators returns something finite
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    (X, tuples, y, tuples_train, tuples_test,
-     y_train, y_test, preprocessor) = build_dataset(preprocessor)
+    tuples, y, preprocessor, _ = build_dataset(preprocessor)
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
@@ -210,7 +104,7 @@ def test_cross_validation_is_finite(estimator, build_dataset, preprocessor):
       assert np.isfinite(cross_val_predict(estimator, tuples, y)).all()
 
 
-@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
@@ -220,8 +114,7 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
   folds is taken from scikit-learn).
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    (X, tuples, y, tuples_train, tuples_test,
-     y_train, y_test, preprocessor) = build_dataset(preprocessor)
+    tuples, y, preprocessor, _ = build_dataset(preprocessor)
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
@@ -238,8 +131,7 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
       test_slice = slice(start, stop)
       train_mask = np.ones(tuples.shape[0], bool)
       train_mask[test_slice] = False
-      (y_train, y_test) = ((y[train_mask], y[test_slice]) if y is not None
-                           else (None, None))
+      y_train, y_test = y[train_mask], y[test_slice]
       estimator.fit(tuples[train_mask], y_train)
       if hasattr(estimator, "score"):
         scores.append(estimator.score(tuples[test_slice], y_test))
@@ -264,15 +156,16 @@ def check_predict(estimator, tuples):
     assert len(y_predicted), len(tuples)
 
 
-@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_simple_estimator(estimator, build_dataset, preprocessor):
   """Tests that fit, predict and scoring works.
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    (X, tuples, y, tuples_train, tuples_test,
-     y_train, y_test, preprocessor) = build_dataset(preprocessor)
+    tuples, y, preprocessor, _ = build_dataset(preprocessor)
+    (tuples_train, tuples_test, y_train,
+     y_test) = train_test_split(tuples, y, random_state=RNG)
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
@@ -284,7 +177,7 @@ def test_simple_estimator(estimator, build_dataset, preprocessor):
 
 @pytest.mark.parametrize('estimator', [est[0] for est in list_estimators],
                          ids=ids_estimators)
-@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('preprocessor', [None, mock_preprocessor])
 def test_no_attributes_set_in_init(estimator, preprocessor):
   """Check setting during init. Adapted from scikit-learn."""
   estimator = clone(estimator)
@@ -314,26 +207,25 @@ def test_no_attributes_set_in_init(estimator, preprocessor):
        "attributes %s." % (type(estimator).__name__, sorted(invalid_attr)))
 
 
-@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_estimators_fit_returns_self(estimator, build_dataset, preprocessor):
   """Check if self is returned when calling fit"""
   # Adapted from scikit-learn
-  (X, tuples, y, tuples_train, tuples_test,
-   y_train, y_test, preprocessor) = build_dataset(preprocessor)
+  tuples, y, preprocessor, _ = build_dataset(preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   assert estimator.fit(tuples, y) is estimator
 
 
-@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_pipeline_consistency(estimator, build_dataset, preprocessor):
   # Adapted from scikit learn
   # check that make_pipeline(est) gives same score as est
-  (_, input_data, y, _, _, _, _, preprocessor) = build_dataset(preprocessor)
+  input_data, y, preprocessor, _ = build_dataset(preprocessor)
 
   def make_random_state(estimator, in_pipeline):
     rs = {}
@@ -368,13 +260,12 @@ def test_pipeline_consistency(estimator, build_dataset, preprocessor):
       assert_allclose_dense_sparse(result, result_pipe)
 
 
-@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('preprocessor',[True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_dict_unchanged(estimator, build_dataset, preprocessor):
   # Adapted from scikit-learn
-  (X, tuples, y, tuples_train, tuples_test,
-   y_train, y_test, preprocessor) = build_dataset(preprocessor)
+  tuples, y, preprocessor, to_transform = build_dataset(preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   if hasattr(estimator, "num_dims"):
@@ -391,19 +282,18 @@ def test_dict_unchanged(estimator, build_dataset, preprocessor):
       check_dict()
   if hasattr(estimator, "transform"):
     dict_before = estimator.__dict__.copy()
-    # we transform only 2D arrays (dataset of points)
-    estimator.transform(X)
+    # we transform only dataset of points
+    estimator.transform(to_transform)
     check_dict()
 
 
-@pytest.mark.parametrize('preprocessor', [None, build_data()[0]])
+@pytest.mark.parametrize('preprocessor',[True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_dont_overwrite_parameters(estimator, build_dataset, preprocessor):
   # Adapted from scikit-learn
   # check that fit method only changes or sets private attributes
-  (X, tuples, y, tuples_train, tuples_test,
-   y_train, y_test, preprocessor) = build_dataset(preprocessor)
+  tuples, y, preprocessor, _ = build_dataset(preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   if hasattr(estimator, "num_dims"):
