@@ -95,14 +95,15 @@ def test_cross_validation_is_finite(estimator, build_dataset,
   """Tests that validation on metric-learn estimators returns something finite
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
+    input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
     if hasattr(estimator, "score"):
-      assert np.isfinite(cross_val_score(estimator, tuples, y)).all()
+      assert np.isfinite(cross_val_score(estimator, input_data, labels)).all()
     if hasattr(estimator, "predict"):
-      assert np.isfinite(cross_val_predict(estimator, tuples, y)).all()
+      assert np.isfinite(cross_val_predict(estimator,
+                                           input_data, labels)).all()
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -115,33 +116,35 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
   folds is taken from scikit-learn).
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
+    input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
     n_splits = 3
     kfold = KFold(shuffle=False, n_splits=n_splits)
-    n_samples = tuples.shape[0]
+    n_samples = input_data.shape[0]
     fold_sizes = (n_samples // n_splits) * np.ones(n_splits, dtype=np.int)
     fold_sizes[:n_samples % n_splits] += 1
     current = 0
-    scores, predictions = [], np.zeros(tuples.shape[0])
+    scores, predictions = [], np.zeros(input_data.shape[0])
     for fold_size in fold_sizes:
       start, stop = current, current + fold_size
       current = stop
       test_slice = slice(start, stop)
-      train_mask = np.ones(tuples.shape[0], bool)
+      train_mask = np.ones(input_data.shape[0], bool)
       train_mask[test_slice] = False
-      y_train, y_test = y[train_mask], y[test_slice]
-      estimator.fit(tuples[train_mask], y_train)
+      y_train, y_test = labels[train_mask], labels[test_slice]
+      estimator.fit(input_data[train_mask], y_train)
       if hasattr(estimator, "score"):
-        scores.append(estimator.score(tuples[test_slice], y_test))
+        scores.append(estimator.score(input_data[test_slice], y_test))
       if hasattr(estimator, "predict"):
-        predictions[test_slice] = estimator.predict(tuples[test_slice])
+        predictions[test_slice] = estimator.predict(input_data[test_slice])
     if hasattr(estimator, "score"):
-      assert all(scores == cross_val_score(estimator, tuples, y, cv=kfold))
+      assert all(scores == cross_val_score(estimator, input_data, labels,
+                                           cv=kfold))
     if hasattr(estimator, "predict"):
-      assert all(predictions == cross_val_predict(estimator, tuples, y,
+      assert all(predictions == cross_val_predict(estimator, input_data,
+                                                  labels,
                                                   cv=kfold))
 
 
@@ -164,9 +167,9 @@ def test_simple_estimator(estimator, build_dataset, with_preprocessor):
   """Tests that fit, predict and scoring works.
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
+    input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
     (tuples_train, tuples_test, y_train,
-     y_test) = train_test_split(tuples, y, random_state=RNG)
+     y_test) = train_test_split(input_data, labels, random_state=RNG)
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
@@ -215,10 +218,10 @@ def test_estimators_fit_returns_self(estimator, build_dataset,
                                      with_preprocessor):
   """Check if self is returned when calling fit"""
   # Adapted from scikit-learn
-  tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
+  input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
-  assert estimator.fit(tuples, y) is estimator
+  assert estimator.fit(input_data, labels) is estimator
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -268,12 +271,13 @@ def test_pipeline_consistency(estimator, build_dataset,
                          ids=ids_metric_learners)
 def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
   # Adapted from scikit-learn
-  tuples, y, preprocessor, to_transform = build_dataset(with_preprocessor)
+  (input_data, labels, preprocessor,
+   to_transform) = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   if hasattr(estimator, "num_dims"):
     estimator.num_dims = 1
-  estimator.fit(tuples, y)
+  estimator.fit(input_data, labels)
 
   def check_dict():
     assert estimator.__dict__ == dict_before, (
@@ -281,7 +285,7 @@ def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
   for method in ["predict", "decision_function", "predict_proba"]:
     if hasattr(estimator, method):
       dict_before = estimator.__dict__.copy()
-      getattr(estimator, method)(tuples)
+      getattr(estimator, method)(input_data)
       check_dict()
   if hasattr(estimator, "transform"):
     dict_before = estimator.__dict__.copy()
@@ -297,14 +301,14 @@ def test_dont_overwrite_parameters(estimator, build_dataset,
                                    with_preprocessor):
   # Adapted from scikit-learn
   # check that fit method only changes or sets private attributes
-  tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
+  input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   if hasattr(estimator, "num_dims"):
     estimator.num_dims = 1
   dict_before_fit = estimator.__dict__.copy()
 
-  estimator.fit(tuples, y)
+  estimator.fit(input_data, labels)
   dict_after_fit = estimator.__dict__
 
   public_keys_after_fit = [key for key in dict_after_fit.keys()
