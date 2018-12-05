@@ -943,13 +943,14 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   """Test that algorithms using a preprocessor behave consistently
 # with their no-preprocessor equivalent
   """
-  dataset = build_dataset(with_preprocessor=True)
+  dataset_indices = build_dataset(with_preprocessor=True)
   dataset_formed = build_dataset(with_preprocessor=False)
-  X = dataset.preprocessor
-  indicators_to_transform = dataset.to_transform
+  X = dataset_indices.preprocessor
+  indicators_to_transform = dataset_indices.to_transform
   formed_points_to_transform = dataset_formed.to_transform
-  (tuples_train, tuples_test, y_train, y_test, formed_tuples_train,
-   formed_tuples_test) = train_test_split(dataset.data, dataset.target,
+  (indices_train, indices_test, y_train, y_test, formed_train,
+   formed_test) = train_test_split(dataset_indices.data,
+                                          dataset_indices.target,
                                           dataset_formed.data,
                                           random_state=SEED)
 
@@ -962,33 +963,33 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)
   estimator_with_preprocessor.set_params(preprocessor=X)
-  estimator_with_preprocessor.fit(tuples_train, y_train,
+  estimator_with_preprocessor.fit(indices_train, y_train,
                                   **make_random_state(estimator))
 
   estimator_without_preprocessor = clone(estimator)
   set_random_state(estimator_without_preprocessor)
   estimator_without_preprocessor.set_params(preprocessor=None)
-  estimator_without_preprocessor.fit(formed_tuples_train, y_train,
+  estimator_without_preprocessor.fit(formed_train, y_train,
                                      **make_random_state(estimator))
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=X)
-  estimator_with_prep_formed.fit(tuples_train, y_train,
+  estimator_with_prep_formed.fit(indices_train, y_train,
                                  **make_random_state(estimator))
 
   # test prediction methods
   for method in ["predict", "decision_function"]:
     if hasattr(estimator, method):
       output_with_prep = getattr(estimator_with_preprocessor,
-                                 method)(tuples_test)
+                                 method)(indices_test)
       output_without_prep = getattr(estimator_without_preprocessor,
-                                    method)(formed_tuples_test)
+                                    method)(formed_test)
       assert np.array(output_with_prep == output_without_prep).all()
       output_with_prep = getattr(estimator_with_preprocessor,
-                                 method)(tuples_test)
+                                 method)(indices_test)
       output_with_prep_formed = getattr(estimator_with_prep_formed,
-                                        method)(formed_tuples_test)
+                                        method)(formed_test)
       assert np.array(output_with_prep == output_with_prep_formed).all()
 
   # test score_pairs
