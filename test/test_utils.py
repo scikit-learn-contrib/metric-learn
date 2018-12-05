@@ -937,29 +937,21 @@ def test_preprocess_points_simple_example():
   assert (preprocess_points(array, fun) == expected_result).all()
 
 
-# ----------------------------------------------------------------------------
-# test that supervised algorithms using a preprocessor behave consistently
+@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
+                         ids=ids_estimators)
+def test_same_with_or_without_preprocessor(estimator, build_dataset):
+  """Test that algorithms using a preprocessor behave consistently
 # with their no-preprocessor equivalent
-
-
-@pytest.mark.parametrize('estimator, build_dataset', supervised_learners,
-                         ids=ids_supervised_learners)
-def test_same_with_or_without_preprocessor_classic(estimator, build_dataset):
-  """Test that supervised algorithms using a preprocessor behave consistently
-  with their no-preprocessor equivalent.
   """
-  dataset_with_preprocessor = build_dataset(preprocessor=True)
-  dataset_without_preprocessor = build_dataset(preprocessor=False)
-  preprocessor = dataset_with_preprocessor.preprocessor
-  (points_indicators_train, points_indicators_test, y_train,
-   y_test, formed_points_train,
-   formed_points_test) = train_test_split(
-                              dataset_with_preprocessor.data,
-                              dataset_with_preprocessor.target,
-                              dataset_without_preprocessor.data,
-                              random_state=SEED)
-  formed_points_to_transform = dataset_without_preprocessor.to_transform
-  points_indicators_to_transform = dataset_with_preprocessor.to_transform
+  dataset = build_dataset(with_preprocessor=True)
+  dataset_formed = build_dataset(with_preprocessor=False)
+  X = dataset.preprocessor
+  indicators_to_transform = dataset.to_transform
+  formed_points_to_transform = dataset_formed.to_transform
+  (tuples_train, tuples_test, y_train, y_test, formed_tuples_train,
+   formed_tuples_test) = train_test_split(dataset.data, dataset.target,
+                                          dataset_formed.data,
+                                          random_state=SEED)
 
   def make_random_state(estimator):
     rs = {}
@@ -967,75 +959,23 @@ def test_same_with_or_without_preprocessor_classic(estimator, build_dataset):
       rs['random_state'] = check_random_state(SEED)
     return rs
 
-  estimator_without_prep = clone(estimator)
-  set_random_state(estimator_without_prep, SEED)
-  estimator_without_prep.set_params(preprocessor=None)
-  estimator_without_prep.fit(formed_points_train, y_train,
-                             **make_random_state(estimator))
-  embedding_without_prep = estimator_without_prep.transform(
-      formed_points_to_transform)
-
-  estimator_with_prep = clone(estimator)
-  set_random_state(estimator_with_prep, SEED)
-  estimator_with_prep.set_params(preprocessor=preprocessor)
-  estimator_with_prep.fit(points_indicators_train, y_train,
-                          **make_random_state(estimator))
-  embedding_with_prep = estimator_with_prep.transform(
-      points_indicators_to_transform)
-
-  estimator_with_prep_formed = clone(estimator)
-  set_random_state(estimator_with_prep_formed, SEED)
-  estimator_with_prep_formed.set_params(preprocessor=preprocessor)
-  estimator_with_prep_formed.fit(formed_points_train, y_train,
-                                 **make_random_state(estimator))
-  embedding_with_prep_formed = estimator_with_prep_formed.transform(
-      formed_points_to_transform)
-
-  # test transform
-  assert (embedding_with_prep == embedding_without_prep).all()
-  assert (embedding_with_prep == embedding_with_prep_formed).all()
-
-  # test score_pairs
-  assert (estimator_without_prep.score_pairs(
-      formed_points_to_transform[np.array([[0, 2], [5, 3]])]) ==
-      estimator_with_prep.score_pairs(
-          (points_indicators_to_transform)[np.array([[0, 2], [5, 3]])])).all()
-
-  assert (
-      estimator_with_prep.score_pairs(
-          (points_indicators_to_transform)[np.array([[0, 2], [5, 3]])]) ==
-      estimator_with_prep_formed.score_pairs(
-          (formed_points_to_transform)[np.array([[0, 2], [5, 3]])])).all()
-
-
-@pytest.mark.parametrize('estimator, build_dataset', tuples_learners,
-                         ids=ids_tuples_learners)
-def test_same_with_or_without_preprocessor_tuples(estimator, build_dataset):
-  """For weakly supervised algorithms, test that using a preprocessor or not
-  (with the appropriate corresponding inputs) give the same result.
-  """
-  dataset = build_dataset(preprocessor=True)
-  dataset_formed = build_dataset(preprocessor=False)
-  X = dataset.preprocessor
-  (tuples_train, tuples_test, y_train, y_test, formed_tuples_train,
-   formed_tuples_test) = train_test_split(dataset.data, dataset.target,
-                                          dataset_formed.data,
-                                          random_state=SEED)
-
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)
   estimator_with_preprocessor.set_params(preprocessor=X)
-  estimator_with_preprocessor.fit(tuples_train, y_train)
+  estimator_with_preprocessor.fit(tuples_train, y_train,
+                                  **make_random_state(estimator))
 
   estimator_without_preprocessor = clone(estimator)
   set_random_state(estimator_without_preprocessor)
   estimator_without_preprocessor.set_params(preprocessor=None)
-  estimator_without_preprocessor.fit(formed_tuples_train, y_train)
+  estimator_without_preprocessor.fit(formed_tuples_train, y_train,
+                                     **make_random_state(estimator))
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=X)
-  estimator_with_prep_formed.fit(tuples_train, y_train)
+  estimator_with_prep_formed.fit(tuples_train, y_train,
+                                 **make_random_state(estimator))
 
   # test prediction methods
   for method in ["predict", "decision_function"]:
@@ -1053,28 +993,28 @@ def test_same_with_or_without_preprocessor_tuples(estimator, build_dataset):
 
   # test score_pairs
   output_with_prep = estimator_with_preprocessor.score_pairs(
-      tuples_test[:, :2])
+      indicators_to_transform[[[[0, 2], [5, 3]]]])
   output_without_prep = estimator_without_preprocessor.score_pairs(
-      formed_tuples_test[:, :2])
+      formed_points_to_transform[[[[0, 2], [5, 3]]]])
   assert np.array(output_with_prep == output_without_prep).all()
 
   output_with_prep = estimator_with_preprocessor.score_pairs(
-      tuples_test[:, :2])
+      indicators_to_transform[[[[0, 2], [5, 3]]]])
   output_without_prep = estimator_with_prep_formed.score_pairs(
-      formed_tuples_test[:, :2])
+      formed_points_to_transform[[[[0, 2], [5, 3]]]])
   assert np.array(output_with_prep == output_without_prep).all()
 
   # test transform
   output_with_prep = estimator_with_preprocessor.transform(
-      tuples_test[:, 0])
+      indicators_to_transform)
   output_without_prep = estimator_without_preprocessor.transform(
-      formed_tuples_test[:, 0])
+      formed_points_to_transform)
   assert np.array(output_with_prep == output_without_prep).all()
 
   output_with_prep = estimator_with_preprocessor.transform(
-      tuples_test[:, 0])
+      indicators_to_transform)
   output_without_prep = estimator_with_prep_formed.transform(
-      formed_tuples_test[:, 0])
+      formed_points_to_transform)
   assert np.array(output_with_prep == output_without_prep).all()
 
 
