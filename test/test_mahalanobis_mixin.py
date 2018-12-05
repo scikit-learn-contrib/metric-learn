@@ -96,8 +96,8 @@ def check_is_distance_matrix(pairwise):
   assert (pairwise.diagonal() == 0).all()  # identity
   # triangular inequality
   tol = 1e-15
-  assert (pairwise <= pairwise[:, :, np.newaxis]
-          + pairwise[:, np.newaxis, :] + tol).all()
+  assert (pairwise <= pairwise[:, :, np.newaxis] +
+          pairwise[:, np.newaxis, :] + tol).all()
 
 
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
