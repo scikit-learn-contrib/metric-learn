@@ -73,13 +73,13 @@ def build_pairs(with_preprocessor=False):
   c = np.vstack([np.column_stack(indices[:2]), np.column_stack(indices[2:])])
   target = np.concatenate([np.ones(indices[0].shape[0]),
                            - np.ones(indices[0].shape[0])])
+  c, target = shuffle(c, target, random_state=SEED)
   if with_preprocessor:
     # if preprocessor, we build a 2D array of pairs of indices
-    return Dataset(*(*shuffle(c, target, random_state=SEED), X, c[:, 0]))
+    return Dataset(c, target, X, c[:, 0])
   else:
     # if not, we build a 3D array of pairs of samples
-    return Dataset(*(*shuffle(X[c], target, random_state=SEED),
-                     None, X[c[:, 0]]))
+    return Dataset(X[c], target, None, X[c[:, 0]])
 
 
 def build_quadruplets(with_preprocessor=False):
@@ -88,13 +88,13 @@ def build_quadruplets(with_preprocessor=False):
   c = np.column_stack(indices)
   target = np.ones(c.shape[0])  # quadruplets targets are not used
   # anyways
+  c, target = shuffle(c, target, random_state=SEED)
   if with_preprocessor:
     # if preprocessor, we build a 2D array of quadruplets of indices
-    return Dataset(*(*shuffle(c, target, random_state=SEED), X, c[:, 0]))
+    return Dataset(c, target, X, c[:, 0])
   else:
     # if not, we build a 3D array of quadruplets of samples
-    return Dataset(*(*shuffle(X[c], target, random_state=SEED),
-                     None, X[c[:, 0]]))
+    return Dataset(X[c], target, None, X[c[:, 0]])
 
 
 quadruplets_learners = [(LSML(), build_quadruplets)]
