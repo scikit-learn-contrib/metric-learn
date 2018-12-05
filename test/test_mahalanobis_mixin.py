@@ -10,13 +10,13 @@ from sklearn.utils.testing import set_random_state
 
 from metric_learn._util import make_context
 
-from test.test_utils import ids_estimators, list_estimators
+from test.test_utils import ids_metric_learners, metric_learners
 
 RNG = check_random_state(0)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_score_pairs_pairwise(estimator, build_dataset):
   # Computing pairwise scores should return a euclidean distance matrix.
   input_data, labels, _, X = build_dataset()
@@ -39,8 +39,8 @@ def test_score_pairs_pairwise(estimator, build_dataset):
   assert_array_almost_equal(squareform(pairwise), pdist(model.transform(X)))
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_score_pairs_toy_example(estimator, build_dataset):
     # Checks that score_pairs works on a toy example
     input_data, labels, _, X = build_dataset()
@@ -57,8 +57,8 @@ def test_score_pairs_toy_example(estimator, build_dataset):
     assert_array_almost_equal(model.score_pairs(pairs), distances)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_score_pairs_finite(estimator, build_dataset):
   # tests that the score is finite
   input_data, labels, _, X = build_dataset()
@@ -69,8 +69,8 @@ def test_score_pairs_finite(estimator, build_dataset):
   assert np.isfinite(model.score_pairs(pairs)).all()
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_score_pairs_dim(estimator, build_dataset):
   # scoring of 3D arrays should return 1D array (several tuples),
   # and scoring of 2D arrays (one tuple) should return an error (like
@@ -100,8 +100,8 @@ def check_is_distance_matrix(pairwise):
           pairwise[:, np.newaxis, :] + tol).all()
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_embed_toy_example(estimator, build_dataset):
     # Checks that embed works on a toy example
     input_data, labels, _, X = build_dataset()
@@ -114,8 +114,8 @@ def test_embed_toy_example(estimator, build_dataset):
     assert_array_almost_equal(model.transform(X), embedded_points)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_embed_dim(estimator, build_dataset):
   # Checks that the the dimension of the output space is as expected
   input_data, labels, _, X = build_dataset()
@@ -143,8 +143,8 @@ def test_embed_dim(estimator, build_dataset):
     assert str(raised_error.value) == err_msg
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_embed_finite(estimator, build_dataset):
   # Checks that embed returns vectors with finite values
   input_data, labels, _, X = build_dataset()
@@ -154,8 +154,8 @@ def test_embed_finite(estimator, build_dataset):
   assert np.isfinite(model.transform(X)).all()
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_embed_is_linear(estimator, build_dataset):
   # Checks that the embedding is linear
   input_data, labels, _, X = build_dataset()

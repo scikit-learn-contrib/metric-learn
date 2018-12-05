@@ -16,7 +16,7 @@ import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
 from sklearn.utils.testing import _get_args
-from test.test_utils import (list_estimators, ids_estimators,
+from test.test_utils import (metric_learners, ids_metric_learners,
                              mock_preprocessor)
 
 
@@ -88,8 +88,8 @@ RNG = check_random_state(0)
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_cross_validation_is_finite(estimator, build_dataset,
                                     with_preprocessor):
   """Tests that validation on metric-learn estimators returns something finite
@@ -106,8 +106,8 @@ def test_cross_validation_is_finite(estimator, build_dataset,
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
                                            with_preprocessor):
   """Tests that if we make a manual cross-validation, the result will be the
@@ -158,8 +158,8 @@ def check_predict(estimator, tuples):
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_simple_estimator(estimator, build_dataset, with_preprocessor):
   """Tests that fit, predict and scoring works.
   """
@@ -176,8 +176,8 @@ def test_simple_estimator(estimator, build_dataset, with_preprocessor):
     check_predict(estimator, tuples_test)
 
 
-@pytest.mark.parametrize('estimator', [est[0] for est in list_estimators],
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator', [est[0] for est in metric_learners],
+                         ids=ids_metric_learners)
 @pytest.mark.parametrize('preprocessor', [None, mock_preprocessor])
 def test_no_attributes_set_in_init(estimator, preprocessor):
   """Check setting during init. Adapted from scikit-learn."""
@@ -209,8 +209,8 @@ def test_no_attributes_set_in_init(estimator, preprocessor):
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_estimators_fit_returns_self(estimator, build_dataset,
                                      with_preprocessor):
   """Check if self is returned when calling fit"""
@@ -222,8 +222,8 @@ def test_estimators_fit_returns_self(estimator, build_dataset,
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_pipeline_consistency(estimator, build_dataset,
                               with_preprocessor):
   # Adapted from scikit learn
@@ -264,8 +264,8 @@ def test_pipeline_consistency(estimator, build_dataset,
 
 
 @pytest.mark.parametrize('with_preprocessor',[True, False])
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
   # Adapted from scikit-learn
   tuples, y, preprocessor, to_transform = build_dataset(with_preprocessor)
@@ -291,8 +291,8 @@ def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
 
 
 @pytest.mark.parametrize('with_preprocessor',[True, False])
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_dont_overwrite_parameters(estimator, build_dataset,
                                    with_preprocessor):
   # Adapted from scikit-learn

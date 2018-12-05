@@ -138,8 +138,8 @@ ids_tuples_learners = ids_pairs_learners + ids_quadruplets_learners
 supervised_learners = classifiers + regressors
 ids_supervised_learners = ids_classifiers + ids_regressors
 
-list_estimators = tuples_learners + supervised_learners
-ids_estimators = ids_tuples_learners + ids_supervised_learners
+metric_learners = tuples_learners + supervised_learners
+ids_metric_learners = ids_tuples_learners + ids_supervised_learners
 
 
 def mock_preprocessor(indices):
@@ -886,8 +886,8 @@ def test_error_message_tuple_size(estimator):
   assert str(raised_err.value) == expected_msg
 
 
-@pytest.mark.parametrize('estimator, _', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, _', metric_learners,
+                         ids=ids_metric_learners)
 def test_error_message_t_score_pairs(estimator, _):
   """tests that if you want to score_pairs on triplets for instance, it returns
   the right error message
@@ -937,8 +937,8 @@ def test_preprocess_points_simple_example():
   assert (preprocess_points(array, fun) == expected_result).all()
 
 
-@pytest.mark.parametrize('estimator, build_dataset', list_estimators,
-                         ids=ids_estimators)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_same_with_or_without_preprocessor(estimator, build_dataset):
   """Test that algorithms using a preprocessor behave consistently
 # with their no-preprocessor equivalent
