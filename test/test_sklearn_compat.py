@@ -87,14 +87,15 @@ RNG = check_random_state(0)
 # ---------------------- Test scikit-learn compatibility ----------------------
 
 
-@pytest.mark.parametrize('preprocessor', [True, False])
+@pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_cross_validation_is_finite(estimator, build_dataset, preprocessor):
+def test_cross_validation_is_finite(estimator, build_dataset,
+                                    with_preprocessor):
   """Tests that validation on metric-learn estimators returns something finite
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    tuples, y, preprocessor, _ = build_dataset(preprocessor)
+    tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
@@ -104,17 +105,17 @@ def test_cross_validation_is_finite(estimator, build_dataset, preprocessor):
       assert np.isfinite(cross_val_predict(estimator, tuples, y)).all()
 
 
-@pytest.mark.parametrize('preprocessor', [True, False])
+@pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
 def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
-                                           preprocessor):
+                                           with_preprocessor):
   """Tests that if we make a manual cross-validation, the result will be the
   same as scikit-learn's cross-validation (some code for generating the
   folds is taken from scikit-learn).
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    tuples, y, preprocessor, _ = build_dataset(preprocessor)
+    tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
@@ -156,14 +157,14 @@ def check_predict(estimator, tuples):
     assert len(y_predicted), len(tuples)
 
 
-@pytest.mark.parametrize('preprocessor', [True, False])
+@pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_simple_estimator(estimator, build_dataset, preprocessor):
+def test_simple_estimator(estimator, build_dataset, with_preprocessor):
   """Tests that fit, predict and scoring works.
   """
   if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    tuples, y, preprocessor, _ = build_dataset(preprocessor)
+    tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
     (tuples_train, tuples_test, y_train,
      y_test) = train_test_split(tuples, y, random_state=RNG)
     estimator = clone(estimator)
@@ -207,25 +208,27 @@ def test_no_attributes_set_in_init(estimator, preprocessor):
        "attributes %s." % (type(estimator).__name__, sorted(invalid_attr)))
 
 
-@pytest.mark.parametrize('preprocessor', [True, False])
+@pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_estimators_fit_returns_self(estimator, build_dataset, preprocessor):
+def test_estimators_fit_returns_self(estimator, build_dataset,
+                                     with_preprocessor):
   """Check if self is returned when calling fit"""
   # Adapted from scikit-learn
-  tuples, y, preprocessor, _ = build_dataset(preprocessor)
+  tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   assert estimator.fit(tuples, y) is estimator
 
 
-@pytest.mark.parametrize('preprocessor', [True, False])
+@pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_pipeline_consistency(estimator, build_dataset, preprocessor):
+def test_pipeline_consistency(estimator, build_dataset,
+                              with_preprocessor):
   # Adapted from scikit learn
   # check that make_pipeline(est) gives same score as est
-  input_data, y, preprocessor, _ = build_dataset(preprocessor)
+  input_data, y, preprocessor, _ = build_dataset(with_preprocessor)
 
   def make_random_state(estimator, in_pipeline):
     rs = {}
@@ -260,12 +263,12 @@ def test_pipeline_consistency(estimator, build_dataset, preprocessor):
       assert_allclose_dense_sparse(result, result_pipe)
 
 
-@pytest.mark.parametrize('preprocessor',[True, False])
+@pytest.mark.parametrize('with_preprocessor',[True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_dict_unchanged(estimator, build_dataset, preprocessor):
+def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
   # Adapted from scikit-learn
-  tuples, y, preprocessor, to_transform = build_dataset(preprocessor)
+  tuples, y, preprocessor, to_transform = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   if hasattr(estimator, "num_dims"):
@@ -287,13 +290,14 @@ def test_dict_unchanged(estimator, build_dataset, preprocessor):
     check_dict()
 
 
-@pytest.mark.parametrize('preprocessor',[True, False])
+@pytest.mark.parametrize('with_preprocessor',[True, False])
 @pytest.mark.parametrize('estimator, build_dataset', list_estimators,
                          ids=ids_estimators)
-def test_dont_overwrite_parameters(estimator, build_dataset, preprocessor):
+def test_dont_overwrite_parameters(estimator, build_dataset,
+                                   with_preprocessor):
   # Adapted from scikit-learn
   # check that fit method only changes or sets private attributes
-  tuples, y, preprocessor, _ = build_dataset(preprocessor)
+  tuples, y, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   if hasattr(estimator, "num_dims"):

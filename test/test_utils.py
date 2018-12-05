@@ -30,25 +30,25 @@ Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 
 
 @pytest.fixture
-def build_classification(preprocessor=False):
+def build_classification(with_preprocessor=False):
   """Basic array for testing when using a preprocessor"""
   X, y = shuffle(*make_blobs(random_state=SEED),
                  random_state=SEED)
   indices = shuffle(np.arange(X.shape[0]), random_state=SEED).astype(int)
-  if preprocessor:
+  if with_preprocessor:
     return Dataset(indices, y[indices], X, indices)
   else:
     return Dataset(X[indices], y[indices], None, X[indices])
 
 
 @pytest.fixture
-def build_regression(preprocessor=False):
+def build_regression(with_preprocessor=False):
   """Basic array for testing when using a preprocessor"""
   X, y = shuffle(*make_regression(n_samples=100, n_features=5,
                                   random_state=SEED),
                  random_state=SEED)
   indices = shuffle(np.arange(X.shape[0]), random_state=SEED).astype(int)
-  if preprocessor:
+  if with_preprocessor:
     return Dataset(indices, y[indices], X, indices)
   else:
     return Dataset(X[indices], y[indices], None, X[indices])
@@ -67,13 +67,13 @@ def build_data():
   return X, pairs
 
 
-def build_pairs(preprocessor=False):
+def build_pairs(with_preprocessor=False):
   # builds a toy pairs problem
   X, indices = build_data()
   c = np.vstack([np.column_stack(indices[:2]), np.column_stack(indices[2:])])
   target = np.concatenate([np.ones(indices[0].shape[0]),
                            - np.ones(indices[0].shape[0])])
-  if preprocessor:
+  if with_preprocessor:
     # if preprocessor, we build a 2D array of pairs of indices
     return Dataset(*shuffle(c, target, random_state=SEED), X, c[:, 0])
   else:
@@ -81,13 +81,13 @@ def build_pairs(preprocessor=False):
     return Dataset(*shuffle(X[c], target, random_state=SEED), None, X[c[:, 0]])
 
 
-def build_quadruplets(preprocessor=False):
+def build_quadruplets(with_preprocessor=False):
   # builds a toy quadruplets problem
   X, indices = build_data()
   c = np.column_stack(indices)
   target = np.ones(c.shape[0])  # quadruplets targets are not used
   # anyways
-  if preprocessor:
+  if with_preprocessor:
     # if preprocessor, we build a 2D array of quadruplets of indices
     return Dataset(*shuffle(c, target, random_state=SEED), X, c[:, 0])
   else:
