@@ -778,34 +778,6 @@ def test_preprocess_points_invalid_message(estimator):
   assert str(raised_error.value) == expected_msg
 
 
-def test_progress_message_preprocessor_points(capsys):
-  """Tests that when using a preprocessor on points, a message is printed
-  """
-  points = np.array([1, 2, 4])
-
-  def fun(row):
-    return [[1, 1], [3, 3], [4, 4]]
-
-  preprocess_points(points, preprocessor=fun)
-  out, _ = capsys.readouterr()
-  assert out == "Preprocessing points...\n"
-
-
-def test_progress_message_preprocessor_tuples(capsys):
-  """Tests that when using a preprocessor on tuples, a message is printed
-  """
-  tuples = np.array([[1, 2],
-                     [2, 3],
-                     [4, 5]])
-
-  def fun(row):
-    return np.array([[1, 1], [3, 3], [4, 4]])
-
-  preprocess_tuples(tuples, preprocessor=fun)
-  out, _ = capsys.readouterr()
-  assert out == "Preprocessing tuples...\n"
-
-
 def test_preprocessor_error_message():
   """Tests whether the preprocessor returns a preprocessor error when there
   is a problem using the preprocessor

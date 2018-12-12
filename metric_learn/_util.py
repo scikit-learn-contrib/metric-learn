@@ -17,7 +17,7 @@ else:
 
 def check_input(input_data, y=None, preprocessor=None,
                 type_of_inputs='classic', tuple_size=None, accept_sparse=False,
-                dtype="numeric", order=None,
+                dtype='numeric', order=None,
                 copy=False, force_all_finite=True,
                 multi_output=False, ensure_min_samples=1,
                 ensure_min_features=1, y_numeric=False,
@@ -53,13 +53,11 @@ def check_input(input_data, y=None, preprocessor=None,
   tuple_size : int
     The number of elements in a tuple (e.g. 2 for pairs).
 
-  dtype : string, type, list of types or None (default="auto")
+  dtype : string, type, list of types or None (default='numeric')
     Data type of result. If None, the dtype of the input is preserved.
-    If "numeric", dtype is preserved unless array.dtype is object.
+    If 'numeric', dtype is preserved unless array.dtype is object.
     If dtype is a list of types, conversion on the first type is only
-    performed if the dtype of the input is not in the list. If
-    "auto", will we be set to "numeric" if `preprocessor=True`,
-    else to None.
+    performed if the dtype of the input is not in the list.
 
   order : 'F', 'C' or None (default=`None`)
     Whether an array will be forced to be fortran or c-style.
@@ -173,9 +171,9 @@ def check_input_tuples(input_data, context, preprocessor, args_for_sk_checks,
                                args_for_sk_checks['ensure_min_features'],
                                context))
   #  normally we don't need to check_tuple_size too because tuple_size
-  # should'nt be able to be modified by any preprocessor
-  if input_data.ndim != 3:  # we have to ensure this because check_array
-    # above does not
+  # shouldn't be able to be modified by any preprocessor
+  if input_data.ndim != 3:
+    # we have to ensure this because check_array above does not
     if preprocessor_has_been_applied:
       make_error_input(211, input_data, context)
     else:
@@ -202,8 +200,8 @@ def check_input_classic(input_data, context, preprocessor, args_for_sk_checks):
 
   input_data = check_array(input_data, allow_nd=True, ensure_2d=False,
                            **args_for_sk_checks)
-  if input_data.ndim != 2:  # we have to ensure this because check_array
-                            # above does not
+  if input_data.ndim != 2:
+    # we have to ensure this because check_array above does not
     if preprocessor_has_been_applied:
       make_error_input(111, input_data, context)
     else:
@@ -241,7 +239,6 @@ def make_error_input(code, input_data, context):
 
 
 def preprocess_tuples(tuples, preprocessor):
-  print("Preprocessing tuples...")
   try:
     tuples = np.column_stack([preprocessor(tuples[:, i])[:, np.newaxis] for
                               i in range(tuples.shape[1])])
@@ -253,7 +250,6 @@ def preprocess_tuples(tuples, preprocessor):
 def preprocess_points(points, preprocessor):
   """form points if there is a preprocessor else keep them as such (assumes
   that check_points has already been called)"""
-  print("Preprocessing points...")
   try:
     points = preprocessor(points)
   except Exception as e:
