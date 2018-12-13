@@ -6,6 +6,7 @@ Mahalanobis Metric Learning for Clustering (MMC)
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :special-members: __init__
 
 Example Code
 ------------
