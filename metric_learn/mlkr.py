@@ -13,7 +13,6 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.base import TransformerMixin
 from sklearn.decomposition import PCA
 
-from sklearn.utils.validation import check_X_y
 
 from .base_metric import MahalanobisMixin
 
@@ -30,7 +29,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   """
 
   def __init__(self, num_dims=None, A0=None, epsilon=0.01, alpha=0.0001,
-               max_iter=1000):
+               max_iter=1000, preprocessor=None):
     """
     Initialize MLKR.
 
@@ -50,16 +49,30 @@ class MLKR(MahalanobisMixin, TransformerMixin):
 
     max_iter: int, optional
         Cap on number of congugate gradient iterations.
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.num_dims = num_dims
     self.A0 = A0
     self.epsilon = epsilon
     self.alpha = alpha
     self.max_iter = max_iter
+    super(MLKR, self).__init__(preprocessor)
 
-  def _process_inputs(self, X, y):
-      self.X_, y = check_X_y(X, y)
-      n, d = self.X_.shape
+  def fit(self, X, y):
+      """
+      Fit MLKR model
+
+      Parameters
+      ----------
+      X : (n x d) array of samples
+      y : (n) data labels
+      """
+      X, y = self._prepare_inputs(X, y, y_numeric=True,
+                                  ensure_min_samples=2)
+      n, d = X.shape
       if y.shape[0] != n:
           raise ValueError('Data and label lengths mismatch: %d != %d'
                            % (n, y.shape[0]))
@@ -75,18 +88,6 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       elif A.shape != (m, d):
           raise ValueError('A0 needs shape (%d,%d) but got %s' % (
               m, d, A.shape))
-      return self.X_, y, A
-
-  def fit(self, X, y):
-      """
-      Fit MLKR model
-
-      Parameters
-      ----------
-      X : (n x d) array of samples
-      y : (n) data labels
-      """
-      X, y, A = self._process_inputs(X, y)
 
       # note: this line takes (n*n*d) memory!
       # for larger datasets, we'll need to compute dX as we go

@@ -16,7 +16,6 @@ import scipy
 import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_X_y
 from sklearn.base import TransformerMixin
 from .base_metric import MahalanobisMixin
 
@@ -32,7 +31,8 @@ class LFDA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   '''
 
-  def __init__(self, num_dims=None, k=None, embedding_type='weighted'):
+  def __init__(self, num_dims=None, k=None, embedding_type='weighted',
+               preprocessor=None):
     '''
     Initialize LFDA.
 
@@ -50,17 +50,32 @@ class LFDA(MahalanobisMixin, TransformerMixin):
           'weighted'        - weighted eigenvectors
           'orthonormalized' - orthonormalized
           'plain'           - raw eigenvectors
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     '''
     if embedding_type not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid embedding_type: %r' % embedding_type)
     self.num_dims = num_dims
     self.embedding_type = embedding_type
     self.k = k
+    super(LFDA, self).__init__(preprocessor)
 
-  def _process_inputs(self, X, y):
+  def fit(self, X, y):
+    '''Fit the LFDA model.
+
+    Parameters
+    ----------
+    X : (n, d) array-like
+        Input data.
+
+    y : (n,) array-like
+        Class labels, one per point of data.
+    '''
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     unique_classes, y = np.unique(y, return_inverse=True)
-    self.X_, y = check_X_y(X, y)
-    n, d = self.X_.shape
+    n, d = X.shape
     num_classes = len(unique_classes)
 
     if self.num_dims is None:
@@ -77,21 +92,6 @@ class LFDA(MahalanobisMixin, TransformerMixin):
       k = d - 1
     else:
       k = int(self.k)
-
-    return self.X_, y, num_classes, n, d, dim, k
-
-  def fit(self, X, y):
-    '''Fit the LFDA model.
-
-    Parameters
-    ----------
-    X : (n, d) array-like
-        Input data.
-
-    y : (n,) array-like
-        Class labels, one per point of data.
-    '''
-    X, y, num_classes, n, d, dim, k_ = self._process_inputs(X, y)
     tSb = np.zeros((d,d))
     tSw = np.zeros((d,d))
 
@@ -102,8 +102,8 @@ class LFDA(MahalanobisMixin, TransformerMixin):
       # classwise affinity matrix
       dist = pairwise_distances(Xc, metric='l2', squared=True)
       # distances to k-th nearest neighbor
-      k = min(k_, nc-1)
-      sigma = np.sqrt(np.partition(dist, k, axis=0)[:,k])
+      k = min(k, nc - 1)
+      sigma = np.sqrt(np.partition(dist, k, axis=0)[:, k])
 
       local_scale = np.outer(sigma, sigma)
       with np.errstate(divide='ignore', invalid='ignore'):
