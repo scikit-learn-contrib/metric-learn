@@ -21,14 +21,11 @@ labels `y`, and learn a distance matrix that make points from the same class
 each other, and points from different classes or with distant target values
 far away from each other.
 
-.. toctree::
-   :maxdepth: 1
-
-   metric_learn.covariance
-   metric_learn.lmnn
-   metric_learn.nca
-   metric_learn.lfda
-   metric_learn.mlkr
+- `Covariance <metric_learn.covariance.html>`_
+- `LMNN <metric_learn.lmnn.html>`_
+- `NCA <metric_learn.nca.html>`_
+- `LFDA <metric_learn.covariance.html>`_
+- `MLKR <metric_learn.mlkr.html>`_
 
 Weakly-Supervised Algorithms
 --------------------------
@@ -38,14 +35,11 @@ similarity judgments on tuples of data points, for instance pairs of similar
 and dissimilar points. Refer to the documentation of each algorithm for its
 particular form of input data.
 
-.. toctree::
-   :maxdepth: 1
-
-   metric_learn.itml
-   metric_learn.lsml
-   metric_learn.sdml
-   metric_learn.rca
-   metric_learn.mmc
+- `ITML <metric_learn.itml.html>`_
+- `LSML <metric_learn.lsml.html>`_
+- `SDML <metric_learn.sdml.html>`_
+- `RCA <metric_learn.rca.html>`_
+- `MMC <metric_learn.mmc.html>`_
 
 Note that each weakly-supervised algorithm has a supervised version of the form
 `*_Supervised` where similarity constraints are generated from
@@ -91,6 +85,20 @@ more complete.
 Navigation
 ----------
 
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+
+   getting_started
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: User Guide
+
+   user_guide
+
 :ref:`genindex` | :ref:`modindex` | :ref:`search`
 
 .. toctree::
@@ -98,6 +106,14 @@ Navigation
    :hidden:
 
    Package Overview <metric_learn>
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Tutorial - Examples
+
+   auto_examples/index
+
 
 .. |PyPI version| image:: https://badge.fury.io/py/metric-learn.svg
    :target: http://badge.fury.io/py/metric-learn
