@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
 """
+Sandwich demo
+=============
+
 Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 """
 

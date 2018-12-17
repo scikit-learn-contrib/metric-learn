@@ -7,6 +7,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'numpydoc',
+    'sphinx_gallery.gen_gallery'
 ]
 
 templates_path = ['_templates']
