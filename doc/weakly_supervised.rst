@@ -12,26 +12,27 @@ particular form of input data.
 Input data
 ==========
 
-In the following paragraph we talk about tuples for sake of generality.
-These can be pairs, triplets, quadruplets etc, depending on what algorithm we
-use.
+In the following paragraph we talk about tuples for sake of generality. These
+can be pairs, triplets, quadruplets etc, depending on what algorithm we use.
 
 Basic form
 ----------
-Every weakly supervised algorithm will take as input tuples of points, and if needed labels for theses tuples.
+Every weakly supervised algorithm will take as input tuples of points, and if
+needed labels for theses tuples.
 
 
 The `tuples` argument is the first argument of every method (like the X
-argument for classical algorithms in scikit-learn). The second argument is
-the label of the tuple: what it is depends on the algorithm used. For
-instance for pairs learners ``y`` is a label indicating if the pair is of
-similar samples or dissimilar samples.
+argument for classical algorithms in scikit-learn). The second argument is the
+label of the tuple: what it is depends on the algorithm used. For instance for
+pairs learners ``y`` is a label indicating if the pair is of similar samples or
+dissimilar samples.
 
 Then one can fit a Weakly Supervised Metric Learner on this tuple, like this:
 
 >>> my_algo.fit(tuples, y)
 
-Like in a classical setting we split the points ``X`` between train and test, here we split the ``tuples`` between train and test.
+Like in a classical setting we split the points ``X`` between train and test,
+here we split the ``tuples`` between train and test.
 
 >>> from sklearn.model_selection import train_test_split
 >>> pairs_train, pairs_test, y_train, y_test = train_test_split(pairs, y)
@@ -48,7 +49,7 @@ The most intuitive way to represent tuples is to provide the algorithm with a
 in a tuple (2 for pairs, 3 for triplets for instance), and ``n_features`` is
 the number of features of each point.
 
-.. rubric:: Example:
+.. topic:: Example:
    Here is an artificial dataset of 4 pairs of 2 points of 3 features each:
 
 >>> import numpy as np
@@ -80,7 +81,7 @@ would be to keep the dataset of points ``X`` aside, and just represent tuples
 as a collection of tuples of *indices* from the points in ``X``. Since we loose
 the feature dimension there, the resulting array is 2D.
 
-.. rubric:: Example: An equivalent representation of the above pairs would be:
+.. topic:: Example: An equivalent representation of the above pairs would be:
 
 >>> X = np.array([[-0.12, -1.21, -0.20],
 >>>               [+0.05, -0.19, -0.05],
@@ -94,12 +95,12 @@ the feature dimension there, the resulting array is 2D.
 >>>                            [0, 2]])
 >>> y = np.array([-1, 1, 1, -1])
 
-In order to fit metric learning algorithms with this type of input, we need
-to give the original dataset of points ``X`` to the estimator so that it
-knows what point the indices refer to. We do this when initializing the
-estimator, through the argument `preprocessor`.
+In order to fit metric learning algorithms with this type of input, we need to
+give the original dataset of points ``X`` to the estimator so that it knows
+what point the indices refer to. We do this when initializing the estimator,
+through the argument `preprocessor`.
 
-.. rubric:: Example:
+.. topic:: Example:
 
 >>> from metric_learn import MMC
 >>> mmc = MMC(preprocessor=X)
@@ -123,7 +124,7 @@ model selection (grid-search, cross-validation etc). See the scoring section
 for more details on what scoring is used in the case of Weakly Supervised
 Metric Learning.
 
-.. rubric:: Example
+.. topic:: Example
 
 >>> from metric_learn import MMC
 >>> from sklearn.datasets import load_iris
@@ -139,17 +140,17 @@ Metric Learning.
 Scoring
 =======
 
-Some default scoring are implemented in metric-learn, depending on which
-kind of tuples you work on. See the docstring of the `score` method of the
-estimator you use.
+Some default scoring are implemented in metric-learn, depending on which kind
+of tuples you work on. See the docstring of the `score` method of the estimator
+you use.
 
 
 Algorithms
 ==================
 
 Note that each weakly-supervised algorithm has a supervised version of the form
-`*_Supervised` where similarity tuples are generated from
-the labels information and passed to the underlying algorithm.
+`*_Supervised` where similarity tuples are generated from the labels
+information and passed to the underlying algorithm.
 
 .. todo:: add more details on `_Supervised` classes
 
@@ -159,15 +160,14 @@ the labels information and passed to the underlying algorithm.
 Information Theoretic Metric Learning, Kulis et al., ICML 2007
 
 `ITML` minimizes the differential relative entropy between two multivariate
-Gaussians under constraints on the distance function,
-which can be formulated into a Bregman optimization problem by minimizing the
-LogDet divergence subject to linear constraints.
-This algorithm can handle a wide variety of constraints and can optionally
-incorporate a prior on the distance function.
-Unlike some other methods, ITML does not rely on an eigenvalue computation
-or semi-definite programming.
+Gaussians under constraints on the distance function, which can be formulated
+into a Bregman optimization problem by minimizing the LogDet divergence subject
+to linear constraints. This algorithm can handle a wide variety of constraints
+and can optionally incorporate a prior on the distance function. Unlike some
+other methods, ITML does not rely on an eigenvalue computation or semi-definite
+programming.
 
-.. rubric:: Example Code:
+.. topic:: Example Code:
 
 ::
 
@@ -181,10 +181,14 @@ or semi-definite programming.
     itml = ITML_Supervised(num_constraints=200)
     itml.fit(X, Y)
 
-.. rubric:: References:
+.. topic:: References:
 
-`Information-theoretic Metric Learning <http://machinelearning.wustl.edu/mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis, et al.
-Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
+    .. [1] `Information-theoretic Metric Learning <http://machinelearning.wustl
+       .edu/mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis,
+       et al.
+
+    .. [2] Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/
+       itml/
 
 
 2. LSML
@@ -193,7 +197,7 @@ Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
 `LSML`: Metric Learning from Relative Comparisons by Minimizing Squared
 Residual
 
-.. rubric:: Example Code:
+.. topic:: Example Code:
 
 ::
 
@@ -207,14 +211,13 @@ Residual
     lsml = LSML_Supervised(num_constraints=200)
     lsml.fit(X, Y)
 
-.. rubric:: References:
+.. topic:: References:
 
-Liu et al.
-"Metric Learning from Relative Comparisons by Minimizing Squared Residual".
-ICDM 2012.
+    .. [1] Liu et al.
+       "Metric Learning from Relative Comparisons by Minimizing Squared
+       Residual". ICDM 2012. http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
 
-Adapted from https://gist.github.com/kcarnold/5439917
-Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
+    .. [2] Adapted from https://gist.github.com/kcarnold/5439917
 
 
 3. SDML
@@ -223,7 +226,7 @@ Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
 `SDML`: An efficient sparse metric learning in high-dimensional space via
 L1-penalized log-determinant regularization
 
-.. rubric:: Example Code:
+.. topic:: Example Code:
 
 ::
 
@@ -237,15 +240,15 @@ L1-penalized log-determinant regularization
     sdml = SDML_Supervised(num_constraints=200)
     sdml.fit(X, Y)
 
-.. rubric:: References:
+.. topic:: References:
 
-Qi et al.
-An efficient sparse metric learning in high-dimensional space via
-L1-penalized log-determinant regularization.
-ICML 2009
+    .. [1] Qi et al.
+       An efficient sparse metric learning in high-dimensional space via
+       L1-penalized log-determinant regularization. ICML 2009.
+       http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/
+       icml09-guojun.pdf
 
-Adapted from https://gist.github.com/kcarnold/5439945
-Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf
+    .. [2] Adapted from https://gist.github.com/kcarnold/5439945
 
 
 4. RCA
@@ -253,14 +256,13 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 
 Relative Components Analysis (RCA)
 
-`RCA` learns a full rank Mahalanobis distance metric based on a
-weighted sum of in-class covariance matrices.
-It applies a global linear transformation to assign large weights to
-relevant dimensions and low weights to irrelevant dimensions.
-Those relevant dimensions are estimated using "chunklets",
-subsets of points that are known to belong to the same class.
+`RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
+in-class covariance matrices. It applies a global linear transformation to
+assign large weights to relevant dimensions and low weights to irrelevant
+dimensions. Those relevant dimensions are estimated using "chunklets", subsets
+of points that are known to belong to the same class.
 
-.. rubric:: Example Code:
+.. topic:: Example Code:
 
 ::
 
@@ -274,10 +276,15 @@ subsets of points that are known to belong to the same class.
     rca = RCA_Supervised(num_chunks=30, chunk_size=2)
     rca.fit(X, Y)
 
-.. rubric:: References:
-`Adjustment learning and relevant component analysis <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam Shental, et al.
-'Learning distance functions using equivalence relations', ICML 2003
-'Learning a Mahalanobis metric from equivalence constraints', JMLR 2005
+.. topic:: References:
+    .. [1] `Adjustment learning and relevant component analysis
+       <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871
+       &rep=rep1&type=pdf>`_ Noam Shental, et al.
+
+    .. [2] 'Learning distance functions using equivalence relations', ICML 2003
+
+    .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
+       2005
 
 5. MMC
 ------
@@ -295,9 +302,10 @@ implicit assumptions of MMC is that all classes form a compact set, i.e.,
 follow a unimodal distribution, which restricts the possible use-cases of this
 method. However, it is one of the earliest and a still often cited technique.
 
-Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
+Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/
+code_Metric_online.tar.gz
 
-.. rubric:: Example Code:
+.. topic:: Example Code:
 
 ::
 
@@ -311,6 +319,9 @@ Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/co
     mmc = MMC_Supervised(num_constraints=200)
     mmc.fit(X, Y)
 
-.. rubric:: References:
+.. topic:: References:
 
-`Distance metric learning with application to clustering with side-information <http://papers.nips.cc/paper/2164-distance-metric-learning-with-application-to-clustering-with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
+  .. [1] `Distance metric learning with application to clustering with
+        side-information <http://papers.nips
+        .cc/paper/2164-distance-metric-learning-with-application-to-clustering
+        -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
