@@ -69,38 +69,21 @@ Example with a supervised metric learner:
 
 The callable should take as input an array-like, and return a 2D array-like.
 
->>> def find_images(arr):
->>>     X = np.array([[-0.7 , -0.23],
->>>                   [-0.43, -0.49],
->>>                   [ 0.14, -0.37]])  # array of 3 samples of 2 features
->>>     result = []
->>>     for img_path in arr:
->>>         result.append(X[int(img_path[3:5])])
->>>         # transforms 'img01.png' into X[1]
->>>     return np.array(result)
->>> images_paths = ['img01.png', 'img00.png', 'img02.png']
->>> y = np.array([1, 0, 1])
+>>> def find_images(file_paths):
+>>>    # each file contains a small image to use as an input datapoint
+>>>    return np.row_stack([imread(f).ravel() for f in file_paths])
 >>>
 >>> nca = NCA(preprocessor=find_images)
->>> nca.fit(images_paths, y)
+>>> nca.fit(['img01.png', 'img00.png', 'img02.png'], [1, 0, 1])
 >>> # under the hood preprocessor(indicators) will be called
 
 
 Example with a weakly supervised metric learner:
 
 The given callable should take as input an array-like, and return a
-2D array-like. It will be called on each column of the input tuples of
-indicators.
+2D array-like, as before. It will be called on each column of the input
+tuples of indicators.
 
->>> def find_images(arr):
->>>     X = np.array([[-0.7 , -0.23],
->>>                   [-0.43, -0.49],
->>>                   [ 0.14, -0.37]])  # array of 3 samples of 2 features
->>>     result = []
->>>     for img_path in arr:
->>>         result.append(X[int(img_path[3:5])])
->>>         # transforms 'img01.png' into X[1]
->>>     return np.array(result)
 >>> pairs_images_paths = [['img02.png', 'img00.png'],
 >>>                       ['img01.png', 'img00.png']]
 >>> y_pairs = np.array([1, -1])
@@ -113,18 +96,19 @@ indicators.
 
 .. note:: Note that when you fill the ``preprocessor`` option, it allows you
  to give more compact inputs, but the classical way of providing inputs
- stays valid (2D array-like for ``X`` for supervised learners and 3D
- array-like of tuples for weakly supervised learners).
+ stays valid (2D array-like for supervised learners and 3D array-like of
+ tuples for weakly supervised learners). If a classical input
+ is provided, the metric learner will not use the preprocessor.
 
- Example: This would work:
+ Example: This will work:
 
  >>> from metric_learn import MMC
- >>> X = np.array([[-0.7 , -0.23],
- >>>               [-0.43, -0.49],
- >>>               [ 0.14, -0.37]])  # array of 3 samples of 2 features
+ >>> def preprocessor_wip(array):
+ >>>    return NotImplementedError("This preprocessor does nothing yet.")
+ >>>
  >>> pairs = np.array([[[ 0.14, -0.37], [-0.7 , -0.23]],
  >>>                   [[-0.43, -0.49], [-0.7 , -0.23]]])
  >>> y_pairs = np.array([1, -1])
  >>>
- >>> mmc = MMC(preprocessor=X)
- >>> mmc.fit(pairs, y_pairs)
+ >>> mmc = MMC(preprocessor=preprocessor_wip)
+ >>> mmc.fit(pairs, y_pairs)  # preprocessor_wip will not be called here

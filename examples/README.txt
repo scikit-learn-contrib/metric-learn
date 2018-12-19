@@ -1,4 +1,4 @@
 Examples
 ========
 
-Below is a gallery of example of metric-learn use cases.
+Below is a gallery of example metric-learn use cases.
