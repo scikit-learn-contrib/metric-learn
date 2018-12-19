@@ -32,3 +32,6 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 htmlhelp_basename = 'metric-learndoc'
 
+# Option to only need single backticks to refer to symbols
+default_role = 'any'
+

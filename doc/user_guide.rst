@@ -12,5 +12,4 @@ User Guide
    introduction.rst
    supervised.rst
    weakly_supervised.rst
-   mahalanobis.rst
    preprocessor.rst

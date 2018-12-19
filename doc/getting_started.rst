@@ -2,5 +2,37 @@
 Getting started
 ###############
 
- .. note:: Put some getting started content here (installation, and some
- very simple example)
+Installation and Setup
+======================
+
+Run ``pip install metric-learn`` to download and install from PyPI.
+
+Alternately, download the source repository and run:
+
+-  ``python setup.py install`` for default installation.
+-  ``python setup.py test`` to run all tests.
+
+**Dependencies**
+
+-  Python 2.7+, 3.4+
+-  numpy, scipy, scikit-learn
+-  (for running the examples only: matplotlib)
+
+**Notes**
+
+If a recent version of the Shogun Python modular (``modshogun``) library
+is available, the LMNN implementation will use the fast C++ version from
+there. The two implementations differ slightly, and the C++ version is
+more complete.
+
+
+Quick start
+===========
+
+>>> from metric_learn import NCA
+>>> from sklearn.datasets import load_iris
+>>> from sklearn.model_selection import cross_val_score
+>>>
+>>> X, y = load_iris(return_X_y=True)
+>>> nca = NCA(n_components=2)
+>>> cross_val_score(nca, X, y)
