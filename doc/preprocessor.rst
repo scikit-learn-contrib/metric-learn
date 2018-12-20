@@ -8,7 +8,11 @@ Estimators in metric-learn all have a ``preprocessor`` option at instantiation.
 Filling this argument allows them to take more compact input representation
 when fitting, predicting etc...
 
-Two types of objects can be put in this argument:
+If ``preprocessor=None``, no preprocessor will be used and the user must
+provide the classical representation to the fit/predict/score/etc... methods of
+the estimators (see the documentation of the particular estimator to know what
+type of input it accepts). Otherwise, two types of objects can be put in this
+argument:
 
 Array-like
 ----------
