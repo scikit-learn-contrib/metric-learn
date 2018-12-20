@@ -114,7 +114,7 @@ through the argument `preprocessor`.
    ``preprocessor``, which will go fetch and form the tuples. This allows to
    give more general indicators than just indices from an array (for instance
    paths in the filesystem, name of records in a database etc...) See section
-   :ref:`preprocessor` for more details on how to use the preprocessor.
+   :ref:`preprocessor_section` for more details on how to use the preprocessor.
 
 
 Scikit-learn compatibility

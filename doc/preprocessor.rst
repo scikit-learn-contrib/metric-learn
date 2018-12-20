@@ -1,4 +1,4 @@
-:ref:`preprocessor`
+.. _preprocessor_section:
 
 ============
 Preprocessor
