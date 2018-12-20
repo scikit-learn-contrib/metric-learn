@@ -22,7 +22,7 @@ Covariance
 
 .. todo:: Covariance is unsupervised, so its doc should not be here.
 
-:class:`Covariance` does not "learn" anything, rather it calculates
+`Covariance` does not "learn" anything, rather it calculates
 the covariance matrix of the input data. This is a simple baseline method.
 
 .. topic:: Example Code:
@@ -46,7 +46,7 @@ LMNN
 
 Large-margin nearest neighbor metric learning.
 
-:class:`LMNN` learns a Mahanalobis distance metric in the kNN classification
+`LMNN` learns a Mahanalobis distance metric in the kNN classification
 setting using semidefinite programming. The learned metric attempts to keep
 k-nearest neighbors in the same class, while keeping examples from different
 classes separated by a large margin. This algorithm makes no assumptions about
@@ -83,7 +83,7 @@ The two implementations differ slightly, and the C++ version is more complete.
 NCA
 ---
 
-Neighborhood Components Analysis (:class:`NCA`) is a distance metric learning
+Neighborhood Components Analysis (`NCA`) is a distance metric learning
 algorithm which aims to improve the accuracy of nearest neighbors
 classification compared to the standard Euclidean distance. The algorithm
 directly  maximizes  a stochastic  variant  of  the leave-one-out k-nearest
@@ -121,7 +121,7 @@ LFDA
 
 Local Fisher Discriminant Analysis (LFDA)
 
-:class:`LFDA` is a linear supervised dimensionality reduction method. It is
+`LFDA` is a linear supervised dimensionality reduction method. It is
 particularly useful when dealing with multimodality, where one ore more classes
 consist of separate clusters in input space. The core optimization problem of
 LFDA is solved as a generalized eigenvalue problem.
@@ -157,7 +157,7 @@ MLKR
 
 Metric Learning for Kernel Regression.
 
-:class:`MLKR` is an algorithm for supervised metric learning, which learns a
+`MLKR` is an algorithm for supervised metric learning, which learns a
 distance function by directly minimising the leave-one-out regression error.
 This algorithm can also be viewed as a supervised variation of PCA and can be
 used for dimensionality reduction and high dimensional data visualization.
