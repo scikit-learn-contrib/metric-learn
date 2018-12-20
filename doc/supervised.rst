@@ -181,3 +181,29 @@ used for dimensionality reduction and high dimensional data visualization.
     .. [1] `Metric Learning for Kernel Regression <http://proceedings.mlr.
        press/v2/weinberger07a/weinberger07a.pdf>`_ Kilian Q. Weinberger,
        Gerald Tesauro
+
+
+Supervised versions of weakly-supervised algorithms
+---------------------------------------------------
+
+Note that each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
+has a supervised version of the form `*_Supervised` where similarity tuples are
+generated from the labels information and passed to the underlying algorithm.
+
+.. todo:: add more details about that (see issue `<https://github
+          .com/metric-learn/metric-learn/issues/135>`_)
+
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import MMC_Supervised
+    from sklearn.datasets import load_iris
+
+    iris_data = load_iris()
+    X = iris_data['data']
+    Y = iris_data['target']
+
+    mmc = MMC_Supervised(num_constraints=200)
+    mmc.fit(X, Y)

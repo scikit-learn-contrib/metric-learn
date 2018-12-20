@@ -1,3 +1,5 @@
+.. _weakly_supervised_section:
+
 =================================
 Weakly Supervised Metric Learning
 =================================
@@ -340,29 +342,3 @@ method. However, it is one of the earliest and a still often cited technique.
         -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
   .. [2] Adapted from Matlab code `here <http://www.cs.cmu
      .edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz>`_.
-
-
-_Supervised version
---------------------
-
-Note that each weakly-supervised algorithm has a supervised version of the form
-`*_Supervised` where similarity tuples are generated from the labels
-information and passed to the underlying algorithm.
-
-.. todo:: add more details about that (see issue https://github
-          .com/metric-learn/metric-learn/issues/135)
-
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import MMC_Supervised
-    from sklearn.datasets import load_iris
-
-    iris_data = load_iris()
-    X = iris_data['data']
-    Y = iris_data['target']
-
-    mmc = MMC_Supervised(num_constraints=200)
-    mmc.fit(X, Y)
