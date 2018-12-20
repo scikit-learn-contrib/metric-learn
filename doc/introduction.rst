@@ -10,7 +10,9 @@ Distance metric learning (or simply, metric learning) is the sub-field of
 machine learning dedicated to automatically constructing optimal distance
 metrics.
 
-This package contains efficient Python implementations of several popular
+This package contains a efficient Python implementations of several popular
+metric learning algorithms, compatible with scikit-learn. This allows to use
+all the scikit-learn routines for pipelining and model selection for
 metric learning algorithms.
 
 
