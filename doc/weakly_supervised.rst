@@ -149,12 +149,6 @@ tuples you're working with (pairs, triplets...). See the docstring of the
 Algorithms
 ==================
 
-Note that each weakly-supervised algorithm has a supervised version of the form
-`*_Supervised` where similarity tuples are generated from the labels
-information and passed to the underlying algorithm.
-
-.. todo:: add more details on `_Supervised` classes
-
 ITML
 ----
 
@@ -278,6 +272,7 @@ of points that are known to belong to the same class.
     rca.fit(X, Y)
 
 .. topic:: References:
+
     .. [1] `Adjustment learning and relevant component analysis
        <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871
        &rep=rep1&type=pdf>`_ Noam Shental, et al.
@@ -303,9 +298,6 @@ implicit assumptions of MMC is that all classes form a compact set, i.e.,
 follow a unimodal distribution, which restricts the possible use-cases of this
 method. However, it is one of the earliest and a still often cited technique.
 
-Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/
-code_Metric_online.tar.gz
-
 .. topic:: Example Code:
 
 ::
@@ -326,3 +318,31 @@ code_Metric_online.tar.gz
         side-information <http://papers.nips
         .cc/paper/2164-distance-metric-learning-with-application-to-clustering
         -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
+  .. [2] Adapted from Matlab code `here <http://www.cs.cmu
+     .edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz>`_.
+
+
+_Supervised version
+--------------------
+
+Note that each weakly-supervised algorithm has a supervised version of the form
+`*_Supervised` where similarity tuples are generated from the labels
+information and passed to the underlying algorithm.
+
+.. todo:: add more details about that (see issue https://github
+          .com/metric-learn/metric-learn/issues/135)
+
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import MMC_Supervised
+    from sklearn.datasets import load_iris
+
+    iris_data = load_iris()
+    X = iris_data['data']
+    Y = iris_data['target']
+
+    mmc = MMC_Supervised(num_constraints=200)
+    mmc.fit(X, Y)
