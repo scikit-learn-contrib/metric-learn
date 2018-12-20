@@ -170,14 +170,15 @@ programming.
 
     from metric_learn import ITML
 
-    pairs = [[[1.2, 5.5], [1.3, 4.5]],
-             [[6.4, 4.6], [6.2, 3.7]],
-             [[1.3, 4.5], [6.4, 4.6]],
-             [[1.2, 5.5], [6.2, 5.4]]]
-
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
     y = [1, 1, -1, -1]
-    # we want to make closer points where the first feature is close, and
-    # further if the second feature is close
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
+
 
     itml = ITML()
     itml.fit(pairs, y)
@@ -204,10 +205,10 @@ Residual
 
     from metric_learn import LSML
 
-    quadruplets = [[[1.2, 5.5], [1.3, 4.5], [6.4, 4.6], [6.2, 3.7]],
-                   [[1.3, 4.5], [6.4, 4.6], [1.2, 5.5], [6.2, 5.4]],
-                   [[3.2, 5.5], [3.3, 4.5], [8.4, 4.6], [8.2, 3.7]],
-                   [[3.3, 4.5], [8.4, 4.6], [3.2, 5.5], [8.2, 5.4]]]
+    quadruplets = [[[1.2, 7.5], [1.3, 1.5], [6.4, 2.6], [6.2, 9.7]],
+                   [[1.3, 4.5], [3.2, 4.6], [6.2, 5.5], [5.4, 5.4]],
+                   [[3.2, 7.5], [3.3, 1.5], [8.4, 2.6], [8.2, 9.7]],
+                   [[3.3, 4.5], [5.2, 4.6], [8.2, 5.5], [7.4, 5.4]]]
 
     # we want to make closer points where the first feature is close, and
     # further if the second feature is close
@@ -236,14 +237,14 @@ L1-penalized log-determinant regularization
 
     from metric_learn import SDML
 
-    pairs = [[[1.2, 5.5], [1.3, 4.5]],
-             [[6.4, 4.6], [6.2, 3.7]],
-             [[1.3, 4.5], [6.4, 4.6]],
-             [[1.2, 5.5], [6.2, 5.4]]]
-
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
     y = [1, 1, -1, -1]
-    # we want to make closer points where the first feature is close, and
-    # further if the second feature is close
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
 
     sdml = SDML()
     sdml.fit(pairs, y)
@@ -276,14 +277,14 @@ of points that are known to belong to the same class.
 
     from metric_learn import RCA
 
-    pairs = [[[1.2, 5.5], [1.3, 4.5]],
-             [[6.4, 4.6], [6.2, 3.7]],
-             [[1.3, 4.5], [6.4, 4.6]],
-             [[1.2, 5.5], [6.2, 5.4]]]
-
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
     y = [1, 1, -1, -1]
-    # we want to make closer points where the first feature is close, and
-    # further if the second feature is close
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
 
     rca = RCA()
     rca.fit(pairs, y)
@@ -322,14 +323,14 @@ method. However, it is one of the earliest and a still often cited technique.
 
     from metric_learn import MMC
 
-    pairs = [[[1.2, 5.5], [1.3, 4.5]],
-             [[6.4, 4.6], [6.2, 3.7]],
-             [[1.3, 4.5], [6.4, 4.6]],
-             [[1.2, 5.5], [6.2, 5.4]]]
-
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
     y = [1, 1, -1, -1]
-    # we want to make closer points where the first feature is close, and
-    # further if the second feature is close
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
 
     mmc = MMC()
     mmc.fit(pairs, y)
