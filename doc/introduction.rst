@@ -16,15 +16,16 @@ all the scikit-learn routines for pipelining and model selection for
 metric learning algorithms.
 
 
-Each metric learning algorithm supports the following methods:
+Currently, each metric learning algorithm supports the following methods:
 
 -  ``fit(...)``, which learns the model.
--  ``transformer()``, which returns a transformation matrix
+-  ``metric()``, which returns a Mahalanobis matrix
+   :math:`M = L^{\top}L` such that distance between vectors ``x`` and
+   ``y`` can be computed as :math:`\left(x-y\right)M\left(x-y\right)`.
+-  ``transformer_from_metric(metric)``, which returns a transformation matrix
    :math:`L \in \mathbb{R}^{D \times d}`, which can be used to convert a
    data matrix :math:`X \in \mathbb{R}^{n \times d}` to the
    :math:`D`-dimensional learned metric space :math:`X L^{\top}`,
    in which standard Euclidean distances may be used.
 -  ``transform(X)``, which applies the aforementioned transformation.
--  ``metric()``, which returns a Mahalanobis matrix
-   :math:`M = L^{\top}L` such that distance between vectors ``x`` and
-   ``y`` can be computed as :math:`\left(x-y\right)M\left(x-y\right)`.
+- ``score_pairs`` which returns the similarity of pairs of points.
