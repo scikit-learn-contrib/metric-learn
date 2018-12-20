@@ -104,7 +104,7 @@ tuples of indicators.
 
  >>> from metric_learn import MMC
  >>> def preprocessor_wip(array):
- >>>    return NotImplementedError("This preprocessor does nothing yet.")
+ >>>    raise NotImplementedError("This preprocessor does nothing yet.")
  >>>
  >>> pairs = np.array([[[ 0.14, -0.37], [-0.7 , -0.23]],
  >>>                   [[-0.43, -0.49], [-0.7 , -0.23]]])
