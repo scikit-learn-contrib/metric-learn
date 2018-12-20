@@ -29,10 +29,14 @@ more complete.
 Quick start
 ===========
 
+This example loads the iris dataset, and evaluates a k-nearest neighbors
+algorithm on an embedding space learned with `NCA`.
+
 >>> from metric_learn import NCA
 >>> from sklearn.datasets import load_iris
 >>> from sklearn.model_selection import cross_val_score
+>>> from sklearn.pipeline import make_pipeline
 >>>
 >>> X, y = load_iris(return_X_y=True)
->>> nca = NCA(n_components=2)
->>> cross_val_score(nca, X, y)
+>>> clf = make_pipeline(NCA(), KNeighborsClassifier())
+>>> cross_val_score(clf, X, y)
