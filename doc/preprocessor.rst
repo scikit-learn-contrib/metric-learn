@@ -58,20 +58,17 @@ Example with a weakly supervised metric learner:
 
 Callable
 --------
-Instead, you can provide a callable in the argument ``preprocessor``.
-Then the estimator will accept indicators of points instead of points.
-Under the hood, the estimator will call this callable on the indicators you
-provide as input when fitting, predicting etc...
-Using a callable can be really useful to represent lazily a dataset of
-images stored on the file system for instance.
-The callable should take as an input an array-like, and return a 2D
-array-like. For supervised learners it will be applied on the whole array of
-indicators at once, and for weakly supervised learners it will be applied
-on each column of the array of tuples.
+Instead, you can provide a callable in the argument ``preprocessor``. Then the
+estimator will accept indicators of points instead of points. Under the hood,
+the estimator will call this callable on the indicators you provide as input
+when fitting, predicting etc... Using a callable can be really useful to
+represent lazily a dataset of images stored on the file system for instance.
+The callable should take as an input a 1D array-like, and return a 2D
+array-like. For supervised learners it will be applied on the whole 1D array of
+indicators at once, and for weakly supervised learners it will be applied on
+each column of the 2D array of tuples.
 
 Example with a supervised metric learner:
-
-The callable should take as input an array-like, and return a 2D array-like.
 
 >>> def find_images(file_paths):
 >>>    # each file contains a small image to use as an input datapoint
@@ -83,10 +80,6 @@ The callable should take as input an array-like, and return a 2D array-like.
 
 
 Example with a weakly supervised metric learner:
-
-The given callable should take as input an array-like, and return a
-2D array-like, as before. It will be called on each column of the input
-tuples of indicators.
 
 >>> pairs_images_paths = [['img02.png', 'img00.png'],
 >>>                       ['img01.png', 'img00.png']]
