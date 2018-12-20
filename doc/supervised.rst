@@ -178,6 +178,6 @@ used for dimensionality reduction and high dimensional data visualization.
 
 .. topic:: References:
 
-    .. [1] `Information-theoretic Metric Learning <http://machinelearning.wustl
-       .edu/mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis,
-       et al.
+    .. [1] `Metric Learning for Kernel Regression <http://proceedings.mlr.
+       press/v2/weinberger07a/weinberger07a.pdf>`_ Kilian Q. Weinberger,
+       Gerald Tesauro

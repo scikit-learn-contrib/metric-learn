@@ -155,10 +155,10 @@ information and passed to the underlying algorithm.
 
 .. todo:: add more details on `_Supervised` classes
 
-1. ITML
--------
+ITML
+----
 
-Information Theoretic Metric Learning, Kulis et al., ICML 2007
+Information Theoretic Metric Learning, Davis et al., ICML 2007
 
 `ITML` minimizes the differential relative entropy between two multivariate
 Gaussians under constraints on the distance function, which can be formulated
@@ -192,8 +192,8 @@ programming.
        itml/
 
 
-2. LSML
--------
+LSML
+----
 
 `LSML`: Metric Learning from Relative Comparisons by Minimizing Squared
 Residual
@@ -221,8 +221,8 @@ Residual
     .. [2] Adapted from https://gist.github.com/kcarnold/5439917
 
 
-3. SDML
--------
+SDML
+----
 
 `SDML`: An efficient sparse metric learning in high-dimensional space via
 L1-penalized log-determinant regularization
@@ -252,8 +252,8 @@ L1-penalized log-determinant regularization
     .. [2] Adapted from https://gist.github.com/kcarnold/5439945
 
 
-4. RCA
-------
+RCA
+---
 
 Relative Components Analysis (RCA)
 
@@ -287,8 +287,8 @@ of points that are known to belong to the same class.
     .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
        2005
 
-5. MMC
-------
+MMC
+---
 
 Mahalanobis Metric Learning with Application for Clustering with
 Side-Information, Xing et al., NIPS 2002
