@@ -7,8 +7,11 @@ Traditionally, practitioners would choose a standard distance metric
 (Euclidean, City-Block, Cosine, etc.) using a priori knowledge of
 the domain.
 Distance metric learning (or simply, metric learning) is the sub-field of
-machine learning dedicated to automatically constructing optimal distance
-metrics.
+machine learning dedicated to automatically construct task-specific distance
+metrics from (weakly) supervised data.
+The learned distance metric often corresponds to a Euclidean distance in a new
+embedding space, hence distance metric learning can be seen as a form of
+representation learning.
 
 This package contains a efficient Python implementations of several popular
 metric learning algorithms, compatible with scikit-learn. This allows to use
