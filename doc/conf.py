@@ -7,6 +7,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'numpydoc',
+    'sphinx_gallery.gen_gallery'
 ]
 
 templates_path = ['_templates']
@@ -15,7 +16,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'metric-learn'
-copyright = u'2015-2017, CJ Carey and Yuan Tang'
+copyright = u'2015-2018, CJ Carey and Yuan Tang'
 author = u'CJ Carey and Yuan Tang'
 version = '0.4.0'
 release = '0.4.0'
@@ -30,4 +31,7 @@ numpydoc_show_class_members = False
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 htmlhelp_basename = 'metric-learndoc'
+
+# Option to only need single backticks to refer to symbols
+default_role = 'any'
 

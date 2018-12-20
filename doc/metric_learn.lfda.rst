@@ -6,6 +6,7 @@ Local Fisher Discriminant Analysis (LFDA)
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :special-members: __init__
 
 Example Code
 ------------
