@@ -3,7 +3,7 @@ metric-learn: Metric Learning in Python
 |License| |PyPI version|
 
 Welcome to metric-learn's documentation !
-=========================================
+-----------------------------------------
 
 .. toctree::
    :maxdepth: 2
