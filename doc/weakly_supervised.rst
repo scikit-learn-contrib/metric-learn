@@ -166,15 +166,19 @@ programming.
 
 ::
 
-    from metric_learn import ITML_Supervised
-    from sklearn.datasets import load_iris
+    from metric_learn import ITML
 
-    iris_data = load_iris()
-    X = iris_data['data']
-    Y = iris_data['target']
+    pairs = [[[1.2, 5.5], [1.3, 4.5]],
+             [[6.4, 4.6], [6.2, 3.7]],
+             [[1.3, 4.5], [6.4, 4.6]],
+             [[1.2, 5.5], [6.2, 5.4]]]
 
-    itml = ITML_Supervised(num_constraints=200)
-    itml.fit(X, Y)
+    y = [1, 1, -1, -1]
+    # we want to make closer points where the first feature is close, and
+    # further if the second feature is close
+
+    itml = ITML()
+    itml.fit(pairs, y)
 
 .. topic:: References:
 
@@ -196,15 +200,18 @@ Residual
 
 ::
 
-    from metric_learn import LSML_Supervised
-    from sklearn.datasets import load_iris
+    from metric_learn import LSML
 
-    iris_data = load_iris()
-    X = iris_data['data']
-    Y = iris_data['target']
+    quadruplets = [[[1.2, 5.5], [1.3, 4.5], [6.4, 4.6], [6.2, 3.7]],
+                   [[1.3, 4.5], [6.4, 4.6], [1.2, 5.5], [6.2, 5.4]],
+                   [[3.2, 5.5], [3.3, 4.5], [8.4, 4.6], [8.2, 3.7]],
+                   [[3.3, 4.5], [8.4, 4.6], [3.2, 5.5], [8.2, 5.4]]]
 
-    lsml = LSML_Supervised(num_constraints=200)
-    lsml.fit(X, Y)
+    # we want to make closer points where the first feature is close, and
+    # further if the second feature is close
+
+    lsml = LSML()
+    lsml.fit(quadruplets)
 
 .. topic:: References:
 
@@ -225,15 +232,19 @@ L1-penalized log-determinant regularization
 
 ::
 
-    from metric_learn import SDML_Supervised
-    from sklearn.datasets import load_iris
+    from metric_learn import SDML
 
-    iris_data = load_iris()
-    X = iris_data['data']
-    Y = iris_data['target']
+    pairs = [[[1.2, 5.5], [1.3, 4.5]],
+             [[6.4, 4.6], [6.2, 3.7]],
+             [[1.3, 4.5], [6.4, 4.6]],
+             [[1.2, 5.5], [6.2, 5.4]]]
 
-    sdml = SDML_Supervised(num_constraints=200)
-    sdml.fit(X, Y)
+    y = [1, 1, -1, -1]
+    # we want to make closer points where the first feature is close, and
+    # further if the second feature is close
+
+    sdml = SDML()
+    sdml.fit(pairs, y)
 
 .. topic:: References:
 
@@ -261,15 +272,20 @@ of points that are known to belong to the same class.
 
 ::
 
-    from metric_learn import RCA_Supervised
-    from sklearn.datasets import load_iris
+    from metric_learn import RCA
 
-    iris_data = load_iris()
-    X = iris_data['data']
-    Y = iris_data['target']
+    pairs = [[[1.2, 5.5], [1.3, 4.5]],
+             [[6.4, 4.6], [6.2, 3.7]],
+             [[1.3, 4.5], [6.4, 4.6]],
+             [[1.2, 5.5], [6.2, 5.4]]]
 
-    rca = RCA_Supervised(num_chunks=30, chunk_size=2)
-    rca.fit(X, Y)
+    y = [1, 1, -1, -1]
+    # we want to make closer points where the first feature is close, and
+    # further if the second feature is close
+
+    rca = RCA()
+    rca.fit(pairs, y)
+
 
 .. topic:: References:
 
@@ -302,15 +318,19 @@ method. However, it is one of the earliest and a still often cited technique.
 
 ::
 
-    from metric_learn import MMC_Supervised
-    from sklearn.datasets import load_iris
+    from metric_learn import MMC
 
-    iris_data = load_iris()
-    X = iris_data['data']
-    Y = iris_data['target']
+    pairs = [[[1.2, 5.5], [1.3, 4.5]],
+             [[6.4, 4.6], [6.2, 3.7]],
+             [[1.3, 4.5], [6.4, 4.6]],
+             [[1.2, 5.5], [6.2, 5.4]]]
 
-    mmc = MMC_Supervised(num_constraints=200)
-    mmc.fit(X, Y)
+    y = [1, 1, -1, -1]
+    # we want to make closer points where the first feature is close, and
+    # further if the second feature is close
+
+    mmc = MMC()
+    mmc.fit(pairs, y)
 
 .. topic:: References:
 
