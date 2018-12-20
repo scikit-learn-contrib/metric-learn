@@ -58,7 +58,7 @@ Example with a weakly supervised metric learner:
 
 Callable
 --------
-Instead, you can provide a callable in the argument ``preprocessor``. Then the
+Alternatively, you can provide a callable as ``preprocessor``. Then the
 estimator will accept indicators of points instead of points. Under the hood,
 the estimator will call this callable on the indicators you provide as input
 when fitting, predicting etc... Using a callable can be really useful to
