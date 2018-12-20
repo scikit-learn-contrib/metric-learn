@@ -10,7 +10,7 @@ when fitting, predicting etc...
 
 If ``preprocessor=None``, no preprocessor will be used and the user must
 provide the classical representation to the fit/predict/score/etc... methods of
-the estimators (see the documentation of the particular estimator to know what
+the estimators (see the documentation of the particular estimator to know the
 type of input it accepts). Otherwise, two types of objects can be put in this
 argument:
 

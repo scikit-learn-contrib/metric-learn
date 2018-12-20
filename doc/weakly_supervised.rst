@@ -13,7 +13,8 @@ Input data
 ==========
 
 In the following paragraph we talk about tuples for sake of generality. These
-can be pairs, triplets, quadruplets etc, depending on what algorithm we use.
+can be pairs, triplets, quadruplets etc, depending on the particular metric
+learning algorithm we use.
 
 Basic form
 ----------
@@ -23,9 +24,9 @@ needed labels for theses tuples.
 
 The `tuples` argument is the first argument of every method (like the X
 argument for classical algorithms in scikit-learn). The second argument is the
-label of the tuple: what it is depends on the algorithm used. For instance for
-pairs learners ``y`` is a label indicating if the pair is of similar samples or
-dissimilar samples.
+label of the tuple: its semantic depends on the algorithm used. For instance
+for pairs learners ``y`` is a label indicating whether the pair is of similar
+samples or dissimilar samples.
 
 Then one can fit a Weakly Supervised Metric Learner on this tuple, like this:
 
@@ -97,7 +98,7 @@ the feature dimension there, the resulting array is 2D.
 
 In order to fit metric learning algorithms with this type of input, we need to
 give the original dataset of points ``X`` to the estimator so that it knows
-what point the indices refer to. We do this when initializing the estimator,
+the points the indices refer to. We do this when initializing the estimator,
 through the argument `preprocessor`.
 
 .. topic:: Example:
@@ -121,7 +122,7 @@ Scikit-learn compatibility
 
 Weakly supervised estimators are compatible with scikit-learn routines for
 model selection (grid-search, cross-validation etc). See the scoring section
-for more details on what scoring is used in the case of Weakly Supervised
+for more details on the scoring used in the case of Weakly Supervised
 Metric Learning.
 
 .. topic:: Example
@@ -140,9 +141,9 @@ Metric Learning.
 Scoring
 =======
 
-Some default scoring are implemented in metric-learn, depending on which kind
-of tuples you work on. See the docstring of the `score` method of the estimator
-you use.
+Some default scoring are implemented in metric-learn, depending on the kind of
+tuples you're working with (pairs, triplets...). See the docstring of the
+`score` method of the estimator you use.
 
 
 Algorithms
