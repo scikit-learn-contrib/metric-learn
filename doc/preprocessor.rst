@@ -13,9 +13,9 @@ Two types of objects can be put in this argument:
 Array-like
 ----------
 You can specify ``preprocessor=X`` where ``X`` is an array-like containing the
-dataset of points. In this case, the estimator will be able to take as
-inputs an array-like of indices, replacing under the hood each index by the
-corresponding sample.
+dataset of points. In this case, the fit/predict/score/etc... methods of the
+estimator will be able to take as inputs an array-like of indices, replacing
+under the hood each index by the corresponding sample.
 
 
 Example with a supervised metric learner:
