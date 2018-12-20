@@ -17,7 +17,6 @@ import warnings
 from six.moves import xrange
 from sklearn import decomposition
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_array
 
 from .base_metric import MahalanobisMixin
 from .constraints import Constraints
@@ -45,7 +44,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, pca_comps=None):
+  def __init__(self, num_dims=None, pca_comps=None, preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -59,26 +58,17 @@ class RCA(MahalanobisMixin, TransformerMixin):
         If ``0 < pca_comps < 1``, it is used as
         the minimum explained variance ratio.
         See sklearn.decomposition.PCA for more details.
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.num_dims = num_dims
     self.pca_comps = pca_comps
+    super(RCA, self).__init__(preprocessor)
 
-  def _process_data(self, X):
-    self.X_ = X = check_array(X)
-
-    # PCA projection to remove noise and redundant information.
-    if self.pca_comps is not None:
-      pca = decomposition.PCA(n_components=self.pca_comps)
-      X = pca.fit_transform(X)
-      M_pca = pca.components_
-    else:
-      X -= X.mean(axis=0)
-      M_pca = None
-
-    return X, M_pca
-
-  def _check_dimension(self, rank):
-    d = self.X_.shape[1]
+  def _check_dimension(self, rank, X):
+    d = X.shape[1]
     if rank < d:
       warnings.warn('The inner covariance matrix is not invertible, '
                     'so the transformation matrix may contain Nan values. '
@@ -97,7 +87,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
       dim = self.num_dims
     return dim
 
-  def fit(self, data, chunks):
+  def fit(self, X, chunks):
     """Learn the RCA model.
 
     Parameters
@@ -108,17 +98,26 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
-    data, M_pca = self._process_data(data)
+    X = self._prepare_inputs(X, ensure_min_samples=2)
+
+    # PCA projection to remove noise and redundant information.
+    if self.pca_comps is not None:
+      pca = decomposition.PCA(n_components=self.pca_comps)
+      X_t = pca.fit_transform(X)
+      M_pca = pca.components_
+    else:
+      X_t = X - X.mean(axis=0)
+      M_pca = None
 
     chunks = np.asanyarray(chunks, dtype=int)
-    chunk_mask, chunked_data = _chunk_mean_centering(data, chunks)
+    chunk_mask, chunked_data = _chunk_mean_centering(X_t, chunks)
 
     inner_cov = np.cov(chunked_data, rowvar=0, bias=1)
-    dim = self._check_dimension(np.linalg.matrix_rank(inner_cov))
+    dim = self._check_dimension(np.linalg.matrix_rank(inner_cov), X_t)
 
     # Fisher Linear Discriminant projection
-    if dim < data.shape[1]:
-      total_cov = np.cov(data[chunk_mask], rowvar=0)
+    if dim < X_t.shape[1]:
+      total_cov = np.cov(X_t[chunk_mask], rowvar=0)
       tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
       vals, vecs = np.linalg.eig(tmp)
       inds = np.argsort(vals)[:dim]
@@ -150,7 +149,7 @@ class RCA_Supervised(RCA):
   """
 
   def __init__(self, num_dims=None, pca_comps=None, num_chunks=100,
-               chunk_size=2):
+               chunk_size=2, preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -159,8 +158,12 @@ class RCA_Supervised(RCA):
         embedding dimension (default: original dimension of data)
     num_chunks: int, optional
     chunk_size: int, optional
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
-    RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps)
+    RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps,
+                 preprocessor=preprocessor)
     self.num_chunks = num_chunks
     self.chunk_size = chunk_size
 
@@ -175,6 +178,7 @@ class RCA_Supervised(RCA):
     y : (n) data labels
     random_state : a random.seed object to fix the random_state if needed.
     """
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     chunks = Constraints(y).chunks(num_chunks=self.num_chunks,
                                    chunk_size=self.chunk_size,
                                    random_state=random_state)

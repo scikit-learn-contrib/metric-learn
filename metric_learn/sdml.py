@@ -13,16 +13,17 @@ import numpy as np
 from sklearn.base import TransformerMixin
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
-from sklearn.utils.validation import check_array, check_X_y
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import check_tuples
 
 
 class _BaseSDML(MahalanobisMixin):
+
+  _tuple_size = 2  # constraints are pairs
+
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               verbose=False):
+               verbose=False, preprocessor=None):
     """
     Parameters
     ----------
@@ -37,18 +38,20 @@ class _BaseSDML(MahalanobisMixin):
 
     verbose : bool, optional
         if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
     """
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
     self.use_cov = use_cov
     self.verbose = verbose
+    super(_BaseSDML, self).__init__(preprocessor)
 
-  def _prepare_pairs(self, pairs, y):
-    # for now we check_X_y and check_tuples but we should only
-    # check_tuples_y in the future
-    pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                         ensure_2d=False, allow_nd=True)
-    pairs = check_tuples(pairs)
+  def _fit(self, pairs, y):
+    pairs, y = self._prepare_inputs(pairs, y,
+                                    type_of_inputs='tuples')
 
     # set up prior M
     if self.use_cov:
@@ -57,10 +60,7 @@ class _BaseSDML(MahalanobisMixin):
     else:
       self.M_ = np.identity(pairs.shape[2])
     diff = pairs[:, 0] - pairs[:, 1]
-    return (diff.T * y).dot(diff)
-
-  def _fit(self, pairs, y):
-    loss_matrix = self._prepare_pairs(pairs, y)
+    loss_matrix = (diff.T * y).dot(diff)
     P = self.M_ + self.balance_param * loss_matrix
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite
@@ -86,8 +86,11 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 
@@ -110,7 +113,8 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   """
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_labeled=np.inf, num_constraints=None, verbose=False):
+               num_labeled=np.inf, num_constraints=None, verbose=False,
+               preprocessor=None):
     """
     Parameters
     ----------
@@ -126,10 +130,13 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
         number of constraints to generate
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     _BaseSDML.__init__(self, balance_param=balance_param,
                        sparsity_param=sparsity_param, use_cov=use_cov,
-                       verbose=verbose)
+                       verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
@@ -151,7 +158,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     self : object
         Returns the instance.
     """
-    y = check_array(y, ensure_2d=False)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

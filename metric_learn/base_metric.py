@@ -1,14 +1,25 @@
 from numpy.linalg import cholesky
 from sklearn.base import BaseEstimator
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import _is_arraylike
 from sklearn.metrics import roc_auc_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
-from ._util import check_tuples
+from ._util import ArrayIndexer, check_input
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
+
+  def __init__(self, preprocessor=None):
+    """
+
+    Parameters
+    ----------
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be gotten like this: X[indices].
+    """
+    self.preprocessor = preprocessor
 
   @abstractmethod
   def score_pairs(self, pairs):
@@ -25,6 +36,55 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The score of every pair.
     """
+
+  def check_preprocessor(self):
+    """Initializes the preprocessor"""
+    if _is_arraylike(self.preprocessor):
+      self.preprocessor_ = ArrayIndexer(self.preprocessor)
+    elif callable(self.preprocessor) or self.preprocessor is None:
+      self.preprocessor_ = self.preprocessor
+    else:
+      raise ValueError("Invalid type for the preprocessor: {}. You should "
+                       "provide either None, an array-like object, "
+                       "or a callable.".format(type(self.preprocessor)))
+
+  def _prepare_inputs(self, X, y=None, type_of_inputs='classic',
+                      **kwargs):
+    """Initializes the preprocessor and processes inputs. See `check_input`
+    for more details.
+
+    Parameters
+    ----------
+    input: array-like
+      The input data array to check.
+
+    y : array-like
+      The input labels array to check.
+
+    type_of_inputs: `str` {'classic', 'tuples'}
+      The type of inputs to check. If 'classic', the input should be
+      a 2D array-like of points or a 1D array like of indicators of points. If
+      'tuples', the input should be a 3D array-like of tuples or a 2D
+      array-like of indicators of tuples.
+
+    **kwargs: dict
+      Arguments to pass to check_input.
+
+    Returns
+    -------
+    X : `numpy.ndarray`
+      The checked input data array.
+
+    y: `numpy.ndarray` (optional)
+      The checked input labels array.
+    """
+    self.check_preprocessor()
+    return check_input(X, y,
+                       type_of_inputs=type_of_inputs,
+                       preprocessor=self.preprocessor_,
+                       estimator=self,
+                       tuple_size=getattr(self, '_tuple_size', None),
+                       **kwargs)
 
 
 class MetricTransformer(six.with_metaclass(ABCMeta)):
@@ -78,15 +138,19 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
     Parameters
     ----------
-    pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
-      3D array of pairs, or 2D array of one pair.
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to score, with each row corresponding to two points,
+      for 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
 
     Returns
     -------
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
     """
-    pairs = check_tuples(pairs)
+    pairs = check_input(pairs, type_of_inputs='tuples',
+                        preprocessor=self.preprocessor_,
+                        estimator=self, tuple_size=2)
     pairwise_diffs = self.transform(pairs[:, 1, :] - pairs[:, 0, :])
     # (for MahalanobisMixin, the embedding is linear so we can just embed the
     # difference)
@@ -109,7 +173,9 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     X_embedded : `numpy.ndarray`, shape=(n_samples, num_dims)
       The embedded data points.
     """
-    X_checked = check_array(X, accept_sparse=True)
+    X_checked = check_input(X, type_of_inputs='classic', estimator=self,
+                             preprocessor=self.preprocessor_,
+                             accept_sparse=True)
     return X_checked.dot(self.transformer_.T)
 
   def metric(self):
@@ -144,28 +210,51 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
 class _PairsClassifierMixin(BaseMetricLearner):
 
+  _tuple_size = 2  # number of points in a tuple, 2 for pairs
+
   def predict(self, pairs):
-    """Predicts the learned metric between input pairs.
+    """Predicts the learned metric between input pairs. (For now it just
+    calls decision function).
 
     Returns the learned metric value between samples in every pair. It should
     ideally be low for similar samples and high for dissimilar samples.
 
     Parameters
     ----------
-    pairs : array-like, shape=(n_constraints, 2, n_features)
-      Input pairs.
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to predict, with each row corresponding to two
+      points, or 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
 
     Returns
     -------
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    pairs = check_tuples(pairs)
-    return self.score_pairs(pairs)
+    return self.decision_function(pairs)
 
   def decision_function(self, pairs):
-    pairs = check_tuples(pairs)
-    return self.predict(pairs)
+    """Returns the learned metric between input pairs.
+
+    Returns the learned metric value between samples in every pair. It should
+    ideally be low for similar samples and high for dissimilar samples.
+
+    Parameters
+    ----------
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to predict, with each row corresponding to two
+      points, or 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
+
+    Returns
+    -------
+    y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
+      The predicted learned metric value between samples in every pair.
+    """
+    pairs = check_input(pairs, type_of_inputs='tuples',
+                        preprocessor=self.preprocessor_,
+                        estimator=self, tuple_size=self._tuple_size)
+    return self.score_pairs(pairs)
 
   def score(self, pairs, y):
     """Computes score of pairs similarity prediction.
@@ -179,8 +268,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    pairs : array-like, shape=(n_constraints, 2, n_features)
-      Input Pairs.
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs, with each row corresponding to two points,
+      or 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
 
     y : array-like, shape=(n_constraints,)
       The corresponding labels.
@@ -190,11 +281,12 @@ class _PairsClassifierMixin(BaseMetricLearner):
     score : float
       The ``roc_auc`` score.
     """
-    pairs = check_tuples(pairs)
     return roc_auc_score(y, self.decision_function(pairs))
 
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
+
+  _tuple_size = 4  # number of points in a tuple, 4 for quadruplets
 
   def predict(self, quadruplets):
     """Predicts the ordering between sample distances in input quadruplets.
@@ -204,15 +296,20 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features)
-      Input quadruplets.
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+                  (n_quadruplets, 4)
+      3D Array of quadruplets to predict, with each row corresponding to four
+      points, or 2D array of indices of quadruplets if the metric learner
+      uses a preprocessor.
 
     Returns
     -------
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
-    quadruplets = check_tuples(quadruplets)
+    quadruplets = check_input(quadruplets, type_of_inputs='tuples',
+                              preprocessor=self.preprocessor_,
+                              estimator=self, tuple_size=self._tuple_size)
     return np.sign(self.decision_function(quadruplets))
 
   def decision_function(self, quadruplets):
@@ -223,17 +320,19 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features)
-      Input quadruplets.
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+                  (n_quadruplets, 4)
+      3D Array of quadruplets to predict, with each row corresponding to four
+      points, or 2D array of indices of quadruplets if the metric learner
+      uses a preprocessor.
 
     Returns
     -------
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
-    quadruplets = check_tuples(quadruplets)
-    return (self.score_pairs(quadruplets[:, :2, :]) -
-            self.score_pairs(quadruplets[:, 2:, :]))
+    return (self.score_pairs(quadruplets[:, :2]) -
+            self.score_pairs(quadruplets[:, 2:]))
 
   def score(self, quadruplets, y=None):
     """Computes score on input quadruplets
@@ -244,8 +343,11 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features)
-      Input quadruplets.
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+                  (n_quadruplets, 4)
+      3D Array of quadruplets to score, with each row corresponding to four
+      points, or 2D array of indices of quadruplets if the metric learner
+      uses a preprocessor.
 
     y : Ignored, for scikit-learn compatibility.
 
@@ -254,5 +356,4 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     score : float
       The quadruplets score.
     """
-    quadruplets = check_tuples(quadruplets)
     return -np.mean(self.predict(quadruplets))

@@ -12,15 +12,17 @@ import numpy as np
 import scipy.linalg
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_array, check_X_y
-from ._util import check_tuples
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
 
 
 class _BaseLSML(MahalanobisMixin):
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
+
+  _tuple_size = 4  # constraints are quadruplets
+
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False,
+               preprocessor=None):
     """Initialize LSML.
 
     Parameters
@@ -31,18 +33,19 @@ class _BaseLSML(MahalanobisMixin):
         guess at a metric [default: inv(covariance(X))]
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.prior = prior
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
+    super(_BaseLSML, self).__init__(preprocessor)
 
-  def _prepare_quadruplets(self, quadruplets, weights):
-    # for now we check_array and check_tuples but we should only
-    # check_tuples in the future (with enhanced check_tuples)
-    quadruplets = check_array(quadruplets, accept_sparse=False,
-                              ensure_2d=False, allow_nd=True)
-    quadruplets = check_tuples(quadruplets)
+  def _fit(self, quadruplets, y=None, weights=None):
+    quadruplets = self._prepare_inputs(quadruplets,
+                                       type_of_inputs='tuples')
 
     # check to make sure that no two constrained vectors are identical
     self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
@@ -63,8 +66,6 @@ class _BaseLSML(MahalanobisMixin):
       self.M_ = self.prior
       self.prior_inv_ = np.linalg.inv(self.prior)
 
-  def _fit(self, quadruplets, weights=None):
-    self._prepare_quadruplets(quadruplets, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
     l_best = 0
@@ -143,11 +144,13 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features)
-        Each row corresponds to 4 points. In order to supervise the
-        algorithm in the right way, we should have the four samples ordered
-        in a way such that: d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3])
-        for all 0 <= i < n_constraints.
+    quadruplets : array-like, shape=(n_constraints, 4, n_features) or
+                  (n_constraints, 4)
+        3D array-like of quadruplets of points or 2D array of quadruplets of
+        indicators. In order to supervise the algorithm in the right way, we
+        should have the four samples ordered in a way such that:
+        d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3]) for all 0 <= i <
+        n_constraints.
     weights : (n_constraints,) array of floats, optional
         scale factor for each constraint
 
@@ -170,7 +173,8 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   """
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
-               num_constraints=None, weights=None, verbose=False):
+               num_constraints=None, weights=None, verbose=False,
+               preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -187,9 +191,12 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
         scale factor for each constraint
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
-                       verbose=verbose)
+                       verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights
@@ -208,7 +215,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    X, y = check_X_y(X, y)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

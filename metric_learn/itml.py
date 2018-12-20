@@ -17,17 +17,20 @@ from __future__ import print_function, absolute_import
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_array, check_X_y
+from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm, check_tuples
+from ._util import vector_norm
 
 
 class _BaseITML(MahalanobisMixin):
   """Information Theoretic Metric Learning (ITML)"""
+
+  _tuple_size = 2  # constraints are pairs
+
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               A0=None, verbose=False):
+               A0=None, verbose=False, preprocessor=None):
     """Initialize ITML.
 
     Parameters
@@ -44,26 +47,21 @@ class _BaseITML(MahalanobisMixin):
 
     verbose : bool, optional
         if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
     self.A0 = A0
     self.verbose = verbose
+    super(_BaseITML, self).__init__(preprocessor)
 
-  def _process_pairs(self, pairs, y, bounds):
-    # for now we check_X_y and check_tuples but we should only
-    # check_tuples_y in the future
-    pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                         ensure_2d=False, allow_nd=True)
-    pairs = check_tuples(pairs)
-
-    # check to make sure that no two constrained vectors are identical
-    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
-    pos_no_ident = vector_norm(pos_pairs[:, 0, :] - pos_pairs[:, 1, :]) > 1e-9
-    pos_pairs = pos_pairs[pos_no_ident]
-    neg_no_ident = vector_norm(neg_pairs[:, 0, :] - neg_pairs[:, 1, :]) > 1e-9
-    neg_pairs = neg_pairs[neg_no_ident]
+  def _fit(self, pairs, y, bounds=None):
+    pairs, y = self._prepare_inputs(pairs, y,
+                                    type_of_inputs='tuples')
     # init bounds
     if bounds is None:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
@@ -77,12 +75,6 @@ class _BaseITML(MahalanobisMixin):
       self.A_ = np.identity(pairs.shape[2])
     else:
       self.A_ = check_array(self.A0)
-    pairs = np.vstack([pos_pairs, neg_pairs])
-    y = np.hstack([np.ones(len(pos_pairs)), - np.ones(len(neg_pairs))])
-    return pairs, y
-
-  def _fit(self, pairs, y, bounds=None):
-    pairs, y = self._process_pairs(pairs, y, bounds)
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
     num_pos = len(pos_pairs)
@@ -151,8 +143,11 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
     bounds : list (pos,neg) pairs, optional
@@ -178,7 +173,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled=np.inf, num_constraints=None, bounds=None, A0=None,
-               verbose=False):
+               verbose=False, preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -197,10 +192,13 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
         initial regularization matrix, defaults to identity
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
-                       A0=A0, verbose=verbose)
+                       A0=A0, verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds
@@ -220,7 +218,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    X, y = check_X_y(X, y)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))

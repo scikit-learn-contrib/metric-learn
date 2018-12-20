@@ -20,17 +20,21 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_array, check_X_y
+from sklearn.utils.validation import check_array
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm, check_tuples
+from ._util import vector_norm
 
 
 class _BaseMMC(MahalanobisMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
+
+  _tuple_size = 2  # constraints are pairs
+
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
+               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
+               preprocessor=None):
     """Initialize MMC.
     Parameters
     ----------
@@ -48,6 +52,9 @@ class _BaseMMC(MahalanobisMixin):
         metric learning
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
     """
     self.max_iter = max_iter
     self.max_proj = max_proj
@@ -56,31 +63,11 @@ class _BaseMMC(MahalanobisMixin):
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
     self.verbose = verbose
+    super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
-    pairs, y = self._process_pairs(pairs, y)
-    if self.diagonal:
-      return self._fit_diag(pairs, y)
-    else:
-      return self._fit_full(pairs, y)
-
-  def _process_pairs(self, pairs, y):
-    # for now we check_X_y and check_tuples but we should only
-    # check_tuples_y in the future
-    pairs, y = check_X_y(pairs, y, accept_sparse=False,
-                         ensure_2d=False, allow_nd=True)
-    pairs = check_tuples(pairs)
-
-    # check to make sure that no two constrained vectors are identical
-    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
-    pos_no_ident = vector_norm(pos_pairs[:, 0, :] - pos_pairs[:, 1, :]) > 1e-9
-    pos_pairs = pos_pairs[pos_no_ident]
-    neg_no_ident = vector_norm(neg_pairs[:, 0, :] - neg_pairs[:, 1, :]) > 1e-9
-    neg_pairs = neg_pairs[neg_no_ident]
-    if len(pos_pairs) == 0:
-      raise ValueError('No non-trivial similarity constraints given for MMC.')
-    if len(neg_pairs) == 0:
-      raise ValueError('No non-trivial dissimilarity constraints given for MMC.')
+    pairs, y = self._prepare_inputs(pairs, y,
+                                    type_of_inputs='tuples')
 
     # init metric
     if self.A0 is None:
@@ -92,9 +79,10 @@ class _BaseMMC(MahalanobisMixin):
     else:
       self.A_ = check_array(self.A0)
 
-    pairs = np.vstack([pos_pairs, neg_pairs])
-    y = np.hstack([np.ones(len(pos_pairs)), - np.ones(len(neg_pairs))])
-    return pairs, y
+    if self.diagonal:
+      return self._fit_diag(pairs, y)
+    else:
+      return self._fit_full(pairs, y)
 
   def _fit_full(self, pairs, y):
     """Learn full metric using MMC.
@@ -373,8 +361,11 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features)
-        Array of pairs. Each row corresponds to two points.
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 
@@ -398,7 +389,8 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled=np.inf, num_constraints=None,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
+               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
+               preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -421,11 +413,14 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
         metric learning
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,
                       A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
-                      verbose=verbose)
+                      verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
@@ -441,7 +436,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
-    X, y = check_X_y(X, y)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
