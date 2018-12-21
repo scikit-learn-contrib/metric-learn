@@ -20,8 +20,7 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import assert_all_finite
+from sklearn.utils.validation import check_array, assert_all_finite
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
@@ -243,7 +242,8 @@ class _BaseMMC(MahalanobisMixin):
       # search over optimal lambda
       lambd = 1  # initial step-size
       w_tmp = np.maximum(0, w - lambd * step)
-      obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
+      obj = (np.dot(s_sum, w_tmp) + self.diagonal_c *
+             self._D_objective(neg_pairs, w_tmp))
       assert_all_finite(obj)
       obj_previous = obj + 1  # just to get the while-loop started
 
@@ -253,7 +253,8 @@ class _BaseMMC(MahalanobisMixin):
         w_previous = w_tmp.copy()
         lambd /= reduction
         w_tmp = np.maximum(0, w - lambd * step)
-        obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
+        obj = (np.dot(s_sum, w_tmp) + self.diagonal_c *
+               self._D_objective(neg_pairs, w_tmp))
         inner_it += 1
         assert_all_finite(obj)
 
