@@ -35,8 +35,8 @@ class NCA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, max_iter=100, learning_rate='deprecated',
-               tol=None, verbose=False, preprocessor=None):
+  def __init__(self, num_dims=None, max_iter=100, tol=None, verbose=False,
+               preprocessor=None):
     """Neighborhood Components Analysis
 
     Parameters
@@ -48,13 +48,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
     max_iter : int, optional (default=100)
       Maximum number of iterations done by the optimization algorithm.
 
-    learning_rate : Not used
-
-      .. deprecated:: 0.4.0
-        `learning_rate` was deprecated in version 0.4.0 and will
-        be removed in 0.5.0. The current optimization algorithm does not need
-        to fix a learning rate.
-
     tol : float, optional (default=None)
         Convergence tolerance for the optimization.
 
@@ -63,7 +56,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
     """
     self.num_dims = num_dims
     self.max_iter = max_iter
-    self.learning_rate = learning_rate  # TODO: remove in v.0.5.0
     self.tol = tol
     self.verbose = verbose
     super(NCA, self).__init__(preprocessor)
@@ -73,11 +65,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
-    if self.learning_rate != 'deprecated':
-      warnings.warn('"learning_rate" parameter is not used.'
-                    ' It has been deprecated in version 0.4 and will be'
-                    'removed in 0.5', DeprecationWarning)
-
     X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
     num_dims = self.num_dims
