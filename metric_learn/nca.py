@@ -4,21 +4,14 @@ Ported to Python from https://github.com/vomjom/nca
 """
 
 from __future__ import absolute_import
-
 import warnings
 import time
 import sys
 import numpy as np
 from scipy.optimize import minimize
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_X_y
 from sklearn.exceptions import ConvergenceWarning
-
-try:  # scipy.misc.logsumexp is deprecated in scipy 1.0.0
-    from scipy.special import logsumexp
-except ImportError:
-    from scipy.misc import logsumexp
-from six.moves import xrange
+from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
 from .base_metric import MahalanobisMixin
