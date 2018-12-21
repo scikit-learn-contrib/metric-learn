@@ -133,7 +133,7 @@ class TestNCA(MetricTestCase):
     self.assertLess(csep, 0.15)
 
     # With dimension reduction
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01, num_dims=2)
+    nca = NCA(max_iter=(100000//n), num_dims=2)
     nca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(nca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.20)
