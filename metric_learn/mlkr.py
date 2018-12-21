@@ -18,6 +18,7 @@ from sklearn.base import TransformerMixin
 from sklearn.decomposition import PCA
 
 
+from sklearn.metrics import pairwise_distances
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
