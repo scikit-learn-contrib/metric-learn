@@ -96,8 +96,8 @@ class python_LMNN(_base_LMNN):
     # first iteration: we compute variables (including objective and gradient)
     #  at initialization point
     G, objective, total_active, df, a1, a2 = (
-        self._loss_grad(L, dfG, impostors, 1, k, reg, target_neighbors, df, a1,
-                        a2))
+        self._loss_grad(X, L, dfG, impostors, 1, k, reg, target_neighbors, df,
+                        a1, a2))
 
     # main loop
     for it in xrange(2, self.max_iter):
@@ -111,7 +111,7 @@ class python_LMNN(_base_LMNN):
         # retry we don t want to modify them several times
         (G_next, objective_next, total_active_next, df_next, a1_next,
          a2_next) = (
-            self._loss_grad(L_next, dfG, impostors, it, k, reg,
+            self._loss_grad(X, L_next, dfG, impostors, it, k, reg,
                             target_neighbors, df.copy(), list(a1), list(a2)))
         assert not np.isnan(objective)
         delta_obj = objective_next - objective
@@ -148,8 +148,8 @@ class python_LMNN(_base_LMNN):
     self.n_iter_ = it
     return self
 
-  def _loss_grad(self, L, dfG, impostors, it, k, reg, target_neighbors, df, a1,
-                 a2):
+  def _loss_grad(self, X, L, dfG, impostors, it, k, reg, target_neighbors, df,
+                 a1, a2):
     # Compute pairwise distances under current metric
     Lx = L.dot(X.T).T
     g0 = _inplace_paired_L2(*Lx[impostors])
