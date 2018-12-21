@@ -1,9 +1,15 @@
 import unittest
+import re
+import pytest
 import numpy as np
+from scipy.optimize import check_grad
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris
-from numpy.testing import assert_array_almost_equal
+from sklearn.datasets import load_iris, make_classification, make_regression
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+from sklearn.utils.testing import assert_warns_message
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.utils.validation import check_X_y
 
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR, MMC,
@@ -71,6 +77,37 @@ class TestLMNN(MetricTestCase):
       csep = class_separation(lmnn.transform(self.iris_points),
                               self.iris_labels)
       self.assertLess(csep, 0.25)
+
+
+def test_convergence_simple_example(capsys):
+  # LMNN should converge on this simple example, which it did not with
+  # this issue: https://github.com/metric-learn/metric-learn/issues/88
+  X, y = make_classification(random_state=0)
+  lmnn = python_LMNN(verbose=True)
+  lmnn.fit(X, y)
+  out, _ = capsys.readouterr()
+  assert "LMNN converged with objective" in out
+
+
+def test_no_twice_same_objective(capsys):
+  # test that the objective function never has twice the same value
+  # see https://github.com/metric-learn/metric-learn/issues/88
+  X, y = make_classification(random_state=0)
+  lmnn = python_LMNN(verbose=True)
+  lmnn.fit(X, y)
+  out, _ = capsys.readouterr()
+  lines = re.split("\n+", out)
+  # we get only objectives from each line:
+  # the regexp matches a float that follows an integer (the iteration
+  # number), and which is followed by a (signed) float (delta obj). It
+  # matches for instance:
+  # 3 **1113.7665747189938** -3.182774197440267 46431.0200999999999998e-06
+  objectives = [re.search("\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
+                for s in lines]
+  objectives = [match.group(1) for match in objectives if match is not None]
+  # we remove the last element because it can be equal to the penultimate
+  # if the last gradient update is null
+  assert len(objectives[:-1]) == len(set(objectives[:-1]))
 
 
 class TestSDML(MetricTestCase):
@@ -145,6 +182,29 @@ class TestMLKR(MetricTestCase):
     csep = class_separation(mlkr.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.25)
 
+  def test_finite_differences(self):
+    """Test gradient of loss function
+
+    Assert that the gradient is almost equal to its finite differences
+    approximation.
+    """
+    # Initialize the transformation `M`, as well as `X`, and `y` and `MLKR`
+    X, y = make_regression(n_features=4, random_state=1, n_samples=20)
+    X, y = check_X_y(X, y)
+    M = np.random.randn(2, X.shape[1])
+    mlkr = MLKR()
+    mlkr.n_iter_ = 0
+
+    def fun(M):
+      return mlkr._loss(M, X, y)[0]
+
+    def grad_fn(M):
+      return mlkr._loss(M, X, y)[1].ravel()
+
+    # compute relative error
+    rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
+    np.testing.assert_almost_equal(rel_diff, 0.)
+
 
 class TestMMC(MetricTestCase):
   def test_iris(self):
@@ -181,6 +241,58 @@ class TestMMC(MetricTestCase):
     mmc.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mmc.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.2)
+
+
+@pytest.mark.parametrize(('algo_class', 'dataset'),
+                         [(NCA, make_classification()),
+                          (MLKR, make_regression())])
+def test_verbose(algo_class, dataset, capsys):
+  # assert there is proper output when verbose = True
+  X, y = dataset
+  model = algo_class(verbose=True)
+  model.fit(X, y)
+  out, _ = capsys.readouterr()
+
+  # check output
+  lines = re.split('\n+', out)
+  header = '{:>10} {:>20} {:>10}'.format('Iteration', 'Objective Value',
+                                         'Time(s)')
+  assert lines[0] == '[{}]'.format(algo_class.__name__)
+  assert lines[1] == '[{}] {}'.format(algo_class.__name__, header)
+  assert lines[2] == '[{}] {}'.format(algo_class.__name__, '-' * len(header))
+  for line in lines[3:-2]:
+    # The following regex will match for instance:
+    # '[NCA]          0         6.988936e+01       0.01'
+    assert re.match("\[" + algo_class.__name__ + "\]\ *\d+\ *\d\.\d{6}e[+|-]"
+                    "\d+\ *\d+\.\d{2}", line)
+  assert re.match("\[" + algo_class.__name__ + "\] Training took\ *"
+                  "\d+\.\d{2}s\.", lines[-2])
+  assert lines[-1] == ''
+
+
+@pytest.mark.parametrize(('algo_class', 'dataset'),
+                         [(NCA, make_classification()),
+                          (MLKR, make_regression(n_features=10))])
+def test_no_verbose(dataset, algo_class, capsys):
+  # assert by default there is no output (verbose=False)
+  X, y = dataset
+  model = algo_class()
+  model.fit(X, y)
+  out, _ = capsys.readouterr()
+  # check output
+  assert (out == '')
+
+
+@pytest.mark.parametrize(('algo_class', 'dataset'),
+                         [(NCA, make_classification()),
+                          (MLKR, make_regression(n_features=10))])
+def test_convergence_warning(dataset, algo_class):
+    X, y = dataset
+    model = algo_class(max_iter=2, verbose=True)
+    cls_name = model.__class__.__name__
+    assert_warns_message(ConvergenceWarning,
+                         '[{}] {} did not converge'.format(cls_name, cls_name),
+                         model.fit, X, y)
 
 
 if __name__ == '__main__':

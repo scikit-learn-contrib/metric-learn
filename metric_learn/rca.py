@@ -150,7 +150,11 @@ class RCA_Supervised(RCA):
 
   def __init__(self, num_dims=None, pca_comps=None, num_chunks=100,
                chunk_size=2, preprocessor=None):
-    """Initialize the learner.
+    """Initialize the supervised version of `RCA`.
+
+    `RCA_Supervised` creates chunks of similar points by first sampling a
+    class, taking `chunk_size` elements in it, and repeating the process
+    `num_chunks` times.
 
     Parameters
     ----------

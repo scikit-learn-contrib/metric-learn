@@ -11,3 +11,5 @@ from .lfda import LFDA
 from .rca import RCA, RCA_Supervised
 from .mlkr import MLKR
 from .mmc import MMC, MMC_Supervised
+
+from ._version import __version__

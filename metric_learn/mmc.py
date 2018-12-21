@@ -20,7 +20,8 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_array
+from sklearn.metrics import pairwise_distances
+from sklearn.utils.validation import assert_all_finite
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
@@ -242,10 +243,9 @@ class _BaseMMC(MahalanobisMixin):
       # search over optimal lambda
       lambd = 1  # initial step-size
       w_tmp = np.maximum(0, w - lambd * step)
-
-      obj = np.dot(s_sum, w_tmp) + self.diagonal_c * \
-            self._D_objective(neg_pairs, w_tmp)
-      obj_previous = obj * 1.1  # just to get the while-loop started
+      obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
+      assert_all_finite(obj)
+      obj_previous = obj + 1  # just to get the while-loop started
 
       inner_it = 0
       while obj < obj_previous:
@@ -253,9 +253,9 @@ class _BaseMMC(MahalanobisMixin):
         w_previous = w_tmp.copy()
         lambd /= reduction
         w_tmp = np.maximum(0, w - lambd * step)
-        obj = np.dot(s_sum, w_tmp) + self.diagonal_c * \
-              self._D_objective(neg_pairs, w_tmp)
+        obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
         inner_it += 1
+        assert_all_finite(obj)
 
       w[:] = w_previous
       error = np.abs((obj_previous - obj_initial) / obj_previous)
@@ -391,15 +391,21 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
                num_labeled=np.inf, num_constraints=None,
                A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None):
-    """Initialize the learner.
+    """Initialize the supervised version of `MMC`.
+
+    `MMC_Supervised` creates pairs of similar sample by taking same class
+    samples, and pairs of dissimilar samples by taking different class
+    samples. It then passes these pairs to `MMC` for training.
 
     Parameters
     ----------
     max_iter : int, optional
     max_proj : int, optional
     convergence_threshold : float, optional
-    num_labeled : int, optional
-        number of labels to preserve for training
+    num_labeled : int, optional (default=np.inf)
+        number of labeled points to keep for building pairs. Extra
+        labeled points will be considered unlabeled, and ignored as such.
+        Use np.inf (default) to use all labeled points.
     num_constraints: int, optional
         number of constraints to generate
     A0 : (d x d) matrix, optional
