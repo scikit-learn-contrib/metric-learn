@@ -33,12 +33,12 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     X : data matrix, (n x d)
     y : unused
     """
-    self.X_ = self._prepare_inputs(X, ensure_min_samples=2)
-    self.M_ = np.cov(self.X_, rowvar = False)
-    if self.M_.ndim == 0:
-      self.M_ = 1./self.M_
+    X = self._prepare_inputs(X, ensure_min_samples=2)
+    M = np.cov(X, rowvar = False)
+    if M.ndim == 0:
+      M = 1./M
     else:
-      self.M_ = np.linalg.inv(self.M_)
+      M = np.linalg.inv(M)
 
-    self.transformer_ = self.transformer_from_metric(np.atleast_2d(self.M_))
+    self.transformer_ = self.transformer_from_metric(np.atleast_2d(M))
     return self
