@@ -74,11 +74,11 @@ class TestFitTransform(unittest.TestCase):
 
   def test_nca(self):
     n = self.X.shape[0]
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01)
+    nca = NCA(max_iter=(100000//n))
     nca.fit(self.X, self.y)
     res_1 = nca.transform(self.X)
 
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01)
+    nca = NCA(max_iter=(100000//n))
     res_2 = nca.fit_transform(self.X, self.y)
 
     assert_array_almost_equal(res_1, res_2)

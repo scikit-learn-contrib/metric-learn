@@ -11,6 +11,7 @@ import time
 import sys
 import warnings
 import numpy as np
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.fixes import logsumexp
 from scipy.optimize import minimize
 from scipy.spatial.distance import pdist, squareform
