@@ -103,7 +103,7 @@ classification.
     X = iris_data['data']
     Y = iris_data['target']
 
-    nca = NCA(max_iter=1000, learning_rate=0.01)
+    nca = NCA(max_iter=1000)
     nca.fit(X, Y)
 
 .. topic:: References:
