@@ -37,7 +37,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
 
   def __init__(self, num_dims=None, max_iter=100, learning_rate='deprecated',
                tol=None, verbose=False, preprocessor=None):
-        """Neighborhood Components Analysis
+    """Neighborhood Components Analysis
 
     Parameters
     ----------
@@ -67,9 +67,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
     self.tol = tol
     self.verbose = verbose
     super(NCA, self).__init__(preprocessor)
-
-  def transformer(self):
-    return self.A_
 
   def fit(self, X, y):
     """
@@ -109,7 +106,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     self.n_iter_ = 0
     opt_result = minimize(**optimizer_params)
 
-    self.A_ = opt_result.x.reshape(-1, X.shape[1])
+    self.transformer_ = opt_result.x.reshape(-1, X.shape[1])
     self.n_iter_ = opt_result.nit
 
     # Stop timer
