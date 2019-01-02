@@ -229,7 +229,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.4 and will be'
                     'removed in 0.5', DeprecationWarning)
-    X, y = self._prepare_inputs(X, y)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
