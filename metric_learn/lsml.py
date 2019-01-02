@@ -12,14 +12,18 @@ import warnings
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
-from sklearn.utils.validation import check_array, check_X_y
+from sklearn.base import TransformerMixin
 
-from .base_metric import BaseMetricLearner
+from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
 
 
-class LSML(BaseMetricLearner):
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False):
+class _BaseLSML(MahalanobisMixin):
+
+  _tuple_size = 4  # constraints are quadruplets
+
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False,
+               preprocessor=None):
     """Initialize LSML.
 
     Parameters
@@ -30,17 +34,23 @@ class LSML(BaseMetricLearner):
         guess at a metric [default: inv(covariance(X))]
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.prior = prior
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
+    super(_BaseLSML, self).__init__(preprocessor)
 
-  def _prepare_inputs(self, X, constraints, weights):
-    self.X_ = X = check_array(X)
-    a,b,c,d = constraints
-    self.vab_ = X[a] - X[b]
-    self.vcd_ = X[c] - X[d]
+  def _fit(self, quadruplets, y=None, weights=None):
+    quadruplets = self._prepare_inputs(quadruplets,
+                                       type_of_inputs='tuples')
+
+    # check to make sure that no two constrained vectors are identical
+    self.vab_ = quadruplets[:, 0, :] - quadruplets[:, 1, :]
+    self.vcd_ = quadruplets[:, 2, :] - quadruplets[:, 3, :]
     if self.vab_.shape != self.vcd_.shape:
       raise ValueError('Constraints must have same length')
     if weights is None:
@@ -49,28 +59,14 @@ class LSML(BaseMetricLearner):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     if self.prior is None:
+      X = np.vstack({tuple(row) for row in
+                     quadruplets.reshape(-1, quadruplets.shape[2])})
       self.prior_inv_ = np.atleast_2d(np.cov(X, rowvar=False))
       self.M_ = np.linalg.inv(self.prior_inv_)
     else:
       self.M_ = self.prior
       self.prior_inv_ = np.linalg.inv(self.prior)
 
-  def metric(self):
-    return self.M_
-
-  def fit(self, X, constraints, weights=None):
-    """Learn the LSML model.
-
-    Parameters
-    ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, such that d(X[a],X[b]) < d(X[c],X[d])
-    weights : (m,) array of floats, optional
-        scale factor for each constraint
-    """
-    self._prepare_inputs(X, constraints, weights)
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
     l_best = 0
@@ -104,6 +100,8 @@ class LSML(BaseMetricLearner):
       if self.verbose:
         print("Didn't converge after", it, "iterations. Final loss:", s_best)
     self.n_iter_ = it
+
+    self.transformer_ = self.transformer_from_metric(self.M_)
     return self
 
   def _comparison_loss(self, metric):
@@ -132,10 +130,53 @@ class LSML(BaseMetricLearner):
     return dMetric
 
 
-class LSML_Supervised(LSML):
+class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
+  """Least Squared-residual Metric Learning (LSML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
+  def fit(self, quadruplets, weights=None):
+    """Learn the LSML model.
+
+    Parameters
+    ----------
+    quadruplets : array-like, shape=(n_constraints, 4, n_features) or
+                  (n_constraints, 4)
+        3D array-like of quadruplets of points or 2D array of quadruplets of
+        indicators. In order to supervise the algorithm in the right way, we
+        should have the four samples ordered in a way such that:
+        d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3]) for all 0 <= i <
+        n_constraints.
+    weights : (n_constraints,) array of floats, optional
+        scale factor for each constraint
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
+    """
+    return self._fit(quadruplets, weights=weights)
+
+
+class LSML_Supervised(_BaseLSML, TransformerMixin):
+  """Supervised version of Least Squared-residual Metric Learning (LSML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,
                num_labeled='deprecated', num_constraints=None, weights=None,
-               verbose=False):
+               verbose=False,
+               preprocessor=None):
     """Initialize the supervised version of `LSML`.
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
@@ -159,9 +200,12 @@ class LSML_Supervised(LSML):
         scale factor for each constraint
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
-    LSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
-                  verbose=verbose)
+    _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
+                       verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights
@@ -184,13 +228,14 @@ class LSML_Supervised(LSML):
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.4 and will be'
                     'removed in 0.5', DeprecationWarning)
-    X, y = check_X_y(X, y)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
     c = Constraints(y)
-    pairs = c.positive_negative_pairs(num_constraints, same_length=True,
-                                      random_state=random_state)
-    return LSML.fit(self, X, pairs, weights=self.weights)
+    pos_neg = c.positive_negative_pairs(num_constraints, same_length=True,
+                                        random_state=random_state)
+    return _BaseLSML._fit(self, X[np.column_stack(pos_neg)],
+                          weights=self.weights)

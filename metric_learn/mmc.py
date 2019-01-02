@@ -20,19 +20,22 @@ from __future__ import print_function, absolute_import, division
 import warnings
 import numpy as np
 from six.moves import xrange
-from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_array, check_X_y, assert_all_finite
+from sklearn.base import TransformerMixin
+from sklearn.utils.validation import check_array, assert_all_finite
 
-from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .base_metric import _PairsClassifierMixin, MahalanobisMixin
+from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
-
-class MMC(BaseMetricLearner):
+class _BaseMMC(MahalanobisMixin):
   """Mahalanobis Metric for Clustering (MMC)"""
+
+  _tuple_size = 2  # constraints are pairs
+
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False):
+               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
+               preprocessor=None):
     """Initialize MMC.
     Parameters
     ----------
@@ -50,6 +53,9 @@ class MMC(BaseMetricLearner):
         metric learning
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
     """
     self.max_iter = max_iter
     self.max_proj = max_proj
@@ -58,42 +64,15 @@ class MMC(BaseMetricLearner):
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
     self.verbose = verbose
+    super(_BaseMMC, self).__init__(preprocessor)
 
-  def fit(self, X, constraints):
-    """Learn the MMC model.
-
-    Parameters
-    ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)
-        dissimilar pairs
-    """
-    constraints = self._process_inputs(X, constraints)
-    if self.diagonal:
-      return self._fit_diag(X, constraints)
-    else:
-      return self._fit_full(X, constraints)
-
-  def _process_inputs(self, X, constraints):
-
-    self.X_ = X = check_array(X)
-
-    # check to make sure that no two constrained vectors are identical
-    a,b,c,d = constraints
-    no_ident = vector_norm(X[a] - X[b]) > 1e-9
-    a, b = a[no_ident], b[no_ident]
-    no_ident = vector_norm(X[c] - X[d]) > 1e-9
-    c, d = c[no_ident], d[no_ident]
-    if len(a) == 0:
-      raise ValueError('No non-trivial similarity constraints given for MMC.')
-    if len(c) == 0:
-      raise ValueError('No non-trivial dissimilarity constraints given for MMC.')
+  def _fit(self, pairs, y):
+    pairs, y = self._prepare_inputs(pairs, y,
+                                    type_of_inputs='tuples')
 
     # init metric
     if self.A0 is None:
-      self.A_ = np.identity(X.shape[1])
+      self.A_ = np.identity(pairs.shape[2])
       if not self.diagonal:
         # Don't know why division by 10... it's in the original code
         # and seems to affect the overall scale of the learned metric.
@@ -101,9 +80,12 @@ class MMC(BaseMetricLearner):
     else:
       self.A_ = check_array(self.A0)
 
-    return a,b,c,d
+    if self.diagonal:
+      return self._fit_diag(pairs, y)
+    else:
+      return self._fit_full(pairs, y)
 
-  def _fit_full(self, X, constraints):
+  def _fit_full(self, pairs, y):
     """Learn full metric using MMC.
 
     Parameters
@@ -114,17 +96,16 @@ class MMC(BaseMetricLearner):
         (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)
         dissimilar pairs
     """
-    a,b,c,d = constraints
-    num_pos = len(a)
-    num_neg = len(c)
-    num_samples, num_dim = X.shape
+    num_dim = pairs.shape[2]
 
     error1 = error2 = 1e10
     eps = 0.01        # error-bound of iterative projection on C1 and C2
     A = self.A_
 
+    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
+
     # Create weight vector from similar samples
-    pos_diff = X[a] - X[b]
+    pos_diff = pos_pairs[:, 0, :] - pos_pairs[:, 1, :]
     w = np.einsum('ij,ik->jk', pos_diff, pos_diff).ravel()
     # `w` is the sum of all outer products of the rows in `pos_diff`.
     # The above `einsum` is equivalent to the much more inefficient:
@@ -141,9 +122,10 @@ class MMC(BaseMetricLearner):
 
     cycle = 1
     alpha = 0.1  # initial step size along gradient
-
-    grad1 = self._fS1(X, a, b, A)            # gradient of similarity constraint function
-    grad2 = self._fD1(X, c, d, A)            # gradient of dissimilarity constraint function
+    grad1 = self._fS1(pos_pairs, A)            # gradient of similarity
+    # constraint function
+    grad2 = self._fD1(neg_pairs, A)            # gradient of dissimilarity
+    # constraint function
     M = self._grad_projection(grad1, grad2)  # gradient of fD1 orthogonal to fS1
 
     A_old = A.copy()
@@ -184,8 +166,8 @@ class MMC(BaseMetricLearner):
       # max: g(A) >= 1
       # here we suppose g(A) = fD(A) = \sum_{I,J \in D} sqrt(d_ij' A d_ij)
 
-      obj_previous = self._fD(X, c, d, A_old)  # g(A_old)
-      obj = self._fD(X, c, d, A)               # g(A)
+      obj_previous = self._fD(neg_pairs, A_old)  # g(A_old)
+      obj = self._fD(neg_pairs, A)               # g(A)
 
       if satisfy and (obj > obj_previous or cycle == 0):
 
@@ -194,8 +176,8 @@ class MMC(BaseMetricLearner):
         # and update from the current A.
         alpha *= 1.05
         A_old[:] = A
-        grad2 = self._fS1(X, a, b, A)
-        grad1 = self._fD1(X, c, d, A)
+        grad2 = self._fS1(pos_pairs, A)
+        grad1 = self._fD1(neg_pairs, A)
         M = self._grad_projection(grad1, grad2)
         A += alpha * M
 
@@ -223,9 +205,11 @@ class MMC(BaseMetricLearner):
         print('mmc converged at iter %d, conv = %f' % (cycle, delta))
     self.A_[:] = A_old
     self.n_iter_ = cycle
+
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
-  def _fit_diag(self, X, constraints):
+  def _fit_diag(self, pairs, y):
     """Learn diagonal metric using MMC.
     Parameters
     ----------
@@ -235,12 +219,9 @@ class MMC(BaseMetricLearner):
         (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)
         dissimilar pairs
     """
-    a,b,c,d = constraints
-    num_pos = len(a)
-    num_neg = len(c)
-    num_samples, num_dim = X.shape
-
-    s_sum = np.sum((X[a] - X[b]) ** 2, axis=0)
+    num_dim = pairs.shape[2]
+    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
+    s_sum = np.sum((pos_pairs[:, 0, :] - pos_pairs[:, 1, :]) ** 2, axis=0)
 
     it = 0
     error = 1.0
@@ -250,19 +231,20 @@ class MMC(BaseMetricLearner):
 
     while error > self.convergence_threshold and it < self.max_iter:
 
-      fD0, fD_1st_d, fD_2nd_d = self._D_constraint(X, c, d, w)
+      fD0, fD_1st_d, fD_2nd_d = self._D_constraint(neg_pairs, w)
       obj_initial = np.dot(s_sum, w) + self.diagonal_c * fD0
       fS_1st_d = s_sum  # first derivative of the similarity constraints
 
       gradient = fS_1st_d - self.diagonal_c * fD_1st_d               # gradient of the objective
       hessian = -self.diagonal_c * fD_2nd_d + eps * np.eye(num_dim)  # Hessian of the objective
-      step = np.dot(np.linalg.inv(hessian), gradient);
+      step = np.dot(np.linalg.inv(hessian), gradient)
 
       # Newton-Rapshon update
       # search over optimal lambda
       lambd = 1  # initial step-size
       w_tmp = np.maximum(0, w - lambd * step)
-      obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
+      obj = (np.dot(s_sum, w_tmp) + self.diagonal_c *
+             self._D_objective(neg_pairs, w_tmp))
       assert_all_finite(obj)
       obj_previous = obj + 1  # just to get the while-loop started
 
@@ -272,7 +254,8 @@ class MMC(BaseMetricLearner):
         w_previous = w_tmp.copy()
         lambd /= reduction
         w_tmp = np.maximum(0, w - lambd * step)
-        obj = np.dot(s_sum, w_tmp) + self.diagonal_c * self._D_objective(X, c, d, w_tmp)
+        obj = (np.dot(s_sum, w_tmp) + self.diagonal_c *
+               self._D_objective(neg_pairs, w_tmp))
         inner_it += 1
         assert_all_finite(obj)
 
@@ -283,18 +266,20 @@ class MMC(BaseMetricLearner):
       it += 1
 
     self.A_ = np.diag(w)
+
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
-  def _fD(self, X, c, d, A):
+  def _fD(self, neg_pairs, A):
     """The value of the dissimilarity constraint function.
 
     f = f(\sum_{ij \in D} distance(x_i, x_j))
     i.e. distance can be L1:  \sqrt{(x_i-x_j)A(x_i-x_j)'}
     """
-    diff = X[c] - X[d]
+    diff = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
     return np.log(np.sum(np.sqrt(np.sum(np.dot(diff, A) * diff, axis=1))) + 1e-6)
 
-  def _fD1(self, X, c, d, A):
+  def _fD1(self, neg_pairs, A):
     """The gradient of the dissimilarity constraint function w.r.t. A.
 
     For example, let distance by L1 norm:
@@ -306,8 +291,8 @@ class MMC(BaseMetricLearner):
         df/dA = f'(\sum_{ij \in D} \sqrt{tr(d_ij'*d_ij*A)})
                 * 0.5*(\sum_{ij \in D} (1/sqrt{tr(d_ij'*d_ij*A)})*(d_ij'*d_ij))
     """
-    dim = X.shape[1]
-    diff = X[c] - X[d]
+    dim = neg_pairs.shape[2]
+    diff = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
     # outer products of all rows in `diff`
     M = np.einsum('ij,ik->ijk', diff, diff)
     # faster version of: dist = np.sqrt(np.sum(M * A[None,:,:], axis=(1,2)))
@@ -317,7 +302,7 @@ class MMC(BaseMetricLearner):
     sum_dist = dist.sum()
     return sum_deri / (sum_dist + 1e-6)
 
-  def _fS1(self, X, a, b, A):
+  def _fS1(self, pos_pairs, A):
     """The gradient of the similarity constraint function w.r.t. A.
 
     f = \sum_{ij}(x_i-x_j)A(x_i-x_j)' = \sum_{ij}d_ij*A*d_ij'
@@ -326,8 +311,8 @@ class MMC(BaseMetricLearner):
     Note that d_ij*A*d_ij' = tr(d_ij*A*d_ij') = tr(d_ij'*d_ij*A)
     so, d(d_ij*A*d_ij')/dA = d_ij'*d_ij
     """
-    dim = X.shape[1]
-    diff = X[a] - X[b]
+    dim = pos_pairs.shape[2]
+    diff = pos_pairs[:, 0, :] - pos_pairs[:, 1, :]
     return np.einsum('ij,ik->jk', diff, diff)  # sum of outer products of all rows in `diff`
 
   def _grad_projection(self, grad1, grad2):
@@ -336,15 +321,17 @@ class MMC(BaseMetricLearner):
     gtemp /= np.linalg.norm(gtemp)
     return gtemp
 
-  def _D_objective(self, X, c, d, w):
-    return np.log(np.sum(np.sqrt(np.sum(((X[c] - X[d]) ** 2) * w[None,:], axis=1) + 1e-6)))
+  def _D_objective(self, neg_pairs, w):
+    return np.log(np.sum(np.sqrt(np.sum(((neg_pairs[:, 0, :] -
+                                          neg_pairs[:, 1, :]) ** 2) *
+                                        w[None,:], axis=1) + 1e-6)))
 
-  def _D_constraint(self, X, c, d, w):
+  def _D_constraint(self, neg_pairs, w):
     """Compute the value, 1st derivative, second derivative (Hessian) of
     a dissimilarity constraint function gF(sum_ij distance(d_ij A d_ij))
     where A is a diagonal matrix (in the form of a column vector 'w').
     """
-    diff = X[c] - X[d]
+    diff = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
     diff_sq = diff * diff
     dist = np.sqrt(diff_sq.dot(w))
     sum_deri1 = np.einsum('ij,i', diff_sq, 0.5 / np.maximum(dist, 1e-6))
@@ -360,33 +347,52 @@ class MMC(BaseMetricLearner):
       sum_deri2 / sum_dist - np.outer(sum_deri1, sum_deri1) / (sum_dist * sum_dist)
     )
 
-  def metric(self):
-    return self.A_
 
-  def transformer(self):
-    """Computes the transformation matrix from the Mahalanobis matrix.
-    L = V.T * w^(-1/2), with A = V*w*V.T being the eigenvector decomposition of A with
-    the eigenvalues in the diagonal matrix w and the columns of V being the eigenvectors.
+class MMC(_BaseMMC, _PairsClassifierMixin):
+  """Mahalanobis Metric for Clustering (MMC)
 
-    The Cholesky decomposition cannot be applied here, since MMC learns only a positive
-    *semi*-definite Mahalanobis matrix.
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
+  def fit(self, pairs, y):
+    """Learn the MMC model.
+
+    Parameters
+    ----------
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 
     Returns
     -------
-    L : (d x d) matrix
+    self : object
+        Returns the instance.
     """
-    if self.diagonal:
-      return np.sqrt(self.A_)
-    else:
-      w, V = np.linalg.eigh(self.A_)
-      return V.T * np.sqrt(np.maximum(0, w[:,None]))
+    return self._fit(pairs, y)
 
 
-class MMC_Supervised(MMC):
-  """Mahalanobis Metric for Clustering (MMC)"""
+class MMC_Supervised(_BaseMMC, TransformerMixin):
+  """Supervised version of Mahalanobis Metric for Clustering (MMC)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled='deprecated', num_constraints=None, A0=None,
-               diagonal=False, diagonal_c=1.0, verbose=False):
+               diagonal=False, diagonal_c=1.0, verbose=False,
+               preprocessor=None):
     """Initialize the supervised version of `MMC`.
 
     `MMC_Supervised` creates pairs of similar sample by taking same class
@@ -415,11 +421,14 @@ class MMC_Supervised(MMC):
         metric learning
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
-    MMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
-                 convergence_threshold=convergence_threshold,
-                 A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
-                 verbose=verbose)
+    _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
+                      convergence_threshold=convergence_threshold,
+                      A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
+                      verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
@@ -439,7 +448,7 @@ class MMC_Supervised(MMC):
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.4 and will be'
                     'removed in 0.5', DeprecationWarning)
-    X, y = check_X_y(X, y)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
@@ -448,4 +457,5 @@ class MMC_Supervised(MMC):
     c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    return MMC.fit(self, X, pos_neg)
+    pairs, y = wrap_pairs(X, pos_neg)
+    return _BaseMMC._fit(self, pairs, y)

@@ -11,22 +11,31 @@ import time
 import sys
 import warnings
 import numpy as np
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.fixes import logsumexp
 from scipy.optimize import minimize
+from scipy.spatial.distance import pdist, squareform
+from sklearn.base import TransformerMixin
 from sklearn.decomposition import PCA
-from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_X_y
-from sklearn.exceptions import ConvergenceWarning
 
-from .base_metric import BaseMetricLearner
+
+from sklearn.metrics import pairwise_distances
+from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
 
 
-class MLKR(BaseMetricLearner):
-  """Metric Learning for Kernel Regression (MLKR)"""
+class MLKR(MahalanobisMixin, TransformerMixin):
+  """Metric Learning for Kernel Regression (MLKR)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
   def __init__(self, num_dims=None, A0=None, tol=None, max_iter=1000,
-               verbose=False):
+               verbose=False, preprocessor=None):
     """
     Initialize MLKR.
 
@@ -46,16 +55,30 @@ class MLKR(BaseMetricLearner):
 
     verbose : bool, optional (default=False)
         Whether to print progress messages or not.
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.num_dims = num_dims
     self.A0 = A0
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
+    super(MLKR, self).__init__(preprocessor)
 
-  def _process_inputs(self, X, y):
-      self.X_, y = check_X_y(X, y, y_numeric=True)
-      n, d = self.X_.shape
+  def fit(self, X, y):
+      """
+      Fit MLKR model
+
+      Parameters
+      ----------
+      X : (n x d) array of samples
+      y : (n) data labels
+      """
+      X, y = self._prepare_inputs(X, y, y_numeric=True,
+                                  ensure_min_samples=2)
+      n, d = X.shape
       if y.shape[0] != n:
           raise ValueError('Data and label lengths mismatch: %d != %d'
                            % (n, y.shape[0]))
@@ -71,18 +94,6 @@ class MLKR(BaseMetricLearner):
       elif A.shape != (m, d):
           raise ValueError('A0 needs shape (%d,%d) but got %s' % (
               m, d, A.shape))
-      return self.X_, y, A
-
-  def fit(self, X, y):
-      """
-      Fit MLKR model
-
-      Parameters
-      ----------
-      X : (n x d) array of samples
-      y : (n) data labels
-      """
-      X, y, A = self._process_inputs(X, y)
 
       # Measure the total training time
       train_time = time.time()
@@ -104,9 +115,6 @@ class MLKR(BaseMetricLearner):
           print('[{}] Training took {:8.2f}s.'.format(cls_name, train_time))
 
       return self
-
-  def transformer(self):
-      return self.transformer_
 
   def _loss(self, flatA, X, y):
 

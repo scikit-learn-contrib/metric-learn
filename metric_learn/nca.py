@@ -4,29 +4,32 @@ Ported to Python from https://github.com/vomjom/nca
 """
 
 from __future__ import absolute_import
-
 import warnings
 import time
 import sys
 import numpy as np
 from scipy.optimize import minimize
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_X_y
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.utils.fixes import logsumexp
+from sklearn.base import TransformerMixin
 
-try:  # scipy.misc.logsumexp is deprecated in scipy 1.0.0
-    from scipy.special import logsumexp
-except ImportError:
-    from scipy.misc import logsumexp
-
-from .base_metric import BaseMetricLearner
+from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
 
 
-class NCA(BaseMetricLearner):
-  def __init__(self, num_dims=None, max_iter=100, learning_rate='deprecated',
-               tol=None, verbose=False):
+class NCA(MahalanobisMixin, TransformerMixin):
+  """Neighborhood Components Analysis (NCA)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The learned linear transformation ``L``.
+  """
+
+  def __init__(self, num_dims=None, max_iter=100, tol=None, verbose=False,
+               preprocessor=None):
     """Neighborhood Components Analysis
 
     Parameters
@@ -38,13 +41,6 @@ class NCA(BaseMetricLearner):
     max_iter : int, optional (default=100)
       Maximum number of iterations done by the optimization algorithm.
 
-    learning_rate : Not used
-
-      .. deprecated:: 0.4.0
-        `learning_rate` was deprecated in version 0.4.0 and will
-        be removed in 0.5.0. The current optimization algorithm does not need
-        to fix a learning rate.
-
     tol : float, optional (default=None)
         Convergence tolerance for the optimization.
 
@@ -53,24 +49,16 @@ class NCA(BaseMetricLearner):
     """
     self.num_dims = num_dims
     self.max_iter = max_iter
-    self.learning_rate = learning_rate  # TODO: remove in v.0.5.0
     self.tol = tol
     self.verbose = verbose
-
-  def transformer(self):
-    return self.A_
+    super(NCA, self).__init__(preprocessor)
 
   def fit(self, X, y):
     """
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
-    if self.learning_rate != 'deprecated':
-      warnings.warn('"learning_rate" parameter is not used.'
-                    ' It has been deprecated in version 0.4 and will be'
-                    'removed in 0.5', DeprecationWarning)
-
-    X, labels = check_X_y(X, y)
+    X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
     num_dims = self.num_dims
     if num_dims is None:
@@ -98,8 +86,7 @@ class NCA(BaseMetricLearner):
     self.n_iter_ = 0
     opt_result = minimize(**optimizer_params)
 
-    self.X_ = X
-    self.A_ = opt_result.x.reshape(-1, X.shape[1])
+    self.transformer_ = opt_result.x.reshape(-1, X.shape[1])
     self.n_iter_ = opt_result.nit
 
     # Stop timer

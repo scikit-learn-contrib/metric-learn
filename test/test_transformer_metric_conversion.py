@@ -19,60 +19,60 @@ class TestTransformerMetricConversion(unittest.TestCase):
   def test_cov(self):
     cov = Covariance()
     cov.fit(self.X)
-    L = cov.transformer()
+    L = cov.transformer_
     assert_array_almost_equal(L.T.dot(L), cov.metric())
 
   def test_lsml_supervised(self):
     seed = np.random.RandomState(1234)
     lsml = LSML_Supervised(num_constraints=200)
     lsml.fit(self.X, self.y, random_state=seed)
-    L = lsml.transformer()
+    L = lsml.transformer_
     assert_array_almost_equal(L.T.dot(L), lsml.metric())
 
   def test_itml_supervised(self):
     seed = np.random.RandomState(1234)
     itml = ITML_Supervised(num_constraints=200)
     itml.fit(self.X, self.y, random_state=seed)
-    L = itml.transformer()
+    L = itml.transformer_
     assert_array_almost_equal(L.T.dot(L), itml.metric())
 
   def test_lmnn(self):
     lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
     lmnn.fit(self.X, self.y)
-    L = lmnn.transformer()
+    L = lmnn.transformer_
     assert_array_almost_equal(L.T.dot(L), lmnn.metric())
 
   def test_sdml_supervised(self):
     seed = np.random.RandomState(1234)
     sdml = SDML_Supervised(num_constraints=1500)
     sdml.fit(self.X, self.y, random_state=seed)
-    L = sdml.transformer()
+    L = sdml.transformer_
     assert_array_almost_equal(L.T.dot(L), sdml.metric())
 
   def test_nca(self):
     n = self.X.shape[0]
-    nca = NCA(max_iter=(100000//n), learning_rate=0.01)
+    nca = NCA(max_iter=(100000//n))
     nca.fit(self.X, self.y)
-    L = nca.transformer()
+    L = nca.transformer_
     assert_array_almost_equal(L.T.dot(L), nca.metric())
 
   def test_lfda(self):
     lfda = LFDA(k=2, num_dims=2)
     lfda.fit(self.X, self.y)
-    L = lfda.transformer()
+    L = lfda.transformer_
     assert_array_almost_equal(L.T.dot(L), lfda.metric())
 
   def test_rca_supervised(self):
     seed = np.random.RandomState(1234)
     rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
     rca.fit(self.X, self.y, random_state=seed)
-    L = rca.transformer()
+    L = rca.transformer_
     assert_array_almost_equal(L.T.dot(L), rca.metric())
 
   def test_mlkr(self):
     mlkr = MLKR(num_dims=2)
     mlkr.fit(self.X, self.y)
-    L = mlkr.transformer()
+    L = mlkr.transformer_
     assert_array_almost_equal(L.T.dot(L), mlkr.metric())
 
 

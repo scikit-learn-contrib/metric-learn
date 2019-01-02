@@ -34,27 +34,8 @@ package installed).
 
 **Usage**
 
-For full usage examples, see the `sphinx documentation`_.
-
-Each metric is a subclass of ``BaseMetricLearner``, which provides
-default implementations for the methods ``metric``, ``transformer``, and
-``transform``. Subclasses must provide an implementation for either
-``metric`` or ``transformer``.
-
-For an instance of a metric learner named ``foo`` learning from a set of
-``d``-dimensional points, ``foo.metric()`` returns a ``d x d``
-matrix ``M`` such that the distance between vectors ``x`` and ``y`` is
-expressed ``sqrt((x-y).dot(M).dot(x-y))``.
-Using scipy's ``pdist`` function, this would look like
-``pdist(X, metric='mahalanobis', VI=foo.metric())``.
-
-In the same scenario, ``foo.transformer()`` returns a ``d x d``
-matrix ``L`` such that a vector ``x`` can be represented in the learned
-space as the vector ``x.dot(L.T)``.
-
-For convenience, the function ``foo.transform(X)`` is provided for
-converting a matrix of points (``X``) into the learned space, in which
-standard Euclidean distance can be used.
+See the `sphinx documentation`_ for full documentation about installation, API,
+ usage, and examples.
 
 **Notes**
 

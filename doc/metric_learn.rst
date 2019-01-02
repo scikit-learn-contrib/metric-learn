@@ -1,8 +1,8 @@
 metric_learn package
 ====================
 
-Submodules
-----------
+Module Contents
+---------------
 
 .. toctree::
 
@@ -16,11 +16,3 @@ Submodules
    metric_learn.nca
    metric_learn.rca
    metric_learn.sdml
-
-Module contents
----------------
-
-.. automodule:: metric_learn
-    :members:
-    :undoc-members:
-    :show-inheritance:

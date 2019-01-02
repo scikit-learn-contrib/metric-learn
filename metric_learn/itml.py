@@ -18,17 +18,20 @@ import warnings
 import numpy as np
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.utils.validation import check_array, check_X_y
-
-from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from sklearn.utils.validation import check_array
+from sklearn.base import TransformerMixin
+from .base_metric import _PairsClassifierMixin, MahalanobisMixin
+from .constraints import Constraints, wrap_pairs
 from ._util import vector_norm
 
 
-class ITML(BaseMetricLearner):
+class _BaseITML(MahalanobisMixin):
   """Information Theoretic Metric Learning (ITML)"""
+
+  _tuple_size = 2  # constraints are pairs
+
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               A0=None, verbose=False):
+               A0=None, verbose=False, preprocessor=None):
     """Initialize ITML.
 
     Parameters
@@ -45,23 +48,24 @@ class ITML(BaseMetricLearner):
 
     verbose : bool, optional
         if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
     self.A0 = A0
     self.verbose = verbose
+    super(_BaseITML, self).__init__(preprocessor)
 
-  def _process_inputs(self, X, constraints, bounds):
-    self.X_ = X = check_array(X)
-    # check to make sure that no two constrained vectors are identical
-    a,b,c,d = constraints
-    no_ident = vector_norm(X[a] - X[b]) > 1e-9
-    a, b = a[no_ident], b[no_ident]
-    no_ident = vector_norm(X[c] - X[d]) > 1e-9
-    c, d = c[no_ident], d[no_ident]
+  def _fit(self, pairs, y, bounds=None):
+    pairs, y = self._prepare_inputs(pairs, y,
+                                    type_of_inputs='tuples')
     # init bounds
     if bounds is None:
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
       self.bounds_ = np.percentile(pairwise_distances(X), (5, 95))
     else:
       assert len(bounds) == 2
@@ -69,35 +73,20 @@ class ITML(BaseMetricLearner):
     self.bounds_[self.bounds_==0] = 1e-9
     # init metric
     if self.A0 is None:
-      self.A_ = np.identity(X.shape[1])
+      self.A_ = np.identity(pairs.shape[2])
     else:
       self.A_ = check_array(self.A0)
-    return a,b,c,d
-
-  def fit(self, X, constraints, bounds=None):
-    """Learn the ITML model.
-
-    Parameters
-    ----------
-    X : (n x d) data matrix
-        each row corresponds to a single instance
-    constraints : 4-tuple of arrays
-        (a,b,c,d) indices into X, with (a,b) specifying positive and (c,d)
-        negative pairs
-    bounds : list (pos,neg) pairs, optional
-        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
-    """
-    a,b,c,d = self._process_inputs(X, constraints, bounds)
     gamma = self.gamma
-    num_pos = len(a)
-    num_neg = len(c)
+    pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
+    num_pos = len(pos_pairs)
+    num_neg = len(neg_pairs)
     _lambda = np.zeros(num_pos + num_neg)
     lambdaold = np.zeros_like(_lambda)
     gamma_proj = 1. if gamma is np.inf else gamma/(gamma+1.)
     pos_bhat = np.zeros(num_pos) + self.bounds_[0]
     neg_bhat = np.zeros(num_neg) + self.bounds_[1]
-    pos_vv = self.X_[a] - self.X_[b]
-    neg_vv = self.X_[c] - self.X_[d]
+    pos_vv = pos_pairs[:, 0, :] - pos_pairs[:, 1, :]
+    neg_vv = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
     A = self.A_
 
     for it in xrange(self.max_iter):
@@ -135,17 +124,57 @@ class ITML(BaseMetricLearner):
     if self.verbose:
       print('itml converged at iter: %d, conv = %f' % (it, conv))
     self.n_iter_ = it
+
+    self.transformer_ = self.transformer_from_metric(self.A_)
     return self
 
-  def metric(self):
-    return self.A_
+
+class ITML(_BaseITML, _PairsClassifierMixin):
+  """Information Theoretic Metric Learning (ITML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
+  def fit(self, pairs, y, bounds=None):
+    """Learn the ITML model.
+
+    Parameters
+    ----------
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+    bounds : list (pos,neg) pairs, optional
+        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
+
+    Returns
+    -------
+    self : object
+        Returns the instance.
+    """
+    return self._fit(pairs, y, bounds=bounds)
 
 
-class ITML_Supervised(ITML):
-  """Information Theoretic Metric Learning (ITML)"""
+class ITML_Supervised(_BaseITML, TransformerMixin):
+  """Supervised version of Information Theoretic Metric Learning (ITML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See `transformer_from_metric`.)
+  """
+
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled='deprecated', num_constraints=None, bounds=None,
-               A0=None, verbose=False):
+               A0=None, verbose=False, preprocessor=None):
     """Initialize the supervised version of `ITML`.
 
     `ITML_Supervised` creates pairs of similar sample by taking same class
@@ -170,17 +199,20 @@ class ITML_Supervised(ITML):
         initial regularization matrix, defaults to identity
     verbose : bool, optional
         if True, prints information while learning
-        learning_rate : Not used
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
-    ITML.__init__(self, gamma=gamma, max_iter=max_iter,
-                  convergence_threshold=convergence_threshold,
-                  A0=A0, verbose=verbose)
+    _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
+                       convergence_threshold=convergence_threshold,
+                       A0=A0, verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds
 
   def fit(self, X, y, random_state=np.random):
     """Create constraints from labels and learn the ITML model.
+
 
     Parameters
     ----------
@@ -197,7 +229,7 @@ class ITML_Supervised(ITML):
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.4 and will be'
                     'removed in 0.5', DeprecationWarning)
-    X, y = check_X_y(X, y)
+    X, y = self._prepare_inputs(X, y)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
@@ -206,4 +238,5 @@ class ITML_Supervised(ITML):
     c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
-    return ITML.fit(self, X, pos_neg, bounds=self.bounds)
+    pairs, y = wrap_pairs(X, pos_neg)
+    return _BaseITML._fit(self, pairs, y, bounds=self.bounds)

@@ -88,3 +88,13 @@ class Constraints(object):
       raise ValueError('Unable to make %d chunks of %d examples each' %
                        (num_chunks, chunk_size))
     return chunks
+
+def wrap_pairs(X, constraints):
+  a = np.array(constraints[0])
+  b = np.array(constraints[1])
+  c = np.array(constraints[2])
+  d = np.array(constraints[3])
+  constraints = np.vstack((np.column_stack((a, b)), np.column_stack((c, d))))
+  y = np.vstack([np.ones((len(a), 1)), - np.ones((len(c), 1))])
+  pairs = X[constraints]
+  return pairs, y

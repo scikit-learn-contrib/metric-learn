@@ -11,18 +11,20 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 from __future__ import absolute_import
 import warnings
 import numpy as np
-from scipy.sparse.csgraph import laplacian
+from sklearn.base import TransformerMixin
 from sklearn.covariance import graph_lasso
 from sklearn.utils.extmath import pinvh
-from sklearn.utils.validation import check_array
 
-from .base_metric import BaseMetricLearner
-from .constraints import Constraints
+from .base_metric import MahalanobisMixin, _PairsClassifierMixin
+from .constraints import Constraints, wrap_pairs
 
 
-class SDML(BaseMetricLearner):
+class _BaseSDML(MahalanobisMixin):
+
+  _tuple_size = 2  # constraints are pairs
+
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               verbose=False):
+               verbose=False, preprocessor=None):
     """
     Parameters
     ----------
@@ -37,59 +39,88 @@ class SDML(BaseMetricLearner):
 
     verbose : bool, optional
         if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
     """
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
     self.use_cov = use_cov
     self.verbose = verbose
+    super(_BaseSDML, self).__init__(preprocessor)
 
-  def _prepare_inputs(self, X, W):
-    self.X_ = X = check_array(X)
-    W = check_array(W, accept_sparse=True)
+  def _fit(self, pairs, y):
+    pairs, y = self._prepare_inputs(pairs, y,
+                                    type_of_inputs='tuples')
+
     # set up prior M
     if self.use_cov:
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
       self.M_ = pinvh(np.cov(X, rowvar = False))
     else:
-      self.M_ = np.identity(X.shape[1])
-    L = laplacian(W, normed=False)
-    return X.T.dot(L.dot(X))
+      self.M_ = np.identity(pairs.shape[2])
+    diff = pairs[:, 0] - pairs[:, 1]
+    loss_matrix = (diff.T * y).dot(diff)
+    P = self.M_ + self.balance_param * loss_matrix
+    emp_cov = pinvh(P)
+    # hack: ensure positive semidefinite
+    emp_cov = emp_cov.T.dot(emp_cov)
+    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
 
-  def metric(self):
-    return self.M_
+    self.transformer_ = self.transformer_from_metric(self.M_)
+    return self
 
-  def fit(self, X, W):
+
+class SDML(_BaseSDML, _PairsClassifierMixin):
+  """Sparse Distance Metric Learning (SDML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
+  def fit(self, pairs, y):
     """Learn the SDML model.
 
     Parameters
     ----------
-    X : array-like, shape (n, d)
-        data matrix, where each row corresponds to a single instance
-    W : array-like, shape (n, n)
-        connectivity graph, with +1 for positive pairs and -1 for negative
+    pairs: array-like, shape=(n_constraints, 2, n_features) or
+           (n_constraints, 2)
+        3D Array of pairs with each row corresponding to two points,
+        or 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
+    y: array-like, of shape (n_constraints,)
+        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
 
     Returns
     -------
     self : object
         Returns the instance.
     """
-    loss_matrix = self._prepare_inputs(X, W)
-    P = self.M_ + self.balance_param * loss_matrix
-    emp_cov = pinvh(P)
-    # hack: ensure positive semidefinite
-    emp_cov = emp_cov.T.dot(emp_cov)
-    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
-    return self
+    return self._fit(pairs, y)
 
 
-class SDML_Supervised(SDML):
+class SDML_Supervised(_BaseSDML, TransformerMixin):
+  """Supervised version of Sparse Distance Metric Learning (SDML)
+
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_labeled='deprecated', num_constraints=None, verbose=False):
+               num_labeled='deprecated', num_constraints=None, verbose=False,
+               preprocessor=None):
     """Initialize the supervised version of `SDML`.
 
     `SDML_Supervised` creates pairs of similar sample by taking same class
     samples, and pairs of dissimilar samples by taking different class
     samples. It then passes these pairs to `SDML` for training.
-
     Parameters
     ----------
     balance_param : float, optional
@@ -106,10 +137,13 @@ class SDML_Supervised(SDML):
         number of constraints to generate
     verbose : bool, optional
         if True, prints information while learning
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be formed like this: X[indices].
     """
-    SDML.__init__(self, balance_param=balance_param,
-                  sparsity_param=sparsity_param, use_cov=use_cov,
-                  verbose=verbose)
+    _BaseSDML.__init__(self, balance_param=balance_param,
+                       sparsity_param=sparsity_param, use_cov=use_cov,
+                       verbose=verbose, preprocessor=preprocessor)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
@@ -135,12 +169,14 @@ class SDML_Supervised(SDML):
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.4 and will be'
                     'removed in 0.5', DeprecationWarning)
-    y = check_array(y, ensure_2d=False)
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
     c = Constraints(y)
-    adj = c.adjacency_matrix(num_constraints, random_state=random_state)
-    return SDML.fit(self, X, adj)
+    pos_neg = c.positive_negative_pairs(num_constraints,
+                                        random_state=random_state)
+    pairs, y = wrap_pairs(X, pos_neg)
+    return _BaseSDML._fit(self, pairs, y)
