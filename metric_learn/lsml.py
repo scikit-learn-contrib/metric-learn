@@ -184,7 +184,7 @@ class LSML_Supervised(LSML):
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.4 and will be'
                     'removed in 0.5', DeprecationWarning)
-    X, y = check_X_y(X, y, ensure_min_samples=2)
+    X, y = check_X_y(X, y)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
