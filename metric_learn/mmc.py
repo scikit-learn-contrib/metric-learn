@@ -17,6 +17,7 @@ Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/co
 """
 
 from __future__ import print_function, absolute_import, division
+import warnings
 import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
@@ -389,8 +390,8 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_labeled=np.inf, num_constraints=None,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
+               num_labeled='deprecated', num_constraints=None, A0=None,
+               diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None):
     """Initialize the supervised version of `MMC`.
 
@@ -403,10 +404,10 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     max_iter : int, optional
     max_proj : int, optional
     convergence_threshold : float, optional
-    num_labeled : int, optional (default=np.inf)
-        number of labeled points to keep for building pairs. Extra
-        labeled points will be considered unlabeled, and ignored as such.
-        Use np.inf (default) to use all labeled points.
+    num_labeled : Not used
+      .. deprecated:: 0.5.0
+         `num_labeled` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0.
     num_constraints: int, optional
         number of constraints to generate
     A0 : (d x d) matrix, optional
@@ -443,14 +444,17 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
+    if self.num_labeled != 'deprecated':
+      warnings.warn('"num_labeled" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
-    c = Constraints.random_subset(y, self.num_labeled,
-                                  random_state=random_state)
+    c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)

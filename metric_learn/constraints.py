@@ -89,17 +89,6 @@ class Constraints(object):
                        (num_chunks, chunk_size))
     return chunks
 
-  @staticmethod
-  def random_subset(all_labels, num_preserved=np.inf, random_state=np.random):
-    """
-    the random state object to be passed must be a numpy random seed
-    """
-    n = len(all_labels)
-    num_ignored = max(0, n - num_preserved)
-    idx = random_state.randint(n, size=num_ignored)
-    partial_labels = np.array(all_labels, copy=True)
-    partial_labels[idx] = -1
-    return Constraints(partial_labels)
 
 def wrap_pairs(X, constraints):
   a = np.array(constraints[0])

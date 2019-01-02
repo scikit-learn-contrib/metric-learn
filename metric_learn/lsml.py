@@ -8,6 +8,7 @@ Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
 """
 
 from __future__ import print_function, absolute_import, division
+import warnings
 import numpy as np
 import scipy.linalg
 from six.moves import xrange
@@ -172,8 +173,9 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       metric (See :meth:`transformer_from_metric`.)
   """
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, num_labeled=np.inf,
-               num_constraints=None, weights=None, verbose=False,
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
+               num_labeled='deprecated', num_constraints=None, weights=None,
+               verbose=False,
                preprocessor=None):
     """Initialize the supervised version of `LSML`.
 
@@ -188,10 +190,10 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     max_iter : int, optional
     prior : (d x d) matrix, optional
         guess at a metric [default: covariance(X)]
-    num_labeled : int, optional (default=np.inf)
-        number of labeled points to keep for building quadruplets. Extra
-        labeled points will be considered unlabeled, and ignored as such.
-        Use np.inf (default) to use all labeled points.
+    num_labeled : Not used
+      .. deprecated:: 0.5.0
+         `num_labeled` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0.
     num_constraints: int, optional
         number of constraints to generate
     weights : (m,) array of floats, optional
@@ -222,14 +224,17 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
+    if self.num_labeled != 'deprecated':
+      warnings.warn('"num_labeled" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
-    c = Constraints.random_subset(y, self.num_labeled,
-                                  random_state=random_state)
+    c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints, same_length=True,
                                         random_state=random_state)
     return _BaseLSML._fit(self, X[np.column_stack(pos_neg)],

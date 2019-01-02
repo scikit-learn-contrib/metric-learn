@@ -9,6 +9,7 @@ Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/ic
 """
 
 from __future__ import absolute_import
+import warnings
 import numpy as np
 from sklearn.base import TransformerMixin
 from sklearn.covariance import graph_lasso
@@ -113,7 +114,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   """
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_labeled=np.inf, num_constraints=None, verbose=False,
+               num_labeled='deprecated', num_constraints=None, verbose=False,
                preprocessor=None):
     """Initialize the supervised version of `SDML`.
 
@@ -128,10 +129,10 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
         trade off between optimizer and sparseness (see graph_lasso)
     use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
-    num_labeled : int, optional (default=np.inf)
-        number of labeled points to keep for building pairs. Extra
-        labeled points will be considered unlabeled, and ignored as such.
-        Use np.inf (default) to use all labeled points.
+    num_labeled : Not used
+      .. deprecated:: 0.5.0
+         `num_labeled` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0.
     num_constraints : int, optional
         number of constraints to generate
     verbose : bool, optional
@@ -164,14 +165,17 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     self : object
         Returns the instance.
     """
+    if self.num_labeled != 'deprecated':
+      warnings.warn('"num_labeled" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
       num_classes = len(np.unique(y))
       num_constraints = 20 * num_classes**2
 
-    c = Constraints.random_subset(y, self.num_labeled,
-                                  random_state=random_state)
+    c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)
