@@ -52,10 +52,9 @@ LSML_Supervised(max_iter=1000, num_constraints=None, num_labeled='deprecated',
                      "SDML(balance_param=0.5, preprocessor=None, "
                      "sparsity_param=0.01, use_cov=True,\n   verbose=False)")
     self.assertEqual(str(metric_learn.SDML_Supervised()), """
-SDML_Supervised(balance_param=0.5, num_constraints=None, num_labeled=inf,
-        num_labeled='deprecated', preprocessor=None, sparsity_param=0.01, 
-        use_cov=True,
-        verbose=False)
+SDML_Supervised(balance_param=0.5, num_constraints=None,
+        num_labeled='deprecated', preprocessor=None, sparsity_param=0.01,
+        use_cov=True, verbose=False)
 """.strip('\n'))
 
   def test_rca(self):
