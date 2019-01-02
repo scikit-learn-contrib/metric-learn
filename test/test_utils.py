@@ -58,8 +58,7 @@ def build_data():
   input_data, labels = load_iris(return_X_y=True)
   X, y = shuffle(input_data, labels, random_state=SEED)
   num_constraints = 50
-  constraints = (
-      Constraints.random_subset(y, random_state=check_random_state(SEED)))
+  constraints = Constraints(y)
   pairs = (
       constraints
       .positive_negative_pairs(num_constraints, same_length=True,
