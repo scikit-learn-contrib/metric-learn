@@ -64,8 +64,8 @@ class TestLSML(MetricTestCase):
     y = np.array([1, 0, 1, 0])
     lsml_supervised = LSML_Supervised(num_labeled=np.inf)
     msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.4 and will be'
-           'removed in 0.5')
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, lsml_supervised.fit, X, y)
 
 
@@ -84,8 +84,8 @@ class TestITML(MetricTestCase):
     y = np.array([1, 0, 1, 0])
     itml_supervised = ITML_Supervised(num_labeled=np.inf)
     msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.4 and will be'
-           'removed in 0.5')
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
 
 
@@ -150,8 +150,8 @@ class TestSDML(MetricTestCase):
     y = np.array([1, 0, 1, 0])
     sdml_supervised = SDML_Supervised(num_labeled=np.inf)
     msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.4 and will be'
-           'removed in 0.5')
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, sdml_supervised.fit, X, y)
 
 
@@ -282,8 +282,8 @@ class TestMMC(MetricTestCase):
     y = np.array([1, 0, 1, 0])
     mmc_supervised = MMC_Supervised(num_labeled=np.inf)
     msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.4 and will be'
-           'removed in 0.5')
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, mmc_supervised.fit, X, y)
 
 
