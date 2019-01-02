@@ -24,7 +24,7 @@ Currently, each metric learning algorithm supports the following methods:
 -  ``fit(...)``, which learns the model.
 -  ``metric()``, which returns a Mahalanobis matrix
    :math:`M = L^{\top}L` such that distance between vectors ``x`` and
-   ``y`` can be computed as :math:`\left(x-y\right)M\left(x-y\right)`.
+   ``y`` can be computed as :math:`\sqrt{\left(x-y\right)M\left(x-y\right)}`.
 -  ``transformer_from_metric(metric)``, which returns a transformation matrix
    :math:`L \in \mathbb{R}^{D \times d}`, which can be used to convert a
    data matrix :math:`X \in \mathbb{R}^{n \times d}` to the
