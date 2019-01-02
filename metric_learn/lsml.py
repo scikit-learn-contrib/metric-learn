@@ -150,9 +150,9 @@ class LSML_Supervised(LSML):
     prior : (d x d) matrix, optional
         guess at a metric [default: covariance(X)]
     num_labeled : Not used
-      .. deprecated:: 0.5.0
-         `num_labeled` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0.
+      .. deprecated:: 0.4.0
+         `num_labeled` was deprecated in version 0.4.0 and will
+         be removed in 0.5.0.
     num_constraints: int, optional
         number of constraints to generate
     weights : (m,) array of floats, optional
