@@ -89,6 +89,7 @@ class Constraints(object):
                        (num_chunks, chunk_size))
     return chunks
 
+
 def wrap_pairs(X, constraints):
   a = np.array(constraints[0])
   b = np.array(constraints[1])
