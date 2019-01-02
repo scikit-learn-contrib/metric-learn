@@ -10,27 +10,35 @@ On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
 from __future__ import absolute_import
 import numpy as np
-from sklearn.utils.validation import check_array
+from sklearn.base import TransformerMixin
 
-from .base_metric import BaseMetricLearner
+from .base_metric import MahalanobisMixin
 
 
-class Covariance(BaseMetricLearner):
-  def __init__(self):
-    pass
+class Covariance(MahalanobisMixin, TransformerMixin):
+  """Covariance metric (baseline method)
 
-  def metric(self):
-    return self.M_
+  Attributes
+  ----------
+  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See :meth:`transformer_from_metric`.)
+  """
+
+  def __init__(self, preprocessor=None):
+    super(Covariance, self).__init__(preprocessor)
 
   def fit(self, X, y=None):
     """
     X : data matrix, (n x d)
     y : unused
     """
-    self.X_ = check_array(X, ensure_min_samples=2)
-    self.M_ = np.cov(self.X_, rowvar = False)
-    if self.M_.ndim == 0:
-      self.M_ = 1./self.M_
+    X = self._prepare_inputs(X, ensure_min_samples=2)
+    M = np.cov(X, rowvar = False)
+    if M.ndim == 0:
+      M = 1./M
     else:
-      self.M_ = np.linalg.inv(self.M_)
+      M = np.linalg.inv(M)
+
+    self.transformer_ = self.transformer_from_metric(np.atleast_2d(M))
     return self

@@ -1,4 +1,8 @@
+# -*- coding: utf-8 -*-
 """
+Sandwich demo
+=============
+
 Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 """
 
@@ -30,7 +34,7 @@ def sandwich_demo():
 
   for ax_num, ml in enumerate(mls, start=3):
     ml.fit(x, y)
-    tx = ml.transform()
+    tx = ml.transform(x)
     ml_knn = nearest_neighbors(tx, k=2)
     ax = plt.subplot(3, 2, ax_num)
     plot_sandwich_data(tx, y, axis=ax)

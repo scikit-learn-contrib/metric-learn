@@ -7,6 +7,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'numpydoc',
+    'sphinx_gallery.gen_gallery'
 ]
 
 templates_path = ['_templates']
@@ -30,4 +31,7 @@ numpydoc_show_class_members = False
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 htmlhelp_basename = 'metric-learndoc'
+
+# Option to only need single backticks to refer to symbols
+default_role = 'any'
 
