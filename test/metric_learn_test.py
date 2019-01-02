@@ -171,17 +171,6 @@ class TestNCA(MetricTestCase):
     csep = class_separation(nca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.20)
 
-  def test_deprecation(self):
-    # test that the right deprecation message is thrown.
-    # TODO: remove in v.0.5
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    nca = NCA(num_dims=2, learning_rate=0.01)
-    msg = ('"learning_rate" parameter is not used.'
-           ' It has been deprecated in version 0.4 and will be'
-           'removed in 0.5')
-    assert_warns_message(DeprecationWarning, msg, nca.fit, X, y)
-
 
 class TestLFDA(MetricTestCase):
   def test_iris(self):
