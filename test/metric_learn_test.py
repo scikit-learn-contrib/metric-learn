@@ -216,7 +216,7 @@ class TestNCA(MetricTestCase):
                        1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
       nca = NCA(max_iter=30, num_dims=X.shape[1])
       nca.fit(X, y)
-      assert_array_equal(nca.A_, A)
+      assert_array_equal(nca.transformer_, A)
 
   def test_one_class(self):
       # if there is only one class the gradient is null, so the final matrix
@@ -229,7 +229,7 @@ class TestNCA(MetricTestCase):
                        1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
       nca = NCA(max_iter=30, num_dims=X.shape[1])
       nca.fit(X, y)
-      assert_array_equal(nca.A_, A)
+      assert_array_equal(nca.transformer_, A)
 
 
 class TestLFDA(MetricTestCase):
