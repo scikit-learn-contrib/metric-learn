@@ -2,12 +2,19 @@
 What is Metric Learning?
 ========================
 
-Distance metrics are widely used in machine learning, but it is often
-difficult for practitioners to design metrics that are well-suited to the data
-and task of interest. The goal of metric learning is precisely to learn such a
-distance measure automatically from data, in a machine learning manner.
+Many approaches in machine learning require a measure of distance between data
+points. Traditionally, practitioners would choose a standard distance metric
+(Euclidean, City-Block, Cosine, etc.) using a priori knowledge of the domain,
+but it is often difficult to design metrics that are well-suited to the data
+and task of interest.
 
-This section is devoted to a brief introduction to metric learning.
+Distance metric learning (or simply, metric learning) aims at
+automatically constructing task-specific distance metrics from (weakly)
+supervised data, in a machine learning manner. The learned distance metric can
+then be used to perform various tasks (e.g., k-NN classification, clustering,
+information retrieval).
+
+In the rest of this section, we introduce the main ideas of metric learning.
 
 Problem Setting
 ===============
@@ -72,7 +79,7 @@ practice, an algorithm may thus solve the metric problem in  :math:`M` or
 Use-cases
 =========
 
-
+K-NN, clustering, dimensionality reduction, retrieval
 
 Additional Resources
 ====================

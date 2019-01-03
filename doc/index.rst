@@ -2,15 +2,6 @@ metric-learn: Metric Learning in Python
 =======================================
 |License| |PyPI version|
 
-Many approaches in machine learning require a measure of distance between data
-points. Traditionally, practitioners would choose a standard distance metric
-(Euclidean, City-Block, Cosine, etc.) using a priori knowledge of the domain,
-which is often difficult.
-In contrast, distance metric learning (or simply, metric learning) aims at
-automatically constructing task-specific distance metrics from (weakly)
-supervised data. The learned distance metric can then be used to perform
-various tasks (e.g., k-NN classification, clustering, information retrieval).
-
 This package contains efficient Python implementations of several popular
 supervised and weakly-supervised metric learning algorithms. The API of
 metric-learn is compatible with scikit-learn, allowing the use of all the
