@@ -49,18 +49,17 @@ distance metric learning can thus be seen as learning a new embedding space
 (representation learning). Note that when :math:`L` is the identity, one
 recovers the Euclidean distance in the original feature space.
 
-Equivalently, Mahalanobis distances can be parameterized by a `positive
-semi-definite matrix
+Mahalanobis distances can also be parameterized by a `positive semi-definite 
+(PSD) matrix
 <https://en.wikipedia.org/wiki/Positive-definite_matrix#Positive_semidefinite>`_
 :math:`M`:
 
 .. math:: D(x, x') = \sqrt{(x-x')^\top M(x-x')}
 
-Using the fact that a positive semi-definite matrix :math:`M` can always be
-decomposed as
-:math:`M=L^\top L`, one can see that both parameterizations are
-equivalent. In practice, an algorithm may thus solve the metric problem in 
-:math:`M` or :math:`L`.
+Using the fact that a PSD matrix :math:`M` can always be decomposed as
+:math:`M=L^\top L`, one can see that both parameterizations are equivalent. In
+practice, an algorithm may thus solve the metric problem in  :math:`M` or
+:math:`L`.
 
 .. note::
 
@@ -78,7 +77,8 @@ Use-cases
 Additional Resources
 ====================
 
-To know more about metric learning, one can refer to the following resources:
+For more information about metric learning and its applications, one can refer
+to the following resources:
 
 - **Tutorial:** `Similarity and Distance Metric Learning with Applications to
   Computer Vision
