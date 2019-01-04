@@ -1,5 +1,3 @@
-.. _supervised_section:
-
 ==========================
 Supervised Metric Learning
 ==========================
