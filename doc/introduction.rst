@@ -103,8 +103,8 @@ learning in Python. This allows to easily pipeline metric learners with other
 scikit-learn estimators to realize the above use-cases, to perform joint
 hyperparameter tuning, etc.
 
-Additional Resources
-====================
+Further reading
+===============
 
 For more information about metric learning and its applications, one can refer
 to the following resources:
