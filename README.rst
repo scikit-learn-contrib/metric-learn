@@ -34,8 +34,7 @@ package installed).
 
 **Usage**
 
-See the `sphinx documentation`_ for full documentation about installation, API,
- usage, and examples.
+See the `sphinx documentation`_ for full documentation about installation, API, usage, and examples.
 
 **Notes**
 
