@@ -25,7 +25,7 @@ from sklearn.utils.validation import check_array, assert_all_finite
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm
+from ._util import vector_norm, transformer_from_metric
 
 
 class _BaseMMC(MahalanobisMixin):
@@ -206,7 +206,7 @@ class _BaseMMC(MahalanobisMixin):
     self.A_[:] = A_old
     self.n_iter_ = cycle
 
-    self.transformer_ = self.transformer_from_metric(self.A_)
+    self.transformer_ = transformer_from_metric(self.A_)
     return self
 
   def _fit_diag(self, pairs, y):
@@ -267,7 +267,7 @@ class _BaseMMC(MahalanobisMixin):
 
     self.A_ = np.diag(w)
 
-    self.transformer_ = self.transformer_from_metric(self.A_)
+    self.transformer_ = transformer_from_metric(self.A_)
     return self
 
   def _fD(self, neg_pairs, A):
@@ -355,7 +355,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See :meth:`transformer_from_metric`.)
+      metric (See function `transformer_from_metric`.)
   """
 
   def fit(self, pairs, y):
@@ -386,7 +386,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See :meth:`transformer_from_metric`.)
+      metric (See function `transformer_from_metric`.)
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
