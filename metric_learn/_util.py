@@ -324,7 +324,7 @@ def check_collapsed_pairs(pairs):
                        "in total.".format(num_ident, pairs.shape[0]))
 
 
-def transformer_from_metric(self, metric):
+def transformer_from_metric(metric):
   """Computes the transformation matrix from the Mahalanobis matrix.
 
   Since by definition the metric `M` is positive semi-definite (PSD), it
