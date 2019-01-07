@@ -322,3 +322,30 @@ def check_collapsed_pairs(pairs):
       raise ValueError("{} collapsed pairs found (where the left element is "
                        "the same as the right element), out of {} pairs "
                        "in total.".format(num_ident, pairs.shape[0]))
+
+
+def transformer_from_metric(metric):
+  """Computes the transformation matrix from the Mahalanobis matrix.
+
+  Since by definition the metric `M` is positive semi-definite (PSD), it
+  admits a Cholesky decomposition: L = cholesky(M).T. However, currently the
+  computation of the Cholesky decomposition used does not support
+  non-definite matrices. If the metric is not definite, this method will
+  return L = V.T w^( -1/2), with M = V*w*V.T being the eigenvector
+  decomposition of M with the eigenvalues in the diagonal matrix w and the
+  columns of V being the eigenvectors. If M is diagonal, this method will
+  just return its elementwise square root (since the diagonalization of
+  the matrix is itself).
+
+  Returns
+  -------
+  L : (d x d) matrix
+  """
+
+  if np.allclose(metric, np.diag(np.diag(metric))):
+    return np.sqrt(metric)
+  elif not np.isclose(np.linalg.det(metric), 0):
+    return np.linalg.cholesky(metric).T
+  else:
+    w, V = np.linalg.eigh(metric)
+    return V.T * np.sqrt(np.maximum(0, w[:, None]))

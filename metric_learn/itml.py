@@ -22,7 +22,7 @@ from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm
+from ._util import vector_norm, transformer_from_metric
 
 
 class _BaseITML(MahalanobisMixin):
@@ -125,7 +125,7 @@ class _BaseITML(MahalanobisMixin):
       print('itml converged at iter: %d, conv = %f' % (it, conv))
     self.n_iter_ = it
 
-    self.transformer_ = self.transformer_from_metric(self.A_)
+    self.transformer_ = transformer_from_metric(self.A_)
     return self
 
 
@@ -136,7 +136,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See :meth:`transformer_from_metric`.)
+      metric (See function `transformer_from_metric`.)
   """
 
   def fit(self, pairs, y, bounds=None):
@@ -169,7 +169,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See `transformer_from_metric`.)
+      metric (See function `transformer_from_metric`.)
   """
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
