@@ -86,6 +86,17 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
                        tuple_size=getattr(self, '_tuple_size', None),
                        **kwargs)
 
+  def get_metric(self):
+    """Returns a function that gives the distance between two points, according
+    to the learned metric. This function will be independent from the metric
+    learner that learned it (it will not be modified if the initial metric
+    learner is modified).
+
+    Returns
+    -------
+    metric_fun : function
+      The function described above.
+    """
 
 class MetricTransformer(six.with_metaclass(ABCMeta)):
 
@@ -178,8 +189,46 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
                              accept_sparse=True)
     return X_checked.dot(self.transformer_.T)
 
+  def get_metric(self):
+    """Returns a function that gives the distance between two points, according
+    to the learned metric. See `score_pairs` for more details on the properties
+    of this distance for Mahalanobis metric learners. This function will be
+    independent from the metric learner that learned it (it will not be
+    modified if the initial metric learner is modified).
+
+    Returns
+    -------
+    metric_fun : function
+      The function described above.
+    """
+    mahalanobis_matrix = self.get_mahalanobis_matrix()
+    def metric_fun(point_1, point_2):
+      """This function computes the euclidean distance between point 1 and
+      point 2, according to some learned metric.
+
+      Parameters
+      ----------
+      point_1 : `numpy.ndarray`, shape=(n_features)
+        The first point involved in the distances computation.
+      point_2 : `numpy.ndarray`, shape=(n_features)
+        The second point involved in the distances computation.
+      Returns
+      -------
+      distance: float
+        The distance between point 1 and point 2 according to the new metric.
+      """
+      return np.sqrt(point_1.dot(mahalanobis_matrix).dot(point_2.T))
+    return metric_fun
+
   def get_mahalanobis_matrix(self):
-    return self.transformer_.T.dot(self.transformer_)
+    """Returns a copy of the Mahalanobis matrix learned by the metric learner.
+
+    Returns
+    -------
+    M : `numpy.ndarray`, shape=(n_components, n_features)
+      The copy of the learned Mahalanobis matrix.
+    """
+    return self.transformer_.T.dot(self.transformer_).copy()
 
   def transformer_from_metric(self, metric):
     """Computes the transformation matrix from the Mahalanobis matrix.
