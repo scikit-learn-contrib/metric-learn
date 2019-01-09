@@ -38,6 +38,8 @@ generally formulated as an optimization problem where one seeks to find the
 parameters of a distance function that optimize some objective function
 measuring the agreement with the training data.
 
+.. _mahalanobis_distances:
+
 Mahalanobis Distances
 =====================
 

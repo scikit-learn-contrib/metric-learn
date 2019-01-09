@@ -35,6 +35,13 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     -------
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The score of every pair.
+
+    See Also
+    --------
+    get_metric : a method that returns a function to compute the metric between
+      two points. The difference is that it works on two 1D arrays and cannot
+      use a preprocessor. Besides, the returned function is independent of
+      the metric learner and hence is not modified if the metric learner is.
     """
 
   def check_preprocessor(self):
@@ -86,6 +93,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
                        tuple_size=getattr(self, '_tuple_size', None),
                        **kwargs)
 
+  @abstractmethod
   def get_metric(self):
     """Returns a function that returns the learned metric between two points.
     This function will be independent from the metric learner that learned it
@@ -95,6 +103,13 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     -------
     metric_fun : function
       The function described above.
+
+    See Also
+    --------
+    score_pairs : a method that returns the metric between several pairs of
+      points. But this is a method of the metric learner and therefore can
+      change if the metric learner changes. Besides, it can use the metric
+      learner's preprocessor, and works on concatenated arrays.
     """
 
 class MetricTransformer(six.with_metaclass(ABCMeta)):
@@ -157,6 +172,16 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     -------
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
+
+    See Also
+    --------
+    get_metric : a method that returns a function to compute the metric between
+      two points. The difference is that it works on two 1D arrays and cannot
+      use a preprocessor. Besides, the returned function is independent of
+      the metric learner and hence is not modified if the metric learner is.
+
+    :ref:`mahalanobis_distances` : The section of the project documentation
+      that describes Mahalanobis Distances.
     """
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
@@ -190,15 +215,23 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
   def get_metric(self):
     """Returns a function that returns the learned metric between two points.
-    See `score_pairs` for more details on the properties of this pseudo-metric
-    for Mahalanobis metric learners. This function will be independent from the
-    metric learner that learned it (it will not be modified if the initial
-    metric learner is modified).
+    This function will be independent from the metric learner that learned it
+    (it will not be modified if the initial metric learner is modified).
 
     Returns
     -------
     metric_fun : function
       The function described above.
+
+    See Also
+    --------
+    score_pairs : a method that returns the metric between several pairs of
+      points. But this is a method of the metric learner and therefore can
+      change if the metric learner changes. Besides, it can use the metric
+      learner's preprocessor, and works on concatenated arrays.
+
+    :ref:`mahalanobis_distances` : The section of the project documentation
+      that describes Mahalanobis Distances.
     """
     mahalanobis_matrix = self.get_mahalanobis_matrix()
     def metric_fun(point_1, point_2):
