@@ -87,10 +87,10 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
                        **kwargs)
 
   def get_metric(self):
-    """Returns a function that gives the distance between two points, according
-    to the learned metric. This function will be independent from the metric
-    learner that learned it (it will not be modified if the initial metric
-    learner is modified).
+    """Returns a function that gives the (pseudo) metric between two points,
+    according to the learned metric. This function will be independent from the
+    metric learner that learned it (it will not be modified if the initial
+    metric learner is modified).
 
     Returns
     -------
@@ -190,11 +190,11 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     return X_checked.dot(self.transformer_.T)
 
   def get_metric(self):
-    """Returns a function that gives the distance between two points, according
-    to the learned metric. See `score_pairs` for more details on the properties
-    of this distance for Mahalanobis metric learners. This function will be
-    independent from the metric learner that learned it (it will not be
-    modified if the initial metric learner is modified).
+    """Returns a function that gives the pseudo-metric between two points,
+    according to the learned metric. See `score_pairs` for more details on the
+    properties of this pseudo-metric for Mahalanobis metric learners. This
+    function will be independent from the metric learner that learned it (it
+    will not be modified if the initial metric learner is modified).
 
     Returns
     -------
@@ -203,8 +203,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     """
     mahalanobis_matrix = self.get_mahalanobis_matrix()
     def metric_fun(point_1, point_2):
-      """This function computes the euclidean distance between point 1 and
-      point 2, according to some learned metric.
+      """This function computes the peudo-metric between point 1 and
+      point 2, according to the previously learned metric.
 
       Parameters
       ----------
