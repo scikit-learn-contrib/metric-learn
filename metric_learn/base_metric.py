@@ -178,7 +178,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
                              accept_sparse=True)
     return X_checked.dot(self.transformer_.T)
 
-  def metric(self):
+  def get_mahalanobis_matrix(self):
     return self.transformer_.T.dot(self.transformer_)
 
   def transformer_from_metric(self, metric):
