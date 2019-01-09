@@ -39,7 +39,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     See Also
     --------
     get_metric : a method that returns a function to compute the metric between
-      two points. The difference is that it works on two 1D arrays and cannot
+      two points. The difference is that it works on two arrays and cannot
       use a preprocessor. Besides, the returned function is independent of
       the metric learner and hence is not modified if the metric learner is.
     """
@@ -176,7 +176,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     See Also
     --------
     get_metric : a method that returns a function to compute the metric between
-      two points. The difference is that it works on two 1D arrays and cannot
+      two points. The difference is that it works on two arrays and cannot
       use a preprocessor. Besides, the returned function is independent of
       the metric learner and hence is not modified if the metric learner is.
 
