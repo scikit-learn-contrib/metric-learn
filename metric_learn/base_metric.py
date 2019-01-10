@@ -1,4 +1,5 @@
 from numpy.linalg import cholesky
+from scipy.spatial.distance import euclidean, _validate_vector
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import _is_arraylike
 from sklearn.metrics import roc_auc_score
@@ -39,7 +40,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     See Also
     --------
     get_metric : a method that returns a function to compute the metric between
-      two points. The difference is that it works on two arrays and cannot
+      two points. The difference is that it works on two 1D arrays and cannot
       use a preprocessor. Besides, the returned function is independent of
       the metric learner and hence is not modified if the metric learner is.
     """
@@ -176,7 +177,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     See Also
     --------
     get_metric : a method that returns a function to compute the metric between
-      two points. The difference is that it works on two arrays and cannot
+      two points. The difference is that it works on two 1D arrays and cannot
       use a preprocessor. Besides, the returned function is independent of
       the metric learner and hence is not modified if the metric learner is.
 
@@ -234,23 +235,25 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       that describes Mahalanobis Distances.
     """
     transformer_T = self.transformer_.T.copy()
-    def metric_fun(point_1, point_2):
+
+    def metric_fun(u, v):
       """This function computes the metric between point 1 and point 2,
       according to the previously learned metric.
 
       Parameters
       ----------
-      point_1 : `numpy.ndarray`, shape=(n_features)
+      u : array-like, shape=(n_features,)
         The first point involved in the distances computation.
-      point_2 : `numpy.ndarray`, shape=(n_features)
+      v : array-like, shape=(n_features,)
         The second point involved in the distances computation.
       Returns
       -------
       distance: float
         The distance between point 1 and point 2 according to the new metric.
       """
-      embeddings_diff = (point_1 - point_2).dot(transformer_T)
-      return np.sqrt(np.sum(embeddings_diff**2))
+      u = _validate_vector(u)
+      v = _validate_vector(v)
+      return euclidean(u.dot(transformer_T), v.dot(transformer_T))
     return metric_fun
 
   def get_mahalanobis_matrix(self):

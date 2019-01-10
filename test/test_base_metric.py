@@ -110,5 +110,58 @@ def test_get_metric_is_independent_from_metric_learner(estimator,
   score_bis = metric(X[0], X[1])
   assert score_bis == score
 
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_raises_error(estimator, build_dataset):
+  """Tests that the metric returned by get_metric raises errors similar to
+  the distance functions in scipy.spatial.distance"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+
+  list_test_get_metric_raises = [(X[0].tolist() + [5.2], X[1]),  # vectors with
+                                 # different dimensions
+                                 (X[0:4], X[1:5]),  # 2D vectors
+                                 (X[0].tolist() + [5.2], X[1] + [7.2])]
+  # vectors of same dimension but incompatible with what the metric learner
+  # was trained on
+
+  for u, v in list_test_get_metric_raises:
+    with pytest.raises(ValueError):
+      metric(u, v)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_works_does_not_raise(estimator, build_dataset):
+  """Tests that the metric returned by get_metric does not raise errors (or
+  warnings) similarly to the distance functions in scipy.spatial.distance"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+
+  list_test_get_metric_doesnt_raise = [(X[0], X[1]),
+                                       (X[0].tolist(), X[1].tolist()),
+                                       (X[0][None], X[1][None])]
+
+  for u, v in list_test_get_metric_doesnt_raise:
+    with pytest.warns(None) as record:
+      metric(u, v)
+    assert len(record) == 0
+
+  # Test that the scalar case works
+  model.transformer_ = np.array([3.1])
+  metric = model.get_metric()
+  for u, v in [(5, 6.7), ([5], [6.7]), ([[5]], [[6.7]])]:
+    with pytest.warns(None) as record:
+      metric(u, v)
+    assert len(record) == 0
+
+
 if __name__ == '__main__':
   unittest.main()
