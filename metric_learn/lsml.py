@@ -16,6 +16,7 @@ from sklearn.base import TransformerMixin
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
+from ._util import transformer_from_metric
 
 
 class _BaseLSML(MahalanobisMixin):
@@ -101,7 +102,7 @@ class _BaseLSML(MahalanobisMixin):
         print("Didn't converge after", it, "iterations. Final loss:", s_best)
     self.n_iter_ = it
 
-    self.transformer_ = self.transformer_from_metric(self.M_)
+    self.transformer_ = transformer_from_metric(self.M_)
     return self
 
   def _comparison_loss(self, metric):
@@ -137,7 +138,7 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See :meth:`transformer_from_metric`.)
+      metric (See function `transformer_from_metric`.)
   """
 
   def fit(self, quadruplets, weights=None):
@@ -170,7 +171,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See :meth:`transformer_from_metric`.)
+      metric (See function `transformer_from_metric`.)
   """
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,

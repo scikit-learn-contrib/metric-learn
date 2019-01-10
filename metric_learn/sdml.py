@@ -17,6 +17,7 @@ from sklearn.utils.extmath import pinvh
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
+from ._util import transformer_from_metric
 
 
 class _BaseSDML(MahalanobisMixin):
@@ -68,7 +69,7 @@ class _BaseSDML(MahalanobisMixin):
     emp_cov = emp_cov.T.dot(emp_cov)
     _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
 
-    self.transformer_ = self.transformer_from_metric(self.M_)
+    self.transformer_ = transformer_from_metric(self.M_)
     return self
 
 
@@ -79,7 +80,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See :meth:`transformer_from_metric`.)
+      metric (See function `transformer_from_metric`.)
   """
 
   def fit(self, pairs, y):
@@ -110,7 +111,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   ----------
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See :meth:`transformer_from_metric`.)
+      metric (See function `transformer_from_metric`.)
   """
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
