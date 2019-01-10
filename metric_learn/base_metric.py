@@ -237,8 +237,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     transformer_T = self.transformer_.T.copy()
 
     def metric_fun(u, v):
-      """This function computes the metric between point 1 and point 2,
-      according to the previously learned metric.
+      """This function computes the metric between u and v, according to the
+      previously learned metric.
 
       Parameters
       ----------
@@ -249,7 +249,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       Returns
       -------
       distance: float
-        The distance between point 1 and point 2 according to the new metric.
+        The distance between u and v according to the new metric.
       """
       u = _validate_vector(u)
       v = _validate_vector(v)
