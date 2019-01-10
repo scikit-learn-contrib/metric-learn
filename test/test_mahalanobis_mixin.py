@@ -3,7 +3,7 @@ from itertools import product
 import pytest
 import numpy as np
 from numpy.testing import assert_array_almost_equal
-from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import pdist, squareform, euclidean
 from sklearn import clone
 from sklearn.utils import check_random_state
 from sklearn.utils.testing import set_random_state
@@ -167,3 +167,47 @@ def test_embed_is_linear(estimator, build_dataset):
                             model.transform(X[10:20]))
   assert_array_almost_equal(model.transform(5 * X[:10]),
                             5 * model.transform(X[:10]))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_equivalent_to_transform_and_euclidean(estimator,
+                                                          build_dataset):
+  """Tests that the get_metric method of mahalanobis metric learners is the
+  euclidean distance in the transformed space
+  """
+  rng = np.random.RandomState(42)
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+  n_features = X.shape[1]
+  a, b = (rng.randn(n_features), rng.randn(n_features))
+  euc_dist = euclidean(model.transform(a[None]), model.transform(b[None]))
+  assert (euc_dist - metric(a, b)) / euc_dist < 1e-15
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_is_pseudo_metric(estimator, build_dataset):
+  """Tests that the get_metric method of mahalanobis metric learners returns a
+  pseudo-metric (metric but without one side of the equivalence of
+  the identity of indiscernables property)
+  """
+  rng = np.random.RandomState(42)
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+
+  n_features = X.shape[1]
+  a, b, c = (rng.randn(n_features) for _ in range(3))
+  assert metric(a, b) >= 0  # positivity
+  assert metric(a, b) == metric(b, a)  # symmetry
+  # one side of identity indiscernables: x == y => d(x, y) == 0. The other
+  # side is not always true for Mahalanobis distances.
+  assert metric(a, a) == 0
+  # triangular inequality
+  assert metric(a, c) <= metric(a, b) + metric(b, c)

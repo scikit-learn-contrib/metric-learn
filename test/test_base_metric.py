@@ -1,5 +1,10 @@
+import pytest
 import unittest
 import metric_learn
+import numpy as np
+from sklearn import clone
+from sklearn.utils.testing import set_random_state
+from test.test_utils import ids_metric_learners, metric_learners
 
 
 class TestStringRepr(unittest.TestCase):
@@ -80,6 +85,30 @@ MMC_Supervised(A0=None, convergence_threshold=1e-06, diagonal=False,
         diagonal_c=1.0, max_iter=100, max_proj=10000, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, verbose=False)
 """.strip('\n'))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_is_independent_from_metric_learner(estimator,
+                                                       build_dataset):
+  """Tests that the get_metric method returns a function that is independent
+  from the original metric learner"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+
+  # we fit the metric learner on it and then we compute the metric on some
+  # points
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+  score = metric(X[0], X[1])
+
+  # then we refit the estimator on another dataset
+  model.fit(np.sin(input_data), labels)
+
+  # we recompute the distance between the two points: it should be the same
+  score_bis = metric(X[0], X[1])
+  assert score_bis == score
 
 if __name__ == '__main__':
   unittest.main()
