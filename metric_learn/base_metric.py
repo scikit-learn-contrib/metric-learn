@@ -233,7 +233,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     :ref:`mahalanobis_distances` : The section of the project documentation
       that describes Mahalanobis Distances.
     """
-    mahalanobis_matrix = self.get_mahalanobis_matrix()
+    transformer_T = self.transformer_.T.copy()
     def metric_fun(point_1, point_2):
       """This function computes the metric between point 1 and point 2,
       according to the previously learned metric.
@@ -249,7 +249,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       distance: float
         The distance between point 1 and point 2 according to the new metric.
       """
-      return np.sqrt(point_1.dot(mahalanobis_matrix).dot(point_2.T))
+      embeddings_diff = (point_1 - point_2).dot(transformer_T)
+      return np.sqrt(np.sum(embeddings_diff**2))
     return metric_fun
 
   def get_mahalanobis_matrix(self):
