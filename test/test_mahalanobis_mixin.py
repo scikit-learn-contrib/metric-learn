@@ -2,9 +2,10 @@ from itertools import product
 
 import pytest
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal, assert_allclose
 from scipy.spatial.distance import pdist, squareform, euclidean
 from sklearn import clone
+from sklearn.cluster import DBSCAN
 from sklearn.utils import check_random_state
 from sklearn.utils.testing import set_random_state
 
@@ -185,7 +186,7 @@ def test_get_metric_equivalent_to_transform_and_euclidean(estimator,
   n_features = X.shape[1]
   a, b = (rng.randn(n_features), rng.randn(n_features))
   euc_dist = euclidean(model.transform(a[None]), model.transform(b[None]))
-  assert (euc_dist - metric(a, b)) / euc_dist < 1e-15
+  assert assert_allclose(euc_dist, metric(a, b), rtol=1e-15)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
@@ -195,7 +196,6 @@ def test_get_metric_is_pseudo_metric(estimator, build_dataset):
   pseudo-metric (metric but without one side of the equivalence of
   the identity of indiscernables property)
   """
-  rng = np.random.RandomState(42)
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -203,11 +203,44 @@ def test_get_metric_is_pseudo_metric(estimator, build_dataset):
   metric = model.get_metric()
 
   n_features = X.shape[1]
-  a, b, c = (rng.randn(n_features) for _ in range(3))
-  assert metric(a, b) >= 0  # positivity
-  assert metric(a, b) == metric(b, a)  # symmetry
-  # one side of identity indiscernables: x == y => d(x, y) == 0. The other
-  # side is not always true for Mahalanobis distances.
-  assert metric(a, a) == 0
-  # triangular inequality
-  assert metric(a, c) <= metric(a, b) + metric(b, c)
+  for seed in range(10):
+    rng = np.random.RandomState(seed)
+    a, b, c = (rng.randn(n_features) for _ in range(3))
+    assert metric(a, b) >= 0  # positivity
+    assert metric(a, b) == metric(b, a)  # symmetry
+    # one side of identity indiscernables: x == y => d(x, y) == 0. The other
+    # side of the equivalence is not always true for Mahalanobis distances.
+    assert metric(a, a) == 0
+    # triangular inequality
+    assert metric(a, c) <= metric(a, b) + metric(b, c)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_metric_raises_deprecation_warning(estimator, build_dataset):
+  """assert that a deprecation warning is raised if someones wants to call
+  the `metric` function"""
+  # TODO: remove this method in version 0.6.0
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+
+  with pytest.warns(DeprecationWarning) as raised_warning:
+    model.metric()
+  assert (str(raised_warning[0].message) ==
+          ("`metric` is deprecated since version 0.5.0 and will be removed "
+           "in 0.6.0. Use `get_mahalanobis_matrix` instead."))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
+  """Check that the metric returned by get_metric is compatible with
+  scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  clustering = DBSCAN(metric=model.get_metric())
+  clustering.fit(X)
