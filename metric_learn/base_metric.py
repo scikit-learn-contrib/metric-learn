@@ -1,12 +1,12 @@
 from numpy.linalg import cholesky
-from scipy.spatial.distance import euclidean, _validate_vector
+from scipy.spatial.distance import euclidean
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import _is_arraylike
 from sklearn.metrics import roc_auc_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
-from ._util import ArrayIndexer, check_input
+from ._util import ArrayIndexer, check_input, validate_vector
 import warnings
 
 
@@ -299,8 +299,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       distance: float
         The distance between u and v according to the new metric.
       """
-      u = _validate_vector(u)
-      v = _validate_vector(v)
+      u = validate_vector(u)
+      v = validate_vector(v)
       return euclidean(u.dot(transformer_T), v.dot(transformer_T))
     return metric_fun
 
