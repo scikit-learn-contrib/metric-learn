@@ -186,7 +186,7 @@ def test_get_metric_equivalent_to_transform_and_euclidean(estimator,
   n_features = X.shape[1]
   a, b = (rng.randn(n_features), rng.randn(n_features))
   euc_dist = euclidean(model.transform(a[None]), model.transform(b[None]))
-  assert assert_allclose(euc_dist, metric(a, b), rtol=1e-15)
+  assert_allclose(metric(a, b), euc_dist, rtol=1e-15)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
