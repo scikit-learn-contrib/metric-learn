@@ -212,7 +212,8 @@ def test_get_metric_is_pseudo_metric(estimator, build_dataset):
     # side of the equivalence is not always true for Mahalanobis distances.
     assert metric(a, a) == 0
     # triangular inequality
-    assert metric(a, c) <= metric(a, b) + metric(b, c)
+    assert (metric(a, c) < metric(a, b) + metric(b, c) or
+            np.isclose(metric(a, c), metric(a, b) + metric(b, c), rtol=1e-20))
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
