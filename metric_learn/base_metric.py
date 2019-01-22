@@ -243,7 +243,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   def get_metric(self):
     transformer_T = self.transformer_.T.copy()
 
-    def metric_fun(u, v):
+    def metric_fun(u, v, squared=False):
       """This function computes the metric between u and v, according to the
       previously learned metric.
 
@@ -251,8 +251,14 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       ----------
       u : array-like, shape=(n_features,)
         The first point involved in the distance computation.
+
       v : array-like, shape=(n_features,)
         The second point involved in the distance computation.
+
+      squared : `bool`
+        If True, the function will return the squared metric between u and
+        v, which is faster to compute.
+
       Returns
       -------
       distance: float
@@ -260,7 +266,12 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       """
       u = validate_vector(u)
       v = validate_vector(v)
-      return euclidean(u.dot(transformer_T), v.dot(transformer_T))
+      transformed_diff = (u - v).dot(transformer_T)
+      dist = transformed_diff.dot(transformed_diff.T)
+      if not squared:
+        dist = np.sqrt(dist)
+      return dist
+
     return metric_fun
 
   get_metric.__doc__ = BaseMetricLearner.get_metric.__doc__

@@ -246,3 +246,23 @@ def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
   model.fit(input_data, labels)
   clustering = DBSCAN(metric=model.get_metric())
   clustering.fit(X)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_squared_metric(estimator, build_dataset):
+  """Test that the squared metric returned is indeed the square of the
+  metric"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+
+  n_features = X.shape[1]
+  for seed in range(10):
+    rng = np.random.RandomState(seed)
+    a, b = (rng.randn(n_features) for _ in range(2))
+    assert_allclose(metric(a, b, squared=True),
+                    metric(a, b, squared=False)**2,
+                    rtol=1e-15)
