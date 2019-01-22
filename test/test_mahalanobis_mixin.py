@@ -3,7 +3,7 @@ from itertools import product
 import pytest
 import numpy as np
 from numpy.testing import assert_array_almost_equal, assert_allclose
-from scipy.spatial.distance import pdist, squareform, euclidean
+from scipy.spatial.distance import pdist, squareform, mahalanobis
 from sklearn import clone
 from sklearn.cluster import DBSCAN
 from sklearn.utils import check_random_state
@@ -172,10 +172,10 @@ def test_embed_is_linear(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
-def test_get_metric_equivalent_to_transform_and_euclidean(estimator,
-                                                          build_dataset):
-  """Tests that the get_metric method of mahalanobis metric learners is the
-  euclidean distance in the transformed space
+def test_get_metric_equivalent_to_explicit_mahalanobis(estimator,
+                                                       build_dataset):
+  """Tests that using the get_metric method of mahalanobis metric learners is
+  equivalent to explicitely calling scipy's mahalanobis metric
   """
   rng = np.random.RandomState(42)
   input_data, labels, _, X = build_dataset()
@@ -185,8 +185,9 @@ def test_get_metric_equivalent_to_transform_and_euclidean(estimator,
   metric = model.get_metric()
   n_features = X.shape[1]
   a, b = (rng.randn(n_features), rng.randn(n_features))
-  euc_dist = euclidean(model.transform(a[None]), model.transform(b[None]))
-  assert_allclose(metric(a, b), euc_dist, rtol=1e-15)
+  expected_dist = mahalanobis(a[None], b[None],
+                              VI=model.get_mahalanobis_matrix())
+  assert_allclose(metric(a, b), expected_dist, rtol=1e-15)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
