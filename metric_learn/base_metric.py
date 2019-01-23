@@ -267,7 +267,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       u = validate_vector(u)
       v = validate_vector(v)
       transformed_diff = (u - v).dot(transformer_T)
-      dist = transformed_diff.dot(transformed_diff.T)
+      dist = np.dot(transformed_diff, transformed_diff.T)
       if not squared:
         dist = np.sqrt(dist)
       return dist

@@ -343,12 +343,13 @@ def transformer_from_metric(metric):
   """
 
   if np.allclose(metric, np.diag(np.diag(metric))):
-    return np.sqrt(metric)
+    transformer = np.sqrt(metric)
   elif not np.isclose(np.linalg.det(metric), 0):
-    return np.linalg.cholesky(metric).T
+    transformer = np.linalg.cholesky(metric).T
   else:
     w, V = np.linalg.eigh(metric)
-    return V.T * np.sqrt(np.maximum(0, w[:, None]))
+    transformer = V.T * np.sqrt(np.maximum(0, w[:, None]))
+  return np.atleast_2d(transformer)
 
 
 def validate_vector(u, dtype=None):

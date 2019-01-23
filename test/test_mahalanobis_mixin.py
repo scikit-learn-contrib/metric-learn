@@ -266,3 +266,25 @@ def test_get_squared_metric(estimator, build_dataset):
     assert_allclose(metric(a, b, squared=True),
                     metric(a, b, squared=False)**2,
                     rtol=1e-15)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_transformer_is_2D(estimator, build_dataset):
+  """Tests that the transformer of metric learners is 2D"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  # test that it works for X.shape[1] features
+  model.fit(input_data, labels)
+  assert model.transformer_.ndim == 2
+
+  # test that it works for 1 feature, or it returns an error
+  trunc_data = input_data[..., :1]
+  try:
+    model.fit(trunc_data, labels)
+    assert model.transformer_.ndim == 2  # the transformer must be 2D
+  except Exception as e:
+    # we allow it not to work as long as the error message is clear
+    assert isinstance(e, ValueError)
+    assert "Found array with 1 feature" in e.message

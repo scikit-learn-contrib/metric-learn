@@ -98,7 +98,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
-    X = self._prepare_inputs(X, ensure_min_samples=2)
+    X = self._prepare_inputs(X, ensure_min_samples=2, ensure_min_features=2)
 
     # PCA projection to remove noise and redundant information.
     if self.pca_comps is not None:
@@ -128,7 +128,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
       self.transformer_ = _inv_sqrtm(inner_cov).T
 
     if M_pca is not None:
-        self.transformer_ = self.transformer_.dot(M_pca)
+        self.transformer_ = np.atleast_2d(self.transformer_.dot(M_pca))
 
     return self
 

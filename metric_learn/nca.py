@@ -86,7 +86,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     self.n_iter_ = 0
     opt_result = minimize(**optimizer_params)
 
-    self.transformer_ = opt_result.x.reshape(-1, X.shape[1])
+    self.transformer_ = np.atleast_2d(opt_result.x.reshape(-1, X.shape[1]))
     self.n_iter_ = opt_result.nit
 
     # Stop timer

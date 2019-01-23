@@ -53,7 +53,8 @@ class _BaseSDML(MahalanobisMixin):
 
   def _fit(self, pairs, y):
     pairs, y = self._prepare_inputs(pairs, y,
-                                    type_of_inputs='tuples')
+                                    type_of_inputs='tuples',
+                                    ensure_min_features=2)
 
     # set up prior M
     if self.use_cov:

@@ -102,7 +102,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       res = minimize(self._loss, A.ravel(), (X, y), method='L-BFGS-B',
                      jac=True, tol=self.tol,
                      options=dict(maxiter=self.max_iter))
-      self.transformer_ = res.x.reshape(A.shape)
+      self.transformer_ = np.atleast_2d(res.x.reshape(A.shape))
 
       # Stop timer
       train_time = time.time() - train_time
