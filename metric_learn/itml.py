@@ -73,9 +73,9 @@ class _BaseITML(MahalanobisMixin):
     self.bounds_[self.bounds_==0] = 1e-9
     # init metric
     if self.A0 is None:
-      self.A_ = np.identity(pairs.shape[2])
+      A = np.identity(pairs.shape[2])
     else:
-      self.A_ = check_array(self.A0)
+      A = check_array(self.A0, copy=True)
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
     num_pos = len(pos_pairs)
@@ -87,7 +87,6 @@ class _BaseITML(MahalanobisMixin):
     neg_bhat = np.zeros(num_neg) + self.bounds_[1]
     pos_vv = pos_pairs[:, 0, :] - pos_pairs[:, 1, :]
     neg_vv = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
-    A = self.A_
 
     for it in xrange(self.max_iter):
       # update positives
@@ -125,7 +124,7 @@ class _BaseITML(MahalanobisMixin):
       print('itml converged at iter: %d, conv = %f' % (it, conv))
     self.n_iter_ = it
 
-    self.transformer_ = transformer_from_metric(self.A_)
+    self.transformer_ = transformer_from_metric(A)
     return self
 
 
@@ -134,6 +133,17 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
   Attributes
   ----------
+  bounds_ : `list` of two numbers
+      Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
+      all given pairs of similar points ``a`` and ``b``, and
+      ``d(c, d) > neg`` for all given pairs of dissimilar points ``c`` and
+      ``d``, with ``bounds=[ pos, neg]``, and ``d`` the learned distance. If
+      not provided at initialization, these are the ones derived at train
+      time.
+
+  n_iter_ : `int`
+      The number of iterations the solver has ran.
+
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
@@ -151,8 +161,12 @@ class ITML(_BaseITML, _PairsClassifierMixin):
         preprocessor.
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
-    bounds : list (pos,neg) pairs, optional
-        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
+    bounds : `list` of two numbers
+        Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
+        all given pairs of similar points ``a`` and ``b``, and
+        ``d(c, d) > neg`` for all given pairs of dissimilar points ``c`` and
+        ``d``, with ``bounds=[pos, neg]``, and ``d`` the learned distance.
+        If not provided at initialization, these will be derived at train time.
 
     Returns
     -------
@@ -167,6 +181,17 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   Attributes
   ----------
+  bounds_ : `list` of two numbers
+      Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
+      all given pairs of similar points ``a`` and ``b``, and
+      ``d(c, d) > neg`` for all given pairs of dissimilar points ``c`` and
+      ``d``, with ``bounds=[pos, neg]``, and ``d`` the learned distance. If
+      not provided at initialization, these are the ones derived at train
+      time.
+
+  n_iter_ : `int`
+      The number of iterations the solver has ran.
+
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
@@ -193,8 +218,12 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
              be removed in 0.6.0.
     num_constraints: int, optional
         number of constraints to generate
-    bounds : list (pos,neg) pairs, optional
-        bounds on similarity, s.t. d(X[a],X[b]) < pos and d(X[c],X[d]) > neg
+    bounds : `list` of two numbers
+      Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
+      all given pairs of similar points ``a`` and ``b``, and ``d(c, d) > neg``
+      for all given pairs of dissimilar points ``c`` and ``d``, with
+      ``bounds=[pos, neg]``, and ``d`` the learned distance. If not provided at
+      initialization, these will be derived at train time.
     A0 : (d x d) matrix, optional
         initial regularization matrix, defaults to identity
     verbose : bool, optional

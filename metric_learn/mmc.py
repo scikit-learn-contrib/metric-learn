@@ -353,6 +353,9 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
 
   Attributes
   ----------
+  n_iter_ : `int`
+      The number of iterations the solver has ran.
+
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
@@ -384,6 +387,9 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
 
   Attributes
   ----------
+  n_iter_ : `int`
+      The number of iterations the solver has ran.
+
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
