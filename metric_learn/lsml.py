@@ -137,7 +137,7 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
   Attributes
   ----------
   n_iter_ : `int`
-      The number of iterations the solver has ran.
+      The number of iterations the solver has run.
 
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
@@ -173,7 +173,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   Attributes
   ----------
   n_iter_ : `int`
-      The number of iterations the solver has ran.
+      The number of iterations the solver has run.
 
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis

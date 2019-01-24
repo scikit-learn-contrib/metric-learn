@@ -133,16 +133,16 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
   Attributes
   ----------
-  bounds_ : `list` of two numbers
+  bounds_ : array-like, shape=(2,)
       Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
       all given pairs of similar points ``a`` and ``b``, and
       ``d(c, d) > neg`` for all given pairs of dissimilar points ``c`` and
       ``d``, with ``bounds=[ pos, neg]``, and ``d`` the learned distance. If
-      not provided at initialization, these are the ones derived at train
+      not provided at initialization, these are derived at train
       time.
 
   n_iter_ : `int`
-      The number of iterations the solver has ran.
+      The number of iterations the solver has run.
 
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
@@ -181,16 +181,16 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   Attributes
   ----------
-  bounds_ : `list` of two numbers
+  bounds_ : array-like, shape=(2,)
       Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
       all given pairs of similar points ``a`` and ``b``, and
       ``d(c, d) > neg`` for all given pairs of dissimilar points ``c`` and
       ``d``, with ``bounds=[pos, neg]``, and ``d`` the learned distance. If
-      not provided at initialization, these are the ones derived at train
+      not provided at initialization, these are derived at train
       time.
 
   n_iter_ : `int`
-      The number of iterations the solver has ran.
+      The number of iterations the solver has run.
 
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
