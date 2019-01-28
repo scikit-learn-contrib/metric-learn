@@ -279,7 +279,7 @@ def test_transformer_is_2D(estimator, build_dataset):
   model.fit(input_data, labels)
   assert model.transformer_.shape == (X.shape[1], X.shape[1])
 
-  # test that it works for 1 feature, or it returns an error
+  # test that it works for 1 feature
   trunc_data = input_data[..., :1]
   model.fit(trunc_data, labels)
   assert model.transformer_.shape == (1, 1)  # the transformer must be 2D
