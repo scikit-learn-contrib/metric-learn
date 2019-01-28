@@ -53,13 +53,12 @@ class _BaseSDML(MahalanobisMixin):
 
   def _fit(self, pairs, y):
     pairs, y = self._prepare_inputs(pairs, y,
-                                    type_of_inputs='tuples',
-                                    ensure_min_features=2)
+                                    type_of_inputs='tuples')
 
     # set up prior M
     if self.use_cov:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-      self.M_ = pinvh(np.cov(X, rowvar = False))
+      self.M_ = pinvh(np.atleast_2d(np.cov(X, rowvar = False)))
     else:
       self.M_ = np.identity(pairs.shape[2])
     diff = pairs[:, 0] - pairs[:, 1]

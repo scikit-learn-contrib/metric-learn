@@ -281,11 +281,5 @@ def test_transformer_is_2D(estimator, build_dataset):
 
   # test that it works for 1 feature, or it returns an error
   trunc_data = input_data[..., :1]
-  try:
-    model.fit(trunc_data, labels)
-    assert model.transformer_.shape == (1, 1)
-    # the transformer must be 2D
-  except Exception as e:
-    # we allow it not to work as long as the error message is clear
-    assert isinstance(e, ValueError)
-    assert "Found array with 1 feature" in str(e)
+  model.fit(trunc_data, labels)
+  assert model.transformer_.shape == (1, 1)  # the transformer must be 2D

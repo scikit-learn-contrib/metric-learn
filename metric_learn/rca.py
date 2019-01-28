@@ -98,7 +98,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
-    X = self._prepare_inputs(X, ensure_min_samples=2, ensure_min_features=2)
+    X = self._prepare_inputs(X, ensure_min_samples=2)
 
     # PCA projection to remove noise and redundant information.
     if self.pca_comps is not None:
@@ -112,7 +112,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
     chunks = np.asanyarray(chunks, dtype=int)
     chunk_mask, chunked_data = _chunk_mean_centering(X_t, chunks)
 
-    inner_cov = np.cov(chunked_data, rowvar=0, bias=1)
+    inner_cov = np.atleast_2d(np.cov(chunked_data, rowvar=0, bias=1))
     dim = self._check_dimension(np.linalg.matrix_rank(inner_cov), X_t)
 
     # Fisher Linear Discriminant projection
@@ -122,7 +122,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
       vals, vecs = np.linalg.eig(tmp)
       inds = np.argsort(vals)[:dim]
       A = vecs[:, inds]
-      inner_cov = A.T.dot(inner_cov).dot(A)
+      inner_cov = np.atleast_2d(A.T.dot(inner_cov).dot(A))
       self.transformer_ = _inv_sqrtm(inner_cov).dot(A.T)
     else:
       self.transformer_ = _inv_sqrtm(inner_cov).T
