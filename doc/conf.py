@@ -7,7 +7,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'numpydoc',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'sphinx.ext.doctest'
 ]
 
 templates_path = ['_templates']
@@ -35,3 +36,6 @@ htmlhelp_basename = 'metric-learndoc'
 # Option to only need single backticks to refer to symbols
 default_role = 'any'
 
+# Option to hide doctests comments in the documentation (like # doctest:
+# +NORMALIZE_WHITESPACE for instance)
+trim_doctest_flags = True

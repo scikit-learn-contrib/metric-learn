@@ -289,7 +289,7 @@ class TestLFDA(MetricTestCase):
     self.assertLess(csep, 0.15)
 
     # Sanity checks for learned matrices.
-    self.assertEqual(lfda.metric().shape, (4, 4))
+    self.assertEqual(lfda.get_mahalanobis_matrix().shape, (4, 4))
     self.assertEqual(lfda.transformer_.shape, (2, 4))
 
 
@@ -364,14 +364,16 @@ class TestMMC(MetricTestCase):
                 [+0.000868, +0.001468, -0.002021, -0.002879],
                 [-0.001195, -0.002021, +0.002782, +0.003964],
                 [-0.001703, -0.002879, +0.003964, +0.005648]]
-    assert_array_almost_equal(expected, mmc.metric(), decimal=6)
+    assert_array_almost_equal(expected, mmc.get_mahalanobis_matrix(),
+                              decimal=6)
 
     # Diagonal metric
     mmc = MMC(diagonal=True)
     mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
     expected = [0, 0, 1.210220, 1.228596]
-    assert_array_almost_equal(np.diag(expected), mmc.metric(), decimal=6)
-    
+    assert_array_almost_equal(np.diag(expected), mmc.get_mahalanobis_matrix(),
+                              decimal=6)
+
     # Supervised Full
     mmc = MMC_Supervised()
     mmc.fit(self.iris_points, self.iris_labels)
