@@ -134,10 +134,10 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   Attributes
   ----------
   bounds_ : array-like, shape=(2,)
-      Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
-      all given pairs of similar points ``a`` and ``b``, and
-      ``d(c, d) > neg`` for all given pairs of dissimilar points ``c`` and
-      ``d``, with ``bounds=[ pos, neg]``, and ``d`` the learned distance. If
+      Bounds on similarity, aside slack variables, s.t.
+      ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+      and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+      dissimilar points ``c`` and ``d``, with ``d`` the learned distance. If
       not provided at initialization, bounds_[0] and bounds_[1] are set at
       train time to the 5th and 95th percentile of the pairwise distances among
       all points present in the input `pairs`.
@@ -163,13 +163,13 @@ class ITML(_BaseITML, _PairsClassifierMixin):
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
     bounds : `list` of two numbers
-        Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
-        all given pairs of similar points ``a`` and ``b``, and ``d(c, d) >
-        neg`` for all given pairs of dissimilar points ``c`` and ``d``, with
-        ``bounds=[pos, neg]``, and ``d`` the learned distance. If not provided
-        at initialization, bounds_[0] and bounds_[1] will be set to the 5th and
-        95th percentile of the pairwise distances among all points present in
-        the input `pairs`.
+        Bounds on similarity, aside slack variables, s.t.
+        ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+        and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+        dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
+        If not provided at initialization, bounds_[0] and bounds_[1] will be
+        set to the 5th and 95th percentile of the pairwise distances among all
+        points present in the input `pairs`.
 
     Returns
     -------
@@ -185,13 +185,13 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   Attributes
   ----------
   bounds_ : array-like, shape=(2,)
-      Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
-      all given pairs of similar points ``a`` and ``b``, and
-      ``d(c, d) > neg`` for all given pairs of dissimilar points ``c`` and
-      ``d``, with ``bounds=[pos, neg]``, and ``d`` the learned distance. If not
-      provided at initialization, bounds_[0] and bounds_[1] are set at train
-      time to the 5th and 95th percentile of the pairwise distances among all
-      points in the training data `X`.
+      Bounds on similarity, aside slack variables, s.t.
+      ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+      and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+      dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
+      If not provided at initialization, bounds_[0] and bounds_[1] are set at
+      train time to the 5th and 95th percentile of the pairwise distances
+      among all points in the training data `X`.
 
   n_iter_ : `int`
       The number of iterations the solver has run.
@@ -223,13 +223,13 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     num_constraints: int, optional
         number of constraints to generate
     bounds : `list` of two numbers
-      Bounds on similarity, aside slack variables, s.t. ``d(a, b) < pos`` for
-      all given pairs of similar points ``a`` and ``b``, and ``d(c, d) > neg``
-      for all given pairs of dissimilar points ``c`` and ``d``, with
-      ``bounds=[pos, neg]``, and ``d`` the learned distance. If not provided at
-      initialization, bounds_[0] and bounds_[1] will be set to the 5th and 95th
-      percentile of the pairwise distances among all points in the training
-      data `X`.
+      Bounds on similarity, aside slack variables, s.t.
+      ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+      and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+      dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
+      If not provided at initialization, bounds_[0] and bounds_[1] will be
+      set to the 5th and 95th percentile of the pairwise distances among all
+      points in the training data `X`.
     A0 : (d x d) matrix, optional
         initial regularization matrix, defaults to identity
     verbose : bool, optional
