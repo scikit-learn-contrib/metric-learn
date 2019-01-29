@@ -1,6 +1,7 @@
 import pytest
 from collections import namedtuple
 import numpy as np
+from numpy.testing import assert_array_equal, assert_equal
 from sklearn.model_selection import train_test_split
 from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_random_state, shuffle
@@ -8,7 +9,7 @@ from sklearn.utils.testing import set_random_state
 from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
-                                check_collapsed_pairs)
+                                check_collapsed_pairs, validate_vector)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -1010,3 +1011,32 @@ def test_check_collapsed_pairs_raises_error():
   assert str(e.value) == ("2 collapsed pairs found (where the left element is "
                           "the same as the right element), out of 3 pairs in"
                           " total.")
+
+def test__validate_vector():
+  """Replica of scipy.spatial.tests.test_distance.test__validate_vector"""
+  x = [1, 2, 3]
+  y = validate_vector(x)
+  assert_array_equal(y, x)
+
+  y = validate_vector(x, dtype=np.float64)
+  assert_array_equal(y, x)
+  assert_equal(y.dtype, np.float64)
+
+  x = [1]
+  y = validate_vector(x)
+  assert_equal(y.ndim, 1)
+  assert_equal(y, x)
+
+  x = 1
+  y = validate_vector(x)
+  assert_equal(y.ndim, 1)
+  assert_equal(y, [x])
+
+  x = np.arange(5).reshape(1, -1, 1)
+  y = validate_vector(x)
+  assert_equal(y.ndim, 1)
+  assert_array_equal(y, x[0, :, 0])
+
+  x = [[1, 2], [3, 4]]
+  with pytest.raises(ValueError):
+    validate_vector(x)

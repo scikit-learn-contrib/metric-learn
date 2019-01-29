@@ -58,7 +58,7 @@ class _BaseSDML(MahalanobisMixin):
     # set up prior M
     if self.use_cov:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-      self.M_ = pinvh(np.cov(X, rowvar = False))
+      self.M_ = pinvh(np.atleast_2d(np.cov(X, rowvar = False)))
     else:
       self.M_ = np.identity(pairs.shape[2])
     diff = pairs[:, 0] - pairs[:, 1]
