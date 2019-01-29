@@ -58,8 +58,9 @@ class TestLSML(MetricTestCase):
     self.assertLess(csep, 0.8)  # it's pretty terrible
 
   def test_deprecation(self):
-    # test that the right deprecation message is thrown.
-    # TODO: remove in v.0.5
+    # test that a deprecation message is thrown if num_labeled is set at
+    # initialization
+    # TODO: remove in v.0.6
     X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
     y = np.array([1, 0, 1, 0])
     lsml_supervised = LSML_Supervised(num_labeled=np.inf)
@@ -78,14 +79,28 @@ class TestITML(MetricTestCase):
     self.assertLess(csep, 0.2)
 
   def test_deprecation(self):
-    # test that the right deprecation message is thrown.
-    # TODO: remove in v.0.5
+    # test that a deprecation message is thrown if num_labeled is set at
+    # initialization
+    # TODO: remove in v.0.6
     X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
     y = np.array([1, 0, 1, 0])
     itml_supervised = ITML_Supervised(num_labeled=np.inf)
     msg = ('"num_labeled" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
            'removed in 0.6.0')
+    assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
+
+  def test_deprecation_bounds(self):
+    # test that a deprecation message is thrown if bounds is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    itml_supervised = ITML_Supervised(bounds=None)
+    msg = ('"bounds" parameter from initialization is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use the "bounds" parameter of this '
+           'fit method instead.')
     assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
 
 
@@ -143,9 +158,10 @@ class TestSDML(MetricTestCase):
     csep = class_separation(sdml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.25)
 
-  def test_deprecation(self):
-    # test that the right deprecation message is thrown.
-    # TODO: remove in v.0.5
+  def test_deprecation_num_labeled(self):
+    # test that a deprecation message is thrown if num_labeled is set at
+    # initialization
+    # TODO: remove in v.0.6
     X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
     y = np.array([1, 0, 1, 0])
     sdml_supervised = SDML_Supervised(num_labeled=np.inf)
@@ -368,9 +384,10 @@ class TestMMC(MetricTestCase):
     csep = class_separation(mmc.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.2)
 
-  def test_deprecation(self):
-    # test that the right deprecation message is thrown.
-    # TODO: remove in v.0.5
+  def test_deprecation_num_labeled(self):
+    # test that a deprecation message is thrown if num_labeled is set at
+    # initialization
+    # TODO: remove in v.0.6
     X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
     y = np.array([1, 0, 1, 0])
     mmc_supervised = MMC_Supervised(num_labeled=np.inf)
