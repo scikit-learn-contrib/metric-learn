@@ -126,7 +126,9 @@ to the following resources:
 .. Currently, each metric learning algorithm supports the following methods:
 
 .. -  ``fit(...)``, which learns the model.
-.. -  ``metric()``, which returns a Mahalanobis matrix
+.. -  ``get_mahalanobis_matrix()``, which returns a Mahalanobis matrix
+.. -  ``get_metric()``, which returns a function that takes as input two 1D
+      arrays and outputs the learned metric score on these two points
 ..    :math:`M = L^{\top}L` such that distance between vectors ``x`` and
 ..    ``y`` can be computed as :math:`\sqrt{\left(x-y\right)M\left(x-y\right)}`.
 .. -  ``transformer_from_metric(metric)``, which returns a transformation matrix
