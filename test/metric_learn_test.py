@@ -57,7 +57,7 @@ class TestLSML(MetricTestCase):
     csep = class_separation(lsml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible
 
-  def test_deprecation(self):
+  def test_deprecation_num_labeled(self):
     # test that a deprecation message is thrown if num_labeled is set at
     # initialization
     # TODO: remove in v.0.6
@@ -78,7 +78,7 @@ class TestITML(MetricTestCase):
     csep = class_separation(itml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.2)
 
-  def test_deprecation(self):
+  def test_deprecation_num_labeled(self):
     # test that a deprecation message is thrown if num_labeled is set at
     # initialization
     # TODO: remove in v.0.6
