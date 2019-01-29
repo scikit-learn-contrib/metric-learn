@@ -60,20 +60,20 @@ class python_LMNN(_base_LMNN):
     X, y = self._prepare_inputs(X, y, dtype=float,
                                 ensure_min_samples=2)
     num_pts, num_dims = X.shape
-    unique_labels, self.label_inds_ = np.unique(y, return_inverse=True)
-    if len(self.label_inds_) != num_pts:
+    unique_labels, label_inds = np.unique(y, return_inverse=True)
+    if len(label_inds) != num_pts:
       raise ValueError('Must have one label per point.')
     self.labels_ = np.arange(len(unique_labels))
     if self.use_pca:
       warnings.warn('use_pca does nothing for the python_LMNN implementation')
     self.transformer_ = np.eye(num_dims)
-    required_k = np.bincount(self.label_inds_).min()
+    required_k = np.bincount(label_inds).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'
                        ' (smallest class has %d)' % required_k)
 
-    target_neighbors = self._select_targets(X)
-    impostors = self._find_impostors(target_neighbors[:, -1], X)
+    target_neighbors = self._select_targets(X, label_inds)
+    impostors = self._find_impostors(target_neighbors[:, -1], X, label_inds)
     if len(impostors) == 0:
         # L has already been initialized to an identity matrix
         return
@@ -196,23 +196,23 @@ class python_LMNN(_base_LMNN):
     objective += G.flatten().dot(L.T.dot(L).flatten())
     return G, objective, total_active, df, a1, a2
 
-  def _select_targets(self, X):
+  def _select_targets(self, X, label_inds):
     target_neighbors = np.empty((X.shape[0], self.k), dtype=int)
     for label in self.labels_:
-      inds, = np.nonzero(self.label_inds_ == label)
+      inds, = np.nonzero(label_inds == label)
       dd = euclidean_distances(X[inds], squared=True)
       np.fill_diagonal(dd, np.inf)
       nn = np.argsort(dd)[..., :self.k]
       target_neighbors[inds] = inds[nn]
     return target_neighbors
 
-  def _find_impostors(self, furthest_neighbors, X):
+  def _find_impostors(self, furthest_neighbors, X, label_inds):
     Lx = self.transform(X)
     margin_radii = 1 + _inplace_paired_L2(Lx[furthest_neighbors], Lx)
     impostors = []
     for label in self.labels_[:-1]:
-      in_inds, = np.nonzero(self.label_inds_ == label)
-      out_inds, = np.nonzero(self.label_inds_ > label)
+      in_inds, = np.nonzero(label_inds == label)
+      out_inds, = np.nonzero(label_inds > label)
       dist = euclidean_distances(Lx[out_inds], Lx[in_inds], squared=True)
       i1,j1 = np.nonzero(dist < margin_radii[out_inds][:,None])
       i2,j2 = np.nonzero(dist < margin_radii[in_inds])
@@ -265,6 +265,9 @@ try:
 
     Attributes
     ----------
+    n_iter_ : `int`
+        The number of iterations the solver has run.
+
     transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
         The learned linear transformation ``L``.
     """

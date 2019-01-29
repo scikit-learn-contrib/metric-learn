@@ -58,18 +58,18 @@ class _BaseSDML(MahalanobisMixin):
     # set up prior M
     if self.use_cov:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-      self.M_ = pinvh(np.atleast_2d(np.cov(X, rowvar = False)))
+      M = pinvh(np.atleast_2d(np.cov(X, rowvar = False)))
     else:
-      self.M_ = np.identity(pairs.shape[2])
+      M = np.identity(pairs.shape[2])
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
-    P = self.M_ + self.balance_param * loss_matrix
+    P = M + self.balance_param * loss_matrix
     emp_cov = pinvh(P)
     # hack: ensure positive semidefinite
     emp_cov = emp_cov.T.dot(emp_cov)
-    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
+    _, M = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
 
-    self.transformer_ = transformer_from_metric(self.M_)
+    self.transformer_ = transformer_from_metric(M)
     return self
 
 
