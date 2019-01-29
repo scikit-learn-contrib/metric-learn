@@ -130,7 +130,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     elif self.embedding_type == 'orthonormalized':
        vecs, _ = np.linalg.qr(vecs)
 
-    self.transformer_ = np.atleast_2d(vecs.T)
+    self.transformer_ = vecs.T
     return self
 
 

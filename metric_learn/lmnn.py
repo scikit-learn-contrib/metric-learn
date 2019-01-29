@@ -144,7 +144,7 @@ class python_LMNN(_base_LMNN):
         print("LMNN didn't converge in %d steps." % self.max_iter)
 
     # store the last L
-    self.transformer_ = np.atleast_2d(L)
+    self.transformer_ = L
     self.n_iter_ = it
     return self
 
