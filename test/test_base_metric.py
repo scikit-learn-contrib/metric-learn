@@ -36,9 +36,9 @@ ITML(A0=None, convergence_threshold=0.001, gamma=1.0, max_iter=1000,
    preprocessor=None, verbose=False)
 """.strip('\n'))
     self.assertEqual(str(metric_learn.ITML_Supervised()), """
-ITML_Supervised(A0=None, bounds=None, convergence_threshold=0.001, gamma=1.0,
-        max_iter=1000, num_constraints=None, num_labeled='deprecated',
-        preprocessor=None, verbose=False)
+ITML_Supervised(A0=None, bounds='deprecated', convergence_threshold=0.001,
+        gamma=1.0, max_iter=1000, num_constraints=None,
+        num_labeled='deprecated', preprocessor=None, verbose=False)
 """.strip('\n'))
 
   def test_lsml(self):

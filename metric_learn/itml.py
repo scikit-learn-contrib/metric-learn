@@ -202,8 +202,8 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   """
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               num_labeled='deprecated', num_constraints=None, bounds=None,
-               A0=None, verbose=False, preprocessor=None):
+               num_labeled='deprecated', num_constraints=None,
+               bounds='deprecated', A0=None, verbose=False, preprocessor=None):
     """Initialize the supervised version of `ITML`.
 
     `ITML_Supervised` creates pairs of similar sample by taking same class
@@ -222,14 +222,11 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
              be removed in 0.6.0.
     num_constraints: int, optional
         number of constraints to generate
-    bounds : `list` of two numbers
-      Bounds on similarity, aside slack variables, s.t.
-      ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
-      and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
-      dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
-      If not provided at initialization, bounds_[0] and bounds_[1] will be
-      set to the 5th and 95th percentile of the pairwise distances among all
-      points in the training data `X`.
+    bounds : Not used
+           .. deprecated:: 0.5.0
+          `bounds` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Set `bounds` at fit time instead :
+          `itml_supervised.fit(X, y, bounds=...)`
     A0 : (d x d) matrix, optional
         initial regularization matrix, defaults to identity
     verbose : bool, optional
@@ -245,7 +242,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     self.num_constraints = num_constraints
     self.bounds = bounds
 
-  def fit(self, X, y, random_state=np.random):
+  def fit(self, X, y, random_state=np.random, bounds=None):
     """Create constraints from labels and learn the ITML model.
 
 
@@ -259,11 +256,26 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
+
+    bounds : `list` of two numbers
+        Bounds on similarity, aside slack variables, s.t.
+        ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+        and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+        dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
+        If not provided at initialization, bounds_[0] and bounds_[1] will be
+        set to the 5th and 95th percentile of the pairwise distances among all
+        points in the training data `X`.
     """
+    # TODO: remove these in v0.6.0
     if self.num_labeled != 'deprecated':
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
                     'removed in 0.6.0', DeprecationWarning)
+    if self.bounds != 'deprecated':
+      warnings.warn('"bounds" parameter from initialization is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use the "bounds" parameter of this '
+                    'fit method instead.', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
@@ -274,4 +286,4 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     pos_neg = c.positive_negative_pairs(num_constraints,
                                         random_state=random_state)
     pairs, y = wrap_pairs(X, pos_neg)
-    return _BaseITML._fit(self, pairs, y, bounds=self.bounds)
+    return _BaseITML._fit(self, pairs, y, bounds=bounds)
