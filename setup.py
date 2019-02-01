@@ -38,7 +38,7 @@ setup(name='metric-learn',
       extras_require=dict(
           docs=['sphinx', 'shinx_rtd_theme', 'numpydoc'],
           demo=['matplotlib'],
-          sdml=['skggm']
+          sdml=['cython', 'skggm']
       ),
       test_suite='test',
       keywords=[
