@@ -141,7 +141,7 @@ class TestSDML(MetricTestCase):
     sdml = SDML_Supervised(num_constraints=1500)
     sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
     csep = class_separation(sdml.transform(self.iris_points), self.iris_labels)
-    self.assertLess(csep, 0.25)
+    self.assertLess(csep, 0.20)
 
   def test_deprecation(self):
     # test that the right deprecation message is thrown.
