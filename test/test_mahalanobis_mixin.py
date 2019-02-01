@@ -2,9 +2,10 @@ from itertools import product
 
 import pytest
 import numpy as np
-from numpy.testing import assert_array_almost_equal
-from scipy.spatial.distance import pdist, squareform
+from numpy.testing import assert_array_almost_equal, assert_allclose
+from scipy.spatial.distance import pdist, squareform, mahalanobis
 from sklearn import clone
+from sklearn.cluster import DBSCAN
 from sklearn.utils import check_random_state
 from sklearn.utils.testing import set_random_state
 
@@ -167,3 +168,118 @@ def test_embed_is_linear(estimator, build_dataset):
                             model.transform(X[10:20]))
   assert_array_almost_equal(model.transform(5 * X[:10]),
                             5 * model.transform(X[:10]))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_equivalent_to_explicit_mahalanobis(estimator,
+                                                       build_dataset):
+  """Tests that using the get_metric method of mahalanobis metric learners is
+  equivalent to explicitely calling scipy's mahalanobis metric
+  """
+  rng = np.random.RandomState(42)
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+  n_features = X.shape[1]
+  a, b = (rng.randn(n_features), rng.randn(n_features))
+  expected_dist = mahalanobis(a[None], b[None],
+                              VI=model.get_mahalanobis_matrix())
+  assert_allclose(metric(a, b), expected_dist, rtol=1e-15)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_is_pseudo_metric(estimator, build_dataset):
+  """Tests that the get_metric method of mahalanobis metric learners returns a
+  pseudo-metric (metric but without one side of the equivalence of
+  the identity of indiscernables property)
+  """
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+
+  n_features = X.shape[1]
+  for seed in range(10):
+    rng = np.random.RandomState(seed)
+    a, b, c = (rng.randn(n_features) for _ in range(3))
+    assert metric(a, b) >= 0  # positivity
+    assert metric(a, b) == metric(b, a)  # symmetry
+    # one side of identity indiscernables: x == y => d(x, y) == 0. The other
+    # side of the equivalence is not always true for Mahalanobis distances.
+    assert metric(a, a) == 0
+    # triangular inequality
+    assert (metric(a, c) < metric(a, b) + metric(b, c) or
+            np.isclose(metric(a, c), metric(a, b) + metric(b, c), rtol=1e-20))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_metric_raises_deprecation_warning(estimator, build_dataset):
+  """assert that a deprecation warning is raised if someones wants to call
+  the `metric` function"""
+  # TODO: remove this method in version 0.6.0
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+
+  with pytest.warns(DeprecationWarning) as raised_warning:
+    model.metric()
+  assert (str(raised_warning[0].message) ==
+          ("`metric` is deprecated since version 0.5.0 and will be removed "
+           "in 0.6.0. Use `get_mahalanobis_matrix` instead."))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
+  """Check that the metric returned by get_metric is compatible with
+  scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  clustering = DBSCAN(metric=model.get_metric())
+  clustering.fit(X)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_squared_metric(estimator, build_dataset):
+  """Test that the squared metric returned is indeed the square of the
+  metric"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(input_data, labels)
+  metric = model.get_metric()
+
+  n_features = X.shape[1]
+  for seed in range(10):
+    rng = np.random.RandomState(seed)
+    a, b = (rng.randn(n_features) for _ in range(2))
+    assert_allclose(metric(a, b, squared=True),
+                    metric(a, b, squared=False)**2,
+                    rtol=1e-15)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_transformer_is_2D(estimator, build_dataset):
+  """Tests that the transformer of metric learners is 2D"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  # test that it works for X.shape[1] features
+  model.fit(input_data, labels)
+  assert model.transformer_.shape == (X.shape[1], X.shape[1])
+
+  # test that it works for 1 feature
+  trunc_data = input_data[..., :1]
+  model.fit(trunc_data, labels)
+  assert model.transformer_.shape == (1, 1)  # the transformer must be 2D

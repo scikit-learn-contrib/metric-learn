@@ -1,10 +1,13 @@
+from numpy.linalg import cholesky
+from scipy.spatial.distance import euclidean
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import _is_arraylike
 from sklearn.metrics import roc_auc_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
-from ._util import ArrayIndexer, check_input
+from ._util import ArrayIndexer, check_input, validate_vector
+import warnings
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
@@ -34,6 +37,14 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     -------
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The score of every pair.
+
+    See Also
+    --------
+    get_metric : a method that returns a function to compute the metric between
+      two points. The difference with `score_pairs` is that it works on two 1D
+      arrays and cannot use a preprocessor. Besides, the returned function is
+      independent of the metric learner and hence is not modified if the metric
+      learner is.
     """
 
   def check_preprocessor(self):
@@ -85,6 +96,47 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
                        tuple_size=getattr(self, '_tuple_size', None),
                        **kwargs)
 
+  @abstractmethod
+  def get_metric(self):
+    """Returns a function that takes as input two 1D arrays and outputs the
+    learned metric score on these two points.
+
+    This function will be independent from the metric learner that learned it
+    (it will not be modified if the initial metric learner is modified),
+    and it can be directly plugged into the `metric` argument of
+    scikit-learn's estimators.
+
+    Returns
+    -------
+    metric_fun : function
+      The function described above.
+
+
+    Examples
+    --------
+    .. doctest::
+
+      >>> from metric_learn import NCA
+      >>> from sklearn.datasets import make_classification
+      >>> from sklearn.neighbors import KNeighborsClassifier
+      >>> nca = NCA()
+      >>> X, y = make_classification()
+      >>> nca.fit(X, y)
+      >>> knn = KNeighborsClassifier(metric=nca.get_metric())
+      >>> knn.fit(X, y) # doctest: +NORMALIZE_WHITESPACE
+      KNeighborsClassifier(algorithm='auto', leaf_size=30,
+        metric=<function MahalanobisMixin.get_metric.<locals>.metric_fun
+                at 0x...>,
+        metric_params=None, n_jobs=None, n_neighbors=5, p=2,
+        weights='uniform')
+
+    See Also
+    --------
+    score_pairs : a method that returns the metric score between several pairs
+      of points. Unlike `get_metric`, this is a method of the metric learner
+      and therefore can change if the metric learner changes. Besides, it can
+      use the metric learner's preprocessor, and works on concatenated arrays.
+    """
 
 class MetricTransformer(six.with_metaclass(ABCMeta)):
 
@@ -146,6 +198,17 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     -------
     scores: `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
+
+    See Also
+    --------
+    get_metric : a method that returns a function to compute the metric between
+      two points. The difference with `score_pairs` is that it works on two 1D
+      arrays and cannot use a preprocessor. Besides, the returned function is
+      independent of the metric learner and hence is not modified if the metric
+      learner is.
+
+    :ref:`mahalanobis_distances` : The section of the project documentation
+      that describes Mahalanobis Distances.
     """
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
@@ -177,7 +240,57 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
                              accept_sparse=True)
     return X_checked.dot(self.transformer_.T)
 
+  def get_metric(self):
+    transformer_T = self.transformer_.T.copy()
+
+    def metric_fun(u, v, squared=False):
+      """This function computes the metric between u and v, according to the
+      previously learned metric.
+
+      Parameters
+      ----------
+      u : array-like, shape=(n_features,)
+        The first point involved in the distance computation.
+
+      v : array-like, shape=(n_features,)
+        The second point involved in the distance computation.
+
+      squared : `bool`
+        If True, the function will return the squared metric between u and
+        v, which is faster to compute.
+
+      Returns
+      -------
+      distance: float
+        The distance between u and v according to the new metric.
+      """
+      u = validate_vector(u)
+      v = validate_vector(v)
+      transformed_diff = (u - v).dot(transformer_T)
+      dist = np.dot(transformed_diff, transformed_diff.T)
+      if not squared:
+        dist = np.sqrt(dist)
+      return dist
+
+    return metric_fun
+
+  get_metric.__doc__ = BaseMetricLearner.get_metric.__doc__
+
   def metric(self):
+    # TODO: remove this method in version 0.6.0
+    warnings.warn(("`metric` is deprecated since version 0.5.0 and will be "
+                   "removed in 0.6.0. Use `get_mahalanobis_matrix` instead."),
+                  DeprecationWarning)
+    return self.get_mahalanobis_matrix()
+
+  def get_mahalanobis_matrix(self):
+    """Returns a copy of the Mahalanobis matrix learned by the metric learner.
+
+    Returns
+    -------
+    M : `numpy.ndarray`, shape=(n_components, n_features)
+      The copy of the learned Mahalanobis matrix.
+    """
     return self.transformer_.T.dot(self.transformer_)
 
 

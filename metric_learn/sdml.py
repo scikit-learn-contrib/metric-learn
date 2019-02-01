@@ -64,9 +64,9 @@ class _BaseSDML(MahalanobisMixin):
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = pinvh(prior) + self.balance_param * loss_matrix
-    self.M_, *_ = quic(emp_cov, lam=self.sparsity_param)
+    M, *_ = quic(emp_cov, lam=self.sparsity_param)
 
-    self.transformer_ = transformer_from_metric(self.M_)
+    self.transformer_ = transformer_from_metric(M)
     return self
 
 

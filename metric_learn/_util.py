@@ -349,3 +349,14 @@ def transformer_from_metric(metric):
   else:
     w, V = np.linalg.eigh(metric)
     return V.T * np.sqrt(np.maximum(0, w[:, None]))
+
+
+def validate_vector(u, dtype=None):
+  # replica of scipy.spatial.distance._validate_vector, for making scipy
+  # compatible functions on vectors (such as distances computations)
+  u = np.asarray(u, dtype=dtype, order='c').squeeze()
+  # Ensure values such as u=1 and u=[1] still return 1-D arrays.
+  u = np.atleast_1d(u)
+  if u.ndim > 1:
+    raise ValueError("Input vector should be 1-D.")
+  return u
