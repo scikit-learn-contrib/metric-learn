@@ -20,7 +20,7 @@ Metric Learning algorithms in Python.
 **Dependencies**
 
 -  Python 2.7+, 3.4+
--  numpy, scipy, scikit-learn
+-  numpy, scipy, scikit-learn, skggm (for `SDML`)
 -  (for running the examples only: matplotlib)
 
 **Installation/Setup**
