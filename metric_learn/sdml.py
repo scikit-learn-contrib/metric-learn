@@ -12,8 +12,8 @@ from __future__ import absolute_import
 import warnings
 import numpy as np
 from sklearn.base import TransformerMixin
-from sklearn.covariance import graph_lasso
-from sklearn.utils.extmath import pinvh
+from inverse_covariance import quic
+from scipy.linalg import pinvh
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
@@ -64,7 +64,7 @@ class _BaseSDML(MahalanobisMixin):
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = pinvh(prior) + self.balance_param * loss_matrix
-    _, self.M_ = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
+    self.M_, *_ = quic(emp_cov, lam=self.sparsity_param)
 
     self.transformer_ = transformer_from_metric(self.M_)
     return self
