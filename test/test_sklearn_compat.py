@@ -15,9 +15,11 @@ from sklearn import clone
 import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
+from sklearn.metrics.scorer import make_scorer
 from sklearn.utils.testing import _get_args
 from test.test_utils import (metric_learners, ids_metric_learners,
-                             mock_preprocessor)
+                             mock_preprocessor, tuples_learners,
+                             ids_tuples_learners)
 
 
 # Wrap the _Supervised methods with a deterministic wrapper for testing.
@@ -88,22 +90,56 @@ RNG = check_random_state(0)
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
-def test_cross_validation_is_finite(estimator, build_dataset,
-                                    with_preprocessor):
+@pytest.mark.parametrize('estimator, build_dataset', tuples_learners,
+                         ids=ids_tuples_learners)
+def test_various_scoring_on_tuples_learners(estimator, build_dataset,
+                                            with_preprocessor):
+  """Tests that metric-learn estimators' scoring returns something finite,
+  for other scoring than default scoring. (List of scikit-learn's scores can be
+  found in sklearn.metrics.scorer). For each type of output (predict,
+  predict_proba, decision_function), we test a bunch of scores.
+  """
+  input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+
+  # scores that need a predict function: every tuples learner should have a
+  # predict function (whether the pair is of positive samples or negative
+  # samples)
+  for scoring in ['accuracy', 'f1', 'precision', 'recall']:
+    check_score_is_finite(scoring, estimator, input_data, labels)
+  # scores that need a predict_proba:
+  if hasattr(estimator, "predict_proba"):
+    for scoring in ['neg_log_loss', 'brier_score']:
+      check_score_is_finite(scoring, estimator, input_data, labels)
+  # scores that need a decision_function: every tuples learner should have a
+  # decision function (the metric between points)
+  for scoring in ['roc_auc', 'average_precision', 'average_recall']:
+    check_score_is_finite(scoring, estimator, input_data, labels)
+
+
+def check_score_is_finite(scoring, estimator, input_data, labels):
+    assert np.isfinite(cross_val_score(estimator, input_data, labels,
+                                       scoring=scoring)).all()
+    assert np.isfinite(cross_val_predict(estimator,
+                                         input_data, labels,
+                                         scoring=scoring)).all()
+    assert np.isfinite(make_scorer(scoring)(input_data, labels))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', tuples_learners,
+                         ids=ids_tuples_learners)
+def test_cross_validation_is_finite(estimator, build_dataset):
   """Tests that validation on metric-learn estimators returns something finite
   """
-  if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
-    estimator = clone(estimator)
-    estimator.set_params(preprocessor=preprocessor)
-    set_random_state(estimator)
-    if hasattr(estimator, "score"):
-      assert np.isfinite(cross_val_score(estimator, input_data, labels)).all()
-    if hasattr(estimator, "predict"):
-      assert np.isfinite(cross_val_predict(estimator,
-                                           input_data, labels)).all()
+  input_data, labels, preprocessor, _ = build_dataset()
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  assert np.isfinite(cross_val_score(estimator, input_data, labels)).all()
+  assert np.isfinite(cross_val_predict(estimator,
+                                       input_data, labels)).all()
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
