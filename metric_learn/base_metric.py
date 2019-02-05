@@ -1,7 +1,7 @@
 from numpy.linalg import cholesky
 from scipy.spatial.distance import euclidean
 from sklearn.base import BaseEstimator
-from sklearn.utils.validation import _is_arraylike
+from sklearn.utils.validation import _is_arraylike, check_is_fitted
 from sklearn.metrics import roc_auc_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
@@ -317,7 +317,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    return self.decision_function(pairs)
+    check_is_fitted(self, 'threshold_')
+    return - 2 * (self.decision_function(pairs) > self.threshold_) + 1
 
   def decision_function(self, pairs):
     """Returns the learned metric between input pairs.
@@ -368,6 +369,13 @@ class _PairsClassifierMixin(BaseMetricLearner):
       The ``roc_auc`` score.
     """
     return roc_auc_score(y, self.decision_function(pairs))
+
+  def set_default_threshold(self, pairs, y):
+    """Returns a threshold that is the mean between the similar metrics
+    mean, and the dissimilar metrics mean"""
+    similar_threshold = np.mean(self.decision_function(pairs[y==1]))
+    dissimilar_threshold = np.mean(self.decision_function(pairs[y==1]))
+    self.threshold_ = np.mean([similar_threshold, dissimilar_threshold])
 
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):

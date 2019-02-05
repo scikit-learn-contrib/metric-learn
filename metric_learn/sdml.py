@@ -81,6 +81,11 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  threshold_ : `float`
+      If the distance metric between two points is lower than this threshold,
+      points will be classified as similar, otherwise they will be
+      classified as dissimilar.
   """
 
   def fit(self, pairs, y):
@@ -101,7 +106,9 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
     self : object
         Returns the instance.
     """
-    return self._fit(pairs, y)
+    self._fit(pairs, y)
+    self.set_default_threshold(pairs, y)
+    return self
 
 
 class SDML_Supervised(_BaseSDML, TransformerMixin):

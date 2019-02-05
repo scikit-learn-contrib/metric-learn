@@ -148,6 +148,11 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  threshold_ : `float`
+      If the distance metric between two points is lower than this threshold,
+      points will be classified as similar, otherwise they will be
+      classified as dissimilar.
   """
 
   def fit(self, pairs, y, bounds=None):
@@ -176,7 +181,9 @@ class ITML(_BaseITML, _PairsClassifierMixin):
     self : object
         Returns the instance.
     """
-    return self._fit(pairs, y, bounds=bounds)
+    self._fit(pairs, y, bounds=bounds)
+    self.threshold_ = np.mean(self.bounds_)
+    return self
 
 
 class ITML_Supervised(_BaseITML, TransformerMixin):
