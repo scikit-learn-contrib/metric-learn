@@ -2,7 +2,7 @@ from numpy.linalg import cholesky
 from scipy.spatial.distance import euclidean
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import _is_arraylike, check_is_fitted
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, accuracy_score
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
@@ -317,7 +317,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    check_is_fitted(self, 'threshold_')
+    check_is_fitted(self, ['threshold_', 'transformer_'])
     return - 2 * (self.decision_function(pairs) > self.threshold_) + 1
 
   def decision_function(self, pairs):
@@ -401,6 +401,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
+    check_is_fitted(self, 'transformer_')
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)
@@ -443,11 +444,22 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
       points, or 2D array of indices of quadruplets if the metric learner
       uses a preprocessor.
 
-    y : Ignored, for scikit-learn compatibility.
+    y : array-like, shape=(n_constraints,) or `None`
+      Labels of constraints. y[i] should be 1 if
+      d(pairs[i, 0], X[i, 1]) is wanted to be larger than
+      d(X[i, 2], X[i, 3]), and -1 if it is wanted to be smaller. If None,
+      `y` will be set to `np.ones(quadruplets.shape[0])`, i.e. we want all
+      first two points to be closer than the last two points in each
+      quadruplet.
 
     Returns
     -------
     score : float
       The quadruplets score.
     """
-    return -np.mean(self.predict(quadruplets))
+    quadruplets = check_input(quadruplets, y, type_of_inputs='tuples',
+                              preprocessor=self.preprocessor_,
+                              estimator=self, tuple_size=self._tuple_size)
+    if y is None:
+      y = np.ones(quadruplets.shape[0])
+    return accuracy_score(y, self.predict(quadruplets))
