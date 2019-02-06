@@ -86,6 +86,11 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
       If the distance metric between two points is lower than this threshold,
       points will be classified as similar, otherwise they will be
       classified as dissimilar.
+
+  classes_ : `list`
+      The possible labels of the pairs `SDML` can fit on. `classes_ = [-1, 1]`,
+      where -1 means points in a pair are dissimilar (negative label), and 1
+      means they are similar (positive label).
   """
 
   def fit(self, pairs, y):

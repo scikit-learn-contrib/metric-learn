@@ -296,6 +296,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
 class _PairsClassifierMixin(BaseMetricLearner):
 
+  classes_ = [-1, 1]
   _tuple_size = 2  # number of points in a tuple, 2 for pairs
 
   def predict(self, pairs):
