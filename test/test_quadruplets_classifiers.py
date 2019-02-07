@@ -28,32 +28,8 @@ def test_predict_only_one_or_minus_one(estimator, build_dataset,
 @pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', quadruplets_learners,
                          ids=ids_quadruplets_learners)
-def test_predict_monotonous(estimator, build_dataset,
-                            with_preprocessor):
-  """Test that there is a threshold distance separating points labeled as
-  similar and points labeled as dissimilar """
-  input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
-  estimator = clone(estimator)
-  estimator.set_params(preprocessor=preprocessor)
-  set_random_state(estimator)
-  (quadruplets_train,
-   quadruplets_test, y_train, y_test) = train_test_split(input_data, labels)
-  estimator.fit(quadruplets_train, y_train)
-  distances = estimator.score_quadruplets(quadruplets_test)
-  predictions = estimator.predict(quadruplets_test)
-  min_dissimilar = np.min(distances[predictions == -1])
-  max_similar = np.max(distances[predictions == 1])
-  assert max_similar <= min_dissimilar
-  separator = np.mean([min_dissimilar, max_similar])
-  assert (predictions[distances > separator] == -1).all()
-  assert (predictions[distances < separator] == 1).all()
-
-
-@pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', quadruplets_learners,
-                         ids=ids_quadruplets_learners)
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
-                                            with_preprocessor):
+                                              with_preprocessor):
   """Test that a NotFittedError is raised if someone tries to predict and
   the metric learner has not been fitted."""
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)

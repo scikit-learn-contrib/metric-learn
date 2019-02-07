@@ -374,8 +374,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
   def set_default_threshold(self, pairs, y):
     """Returns a threshold that is the mean between the similar metrics
     mean, and the dissimilar metrics mean"""
-    similar_threshold = np.mean(self.decision_function(pairs[y==1]))
-    dissimilar_threshold = np.mean(self.decision_function(pairs[y==1]))
+    similar_threshold = np.mean(self.decision_function(
+        pairs[(y == 1).ravel()]))
+    dissimilar_threshold = np.mean(self.decision_function(
+        pairs[(y == -1).ravel()]))
     self.threshold_ = np.mean([similar_threshold, dissimilar_threshold])
 
 
@@ -458,9 +460,14 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     score : float
       The quadruplets score.
     """
-    quadruplets = check_input(quadruplets, y, type_of_inputs='tuples',
-                              preprocessor=self.preprocessor_,
-                              estimator=self, tuple_size=self._tuple_size)
+    checked_input = check_input(quadruplets, y, type_of_inputs='tuples',
+                                preprocessor=self.preprocessor_,
+                                estimator=self, tuple_size=self._tuple_size)
+    # checked_input will be of the form `(checked_quadruplets, checked_y)` if
+    # `y` is not None, or just `checked_quadruplets` if `y` is None
+    quadruplets = checked_input if y is None else checked_input[0]
     if y is None:
       y = np.ones(quadruplets.shape[0])
+    else:
+      y = checked_input[1]
     return accuracy_score(y, self.predict(quadruplets))
