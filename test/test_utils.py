@@ -842,8 +842,8 @@ def test_error_message_check_preprocessor(preprocessor):
                           "or a callable.".format(type(preprocessor)))
 
 
-@pytest.mark.parametrize('estimator', [ITML(), LSML(), MMC(), SDML()],
-                         ids=['ITML', 'LSML', 'MMC', 'SDML'])
+@pytest.mark.parametrize('estimator', tuples_learners,
+                         ids=ids_tuples_learners)
 def test_error_message_tuple_size(estimator):
   """Tests that if a tuples learner is not given the good number of points
   per tuple, it throws an error message"""
