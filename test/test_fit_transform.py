@@ -7,6 +7,8 @@ from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
 
+from metric_learn._util import has_installed_skggm
+
 
 class TestFitTransform(unittest.TestCase):
   @classmethod
@@ -60,17 +62,18 @@ class TestFitTransform(unittest.TestCase):
 
     assert_array_almost_equal(res_1, res_2)
 
-  def test_sdml_supervised(self):
-    seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500)
-    sdml.fit(self.X, self.y, random_state=seed)
-    res_1 = sdml.transform(self.X)
+  if has_installed_skggm():
+    def test_sdml_supervised(self):
+      seed = np.random.RandomState(1234)
+      sdml = SDML_Supervised(num_constraints=1500)
+      sdml.fit(self.X, self.y, random_state=seed)
+      res_1 = sdml.transform(self.X)
 
-    seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500)
-    res_2 = sdml.fit_transform(self.X, self.y, random_state=seed)
+      seed = np.random.RandomState(1234)
+      sdml = SDML_Supervised(num_constraints=1500)
+      res_2 = sdml.fit_transform(self.X, self.y, random_state=seed)
 
-    assert_array_almost_equal(res_1, res_2)
+      assert_array_almost_equal(res_1, res_2)
 
   def test_nca(self):
     n = self.X.shape[0]
