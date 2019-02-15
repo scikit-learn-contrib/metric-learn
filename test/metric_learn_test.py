@@ -13,8 +13,10 @@ from sklearn.utils.validation import check_X_y
 
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
+    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised,
+    MMC_Supervised)
 # Import this specially for testing.
+from metric_learn._util import has_installed_skggm
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
 
@@ -147,28 +149,30 @@ def test_no_twice_same_objective(capsys):
   assert len(objectives[:-1]) == len(set(objectives[:-1]))
 
 
-class TestSDML(MetricTestCase):
-  def test_iris(self):
-    # Note: this is a flaky test, which fails for certain seeds.
-    # TODO: un-flake it!
-    rs = np.random.RandomState(5555)
+if has_installed_skggm():
+  class TestSDML(MetricTestCase):
+    def test_iris(self):
+      # Note: this is a flaky test, which fails for certain seeds.
+      # TODO: un-flake it!
+      rs = np.random.RandomState(5555)
 
-    sdml = SDML_Supervised(num_constraints=1500)
-    sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
-    csep = class_separation(sdml.transform(self.iris_points), self.iris_labels)
-    self.assertLess(csep, 0.20)
+      sdml = SDML_Supervised(num_constraints=1500)
+      sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
+      csep = class_separation(sdml.transform(self.iris_points),
+                              self.iris_labels)
+      self.assertLess(csep, 0.20)
 
-  def test_deprecation_num_labeled(self):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    sdml_supervised = SDML_Supervised(num_labeled=np.inf)
-    msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0')
-    assert_warns_message(DeprecationWarning, msg, sdml_supervised.fit, X, y)
+    def test_deprecation_num_labeled(self):
+      # test that a deprecation message is thrown if num_labeled is set at
+      # initialization
+      # TODO: remove in v.0.6
+      X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+      y = np.array([1, 0, 1, 0])
+      sdml_supervised = SDML_Supervised(num_labeled=np.inf)
+      msg = ('"num_labeled" parameter is not used.'
+             ' It has been deprecated in version 0.5.0 and will be'
+             'removed in 0.6.0')
+      assert_warns_message(DeprecationWarning, msg, sdml_supervised.fit, X, y)
 
 
 class TestNCA(MetricTestCase):
