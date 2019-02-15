@@ -64,17 +64,25 @@ class _BaseSDML(MahalanobisMixin):
     # set up prior M
     if self.use_cov:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-      prior = pinvh(np.cov(X, rowvar = False))
+      prior = pinvh(np.atleast_2d(np.cov(X, rowvar=False)))
     else:
       prior = np.identity(pairs.shape[2])
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = pinvh(prior) + self.balance_param * loss_matrix
-    M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param, msg=self.verbose,
-                            Theta0=np.eye(pairs.shape[2]),
-                            Sigma0=np.eye(pairs.shape[2]))
 
-    self.transformer_ = transformer_from_metric(M)
+    # our initialization will be the matrix with emp_cov's eigenvalues,
+    # with a constant added so that they are all positive (plus an epsilon
+    # to ensure definiteness). This is empirical. TODO: see if there are
+    #  better justified initializations.
+    w, V = np.linalg.eigh(emp_cov)
+    sigma0 = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
+    theta0 = pinvh(sigma0)
+    M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
+                            msg=self.verbose,
+                            Theta0=theta0, Sigma0=sigma0)
+    M = M + 1e-10 * np.eye(M.shape[0])  # to ensure M is positive semi-definite
+    self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self
 
 

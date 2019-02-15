@@ -166,8 +166,7 @@ if has_installed_skggm():
       # test that a deprecation message is thrown if num_labeled is set at
       # initialization
       # TODO: remove in v.0.6
-      X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-      y = np.array([1, 0, 1, 0])
+      X, y = make_classification()
       sdml_supervised = SDML_Supervised(num_labeled=np.inf)
       msg = ('"num_labeled" parameter is not used.'
              ' It has been deprecated in version 0.5.0 and will be'

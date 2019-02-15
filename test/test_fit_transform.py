@@ -1,3 +1,4 @@
+import pytest
 import unittest
 import numpy as np
 from sklearn.datasets import load_iris
@@ -63,6 +64,8 @@ class TestFitTransform(unittest.TestCase):
     assert_array_almost_equal(res_1, res_2)
 
   if has_installed_skggm():
+    # TODO: remove the mark when SDML has become deterministic
+    @pytest.mark.xfail
     def test_sdml_supervised(self):
       seed = np.random.RandomState(1234)
       sdml = SDML_Supervised(num_constraints=1500)
