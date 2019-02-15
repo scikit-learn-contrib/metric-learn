@@ -17,6 +17,8 @@ from scipy.linalg import pinvh
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import transformer_from_metric, has_installed_skggm
+if has_installed_skggm():
+  from inverse_covariance import quic
 
 
 class _BaseSDML(MahalanobisMixin):
@@ -44,9 +46,7 @@ class _BaseSDML(MahalanobisMixin):
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be gotten like this: X[indices].
     """
-    if has_installed_skggm():
-      from inverse_covariance import quic
-    else:
+    if not has_installed_skggm():
       raise NotImplementedError("SDML cannot be instantiated without "
                                 "installing skggm. Please install skggm and "
                                 "try again (make sure you meet skggm's "
