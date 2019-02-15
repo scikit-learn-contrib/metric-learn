@@ -81,7 +81,6 @@ class _BaseSDML(MahalanobisMixin):
     M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
                             msg=self.verbose,
                             Theta0=theta0, Sigma0=sigma0)
-    M = M + 1e-10 * np.eye(M.shape[0])  # to ensure M is positive semi-definite
     self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self
 
