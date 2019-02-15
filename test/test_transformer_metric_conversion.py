@@ -6,6 +6,7 @@ from numpy.testing import assert_array_almost_equal
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
+from metric_learn._util import has_installed_skggm
 
 
 class TestTransformerMetricConversion(unittest.TestCase):
@@ -42,12 +43,13 @@ class TestTransformerMetricConversion(unittest.TestCase):
     L = lmnn.transformer_
     assert_array_almost_equal(L.T.dot(L), lmnn.get_mahalanobis_matrix())
 
-  def test_sdml_supervised(self):
-    seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500)
-    sdml.fit(self.X, self.y, random_state=seed)
-    L = sdml.transformer_
-    assert_array_almost_equal(L.T.dot(L), sdml.get_mahalanobis_matrix())
+  if has_installed_skggm():
+    def test_sdml_supervised(self):
+      seed = np.random.RandomState(1234)
+      sdml = SDML_Supervised(num_constraints=1500)
+      sdml.fit(self.X, self.y, random_state=seed)
+      L = sdml.transformer_
+      assert_array_almost_equal(L.T.dot(L), sdml.get_mahalanobis_matrix())
 
   def test_nca(self):
     n = self.X.shape[0]
