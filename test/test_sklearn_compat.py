@@ -117,8 +117,8 @@ def test_calibrated_classifier_CV(estimator, build_dataset,
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', tuples_learners,
-                         ids=ids_tuples_learners)
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
+                         ids=ids_pairs_learners)
 def test_various_scoring_on_tuples_learners(estimator, build_dataset,
                                             with_preprocessor):
   """Tests that metric-learn estimators' scoring returns something finite,
