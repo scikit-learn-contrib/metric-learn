@@ -72,9 +72,8 @@ class TestSklearnCompat(unittest.TestCase):
   def test_mmc(self):
     check_estimator(dMMC)
 
-  # TODO: uncomment this when SDML has become deterministic
-  # def test_sdml(self):
-  #   check_estimator(dSDML)
+  def test_sdml(self):
+    check_estimator(dSDML)
 
   # This fails because the default num_chunks isn't data-dependent.
   # def test_rca(self):
