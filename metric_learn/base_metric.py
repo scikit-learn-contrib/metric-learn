@@ -342,7 +342,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=self._tuple_size)
-    return self.score_pairs(pairs)
+    return - self.score_pairs(pairs)
 
   def score(self, pairs, y):
     """Computes score of pairs similarity prediction.
@@ -429,8 +429,8 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
-    return (self.score_pairs(quadruplets[:, :2]) -
-            self.score_pairs(quadruplets[:, 2:]))
+    return (self.score_pairs(quadruplets[:, 2:]) -
+            self.score_pairs(quadruplets[:, :2]))
 
   def score(self, quadruplets, y=None):
     """Computes score on input quadruplets
