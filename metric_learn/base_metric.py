@@ -335,10 +335,12 @@ class _PairsClassifierMixin(BaseMetricLearner):
     return - 2 * (self.decision_function(pairs) > self.threshold_) + 1
 
   def decision_function(self, pairs):
-    """Returns the learned metric between input pairs.
+    """Returns the decision function used to classify the pairs.
 
-    Returns the learned metric value between samples in every pair. It should
-    ideally be low for similar samples and high for dissimilar samples.
+    Returns the opposite of the learned metric value between samples in every
+    pair. Hence it should ideally be low for dissimilar samples and high for
+    similar samples. This is the decision function that is used to classify
+    pairs as similar (+1), or dissimilar (-1).
 
     Parameters
     ----------
@@ -350,7 +352,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     Returns
     -------
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
-      The predicted learned metric value between samples in every pair.
+      The predicted decision function value for each pair.
     """
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
@@ -426,8 +428,12 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
   def decision_function(self, quadruplets):
     """Predicts differences between sample distances in input quadruplets.
 
-    For each quadruplet of samples, computes the difference between the learned
-    metric of the first pair minus the learned metric of the second pair.
+    For each quadruplet in the samples, computes the difference between the
+    learned metric of the second pair minus the learned metric of the first
+    pair. The higher it is, the more probable it is that the pairs in the
+    quadruplet are presented in the right order, i.e. that the label of the
+    quadruplet is 1. The lower it is, the more probable it is that the label of
+    the quadruplet is -1.
 
     Parameters
     ----------
