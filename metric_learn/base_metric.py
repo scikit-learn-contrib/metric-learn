@@ -445,7 +445,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     return (self.score_pairs(quadruplets[:, 2:]) -
             self.score_pairs(quadruplets[:, :2]))
 
-  def score(self, quadruplets, y=None):
+  def score(self, quadruplets):
     """Computes score on input quadruplets
 
     Returns the accuracy score of the following classification task: a record
@@ -460,27 +460,9 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
       points, or 2D array of indices of quadruplets if the metric learner
       uses a preprocessor.
 
-    y : array-like, shape=(n_constraints,) or `None`
-      Labels of constraints. y[i] should be 1 if
-      d(pairs[i, 0], X[i, 1]) is wanted to be larger than
-      d(X[i, 2], X[i, 3]), and -1 if it is wanted to be smaller. If None,
-      `y` will be set to `np.ones(quadruplets.shape[0])`, i.e. we want all
-      first two points to be closer than the last two points in each
-      quadruplet.
-
     Returns
     -------
     score : float
       The quadruplets score.
     """
-    checked_input = check_input(quadruplets, y, type_of_inputs='tuples',
-                                preprocessor=self.preprocessor_,
-                                estimator=self, tuple_size=self._tuple_size)
-    # checked_input will be of the form `(checked_quadruplets, checked_y)` if
-    # `y` is not None, or just `checked_quadruplets` if `y` is None
-    quadruplets = checked_input if y is None else checked_input[0]
-    if y is None:
-      y = np.ones(quadruplets.shape[0])
-    else:
-      y = checked_input[1]
-    return accuracy_score(y, self.predict(quadruplets))
+    return - np.mean(self.predict(quadruplets))

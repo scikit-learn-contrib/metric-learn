@@ -45,16 +45,10 @@ class _BaseLSML(MahalanobisMixin):
     self.verbose = verbose
     super(_BaseLSML, self).__init__(preprocessor)
 
-  def _fit(self, quadruplets, y=None, weights=None):
-    quadruplets = self._prepare_inputs(quadruplets, y,
+  def _fit(self, quadruplets, weights=None):
+    quadruplets = self._prepare_inputs(quadruplets,
                                        type_of_inputs='tuples')
-    if y is None:
-      y = np.ones(quadruplets.shape[0])
-    # we swap the quadruplets where the label is -1 since they are not in
-    # the right order
-    quadruplets_to_swap = quadruplets[y == -1]
-    quadruplets[y == -1] = np.column_stack([quadruplets_to_swap[:, 2:],
-                                            quadruplets_to_swap[:, :2]])
+
     # check to make sure that no two constrained vectors are identical
     vab = quadruplets[:, 0, :] - quadruplets[:, 1, :]
     vcd = quadruplets[:, 2, :] - quadruplets[:, 3, :]
@@ -150,7 +144,7 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
       metric (See function `transformer_from_metric`.)
   """
 
-  def fit(self, quadruplets, y=None, weights=None):
+  def fit(self, quadruplets, weights=None):
     """Learn the LSML model.
 
     Parameters
@@ -158,14 +152,10 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
     quadruplets : array-like, shape=(n_constraints, 4, n_features) or
                   (n_constraints, 4)
         3D array-like of quadruplets of points or 2D array of quadruplets of
-        indicators.
-    y : array-like, shape=(n_constraints,) or `None`
-        Labels of constraints. y[i] should be 1 if
-        d(pairs[i, 0], X[i, 1]) is wanted to be larger than
-        d(X[i, 2], X[i, 3]), and -1 if it is wanted to be smaller. If None,
-        `y` will be set to `np.ones(quadruplets.shape[0])`, i.e. we want to
-        put all first two points closer than the last two points in each
-        quadruplet.
+        indicators. In order to supervise the algorithm in the right way, we
+        should have the four samples ordered in a way such that:
+        d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3]) for all 0 <= i <
+        n_constraints.
     weights : (n_constraints,) array of floats, optional
         scale factor for each constraint
 
