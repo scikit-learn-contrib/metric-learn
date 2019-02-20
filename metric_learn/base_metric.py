@@ -332,7 +332,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
       The predicted learned metric value between samples in every pair.
     """
     check_is_fitted(self, ['threshold_', 'transformer_'])
-    return - 2 * (self.decision_function(pairs) > self.threshold_) + 1
+    return 2 * (self.decision_function(pairs) > self.threshold_) - 1
 
   def decision_function(self, pairs):
     """Returns the decision function used to classify the pairs.
@@ -387,13 +387,13 @@ class _PairsClassifierMixin(BaseMetricLearner):
     return roc_auc_score(y, self.decision_function(pairs))
 
   def set_default_threshold(self, pairs, y):
-    """Returns a threshold that is the mean between the similar metrics
-    mean, and the dissimilar metrics mean"""
-    similar_threshold = np.mean(self.decision_function(
+    """Returns a threshold that is the opposite of the mean between the similar
+    metrics mean and the dissimilar metrics mean"""
+    similar_threshold = np.mean(self.score_pairs(
         pairs[(y == 1).ravel()]))
-    dissimilar_threshold = np.mean(self.decision_function(
+    dissimilar_threshold = np.mean(self.score_pairs(
         pairs[(y == -1).ravel()]))
-    self.threshold_ = np.mean([similar_threshold, dissimilar_threshold])
+    self.threshold_ = - np.mean([similar_threshold, dissimilar_threshold])
 
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
