@@ -187,7 +187,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
         Returns the instance.
     """
     self._fit(pairs, y, bounds=bounds)
-    self.threshold_ = - np.mean(self.bounds_)
+    self.threshold_ = np.mean(self.bounds_)
     return self
 
 
