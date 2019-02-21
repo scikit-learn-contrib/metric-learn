@@ -1,4 +1,5 @@
 import pytest
+from metric_learn.base_metric import _PairsClassifierMixin, MahalanobisMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
 
@@ -54,7 +55,7 @@ def test_predict_monotonous(estimator, build_dataset,
 @pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
                          ids=ids_pairs_learners)
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
-                                            with_preprocessor):
+                                              with_preprocessor):
   """Test that a NotFittedError is raised if someone tries to predict and
   the metric learner has not been fitted."""
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
@@ -64,3 +65,23 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
   with pytest.raises(NotFittedError):
     estimator.predict(input_data)
 
+
+class IdentityPairsClassifier(MahalanobisMixin, _PairsClassifierMixin):
+  """A simple pairs classifier for testing purposes, that will just have
+  identity as transformer_.
+  """
+  def fit(self, pairs, y):
+    pairs, y = self._prepare_inputs(pairs, y,
+                                    type_of_inputs='tuples')
+    self.transformer_ = np.atleast_2d(np.identity(pairs.shape[2]))
+    return self
+
+
+def test_set_default_threshold_toy_example():
+  # test that the default threshold has the right value on a toy example
+  identity_pairs_classifier = IdentityPairsClassifier()
+  pairs = np.array([[[0.], [1.]], [[1.], [3.]], [[2.], [5.]], [[3.], [7.]]])
+  y = np.array([1, 1, -1, -1])
+  identity_pairs_classifier.fit(pairs, y)
+  identity_pairs_classifier._set_default_threshold(pairs, y)
+  assert identity_pairs_classifier.threshold_ == 2.5
