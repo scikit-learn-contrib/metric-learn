@@ -107,23 +107,23 @@ pairs_learners = [(ITML(), build_pairs),
                   (SDML(), build_pairs),
                   ]
 ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
-                                [learner for (learner, _) in
-                                 pairs_learners]))
+                              [learner for (learner, _) in
+                               pairs_learners]))
 
-classifiers =   [(Covariance(), build_classification),
-                 (LFDA(), build_classification),
-                 (LMNN(), build_classification),
-                 (NCA(), build_classification),
-                 (RCA(), build_classification),
-                 (ITML_Supervised(max_iter=5), build_classification),
-                 (LSML_Supervised(), build_classification),
-                 (MMC_Supervised(max_iter=5), build_classification),
-                 (RCA_Supervised(num_chunks=10), build_classification),
-                 (SDML_Supervised(), build_classification)
-                 ]
+classifiers = [(Covariance(), build_classification),
+               (LFDA(), build_classification),
+               (LMNN(), build_classification),
+               (NCA(), build_classification),
+               (RCA(), build_classification),
+               (ITML_Supervised(max_iter=5), build_classification),
+               (LSML_Supervised(), build_classification),
+               (MMC_Supervised(max_iter=5), build_classification),
+               (RCA_Supervised(num_chunks=10), build_classification),
+               (SDML_Supervised(), build_classification)
+               ]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
-                                [learner for (learner, _) in
-                                 classifiers]))
+                           [learner for (learner, _) in
+                            classifiers]))
 
 regressors = [(MLKR(), build_regression)]
 ids_regressors = list(map(lambda x: x.__class__.__name__,
@@ -140,6 +140,18 @@ ids_supervised_learners = ids_classifiers + ids_regressors
 
 metric_learners = tuples_learners + supervised_learners
 ids_metric_learners = ids_tuples_learners + ids_supervised_learners
+
+
+def make_args_inc_quadruplets(estimator, X, y):
+  """Quadruplets learners have no y in fit, but to write test for all
+  estimators, it is convenient to have this function, that will return X and y
+  if the estimator needs a y to fit on, and just X otherwise."""
+  if estimator.__class__.__name__ in [e.__class__.__name__
+                                      for (e, _) in
+                                      quadruplets_learners]:
+    return (X,)
+  else:
+    return (X, y)
 
 
 def mock_preprocessor(indices):
@@ -839,8 +851,8 @@ def test_error_message_check_preprocessor(preprocessor):
                           "or a callable.".format(type(preprocessor)))
 
 
-@pytest.mark.parametrize('estimator', [ITML(), LSML(), MMC(), SDML()],
-                         ids=['ITML', 'LSML', 'MMC', 'SDML'])
+@pytest.mark.parametrize('estimator', [e for (e, _) in tuples_learners],
+                         ids=ids_tuples_learners)
 def test_error_message_tuple_size(estimator):
   """Tests that if a tuples learner is not given the good number of points
   per tuple, it throws an error message"""
@@ -850,7 +862,7 @@ def test_error_message_tuple_size(estimator):
                             [[1.9, 5.3], [1., 7.8], [3.2, 1.2]]])
   y = [1, 1]
   with pytest.raises(ValueError) as raised_err:
-    estimator.fit(invalid_pairs, y)
+    estimator.fit(*make_args_inc_quadruplets(estimator, invalid_pairs, y))
   expected_msg = ("Tuples of {} element(s) expected{}. Got tuples of 3 "
                   "element(s) instead (shape=(2, 3, 2)):\ninput={}.\n"
                   .format(estimator._tuple_size, make_context(estimator),
@@ -935,19 +947,25 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)
   estimator_with_preprocessor.set_params(preprocessor=X)
-  estimator_with_preprocessor.fit(indices_train, y_train,
+  estimator_with_preprocessor.fit(*make_args_inc_quadruplets(estimator,
+                                                             indices_train,
+                                                             y_train),
                                   **make_random_state(estimator))
 
   estimator_without_preprocessor = clone(estimator)
   set_random_state(estimator_without_preprocessor)
   estimator_without_preprocessor.set_params(preprocessor=None)
-  estimator_without_preprocessor.fit(formed_train, y_train,
+  estimator_without_preprocessor.fit(*make_args_inc_quadruplets(estimator,
+                                                                formed_train,
+                                                                y_train),
                                      **make_random_state(estimator))
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=X)
-  estimator_with_prep_formed.fit(indices_train, y_train,
+  estimator_with_prep_formed.fit(*make_args_inc_quadruplets(estimator,
+                                                            indices_train,
+                                                            y_train),
                                  **make_random_state(estimator))
 
   # test prediction methods

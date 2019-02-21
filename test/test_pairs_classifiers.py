@@ -22,7 +22,8 @@ def test_predict_only_one_or_minus_one(estimator, build_dataset,
                                                               labels)
   estimator.fit(pairs_train, y_train)
   predictions = estimator.predict(pairs_test)
-  assert np.isin(predictions, [-1, 1]).all()
+  not_valid = [e for e in predictions if e not in [-1, 1]]
+  assert len(not_valid) == 0
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
