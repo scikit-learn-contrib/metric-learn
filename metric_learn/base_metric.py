@@ -1,8 +1,7 @@
-from numpy.linalg import cholesky
-from scipy.spatial.distance import euclidean
 from sklearn.base import BaseEstimator
+from sklearn.utils.extmath import stable_cumsum
 from sklearn.utils.validation import _is_arraylike, check_is_fitted
-from sklearn.metrics import roc_auc_score, accuracy_score
+from sklearn.metrics import roc_auc_score, precision_recall_curve, roc_curve
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
@@ -333,7 +332,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
       The predicted learned metric value between samples in every pair.
     """
     check_is_fitted(self, ['threshold_', 'transformer_'])
-    return 2 * (self.decision_function(pairs) > - self.threshold_) - 1
+    return 2 * (self.decision_function(pairs) >= - self.threshold_) - 1
 
   def decision_function(self, pairs):
     """Returns the decision function used to classify the pairs.
@@ -395,6 +394,150 @@ class _PairsClassifierMixin(BaseMetricLearner):
     dissimilar_threshold = np.mean(self.score_pairs(
         pairs[(y == -1).ravel()]))
     self.threshold_ = np.mean([similar_threshold, dissimilar_threshold])
+
+  def set_threshold(self, threshold):
+    """Sets the threshold of the metric learner to the given value `threshold
+
+    Parameters
+    ----------
+    threshold : float
+      The threshold value we want to set. It's a distance metric with
+      respect to which the predicted distance metric for test pairs will be
+      compared to. If they are superior to the threshold they will be
+      classified as similar (+1), and dissimilar (-1) if not.
+
+    Returns
+    -------
+    self : `_PairsClassifier`
+      The pairs classifier with the new threshold set.
+    """
+    self.threshold_ = threshold
+    return self
+
+  def calibrate_threshold(self, pairs_valid, y_valid, strategy='accuracy',
+                          threshold=None, beta=None):
+    """Decision threshold calibration for binary classification
+
+    Method that calibrates the decision threshold (cutoff point) of the metric
+    learner. This threshold will then be used when calling the method
+    `predict`. The methods for picking cutoff points make use of traditional
+    binary classification evaluation statistics such as the true positive and
+    true negative rates and F-scores. The threshold will be found to maximize
+    the chosen score on the validation set `(pairs_valid, y_valid)`.
+
+    Parameters
+    ----------
+    strategy : str, optional (default='roc')
+      The strategy to use for choosing the cutoff point
+
+      'accuracy'
+          selects a decision threshold that maximizes the accuracy
+      'f_beta'
+          selects a decision threshold that maximizes the f_beta score
+      'max_tpr'
+          selects the point that yields the highest true positive rate with
+          true negative rate at least equal to the value of the parameter
+          threshold
+      'max_tnr'
+          selects the point that yields the highest true negative rate with
+          true positive rate at least equal to the value of the parameter
+          threshold
+
+    beta : float in [0, 1], optional (default=None)
+      beta value to be used in case strategy == 'f_beta'
+
+    threshold : float in [0, 1] or None, (default=None)
+      In case strategy is 'max_tpr' or 'max_tnr' this parameter must be set
+      to specify the threshold for the true negative rate or true positive
+      rate respectively that needs to be achieved
+
+    pairs_valid : array-like, shape=(n_pairs_valid, 2, n_features)
+      The validation set of pairs to use to set the threshold.
+
+    y_valid : array-like, shape=(n_pairs_valid,)
+      The labels of the pairs of the validation set to use to set the
+      threshold.
+
+    References
+    ----------
+    .. [1] Receiver-operating characteristic (ROC) plots: a fundamental
+           evaluation tool in clinical medicine, MH Zweig, G Campbell -
+           Clinical chemistry, 1993
+
+    .. [2] most of the code of this function is from scikit-learn's PR #10117
+
+    See Also
+    --------
+    sklearn.calibration : scikit-learn's module for calibrating classifiers
+    """
+
+    if strategy not in ('accuracy', 'f_beta', 'max_tpr',
+                        'max_tnr'):
+      raise ValueError('Strategy can either be "accuracy", "f_beta" or '
+                       '"max_tpr" or "max_tnr". Got "{}" instead.'
+                       .format(strategy))
+
+    if strategy == 'max_tpr' or strategy == 'max_tnr':
+      if (threshold is None or not isinstance(threshold, (int, float)) or
+          not threshold >= 0 or not threshold <= 1):
+        raise ValueError('Parameter threshold must be a number in'
+                         '[0, 1]. '
+                         'Got {} instead.'.format(threshold))
+
+    if strategy == 'f_beta':
+      if beta is None or not isinstance(beta, (int, float)):
+        raise ValueError('Parameter beta must be a real number. '
+                         'Got {} instead.'.format(type(beta)))
+
+    pairs_valid, y_valid = self._prepare_inputs(pairs_valid, y_valid,
+                                                type_of_inputs='tuples')
+
+    n_samples = pairs_valid.shape[0]
+    if strategy == 'accuracy':
+      scores = self.decision_function(pairs_valid)
+      scores_sorted_idces = np.argsort(scores)[::-1]
+      scores_sorted = scores[scores_sorted_idces]
+      # true labels ordered by decision_function value: (higher first)
+      y_ordered = y_valid[scores_sorted_idces]
+      # finds the threshold that maximizes the accuracy:
+      cum_tp = stable_cumsum(y_ordered == 1)  # cumulative number of true
+      # positives
+      cum_tn_inverted = stable_cumsum(y_ordered[::-1] == -1)
+      cum_tn = np.concatenate([[0], cum_tn_inverted[:-1]])[::-1]
+      cum_accuracy = (cum_tp + cum_tn) / n_samples
+      max_i = np.argmax(cum_accuracy)
+      # note: we want a positive threshold (distance), so we take - threshold
+      self.threshold_ = - scores_sorted[max_i]
+      return self
+
+    if strategy == 'f_beta':
+      precision, recall, thresholds = precision_recall_curve(
+          y_valid, self.decision_function(pairs_valid), pos_label=1)
+      with np.errstate(divide='ignore', invalid='ignore'):
+        f_beta = ((1 + beta**2) * (precision * recall) /
+                  (beta**2 * precision + recall))
+      f_beta[np.isnan(f_beta)] = 0.
+      imax = np.argmax(f_beta)
+      self.threshold_ = - thresholds[imax]
+      return self
+
+    fpr, tpr, thresholds = roc_curve(y_valid,
+                                     self.decision_function(pairs_valid),
+                                     pos_label=1)
+    fpr, tpr, thresholds = fpr, tpr, thresholds
+
+    if strategy == 'max_tpr':
+      indices = np.where(1 - fpr >= threshold)[0]
+      max_tpr_index = np.argmax(tpr[indices])
+      # note: we want a positive threshold (distance), so we take - threshold
+      self.threshold_ = - thresholds[indices[max_tpr_index]]
+
+    if strategy == 'max_tnr':
+      indices = np.where(tpr >= threshold)[0]
+      max_tnr_index = np.argmax(1 - fpr[indices])
+      # note: we want a positive threshold (distance), so we take - threshold
+      self.threshold_ = - thresholds[indices[max_tnr_index]]
+    return self
 
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
