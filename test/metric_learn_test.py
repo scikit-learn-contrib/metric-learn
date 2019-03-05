@@ -11,10 +11,9 @@ from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
 
-from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised,
-    MMC_Supervised)
+from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+                          LSML_Supervised, ITML_Supervised, SDML_Supervised,
+                          RCA_Supervised, MMC_Supervised, SDML)
 # Import this specially for testing.
 from metric_learn._util import has_installed_skggm
 from metric_learn.constraints import wrap_pairs
@@ -172,6 +171,34 @@ if has_installed_skggm():
              ' It has been deprecated in version 0.5.0 and will be'
              'removed in 0.6.0')
       assert_warns_message(DeprecationWarning, msg, sdml_supervised.fit, X, y)
+
+    def test_sdml_raises_warning_non_psd(self):
+      """Tests that SDML raises a warning on a toy example where we know the
+      pseudo-covariance matrix is not PSD"""
+      pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+      y = [1, -1]
+      sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
+      msg = ("Warning, the input matrix of graphical lasso is not "
+             "positive semi-definite (PSD). The algorithm may diverge, "
+             "and lead to degenerate solutions. "
+             "To prevent that, try to decrease the balance parameter "
+             "`balance_param` and/or to set use_covariance=False.")
+      with pytest.warns(ConvergenceWarning) as raised_warning:
+        try:
+          sdml.fit(pairs, y)
+        except Exception:
+          pass
+      assert str(raised_warning[0].message) == msg
+
+    def test_sdml_doesnt_raise_warning_if_psd(self):
+      """Tests that sdml does not raise a warning and converges on a simple
+      problem where we know the pseudo-covariance matrix is PSD"""
+      pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+      y = [1, -1]
+      sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
+      with pytest.warns(None) as record:
+        sdml.fit(pairs, y)
+      assert len(record) == 0
 
 
 class TestNCA(MetricTestCase):

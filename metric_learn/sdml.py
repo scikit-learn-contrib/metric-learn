@@ -13,6 +13,7 @@ import warnings
 import numpy as np
 from sklearn.base import TransformerMixin
 from scipy.linalg import pinvh
+from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
@@ -73,9 +74,15 @@ class _BaseSDML(MahalanobisMixin):
 
     # our initialization will be the matrix with emp_cov's eigenvalues,
     # with a constant added so that they are all positive (plus an epsilon
-    # to ensure definiteness). This is empirical. TODO: see if there are
-    #  better justified initializations.
+    # to ensure definiteness). This is empirical.
     w, V = np.linalg.eigh(emp_cov)
+    if any(w < 0.):
+      warnings.warn("Warning, the input matrix of graphical lasso is not "
+                    "positive semi-definite (PSD). The algorithm may diverge, "
+                    "and lead to degenerate solutions. "
+                    "To prevent that, try to decrease the balance parameter "
+                    "`balance_param` and/or to set use_covariance=False.",
+                    ConvergenceWarning)
     sigma0 = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
     theta0 = pinvh(sigma0)
     M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
