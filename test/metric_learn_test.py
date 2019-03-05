@@ -148,8 +148,28 @@ def test_no_twice_same_objective(capsys):
   assert len(objectives[:-1]) == len(set(objectives[:-1]))
 
 
-if has_installed_skggm():
-  class TestSDML(MetricTestCase):
+class TestSDML(MetricTestCase):
+
+  def test_raises_error_msg_not_installed_skggm(self):
+    """Tests that the right error message is raised if someone tries to
+    instantiate SDML but has not installed skggm"""
+    # TODO: to be removed when scikit-learn v0.21 is released
+    if not has_installed_skggm():
+      msg = ("SDML cannot be instantiated without "
+             "installing skggm. Please install skggm and "
+             "try again (make sure you meet skggm's "
+             "requirements).")
+      with pytest.raises(NotImplementedError) as expected_err:
+        SDML()
+      assert str(expected_err.value) == msg
+    else:  # otherwise we should be able to instantiate SDML and it should
+      # raise no warning
+      with pytest.warns(None) as record:
+        SDML()
+      assert len(record) == 0
+
+  if has_installed_skggm():
+
     def test_iris(self):
       # Note: this is a flaky test, which fails for certain seeds.
       # TODO: un-flake it!
