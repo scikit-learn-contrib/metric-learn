@@ -16,6 +16,8 @@ import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
 from sklearn.utils.testing import _get_args
+
+from metric_learn._util import has_installed_skggm
 from test.test_utils import (metric_learners, ids_metric_learners,
                              mock_preprocessor)
 
@@ -73,7 +75,10 @@ class TestSklearnCompat(unittest.TestCase):
     check_estimator(dMMC)
 
   def test_sdml(self):
-    check_estimator(dSDML)
+    if has_installed_skggm():
+      check_estimator(dSDML)
+    else:
+      pass
 
   # This fails because the default num_chunks isn't data-dependent.
   # def test_rca(self):
