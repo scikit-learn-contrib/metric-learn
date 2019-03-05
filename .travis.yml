@@ -12,5 +12,5 @@ before_install:
   - if [[ ($TRAVIS_PYTHON_VERSION -ge 3.6) ||
           ($TRAVIS_PYTHON_VERSION == 2.7)]]; then
               pip install git+https://github.com/skggm/skggm.git@a0ed406586c43\
-    64ea3297a658f415e13b5cbdaf8; fi
+64ea3297a658f415e13b5cbdaf8; fi
 script: pytest test
