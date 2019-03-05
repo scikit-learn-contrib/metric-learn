@@ -205,7 +205,6 @@ def test_found_score_is_best_score(kwargs, scoring):
   pairs_learner.calibrate_threshold(pairs, y, **kwargs)
   best_score = scoring(y, pairs_learner.predict(pairs))
   scores = []
-  i = 0
   predicted_scores = pairs_learner.decision_function(pairs)
   predicted_scores = np.hstack([[np.min(predicted_scores) - 1],
                                 predicted_scores,
@@ -213,7 +212,6 @@ def test_found_score_is_best_score(kwargs, scoring):
   for threshold in - predicted_scores:
     pairs_learner.set_threshold(threshold)
     score = scoring(y, pairs_learner.predict(pairs))
-    i += 1
     assert score <= best_score
     scores.append(score)
   assert len(set(scores)) > 1  # assert that we didn't always have the same
@@ -253,7 +251,6 @@ def test_found_score_is_best_score_duplicates(kwargs, scoring):
   pairs_learner.calibrate_threshold(pairs, y, **kwargs)
   best_score = scoring(y, pairs_learner.predict(pairs))
   scores = []
-  i = 0
   predicted_scores = pairs_learner.decision_function(pairs)
   predicted_scores = np.hstack([[np.min(predicted_scores) - 1],
                                 predicted_scores,
@@ -261,7 +258,6 @@ def test_found_score_is_best_score_duplicates(kwargs, scoring):
   for threshold in - predicted_scores:
     pairs_learner.set_threshold(threshold)
     score = scoring(y, pairs_learner.predict(pairs))
-    i += 1
     assert score <= best_score
     scores.append(score)
   assert len(set(scores)) > 1  # assert that we didn't always have the same
