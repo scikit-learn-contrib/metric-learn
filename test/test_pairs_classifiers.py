@@ -72,14 +72,13 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
 
 
 @pytest.mark.parametrize('kwargs',
-                         [{'strategy': 'accuracy'},
-                          *[{'strategy': strategy, 'threshold': threshold}
-                             for (strategy, threshold) in product(
-                            ['max_tpr', 'max_tnr'],
-                            [0., 0.2, 0.8, 1.])],
-                          *[{'strategy': 'f_beta', 'beta': beta}
-                            for beta in [0., 0.1, 0.2, 1., 5.]]
-                          ])
+                         [{'strategy': 'accuracy'}] +
+                         [{'strategy': strategy, 'threshold': threshold}
+                          for (strategy, threshold) in product(
+                              ['max_tpr', 'max_tnr'], [0., 0.2, 0.8, 1.])] +
+                         [{'strategy': 'f_beta', 'beta': beta}
+                          for beta in [0., 0.1, 0.2, 1., 5.]]
+                         )
 @pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
                          ids=ids_pairs_learners)
@@ -182,18 +181,19 @@ def tnr_threshold(y_true, y_pred, tpr_threshold=0.):
 
 
 @pytest.mark.parametrize('kwargs, scoring',
-                         [({'strategy': 'accuracy'}, accuracy_score),
-                          *[({'strategy': 'f_beta', 'beta': b},
-                             partial(fbeta_score, beta=b))
-                             for b in [0.1, 0.5, 1.]],
-                          ({'strategy': 'f_beta', 'beta': 0}, precision_score),
-                          *[({'strategy': 'max_tpr', 'threshold': t},
-                             partial(tpr_threshold, tnr_threshold=t))
-                             for t in [0., 0.1, 0.5, 0.8, 1.]],
-                          *[({'strategy': 'max_tnr', 'threshold': t},
-                             partial(tnr_threshold, tpr_threshold=t))
-                             for t in [0., 0.1, 0.5, 0.8, 1.]],
-                          ])
+                         [({'strategy': 'accuracy'}, accuracy_score)] +
+                         [({'strategy': 'f_beta', 'beta': b},
+                           partial(fbeta_score, beta=b))
+                          for b in [0.1, 0.5, 1.]] +
+                         [({'strategy': 'f_beta', 'beta': 0},
+                           precision_score)] +
+                         [({'strategy': 'max_tpr', 'threshold': t},
+                           partial(tpr_threshold, tnr_threshold=t))
+                          for t in [0., 0.1, 0.5, 0.8, 1.]] +
+                         [({'strategy': 'max_tnr', 'threshold': t},
+                           partial(tnr_threshold, tpr_threshold=t))
+                          for t in [0., 0.1, 0.5, 0.8, 1.]],
+                         )
 def test_found_score_is_best_score(kwargs, scoring):
   # test that when we use calibrate threshold, it will indeed be the
   # threshold that have the best score
@@ -222,18 +222,19 @@ def test_found_score_is_best_score(kwargs, scoring):
 
 
 @pytest.mark.parametrize('kwargs, scoring',
-                         [({'strategy': 'accuracy'}, accuracy_score),
-                          *[({'strategy': 'f_beta', 'beta': b},
-                             partial(fbeta_score, beta=b))
-                             for b in [0.1, 0.5, 1.]],
-                          ({'strategy': 'f_beta', 'beta': 0}, precision_score),
-                          *[({'strategy': 'max_tpr', 'threshold': t},
-                             partial(tpr_threshold, tnr_threshold=t))
-                             for t in [0., 0.1, 0.5, 0.8, 1.]],
-                          *[({'strategy': 'max_tnr', 'threshold': t},
-                             partial(tnr_threshold, tpr_threshold=t))
-                             for t in [0., 0.1, 0.5, 0.8, 1.]],
-                          ])
+                         [({'strategy': 'accuracy'}, accuracy_score)] +
+                         [({'strategy': 'f_beta', 'beta': b},
+                           partial(fbeta_score, beta=b))
+                          for b in [0.1, 0.5, 1.]] +
+                         [({'strategy': 'f_beta', 'beta': 0},
+                           precision_score)] +
+                         [({'strategy': 'max_tpr', 'threshold': t},
+                           partial(tpr_threshold, tnr_threshold=t))
+                          for t in [0., 0.1, 0.5, 0.8, 1.]] +
+                         [({'strategy': 'max_tnr', 'threshold': t},
+                           partial(tnr_threshold, tpr_threshold=t))
+                          for t in [0., 0.1, 0.5, 0.8, 1.]]
+                         )
 def test_found_score_is_best_score_duplicates(kwargs, scoring):
   # test that when we use calibrate threshold, it will indeed be the
   # threshold that have the best score. It's the same as the previous test
@@ -270,19 +271,19 @@ def test_found_score_is_best_score_duplicates(kwargs, scoring):
 
 @pytest.mark.parametrize('invalid_args, expected_msg',
                          [({'strategy': 'weird'},
-                          ('Strategy can either be "accuracy", "f_beta" or '
-                           '"max_tpr" or "max_tnr". Got "weird" instead.')),
-                          *[({'strategy': strategy, 'threshold': threshold},
-                              'Parameter threshold must be a number in'
-                              '[0, 1]. Got {} instead.'.format(threshold))
-                             for (strategy, threshold) in product(
-                            ['max_tpr', 'max_tnr'],
-                            [None, 'weird', -0.2, 1.2, 3 + 2j])],
-                          *[({'strategy': 'f_beta', 'beta': beta},
-                              'Parameter beta must be a real number. '
-                              'Got {} instead.'.format(type(beta)))
-                            for beta in [None, 'weird', 3 + 2j]]
-                          ])
+                           ('Strategy can either be "accuracy", "f_beta" or '
+                            '"max_tpr" or "max_tnr". Got "weird" instead.'))] +
+                         [({'strategy': strategy, 'threshold': threshold},
+                           'Parameter threshold must be a number in'
+                           '[0, 1]. Got {} instead.'.format(threshold))
+                          for (strategy, threshold) in product(
+                             ['max_tpr', 'max_tnr'],
+                             [None, 'weird', -0.2, 1.2, 3 + 2j])] +
+                         [({'strategy': 'f_beta', 'beta': beta},
+                           'Parameter beta must be a real number. '
+                           'Got {} instead.'.format(type(beta)))
+                          for beta in [None, 'weird', 3 + 2j]]
+                         )
 def test_calibrate_threshold_invalid_parameters_right_error(invalid_args,
                                                             expected_msg):
   # test that the right error message is returned if invalid arguments are
@@ -297,17 +298,17 @@ def test_calibrate_threshold_invalid_parameters_right_error(invalid_args,
 
 
 @pytest.mark.parametrize('valid_args',
-                         [{'strategy': 'accuracy'},
-                          *[{'strategy': strategy, 'threshold': threshold}
-                             for (strategy, threshold) in product(
-                            ['max_tpr', 'max_tnr'],
-                            [0., 0.2, 0.8, 1.])],
-                          *[{'strategy': 'f_beta', 'beta': beta}
-                            for beta in [-5., -1., 0., 0.1, 0.2, 1., 5.]]
-                          # Note that we authorize beta < 0 (even if
-                          # in fact it will be squared, so it would be useless
-                          # to do that)
-                          ])
+                         [{'strategy': 'accuracy'}] +
+                         [{'strategy': strategy, 'threshold': threshold}
+                          for (strategy, threshold) in product(
+                             ['max_tpr', 'max_tnr'],
+                             [0., 0.2, 0.8, 1.])] +
+                         [{'strategy': 'f_beta', 'beta': beta}
+                          for beta in [-5., -1., 0., 0.1, 0.2, 1., 5.]]
+                         # Note that we authorize beta < 0 (even if
+                         # in fact it will be squared, so it would be useless
+                         # to do that)
+                         )
 def test_calibrate_threshold_valid_parameters(valid_args):
   # test that no warning message is returned if valid arguments are given to
   # calibrate threshold
