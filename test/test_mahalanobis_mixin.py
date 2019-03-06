@@ -288,9 +288,10 @@ def test_transformer_is_2D(estimator, build_dataset):
   slices = {4: [slice(0, 2), slice(2, 4)], 2: [slice(0, 2)]}
   if trunc_data.ndim == 3:
     for slice_idx in slices[trunc_data.shape[1]]:
-      _, indices = np.unique(trunc_data[:, slice_idx, :], axis=2,
-                             return_index=True)
-      trunc_data = trunc_data[indices]
-      labels = labels[indices]
+      pairs = trunc_data[:, slice_idx, :]
+      diffs = pairs[:, 1, :] - pairs[:, 0, :]
+      to_keep = np.nonzero(diffs.ravel())
+      trunc_data = trunc_data[to_keep]
+      labels = labels[to_keep]
   model.fit(trunc_data, labels)
   assert model.transformer_.shape == (1, 1)  # the transformer must be 2D
