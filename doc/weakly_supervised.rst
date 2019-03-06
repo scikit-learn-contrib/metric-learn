@@ -228,8 +228,12 @@ Residual
 SDML
 ----
 
-`SDML`: An efficient sparse metric learning in high-dimensional space via
-L1-penalized log-determinant regularization
+`SDML`: An efficient sparse metric learning in high-dimensional space via 
+double regularization: L1-penalized on the off-diagonal elements of Mahalanobis
+matrix :math:`\mathbf{M}` and the log-determinant divergence between 
+:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}` 
+or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
+covariance matrix).
 
 .. topic:: Example Code:
 
@@ -266,10 +270,24 @@ RCA
 Relative Components Analysis (RCA)
 
 `RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
-in-class covariance matrices. It applies a global linear transformation to
-assign large weights to relevant dimensions and low weights to irrelevant
-dimensions. Those relevant dimensions are estimated using "chunklets", subsets
-of points that are known to belong to the same class.
+in-class(only utilizes the instances share the similarity) covariance matrices. 
+It applies a global linear transformation to assign large weights to relevant 
+dimensions and low weights to irrelevant dimensions. Those relevant dimensions 
+are estimated using "chunklets", subsets of points that are known to belong to 
+the same class.
+
+For a training set with :math:`n` training points in :math:`k` chunklets, the 
+algorithm is efficient since it simply amounts to computing
+
+.. math::
+
+      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}(x_{ji}-\hat{m}_j)
+      (x_{ji}-\hat{m}_j)^T
+
+
+where chunklet :math:`j` consists of :math:`\{x_{ji}\}_{i=1}^{n_j}` with a 
+mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}` is used as the 
+Mahalanobis matrix.
 
 .. topic:: Example Code:
 
@@ -316,6 +334,20 @@ Since it has initially been designed for clustering applications, one of the
 implicit assumptions of MMC is that all classes form a compact set, i.e.,
 follow a unimodal distribution, which restricts the possible use-cases of this
 method. However, it is one of the earliest and a still often cited technique.
+
+This is the first Mahalanobis distance learning method, the algorithm aims at 
+maximizing the sum of distances between all the instances from the dissimilar 
+set :math:`\mathbf{D}`, while constrains the sum of distances between examples 
+from the similar set :math:`\mathbf{S}`.
+
+.. math::
+
+      \max_{\mathbf{M}\in\mathbb{S}_+^d}\sum_{(x_i, x_j)\in\mathbf{D}} 
+      d_{\mathbf{M}}(x_i, x_j)\qquad \qquad \text{s.t.} \qquad 
+      \sum_{(x'_i, x'_j)\in\mathbf{S}} d^2_{\mathbf{M}}(x'_i, x'_j) \leq 1
+
+
+
 
 .. topic:: Example Code:
 

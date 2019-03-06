@@ -13,6 +13,17 @@ implicit assumptions of MMC is that all classes form a compact set, i.e.,
 follow a unimodal distribution, which restricts the possible use-cases of
 this method. However, it is one of the earliest and a still often cited technique.
 
+This is the first Mahalanobis distance learning method, the algorithm aims at
+maximizing the sum of distances between all the instances from the dissimilar
+set :math:`\mathbf{D}`, while constrains the sum of distances between examples
+from the similar set :math:`\mathbf{S}`.
+
+.. math::
+
+      \max_{\mathbf{M}\in\mathbb{S}_+^d}\sum_{(x_i, x_j)\in\mathbf{D}}
+      d_{\mathbf{M}}(x_i, x_j)\qquad \qquad \text{s.t.} \qquad
+      \sum_{(x'_i, x'_j)\in\mathbf{S}} d^2_{\mathbf{M}}(x'_i, x'_j) \leq 1
+
 Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
 """
 

@@ -7,6 +7,19 @@ relevant dimensions and low weights to irrelevant dimensions.
 Those relevant dimensions are estimated using "chunklets",
 subsets of points that are known to belong to the same class.
 
+For a training set with :math:`n` training points in :math:`k`
+chunklets, the algorithm is efficient since it simply amounts to
+computing
+
+.. math::
+
+      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}
+      (x_{ji}-\hat{m}_j)(x_{ji}-\hat{m}_j)^T
+
+where chunklet :math:`j` consists of :math:`\{x_{ji}\}_{i=1}^{n_j}`
+and :math:`\hat{m}_j` is its mean. The inverse of :math:`\mathbf{C}`
+is used as the Mahalanobis matrix.
+
 'Learning distance functions using equivalence relations', ICML 2003
 'Learning a Mahalanobis metric from equivalence constraints', JMLR 2005
 """

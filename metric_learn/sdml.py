@@ -1,8 +1,11 @@
 """
-Qi et al.
+Qi et al. ICML 2009
 An efficient sparse metric learning in high-dimensional space via
-L1-penalized log-determinant regularization.
-ICML 2009
+double regularization: L1-penalized on the off-diagonal elements of Mahalanobis
+matrix :math:`\mathbf{M}` and the log-determinant divergence between
+:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}`
+or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the
+covariance matrix).
 
 Adapted from https://gist.github.com/kcarnold/5439945
 Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf

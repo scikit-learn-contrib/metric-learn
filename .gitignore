@@ -6,3 +6,5 @@ dist/
 htmlcov/
 .cache/
 doc/auto_examples/*
+.idea/workspace.xml
+.DS_Store

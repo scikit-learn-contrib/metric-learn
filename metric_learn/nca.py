@@ -1,6 +1,40 @@
 """
 Neighborhood Components Analysis (NCA)
 Ported to Python from https://github.com/vomjom/nca
+
+Neighborhood Components Analysis (`NCA`) is a distance
+metric learning algorithm which aims to improve the accuracy
+of nearest neighbors classification compared to the standard
+Euclidean distance. The algorithm directly maximizes a stochastic
+variant of the leave-one-out k-nearest neighbors (kNN) score
+on the training set. It can also learn a low-dimensional linear
+embedding of data that can be used for data visualization and fast
+classification.
+
+They use the decomposition :math:`\mathbf{M} = \mathbf{L}^T\mathbf{L}`
+and define the probability :math:`p_{ij}` that :math:`x_i` is
+the neighbor of :math:`x_j` by calculating the softmax likelihood
+of the Mahalanobis distance:
+
+.. math::
+
+      p_{ij} = \frac{\exp(-|| \mathbf{L}x_i - \mathbf{L}x_j ||_2^2)}
+      {\sum_{l\neq i}\exp(-||\mathbf{L}x_i - \mathbf{L}x_l||_2^2)},
+      \qquad p_{ii}=0
+
+
+Then the probability that :math:`x_i` will be correctly classified is:
+
+.. math::
+
+      p_{i} = \sum_{j:j\neq i, y_j=y_i}p_{ij}
+
+The optimization is to find matrix :math:`\mathbf{L}` that maximizes
+the sum of probability of being correctly classified:
+
+.. math::
+
+      \mathbf{L} = \text{argmax}\sum_i p_i
 """
 
 from __future__ import absolute_import
