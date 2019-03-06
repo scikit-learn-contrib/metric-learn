@@ -272,26 +272,25 @@ def test_get_squared_metric(estimator, build_dataset):
                          ids=ids_metric_learners)
 def test_transformer_is_2D(estimator, build_dataset):
   """Tests that the transformer of metric learners is 2D"""
-  # TODO: remove this check when SDML has become robust to 1D elements,
-  #  or when the 1D case is dealt with separately
-  if not str(estimator).startswith('SDML'):
-    input_data, labels, _, X = build_dataset()
-    model = clone(estimator)
-    set_random_state(model)
-    # test that it works for X.shape[1] features
-    model.fit(input_data, labels)
-    assert model.transformer_.shape == (X.shape[1], X.shape[1])
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  if model.__class__.__name__.startswith('SDML'):
+    model.set_params(use_cov=False, balance_param=1e-3)
+  set_random_state(model)
+  # test that it works for X.shape[1] features
+  model.fit(input_data, labels)
+  assert model.transformer_.shape == (X.shape[1], X.shape[1])
 
-    # test that it works for 1 feature
-    trunc_data = input_data[..., :1]
-    # we drop duplicates that might have been formed, i.e. of the form
-    # aabc or abcc or aabb for quadruplets, and aa for pairs.
-    slices = {4: [slice(0, 2), slice(2, 4)], 2: [slice(0, 2)]}
-    if trunc_data.ndim == 3:
-      for slice_idx in slices[trunc_data.shape[1]]:
-        _, indices = np.unique(trunc_data[:, slice_idx, :], axis=2,
-                               return_index=True)
-        trunc_data = trunc_data[indices]
-        labels = labels[indices]
-    model.fit(trunc_data, labels)
-    assert model.transformer_.shape == (1, 1)  # the transformer must be 2D
+  # test that it works for 1 feature
+  trunc_data = input_data[..., :1]
+  # we drop duplicates that might have been formed, i.e. of the form
+  # aabc or abcc or aabb for quadruplets, and aa for pairs.
+  slices = {4: [slice(0, 2), slice(2, 4)], 2: [slice(0, 2)]}
+  if trunc_data.ndim == 3:
+    for slice_idx in slices[trunc_data.shape[1]]:
+      _, indices = np.unique(trunc_data[:, slice_idx, :], axis=2,
+                             return_index=True)
+      trunc_data = trunc_data[indices]
+      labels = labels[indices]
+  model.fit(trunc_data, labels)
+  assert model.transformer_.shape == (1, 1)  # the transformer must be 2D
