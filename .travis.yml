@@ -9,8 +9,4 @@ before_install:
   - pip install --upgrade pip
   - pip install wheel
   - pip install numpy scipy scikit-learn
-  - if [[ ($TRAVIS_PYTHON_VERSION -ge 3.6) ||
-          ($TRAVIS_PYTHON_VERSION -eq 2.7)]]; then
-              pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
-    fi
 script: pytest test
