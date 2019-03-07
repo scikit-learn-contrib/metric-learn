@@ -13,13 +13,12 @@ import warnings
 import numpy as np
 from sklearn.base import TransformerMixin
 from scipy.linalg import pinvh
+from sklearn.covariance import graphical_lasso
 from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import transformer_from_metric, has_installed_skggm
-if has_installed_skggm():
-  from inverse_covariance import quic
+from ._util import transformer_from_metric
 
 
 class _BaseSDML(MahalanobisMixin):
@@ -47,11 +46,6 @@ class _BaseSDML(MahalanobisMixin):
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be gotten like this: X[indices].
     """
-    if not has_installed_skggm():
-      raise NotImplementedError("SDML cannot be instantiated without "
-                                "installing skggm. Please install skggm and "
-                                "try again (make sure you meet skggm's "
-                                "requirements).")
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
     self.use_cov = use_cov
@@ -83,11 +77,10 @@ class _BaseSDML(MahalanobisMixin):
                     "To prevent that, try to decrease the balance parameter "
                     "`balance_param` and/or to set use_covariance=False.",
                     ConvergenceWarning)
-    sigma0 = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
-    theta0 = pinvh(sigma0)
-    M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
-                            msg=self.verbose,
-                            Theta0=theta0, Sigma0=sigma0)
+    cov_init = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
+    _, M = graphical_lasso(emp_cov, alpha=self.sparsity_param,
+                           verbose=self.verbose,
+                           cov_init=cov_init)
     self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self
 

@@ -15,7 +15,6 @@ from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
                           RCA_Supervised, MMC_Supervised, SDML)
 # Import this specially for testing.
-from metric_learn._util import has_installed_skggm
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
 
@@ -150,43 +149,25 @@ def test_no_twice_same_objective(capsys):
 
 class TestSDML(MetricTestCase):
 
-  def test_raises_error_msg_not_installed_skggm(self):
-    """Tests that the right error message is raised if someone tries to
-    instantiate SDML but has not installed skggm"""
-    # TODO: to be removed when scikit-learn v0.21 is released
-    if not has_installed_skggm():
-      msg = ("SDML cannot be instantiated without "
-             "installing skggm. Please install skggm and "
-             "try again (make sure you meet skggm's "
-             "requirements).")
-      with pytest.raises(NotImplementedError) as expected_err:
-        SDML()
-      assert str(expected_err.value) == msg
-    else:  # otherwise we should be able to instantiate SDML and it should
-      # raise no warning
-      with pytest.warns(None) as record:
-        SDML()
-      assert len(record) == 0
-
-  if has_installed_skggm():
-
     def test_iris(self):
       # Note: this is a flaky test, which fails for certain seeds.
       # TODO: un-flake it!
       rs = np.random.RandomState(5555)
 
-      sdml = SDML_Supervised(num_constraints=1500)
+      sdml = SDML_Supervised(num_constraints=1500, use_cov=False,
+                             balance_param=5e-5)
       sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
       csep = class_separation(sdml.transform(self.iris_points),
                               self.iris_labels)
-      self.assertLess(csep, 0.20)
+      self.assertLess(csep, 0.22)
 
     def test_deprecation_num_labeled(self):
       # test that a deprecation message is thrown if num_labeled is set at
       # initialization
       # TODO: remove in v.0.6
       X, y = make_classification()
-      sdml_supervised = SDML_Supervised(num_labeled=np.inf)
+      sdml_supervised = SDML_Supervised(num_labeled=np.inf, use_cov=False,
+                                        balance_param=5e-5)
       msg = ('"num_labeled" parameter is not used.'
              ' It has been deprecated in version 0.5.0 and will be'
              'removed in 0.6.0')

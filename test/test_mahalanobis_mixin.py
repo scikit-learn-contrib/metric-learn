@@ -274,8 +274,6 @@ def test_transformer_is_2D(estimator, build_dataset):
   """Tests that the transformer of metric learners is 2D"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
-  if model.__class__.__name__.startswith('SDML'):
-    model.set_params(use_cov=False, balance_param=1e-3)
   set_random_state(model)
   # test that it works for X.shape[1] features
   model.fit(input_data, labels)

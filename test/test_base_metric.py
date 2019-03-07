@@ -5,7 +5,6 @@ import numpy as np
 from sklearn import clone
 from sklearn.utils.testing import set_random_state
 
-from metric_learn._util import has_installed_skggm
 from test.test_utils import ids_metric_learners, metric_learners
 
 
@@ -54,32 +53,16 @@ LSML_Supervised(max_iter=1000, num_constraints=None, num_labeled='deprecated',
         weights=None)
 """.strip('\n'))
 
-  if has_installed_skggm():
-    def test_sdml(self):
-      self.assertEqual(str(metric_learn.SDML()),
-                       "SDML(balance_param=0.5, preprocessor=None, "
-                       "sparsity_param=0.01, use_cov=True,\n   "
-                       "verbose=False)")
-      self.assertEqual(str(metric_learn.SDML_Supervised()), """
+  def test_sdml(self):
+    self.assertEqual(str(metric_learn.SDML()),
+                     "SDML(balance_param=0.5, preprocessor=None, "
+                     "sparsity_param=0.01, use_cov=True,\n   "
+                     "verbose=False)")
+    self.assertEqual(str(metric_learn.SDML_Supervised()), """
 SDML_Supervised(balance_param=0.5, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, sparsity_param=0.01,
         use_cov=True, verbose=False)
 """.strip('\n'))
-
-  else:
-    # if we haven't install skggm, we will just check that instantiating SDML
-    # or SDML_Supervised will return an error
-    def test_sdml(self):
-      expected_msg = ("SDML cannot be instantiated without "
-                      "installing skggm. Please install skggm and "
-                      "try again (make sure you meet skggm's "
-                      "requirements).")
-      with pytest.raises(NotImplementedError) as raised_error:
-        metric_learn.SDML()
-      assert str(raised_error.value) == expected_msg
-      with pytest.raises(NotImplementedError) as raised_error:
-        metric_learn.SDML_Supervised()
-      assert str(raised_error.value) == expected_msg
 
   def test_rca(self):
     self.assertEqual(str(metric_learn.RCA()),

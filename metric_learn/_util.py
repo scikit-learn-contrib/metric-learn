@@ -15,14 +15,6 @@ else:
     return np.linalg.norm(X, axis=1)
 
 
-def has_installed_skggm():
-  try:
-    import inverse_covariance
-    return True
-  except ImportError:
-    return False
-
-
 def check_input(input_data, y=None, preprocessor=None,
                 type_of_inputs='classic', tuple_size=None, accept_sparse=False,
                 dtype='numeric', order=None,

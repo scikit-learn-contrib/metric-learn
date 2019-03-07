@@ -9,8 +9,7 @@ from sklearn.utils.testing import set_random_state
 from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
-                                check_collapsed_pairs, validate_vector,
-                                has_installed_skggm)
+                                check_collapsed_pairs, validate_vector)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -105,9 +104,7 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
 
 pairs_learners = [(ITML(), build_pairs),
                   (MMC(max_iter=2), build_pairs),  # max_iter=2 for faster
-                  ]
-if has_installed_skggm():
-  pairs_learners.append(((SDML(), build_pairs)))
+                  (SDML(use_cov=False, balance_param=1e-5), build_pairs)]
 ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
                               [learner for (learner, _) in
                                pairs_learners]))
@@ -121,9 +118,8 @@ classifiers = [(Covariance(), build_classification),
                (LSML_Supervised(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
                (RCA_Supervised(num_chunks=10), build_classification),
-               ]
-if has_installed_skggm():
-  classifiers.append(((SDML_Supervised(), build_classification)))
+               (SDML_Supervised(use_cov=False, balance_param=1e-5),
+                build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
