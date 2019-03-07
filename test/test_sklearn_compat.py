@@ -74,6 +74,16 @@ class TestSklearnCompat(unittest.TestCase):
     check_estimator(dMMC)
 
   def test_sdml(self):
+    def stable_init(self, sparsity_param=0.01, num_labeled='deprecated',
+                    num_constraints=None, verbose=False, preprocessor=None):
+      # this init makes SDML stable for scikit-learn examples.
+      SDML_Supervised.__init__(self, sparsity_param=sparsity_param,
+                               num_labeled=num_labeled,
+                               num_constraints=num_constraints,
+                               verbose=verbose,
+                               preprocessor=preprocessor,
+                               balance_param=1e-5, use_cov=False)
+    dSDML.__init__ = stable_init
     check_estimator(dSDML)
 
   # This fails because the default num_chunks isn't data-dependent.
