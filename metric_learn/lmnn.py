@@ -1,4 +1,4 @@
-"""
+r"""
 Large-margin nearest neighbor metric learning. (Weinberger 2005)
 
 LMNN learns a Mahanalobis distance metric in the kNN classification setting
