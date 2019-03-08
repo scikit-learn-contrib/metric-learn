@@ -150,6 +150,9 @@ def test_no_twice_same_objective(capsys):
 
 class TestSDML(MetricTestCase):
 
+    @pytest.mark.skipif(has_installed_skggm(),
+                        reason="The warning will be thrown only if skggm is "
+                               "not installed.")
     def test_raises_warning_msg_not_installed_skggm(self):
       """Tests that the right warning message is raised if someone tries to
       use SDML but has not installed skggm"""
@@ -159,28 +162,35 @@ class TestSDML(MetricTestCase):
       X, y = make_classification(random_state=42)
       sdml = SDML()
       sdml_supervised = SDML_Supervised(use_cov=False, balance_param=1e-5)
-      if not has_installed_skggm():
-        msg = ("Warning, skggm is not installed, so SDML will use "
-               "scikit-learn's graphical_lasso method. It can fail to converge"
-               "on some non SPD matrices where skggm would converge. If so, "
-               "try to install skggm. (see the README.md for the right "
-               "version.)")
-        with pytest.warns(None) as record:
-          sdml.fit(pairs, y_pairs)
-        assert str(record[0].message) == msg
-        with pytest.warns(None) as record:
-          sdml_supervised.fit(X, y)
-        assert str(record[0].message) == msg
-      else:  # otherwise we should be able to instantiate and fit SDML and it
-        # should raise no warning
-        with pytest.warns(None) as record:
-          sdml = SDML()
-          sdml.fit(pairs, y_pairs)
-        assert len(record) == 0
-        with pytest.warns(None) as record:
-          sdml = SDML_Supervised(use_cov=False, balance_param=1e-5)
-          sdml.fit(X, y)
-        assert len(record) == 0
+      msg = ("Warning, skggm is not installed, so SDML will use "
+             "scikit-learn's graphical_lasso method. It can fail to converge"
+             "on some non SPD matrices where skggm would converge. If so, "
+             "try to install skggm. (see the README.md for the right "
+             "version.)")
+      with pytest.warns(None) as record:
+        sdml.fit(pairs, y_pairs)
+      assert str(record[0].message) == msg
+      with pytest.warns(None) as record:
+        sdml_supervised.fit(X, y)
+      assert str(record[0].message) == msg
+
+    @pytest.mark.skipif(not has_installed_skggm(),
+                        reason="It's only in the case where skggm is installed"
+                               "that no warning should be thrown.")
+    def test_raises_no_warning_installed_skggm(self):
+      # otherwise we should be able to instantiate and fit SDML and it
+      # should raise no warning
+      pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+      y_pairs = [1, -1]
+      X, y = make_classification(random_state=42)
+      with pytest.warns(None) as record:
+        sdml = SDML()
+        sdml.fit(pairs, y_pairs)
+      assert len(record) == 0
+      with pytest.warns(None) as record:
+        sdml = SDML_Supervised(use_cov=False, balance_param=1e-5)
+        sdml.fit(X, y)
+      assert len(record) == 0
 
     def test_iris(self):
       # Note: this is a flaky test, which fails for certain seeds.
@@ -235,39 +245,46 @@ class TestSDML(MetricTestCase):
       sdml.fit(pairs, y)
       assert np.isfinite(sdml.get_mahalanobis_matrix()).all()
 
+    @pytest.mark.skipif(not has_installed_skggm(),
+                        reason="sklearn's graphical_lasso can sometimes not "
+                               "work on some non SPD problems. We test that "
+                               "is works only if skggm is installed.")
     def test_sdml_works_on_non_spd_pb_with_skggm(self):
       """Test that SDML works on a certain non SPD problem on which we know
       it should work, but scikit-learn's graphical_lasso does not work"""
-      if has_installed_skggm():
-        X, y = load_iris(return_X_y=True)
-        sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
-                               use_cov=True)
-        sdml.fit(X, y)
+      X, y = load_iris(return_X_y=True)
+      sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
+                             use_cov=True)
+      sdml.fit(X, y)
 
 
+@pytest.mark.skipif(not has_installed_skggm(),
+                    reason='The message should be printed only if skggm is '
+                           'installed.')
 def test_verbose_has_installed_skggm_sdml(capsys):
   # Test that if users have installed skggm, a message is printed telling them
   # skggm's solver is used (when they use SDML)
   # TODO: remove if we don't need skggm anymore
-  if has_installed_skggm():
-    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
-    y_pairs = [1, -1]
-    sdml = SDML()
-    sdml.fit(pairs, y_pairs)
-    out, _ = capsys.readouterr()
-    assert "SDML will use skggm's solver." in out
+  pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+  y_pairs = [1, -1]
+  sdml = SDML()
+  sdml.fit(pairs, y_pairs)
+  out, _ = capsys.readouterr()
+  assert "SDML will use skggm's solver." in out
 
 
+@pytest.mark.skipif(not has_installed_skggm(),
+                    reason='The message should be printed only if skggm is '
+                           'installed.')
 def test_verbose_has_installed_skggm_sdml_supervised(capsys):
   # Test that if users have installed skggm, a message is printed telling them
   # skggm's solver is used (when they use SDML_Supervised)
   # TODO: remove if we don't need skggm anymore
-  if has_installed_skggm():
-    X, y = make_classification(random_state=42)
-    sdml = SDML_Supervised()
-    sdml.fit(X, y)
-    out, _ = capsys.readouterr()
-    assert "SDML will use skggm's solver." in out
+  X, y = make_classification(random_state=42)
+  sdml = SDML_Supervised()
+  sdml.fit(X, y)
+  out, _ = capsys.readouterr()
+  assert "SDML will use skggm's solver." in out
 
 
 class TestNCA(MetricTestCase):
