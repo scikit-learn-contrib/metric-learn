@@ -18,7 +18,9 @@ from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import transformer_from_metric
+from ._util import transformer_from_metric, has_installed_skggm
+if has_installed_skggm():
+  from inverse_covariance import quic
 
 
 class _BaseSDML(MahalanobisMixin):
@@ -53,6 +55,15 @@ class _BaseSDML(MahalanobisMixin):
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
+    if not has_installed_skggm():
+      msg = ("Warning, skggm is not installed, so SDML will use "
+             "scikit-learn's graphical_lasso method. It can fail to converge"
+             "on some non SPD matrices where skggm would converge. If so, "
+             "try to install skggm. (see the README.md for the right "
+             "version.)")
+      warnings.warn(msg)
+    else:
+      print("SDML will use skggm's solver.")
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
@@ -77,10 +88,16 @@ class _BaseSDML(MahalanobisMixin):
                     "To prevent that, try to decrease the balance parameter "
                     "`balance_param` and/or to set use_covariance=False.",
                     ConvergenceWarning)
-    cov_init = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
-    _, M = graphical_lasso(emp_cov, alpha=self.sparsity_param,
-                           verbose=self.verbose,
-                           cov_init=cov_init)
+    sigma0 = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
+    if has_installed_skggm():
+      theta0 = pinvh(sigma0)
+      M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
+                              msg=self.verbose,
+                              Theta0=theta0, Sigma0=sigma0)
+    else:
+      _, M = graphical_lasso(emp_cov, alpha=self.sparsity_param,
+                             verbose=self.verbose,
+                             cov_init=sigma0)
     self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self
 

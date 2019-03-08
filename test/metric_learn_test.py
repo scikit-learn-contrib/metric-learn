@@ -15,6 +15,7 @@ from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
                           RCA_Supervised, MMC_Supervised, SDML)
 # Import this specially for testing.
+from metric_learn._util import has_installed_skggm
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
 
@@ -149,6 +150,33 @@ def test_no_twice_same_objective(capsys):
 
 class TestSDML(MetricTestCase):
 
+    def test_raises_warning_msg_not_installed_skggm(self):
+      """Tests that the right warning message is raised if someone tries to
+      use SDML but has not installed skggm"""
+      # TODO: remove if we don't need skggm anymore
+      pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+      y_pairs = [1, -1]
+      X, y = make_classification(random_state=42)
+      sdml = SDML()
+      sdml_supervised = SDML_Supervised()
+      if not has_installed_skggm():
+        msg = ("Warning, skggm is not installed, so SDML will use "
+               "scikit-learn's graphical_lasso method. It can fail to converge"
+               "on some non SPD matrices where skggm would converge. If so, "
+               "try to install skggm. (see the README.md for the right "
+               "version.)")
+        with pytest.warns(None) as expected_err:
+          sdml.fit(pairs, y_pairs)
+        assert str(expected_err.value) == msg
+        with pytest.warns(None) as expected_err:
+          sdml_supervised.fit(X, y)
+        assert str(expected_err.value) == msg
+      else:  # otherwise we should be able to instantiate SDML and it should
+        # raise no warning
+        with pytest.warns(None) as record:
+          SDML()
+        assert len(record) == 0
+
     def test_iris(self):
       # Note: this is a flaky test, which fails for certain seeds.
       # TODO: un-flake it!
@@ -165,7 +193,7 @@ class TestSDML(MetricTestCase):
       # test that a deprecation message is thrown if num_labeled is set at
       # initialization
       # TODO: remove in v.0.6
-      X, y = make_classification()
+      X, y = make_classification(random_state=42)
       sdml_supervised = SDML_Supervised(num_labeled=np.inf, use_cov=False,
                                         balance_param=5e-5)
       msg = ('"num_labeled" parameter is not used.'
@@ -200,6 +228,29 @@ class TestSDML(MetricTestCase):
       with pytest.warns(None) as record:
         sdml.fit(pairs, y)
       assert len(record) == 0
+
+
+def test_verbose_has_installed_skggm_sdml(capsys):
+  # Test that if users have installed skggm, a message is printed telling them
+  # skggm's solver is used (when they use SDML)
+  # TODO: remove if we don't need skggm anymore
+  pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+  y_pairs = [1, -1]
+  sdml = SDML()
+  sdml.fit(pairs, y_pairs)
+  out, _ = capsys.readouterr()
+  assert "SDML will use skggm's solver." in out
+
+
+def test_verbose_has_installed_skggm_sdml_supervised(capsys):
+  # Test that if users have installed skggm, a message is printed telling them
+  # skggm's solver is used (when they use SDML_Supervised)
+  # TODO: remove if we don't need skggm anymore
+  X, y = make_classification(random_state=42)
+  sdml = SDML_Supervised()
+  sdml.fit(X, y)
+  out, _ = capsys.readouterr()
+  assert "SDML will use skggm's solver." in out
 
 
 class TestNCA(MetricTestCase):
