@@ -234,6 +234,15 @@ class TestSDML(MetricTestCase):
         sdml.fit(pairs, y)
       assert len(record) == 0
 
+    def test_sdml_works_on_non_spd_pb_with_skggm(self):
+      """Test that SDML works on a certain non SPD problem on which we know
+      it should work, but scikit-learn's graphical_lasso does not work"""
+      if has_installed_skggm():
+        X, y = load_iris(return_X_y=True)
+        sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
+                               use_cov=True)
+        sdml.fit(X, y)
+
 
 def test_verbose_has_installed_skggm_sdml(capsys):
   # Test that if users have installed skggm, a message is printed telling them
