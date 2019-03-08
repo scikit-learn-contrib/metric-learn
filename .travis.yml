@@ -6,6 +6,7 @@ python:
   - "3.4"
   - "3.6"
 before_install:
+  - sudo apt-get install build-essential
   - pip install --upgrade pip
   - pip install wheel
   - pip install cython numpy scipy scikit-learn
