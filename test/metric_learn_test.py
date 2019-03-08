@@ -178,7 +178,7 @@ class TestSDML(MetricTestCase):
           sdml.fit(pairs, y_pairs)
         assert len(record) == 0
         with pytest.warns(None) as record:
-          sdml = SDML_Supervised()
+          sdml = SDML_Supervised(use_cov=False, balance_param=1e-5)
           sdml.fit(X, y)
         assert len(record) == 0
 
