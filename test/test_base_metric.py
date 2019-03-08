@@ -4,7 +4,6 @@ import metric_learn
 import numpy as np
 from sklearn import clone
 from sklearn.utils.testing import set_random_state
-
 from test.test_utils import ids_metric_learners, metric_learners
 
 
@@ -56,8 +55,7 @@ LSML_Supervised(max_iter=1000, num_constraints=None, num_labeled='deprecated',
   def test_sdml(self):
     self.assertEqual(str(metric_learn.SDML()),
                      "SDML(balance_param=0.5, preprocessor=None, "
-                     "sparsity_param=0.01, use_cov=True,\n   "
-                     "verbose=False)")
+                     "sparsity_param=0.01, use_cov=True,\n   verbose=False)")
     self.assertEqual(str(metric_learn.SDML_Supervised()), """
 SDML_Supervised(balance_param=0.5, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, sparsity_param=0.01,

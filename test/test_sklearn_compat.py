@@ -16,7 +16,6 @@ import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
 from sklearn.utils.testing import _get_args
-
 from test.test_utils import (metric_learners, ids_metric_learners,
                              mock_preprocessor)
 
