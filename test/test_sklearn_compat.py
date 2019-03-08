@@ -125,39 +125,37 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
   same as scikit-learn's cross-validation (some code for generating the
   folds is taken from scikit-learn).
   """
-  # TODO: remove this check when SDML has become deterministic
-  if not str(estimator).startswith('SDML'):
-    if any(hasattr(estimator, method) for method in ["predict", "score"]):
-      input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
-      estimator = clone(estimator)
-      estimator.set_params(preprocessor=preprocessor)
-      set_random_state(estimator)
-      n_splits = 3
-      kfold = KFold(shuffle=False, n_splits=n_splits)
-      n_samples = input_data.shape[0]
-      fold_sizes = (n_samples // n_splits) * np.ones(n_splits, dtype=np.int)
-      fold_sizes[:n_samples % n_splits] += 1
-      current = 0
-      scores, predictions = [], np.zeros(input_data.shape[0])
-      for fold_size in fold_sizes:
-        start, stop = current, current + fold_size
-        current = stop
-        test_slice = slice(start, stop)
-        train_mask = np.ones(input_data.shape[0], bool)
-        train_mask[test_slice] = False
-        y_train, y_test = labels[train_mask], labels[test_slice]
-        estimator.fit(input_data[train_mask], y_train)
-        if hasattr(estimator, "score"):
-          scores.append(estimator.score(input_data[test_slice], y_test))
-        if hasattr(estimator, "predict"):
-          predictions[test_slice] = estimator.predict(input_data[test_slice])
+  if any(hasattr(estimator, method) for method in ["predict", "score"]):
+    input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
+    estimator = clone(estimator)
+    estimator.set_params(preprocessor=preprocessor)
+    set_random_state(estimator)
+    n_splits = 3
+    kfold = KFold(shuffle=False, n_splits=n_splits)
+    n_samples = input_data.shape[0]
+    fold_sizes = (n_samples // n_splits) * np.ones(n_splits, dtype=np.int)
+    fold_sizes[:n_samples % n_splits] += 1
+    current = 0
+    scores, predictions = [], np.zeros(input_data.shape[0])
+    for fold_size in fold_sizes:
+      start, stop = current, current + fold_size
+      current = stop
+      test_slice = slice(start, stop)
+      train_mask = np.ones(input_data.shape[0], bool)
+      train_mask[test_slice] = False
+      y_train, y_test = labels[train_mask], labels[test_slice]
+      estimator.fit(input_data[train_mask], y_train)
       if hasattr(estimator, "score"):
-        assert all(scores == cross_val_score(estimator, input_data, labels,
-                                             cv=kfold))
+        scores.append(estimator.score(input_data[test_slice], y_test))
       if hasattr(estimator, "predict"):
-        assert all(predictions == cross_val_predict(estimator, input_data,
-                                                    labels,
-                                                    cv=kfold))
+        predictions[test_slice] = estimator.predict(input_data[test_slice])
+    if hasattr(estimator, "score"):
+      assert all(scores == cross_val_score(estimator, input_data, labels,
+                                           cv=kfold))
+    if hasattr(estimator, "predict"):
+      assert all(predictions == cross_val_predict(estimator, input_data,
+                                                  labels,
+                                                  cv=kfold))
 
 
 def check_score(estimator, tuples, y):
