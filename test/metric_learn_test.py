@@ -165,12 +165,12 @@ class TestSDML(MetricTestCase):
                "on some non SPD matrices where skggm would converge. If so, "
                "try to install skggm. (see the README.md for the right "
                "version.)")
-        with pytest.warns(None) as expected_err:
+        with pytest.warns(None) as record:
           sdml.fit(pairs, y_pairs)
-        assert str(expected_err.value) == msg
-        with pytest.warns(None) as expected_err:
+        assert str(record[0].message) == msg
+        with pytest.warns(None) as record:
           sdml_supervised.fit(X, y)
-        assert str(expected_err.value) == msg
+        assert str(record[0].message) == msg
       else:  # otherwise we should be able to instantiate SDML and it should
         # raise no warning
         with pytest.warns(None) as record:
