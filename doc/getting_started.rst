@@ -15,8 +15,7 @@ Alternately, download the source repository and run:
 **Dependencies**
 
 -  Python 2.7+, 3.4+
--  numpy, scipy, scikit-learn, and skggm (commit [a0ed406](https://github.com/\
-skggm/skggm/commit/a0ed406586c4364ea3297a658f415e13b5cbdaf8)) for `SDML`
+-  numpy, scipy, scikit-learn, and skggm (commit `a0ed406 <https://github.com/skggm/skggm/commit/a0ed406586c4364ea3297a658f415e13b5cbdaf8>`_) for `SDML`
 -  (for running the examples only: matplotlib)
 
 **Notes**
