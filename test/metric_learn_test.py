@@ -171,10 +171,15 @@ class TestSDML(MetricTestCase):
         with pytest.warns(None) as record:
           sdml_supervised.fit(X, y)
         assert str(record[0].message) == msg
-      else:  # otherwise we should be able to instantiate SDML and it should
-        # raise no warning
+      else:  # otherwise we should be able to instantiate and fit SDML and it
+        # should raise no warning
         with pytest.warns(None) as record:
-          SDML()
+          sdml = SDML()
+          sdml.fit(pairs, y_pairs)
+        assert len(record) == 0
+        with pytest.warns(None) as record:
+          sdml = SDML_Supervised()
+          sdml.fit(X, y)
         assert len(record) == 0
 
     def test_iris(self):
