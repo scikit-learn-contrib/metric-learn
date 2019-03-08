@@ -158,7 +158,7 @@ class TestSDML(MetricTestCase):
       y_pairs = [1, -1]
       X, y = make_classification(random_state=42)
       sdml = SDML()
-      sdml_supervised = SDML_Supervised()
+      sdml_supervised = SDML_Supervised(use_cov=False, balance_param=1e-5)
       if not has_installed_skggm():
         msg = ("Warning, skggm is not installed, so SDML will use "
                "scikit-learn's graphical_lasso method. It can fail to converge"
@@ -222,17 +222,18 @@ class TestSDML(MetricTestCase):
           sdml.fit(pairs, y)
         except Exception:
           pass
-      assert str(raised_warning[0].message) == msg
+      # we assert that this warning is in one of the warning raised by the
+      # estimator
+      assert msg in list(map(lambda w: str(w.message), raised_warning))
 
-    def test_sdml_doesnt_raise_warning_if_psd(self):
-      """Tests that sdml does not raise a warning and converges on a simple
-      problem where we know the pseudo-covariance matrix is PSD"""
+    def test_sdml_converges_if_psd(self):
+      """Tests that sdml converges on a simple problem where we know the
+      pseudo-covariance matrix is PSD"""
       pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
       y = [1, -1]
       sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
-      with pytest.warns(None) as record:
-        sdml.fit(pairs, y)
-      assert len(record) == 0
+      sdml.fit(pairs, y)
+      assert np.isfinite(sdml.get_mahalanobis_matrix()).all()
 
     def test_sdml_works_on_non_spd_pb_with_skggm(self):
       """Test that SDML works on a certain non SPD problem on which we know
@@ -248,23 +249,25 @@ def test_verbose_has_installed_skggm_sdml(capsys):
   # Test that if users have installed skggm, a message is printed telling them
   # skggm's solver is used (when they use SDML)
   # TODO: remove if we don't need skggm anymore
-  pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
-  y_pairs = [1, -1]
-  sdml = SDML()
-  sdml.fit(pairs, y_pairs)
-  out, _ = capsys.readouterr()
-  assert "SDML will use skggm's solver." in out
+  if has_installed_skggm():
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+    y_pairs = [1, -1]
+    sdml = SDML()
+    sdml.fit(pairs, y_pairs)
+    out, _ = capsys.readouterr()
+    assert "SDML will use skggm's solver." in out
 
 
 def test_verbose_has_installed_skggm_sdml_supervised(capsys):
   # Test that if users have installed skggm, a message is printed telling them
   # skggm's solver is used (when they use SDML_Supervised)
   # TODO: remove if we don't need skggm anymore
-  X, y = make_classification(random_state=42)
-  sdml = SDML_Supervised()
-  sdml.fit(X, y)
-  out, _ = capsys.readouterr()
-  assert "SDML will use skggm's solver." in out
+  if has_installed_skggm():
+    X, y = make_classification(random_state=42)
+    sdml = SDML_Supervised()
+    sdml.fit(X, y)
+    out, _ = capsys.readouterr()
+    assert "SDML will use skggm's solver." in out
 
 
 class TestNCA(MetricTestCase):
