@@ -185,7 +185,7 @@ See also: `sklearn.calibration`.
 
 
 Algorithms
-==================
+==========
 
 ITML
 ----
@@ -357,7 +357,7 @@ last points. No target vector (``y``) is needed, since the supervision is
 already in the order that points are given in the quadruplet.
 
 Algorithms
-==================
+==========
 
 LSML
 ----
