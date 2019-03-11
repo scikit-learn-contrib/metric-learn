@@ -8,4 +8,6 @@ before_install:
   - pip install --upgrade pip
   - pip install wheel
   - pip install numpy scipy scikit-learn
-script: pytest test
+script: 
+  - pytest test
+  - codecov
