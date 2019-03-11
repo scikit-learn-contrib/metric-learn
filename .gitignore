@@ -7,3 +7,5 @@ htmlcov/
 .cache/
 .pytest_cache/
 doc/auto_examples/*
+coverage
+.coverage
