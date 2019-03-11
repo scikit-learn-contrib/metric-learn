@@ -126,7 +126,7 @@ def test_set_default_threshold_toy_example():
   pairs = np.array([[[0.], [1.]], [[1.], [3.]], [[2.], [5.]], [[3.], [7.]]])
   y = np.array([1, 1, -1, -1])
   identity_pairs_classifier.fit(pairs, y)
-  identity_pairs_classifier._set_default_threshold(pairs, y)
+  identity_pairs_classifier.set_default_threshold(pairs, y)
   assert identity_pairs_classifier.threshold_ == 2.5
 
 

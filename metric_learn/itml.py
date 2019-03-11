@@ -163,6 +163,8 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   def fit(self, pairs, y, bounds=None):
     """Learn the ITML model.
 
+    The default threshold will be set to the mean of the bounds.
+
     Parameters
     ----------
     pairs: array-like, shape=(n_constraints, 2, n_features) or

@@ -386,9 +386,14 @@ class _PairsClassifierMixin(BaseMetricLearner):
     """
     return roc_auc_score(y, self.decision_function(pairs))
 
-  def _set_default_threshold(self, pairs, y):
-    """Returns a threshold that is the opposite of the mean between the similar
-    metrics mean and the dissimilar metrics mean"""
+  def set_default_threshold(self, pairs, y):
+    """Sets the default threshold on the given dataset.
+
+    Returns a threshold that is the mean between the similar
+    metrics mean and the dissimilar metrics mean.
+
+    See more in the :ref:`User Guide <calibration>`.
+    """
     similar_threshold = np.mean(self.score_pairs(
         pairs[(y == 1).ravel()]))
     dissimilar_threshold = np.mean(self.score_pairs(
@@ -397,6 +402,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
   def set_threshold(self, threshold):
     """Sets the threshold of the metric learner to the given value `threshold
+
+    See more in the :ref:`User Guide <calibration>`.
 
     Parameters
     ----------
@@ -424,6 +431,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
     binary classification evaluation statistics such as the true positive and
     true negative rates and F-scores. The threshold will be found to maximize
     the chosen score on the validation set `(pairs_valid, y_valid)`.
+
+    See more in the :ref:`User Guide <calibration>`.
 
     Parameters
     ----------
