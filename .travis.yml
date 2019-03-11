@@ -7,6 +7,7 @@ python:
 before_install:
   - pip install --upgrade pip
   - pip install wheel
+  - pip install codecov
   - pip install numpy scipy scikit-learn
 script: 
   - pytest test
