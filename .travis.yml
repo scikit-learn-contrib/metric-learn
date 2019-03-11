@@ -10,5 +10,5 @@ before_install:
   - pip install codecov
   - pip install numpy scipy scikit-learn
 script: 
-  - pytest test
+  - pytest --cov
   - codecov

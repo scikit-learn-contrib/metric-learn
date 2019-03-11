@@ -1,4 +1,4 @@
-|Travis-CI Build Status| |License| |PyPI version|
+|Travis-CI Build Status| |License| |PyPI version| |Code coverage|
 
 metric-learn
 =============
