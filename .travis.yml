@@ -8,7 +8,7 @@ before_install:
   - pip install --upgrade pip
   - pip install wheel
   - pip install codecov
-  - pip install pytest-cov
+  - pip install pytest-cov pytest==3.6
   - pip install numpy scipy scikit-learn
 script: 
   - pytest --cov
