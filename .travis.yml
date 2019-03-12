@@ -11,6 +11,8 @@ before_install:
   - pip install pytest-cov pytest==3.6
   - pip install numpy scipy scikit-learn
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == "3.6" ]]; then pytest --cov; fi
-  - pytest --cov
+  - if [[ $TRAVIS_PYTHON_VERSION == "3.6" ]];
+    then pytest --cov;
+    else pytest;
+    fi
   - codecov
