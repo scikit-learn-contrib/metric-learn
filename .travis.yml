@@ -5,7 +5,6 @@ python:
   - "2.7"
   - "3.4"
 before_install:
-  - CODECOV_TOKEN="23c57533-8bcc-4caa-84e3-419854017212"
   - pip install --upgrade pip
   - pip install wheel
   - pip install codecov
