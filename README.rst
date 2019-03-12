@@ -52,5 +52,5 @@ more complete.
    :target: http://badges.mit-license.org
 .. |PyPI version| image:: https://badge.fury.io/py/metric-learn.svg
    :target: http://badge.fury.io/py/metric-learn
-.. |Code coverage| image:: https://codecov.io/gh/metric-learn/metric-learn/branch/feat/add_code_coverage/graph/badge.svg
-   :target: https://codecov.io/gh/metric-learn/metric-learn?branch=feat/add_code_coverage
+.. |Code coverage| image:: https://codecov.io/gh/metric-learn/metric-learn/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/metric-learn/metric-learn?branch=master
