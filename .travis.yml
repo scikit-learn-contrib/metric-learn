@@ -17,4 +17,5 @@ script:
     then pytest --cov;
     else pytest;
     fi
-  - codecov
+after_success:
+  - bash < (curl -s https://codecov.io/bash)
