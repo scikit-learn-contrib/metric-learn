@@ -53,4 +53,4 @@ more complete.
 .. |PyPI version| image:: https://badge.fury.io/py/metric-learn.svg
    :target: http://badge.fury.io/py/metric-learn
 .. |Code coverage| image:: https://img.shields.io/codecov/c/github/metric_learn/metric-learn.svg
-   :target: https://codecov.io/github/metric-learn/metric-learn?branch=master
+   :target: https://codecov.io/github/metric-learn/metric-learn?branch=feat/add_code_coverage
