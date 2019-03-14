@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -8,7 +9,8 @@ extensions = [
     'sphinx.ext.mathjax',
     'numpydoc',
     'sphinx_gallery.gen_gallery',
-    'sphinx.ext.doctest'
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx'
 ]
 
 templates_path = ['_templates']
@@ -39,3 +41,12 @@ default_role = 'any'
 # Option to hide doctests comments in the documentation (like # doctest:
 # +NORMALIZE_WHITESPACE for instance)
 trim_doctest_flags = True
+
+# intersphinx configuration
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/{.major}'.format(
+        sys.version_info), None),
+    'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+    'scikit-learn': ('https://scikit-learn.org/stable/', None)
+}
