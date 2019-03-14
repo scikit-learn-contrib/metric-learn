@@ -20,4 +20,5 @@ coverage:
         # extension:
         # https://github.com/codecov/browser-extension
         target: auto
-threshold: 1%
+        threshold: 1%
+
