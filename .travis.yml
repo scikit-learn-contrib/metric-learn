@@ -18,4 +18,4 @@ script:
     else pytest test;
     fi
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
