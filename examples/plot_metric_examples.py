@@ -56,7 +56,7 @@ Y = iris_data['target']
 def plot(X, Y):
     x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
     y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
-    plt.figure(2, figsize=(8, 6))
+    plt.figure(figsize=(8, 6))
 
     # clean the figure
     plt.clf()
