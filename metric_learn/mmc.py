@@ -450,6 +450,10 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
     """
+    if len(X) > 3:
+      print('test')
+    elif len(X) < 3:
+      print('test')
     if self.num_labeled != 'deprecated':
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
