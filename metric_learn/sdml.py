@@ -68,15 +68,15 @@ class _BaseSDML(MahalanobisMixin):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
-    # set up prior M
+    # set up (the inverse of) the prior M
     if self.use_cov:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-      prior = pinvh(np.atleast_2d(np.cov(X, rowvar=False)))
+      prior_inv = np.atleast_2d(np.cov(X, rowvar=False))
     else:
-      prior = np.identity(pairs.shape[2])
+      prior_inv = np.identity(pairs.shape[2])
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
-    emp_cov = pinvh(prior) + self.balance_param * loss_matrix
+    emp_cov = prior_inv + self.balance_param * loss_matrix
 
     # our initialization will be the matrix with emp_cov's eigenvalues,
     # with a constant added so that they are all positive (plus an epsilon
