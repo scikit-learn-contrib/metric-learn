@@ -82,14 +82,17 @@ class _BaseSDML(MahalanobisMixin):
     # with a constant added so that they are all positive (plus an epsilon
     # to ensure definiteness). This is empirical.
     w, V = np.linalg.eigh(emp_cov)
-    if any(w < 0.):
+    min_eigval = np.min(w)
+    if min_eigval < 0.:
       warnings.warn("Warning, the input matrix of graphical lasso is not "
                     "positive semi-definite (PSD). The algorithm may diverge, "
                     "and lead to degenerate solutions. "
                     "To prevent that, try to decrease the balance parameter "
                     "`balance_param` and/or to set use_covariance=False.",
                     ConvergenceWarning)
-    sigma0 = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
+      w -= min_eigval  # we translate the eigenvalues to make them all positive
+    w += 1e-10  # we add a small offset to avoid definiteness problems
+    sigma0 = (V * w).dot(V.T)
     try:
       if HAS_SKGGM:
         theta0 = pinvh(sigma0)
