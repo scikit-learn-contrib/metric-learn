@@ -10,6 +10,8 @@ from sklearn.utils import check_random_state
 from sklearn.utils.testing import set_random_state
 
 from metric_learn._util import make_context
+from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
+                                      _PairsClassifierMixin)
 
 from test.test_utils import ids_metric_learners, metric_learners
 
@@ -283,13 +285,17 @@ def test_transformer_is_2D(estimator, build_dataset):
   trunc_data = input_data[..., :1]
   # we drop duplicates that might have been formed, i.e. of the form
   # aabc or abcc or aabb for quadruplets, and aa for pairs.
-  slices = {4: [slice(0, 2), slice(2, 4)], 2: [slice(0, 2)]}
-  if trunc_data.ndim == 3:
-    for slice_idx in slices[trunc_data.shape[1]]:
+  if isinstance(estimator, _QuadrupletsClassifierMixin):
+    for slice_idx in [slice(0, 2), slice(2, 4)]:
       pairs = trunc_data[:, slice_idx, :]
       diffs = pairs[:, 1, :] - pairs[:, 0, :]
-      to_keep = np.nonzero(diffs.ravel())
+      to_keep = np.where(np.abs(diffs.ravel()) > 1e-9)
       trunc_data = trunc_data[to_keep]
       labels = labels[to_keep]
+  elif isinstance(estimator, _PairsClassifierMixin):
+    diffs = trunc_data[:, 1, :] - trunc_data[:, 0, :]
+    to_keep = np.where(np.abs(diffs.ravel()) > 1e-9)
+    trunc_data = trunc_data[to_keep]
+    labels = labels[to_keep]
   model.fit(trunc_data, labels)
   assert model.transformer_.shape == (1, 1)  # the transformer must be 2D
