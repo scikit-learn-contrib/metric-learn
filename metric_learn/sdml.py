@@ -60,14 +60,11 @@ class _BaseSDML(MahalanobisMixin):
 
   def _fit(self, pairs, y):
     if not HAS_SKGGM:
-      msg = ("Warning, skggm is not installed, so SDML will use "
-             "scikit-learn's graphical_lasso method. It can fail to converge"
-             "on some non SPD matrices where skggm would converge. If so, "
-             "try to install skggm. (see the README.md for the right "
-             "version.)")
-      warnings.warn(msg)
+      if self.verbose:
+        print("SDML will use scikit-learn's graphical lasso solver.")
     else:
-      print("SDML will use skggm's solver.")
+      if self.verbose:
+        print("SDML will use skggm's graphical lasso solver.")
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
@@ -93,15 +90,39 @@ class _BaseSDML(MahalanobisMixin):
                     "`balance_param` and/or to set use_covariance=False.",
                     ConvergenceWarning)
     sigma0 = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
-    if HAS_SKGGM:
-      theta0 = pinvh(sigma0)
-      M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
-                              msg=self.verbose,
-                              Theta0=theta0, Sigma0=sigma0)
-    else:
-      _, M = graphical_lasso(emp_cov, alpha=self.sparsity_param,
-                             verbose=self.verbose,
-                             cov_init=sigma0)
+    try:
+      if HAS_SKGGM:
+        theta0 = pinvh(sigma0)
+        M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
+                                msg=self.verbose,
+                                Theta0=theta0, Sigma0=sigma0)
+      else:
+        _, M = graphical_lasso(emp_cov, alpha=self.sparsity_param,
+                               verbose=self.verbose,
+                               cov_init=sigma0)
+      raised_error = None
+      w_mahalanobis, _ = np.linalg.eigh(M)
+      not_spd = any(w_mahalanobis < 0.)
+      not_finite = not np.isfinite(M).all()
+    except Exception as e:
+      raised_error = e
+      not_spd = False  # not_spd not applicable here so we set to False
+      not_finite = False  # not_finite not applicable here so we set to False
+    if raised_error is not None or not_spd or not_finite:
+      msg = ("There was a problem in SDML when using {}'s graphical "
+             "lasso solver.").format("skggm" if HAS_SKGGM else "scikit-learn")
+      if not HAS_SKGGM:
+        skggm_advice = (" skggm's graphical lasso can sometimes converge "
+                        "on non SPD cases where scikit-learn's graphical "
+                        "lasso fails to converge. Try to install skggm and "
+                        "rerun the algorithm (see the README.md for the "
+                        "right version of skggm).")
+        msg += skggm_advice
+      if raised_error is not None:
+        msg += " The following error message was thrown: {}.".format(
+            raised_error)
+      raise RuntimeError(msg)
+
     self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self
 
