@@ -20,7 +20,7 @@ Alternately, download the source repository and run:
 **Optional dependencies**
 
 - For SDML, convergence will be better in some cases with skggm
-(install from commit `a0ed406 <https://github.com/skggm/skggm/commit/a0ed406586c4364ea3297a658f415e13b5cbdaf8>`_).
+  (install from commit `a0ed406 <https://github.com/skggm/skggm/commit/a0ed406586c4364ea3297a658f415e13b5cbdaf8>`_).
 -  For running the examples only: matplotlib
 
 **Notes**
