@@ -10,12 +10,16 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
-
+try:
+  from inverse_covariance import quic
+except ImportError:
+  HAS_SKGGM = False
+else:
+  HAS_SKGGM = True
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
                           RCA_Supervised, MMC_Supervised, SDML)
 # Import this specially for testing.
-from metric_learn._util import has_installed_skggm
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
 
@@ -150,7 +154,7 @@ def test_no_twice_same_objective(capsys):
 
 class TestSDML(MetricTestCase):
 
-  @pytest.mark.skipif(has_installed_skggm(),
+  @pytest.mark.skipif(HAS_SKGGM,
                       reason="The warning will be thrown only if skggm is "
                              "not installed.")
   def test_raises_warning_msg_not_installed_skggm(self):
@@ -174,7 +178,7 @@ class TestSDML(MetricTestCase):
       sdml_supervised.fit(X, y)
     assert str(record[0].message) == msg
 
-  @pytest.mark.skipif(not has_installed_skggm(),
+  @pytest.mark.skipif(not HAS_SKGGM,
                       reason="It's only in the case where skggm is installed"
                              "that no warning should be thrown.")
   def test_raises_no_warning_installed_skggm(self):
@@ -245,7 +249,7 @@ class TestSDML(MetricTestCase):
     sdml.fit(pairs, y)
     assert np.isfinite(sdml.get_mahalanobis_matrix()).all()
 
-  @pytest.mark.skipif(not has_installed_skggm(),
+  @pytest.mark.skipif(not HAS_SKGGM,
                       reason="sklearn's graphical_lasso can sometimes not "
                              "work on some non SPD problems. We test that "
                              "is works only if skggm is installed.")
@@ -258,7 +262,7 @@ class TestSDML(MetricTestCase):
     sdml.fit(X, y)
 
 
-@pytest.mark.skipif(not has_installed_skggm(),
+@pytest.mark.skipif(not HAS_SKGGM,
                     reason='The message should be printed only if skggm is '
                            'installed.')
 def test_verbose_has_installed_skggm_sdml(capsys):
@@ -273,7 +277,7 @@ def test_verbose_has_installed_skggm_sdml(capsys):
   assert "SDML will use skggm's solver." in out
 
 
-@pytest.mark.skipif(not has_installed_skggm(),
+@pytest.mark.skipif(not HAS_SKGGM,
                     reason='The message should be printed only if skggm is '
                            'installed.')
 def test_verbose_has_installed_skggm_sdml_supervised(capsys):

@@ -18,9 +18,13 @@ from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import transformer_from_metric, has_installed_skggm
-if has_installed_skggm():
+from ._util import transformer_from_metric
+try:
   from inverse_covariance import quic
+except ImportError:
+  HAS_SKGGM = False
+else:
+  HAS_SKGGM = True
 
 
 class _BaseSDML(MahalanobisMixin):
@@ -55,7 +59,7 @@ class _BaseSDML(MahalanobisMixin):
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
-    if not has_installed_skggm():
+    if not HAS_SKGGM:
       msg = ("Warning, skggm is not installed, so SDML will use "
              "scikit-learn's graphical_lasso method. It can fail to converge"
              "on some non SPD matrices where skggm would converge. If so, "
@@ -89,7 +93,7 @@ class _BaseSDML(MahalanobisMixin):
                     "`balance_param` and/or to set use_covariance=False.",
                     ConvergenceWarning)
     sigma0 = (V * (w - min(0, np.min(w)) + 1e-10)).dot(V.T)
-    if has_installed_skggm():
+    if HAS_SKGGM:
       theta0 = pinvh(sigma0)
       M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
                               msg=self.verbose,
