@@ -230,13 +230,17 @@ class TestSDML(MetricTestCase):
     # TODO: remove if we don't need skggm anymore
     # case on which we know that skggm's graphical lasso fails
     # because it will return non finite values
-    X, y = load_iris(return_X_y=True)
-    sdml_supervised = SDML_Supervised(balance_param=0.5, use_cov=True,
+    rng = np.random.RandomState(42)
+    # This example will create a diagonal em_cov with a negative coeff (
+    # pathological case)
+    X = np.array([[-10., 0.], [10., 0.], [5., 0.], [3., 0.]])
+    y = [0, 0, 1, 1]
+    sdml_supervised = SDML_Supervised(balance_param=0.5, use_cov=False,
                                       sparsity_param=0.01)
     msg = ("There was a problem in SDML when using skggm's graphical "
            "lasso solver.")
     with pytest.raises(RuntimeError) as raised_error:
-      sdml_supervised.fit(X, y)
+      sdml_supervised.fit(X, y, random_state=rng)
     assert msg == str(raised_error.value)
 
   @pytest.mark.skipif(not HAS_SKGGM,
