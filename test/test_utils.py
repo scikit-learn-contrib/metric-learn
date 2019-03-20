@@ -30,7 +30,6 @@ Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 # and to_transform is some additional data that we would want to transform
 
 
-@pytest.fixture
 def build_classification(with_preprocessor=False):
   """Basic array for testing when using a preprocessor"""
   X, y = shuffle(*make_blobs(random_state=SEED),
@@ -42,7 +41,6 @@ def build_classification(with_preprocessor=False):
     return Dataset(X[indices], y[indices], None, X[indices])
 
 
-@pytest.fixture
 def build_regression(with_preprocessor=False):
   """Basic array for testing when using a preprocessor"""
   X, y = shuffle(*make_regression(n_samples=100, n_features=5,
