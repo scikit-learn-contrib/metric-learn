@@ -120,16 +120,6 @@ def test_set_threshold():
   assert identity_pairs_classifier.threshold_ == 0.5
 
 
-def test_set_default_threshold_toy_example():
-  # test that the default threshold has the right value on a toy example
-  identity_pairs_classifier = IdentityPairsClassifier()
-  pairs = np.array([[[0.], [1.]], [[1.], [3.]], [[2.], [5.]], [[3.], [7.]]])
-  y = np.array([1, 1, -1, -1])
-  identity_pairs_classifier.fit(pairs, y)
-  identity_pairs_classifier.set_default_threshold(pairs, y)
-  assert identity_pairs_classifier.threshold_ == 2.5
-
-
 def test_f_beta_1_is_f_1():
   # test that putting beta to 1 indeed finds the best threshold to optimize
   # the f1_score

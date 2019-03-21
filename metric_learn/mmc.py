@@ -385,7 +385,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
         Returns the instance.
     """
     self._fit(pairs, y)
-    self.set_default_threshold(pairs, y)
+    self.calibrate_threshold(pairs, y)
     return self
 
 
