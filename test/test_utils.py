@@ -30,7 +30,6 @@ Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 # and to_transform is some additional data that we would want to transform
 
 
-@pytest.fixture
 def build_classification(with_preprocessor=False):
   """Basic array for testing when using a preprocessor"""
   X, y = shuffle(*make_blobs(random_state=SEED),
@@ -42,7 +41,6 @@ def build_classification(with_preprocessor=False):
     return Dataset(X[indices], y[indices], None, X[indices])
 
 
-@pytest.fixture
 def build_regression(with_preprocessor=False):
   """Basic array for testing when using a preprocessor"""
   X, y = shuffle(*make_regression(n_samples=100, n_features=5,
@@ -161,7 +159,6 @@ def test_check_input_invalid_type_of_inputs(type_of_inputs):
 #  ---------------- test check_input with 'tuples' type_of_input' ------------
 
 
-@pytest.fixture
 def tuples_prep():
   """Basic array for testing when using a preprocessor"""
   tuples = np.array([[1, 2],
@@ -169,7 +166,6 @@ def tuples_prep():
   return tuples
 
 
-@pytest.fixture
 def tuples_no_prep():
   """Basic array for testing when using no preprocessor"""
   tuples = np.array([[[1., 2.3], [2.3, 5.3]],
@@ -251,15 +247,15 @@ def test_check_tuples_invalid_shape(estimator, context, tuples, found,
 
 @pytest.mark.parametrize('estimator, context',
                          [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-def test_check_tuples_invalid_n_features(estimator, context, tuples_no_prep):
+def test_check_tuples_invalid_n_features(estimator, context):
   """Checks that the right warning is printed if not enough features
   Here we only test if no preprocessor (otherwise we don't ensure this)
   """
   msg = ("Found array with 2 feature(s) (shape={}) while"
-         " a minimum of 3 is required{}.".format(tuples_no_prep.shape,
+         " a minimum of 3 is required{}.".format(tuples_no_prep().shape,
                                                  context))
   with pytest.raises(ValueError) as raised_error:
-      check_input(tuples_no_prep, type_of_inputs='tuples',
+      check_input(tuples_no_prep(), type_of_inputs='tuples',
                   preprocessor=None, ensure_min_features=3,
                   estimator=estimator)
   assert str(raised_error.value) == msg
@@ -316,8 +312,7 @@ def test_check_tuples_invalid_dtype_convertible(estimator, context,
   assert str(raised_warning[0].message) == msg
 
 
-def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor(
-        tuples_prep):
+def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor():
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float, when using a preprocessor
   """
@@ -327,31 +322,30 @@ def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor(
     return np.full((indices.shape[0], 3), 'a')
 
   with pytest.raises(ValueError):
-    check_input(tuples_prep, type_of_inputs='tuples',
+    check_input(tuples_prep(), type_of_inputs='tuples',
                 preprocessor=preprocessor, dtype=np.float64)
 
 
-def test_check_tuples_invalid_dtype_not_convertible_without_preprocessor(
-        tuples_no_prep):
+def test_check_tuples_invalid_dtype_not_convertible_without_preprocessor():
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float, when using no preprocessor
   """
-  tuples = np.full_like(tuples_no_prep, 'a', dtype=object)
+  tuples = np.full_like(tuples_no_prep(), 'a', dtype=object)
   with pytest.raises(ValueError):
     check_input(tuples, type_of_inputs='tuples',
                 preprocessor=None, dtype=np.float64)
 
 
 @pytest.mark.parametrize('tuple_size', [2, None])
-def test_check_tuples_valid_tuple_size(tuple_size, tuples_prep, tuples_no_prep):
+def test_check_tuples_valid_tuple_size(tuple_size):
   """For inputs that have the right matrix dimension (2D or 3D for instance),
   checks that checking the number of tuples (pairs, quadruplets, etc) raises
   no warning if there is the right number of points in a tuple.
   """
   with pytest.warns(None) as record:
-    check_input(tuples_prep, type_of_inputs='tuples',
+    check_input(tuples_prep(), type_of_inputs='tuples',
                 preprocessor=mock_preprocessor, tuple_size=tuple_size)
-    check_input(tuples_no_prep, type_of_inputs='tuples', preprocessor=None,
+    check_input(tuples_no_prep(), type_of_inputs='tuples', preprocessor=None,
                 tuple_size=tuple_size)
   assert len(record) == 0
 
@@ -399,7 +393,7 @@ def test_check_tuples_valid_without_preprocessor(tuples):
   assert len(record) == 0
 
 
-def test_check_tuples_behaviour_auto_dtype(tuples_no_prep):
+def test_check_tuples_behaviour_auto_dtype():
   """Checks that check_tuples allows by default every type if using a
   preprocessor, and numeric types if using no preprocessor"""
   tuples_prep = [['img1.png', 'img2.png'], ['img3.png', 'img5.png']]
@@ -409,15 +403,15 @@ def test_check_tuples_behaviour_auto_dtype(tuples_no_prep):
   assert len(record) == 0
 
   with pytest.warns(None) as record:
-      check_input(tuples_no_prep, type_of_inputs='tuples')  # numeric type
+      check_input(tuples_no_prep(), type_of_inputs='tuples')  # numeric type
   assert len(record) == 0
 
   # not numeric type
-  tuples_no_prep = np.array([[['img1.png'], ['img2.png']],
-                             [['img3.png'], ['img5.png']]])
-  tuples_no_prep = tuples_no_prep.astype(object)
+  tuples_no_prep_bis = np.array([[['img1.png'], ['img2.png']],
+                                 [['img3.png'], ['img5.png']]])
+  tuples_no_prep_bis = tuples_no_prep_bis.astype(object)
   with pytest.raises(ValueError):
-      check_input(tuples_no_prep, type_of_inputs='tuples')
+      check_input(tuples_no_prep_bis, type_of_inputs='tuples')
 
 
 def test_check_tuples_invalid_complex_data():
@@ -435,14 +429,12 @@ def test_check_tuples_invalid_complex_data():
 # ------------- test check_input with 'classic' type_of_inputs ----------------
 
 
-@pytest.fixture
 def points_prep():
   """Basic array for testing when using a preprocessor"""
   points = np.array([1, 2])
   return points
 
 
-@pytest.fixture
 def points_no_prep():
   """Basic array for testing when using no preprocessor"""
   points = np.array([[1., 2.3],
@@ -483,17 +475,16 @@ def test_check_classic_invalid_shape(estimator, context, points, found,
 
 @pytest.mark.parametrize('estimator, context',
                          [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-def test_check_classic_invalid_n_features(estimator, context,
-                                          points_no_prep):
+def test_check_classic_invalid_n_features(estimator, context):
   """Checks that the right warning is printed if not enough features
   Here we only test if no preprocessor (otherwise we don't ensure this)
   """
   msg = ("Found array with 2 feature(s) (shape={}) while"
-         " a minimum of 3 is required{}.".format(points_no_prep.shape,
+         " a minimum of 3 is required{}.".format(points_no_prep().shape,
                                                  context))
   with pytest.raises(ValueError) as raised_error:
-      check_input(points_no_prep, type_of_inputs='classic', preprocessor=None,
-                  ensure_min_features=3,
+      check_input(points_no_prep(), type_of_inputs='classic',
+                  preprocessor=None, ensure_min_features=3,
                   estimator=estimator)
   assert str(raised_error.value) == msg
 
@@ -609,7 +600,7 @@ def test_check_classic_by_default():
           check_input([[2, 3], [3, 2]], type_of_inputs='classic')).all()
 
 
-def test_check_classic_behaviour_auto_dtype(points_no_prep):
+def test_check_classic_behaviour_auto_dtype():
   """Checks that check_input (for points) allows by default every type if
   using a preprocessor, and numeric types if using no preprocessor"""
   points_prep = ['img1.png', 'img2.png', 'img3.png', 'img5.png']
@@ -619,15 +610,15 @@ def test_check_classic_behaviour_auto_dtype(points_no_prep):
   assert len(record) == 0
 
   with pytest.warns(None) as record:
-      check_input(points_no_prep, type_of_inputs='classic')  # numeric type
+      check_input(points_no_prep(), type_of_inputs='classic')  # numeric type
   assert len(record) == 0
 
   # not numeric type
-  points_no_prep = np.array(['img1.png', 'img2.png', 'img3.png',
-                             'img5.png'])
-  points_no_prep = points_no_prep.astype(object)
+  points_no_prep_bis = np.array(['img1.png', 'img2.png', 'img3.png',
+                                 'img5.png'])
+  points_no_prep_bis = points_no_prep_bis.astype(object)
   with pytest.raises(ValueError):
-      check_input(points_no_prep, type_of_inputs='classic')
+      check_input(points_no_prep_bis, type_of_inputs='classic')
 
 
 def test_check_classic_invalid_complex_data():

@@ -7,7 +7,7 @@ python:
   - "3.6"
 before_install:
   - sudo apt-get install liblapack-dev
-  - pip install --upgrade pip
+  - pip install --upgrade pip pytest
   - pip install wheel
   - pip install cython numpy scipy scikit-learn codecov
   - if [[ ($TRAVIS_PYTHON_VERSION == "3.6") ||
@@ -15,7 +15,7 @@ before_install:
               pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
     fi
   - if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]];
-    then pip install pytest-cov pytest==3.6;
+    then pip install pytest-cov;
     fi
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]];
