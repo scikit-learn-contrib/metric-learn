@@ -295,7 +295,16 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
 
 class _PairsClassifierMixin(BaseMetricLearner):
+  """
+  Attributes
+  ----------
+  classes_ : `list`
+      The possible labels of the pairs the metric learner can fit on.
+      `classes_ = [-1, 1]`, where -1 means points in a pair are dissimilar
+      (negative label), and 1 means they are similar (positive label).
+  """
 
+  classes_ = [-1, 1]
   _tuple_size = 2  # number of points in a tuple, 2 for pairs
 
   def predict(self, pairs):

@@ -81,6 +81,11 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  classes_ : `list`
+      The possible labels of the pairs `SDML` can fit on. `classes_ = [-1, 1]`,
+      where -1 means points in a pair are dissimilar (negative label), and 1
+      means they are similar (positive label).
   """
 
   def fit(self, pairs, y):
