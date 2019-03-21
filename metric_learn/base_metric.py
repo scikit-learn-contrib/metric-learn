@@ -304,9 +304,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
       classified as dissimilar.
 
   classes_ : `list`
-      The possible labels of the pairs `MMC` can fit on. `classes_ = [-1, 1]`,
-      where -1 means points in a pair are dissimilar (negative label), and 1
-      means they are similar (positive label).
+      The possible labels of the pairs the metric learner can fit on.
+      `classes_ = [-1, 1]`, where -1 means points in a pair are dissimilar
+      (negative label), and 1 means they are similar (positive label).
   """
 
   classes_ = [-1, 1]
@@ -338,9 +338,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
     """Returns the decision function used to classify the pairs.
 
     Returns the opposite of the learned metric value between samples in every
-    pair. Hence it should ideally be low for dissimilar samples and high for
-    similar samples. This is the decision function that is used to classify
-    pairs as similar (+1), or dissimilar (-1).
+    pair, to be consistent with scikit-learn conventions. Hence it should
+    ideally be low for dissimilar samples and high for similar samples.
+    This is the decision function that is used to classify pairs as similar
+    (+1), or dissimilar (-1).
 
     Parameters
     ----------
@@ -401,17 +402,17 @@ class _PairsClassifierMixin(BaseMetricLearner):
     self.threshold_ = np.mean([similar_threshold, dissimilar_threshold])
 
   def set_threshold(self, threshold):
-    """Sets the threshold of the metric learner to the given value `threshold
+    """Sets the threshold of the metric learner to the given value `threshold`.
 
     See more in the :ref:`User Guide <calibration>`.
 
     Parameters
     ----------
     threshold : float
-      The threshold value we want to set. It's a distance metric with
-      respect to which the predicted distance metric for test pairs will be
-      compared to. If they are superior to the threshold they will be
-      classified as similar (+1), and dissimilar (-1) if not.
+      The threshold value we want to set. It is the value to which the
+      predicted distance for test pairs will be compared. If they are superior
+      to the threshold they will be classified as similar (+1),
+      and dissimilar (-1) if not.
 
     Returns
     -------
@@ -422,50 +423,51 @@ class _PairsClassifierMixin(BaseMetricLearner):
     return self
 
   def calibrate_threshold(self, pairs_valid, y_valid, strategy='accuracy',
-                          threshold=None, beta=None):
-    """Decision threshold calibration for binary classification
+                          min_rate=None, beta=1.):
+    """Decision threshold calibration for pairwise binary classification
 
     Method that calibrates the decision threshold (cutoff point) of the metric
     learner. This threshold will then be used when calling the method
     `predict`. The methods for picking cutoff points make use of traditional
     binary classification evaluation statistics such as the true positive and
     true negative rates and F-scores. The threshold will be found to maximize
-    the chosen score on the validation set `(pairs_valid, y_valid)`.
+    the chosen score on the validation set ``(pairs_valid, y_valid)``.
 
     See more in the :ref:`User Guide <calibration>`.
 
     Parameters
     ----------
-    strategy : str, optional (default='roc')
-      The strategy to use for choosing the cutoff point
+    strategy : str, optional (default='accuracy')
+      The strategy to use for choosing the cutoff threshold.
 
       'accuracy'
-          selects a decision threshold that maximizes the accuracy
+          Selects a decision threshold that maximizes the accuracy.
       'f_beta'
-          selects a decision threshold that maximizes the f_beta score
+          Selects a decision threshold that maximizes the f_beta score,
+          with beta given by the parameter `beta`.
       'max_tpr'
-          selects the point that yields the highest true positive rate with
-          true negative rate at least equal to the value of the parameter
-          threshold
+          Selects a decision threshold that yields the highest true positive
+          rate with true negative rate at least equal to the value of the
+          parameter `min_rate`.
       'max_tnr'
-          selects the point that yields the highest true negative rate with
-          true positive rate at least equal to the value of the parameter
-          threshold
+          Selects a decision threshold that yields the highest true negative
+          rate with true positive rate at least equal to the value of the
+          parameter `min_rate`.
 
     beta : float in [0, 1], optional (default=None)
-      beta value to be used in case strategy == 'f_beta'
+      Beta value to be used in case strategy == 'f_beta'.
 
-    threshold : float in [0, 1] or None, (default=None)
+    min_rate : float in [0, 1] or None, (default=None)
       In case strategy is 'max_tpr' or 'max_tnr' this parameter must be set
-      to specify the threshold for the true negative rate or true positive
-      rate respectively that needs to be achieved
+      to specify the minimal value for the true negative rate or true positive
+      rate respectively that needs to be achieved.
 
     pairs_valid : array-like, shape=(n_pairs_valid, 2, n_features)
       The validation set of pairs to use to set the threshold.
 
     y_valid : array-like, shape=(n_pairs_valid,)
       The labels of the pairs of the validation set to use to set the
-      threshold.
+      threshold. They must be +1 for positive pairs and -1 for negative pairs.
 
     References
     ----------
@@ -487,11 +489,11 @@ class _PairsClassifierMixin(BaseMetricLearner):
                        .format(strategy))
 
     if strategy == 'max_tpr' or strategy == 'max_tnr':
-      if (threshold is None or not isinstance(threshold, (int, float)) or
-          not threshold >= 0 or not threshold <= 1):
-        raise ValueError('Parameter threshold must be a number in'
+      if (min_rate is None or not isinstance(min_rate, (int, float)) or
+              not min_rate >= 0 or not min_rate <= 1):
+        raise ValueError('Parameter min_rate must be a number in'
                          '[0, 1]. '
-                         'Got {} instead.'.format(threshold))
+                         'Got {} instead.'.format(min_rate))
 
     if strategy == 'f_beta':
       if beta is None or not isinstance(beta, (int, float)):
@@ -514,9 +516,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
       cum_tn_inverted = stable_cumsum(y_ordered[::-1] == -1)
       cum_tn = np.concatenate([[0], cum_tn_inverted[:-1]])[::-1]
       cum_accuracy = (cum_tp + cum_tn) / n_samples
-      max_i = np.argmax(cum_accuracy)
+      imax = np.argmax(cum_accuracy)
       # note: we want a positive threshold (distance), so we take - threshold
-      self.threshold_ = - scores_sorted[max_i]
+      self.threshold_ = - scores_sorted[imax]
       return self
 
     if strategy == 'f_beta':
@@ -527,6 +529,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
                   (beta**2 * precision + recall))
       f_beta[np.isnan(f_beta)] = 0.
       imax = np.argmax(f_beta)
+      # note: we want a positive threshold (distance), so we take - threshold
       self.threshold_ = - thresholds[imax]
       return self
 
@@ -536,13 +539,13 @@ class _PairsClassifierMixin(BaseMetricLearner):
     fpr, tpr, thresholds = fpr, tpr, thresholds
 
     if strategy == 'max_tpr':
-      indices = np.where(1 - fpr >= threshold)[0]
+      indices = np.where(1 - fpr >= min_rate)[0]
       max_tpr_index = np.argmax(tpr[indices])
       # note: we want a positive threshold (distance), so we take - threshold
       self.threshold_ = - thresholds[indices[max_tpr_index]]
 
     if strategy == 'max_tnr':
-      indices = np.where(tpr >= threshold)[0]
+      indices = np.where(tpr >= min_rate)[0]
       max_tnr_index = np.argmax(1 - fpr[indices])
       # note: we want a positive threshold (distance), so we take - threshold
       self.threshold_ = - thresholds[indices[max_tnr_index]]

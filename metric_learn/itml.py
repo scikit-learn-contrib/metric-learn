@@ -155,7 +155,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
       classified as dissimilar.
 
   classes_ : `list`
-      The possible labels of the pairs `LSML` can fit on. `classes_ = [-1, 1]`,
+      The possible labels of the pairs `ITML` can fit on. `classes_ = [-1, 1]`,
       where -1 means points in a pair are dissimilar (negative label), and 1
       means they are similar (positive label).
   """

@@ -172,13 +172,12 @@ thresholding.
   of the estimator, the threshold is set with the method
   `set_default_threshold` on the trainset.
 
-- **manual**: calling `set_threshold`, the user can
-  manually set the threshold to a particular value.
+- **manual**: calling `set_threshold` will set the threshold to a
+  particular value.
 
-- **calibrated**: calling `calibrate_threshold`, the user can
-  calibrate the threshold to achieve a particular score on a validation set,
-  the score being among the classical scores for classification (accuracy, f1
-  score...).
+- **calibrated**: calling `calibrate_threshold` will calibrate the threshold to
+  achieve a particular score on a validation set, the score being among the
+  classical scores for classification (accuracy, f1 score...).
 
 
 See also: `sklearn.calibration`.
