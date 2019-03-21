@@ -143,7 +143,7 @@ metric_learners = tuples_learners + supervised_learners
 ids_metric_learners = ids_tuples_learners + ids_supervised_learners
 
 
-def make_args_inc_quadruplets(estimator, X, y):
+def remove_y_quadruplets(estimator, X, y):
   """Quadruplets learners have no y in fit, but to write test for all
   estimators, it is convenient to have this function, that will return X and y
   if the estimator needs a y to fit on, and just X otherwise."""
@@ -856,7 +856,7 @@ def test_error_message_tuple_size(estimator):
                             [[1.9, 5.3], [1., 7.8], [3.2, 1.2]]])
   y = [1, 1]
   with pytest.raises(ValueError) as raised_err:
-    estimator.fit(*make_args_inc_quadruplets(estimator, invalid_pairs, y))
+    estimator.fit(*remove_y_quadruplets(estimator, invalid_pairs, y))
   expected_msg = ("Tuples of {} element(s) expected{}. Got tuples of 3 "
                   "element(s) instead (shape=(2, 3, 2)):\ninput={}.\n"
                   .format(estimator._tuple_size, make_context(estimator),
@@ -941,25 +941,25 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)
   estimator_with_preprocessor.set_params(preprocessor=X)
-  estimator_with_preprocessor.fit(*make_args_inc_quadruplets(estimator,
-                                                             indices_train,
-                                                             y_train),
+  estimator_with_preprocessor.fit(*remove_y_quadruplets(estimator,
+                                                        indices_train,
+                                                        y_train),
                                   **make_random_state(estimator))
 
   estimator_without_preprocessor = clone(estimator)
   set_random_state(estimator_without_preprocessor)
   estimator_without_preprocessor.set_params(preprocessor=None)
-  estimator_without_preprocessor.fit(*make_args_inc_quadruplets(estimator,
-                                                                formed_train,
-                                                                y_train),
+  estimator_without_preprocessor.fit(*remove_y_quadruplets(estimator,
+                                                           formed_train,
+                                                           y_train),
                                      **make_random_state(estimator))
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=X)
-  estimator_with_prep_formed.fit(*make_args_inc_quadruplets(estimator,
-                                                            indices_train,
-                                                            y_train),
+  estimator_with_prep_formed.fit(*remove_y_quadruplets(estimator,
+                                                       indices_train,
+                                                       y_train),
                                  **make_random_state(estimator))
 
   # test prediction methods

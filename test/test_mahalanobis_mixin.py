@@ -12,7 +12,7 @@ from sklearn.utils.testing import set_random_state
 from metric_learn._util import make_context
 
 from test.test_utils import (ids_metric_learners, metric_learners,
-                             make_args_inc_quadruplets)
+                             remove_y_quadruplets)
 
 RNG = check_random_state(0)
 
@@ -26,7 +26,7 @@ def test_score_pairs_pairwise(estimator, build_dataset):
   X = X[:n_samples]
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
 
   pairwise = model.score_pairs(np.array(list(product(X, X))))\
       .reshape(n_samples, n_samples)
@@ -50,7 +50,7 @@ def test_score_pairs_toy_example(estimator, build_dataset):
     X = X[:n_samples]
     model = clone(estimator)
     set_random_state(model)
-    model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+    model.fit(*remove_y_quadruplets(estimator, input_data, labels))
     pairs = np.stack([X[:10], X[10:20]], axis=1)
     embedded_pairs = pairs.dot(model.transformer_.T)
     distances = np.sqrt(np.sum((embedded_pairs[:, 1] -
@@ -66,7 +66,7 @@ def test_score_pairs_finite(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   pairs = np.array(list(product(X, X)))
   assert np.isfinite(model.score_pairs(pairs)).all()
 
@@ -80,7 +80,7 @@ def test_score_pairs_dim(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   tuples = np.array(list(product(X, X)))
   assert model.score_pairs(tuples).shape == (tuples.shape[0],)
   context = make_context(estimator)
@@ -111,7 +111,7 @@ def test_embed_toy_example(estimator, build_dataset):
     X = X[:n_samples]
     model = clone(estimator)
     set_random_state(model)
-    model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+    model.fit(*remove_y_quadruplets(estimator, input_data, labels))
     embedded_points = X.dot(model.transformer_.T)
     assert_array_almost_equal(model.transform(X), embedded_points)
 
@@ -123,7 +123,7 @@ def test_embed_dim(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   assert model.transform(X).shape == X.shape
 
   # assert that ValueError is thrown if input shape is 1D
@@ -140,7 +140,7 @@ def test_embed_dim(estimator, build_dataset):
     #  avoid this enumeration and rather test if hasattr n_components
     #  as soon as we have made the arguments names as such (issue #167)
     model.set_params(num_dims=2)
-    model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+    model.fit(*remove_y_quadruplets(estimator, input_data, labels))
     assert model.transform(X).shape == (X.shape[0], 2)
     # assert that ValueError is thrown if input shape is 1D
     with pytest.raises(ValueError) as raised_error:
@@ -155,7 +155,7 @@ def test_embed_finite(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   assert np.isfinite(model.transform(X)).all()
 
 
@@ -166,7 +166,7 @@ def test_embed_is_linear(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   assert_array_almost_equal(model.transform(X[:10] + X[10:20]),
                             model.transform(X[:10]) +
                             model.transform(X[10:20]))
@@ -185,7 +185,7 @@ def test_get_metric_equivalent_to_explicit_mahalanobis(estimator,
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   metric = model.get_metric()
   n_features = X.shape[1]
   a, b = (rng.randn(n_features), rng.randn(n_features))
@@ -204,7 +204,7 @@ def test_get_metric_is_pseudo_metric(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   metric = model.get_metric()
 
   n_features = X.shape[1]
@@ -230,7 +230,7 @@ def test_metric_raises_deprecation_warning(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
 
   with pytest.warns(DeprecationWarning) as raised_warning:
     model.metric()
@@ -247,7 +247,7 @@ def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   clustering = DBSCAN(metric=model.get_metric())
   clustering.fit(X)
 
@@ -260,7 +260,7 @@ def test_get_squared_metric(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   metric = model.get_metric()
 
   n_features = X.shape[1]
@@ -280,10 +280,10 @@ def test_transformer_is_2D(estimator, build_dataset):
   model = clone(estimator)
   set_random_state(model)
   # test that it works for X.shape[1] features
-  model.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
   assert model.transformer_.shape == (X.shape[1], X.shape[1])
 
   # test that it works for 1 feature
   trunc_data = input_data[..., :1]
-  model.fit(*make_args_inc_quadruplets(estimator, trunc_data, labels))
+  model.fit(*remove_y_quadruplets(estimator, trunc_data, labels))
   assert model.transformer_.shape == (1, 1)  # the transformer must be 2D

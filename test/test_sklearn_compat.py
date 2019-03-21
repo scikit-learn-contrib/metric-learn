@@ -20,7 +20,7 @@ from sklearn.utils.testing import _get_args
 from test.test_utils import (metric_learners, ids_metric_learners,
                              mock_preprocessor, tuples_learners,
                              ids_tuples_learners, pairs_learners,
-                             ids_pairs_learners, make_args_inc_quadruplets,
+                             ids_pairs_learners, remove_y_quadruplets,
                              quadruplets_learners)
 
 
@@ -140,13 +140,13 @@ def test_cross_validation_is_finite(estimator, build_dataset):
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   assert np.isfinite(cross_val_score(estimator,
-                                     *make_args_inc_quadruplets(estimator,
-                                                                input_data,
-                                                                labels))).all()
+                                     *remove_y_quadruplets(estimator,
+                                                           input_data,
+                                                           labels))).all()
   assert np.isfinite(cross_val_predict(estimator,
-                                       *make_args_inc_quadruplets(estimator,
-                                                                  input_data,
-                                                                  labels)
+                                       *remove_y_quadruplets(estimator,
+                                                             input_data,
+                                                             labels)
                                        )).all()
 
 
@@ -178,25 +178,28 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
       train_mask = np.ones(input_data.shape[0], bool)
       train_mask[test_slice] = False
       y_train, y_test = labels[train_mask], labels[test_slice]
-      estimator.fit(*make_args_inc_quadruplets(estimator,
-                                               input_data[train_mask],
-                                               y_train))
+      estimator.fit(*remove_y_quadruplets(estimator,
+                                          input_data[train_mask],
+                                          y_train))
       if hasattr(estimator, "score"):
-        scores.append(estimator.score(*make_args_inc_quadruplets(estimator,
-          input_data[test_slice], y_test)))
+        scores.append(estimator.score(*remove_y_quadruplets(
+            estimator, input_data[test_slice], y_test)))
       if hasattr(estimator, "predict"):
         predictions[test_slice] = estimator.predict(input_data[test_slice])
     if hasattr(estimator, "score"):
-      assert all(scores == cross_val_score(estimator,
-        *make_args_inc_quadruplets(estimator, input_data, labels), cv=kfold))
+      assert all(scores == cross_val_score(
+          estimator, *remove_y_quadruplets(estimator, input_data, labels),
+          cv=kfold))
     if hasattr(estimator, "predict"):
-      assert all(predictions == cross_val_predict(estimator,
-        *make_args_inc_quadruplets(estimator, input_data, labels), cv=kfold))
+      assert all(predictions == cross_val_predict(
+          estimator,
+          *remove_y_quadruplets(estimator, input_data, labels),
+          cv=kfold))
 
 
 def check_score(estimator, tuples, y):
   if hasattr(estimator, "score"):
-    score = estimator.score(*make_args_inc_quadruplets(estimator, tuples, y))
+    score = estimator.score(*remove_y_quadruplets(estimator, tuples, y))
     assert np.isfinite(score)
 
 
@@ -220,7 +223,7 @@ def test_simple_estimator(estimator, build_dataset, with_preprocessor):
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
 
-    estimator.fit(*make_args_inc_quadruplets(estimator, tuples_train, y_train))
+    estimator.fit(*remove_y_quadruplets(estimator, tuples_train, y_train))
     check_score(estimator, tuples_test, y_test)
     check_predict(estimator, tuples_test)
 
@@ -267,9 +270,9 @@ def test_estimators_fit_returns_self(estimator, build_dataset,
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
-  assert estimator.fit(*make_args_inc_quadruplets(estimator,
-                                                  input_data,
-                                                  labels)) is estimator
+  assert estimator.fit(*remove_y_quadruplets(estimator,
+                                             input_data,
+                                             labels)) is estimator
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -299,18 +302,18 @@ def test_pipeline_consistency(estimator, build_dataset,
     estimator = clone(estimator)
     estimator.set_params(preprocessor=preprocessor)
     pipeline = make_pipeline(estimator)
-    estimator.fit(*make_args_inc_quadruplets(estimator, input_data, y),
+    estimator.fit(*remove_y_quadruplets(estimator, input_data, y),
                   **make_random_state(estimator, False))
-    pipeline.fit(*make_args_inc_quadruplets(estimator, input_data, y),
+    pipeline.fit(*remove_y_quadruplets(estimator, input_data, y),
                  **make_random_state(estimator, True))
 
     if hasattr(estimator, 'score'):
-      result = estimator.score(*make_args_inc_quadruplets(estimator,
-                                                          input_data,
-                                                          y))
-      result_pipe = pipeline.score(*make_args_inc_quadruplets(estimator,
-                                                              input_data,
-                                                              y))
+      result = estimator.score(*remove_y_quadruplets(estimator,
+                                                     input_data,
+                                                     y))
+      result_pipe = pipeline.score(*remove_y_quadruplets(estimator,
+                                                         input_data,
+                                                         y))
       assert_allclose_dense_sparse(result, result_pipe)
 
     if hasattr(estimator, 'predict'):
@@ -336,7 +339,7 @@ def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
   estimator.set_params(preprocessor=preprocessor)
   if hasattr(estimator, "num_dims"):
     estimator.num_dims = 1
-  estimator.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  estimator.fit(*remove_y_quadruplets(estimator, input_data, labels))
 
   def check_dict():
     assert estimator.__dict__ == dict_before, (
@@ -367,7 +370,7 @@ def test_dont_overwrite_parameters(estimator, build_dataset,
     estimator.num_dims = 1
   dict_before_fit = estimator.__dict__.copy()
 
-  estimator.fit(*make_args_inc_quadruplets(estimator, input_data, labels))
+  estimator.fit(*remove_y_quadruplets(estimator, input_data, labels))
   dict_after_fit = estimator.__dict__
 
   public_keys_after_fit = [key for key in dict_after_fit.keys()
