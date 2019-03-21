@@ -231,7 +231,7 @@ def test_found_score_is_best_score(kwargs, scoring):
                          [({'strategy': 'max_tpr', 'min_rate': t},
                            partial(tpr_threshold, tnr_threshold=t))
                           for t in [0., 0.1, 0.5, 0.8, 1.]] +
-                         [({'strategy': 'max_tnr', 'threshold': t},
+                         [({'strategy': 'max_tnr', 'min_rate': t},
                            partial(tnr_threshold, tpr_threshold=t))
                           for t in [0., 0.1, 0.5, 0.8, 1.]]
                          )
