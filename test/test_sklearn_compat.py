@@ -1,6 +1,5 @@
 import pytest
 import unittest
-from sklearn.calibration import CalibratedClassifierCV
 from sklearn.utils.estimator_checks import check_estimator
 from sklearn.base import TransformerMixin
 from sklearn.pipeline import make_pipeline
@@ -90,31 +89,6 @@ RNG = check_random_state(0)
 
 
 # ---------------------- Test scikit-learn compatibility ----------------------
-
-
-@pytest.mark.parametrize('with_preprocessor',
-                         [True,
-                          # TODO: uncomment the below line as soon as
-                          # https://github.com/scikit-learn/scikit-learn/
-                          # issues/13077 is solved:
-                          # False,
-                          ])
-@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
-                         ids=ids_pairs_learners)
-def test_calibrated_classifier_CV(estimator, build_dataset,
-                                  with_preprocessor):
-  """Tests that metric-learn tuples estimators' work with scikit-learn's
-  CalibratedClassifierCV.
-  """
-  input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
-  estimator = clone(estimator)
-  estimator.set_params(preprocessor=preprocessor)
-  set_random_state(estimator)
-  calibrated_clf = CalibratedClassifierCV(estimator)
-
-  # test fit and predict_proba
-  calibrated_clf.fit(input_data, labels)
-  calibrated_clf.predict_proba(input_data)
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
