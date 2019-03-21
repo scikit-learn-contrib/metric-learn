@@ -73,6 +73,29 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
     estimator.predict(input_data)
 
 
+@pytest.mark.parametrize('threshold_param',
+                         [None, {}, dict(), {'strategy': 'accuracy'}] +
+                         [{'strategy': strategy, 'min_rate': min_rate}
+                          for (strategy, min_rate) in product(
+                              ['max_tpr', 'max_tnr'], [0., 0.2, 0.8, 1.])] +
+                         [{'strategy': 'f_beta', 'beta': beta}
+                          for beta in [0., 0.1, 0.2, 1., 5.]]
+                         )
+@pytest.mark.parametrize('with_preprocessor', [True, False])
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
+                         ids=ids_pairs_learners)
+def test_fit_with_valid_threshold_params(estimator, build_dataset,
+                                         with_preprocessor, threshold_param):
+  """Tests that fitting `threshold_params` with appropriate parameters works
+  as expected"""
+  pairs, y, preprocessor, _ = build_dataset(with_preprocessor)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  estimator.fit(pairs, y, threshold_params=threshold_param)
+  estimator.predict(pairs)
+
+
 @pytest.mark.parametrize('kwargs',
                          [{'strategy': 'accuracy'}] +
                          [{'strategy': strategy, 'min_rate': min_rate}
@@ -84,9 +107,9 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
 @pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
                          ids=ids_pairs_learners)
-def test_min_rate_different_scores_is_finite(estimator, build_dataset,
-                                             with_preprocessor, kwargs):
-  # test that the score returned is finite for every metric learner
+def test_threshold_different_scores_is_finite(estimator, build_dataset,
+                                              with_preprocessor, kwargs):
+  # test that calibrating the threshold works for every metric learner
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
