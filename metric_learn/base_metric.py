@@ -504,9 +504,15 @@ class _PairsClassifierMixin(BaseMetricLearner):
     if strategy == 'f_beta':
       precision, recall, thresholds = precision_recall_curve(
           y_valid, self.decision_function(pairs_valid), pos_label=1)
+      # We ignore the warnings here, in the same taste as
+      # https://github.com/scikit-learn/scikit-learn/blob/62d205980446a1abc1065
+      # f4332fd74eee57fcf73/sklearn/metrics/classification.py#L1284
       with np.errstate(divide='ignore', invalid='ignore'):
         f_beta = ((1 + beta**2) * (precision * recall) /
                   (beta**2 * precision + recall))
+      # We need to set nans to zero otherwise they will be considered higher
+      # than the others (also discussed in https://github.com/scikit-learn/
+      # scikit-learn/pull/10117/files#r262115773)
       f_beta[np.isnan(f_beta)] = 0.
       imax = np.argmax(f_beta)
       # note: we want a positive threshold (distance), so we take - threshold
