@@ -168,16 +168,20 @@ learned space) than this threshold are predicted as similar, and points further
 away are predicted as dissimilar. Several methods are possible for this
 thresholding.
 
-- **default**: Unless explicitely stated in the `fit` method documentation
-  of the estimator, the threshold is set with the method
-  `set_default_threshold` on the trainset.
+- **At fit time**: The threshold is set with `calibrate_threshold` (see
+  below) on the trainset. You can specify the calibration parameters directly
+  in the `fit` method with the `threshold_params` parameter (see the
+  documentation of the `fit` method of any metric learner that learns on pairs
+  of points for more information). This method can cause a little bit of
+  overfitting. If you want to avoid that, calibrate the threshold after
+  fitting, on a validation set.
 
-- **manual**: calling `set_threshold` will set the threshold to a
+- **Manual**: calling `set_threshold` will set the threshold to a
   particular value.
 
-- **calibrated**: calling `calibrate_threshold` will calibrate the threshold to
-  achieve a particular score on a validation set, the score being among the
-  classical scores for classification (accuracy, f1 score...).
+- **Calibration**: calling `calibrate_threshold` will calibrate the
+  threshold to achieve a particular score on a validation set, the score
+  being among the classical scores for classification (accuracy, f1 score...).
 
 
 See also: `sklearn.calibration`.
