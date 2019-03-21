@@ -18,10 +18,9 @@ before_install:
     then pip install pytest-cov;
     fi
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]];
-    then pytest test --cov;
-    else pytest test;
-    fi
+  # we do coverage for all versions so that codecov will merge them: this
+  # way we will see that both paths (with or without skggm) are tested
+  - pytest test --cov;
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
