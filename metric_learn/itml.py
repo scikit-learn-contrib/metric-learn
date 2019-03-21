@@ -155,8 +155,11 @@ class ITML(_BaseITML, _PairsClassifierMixin):
       classified as dissimilar.
   """
 
-  def fit(self, pairs, y, bounds=None):
+  def fit(self, pairs, y, bounds=None, threshold_params=None):
     """Learn the ITML model.
+
+    The threshold will be calibrated on the trainset using the parameters
+    `threshold_params`.
 
     Parameters
     ----------
@@ -175,6 +178,10 @@ class ITML(_BaseITML, _PairsClassifierMixin):
         If not provided at initialization, bounds_[0] and bounds_[1] will be
         set to the 5th and 95th percentile of the pairwise distances among all
         points present in the input `pairs`.
+    threshold_params : `dict` or `None`
+        Dictionary of parameters to give to `calibrate_threshold` for the
+        threshold calibration step done at the end of `fit`. If `None` is
+        given, `calibrate_threshold` will use the default parameters.
 
     Returns
     -------
@@ -182,7 +189,9 @@ class ITML(_BaseITML, _PairsClassifierMixin):
         Returns the instance.
     """
     self._fit(pairs, y, bounds=bounds)
-    self.threshold_ = self.calibrate_threshold(pairs, y)
+    self.calibrate_threshold(pairs, y, **(threshold_params if
+                                          threshold_params is not None else
+                                          dict()))
     return self
 
 
