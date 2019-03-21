@@ -326,7 +326,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
       The predicted learned metric value between samples in every pair.
     """
     check_is_fitted(self, ['threshold_', 'transformer_'])
-    return 2 * (self.decision_function(pairs) >= - self.threshold_) - 1
+    return 2 * (- self.decision_function(pairs) <= self.threshold_) - 1
 
   def decision_function(self, pairs):
     """Returns the decision function used to classify the pairs.
