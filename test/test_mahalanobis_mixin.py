@@ -10,6 +10,8 @@ from sklearn.utils import check_random_state
 from sklearn.utils.testing import set_random_state
 
 from metric_learn._util import make_context
+from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
+                                      _PairsClassifierMixin)
 
 from test.test_utils import ids_metric_learners, metric_learners
 
@@ -96,7 +98,7 @@ def check_is_distance_matrix(pairwise):
   assert np.array_equal(pairwise, pairwise.T)  # symmetry
   assert (pairwise.diagonal() == 0).all()  # identity
   # triangular inequality
-  tol = 1e-15
+  tol = 1e-12
   assert (pairwise <= pairwise[:, :, np.newaxis] +
           pairwise[:, np.newaxis, :] + tol).all()
 
@@ -281,5 +283,19 @@ def test_transformer_is_2D(estimator, build_dataset):
 
   # test that it works for 1 feature
   trunc_data = input_data[..., :1]
+  # we drop duplicates that might have been formed, i.e. of the form
+  # aabc or abcc or aabb for quadruplets, and aa for pairs.
+  if isinstance(estimator, _QuadrupletsClassifierMixin):
+    for slice_idx in [slice(0, 2), slice(2, 4)]:
+      pairs = trunc_data[:, slice_idx, :]
+      diffs = pairs[:, 1, :] - pairs[:, 0, :]
+      to_keep = np.where(np.abs(diffs.ravel()) > 1e-9)
+      trunc_data = trunc_data[to_keep]
+      labels = labels[to_keep]
+  elif isinstance(estimator, _PairsClassifierMixin):
+    diffs = trunc_data[:, 1, :] - trunc_data[:, 0, :]
+    to_keep = np.where(np.abs(diffs.ravel()) > 1e-9)
+    trunc_data = trunc_data[to_keep]
+    labels = labels[to_keep]
   model.fit(trunc_data, labels)
   assert model.transformer_.shape == (1, 1)  # the transformer must be 2D

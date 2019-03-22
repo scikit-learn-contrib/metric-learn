@@ -10,10 +10,15 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
-
-from metric_learn import (
-    LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-    LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised, MMC_Supervised)
+try:
+  from inverse_covariance import quic
+except ImportError:
+  HAS_SKGGM = False
+else:
+  HAS_SKGGM = True
+from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+                          LSML_Supervised, ITML_Supervised, SDML_Supervised,
+                          RCA_Supervised, MMC_Supervised, SDML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
@@ -148,27 +153,236 @@ def test_no_twice_same_objective(capsys):
 
 
 class TestSDML(MetricTestCase):
+
+  @pytest.mark.skipif(HAS_SKGGM,
+                      reason="The warning can be thrown only if skggm is "
+                             "not installed.")
+  def test_sdml_supervised_raises_warning_msg_not_installed_skggm(self):
+    """Tests that the right warning message is raised if someone tries to
+    use SDML_Supervised but has not installed skggm, and that the algorithm
+    fails to converge"""
+    # TODO: remove if we don't need skggm anymore
+    # load_iris: dataset where we know scikit-learn's graphical lasso fails
+    # with a Floating Point error
+    X, y = load_iris(return_X_y=True)
+    sdml_supervised = SDML_Supervised(balance_param=0.5, use_cov=True,
+                                      sparsity_param=0.01)
+    msg = ("There was a problem in SDML when using scikit-learn's graphical "
+           "lasso solver. skggm's graphical lasso can sometimes converge on "
+           "non SPD cases where scikit-learn's graphical lasso fails to "
+           "converge. Try to install skggm and rerun the algorithm (see "
+           "the README.md for the right version of skggm). The following "
+           "error message was thrown:")
+    with pytest.raises(RuntimeError) as raised_error:
+      sdml_supervised.fit(X, y)
+    assert str(raised_error.value).startswith(msg)
+
+  @pytest.mark.skipif(HAS_SKGGM,
+                      reason="The warning can be thrown only if skggm is "
+                             "not installed.")
+  def test_sdml_raises_warning_msg_not_installed_skggm(self):
+    """Tests that the right warning message is raised if someone tries to
+    use SDML but has not installed skggm, and that the algorithm fails to
+    converge"""
+    # TODO: remove if we don't need skggm anymore
+    # case on which we know that scikit-learn's graphical lasso fails
+    # because it will return a non SPD matrix
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    sdml = SDML(use_cov=False, balance_param=100, verbose=True)
+
+    msg = ("There was a problem in SDML when using scikit-learn's graphical "
+           "lasso solver. skggm's graphical lasso can sometimes converge on "
+           "non SPD cases where scikit-learn's graphical lasso fails to "
+           "converge. Try to install skggm and rerun the algorithm (see "
+           "the README.md for the right version of skggm).")
+    with pytest.raises(RuntimeError) as raised_error:
+      sdml.fit(pairs, y_pairs)
+    assert msg == str(raised_error.value)
+
+  @pytest.mark.skipif(not HAS_SKGGM,
+                      reason="The warning can be thrown only if skggm is "
+                             "installed.")
+  def test_sdml_raises_warning_msg_installed_skggm(self):
+    """Tests that the right warning message is raised if someone tries to
+    use SDML but has not installed skggm, and that the algorithm fails to
+    converge"""
+    # TODO: remove if we don't need skggm anymore
+    # case on which we know that skggm's graphical lasso fails
+    # because it will return non finite values
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    sdml = SDML(use_cov=False, balance_param=100, verbose=True)
+
+    msg = ("There was a problem in SDML when using skggm's graphical "
+           "lasso solver.")
+    with pytest.raises(RuntimeError) as raised_error:
+      sdml.fit(pairs, y_pairs)
+    assert msg == str(raised_error.value)
+
+  @pytest.mark.skipif(not HAS_SKGGM,
+                      reason="The warning can be thrown only if skggm is "
+                             "installed.")
+  def test_sdml_supervised_raises_warning_msg_installed_skggm(self):
+    """Tests that the right warning message is raised if someone tries to
+    use SDML_Supervised but has not installed skggm, and that the algorithm
+    fails to converge"""
+    # TODO: remove if we don't need skggm anymore
+    # case on which we know that skggm's graphical lasso fails
+    # because it will return non finite values
+    rng = np.random.RandomState(42)
+    # This example will create a diagonal em_cov with a negative coeff (
+    # pathological case)
+    X = np.array([[-10., 0.], [10., 0.], [5., 0.], [3., 0.]])
+    y = [0, 0, 1, 1]
+    sdml_supervised = SDML_Supervised(balance_param=0.5, use_cov=False,
+                                      sparsity_param=0.01)
+    msg = ("There was a problem in SDML when using skggm's graphical "
+           "lasso solver.")
+    with pytest.raises(RuntimeError) as raised_error:
+      sdml_supervised.fit(X, y, random_state=rng)
+    assert msg == str(raised_error.value)
+
+  @pytest.mark.skipif(not HAS_SKGGM,
+                      reason="It's only in the case where skggm is installed"
+                             "that no warning should be thrown.")
+  def test_raises_no_warning_installed_skggm(self):
+    # otherwise we should be able to instantiate and fit SDML and it
+    # should raise no warning
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+    y_pairs = [1, -1]
+    X, y = make_classification(random_state=42)
+    with pytest.warns(None) as record:
+      sdml = SDML()
+      sdml.fit(pairs, y_pairs)
+    assert len(record) == 0
+    with pytest.warns(None) as record:
+      sdml = SDML_Supervised(use_cov=False, balance_param=1e-5)
+      sdml.fit(X, y)
+    assert len(record) == 0
+
   def test_iris(self):
     # Note: this is a flaky test, which fails for certain seeds.
     # TODO: un-flake it!
     rs = np.random.RandomState(5555)
 
-    sdml = SDML_Supervised(num_constraints=1500)
+    sdml = SDML_Supervised(num_constraints=1500, use_cov=False,
+                           balance_param=5e-5)
     sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
-    csep = class_separation(sdml.transform(self.iris_points), self.iris_labels)
-    self.assertLess(csep, 0.25)
+    csep = class_separation(sdml.transform(self.iris_points),
+                            self.iris_labels)
+    self.assertLess(csep, 0.22)
 
   def test_deprecation_num_labeled(self):
     # test that a deprecation message is thrown if num_labeled is set at
     # initialization
     # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    sdml_supervised = SDML_Supervised(num_labeled=np.inf)
+    X, y = make_classification(random_state=42)
+    sdml_supervised = SDML_Supervised(num_labeled=np.inf, use_cov=False,
+                                      balance_param=5e-5)
     msg = ('"num_labeled" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
            'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, sdml_supervised.fit, X, y)
+
+  def test_sdml_raises_warning_non_psd(self):
+    """Tests that SDML raises a warning on a toy example where we know the
+    pseudo-covariance matrix is not PSD"""
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y = [1, -1]
+    sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
+    msg = ("Warning, the input matrix of graphical lasso is not "
+           "positive semi-definite (PSD). The algorithm may diverge, "
+           "and lead to degenerate solutions. "
+           "To prevent that, try to decrease the balance parameter "
+           "`balance_param` and/or to set use_covariance=False.")
+    with pytest.warns(ConvergenceWarning) as raised_warning:
+      try:
+        sdml.fit(pairs, y)
+      except Exception:
+        pass
+    # we assert that this warning is in one of the warning raised by the
+    # estimator
+    assert msg in list(map(lambda w: str(w.message), raised_warning))
+
+  def test_sdml_converges_if_psd(self):
+    """Tests that sdml converges on a simple problem where we know the
+    pseudo-covariance matrix is PSD"""
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+    y = [1, -1]
+    sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
+    sdml.fit(pairs, y)
+    assert np.isfinite(sdml.get_mahalanobis_matrix()).all()
+
+  @pytest.mark.skipif(not HAS_SKGGM,
+                      reason="sklearn's graphical_lasso can sometimes not "
+                             "work on some non SPD problems. We test that "
+                             "is works only if skggm is installed.")
+  def test_sdml_works_on_non_spd_pb_with_skggm(self):
+    """Test that SDML works on a certain non SPD problem on which we know
+    it should work, but scikit-learn's graphical_lasso does not work"""
+    X, y = load_iris(return_X_y=True)
+    sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
+                           use_cov=True)
+    sdml.fit(X, y)
+
+
+@pytest.mark.skipif(not HAS_SKGGM,
+                    reason='The message should be printed only if skggm is '
+                           'installed.')
+def test_verbose_has_installed_skggm_sdml(capsys):
+  # Test that if users have installed skggm, a message is printed telling them
+  # skggm's solver is used (when they use SDML)
+  # TODO: remove if we don't need skggm anymore
+  pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+  y_pairs = [1, -1]
+  sdml = SDML(verbose=True)
+  sdml.fit(pairs, y_pairs)
+  out, _ = capsys.readouterr()
+  assert "SDML will use skggm's graphical lasso solver." in out
+
+
+@pytest.mark.skipif(not HAS_SKGGM,
+                    reason='The message should be printed only if skggm is '
+                           'installed.')
+def test_verbose_has_installed_skggm_sdml_supervised(capsys):
+  # Test that if users have installed skggm, a message is printed telling them
+  # skggm's solver is used (when they use SDML_Supervised)
+  # TODO: remove if we don't need skggm anymore
+  X, y = make_classification(random_state=42)
+  sdml = SDML_Supervised(verbose=True)
+  sdml.fit(X, y)
+  out, _ = capsys.readouterr()
+  assert "SDML will use skggm's graphical lasso solver." in out
+
+
+@pytest.mark.skipif(HAS_SKGGM,
+                    reason='The message should be printed only if skggm is '
+                           'not installed.')
+def test_verbose_has_not_installed_skggm_sdml(capsys):
+  # Test that if users have installed skggm, a message is printed telling them
+  # skggm's solver is used (when they use SDML)
+  # TODO: remove if we don't need skggm anymore
+  pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
+  y_pairs = [1, -1]
+  sdml = SDML(verbose=True)
+  sdml.fit(pairs, y_pairs)
+  out, _ = capsys.readouterr()
+  assert "SDML will use scikit-learn's graphical lasso solver." in out
+
+
+@pytest.mark.skipif(HAS_SKGGM,
+                    reason='The message should be printed only if skggm is '
+                           'not installed.')
+def test_verbose_has_not_installed_skggm_sdml_supervised(capsys):
+  # Test that if users have installed skggm, a message is printed telling them
+  # skggm's solver is used (when they use SDML_Supervised)
+  # TODO: remove if we don't need skggm anymore
+  X, y = make_classification(random_state=42)
+  sdml = SDML_Supervised(verbose=True, balance_param=1e-5, use_cov=False)
+  sdml.fit(X, y)
+  out, _ = capsys.readouterr()
+  assert "SDML will use scikit-learn's graphical lasso solver." in out
 
 
 class TestNCA(MetricTestCase):

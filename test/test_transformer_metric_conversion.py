@@ -44,7 +44,8 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
   def test_sdml_supervised(self):
     seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500)
+    sdml = SDML_Supervised(num_constraints=1500, use_cov=False,
+                           balance_param=1e-5)
     sdml.fit(self.X, self.y, random_state=seed)
     L = sdml.transformer_
     assert_array_almost_equal(L.T.dot(L), sdml.get_mahalanobis_matrix())
