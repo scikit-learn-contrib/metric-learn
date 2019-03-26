@@ -330,3 +330,81 @@ def test_calibrate_threshold_valid_parameters(valid_args):
   with pytest.warns(None) as record:
     pairs_learner.calibrate_threshold(pairs, y, **valid_args)
   assert len(record) == 0
+
+
+def test_calibrate_threshold_extreme():
+  """Test that in the (rare) case where we should accept all points or
+  reject all points, this is effectively what
+  is done"""
+
+  class MockBadPairsClassifier(MahalanobisMixin, _PairsClassifierMixin):
+    """A pairs classifier that returns bad scores (i.e. in the inverse order
+    of what we would expect from a good pairs classifier
+    """
+
+    def fit(self, pairs, y, calibration_params=None):
+      self.transformer_ = 'not used'
+      self.calibrate_threshold(pairs, y, **(calibration_params if
+                                            calibration_params is not None else
+                                            dict()))
+      return self
+
+    def decision_function(self, pairs):
+      return np.arange(7)
+  rng = np.random.RandomState(42)
+  pairs = rng.randn(7, 2, 5)  # the info in X is not used, it's just for the
+  # API
+
+  y = [1, 1, 1, -1, -1, -1, -1]
+  mock_clf = MockBadPairsClassifier()
+  # case of bad scoring with more negative than positives. In
+  # this case, when:
+  # optimizing for accuracy we should reject all points
+  mock_clf.fit(pairs, y, calibration_params={'strategy': 'accuracy'})
+  assert (mock_clf.predict(pairs) == - np.ones(7)).all()
+
+  # optimizing for max_tpr we should accept all points if min_rate == 0. (
+  # because by convention then tnr=0/0=0)
+  mock_clf.fit(pairs, y, calibration_params={'strategy': 'max_tpr',
+                                             'min_rate': 0.})
+  assert (mock_clf.predict(pairs) == np.ones(7)).all()
+  # optimizing for max_tnr we should reject all points if min_rate = 0. (
+  # because by convention then tpr=0/0=0)
+  mock_clf.fit(pairs, y, calibration_params={'strategy': 'max_tnr',
+                                             'min_rate': 0.})
+  assert (mock_clf.predict(pairs) == - np.ones(7)).all()
+
+  y = [1, 1, 1, 1, -1, -1, -1]
+  # case of bad scoring with more positives than negatives. In
+  # this case, when:
+  # optimizing for accuracy we should accept all points
+  mock_clf.fit(pairs, y, calibration_params={'strategy': 'accuracy'})
+  assert (mock_clf.predict(pairs) == np.ones(7)).all()
+  # optimizing for max_tpr we should accept all points if min_rate == 0. (
+  # because by convention then tnr=0/0=0)
+  mock_clf.fit(pairs, y, calibration_params={'strategy': 'max_tpr',
+                                             'min_rate': 0.})
+  assert (mock_clf.predict(pairs) == np.ones(7)).all()
+  # optimizing for max_tnr we should reject all points if min_rate = 0. (
+  # because by convention then tpr=0/0=0)
+  mock_clf.fit(pairs, y, calibration_params={'strategy': 'max_tnr',
+                                             'min_rate': 0.})
+  assert (mock_clf.predict(pairs) == - np.ones(7)).all()
+
+  # Note: we'll never find a case where we would reject all points for
+  # maximizing tpr (we can always accept more points), and accept all
+  # points for maximizing tnr (we can always reject more points)
+
+  # case of alternated scores: for optimizing the f_1 score we should accept
+  # all points (because this way we have max recall (1) and max precision (
+  # here: 0.5))
+  y = [1, -1, 1, -1, 1, -1]
+  mock_clf.fit(pairs, y, calibration_params={'strategy': 'f_beta',
+                                             'beta': 1.})
+  assert (mock_clf.predict(pairs) == - np.ones(7)).all()
+
+  # Note: for optimizing f_1 score, we will never find an optimal case where we
+  # reject all points because in this case we would have 0 precision (by
+  # convention, because it's 0/0), and 0 recall (and we could always decrease
+  # the threshold to increase the recall, and we couldn't do worse for
+  # precision so it would be better)
