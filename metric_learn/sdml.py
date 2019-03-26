@@ -88,11 +88,11 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
       classified as dissimilar.
   """
 
-  def fit(self, pairs, y, threshold_params=None):
+  def fit(self, pairs, y, calibration_params=None):
     """Learn the SDML model.
 
     The threshold will be calibrated on the trainset using the parameters
-    `threshold_params`.
+    `calibration_params`.
 
     Parameters
     ----------
@@ -103,7 +103,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
         preprocessor.
     y : array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
-    threshold_params : `dict` or `None`
+    calibration_params : `dict` or `None`
         Dictionary of parameters to give to `calibrate_threshold` for the
         threshold calibration step done at the end of `fit`. If `None` is
         given, `calibrate_threshold` will use the default parameters.
@@ -114,8 +114,8 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
         Returns the instance.
     """
     self._fit(pairs, y)
-    self.calibrate_threshold(pairs, y, **(threshold_params if
-                                          threshold_params is not None else
+    self.calibrate_threshold(pairs, y, **(calibration_params if
+                                          calibration_params is not None else
                                           dict()))
     return self
 
