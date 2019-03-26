@@ -92,7 +92,7 @@ def test_fit_with_valid_threshold_params(estimator, build_dataset,
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
-  estimator.fit(pairs, y, threshold_params=threshold_param)
+  estimator.fit(pairs, y, calibration_params=threshold_param)
   estimator.predict(pairs)
 
 
