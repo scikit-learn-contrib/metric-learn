@@ -295,7 +295,7 @@ class TestSDML(MetricTestCase):
            "positive semi-definite (PSD). The algorithm may diverge, "
            "and lead to degenerate solutions. "
            "To prevent that, try to decrease the balance parameter "
-           "`balance_param` and/or to set use_covariance=False.")
+           "`balance_param` and/or to set use_cov=False.")
     with pytest.warns(ConvergenceWarning) as raised_warning:
       try:
         sdml.fit(pairs, y)
