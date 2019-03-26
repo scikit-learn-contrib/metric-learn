@@ -73,7 +73,7 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
     estimator.predict(input_data)
 
 
-@pytest.mark.parametrize('threshold_param',
+@pytest.mark.parametrize('calibration_params',
                          [None, {}, dict(), {'strategy': 'accuracy'}] +
                          [{'strategy': strategy, 'min_rate': min_rate}
                           for (strategy, min_rate) in product(
@@ -85,14 +85,15 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
 @pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
                          ids=ids_pairs_learners)
 def test_fit_with_valid_threshold_params(estimator, build_dataset,
-                                         with_preprocessor, threshold_param):
-  """Tests that fitting `threshold_params` with appropriate parameters works
+                                         with_preprocessor,
+                                         calibration_params):
+  """Tests that fitting `calibration_params` with appropriate parameters works
   as expected"""
   pairs, y, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
-  estimator.fit(pairs, y, calibration_params=threshold_param)
+  estimator.fit(pairs, y, calibration_params=calibration_params)
   estimator.predict(pairs)
 
 
