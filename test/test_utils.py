@@ -105,8 +105,7 @@ pairs_learners = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be
                   # be solved
                   # TODO: remove this comment when #175 is solved
                   (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster
-                  (SDML(), build_pairs),
-                  ]
+                  (SDML(use_cov=False, balance_param=1e-5), build_pairs)]
 ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
                               [learner for (learner, _) in
                                pairs_learners]))
@@ -120,8 +119,8 @@ classifiers = [(Covariance(), build_classification),
                (LSML_Supervised(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
                (RCA_Supervised(num_chunks=10), build_classification),
-               (SDML_Supervised(), build_classification)
-               ]
+               (SDML_Supervised(use_cov=False, balance_param=1e-5),
+               build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
@@ -845,9 +844,9 @@ def test_error_message_check_preprocessor(preprocessor):
                           "or a callable.".format(type(preprocessor)))
 
 
-@pytest.mark.parametrize('estimator', [e for (e, _) in tuples_learners],
+@pytest.mark.parametrize('estimator, _', tuples_learners,
                          ids=ids_tuples_learners)
-def test_error_message_tuple_size(estimator):
+def test_error_message_tuple_size(estimator, _):
   """Tests that if a tuples learner is not given the good number of points
   per tuple, it throws an error message"""
   estimator = clone(estimator)
