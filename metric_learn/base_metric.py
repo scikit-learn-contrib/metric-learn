@@ -1,7 +1,8 @@
 from sklearn.base import BaseEstimator
+from sklearn.metrics.ranking import _binary_clf_curve
 from sklearn.utils.extmath import stable_cumsum
 from sklearn.utils.validation import _is_arraylike, check_is_fitted
-from sklearn.metrics import roc_auc_score, precision_recall_curve, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
@@ -490,20 +491,39 @@ class _PairsClassifierMixin(BaseMetricLearner):
       scores_sorted = scores[scores_sorted_idces]
       # true labels ordered by decision_function value: (higher first)
       y_ordered = y_valid[scores_sorted_idces]
+      # we need to add a threshold that will reject all points
+      scores_sorted = np.concatenate([[scores_sorted[0] + 1], scores_sorted])
+
       # finds the threshold that maximizes the accuracy:
       cum_tp = stable_cumsum(y_ordered == 1)  # cumulative number of true
       # positives
+      # we need to add the point where all samples are rejected:
+      cum_tp = np.concatenate([[0.], cum_tp])
       cum_tn_inverted = stable_cumsum(y_ordered[::-1] == -1)
-      cum_tn = np.concatenate([[0], cum_tn_inverted[:-1]])[::-1]
+      cum_tn = np.concatenate([[0.], cum_tn_inverted])[::-1]
       cum_accuracy = (cum_tp + cum_tn) / n_samples
       imax = np.argmax(cum_accuracy)
       # note: we want a positive threshold (distance), so we take - threshold
-      self.threshold_ = - scores_sorted[imax]
+      if imax == len(scores_sorted):  # if the best is to accept all points
+        # we set the threshold to (minus) [the lowest score - 1]
+        self.threshold_ = - (scores_sorted[imax] - 1)
+      else:
+        # otherwise, we set the threshold to the mean between the lowest
+        # accepted score and the highest accepted score
+        self.threshold_ = - np.mean(scores_sorted[imax: imax + 2])
+      # note: if the best is to reject all points it's already one of the
+      # thresholds (scores_sorted[0] + 1)
       return self
 
     if strategy == 'f_beta':
-      precision, recall, thresholds = precision_recall_curve(
+      fps, tps, thresholds = _binary_clf_curve(
           y_valid, self.decision_function(pairs_valid), pos_label=1)
+
+      precision = tps / (tps + fps)
+      precision[np.isnan(precision)] = 0
+      recall = tps / tps[-1]
+
+      # here the thresholds are decreasing
       # We ignore the warnings here, in the same taste as
       # https://github.com/scikit-learn/scikit-learn/blob/62d205980446a1abc1065
       # f4332fd74eee57fcf73/sklearn/metrics/classification.py#L1284
@@ -516,26 +536,45 @@ class _PairsClassifierMixin(BaseMetricLearner):
       f_beta[np.isnan(f_beta)] = 0.
       imax = np.argmax(f_beta)
       # note: we want a positive threshold (distance), so we take - threshold
-      self.threshold_ = - thresholds[imax]
+      if imax == len(thresholds):  # the best is to accept all points
+        # we set the threshold to (minus) [the lowest score - 1]
+        self.threshold_ = - (thresholds[imax] - 1)
+      else:
+        # otherwise, we set the threshold to the mean between the lowest
+        # accepted score and the highest rejected score
+        self.threshold_ = - np.mean(thresholds[imax: imax + 2])
+      # Note: we don't need to deal with rejecting all points (i.e. threshold =
+      # max_scores + 1), since this can never happen to be optimal
+      # (see a more detailed discussion in test_calibrate_threshold_extreme)
       return self
 
     fpr, tpr, thresholds = roc_curve(y_valid,
                                      self.decision_function(pairs_valid),
-                                     pos_label=1)
+                                     pos_label=1, drop_intermediate=False)
+    # here the thresholds are decreasing
     fpr, tpr, thresholds = fpr, tpr, thresholds
 
-    if strategy == 'max_tpr':
-      indices = np.where(1 - fpr >= min_rate)[0]
-      max_tpr_index = np.argmax(tpr[indices])
-      # note: we want a positive threshold (distance), so we take - threshold
-      self.threshold_ = - thresholds[indices[max_tpr_index]]
+    if strategy in ['max_tpr', 'max_tnr']:
+      if strategy == 'max_tpr':
+        indices = np.where(1 - fpr >= min_rate)[0]
+        imax = np.argmax(tpr[indices])
 
-    if strategy == 'max_tnr':
-      indices = np.where(tpr >= min_rate)[0]
-      max_tnr_index = np.argmax(1 - fpr[indices])
+      if strategy == 'max_tnr':
+        indices = np.where(tpr >= min_rate)[0]
+        imax = np.argmax(1 - fpr[indices])
+
+      imax_valid = indices[imax]
       # note: we want a positive threshold (distance), so we take - threshold
-      self.threshold_ = - thresholds[indices[max_tnr_index]]
-    return self
+      if indices[imax] == len(thresholds):  # we want to accept everything
+        self.threshold_ = - (thresholds[imax_valid] - 1)
+      elif indices[imax] == 0:  # we want to reject everything
+        # thanks to roc_curve, the first point should be always max_threshold
+        # + 1 (we should always go through the "if" statement in roc_curve),
+        # see: https://github.com/scikit-learn/scikit-learn/pull/13523
+        self.threshold_ = - (thresholds[imax_valid])
+      else:
+        self.threshold_ = - np.mean(thresholds[imax_valid: imax_valid + 2])
+      return self
 
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
