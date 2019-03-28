@@ -7,23 +7,7 @@ The learned metric attempts to keep k-nearest neighbors in the same class,
 while keeping examples from different classes separated by a large margin.
 This algorithm makes no assumptions about the distribution of the data.
 
-
-The distance is learned using the following convex optimization:
-
-.. math::
-
-      \min_\mathbf{M}\sum_{i, j}\eta_{ij}||\mathbf{L}(x_i-x_j)||^2 +
-      c\sum_{i, j, k}\eta_{ij}(1-y_{ij})[1+||\mathbf{L}(x_i-x_j)||^2-||
-      \mathbf{L}(x_i-x_l)||^2]_+)
-
-where :math:`x_i` is the 'target', :math:`x_j` are its k nearest neighbors
-sharing the same label, and :math:`x_l` are all the other instances within
-that region with different labels, :math:`\eta_{ij}, y_{ij} \in \{0, 1\}`
-are both the indicators, :math:`\eta_{ij}` represents :math:`x_{j}` is the
-k nearest neighbors(with same labels) of :math:`x_{i}`, :math:`y_{ij}=0`
-indicates :math:`x_{i}, x_{j}` belong to different class, :math:`[\cdot]_+`
-is Hinge loss. In the optimization process, the second term is replaced
-by the slack variables :math:`\xi_{ijk}` for the sake of convexity.
+Read more in the :ref:`User Guide <lmnn>`.
 
 """
 #TODO: periodic recalculation of impostors, PCA initialization

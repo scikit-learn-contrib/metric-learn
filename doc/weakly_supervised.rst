@@ -225,15 +225,33 @@ Residual
     .. [2] Adapted from https://gist.github.com/kcarnold/5439917
 
 
+.. _sdml:
+
 SDML
 ----
 
 `SDML`: An efficient sparse metric learning in high-dimensional space via 
-double regularization: L1-penalized on the off-diagonal elements of Mahalanobis
-matrix :math:`\mathbf{M}` and the log-determinant divergence between 
+double regularization: an L1-penalization on the off-diagonal elements of the 
+Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between 
 :math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}` 
 or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
 covariance matrix).
+
+The formulated optimization on the semidfinite matrix :math:`M` is convex:
+
+.. math::
+
+    \min_{\mathbf{M}} = \text{tr}((M_0 + \eta XLX^{T})\cdot M) - \log\det M 
+    + \lambda ||M||_{1, off}
+
+where :math:`\mathbf{X}=[x_1, x_2, ..., x_n]`, :math:`\mathbf{L = D − K}` is 
+the Laplacian matrix, :math:`\mathbf{D}` is a diagonal matrix whose diagonal 
+elements are the sums of the row elements of :math:`\mathbf{K}`, 
+:math:`\mathbf{K}` is the incidence matrix to encode the (dis)similarity 
+information as :math:`\mathbf{K}_{ij} = 1` if :math:`(x_i,x_j)\in \mathbf{S}`, 
+:math:`\mathbf{K}_{ij} = -1` if :math:`(x_i,x_j)\in \mathbf{D}`, 
+:math:`||\cdot||_{1, off}` is the off-diagonal L1 norm of :math:`\mathbf{M}`.
+
 
 .. topic:: Example Code:
 
@@ -270,7 +288,7 @@ RCA
 Relative Components Analysis (RCA)
 
 `RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
-in-class(only utilizes the instances share the similarity) covariance matrices. 
+in-chunklets (see below for the definition of chunklets) covariance matrices. 
 It applies a global linear transformation to assign large weights to relevant 
 dimensions and low weights to irrelevant dimensions. Those relevant dimensions 
 are estimated using "chunklets", subsets of points that are known to belong to 
@@ -319,6 +337,9 @@ Mahalanobis matrix.
     .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
        2005
 
+
+.. _mmc:
+
 MMC
 ---
 
@@ -327,7 +348,7 @@ Side-Information, Xing et al., NIPS 2002
 
 `MMC` minimizes the sum of squared distances between similar examples, while
 enforcing the sum of distances between dissimilar examples to be greater than a
-certain margin. This leads to a convex and, thus, local-minima-free
+certain margin, default is 1. This leads to a convex and, thus, local-minima-free
 optimization problem that can be solved efficiently. However, the algorithm
 involves the computation of eigenvalues, which is the main speed-bottleneck.
 Since it has initially been designed for clustering applications, one of the
@@ -335,10 +356,9 @@ implicit assumptions of MMC is that all classes form a compact set, i.e.,
 follow a unimodal distribution, which restricts the possible use-cases of this
 method. However, it is one of the earliest and a still often cited technique.
 
-This is the first Mahalanobis distance learning method, the algorithm aims at 
-maximizing the sum of distances between all the instances from the dissimilar 
-set :math:`\mathbf{D}`, while constrains the sum of distances between examples 
-from the similar set :math:`\mathbf{S}`.
+The algorithm aims at maximizing the sum of distances between all the instances 
+from the dissimilar set :math:`\mathbf{D}`, while constrains the sum of distances 
+between examples from the similar set :math:`\mathbf{S}`.
 
 .. math::
 

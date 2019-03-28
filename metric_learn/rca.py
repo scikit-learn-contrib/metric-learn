@@ -1,4 +1,4 @@
-"""Relative Components Analysis (RCA)
+r"""Relative Components Analysis (RCA)
 
 RCA learns a full rank Mahalanobis distance metric based on a
 weighted sum of in-class covariance matrices.

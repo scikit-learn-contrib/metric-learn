@@ -41,35 +41,35 @@ the covariance matrix of the input data. This is a simple baseline method.
 
     .. [1] On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
+
+.. _lmnn:
+
 LMNN
 -----
 
 Large-margin nearest neighbor metric learning.
 
 `LMNN` learns a Mahalanobis distance metric in the kNN classification
-setting using semidefinite programming. The learned metric attempts to keep
-k-nearest neighbors in the same class, while keeping examples from different
-classes separated by a large margin. This algorithm makes no assumptions about
+setting. The learned metric attempts to keep close k-nearest neighbors 
+from the same class, while keeping examples from different classes 
+separated by a large margin. This algorithm makes no assumptions about
 the distribution of the data.
 
-The distance is learned using the following convex optimization:
+The distance is learned using the following optimization:
 
 .. math::
 
-      \min_\mathbf{M}\sum_{i, j}\eta_{ij}||\mathbf{L}(x_i-x_j)||^2 + 
-      c\sum_{i, j, k}\eta_{ij}(1-y_{ij})[1+||\mathbf{L}(x_i-x_j)||^2-||
+      \min_\mathbf{L}\sum_{i, j}\eta_{ij}||\mathbf{L}(x_i-x_j)||^2 + 
+      c\sum_{i, j, l}\eta_{ij}(1-y_{ij})[1+||\mathbf{L}(x_i-x_j)||^2-||
       \mathbf{L}(x_i-x_l)||^2]_+)
 
-where :math:`x_i` is the 'target', :math:`x_j` are its k nearest neighbors 
+where :math:`x_i` is an data point, :math:`x_j` are its k nearest neighbors 
 sharing the same label, and :math:`x_l` are all the other instances within 
 that region with different labels, :math:`\eta_{ij}, y_{ij} \in \{0, 1\}` 
 are both the indicators, :math:`\eta_{ij}` represents :math:`x_{j}` is the 
 k nearest neighbors(with same labels) of :math:`x_{i}`, :math:`y_{ij}=0` 
 indicates :math:`x_{i}, x_{j}` belong to different class, :math:`[\cdot]_+` 
-is Hinge loss. In the optimization process, the second term is replaced 
-by the slack variables :math:`\xi_{ijk}` for the sake of convexity. 
-
-
+is the Hinge loss :math:`[\cdot]_+=\max(0, \cdot)`.
 
 .. topic:: Example Code:
 
@@ -99,6 +99,9 @@ The two implementations differ slightly, and the C++ version is more complete.
        -margin -nearest-neighbor-classification>`_ Kilian Q. Weinberger, John
        Blitzer, Lawrence K. Saul
 
+
+.. _nca:
+
 NCA
 ---
 
@@ -107,7 +110,7 @@ algorithm which aims to improve the accuracy of nearest neighbors
 classification compared to the standard Euclidean distance. The algorithm
 directly maximizes a stochastic variant of the leave-one-out k-nearest
 neighbors (KNN) score on the training set. It can also learn a low-dimensional
-linear  embedding of data that can be used for data visualization and fast
+linear transformation of data that can be used for data visualization and fast
 classification.
 
 They use the decomposition :math:`\mathbf{M} = \mathbf{L}^T\mathbf{L}` and 
@@ -120,21 +123,19 @@ define the probability :math:`p_{ij}` that :math:`x_i` is the neighbor of
       {\sum_{l\neq i}\exp(-||\mathbf{L}x_i - \mathbf{L}x_l||_2^2)}, 
       \qquad p_{ii}=0
 
-
-Then the probability that :math:`x_i` will be correctly classified is:
+Then the probability that :math:`x_i` will be correctly classified by the 
+stochastic nearest neighbors rule is:
 
 .. math::
 
       p_{i} = \sum_{j:j\neq i, y_j=y_i}p_{ij}
 
-The optimization is to find matrix :math:`\mathbf{L}` that maximizes 
+The optimization problem is to find matrix :math:`\mathbf{L}` that maximizes 
 the sum of probability of being correctly classified:
 
 .. math::
 
       \mathbf{L} = \text{argmax}\sum_i p_i
-
-
 
 .. topic:: Example Code:
 
@@ -237,7 +238,6 @@ generated from the labels information and passed to the underlying algorithm.
 
 .. todo:: add more details about that (see issue `<https://github
           .com/metric-learn/metric-learn/issues/135>`_)
-
 
 .. topic:: Example Code:
 

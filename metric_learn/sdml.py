@@ -7,6 +7,8 @@ matrix :math:`\mathbf{M}` and the log-determinant divergence between
 or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the
 covariance matrix).
 
+Read more in the :ref:`User Guide <sdml>`.
+
 Adapted from https://gist.github.com/kcarnold/5439945
 Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf
 """
