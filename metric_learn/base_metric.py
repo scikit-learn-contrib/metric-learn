@@ -1,8 +1,7 @@
 from sklearn.base import BaseEstimator
-from sklearn.metrics.ranking import _binary_clf_curve
 from sklearn.utils.extmath import stable_cumsum
 from sklearn.utils.validation import _is_arraylike, check_is_fitted
-from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve, precision_recall_curve
 import numpy as np
 from abc import ABCMeta, abstractmethod
 import six
@@ -503,25 +502,16 @@ class _PairsClassifierMixin(BaseMetricLearner):
       cum_tn = np.concatenate([[0.], cum_tn_inverted])[::-1]
       cum_accuracy = (cum_tp + cum_tn) / n_samples
       imax = np.argmax(cum_accuracy)
+      # we set the threshold to the lowest accepted score
       # note: we want a positive threshold (distance), so we take - threshold
-      if imax == len(scores_sorted):  # if the best is to accept all points
-        # we set the threshold to (minus) [the lowest score - 1]
-        self.threshold_ = - (scores_sorted[imax] - 1)
-      else:
-        # otherwise, we set the threshold to the mean between the lowest
-        # accepted score and the highest accepted score
-        self.threshold_ = - np.mean(scores_sorted[imax: imax + 2])
+      self.threshold_ = - scores_sorted[imax]
       # note: if the best is to reject all points it's already one of the
-      # thresholds (scores_sorted[0] + 1)
+      # thresholds (scores_sorted[0])
       return self
 
     if strategy == 'f_beta':
-      fps, tps, thresholds = _binary_clf_curve(
+      precision, recall, thresholds = precision_recall_curve(
           y_valid, self.decision_function(pairs_valid), pos_label=1)
-
-      precision = tps / (tps + fps)
-      precision[np.isnan(precision)] = 0
-      recall = tps / tps[-1]
 
       # here the thresholds are decreasing
       # We ignore the warnings here, in the same taste as
@@ -535,14 +525,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
       # scikit-learn/pull/10117/files#r262115773)
       f_beta[np.isnan(f_beta)] = 0.
       imax = np.argmax(f_beta)
+      # we set the threshold to the lowest accepted score
       # note: we want a positive threshold (distance), so we take - threshold
-      if imax == len(thresholds):  # the best is to accept all points
-        # we set the threshold to (minus) [the lowest score - 1]
-        self.threshold_ = - (thresholds[imax] - 1)
-      else:
-        # otherwise, we set the threshold to the mean between the lowest
-        # accepted score and the highest rejected score
-        self.threshold_ = - np.mean(thresholds[imax: imax + 2])
+      self.threshold_ = - thresholds[imax]
       # Note: we don't need to deal with rejecting all points (i.e. threshold =
       # max_scores + 1), since this can never happen to be optimal
       # (see a more detailed discussion in test_calibrate_threshold_extreme)
@@ -550,7 +535,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
     fpr, tpr, thresholds = roc_curve(y_valid,
                                      self.decision_function(pairs_valid),
-                                     pos_label=1, drop_intermediate=False)
+                                     pos_label=1)
     # here the thresholds are decreasing
     fpr, tpr, thresholds = fpr, tpr, thresholds
 
@@ -567,13 +552,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
       # note: we want a positive threshold (distance), so we take - threshold
       if indices[imax] == len(thresholds):  # we want to accept everything
         self.threshold_ = - (thresholds[imax_valid] - 1)
-      elif indices[imax] == 0:  # we want to reject everything
-        # thanks to roc_curve, the first point should be always max_threshold
-        # + 1 (we should always go through the "if" statement in roc_curve),
-        # see: https://github.com/scikit-learn/scikit-learn/pull/13523
-        self.threshold_ = - (thresholds[imax_valid])
       else:
-        self.threshold_ = - np.mean(thresholds[imax_valid: imax_valid + 2])
+        # thanks to roc_curve, the first point will always be max_scores
+        # + 1, see: https://github.com/scikit-learn/scikit-learn/pull/13523
+        self.threshold_ = - thresholds[imax_valid]
       return self
 
 
