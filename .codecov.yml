@@ -1,3 +1,6 @@
+ignore:
+  - "test"
+
 # taken from scikit-learn:
 # https://github.com/scikit-learn/scikit-learn/blob/a7e17117bb15eb3f51ebccc1bd53e42fcb4e6cd8/.codecov.yml
 comment: false
