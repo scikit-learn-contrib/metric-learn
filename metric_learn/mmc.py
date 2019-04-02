@@ -390,10 +390,11 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
     self : object
         Returns the instance.
     """
+    calibration_params = (calibration_params if calibration_params is not
+                          None else dict())
+    self._validate_calibration_params(**calibration_params)
     self._fit(pairs, y)
-    self.calibrate_threshold(pairs, y, **(calibration_params if
-                                          calibration_params is not None else
-                                          dict()))
+    self.calibrate_threshold(pairs, y, **calibration_params)
     return self
 
 

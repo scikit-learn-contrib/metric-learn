@@ -462,7 +462,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     sklearn.calibration : scikit-learn's module for calibrating classifiers
     """
 
-    self._validate_calibration_parameters(beta, min_rate, strategy)
+    self._validate_calibration_params(strategy, min_rate, beta)
 
     pairs_valid, y_valid = self._prepare_inputs(pairs_valid, y_valid,
                                                 type_of_inputs='tuples')
@@ -542,7 +542,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
         self.threshold_ = - thresholds[imax_valid]
       return self
 
-  def _validate_calibration_parameters(self, beta, min_rate, strategy):
+  @staticmethod
+  def _validate_calibration_params(strategy='accuracy', min_rate=None,
+                                   beta=1.):
     """Ensure that calibration parameters have allowed values"""
     if strategy not in ('accuracy', 'f_beta', 'max_tpr',
                         'max_tnr'):

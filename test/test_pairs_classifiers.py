@@ -412,3 +412,80 @@ def test_calibrate_threshold_extreme():
   # convention, because it's 0/0), and 0 recall (and we could always decrease
   # the threshold to increase the recall, and we couldn't do worse for
   # precision so it would be better)
+
+
+@pytest.mark.parametrize('estimator, _',
+                         pairs_learners + [(IdentityPairsClassifier(), None),
+                                           (_PairsClassifierMixin, None)],
+                         ids=ids_pairs_learners + ['mock', 'class'])
+@pytest.mark.parametrize('invalid_args, expected_msg',
+                         [({'strategy': 'weird'},
+                           ('Strategy can either be "accuracy", "f_beta" or '
+                            '"max_tpr" or "max_tnr". Got "weird" instead.'))] +
+                         [({'strategy': strategy, 'min_rate': min_rate},
+                           'Parameter min_rate must be a number in'
+                           '[0, 1]. Got {} instead.'.format(min_rate))
+                          for (strategy, min_rate) in product(
+                             ['max_tpr', 'max_tnr'],
+                             [None, 'weird', -0.2, 1.2, 3 + 2j])] +
+                         [({'strategy': 'f_beta', 'beta': beta},
+                           'Parameter beta must be a real number. '
+                           'Got {} instead.'.format(type(beta)))
+                          for beta in [None, 'weird', 3 + 2j]]
+                         )
+def test_validate_calibration_params_invalid_parameters_right_error(
+        estimator, _, invalid_args, expected_msg):
+  # test that the right error message is returned if invalid arguments are
+  # given to _validate_calibration_params, for all pairs metric learners as
+  # well as a mocking general identity pairs classifier and the class itself
+  with pytest.raises(ValueError) as raised_error:
+    estimator._validate_calibration_params(**invalid_args)
+  assert str(raised_error.value) == expected_msg
+
+
+@pytest.mark.parametrize('estimator, _',
+                         pairs_learners + [(IdentityPairsClassifier(), None),
+                                           (_PairsClassifierMixin, None)],
+                         ids=ids_pairs_learners + ['mock', 'class'])
+@pytest.mark.parametrize('valid_args',
+                         [{}, {'strategy': 'accuracy'}] +
+                         [{'strategy': strategy, 'min_rate': min_rate}
+                          for (strategy, min_rate) in product(
+                             ['max_tpr', 'max_tnr'],
+                             [0., 0.2, 0.8, 1.])] +
+                         [{'strategy': 'f_beta', 'beta': beta}
+                          for beta in [-5., -1., 0., 0.1, 0.2, 1., 5.]]
+                         # Note that we authorize beta < 0 (even if
+                         # in fact it will be squared, so it would be useless
+                         # to do that)
+                         )
+def test_validate_calibration_params_valid_parameters(
+        estimator, _, valid_args):
+  # test that no warning message is returned if valid arguments are given to
+  # _validate_calibration_params for all pairs metric learners, as well as
+  # a mocking example, and the class itself
+  with pytest.warns(None) as record:
+    estimator._validate_calibration_params(**valid_args)
+  assert len(record) == 0
+
+
+@pytest.mark.parametrize('estimator, build_dataset',
+                         pairs_learners,
+                         ids=ids_pairs_learners)
+def test_validate_calibration_params_invalid_parameters_error_before__fit(
+        estimator, build_dataset):
+  """For all pairs metric learners (which currently all have a _fit method),
+  make sure that calibration parameters are validated before fitting"""
+  estimator = clone(estimator)
+  input_data, labels, _, _ = build_dataset()
+
+  def breaking_fun(**args):  # a function that fails so that we will miss
+    # the calibration at the end and therefore the right error message from
+    # validating params should be thrown before
+    raise RuntimeError('Game over.')
+  estimator._fit = breaking_fun
+  expected_msg = ('Strategy can either be "accuracy", "f_beta" or '
+                  '"max_tpr" or "max_tnr". Got "weird" instead.')
+  with pytest.raises(ValueError) as raised_error:
+    estimator.fit(input_data, labels, calibration_params={'strategy': 'weird'})
+  assert str(raised_error.value) == expected_msg
