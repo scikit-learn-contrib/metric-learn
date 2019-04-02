@@ -462,23 +462,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     sklearn.calibration : scikit-learn's module for calibrating classifiers
     """
 
-    if strategy not in ('accuracy', 'f_beta', 'max_tpr',
-                        'max_tnr'):
-      raise ValueError('Strategy can either be "accuracy", "f_beta" or '
-                       '"max_tpr" or "max_tnr". Got "{}" instead.'
-                       .format(strategy))
-
-    if strategy == 'max_tpr' or strategy == 'max_tnr':
-      if (min_rate is None or not isinstance(min_rate, (int, float)) or
-              not min_rate >= 0 or not min_rate <= 1):
-        raise ValueError('Parameter min_rate must be a number in'
-                         '[0, 1]. '
-                         'Got {} instead.'.format(min_rate))
-
-    if strategy == 'f_beta':
-      if beta is None or not isinstance(beta, (int, float)):
-        raise ValueError('Parameter beta must be a real number. '
-                         'Got {} instead.'.format(type(beta)))
+    self._validate_calibration_parameters(beta, min_rate, strategy)
 
     pairs_valid, y_valid = self._prepare_inputs(pairs_valid, y_valid,
                                                 type_of_inputs='tuples')
@@ -557,6 +541,24 @@ class _PairsClassifierMixin(BaseMetricLearner):
         # + 1, see: https://github.com/scikit-learn/scikit-learn/pull/13523
         self.threshold_ = - thresholds[imax_valid]
       return self
+
+  def _validate_calibration_parameters(self, beta, min_rate, strategy):
+    """Ensure that calibration parameters have allowed values"""
+    if strategy not in ('accuracy', 'f_beta', 'max_tpr',
+                        'max_tnr'):
+      raise ValueError('Strategy can either be "accuracy", "f_beta" or '
+                       '"max_tpr" or "max_tnr". Got "{}" instead.'
+                       .format(strategy))
+    if strategy == 'max_tpr' or strategy == 'max_tnr':
+      if (min_rate is None or not isinstance(min_rate, (int, float)) or
+              not min_rate >= 0 or not min_rate <= 1):
+        raise ValueError('Parameter min_rate must be a number in'
+                         '[0, 1]. '
+                         'Got {} instead.'.format(min_rate))
+    if strategy == 'f_beta':
+      if beta is None or not isinstance(beta, (int, float)):
+        raise ValueError('Parameter beta must be a real number. '
+                         'Got {} instead.'.format(type(beta)))
 
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
