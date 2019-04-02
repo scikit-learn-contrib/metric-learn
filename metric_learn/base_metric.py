@@ -487,7 +487,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
       cum_accuracy = (cum_tp + cum_tn) / n_samples
       imax = np.argmax(cum_accuracy)
       # we set the threshold to the lowest accepted score
-      # note: we want a positive threshold (distance), so we take - threshold
+      # note: we are working with negative distances but we want the threshold
+      # to be with respect to the actual distances so we take minus sign
       self.threshold_ = - scores_sorted[imax]
       # note: if the best is to reject all points it's already one of the
       # thresholds (scores_sorted[0])
@@ -510,7 +511,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
       f_beta[np.isnan(f_beta)] = 0.
       imax = np.argmax(f_beta)
       # we set the threshold to the lowest accepted score
-      # note: we want a positive threshold (distance), so we take - threshold
+      # note: we are working with negative distances but we want the threshold
+      # to be with respect to the actual distances so we take minus sign
       self.threshold_ = - thresholds[imax]
       # Note: we don't need to deal with rejecting all points (i.e. threshold =
       # max_scores + 1), since this can never happen to be optimal
@@ -533,7 +535,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
         imax = np.argmax(1 - fpr[indices])
 
       imax_valid = indices[imax]
-      # note: we want a positive threshold (distance), so we take - threshold
+      # note: we are working with negative distances but we want the threshold
+      # to be with respect to the actual distances so we take minus sign
       if indices[imax] == len(thresholds):  # we want to accept everything
         self.threshold_ = - (thresholds[imax_valid] - 1)
       else:
