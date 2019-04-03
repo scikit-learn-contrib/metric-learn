@@ -19,11 +19,12 @@ and constraints accordingly.
 ######################################################################
 # Imports
 # ^^^^^^^
-# 
+#
+from sklearn.manifold import TSNE
 
 import metric_learn
 import numpy as np
-from sklearn.datasets import load_iris
+from sklearn.datasets import fetch_olivetti_faces
 
 # visualisation imports
 import matplotlib.pyplot as plt
@@ -46,27 +47,29 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # loading our dataset
 
-iris_data = load_iris()
+faces_data = fetch_olivetti_faces()
 # this is our data
-X = iris_data['data']
+X = faces_data['data']
 # these are our constraints
-Y = iris_data['target']
+Y = faces_data['target']
 
 # function to plot the results
 def plot(X, Y):
-    x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
-    y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
+    # x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
+    # y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
     plt.figure(figsize=(8, 6))
 
     # clean the figure
     plt.clf()
 
-    plt.scatter(X[:, 0], X[:, 1], c=Y, cmap=plt.cm.Paired)
+    tsne = TSNE()
+    X_embedded = tsne.fit_transform(X)
+    plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=Y, cmap=plt.cm.Paired)
     plt.xlabel('Sepal length')
     plt.ylabel('Sepal width')
 
-    plt.xlim(x_min, x_max)
-    plt.ylim(y_min, y_max)
+    # plt.xlim(x_min, x_max)
+    # plt.ylim(y_min, y_max)
     plt.xticks(())
     plt.yticks(())
 
