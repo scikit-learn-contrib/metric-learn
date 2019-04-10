@@ -1,9 +1,9 @@
 """
-Metric Learning and Plotting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Algorithms walkthrough
+~~~~~~~~~~~~~~~~~~~~~~
 
 This is a small walkthrough which illustrates all the Metric Learning
-algorithms implemented in metric\_learn, and also does a quick
+algorithms implemented in metric-learn, and also does a quick
 visualisation which can help understand which algorithm might be best
 suited for you.
 
@@ -20,43 +20,43 @@ and constraints accordingly.
 # Imports
 # ^^^^^^^
 #
+
 from sklearn.manifold import TSNE
 
 import metric_learn
 import numpy as np
-from sklearn.datasets import fetch_olivetti_faces
+from sklearn.datasets import load_iris
 
 # visualisation imports
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 
 ######################################################################
 # Loading our data-set and setting up plotting
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # We will be using the IRIS data-set to illustrate the plotting. You can
 # read more about the IRIS data-set here:
 # `link <https://en.wikipedia.org/wiki/Iris_flower_data_set>`__.
-# 
-# We would like to point out that only two features - Sepal Width and
-# Sepal Length are being plotted. This is because it is tough to visualise
-# more features than this. The purpose of the plotting is to understand
-# how each of the new learned metrics transform the input space.
-# 
 
-# loading our dataset
-
-faces_data = fetch_olivetti_faces()
+iris_data = load_iris()
 # this is our data
-X = faces_data['data']
+X = iris_data['data']
 # these are our constraints
-Y = faces_data['target']
+Y = iris_data['target']
 
-# function to plot the results
+########################################################################
+# To make the task more difficult, we will add five noise columns to the
+# data, of variance 5.
+rng = np.random.RandomState(42)
+X = np.hstack([X, rng.randn(X.shape[0], 5)*5])
+
+###########################################################################
+# Note that the dimensionality of the data is now 4 + 5 = 9, so to plot the
+# transformed data in 2D, we will use the t-sne algorithm. (See
+# `sklearn.manifold.TSNE`).
+
 def plot(X, Y):
-    # x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
-    # y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
     plt.figure(figsize=(8, 6))
 
     # clean the figure
@@ -65,23 +65,21 @@ def plot(X, Y):
     tsne = TSNE()
     X_embedded = tsne.fit_transform(X)
     plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=Y, cmap=plt.cm.Paired)
-    plt.xlabel('Sepal length')
-    plt.ylabel('Sepal width')
 
-    # plt.xlim(x_min, x_max)
-    # plt.ylim(y_min, y_max)
     plt.xticks(())
     plt.yticks(())
 
     plt.show()
 
-# plotting the dataset as is.
+###################################
+# Let's now plot the dataset as is.
+
 plot(X, Y)
 
 
 ######################################################################
 # Metric Learning
-# ~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^
 # 
 # Why is Metric Learning useful? We can, with prior knowledge of which
 # points are supposed to be closer, figure out a better way to understand
@@ -107,7 +105,7 @@ plot(X, Y)
 
 ######################################################################
 # Large Margin Nearest Neighbour
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # LMNN is a metric learning algorithm primarily designed for k-nearest
 # neighbor classification. The algorithm is based on semidefinite
@@ -126,7 +124,7 @@ plot(X, Y)
 
 ######################################################################
 # Fit and then transform!
-# ^^^^^^^^^^^^^^^^^^^^^^^
+# -----------------------
 # 
 
 # setting up LMNN
@@ -159,17 +157,16 @@ plot(X_lmnn, Y)
 # Pretty neat, huh?
 # 
 # The rest of this notebook will briefly explain the other Metric Learning
-# algorithms before plottting them. Also, while we have first run ``fit``
+# algorithms before plotting them. Also, while we have first run ``fit``
 # and then ``transform`` to see our data transformed, we can also use
-# ``fit_transform`` if you are using the bleeding edge version of the
-# code. The rest of the examples and illustrations will use
+# ``fit_transform``. The rest of the examples and illustrations will use
 # ``fit_transform``.
 # 
 
 
 ######################################################################
 # Information Theoretic Metric Learning
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # ITML uses a regularizer that automatically enforces a Semi-Definite
 # Positive Matrix condition - the LogDet divergence. It uses soft
@@ -188,7 +185,7 @@ plot(X_itml, Y)
 
 ######################################################################
 # Sparse Determinant Metric Learning
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # Implements an efficient sparse metric learning algorithm in high
 # dimensional space via an :math:`l_1`-penalised log-determinant
@@ -205,15 +202,16 @@ plot(X_itml, Y)
 # pass a numpy random seed as shown in the example below.
 # 
 
-sdml = metric_learn.SDML_Supervised(num_constraints=200, sparsity_param=0.1)
-X_sdml = sdml.fit_transform(X, Y, random_state = np.random.RandomState(1234))
+sdml = metric_learn.SDML_Supervised(num_constraints=200, sparsity_param=0.1,
+                                    balance_param=0.0015)
+X_sdml = sdml.fit_transform(X, Y, random_state=np.random.RandomState(1234))
 
 plot(X_sdml, Y)
 
 
 ######################################################################
 # Least Squares Metric Learning
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # LSML is a simple, yet effective, algorithm that learns a Mahalanobis
 # metric from a given set of relative comparisons. This is done by
@@ -224,7 +222,7 @@ plot(X_sdml, Y)
 # `LSML <http://web.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`__
 # 
 
-lsml = metric_learn.LSML_Supervised(prior=np.eye(X.shape[1]), num_constraints=200, tol=0.0001, max_iter=10000, verbose=True)
+lsml = metric_learn.LSML_Supervised(num_constraints=200, tol=0.0001, max_iter=10000, verbose=True)
 X_lsml = lsml.fit_transform(X, Y)
 
 plot(X_lsml, Y)
@@ -232,7 +230,7 @@ plot(X_lsml, Y)
 
 ######################################################################
 # Neighborhood Components Analysis
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # NCA is an extrememly popular metric-learning algorithm, and one of the
 # first few (published back in 2005).
@@ -260,7 +258,7 @@ plot(X_nca, Y)
 
 ######################################################################
 # Local Fischer Discriminant Analysis
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # LFDA is a linear supervised dimensionality reduction method. It is
 # particularly useful when dealing with multimodality, where one ore more
@@ -280,7 +278,7 @@ plot(X_lfda, Y)
 
 ######################################################################
 # Relative Components Analysis
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # RCA is another one of the older algorithms. It learns a full rank
 # Mahalanobis distance metric based on a weighted sum of in-class
@@ -301,11 +299,11 @@ plot(X_rca, Y)
 
 ######################################################################
 # Manual Constraints
-# ~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^
 # 
 # Some of the algorithms we've mentioned have alternate ways to pass
 # constraints. So far we've been passing them as just class labels - and
-# letting the internals of metric-learn deal with creating our constrints.
+# letting the internals of metric-learn deal with creating our constraints.
 # 
 # We'll be looking at one other way to do this - which is to pass a Matrix
 # X such that - (a,b,c,d) indices into X, such that
