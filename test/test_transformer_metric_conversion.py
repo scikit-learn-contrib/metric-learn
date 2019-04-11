@@ -123,7 +123,7 @@ class TestTransformerMetricConversion(unittest.TestCase):
     M = np.diag([1e5, 1e5, 1e5, 1e5, 1e5, 1e5, 1e-20])
     M = P.dot(M).dot(P.T)
     assert np.abs(np.linalg.det(M)) > 10
-    assert np.linalg.slogdet(M) > 1  # (just to show that the computed
+    assert np.linalg.slogdet(M)[1] > 1  # (just to show that the computed
     # determinant is far from null)
     with pytest.raises(LinAlgError) as err_msg:
       np.linalg.cholesky(M)
