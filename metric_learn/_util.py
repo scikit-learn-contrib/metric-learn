@@ -1,5 +1,7 @@
+import warnings
 import numpy as np
 import six
+from numpy.linalg import LinAlgError
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y
 from metric_learn.exceptions import PreprocessorError
@@ -337,18 +339,32 @@ def transformer_from_metric(metric):
   just return its elementwise square root (since the diagonalization of
   the matrix is itself).
 
+  Parameters
+  ----------
+  metric : symmetric `np.ndarray`, shape=(d x d)
+    The input metric, from which we want to extract a transformation matrix.
+
   Returns
   -------
-  L : (d x d) matrix
+  L : np.ndarray, shape=(d x d)
+    The transformation matrix, such that L.T.dot(L) == metric.
   """
-
-  if np.allclose(metric, np.diag(np.diag(metric))):
-    return np.sqrt(metric)
-  elif not np.isclose(np.linalg.det(metric), 0):
-    return np.linalg.cholesky(metric).T
+  if not np.allclose(metric, metric.T):
+    raise ValueError("The input metric should be symmetric.")
+  abs_M = np.abs(metric)
+  diag_coeffs = np.diag(abs_M)
+  min_abs_diag_coeff = np.min(diag_coeffs)
+  if min_abs_diag_coeff >= 1000 * np.max(np.diag(abs_M) - abs_M):
+    return np.diag(np.sqrt(np.diag(metric)))
   else:
-    w, V = np.linalg.eigh(metric)
-    return V.T * np.sqrt(np.maximum(0, w[:, None]))
+    try:
+      return np.linalg.cholesky(metric).T
+    except LinAlgError as e:
+      warnings.warn("The Cholesky decomposition returned the following "
+                    "error: '{}'. Using the eigendecomposition "
+                    "instead.".format(e))
+      w, V = np.linalg.eigh(metric)
+      return V.T * np.sqrt(np.maximum(0, w[:, None]))
 
 
 def validate_vector(u, dtype=None):

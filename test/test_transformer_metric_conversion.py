@@ -1,11 +1,15 @@
 import unittest
 import numpy as np
+import pytest
+from scipy.stats import ortho_group
 from sklearn.datasets import load_iris
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal, assert_allclose
+from sklearn.utils.testing import ignore_warnings
 
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
+from metric_learn._util import transformer_from_metric
 
 
 class TestTransformerMetricConversion(unittest.TestCase):
@@ -75,6 +79,84 @@ class TestTransformerMetricConversion(unittest.TestCase):
     mlkr.fit(self.X, self.y)
     L = mlkr.transformer_
     assert_array_almost_equal(L.T.dot(L), mlkr.get_mahalanobis_matrix())
+
+  @ignore_warnings
+  def test_transformer_from_metric_edge_cases(self):
+    """Test that transformer_from_metric returns the right result in various
+    edge cases"""
+    rng = np.random.RandomState(42)
+
+    # an orthonormal matrix useful for creating matrices with given
+    # eigenvalues:
+    P = ortho_group.rvs(7, random_state=rng)
+
+    # matrix with all its coefficients very low (to check that the algorithm
+    # does not consider it as a diagonal matrix)(non regression test for
+    # https://github.com/metric-learn/metric-learn/issues/175)
+    M = np.diag([1e-15, 2e-16, 3e-15, 4e-16, 5e-15, 6e-16, 7e-15])
+    M = P.dot(M).dot(P.T)
+    L = transformer_from_metric(M)
+    assert_allclose(L.T.dot(L), M)
+
+    # diagonal matrix
+    M = np.diag(np.abs(rng.randn(5)))
+    L = transformer_from_metric(M)
+    assert_allclose(L.T.dot(L), M)
+
+    # low-rank matrix (with zeros)
+    M = np.zeros((7, 7))
+    small_random = rng.randn(3, 3)
+    M[:3, :3] = small_random.T.dot(small_random)
+    L = transformer_from_metric(M)
+    assert_allclose(L.T.dot(L), M)
+
+    # low-rank matrix (without necessarily zeros)
+    R = np.abs(rng.randn(7, 7))
+    M = R.dot(np.diag([1, 5, 3, 2, 0, 0, 0])).dot(R.T)
+    L = transformer_from_metric(M)
+    assert_allclose(L.T.dot(L), M)
+
+    # matrix with a determinant still high but which should be considered as a
+    # non-definite matrix
+    M = np.diag([1e5, 1e5, 1e5, 1e5, 1e5, 1e5, 1e-10])
+    M = P.dot(M).dot(P.T)
+    L = transformer_from_metric(M)
+    assert_allclose(L.T.dot(L), M)
+
+    # matrix with lots of small nonzeros that make a big zero when multiplied
+    M = np.diag([1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3])
+    L = transformer_from_metric(M)
+    assert_allclose(L.T.dot(L), M)
+
+    # full rank matrix
+    M = rng.randn(10, 10)
+    M = M.T.dot(M)
+    assert np.linalg.matrix_rank(M) == 10
+    L = transformer_from_metric(M)
+    assert_allclose(L.T.dot(L), M)
+
+  def test_non_symmetric_matrix_raises(self):
+    """Checks that if a non symmetric matrix is given to
+    transformer_from_metric, an error is thrown"""
+    rng = np.random.RandomState(42)
+    M = rng.randn(10, 10)
+    with pytest.raises(ValueError) as raised_error:
+      transformer_from_metric(M)
+    assert str(raised_error.value) == "The input metric should be symmetric."
+
+  def test_non_psd_warns(self):
+    """Checks that if the matrix is not PSD it will raise a warning saying
+    that we will do the eigendecomposition"""
+    rng = np.random.RandomState(42)
+    R = np.abs(rng.randn(7, 7))
+    M = R.dot(np.diag([1, 5, 3, 2, 0, 0, 0])).dot(R.T)
+    msg = ("The Cholesky decomposition returned the following "
+           "error: 'Matrix is not positive definite'. Using the "
+           "eigendecomposition instead.")
+    with pytest.warns(None) as raised_warning:
+      L = transformer_from_metric(M)
+    assert str(raised_warning[0].message) == msg
+    assert_allclose(L.T.dot(L), M)
 
 
 if __name__ == '__main__':
