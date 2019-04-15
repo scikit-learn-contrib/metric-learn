@@ -148,10 +148,18 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  threshold_ : `float`
+      If the distance metric between two points is lower than this threshold,
+      points will be classified as similar, otherwise they will be
+      classified as dissimilar.
   """
 
-  def fit(self, pairs, y, bounds=None):
+  def fit(self, pairs, y, bounds=None, calibration_params=None):
     """Learn the ITML model.
+
+    The threshold will be calibrated on the trainset using the parameters
+    `calibration_params`.
 
     Parameters
     ----------
@@ -170,13 +178,22 @@ class ITML(_BaseITML, _PairsClassifierMixin):
         If not provided at initialization, bounds_[0] and bounds_[1] will be
         set to the 5th and 95th percentile of the pairwise distances among all
         points present in the input `pairs`.
+    calibration_params : `dict` or `None`
+        Dictionary of parameters to give to `calibrate_threshold` for the
+        threshold calibration step done at the end of `fit`. If `None` is
+        given, `calibrate_threshold` will use the default parameters.
 
     Returns
     -------
     self : object
         Returns the instance.
     """
-    return self._fit(pairs, y, bounds=bounds)
+    calibration_params = (calibration_params if calibration_params is not
+                          None else dict())
+    self._validate_calibration_params(**calibration_params)
+    self._fit(pairs, y)
+    self.calibrate_threshold(pairs, y, **calibration_params)
+    return self
 
 
 class ITML_Supervised(_BaseITML, TransformerMixin):

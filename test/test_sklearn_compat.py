@@ -15,9 +15,13 @@ from sklearn import clone
 import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
+from sklearn.metrics.scorer import get_scorer
 from sklearn.utils.testing import _get_args
 from test.test_utils import (metric_learners, ids_metric_learners,
-                             mock_preprocessor)
+                             mock_preprocessor, tuples_learners,
+                             ids_tuples_learners, pairs_learners,
+                             ids_pairs_learners, remove_y_quadruplets,
+                             quadruplets_learners)
 
 
 # Wrap the _Supervised methods with a deterministic wrapper for testing.
@@ -97,22 +101,62 @@ RNG = check_random_state(0)
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
-def test_cross_validation_is_finite(estimator, build_dataset,
-                                    with_preprocessor):
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
+                         ids=ids_pairs_learners)
+def test_various_scoring_on_tuples_learners(estimator, build_dataset,
+                                            with_preprocessor):
+  """Tests that scikit-learn's scoring returns something finite,
+  for other scoring than default scoring. (List of scikit-learn's scores can be
+  found in sklearn.metrics.scorer). For each type of output (predict,
+  predict_proba, decision_function), we test a bunch of scores.
+  We only test on pairs learners because quadruplets don't have a y argument.
+  """
+  input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+
+  # scores that need a predict function: every tuples learner should have a
+  # predict function (whether the pair is of positive samples or negative
+  # samples)
+  for scoring in ['accuracy', 'f1']:
+    check_score_is_finite(scoring, estimator, input_data, labels)
+  # scores that need a predict_proba:
+  if hasattr(estimator, "predict_proba"):
+    for scoring in ['neg_log_loss', 'brier_score']:
+      check_score_is_finite(scoring, estimator, input_data, labels)
+  # scores that need a decision_function: every tuples learner should have a
+  # decision function (the metric between points)
+  for scoring in ['roc_auc', 'average_precision', 'precision', 'recall']:
+    check_score_is_finite(scoring, estimator, input_data, labels)
+
+
+def check_score_is_finite(scoring, estimator, input_data, labels):
+  estimator = clone(estimator)
+  assert np.isfinite(cross_val_score(estimator, input_data, labels,
+                                     scoring=scoring)).all()
+  estimator.fit(input_data, labels)
+  assert np.isfinite(get_scorer(scoring)(estimator, input_data, labels))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', tuples_learners,
+                         ids=ids_tuples_learners)
+def test_cross_validation_is_finite(estimator, build_dataset):
   """Tests that validation on metric-learn estimators returns something finite
   """
-  if any(hasattr(estimator, method) for method in ["predict", "score"]):
-    input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
-    estimator = clone(estimator)
-    estimator.set_params(preprocessor=preprocessor)
-    set_random_state(estimator)
-    if hasattr(estimator, "score"):
-      assert np.isfinite(cross_val_score(estimator, input_data, labels)).all()
-    if hasattr(estimator, "predict"):
-      assert np.isfinite(cross_val_predict(estimator,
-                                           input_data, labels)).all()
+  input_data, labels, preprocessor, _ = build_dataset()
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  assert np.isfinite(cross_val_score(estimator,
+                                     *remove_y_quadruplets(estimator,
+                                                           input_data,
+                                                           labels))).all()
+  assert np.isfinite(cross_val_predict(estimator,
+                                       *remove_y_quadruplets(estimator,
+                                                             input_data,
+                                                             labels)
+                                       )).all()
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -143,23 +187,28 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
       train_mask = np.ones(input_data.shape[0], bool)
       train_mask[test_slice] = False
       y_train, y_test = labels[train_mask], labels[test_slice]
-      estimator.fit(input_data[train_mask], y_train)
+      estimator.fit(*remove_y_quadruplets(estimator,
+                                          input_data[train_mask],
+                                          y_train))
       if hasattr(estimator, "score"):
-        scores.append(estimator.score(input_data[test_slice], y_test))
+        scores.append(estimator.score(*remove_y_quadruplets(
+            estimator, input_data[test_slice], y_test)))
       if hasattr(estimator, "predict"):
         predictions[test_slice] = estimator.predict(input_data[test_slice])
     if hasattr(estimator, "score"):
-      assert all(scores == cross_val_score(estimator, input_data, labels,
-                                           cv=kfold))
+      assert all(scores == cross_val_score(
+          estimator, *remove_y_quadruplets(estimator, input_data, labels),
+          cv=kfold))
     if hasattr(estimator, "predict"):
-      assert all(predictions == cross_val_predict(estimator, input_data,
-                                                  labels,
-                                                  cv=kfold))
+      assert all(predictions == cross_val_predict(
+          estimator,
+          *remove_y_quadruplets(estimator, input_data, labels),
+          cv=kfold))
 
 
 def check_score(estimator, tuples, y):
   if hasattr(estimator, "score"):
-    score = estimator.score(tuples, y)
+    score = estimator.score(*remove_y_quadruplets(estimator, tuples, y))
     assert np.isfinite(score)
 
 
@@ -183,7 +232,7 @@ def test_simple_estimator(estimator, build_dataset, with_preprocessor):
     estimator.set_params(preprocessor=preprocessor)
     set_random_state(estimator)
 
-    estimator.fit(tuples_train, y_train)
+    estimator.fit(*remove_y_quadruplets(estimator, tuples_train, y_train))
     check_score(estimator, tuples_test, y_test)
     check_predict(estimator, tuples_test)
 
@@ -230,7 +279,9 @@ def test_estimators_fit_returns_self(estimator, build_dataset,
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
-  assert estimator.fit(input_data, labels) is estimator
+  assert estimator.fit(*remove_y_quadruplets(estimator,
+                                             input_data,
+                                             labels)) is estimator
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -240,42 +291,53 @@ def test_pipeline_consistency(estimator, build_dataset,
                               with_preprocessor):
   # Adapted from scikit learn
   # check that make_pipeline(est) gives same score as est
-  input_data, y, preprocessor, _ = build_dataset(with_preprocessor)
+  # we do this test on all except quadruplets (since they don't have a y
+  # in fit):
+  if estimator.__class__.__name__ not in [e.__class__.__name__
+                                          for (e, _) in
+                                          quadruplets_learners]:
+    input_data, y, preprocessor, _ = build_dataset(with_preprocessor)
 
-  def make_random_state(estimator, in_pipeline):
-    rs = {}
-    name_estimator = estimator.__class__.__name__
-    if name_estimator[-11:] == '_Supervised':
-      name_param = 'random_state'
-      if in_pipeline:
-          name_param = name_estimator.lower() + '__' + name_param
-      rs[name_param] = check_random_state(0)
-    return rs
+    def make_random_state(estimator, in_pipeline):
+      rs = {}
+      name_estimator = estimator.__class__.__name__
+      if name_estimator[-11:] == '_Supervised':
+        name_param = 'random_state'
+        if in_pipeline:
+            name_param = name_estimator.lower() + '__' + name_param
+        rs[name_param] = check_random_state(0)
+      return rs
 
-  estimator = clone(estimator)
-  estimator.set_params(preprocessor=preprocessor)
-  pipeline = make_pipeline(estimator)
-  estimator.fit(input_data, y, **make_random_state(estimator, False))
-  pipeline.fit(input_data, y, **make_random_state(estimator, True))
+    estimator = clone(estimator)
+    estimator.set_params(preprocessor=preprocessor)
+    pipeline = make_pipeline(estimator)
+    estimator.fit(*remove_y_quadruplets(estimator, input_data, y),
+                  **make_random_state(estimator, False))
+    pipeline.fit(*remove_y_quadruplets(estimator, input_data, y),
+                 **make_random_state(estimator, True))
 
-  if hasattr(estimator, 'score'):
-    result = estimator.score(input_data, y)
-    result_pipe = pipeline.score(input_data, y)
-    assert_allclose_dense_sparse(result, result_pipe)
-
-  if hasattr(estimator, 'predict'):
-    result = estimator.predict(input_data)
-    result_pipe = pipeline.predict(input_data)
-    assert_allclose_dense_sparse(result, result_pipe)
-
-  if issubclass(estimator.__class__, TransformerMixin):
-    if hasattr(estimator, 'transform'):
-      result = estimator.transform(input_data)
-      result_pipe = pipeline.transform(input_data)
+    if hasattr(estimator, 'score'):
+      result = estimator.score(*remove_y_quadruplets(estimator,
+                                                     input_data,
+                                                     y))
+      result_pipe = pipeline.score(*remove_y_quadruplets(estimator,
+                                                         input_data,
+                                                         y))
       assert_allclose_dense_sparse(result, result_pipe)
 
+    if hasattr(estimator, 'predict'):
+      result = estimator.predict(input_data)
+      result_pipe = pipeline.predict(input_data)
+      assert_allclose_dense_sparse(result, result_pipe)
 
-@pytest.mark.parametrize('with_preprocessor',[True, False])
+    if issubclass(estimator.__class__, TransformerMixin):
+      if hasattr(estimator, 'transform'):
+        result = estimator.transform(input_data)
+        result_pipe = pipeline.transform(input_data)
+        assert_allclose_dense_sparse(result, result_pipe)
+
+
+@pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
@@ -286,7 +348,7 @@ def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
   estimator.set_params(preprocessor=preprocessor)
   if hasattr(estimator, "num_dims"):
     estimator.num_dims = 1
-  estimator.fit(input_data, labels)
+  estimator.fit(*remove_y_quadruplets(estimator, input_data, labels))
 
   def check_dict():
     assert estimator.__dict__ == dict_before, (
@@ -303,7 +365,7 @@ def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
     check_dict()
 
 
-@pytest.mark.parametrize('with_preprocessor',[True, False])
+@pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_dont_overwrite_parameters(estimator, build_dataset,
@@ -317,7 +379,7 @@ def test_dont_overwrite_parameters(estimator, build_dataset,
     estimator.num_dims = 1
   dict_before_fit = estimator.__dict__.copy()
 
-  estimator.fit(input_data, labels)
+  estimator.fit(*remove_y_quadruplets(estimator, input_data, labels))
   dict_after_fit = estimator.__dict__
 
   public_keys_after_fit = [key for key in dict_after_fit.keys()

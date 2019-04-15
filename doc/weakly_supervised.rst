@@ -148,8 +148,47 @@ tuples you're working with (pairs, triplets...). See the docstring of the
 `score` method of the estimator you use.
 
 
+Learning on pairs
+=================
+
+Some metric learning algorithms learn on pairs of samples. In this case, one
+should provide the algorithm with ``n_samples`` pairs of points, with a
+corresponding target containing ``n_samples`` values being either +1 or -1.
+These values indicate whether the given pairs are similar points or
+dissimilar points.
+
+
+.. _calibration:
+
+Thresholding
+------------
+In order to predict whether a new pair represents similar or dissimilar
+samples, we need to set a distance threshold, so that points closer (in the
+learned space) than this threshold are predicted as similar, and points further
+away are predicted as dissimilar. Several methods are possible for this
+thresholding.
+
+- **At fit time**: The threshold is set with `calibrate_threshold` (see
+  below) on the trainset. You can specify the calibration parameters directly
+  in the `fit` method with the `threshold_params` parameter (see the
+  documentation of the `fit` method of any metric learner that learns on pairs
+  of points for more information). This method can cause a little bit of
+  overfitting. If you want to avoid that, calibrate the threshold after
+  fitting, on a validation set.
+
+- **Manual**: calling `set_threshold` will set the threshold to a
+  particular value.
+
+- **Calibration**: calling `calibrate_threshold` will calibrate the
+  threshold to achieve a particular score on a validation set, the score
+  being among the classical scores for classification (accuracy, f1 score...).
+
+
+See also: `sklearn.calibration`.
+
+
 Algorithms
-==================
+==========
 
 ITML
 ----
@@ -191,39 +230,6 @@ programming.
 
     .. [2] Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/
        itml/
-
-
-LSML
-----
-
-`LSML`: Metric Learning from Relative Comparisons by Minimizing Squared
-Residual
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import LSML
-
-    quadruplets = [[[1.2, 7.5], [1.3, 1.5], [6.4, 2.6], [6.2, 9.7]],
-                   [[1.3, 4.5], [3.2, 4.6], [6.2, 5.5], [5.4, 5.4]],
-                   [[3.2, 7.5], [3.3, 1.5], [8.4, 2.6], [8.2, 9.7]],
-                   [[3.3, 4.5], [5.2, 4.6], [8.2, 5.5], [7.4, 5.4]]]
-
-    # we want to make closer points where the first feature is close, and
-    # further if the second feature is close
-
-    lsml = LSML()
-    lsml.fit(quadruplets)
-
-.. topic:: References:
-
-    .. [1] Liu et al.
-       "Metric Learning from Relative Comparisons by Minimizing Squared
-       Residual". ICDM 2012. http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
-
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439917
-
 
 SDML
 ----
@@ -343,3 +349,46 @@ method. However, it is one of the earliest and a still often cited technique.
         -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
   .. [2] Adapted from Matlab code `here <http://www.cs.cmu
      .edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz>`_.
+
+Learning on quadruplets
+=======================
+
+A type of information even weaker than pairs is information about relative
+comparisons between pairs. The user should provide the algorithm with a
+quadruplet of points, where the two first points are closer than the two
+last points. No target vector (``y``) is needed, since the supervision is
+already in the order that points are given in the quadruplet.
+
+Algorithms
+==========
+
+LSML
+----
+
+`LSML`: Metric Learning from Relative Comparisons by Minimizing Squared
+Residual
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import LSML
+
+    quadruplets = [[[1.2, 7.5], [1.3, 1.5], [6.4, 2.6], [6.2, 9.7]],
+                   [[1.3, 4.5], [3.2, 4.6], [6.2, 5.5], [5.4, 5.4]],
+                   [[3.2, 7.5], [3.3, 1.5], [8.4, 2.6], [8.2, 9.7]],
+                   [[3.3, 4.5], [5.2, 4.6], [8.2, 5.5], [7.4, 5.4]]]
+
+    # we want to make closer points where the first feature is close, and
+    # further if the second feature is close
+
+    lsml = LSML()
+    lsml.fit(quadruplets)
+
+.. topic:: References:
+
+    .. [1] Liu et al.
+       "Metric Learning from Relative Comparisons by Minimizing Squared
+       Residual". ICDM 2012. http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
+
+    .. [2] Adapted from https://gist.github.com/kcarnold/5439917
