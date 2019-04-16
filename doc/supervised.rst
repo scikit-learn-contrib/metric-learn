@@ -54,22 +54,22 @@ from the same class, while keeping examples from different classes
 separated by a large margin. This algorithm makes no assumptions about
 the distribution of the data.
 
-The distance is learned using the following optimization:
+The distance is learned by solving the following optimization problem:
 
 .. math::
 
-      \min_\mathbf{L}\sum_{i, j}\eta_{ij}||\mathbf{L}(x_i-x_j)||^2 + 
-      c\sum_{i, j, l}\eta_{ij}(1-y_{ij})[1+||\mathbf{L}(x_i-x_j)||^2-||
-      \mathbf{L}(x_i-x_l)||^2]_+)
+      \min_\mathbf{L}\sum_{i, j}\eta_{ij}||\mathbf{L(x_i-x_j)}||^2 + 
+      c\sum_{i, j, l}\eta_{ij}(1-y_{ij})[1+||\mathbf{L(x_i-x_j)}||^2-||
+      \mathbf{L(x_i-x_l)}||^2]_+)
 
-where :math:`\mathbf{x}_i` is an data point, :math:`\mathbf{x}_j` are its 
-k nearest neighbors sharing the same label, and :math:`\mathbf{x}_l` are 
-all the other instances within that region with different labels, 
+where :math:`\mathbf{x}_i` is an data point, :math:`\mathbf{x}_j` is one 
+of its k nearest neighbors sharing the same label, and :math:`\mathbf{x}_l` 
+are all the other instances within that region with different labels, 
 :math:`\eta_{ij}, y_{ij} \in \{0, 1\}` are both the indicators, 
 :math:`\eta_{ij}` represents :math:`\mathbf{x}_{j}` is the k nearest 
 neighbors(with same labels) of :math:`\mathbf{x}_{i}`, :math:`y_{ij}=0` 
 indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class, 
-:math:`[\cdot]_+` is the Hinge loss :math:`[\cdot]_+=\max(0, \cdot)`.
+:math:`[\cdot]_+=\max(0, \cdot)` is the Hinge loss.
 
 .. topic:: Example Code:
 
@@ -105,7 +105,8 @@ NCA
 
 Neighborhood Components Analysis(:py:class:`NCA <metric_learn.nca.NCA>`)
 
-`NCA` is a distance metric learning algorithm which aims to improve the accuracy of nearest neighbors classification compared to the standard 
+`NCA` is a distance metric learning algorithm which aims to improve the 
+accuracy of nearest neighbors classification compared to the standard 
 Euclidean distance. The algorithm directly maximizes a stochastic variant 
 of the leave-one-out k-nearest neighbors(KNN) score on the training set. 
 It can also learn a low-dimensional linear transformation of data that can 
@@ -168,24 +169,24 @@ LFDA
 Local Fisher Discriminant Analysis(:py:class:`LFDA <metric_learn.lfda.LFDA>`)
 
 `LFDA` is a linear supervised dimensionality reduction method. It is
-particularly useful when dealing with multimodality, where one ore more classes
+particularly useful when dealing with multi-modality, where one ore more classes
 consist of separate clusters in input space. The core optimization problem of
 LFDA is solved as a generalized eigenvalue problem.
 
 
 The algorithm define the Fisher local within-/between-class scatter matrix 
-:math: `\mathbf{S}^(w)/\mathbf{S}^(b)` in a pairwise fashion:
+:math:`\mathbf{S}^{(w)}/ \mathbf{S}^{(b)}` in a pairwise fashion:
 
-..math::
+.. math::
 
-    \mathbf{S}^(w) = \frac{1}{2}\sum_{i,j=1}^nW_{ij}^{(w)}(\mathbf{x}_i - 
+    \mathbf{S}^{(w)} = \frac{1}{2}\sum_{i,j=1}^nW_{ij}^{(w)}(\mathbf{x}_i - 
     \mathbf{x}_j)(\mathbf{x}_i - \mathbf{x}_j)^T,\\
-    \mathbf{S}^(b) = \frac{1}{2}\sum_{i,j=1}^nW_{ij}^{(b)}(\mathbf{x}_i - 
+    \mathbf{S}^{(b)} = \frac{1}{2}\sum_{i,j=1}^nW_{ij}^{(b)}(\mathbf{x}_i - 
     \mathbf{x}_j)(\mathbf{x}_i - \mathbf{x}_j)^T,\\
 
 where 
 
-..math::
+.. math::
 
     W_{ij}^{(w)} = \left\{\begin{aligned}0 \qquad y_i\neq y_j \\
     \,\,\mathbf{A}_{i,j}/n_l \qquad y_i = y_j\end{aligned}\right.\\
@@ -198,13 +199,15 @@ matrix :math:`\mathbf{A}`:
 Then the learning problem becomes derive the LFDA transformation matrix 
 :math:`\mathbf{T}_{LFDA}`:
 
-..math::
+.. math::
 
-    \mathbf{T}_{LFDA} = \arg\max[\text{tr}(\mathbf{T}^T\mathbf{S}^{(w)}
+    \mathbf{T}_{LFDA} = \arg\max_\mathbf{T}
+    [\text{tr}((\mathbf{T}^T\mathbf{S}^{(w)}
     \mathbf{T})^{-1}\mathbf{T}^T\mathbf{S}^{(b)}\mathbf{T})]
 
-That is, the algorithm is looking for a transformation matrix T such that 
-nearby data pairs in the same class are made close and the data pairs in different classes are separated from each other; far apart data pairs in the 
+That is, it is looking for a transformation matrix :math:`\mathbf{T}` such that 
+nearby data pairs in the same class are made close and the data pairs in 
+different classes are separated from each other; far apart data pairs in the 
 same class are not imposed to be close.
 
 .. topic:: Example Code:
@@ -236,12 +239,53 @@ same class are not imposed to be close.
 MLKR
 ----
 
-Metric Learning for Kernel Regression.
+Metric Learning for Kernel Regression(:py:class:`MLKR <metric_learn.mlkr.MLKR>`)
 
 `MLKR` is an algorithm for supervised metric learning, which learns a
-distance function by directly minimising the leave-one-out regression error.
+distance function by directly minimizing the leave-one-out regression error.
 This algorithm can also be viewed as a supervised variation of PCA and can be
 used for dimensionality reduction and high dimensional data visualization.
+
+Theoretically, `MLKR` can be applied with many types of kernel functions and 
+distance metrics, we hereafter focus the exposition on a particular instance 
+of the Gaussian kernel and Mahalanobis metric, as these are used in our 
+empirical development. The Gaussian kernel is denoted as:
+
+.. math::
+
+    k_{ij} = \frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{d(\mathbf{x}_i, 
+    \mathbf{x}_j)}{\sigma^2})
+
+where :math:`d(\cdot, \cdot)` is the squared distance under some metrics, 
+here in the fashion of Mahalanobis, it should be :math:`d(\mathbf{x}_i, 
+\mathbf{x}_j) = ||\mathbf{A}(\mathbf{x}_i - \mathbf{x}_j)||`, the transition 
+matrix :math:`\mathbf{A}` is derived from the decomposition of Mahalanobis 
+matrix :math:`\mathbf{M=A^TA}`.
+
+Since :math:`\sigma^2` can be integrated into :math:`d(\cdot)`, we can set 
+:math:`\sigma^2=1` for the sake of simplicity. Here we use the cumulative 
+leave-one-out quadratic regression error of the training samples as the 
+loss function:
+
+.. math::
+
+    \mathcal{L} = \sum_i(y_i - \hat{y}_i)^2
+
+where the prediction :math:`\hat{y}_i` is derived from kernel regression by 
+calculating a weighted average of all the training samples:
+
+.. math::
+
+    \hat{y}_i = \frac{\sum_{j\neq i}y_jk_{ij}}{\sum_{j\neq i}k_{ij}}
+
+The tractable property has enabled the distance metric learning problem to 
+be solved by stochastic gradient descent, where the gradient is:
+
+.. math::
+
+    \frac{\partial\mathcal{L}}{\partial\mathbf{A}} = 4\mathbf{A}\sum_i
+    (\hat{y}_i - y_i)\sum_j(\hat{y}_j - y_j)k_{ij}(\mathbf{x}_i - 
+    \mathbf{x}_j)(\mathbf{x}_i - \mathbf{x}_j)^T
 
 .. topic:: Example Code:
 

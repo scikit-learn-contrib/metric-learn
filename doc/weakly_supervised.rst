@@ -330,14 +330,12 @@ is convex:
     \min_{\mathbf{M}} = \text{tr}((\mathbf{M}_0 + \eta \mathbf{XLX}^{T})
     \cdot \mathbf{M}) - \log\det \mathbf{M} + \lambda ||\mathbf{M}||_{1, off}
 
-where :math:`\mathbf{X}=[\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_n]`, 
-:math:`\mathbf{L = D − K}` is the Laplacian matrix, :math:`\mathbf{D}` is 
-a diagonal matrix whose diagonal elements are the sums of the row elements 
-of :math:`\mathbf{K}`, :math:`\mathbf{K}` is the incidence matrix to encode 
-the (dis)similarity information as :math:`\mathbf{K}_{ij} = 1` if 
-:math:`(\mathbf{x}_i, \mathbf{x}_j)\in S`, :math:`\mathbf{K}_{ij} = -1` if 
-:math:`(\mathbf{x}_i, \mathbf{x}_j)\in D`, :math:`||\cdot||_{1, off}` is the 
-off-diagonal L1 norm of :math:`\mathbf{M}`.
+where :math:`\mathbf{X}=[\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_n]` is 
+the training data, incidence matrix :math:`\mathbf{K}_{ij} = 1` if 
+:math:`(\mathbf{x}_i, \mathbf{x}_j)` is a similar pair, otherwise -1. The 
+Laplacian matrix :math:`\mathbf{L}` is calculated from :math:`\mathbf{K}` 
+(see original paper for more details), :math:`||\cdot||_{1, off}` is the 
+off-diagonal L1 norm.
 
 
 .. topic:: Example Code:
@@ -391,8 +389,8 @@ algorithm is efficient since it simply amounts to computing
 
 
 where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}` 
-with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}` is used as 
-the Mahalanobis matrix.
+with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used 
+as the Mahalanobis matrix.
 
 .. topic:: Example Code:
 
@@ -448,8 +446,8 @@ points, while constrains the sum of distances between dissimilar points:
 
       \min_{\mathbf{M}\in\mathbb{S}_+^d}\sum_{(\mathbf{x}_i, 
       \mathbf{x}_j)\in S} d_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j)
-      \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}'_i, \mathbf{x}'_j)
-      \in D} d^2_{\mathbf{M}}(\mathbf{x}'_i, \mathbf{x}'_j) \geq 1
+      \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}_i, \mathbf{x}_j)
+      \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
 
 .. topic:: Example Code:
 

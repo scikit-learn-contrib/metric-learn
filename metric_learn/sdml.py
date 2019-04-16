@@ -1,9 +1,9 @@
 r"""
 Sparse High-Dimensional Metric Learning(SDML)
 
-An efficient sparse metric learning in high-dimensional space via
-double regularization: L1-penalized on the off-diagonal elements of Mahalanobis
-matrix :math:`\mathbf{M}` and the log-determinant divergence between
+SDML is an efficient sparse metric learning in high-dimensional space via
+double regularization: an L1-penalization on the off-diagonal elements of the
+Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between
 :math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}`
 or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the
 covariance matrix).

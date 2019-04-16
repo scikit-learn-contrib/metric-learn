@@ -1,7 +1,7 @@
 r"""
 Large Margin Nearest Neighbor Metric learning(LMNN)
 
-`LMNN` learns a Mahalanobis distance metric in the kNN classification
+LMNN learns a Mahalanobis distance metric in the kNN classification
 setting. The learned metric attempts to keep close k-nearest neighbors
 from the same class, while keeping examples from different classes
 separated by a large margin. This algorithm makes no assumptions about

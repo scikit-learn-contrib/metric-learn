@@ -11,6 +11,7 @@ extension leads to more stable estimation when the dimension is high and
 only a small amount of constraints is given.
 
 Read more in the :ref:`User Guide <lsml>`.
+
 """
 
 from __future__ import print_function, absolute_import, division

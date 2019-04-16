@@ -1,7 +1,7 @@
 r"""
 Metric Learning with Application for Clustering with Side Information(MMC)
 
-`MMC` minimizes the sum of squared distances between similar points, while
+MMC minimizes the sum of squared distances between similar points, while
 enforcing the sum of distances between dissimilar ones to be greater than one.
 This leads to a convex and, thus, local-minima-free optimization problem that
 can be solved efficiently.

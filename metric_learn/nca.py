@@ -1,7 +1,8 @@
 r"""
-Neighborhood Components Analysis (NCA)
+Neighborhood Components Analysis(NCA)
 
-`NCA` is a distance metric learning algorithm which aims to improve the accuracy of nearest neighbors classification compared to the standard
+NCA is a distance metric learning algorithm which aims to improve the
+accuracy of nearest neighbors classification compared to the standard
 Euclidean distance. The algorithm directly maximizes a stochastic variant
 of the leave-one-out k-nearest neighbors(KNN) score on the training set.
 It can also learn a low-dimensional linear transformation of data that can
