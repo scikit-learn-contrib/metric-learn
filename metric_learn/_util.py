@@ -326,7 +326,32 @@ def check_collapsed_pairs(pairs):
                        "in total.".format(num_ident, pairs.shape[0]))
 
 
-def transformer_from_metric(metric):
+def _check_sdp_from_eigen(w, tol=None):
+  """Checks if some of the eigenvalues given are negative, up to a tolerance
+  level, with a default value of the tolerance depending on the eigenvalues.
+
+  Parameters
+  ----------
+  w : array-like, shape=(n_eigenvalues,)
+    Eigenvalues to check for non semidefinite positiveness.
+
+  tol : float, optional
+    Negative eigenvalues above - tol are considered zero. If
+    tol is None, and w are `metric`'s eigenvalues, and eps is the
+    epsilon value for datatype of w, then tol is set to w.max() * len(w) * eps.
+
+  See Also
+  --------
+  np.linalg.matrix_rank for more details on the choice of tolerance (the same
+    strategy is applied here)
+  """
+  if tol is None:
+    tol = w.max() * len(w) * np.finfo(w.dtype).eps
+  if any(w[w < 0] < - tol):
+      raise ValueError("Matrix is not positive semidefinite (PSD).")
+
+
+def transformer_from_metric(metric, tol=None):
   """Computes the transformation matrix from the Mahalanobis matrix.
 
   Since by definition the metric `M` is positive semi-definite (PSD), it
@@ -344,6 +369,12 @@ def transformer_from_metric(metric):
   metric : symmetric `np.ndarray`, shape=(d x d)
     The input metric, from which we want to extract a transformation matrix.
 
+  tol : positive float, optional
+    Eigenvalues of `metric` between 0 and - tol are considered zero. If tol is
+    None, and w are `metric`'s eigenvalues, and eps is the epsilon value for
+    datatype of w, then tol is set to w.max() * len(w) * eps.
+
+
   Returns
   -------
   L : np.ndarray, shape=(d x d)
@@ -351,19 +382,15 @@ def transformer_from_metric(metric):
   """
   if not np.allclose(metric, metric.T):
     raise ValueError("The input metric should be symmetric.")
-  abs_M = np.abs(metric)
-  diag_coeffs = np.diag(abs_M)
-  min_abs_diag_coeff = np.min(diag_coeffs)
-  if min_abs_diag_coeff >= 1000 * np.max(np.diag(abs_M) - abs_M):
-    return np.diag(np.sqrt(np.diag(metric)))
+  if np.array_equal(metric, np.diag(np.diag(metric))):
+    _check_sdp_from_eigen(np.diag(metric), tol)
+    return np.diag(np.sqrt(np.maximum(0, np.diag(metric))))
   else:
     try:
       return np.linalg.cholesky(metric).T
-    except LinAlgError as e:
-      warnings.warn("The Cholesky decomposition returned the following "
-                    "error: '{}'. Using the eigendecomposition "
-                    "instead.".format(e))
+    except LinAlgError:
       w, V = np.linalg.eigh(metric)
+      _check_sdp_from_eigen(w, tol)
       return V.T * np.sqrt(np.maximum(0, w[:, None]))
 
 

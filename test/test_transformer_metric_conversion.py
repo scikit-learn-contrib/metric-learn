@@ -154,18 +154,27 @@ class TestTransformerMetricConversion(unittest.TestCase):
       transformer_from_metric(M)
     assert str(raised_error.value) == "The input metric should be symmetric."
 
-  def test_non_psd_warns(self):
-    """Checks that if the matrix is not PSD it will raise a warning saying
-    that we will do the eigendecomposition"""
+  def test_non_psd_raises(self):
+    """Checks that a non PSD matrix (i.e. with negative eigenvalues) will
+    raise an error when passed to transformer_from_metric"""
     rng = np.random.RandomState(42)
-    R = np.abs(rng.randn(7, 7))
-    M = R.dot(np.diag([1, 5, 3, 2, 0, 0, 0])).dot(R.T)
-    msg = ("The Cholesky decomposition returned the following "
-           "error: 'Matrix is not positive definite'. Using the "
-           "eigendecomposition instead.")
-    with pytest.warns(None) as raised_warning:
-      L = transformer_from_metric(M)
-    assert str(raised_warning[0].message) == msg
+    D = np.diag([1, 5, 3, 4.2, -4, -2, 1])
+    P = ortho_group.rvs(7, random_state=rng)
+    M = P.dot(D).dot(P.T)
+    with pytest.raises(ValueError) as raised_error:
+      transformer_from_metric(M)
+    msg = ("Matrix is not positive semidefinite (PSD).")
+    assert str(raised_error.value) == msg
+
+  def test_almost_psd_dont_raise(self):
+    """Checks that if the metric is almost PSD (i.e. it has some negative
+    eigenvalues very close to zero), then transformer_from_metric will still
+    work"""
+    rng = np.random.RandomState(42)
+    D = np.diag([1, 5, 3, 4.2, -1e-20, -2e-20, -1e-20])
+    P = ortho_group.rvs(7, random_state=rng)
+    M = P.dot(D).dot(P.T)
+    L = transformer_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
 
