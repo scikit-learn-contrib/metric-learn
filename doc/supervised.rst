@@ -42,12 +42,11 @@ the covariance matrix of the input data. This is a simple baseline method.
     .. [1] On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
 
-.. _lmnn:
-
 LMNN
 -----
 
-Large-margin nearest neighbor metric learning.
+Large Margin Nearest Neighbor Metric Learning
+(:py:class:`LMNN <metric_learn.lmnn.LMNN>`)
 
 `LMNN` learns a Mahalanobis distance metric in the kNN classification
 setting. The learned metric attempts to keep close k-nearest neighbors 
@@ -63,13 +62,14 @@ The distance is learned using the following optimization:
       c\sum_{i, j, l}\eta_{ij}(1-y_{ij})[1+||\mathbf{L}(x_i-x_j)||^2-||
       \mathbf{L}(x_i-x_l)||^2]_+)
 
-where :math:`x_i` is an data point, :math:`x_j` are its k nearest neighbors 
-sharing the same label, and :math:`x_l` are all the other instances within 
-that region with different labels, :math:`\eta_{ij}, y_{ij} \in \{0, 1\}` 
-are both the indicators, :math:`\eta_{ij}` represents :math:`x_{j}` is the 
-k nearest neighbors(with same labels) of :math:`x_{i}`, :math:`y_{ij}=0` 
-indicates :math:`x_{i}, x_{j}` belong to different class, :math:`[\cdot]_+` 
-is the Hinge loss :math:`[\cdot]_+=\max(0, \cdot)`.
+where :math:`\mathbf{x}_i` is an data point, :math:`\mathbf{x}_j` are its 
+k nearest neighbors sharing the same label, and :math:`\mathbf{x}_l` are 
+all the other instances within that region with different labels, 
+:math:`\eta_{ij}, y_{ij} \in \{0, 1\}` are both the indicators, 
+:math:`\eta_{ij}` represents :math:`\mathbf{x}_{j}` is the k nearest 
+neighbors(with same labels) of :math:`\mathbf{x}_{i}`, :math:`y_{ij}=0` 
+indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class, 
+:math:`[\cdot]_+` is the Hinge loss :math:`[\cdot]_+=\max(0, \cdot)`.
 
 .. topic:: Example Code:
 
@@ -100,31 +100,30 @@ The two implementations differ slightly, and the C++ version is more complete.
        Blitzer, Lawrence K. Saul
 
 
-.. _nca:
-
 NCA
 ---
 
-Neighborhood Components Analysis (:py:class:`NCA <metric_learn.nca.NCA>`)
-is a distance metric learning algorithm which aims to improve the accuracy of
-nearest neighbors classification compared to the standard Euclidean distance.
-The algorithm directly maximizes a stochastic variant of the leave-one-out
-k-nearest neighbors (KNN) score on the training set. It can also learn a
-low-dimensional linear transformation of data that can be used for data
-visualization and fast classification.
+Neighborhood Components Analysis(:py:class:`NCA <metric_learn.nca.NCA>`)
+
+`NCA` is a distance metric learning algorithm which aims to improve the accuracy of nearest neighbors classification compared to the standard 
+Euclidean distance. The algorithm directly maximizes a stochastic variant 
+of the leave-one-out k-nearest neighbors(KNN) score on the training set. 
+It can also learn a low-dimensional linear transformation of data that can 
+be used for data visualization and fast classification.
 
 They use the decomposition :math:`\mathbf{M} = \mathbf{L}^T\mathbf{L}` and 
-define the probability :math:`p_{ij}` that :math:`x_i` is the neighbor of 
-:math:`x_j` by calculating the softmax likelihood of the Mahalanobis distance:
+define the probability :math:`p_{ij}` that :math:`\mathbf{x}_i` is the 
+neighbor of :math:`\mathbf{x}_j` by calculating the softmax likelihood of 
+the Mahalanobis distance:
 
 .. math::
 
-      p_{ij} = \frac{\exp(-|| \mathbf{L}x_i - \mathbf{L}x_j ||_2^2)}
-      {\sum_{l\neq i}\exp(-||\mathbf{L}x_i - \mathbf{L}x_l||_2^2)}, 
+      p_{ij} = \frac{\exp(-|| \mathbf{Lx}_i - \mathbf{Lx}_j ||_2^2)}
+      {\sum_{l\neq i}\exp(-||\mathbf{Lx}_i - \mathbf{Lx}_l||_2^2)}, 
       \qquad p_{ii}=0
 
-Then the probability that :math:`x_i` will be correctly classified by the 
-stochastic nearest neighbors rule is:
+Then the probability that :math:`\mathbf{x}_i` will be correctly classified 
+by the stochastic nearest neighbors rule is:
 
 .. math::
 
@@ -162,15 +161,51 @@ the sum of probability of being correctly classified:
     .. [2] Wikipedia entry on Neighborhood Components Analysis
        https://en.wikipedia.org/wiki/Neighbourhood_components_analysis
 
+
 LFDA
 ----
 
-Local Fisher Discriminant Analysis (LFDA)
+Local Fisher Discriminant Analysis(:py:class:`LFDA <metric_learn.lfda.LFDA>`)
 
 `LFDA` is a linear supervised dimensionality reduction method. It is
 particularly useful when dealing with multimodality, where one ore more classes
 consist of separate clusters in input space. The core optimization problem of
 LFDA is solved as a generalized eigenvalue problem.
+
+
+The algorithm define the Fisher local within-/between-class scatter matrix 
+:math: `\mathbf{S}^(w)/\mathbf{S}^(b)` in a pairwise fashion:
+
+..math::
+
+    \mathbf{S}^(w) = \frac{1}{2}\sum_{i,j=1}^nW_{ij}^{(w)}(\mathbf{x}_i - 
+    \mathbf{x}_j)(\mathbf{x}_i - \mathbf{x}_j)^T,\\
+    \mathbf{S}^(b) = \frac{1}{2}\sum_{i,j=1}^nW_{ij}^{(b)}(\mathbf{x}_i - 
+    \mathbf{x}_j)(\mathbf{x}_i - \mathbf{x}_j)^T,\\
+
+where 
+
+..math::
+
+    W_{ij}^{(w)} = \left\{\begin{aligned}0 \qquad y_i\neq y_j \\
+    \,\,\mathbf{A}_{i,j}/n_l \qquad y_i = y_j\end{aligned}\right.\\
+    W_{ij}^{(b)} = \left\{\begin{aligned}1/n \qquad y_i\neq y_j \\
+    \,\,\mathbf{A}_{i,j}(1/n-1/n_l) \qquad y_i = y_j\end{aligned}\right.\\
+
+here :math:`\mathbf{A}_{i,j}` is the :math:`(i,j)`-th entry of the affinity
+matrix :math:`\mathbf{A}`:
+
+Then the learning problem becomes derive the LFDA transformation matrix 
+:math:`\mathbf{T}_{LFDA}`:
+
+..math::
+
+    \mathbf{T}_{LFDA} = \arg\max[\text{tr}(\mathbf{T}^T\mathbf{S}^{(w)}
+    \mathbf{T})^{-1}\mathbf{T}^T\mathbf{S}^{(b)}\mathbf{T})]
+
+That is, the algorithm is looking for a transformation matrix T such that 
+nearby data pairs in the same class are made close and the data pairs in different classes are separated from each other; far apart data pairs in the 
+same class are not imposed to be close.
 
 .. topic:: Example Code:
 

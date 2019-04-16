@@ -1,11 +1,11 @@
 r"""
-Large-margin nearest neighbor metric learning. (Weinberger 2005)
+Large Margin Nearest Neighbor Metric learning(LMNN)
 
-LMNN learns a Mahanalobis distance metric in the kNN classification setting
-using semidefinite programming.
-The learned metric attempts to keep k-nearest neighbors in the same class,
-while keeping examples from different classes separated by a large margin.
-This algorithm makes no assumptions about the distribution of the data.
+`LMNN` learns a Mahalanobis distance metric in the kNN classification
+setting. The learned metric attempts to keep close k-nearest neighbors
+from the same class, while keeping examples from different classes
+separated by a large margin. This algorithm makes no assumptions about
+the distribution of the data.
 
 Read more in the :ref:`User Guide <lmnn>`.
 

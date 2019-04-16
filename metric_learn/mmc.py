@@ -1,16 +1,19 @@
-"""
-Mahalanobis Metric Learning with Application for Clustering with Side-Information, Xing et al., NIPS 2002
+r"""
+Metric Learning with Application for Clustering with Side Information(MMC)
 
-MMC minimizes the sum of squared distances between similar examples,
-while enforcing the sum of distances between dissimilar examples to be
-greater than a certain margin.
-This leads to a convex and, thus, local-minima-free optimization problem
-that can be solved efficiently.
+`MMC` minimizes the sum of squared distances between similar points, while
+enforcing the sum of distances between dissimilar ones to be greater than one.
+This leads to a convex and, thus, local-minima-free optimization problem that
+can be solved efficiently.
+However, the algorithm involves the computation of eigenvalues, which is the
+main speed-bottleneck. Since it has initially been designed for clustering
+applications, one of the implicit assumptions of MMC is that all classes form
+a compact set, i.e., follow a unimodal distribution, which restricts the
+possible use-cases of this method. However, it is one of the earliest and a
+still often cited technique.
 
 Read more in the :ref:`User Guide <mmc>`.
 
-
-Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
 """
 
 from __future__ import print_function, absolute_import, division

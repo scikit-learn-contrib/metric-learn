@@ -1,5 +1,6 @@
-"""
-Qi et al. ICML 2009
+r"""
+Sparse High-Dimensional Metric Learning(SDML)
+
 An efficient sparse metric learning in high-dimensional space via
 double regularization: L1-penalized on the off-diagonal elements of Mahalanobis
 matrix :math:`\mathbf{M}` and the log-determinant divergence between
@@ -9,8 +10,6 @@ covariance matrix).
 
 Read more in the :ref:`User Guide <sdml>`.
 
-Adapted from https://gist.github.com/kcarnold/5439945
-Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf
 """
 
 from __future__ import absolute_import
