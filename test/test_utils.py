@@ -9,7 +9,8 @@ from sklearn.utils.testing import set_random_state
 from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
-                                check_collapsed_pairs, validate_vector)
+                                check_collapsed_pairs, validate_vector,
+                                _check_sdp_from_eigen)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -1030,3 +1031,21 @@ def test__validate_vector():
   x = [[1, 2], [3, 4]]
   with pytest.raises(ValueError):
     validate_vector(x)
+
+
+def _check_sdp_from_eigen_positive_err_messages():
+  """Tests that if _check_sdp_from_eigen is given a negative tol it returns
+  an error, and if positive it does not"""
+  w = np.random.RandomState(42).randn(10)
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, -5.)
+  assert str(raised_error.value) == "tol should be positive."
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, -1e-10)
+  assert str(raised_error.value) == "tol should be positive."
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, 1.)
+  assert len(raised_error.value) == 0
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, 0.)
+  assert str(raised_error.value) == 0

@@ -161,9 +161,12 @@ class TestTransformerMetricConversion(unittest.TestCase):
     D = np.diag([1, 5, 3, 4.2, -4, -2, 1])
     P = ortho_group.rvs(7, random_state=rng)
     M = P.dot(D).dot(P.T)
+    msg = ("Matrix is not positive semidefinite (PSD).")
     with pytest.raises(ValueError) as raised_error:
       transformer_from_metric(M)
-    msg = ("Matrix is not positive semidefinite (PSD).")
+    assert str(raised_error.value) == msg
+    with pytest.raises(ValueError) as raised_error:
+      transformer_from_metric(D)
     assert str(raised_error.value) == msg
 
   def test_almost_psd_dont_raise(self):

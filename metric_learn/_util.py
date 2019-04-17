@@ -335,10 +335,10 @@ def _check_sdp_from_eigen(w, tol=None):
   w : array-like, shape=(n_eigenvalues,)
     Eigenvalues to check for non semidefinite positiveness.
 
-  tol : float, optional
+  tol : positive `float`, optional
     Negative eigenvalues above - tol are considered zero. If
-    tol is None, and w are `metric`'s eigenvalues, and eps is the
-    epsilon value for datatype of w, then tol is set to w.max() * len(w) * eps.
+    tol is None, and eps is the epsilon value for datatype of w, then tol
+    is set to w.max() * len(w) * eps.
 
   See Also
   --------
@@ -347,33 +347,26 @@ def _check_sdp_from_eigen(w, tol=None):
   """
   if tol is None:
     tol = w.max() * len(w) * np.finfo(w.dtype).eps
-  if any(w[w < 0] < - tol):
+  assert tol >= 0, ValueError("tol should be positive.")
+  if any(w < - tol):
       raise ValueError("Matrix is not positive semidefinite (PSD).")
 
 
 def transformer_from_metric(metric, tol=None):
-  """Computes the transformation matrix from the Mahalanobis matrix.
+  """Returns the transformation matrix from the Mahalanobis matrix.
 
-  Since by definition the metric `M` is positive semi-definite (PSD), it
-  admits a Cholesky decomposition: L = cholesky(M).T. However, currently the
-  computation of the Cholesky decomposition used does not support
-  non-definite matrices. If the metric is not definite, this method will
-  return L = V.T w^( -1/2), with M = V*w*V.T being the eigenvector
-  decomposition of M with the eigenvalues in the diagonal matrix w and the
-  columns of V being the eigenvectors. If M is diagonal, this method will
-  just return its elementwise square root (since the diagonalization of
-  the matrix is itself).
+  Returns the transformation matrix from the Mahalanobis matrix, i.e. the
+  matrix L such that metric=L.T.dot(L).
 
   Parameters
   ----------
   metric : symmetric `np.ndarray`, shape=(d x d)
     The input metric, from which we want to extract a transformation matrix.
 
-  tol : positive float, optional
+  tol : positive `float`, optional
     Eigenvalues of `metric` between 0 and - tol are considered zero. If tol is
-    None, and w are `metric`'s eigenvalues, and eps is the epsilon value for
-    datatype of w, then tol is set to w.max() * len(w) * eps.
-
+    None, and w_max is `metric`'s largest eigenvalue, and eps is the epsilon
+    value for datatype of w, then tol is set to w_max * metric.shape[0] * eps.
 
   Returns
   -------
@@ -382,13 +375,21 @@ def transformer_from_metric(metric, tol=None):
   """
   if not np.allclose(metric, metric.T):
     raise ValueError("The input metric should be symmetric.")
+  # If M is diagonal, we will just return the elementwise square root:
   if np.array_equal(metric, np.diag(np.diag(metric))):
     _check_sdp_from_eigen(np.diag(metric), tol)
     return np.diag(np.sqrt(np.maximum(0, np.diag(metric))))
   else:
     try:
+      # if `M` is positive semi-definite, it will admit a Cholesky
+      # decomposition: L = cholesky(M).T
       return np.linalg.cholesky(metric).T
     except LinAlgError:
+      # However, currently np.linalg.cholesky does not support indefinite
+      # matrices. So if the latter does not work we will return L = V.T w^(
+      # -1/2), with M = V*w*V.T being the eigenvector decomposition of M with
+      # the eigenvalues in the diagonal matrix w and the columns of V being the
+      # eigenvectors.
       w, V = np.linalg.eigh(metric)
       _check_sdp_from_eigen(w, tol)
       return V.T * np.sqrt(np.maximum(0, w[:, None]))
