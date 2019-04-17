@@ -45,7 +45,7 @@ class _BaseLSML(MahalanobisMixin):
     self.verbose = verbose
     super(_BaseLSML, self).__init__(preprocessor)
 
-  def _fit(self, quadruplets, y=None, weights=None):
+  def _fit(self, quadruplets, weights=None):
     quadruplets = self._prepare_inputs(quadruplets,
                                        type_of_inputs='tuples')
 

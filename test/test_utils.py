@@ -9,7 +9,8 @@ from sklearn.utils.testing import set_random_state
 from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
-                                check_collapsed_pairs, validate_vector)
+                                check_collapsed_pairs, validate_vector,
+                                _check_sdp_from_eigen)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -100,8 +101,11 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
                                  quadruplets_learners]))
 
-pairs_learners = [(ITML(), build_pairs),
-                  (MMC(max_iter=2), build_pairs),  # max_iter=2 for faster
+pairs_learners = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be
+                  # faster, also make tests pass while waiting for #175 to
+                  # be solved
+                  # TODO: remove this comment when #175 is solved
+                  (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster
                   (SDML(use_cov=False, balance_param=1e-5), build_pairs)]
 ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
                               [learner for (learner, _) in
@@ -117,7 +121,7 @@ classifiers = [(Covariance(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
                (RCA_Supervised(num_chunks=10), build_classification),
                (SDML_Supervised(use_cov=False, balance_param=1e-5),
-                build_classification)]
+               build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
@@ -137,6 +141,18 @@ ids_supervised_learners = ids_classifiers + ids_regressors
 
 metric_learners = tuples_learners + supervised_learners
 ids_metric_learners = ids_tuples_learners + ids_supervised_learners
+
+
+def remove_y_quadruplets(estimator, X, y):
+  """Quadruplets learners have no y in fit, but to write test for all
+  estimators, it is convenient to have this function, that will return X and y
+  if the estimator needs a y to fit on, and just X otherwise."""
+  if estimator.__class__.__name__ in [e.__class__.__name__
+                                      for (e, _) in
+                                      quadruplets_learners]:
+    return (X,)
+  else:
+    return (X, y)
 
 
 def mock_preprocessor(indices):
@@ -840,7 +856,7 @@ def test_error_message_tuple_size(estimator, _):
                             [[1.9, 5.3], [1., 7.8], [3.2, 1.2]]])
   y = [1, 1]
   with pytest.raises(ValueError) as raised_err:
-    estimator.fit(invalid_pairs, y)
+    estimator.fit(*remove_y_quadruplets(estimator, invalid_pairs, y))
   expected_msg = ("Tuples of {} element(s) expected{}. Got tuples of 3 "
                   "element(s) instead (shape=(2, 3, 2)):\ninput={}.\n"
                   .format(estimator._tuple_size, make_context(estimator),
@@ -925,19 +941,25 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)
   estimator_with_preprocessor.set_params(preprocessor=X)
-  estimator_with_preprocessor.fit(indices_train, y_train,
+  estimator_with_preprocessor.fit(*remove_y_quadruplets(estimator,
+                                                        indices_train,
+                                                        y_train),
                                   **make_random_state(estimator))
 
   estimator_without_preprocessor = clone(estimator)
   set_random_state(estimator_without_preprocessor)
   estimator_without_preprocessor.set_params(preprocessor=None)
-  estimator_without_preprocessor.fit(formed_train, y_train,
+  estimator_without_preprocessor.fit(*remove_y_quadruplets(estimator,
+                                                           formed_train,
+                                                           y_train),
                                      **make_random_state(estimator))
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=X)
-  estimator_with_prep_formed.fit(indices_train, y_train,
+  estimator_with_prep_formed.fit(*remove_y_quadruplets(estimator,
+                                                       indices_train,
+                                                       y_train),
                                  **make_random_state(estimator))
 
   # test prediction methods
@@ -1030,3 +1052,21 @@ def test__validate_vector():
   x = [[1, 2], [3, 4]]
   with pytest.raises(ValueError):
     validate_vector(x)
+
+
+def _check_sdp_from_eigen_positive_err_messages():
+  """Tests that if _check_sdp_from_eigen is given a negative tol it returns
+  an error, and if positive it does not"""
+  w = np.random.RandomState(42).randn(10)
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, -5.)
+  assert str(raised_error.value) == "tol should be positive."
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, -1e-10)
+  assert str(raised_error.value) == "tol should be positive."
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, 1.)
+  assert len(raised_error.value) == 0
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, 0.)
+  assert str(raised_error.value) == 0

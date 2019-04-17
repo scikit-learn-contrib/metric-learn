@@ -359,27 +359,43 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  threshold_ : `float`
+      If the distance metric between two points is lower than this threshold,
+      points will be classified as similar, otherwise they will be
+      classified as dissimilar.
   """
 
-  def fit(self, pairs, y):
+  def fit(self, pairs, y, calibration_params=None):
     """Learn the MMC model.
+
+    The threshold will be calibrated on the trainset using the parameters
+    `calibration_params`.
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features) or
+    pairs : array-like, shape=(n_constraints, 2, n_features) or
            (n_constraints, 2)
         3D Array of pairs with each row corresponding to two points,
         or 2D array of indices of pairs if the metric learner uses a
         preprocessor.
-    y: array-like, of shape (n_constraints,)
+    y : array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
-
+    calibration_params : `dict` or `None`
+        Dictionary of parameters to give to `calibrate_threshold` for the
+        threshold calibration step done at the end of `fit`. If `None` is
+        given, `calibrate_threshold` will use the default parameters.
     Returns
     -------
     self : object
         Returns the instance.
     """
-    return self._fit(pairs, y)
+    calibration_params = (calibration_params if calibration_params is not
+                          None else dict())
+    self._validate_calibration_params(**calibration_params)
+    self._fit(pairs, y)
+    self.calibrate_threshold(pairs, y, **calibration_params)
+    return self
 
 
 class MMC_Supervised(_BaseMMC, TransformerMixin):
