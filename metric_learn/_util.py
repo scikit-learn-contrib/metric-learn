@@ -347,7 +347,8 @@ def _check_sdp_from_eigen(w, tol=None):
   """
   if tol is None:
     tol = w.max() * len(w) * np.finfo(w.dtype).eps
-  assert tol >= 0, ValueError("tol should be positive.")
+  if tol < 0:
+    raise ValueError("tol should be positive.")
   if any(w < - tol):
       raise ValueError("Matrix is not positive semidefinite (PSD).")
 
