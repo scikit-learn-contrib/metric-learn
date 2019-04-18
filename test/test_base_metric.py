@@ -164,6 +164,8 @@ def test_get_metric_works_does_not_raise(estimator, build_dataset):
     assert len(record) == 0
 
 
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
 def test_num_dims(estimator, build_dataset):
   """Check that estimators that have a num_dims parameters can use it
   and that it actually works as expected"""
