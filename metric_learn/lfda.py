@@ -17,6 +17,8 @@ import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.base import TransformerMixin
+
+from metric_learn._util import _check_num_dims
 from .base_metric import MahalanobisMixin
 
 
@@ -78,12 +80,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     n, d = X.shape
     num_classes = len(unique_classes)
 
-    if self.num_dims is None:
-      dim = d
-    else:
-      if not 0 < self.num_dims <= d:
-        raise ValueError('Invalid num_dims, must be in [1,%d]' % d)
-      dim = self.num_dims
+    dim = _check_num_dims(d, self.num_dims)
 
     if self.k is None:
       k = min(7, d - 1)

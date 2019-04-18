@@ -18,6 +18,7 @@ from six.moves import xrange
 from sklearn import decomposition
 from sklearn.base import TransformerMixin
 
+from metric_learn._util import _check_num_dims
 from .base_metric import MahalanobisMixin
 from .constraints import Constraints
 
@@ -75,16 +76,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
                     'You should adjust pca_comps to remove noise and '
                     'redundant information.')
 
-    if self.num_dims is None:
-      dim = d
-    elif self.num_dims <= 0:
-      raise ValueError('Invalid embedding dimension: must be greater than 0.')
-    elif self.num_dims > d:
-      dim = d
-      warnings.warn('num_dims (%d) must be smaller than '
-                    'the data dimension (%d)' % (self.num_dims, d))
-    else:
-      dim = self.num_dims
+    dim = _check_num_dims(d, self.num_dims)
     return dim
 
   def fit(self, X, chunks):

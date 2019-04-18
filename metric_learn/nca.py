@@ -14,6 +14,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
+from metric_learn._util import _check_num_dims
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -63,9 +64,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     """
     X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
-    num_dims = self.num_dims
-    if num_dims is None:
-        num_dims = d
+    num_dims = _check_num_dims(d, self.num_dims)
 
     # Measure the total training time
     train_time = time.time()

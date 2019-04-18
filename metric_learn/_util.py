@@ -404,3 +404,15 @@ def validate_vector(u, dtype=None):
   if u.ndim > 1:
     raise ValueError("Input vector should be 1-D.")
   return u
+
+
+def _check_num_dims(n_features, num_dims):
+  """Checks that num_dims is less that n_features and deal with the None
+  case"""
+  if num_dims is None:
+    dim = n_features
+  else:
+    if not 0 < num_dims <= n_features:
+      raise ValueError('Invalid num_dims, must be in [1, %d]' % n_features)
+    dim = num_dims
+  return dim

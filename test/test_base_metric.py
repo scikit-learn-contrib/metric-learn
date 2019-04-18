@@ -17,8 +17,9 @@ class TestStringRepr(unittest.TestCase):
     self.assertRegexpMatches(
         str(metric_learn.LMNN()),
         r"(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
-        r"max_iter=1000,\n      min_iter=50, preprocessor=None, "
-        r"regularization=0.5, use_pca=True,\n      verbose=False\)")
+        r"max_iter=1000,\n      min_iter=50, num_dims=None, "
+        r"preprocessor=None, regularization=0.5,\n      use_pca=True, "
+        r"verbose=False\)")
 
   def test_nca(self):
     self.assertEqual(str(metric_learn.NCA()),
@@ -161,6 +162,41 @@ def test_get_metric_works_does_not_raise(estimator, build_dataset):
     with pytest.warns(None) as record:
       metric(u, v)
     assert len(record) == 0
+
+
+def test_num_dims(estimator, build_dataset):
+  """Check that estimators that have a num_dims parameters can use it
+  and that it actually works as expected"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+
+  if hasattr(model, 'num_dims'):
+    set_random_state(model)
+    model.set_params(num_dims=None)
+    model.fit(input_data, labels)
+    assert model.transformer_.shape == (X.shape[1], X.shape[1])
+
+    model = clone(estimator)
+    set_random_state(model)
+    model.set_params(num_dims=X.shape[1] - 1)
+    model.fit(input_data, labels)
+    assert model.transformer_.shape == (X.shape[1] - 1, X.shape[1])
+
+    model = clone(estimator)
+    set_random_state(model)
+    model.set_params(num_dims=X.shape[1] + 1)
+    with pytest.raises(ValueError) as expected_err:
+      model.fit(input_data, labels)
+    assert str(expected_err.value) == ('Invalid num_dims, must be in [1, {}]'
+                                       .format(X.shape[1]))
+
+    model = clone(estimator)
+    set_random_state(model)
+    model.set_params(num_dims=0)
+    with pytest.raises(ValueError) as expected_err:
+      model.fit(input_data, labels)
+    assert str(expected_err.value) == ('Invalid num_dims, must be in [1, {}]'
+                                       .format(X.shape[1]))
 
 
 if __name__ == '__main__':

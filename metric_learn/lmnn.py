@@ -16,6 +16,8 @@ from collections import Counter
 from six.moves import xrange
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
+
+from metric_learn._util import _check_num_dims
 from .base_metric import MahalanobisMixin
 
 
@@ -23,7 +25,7 @@ from .base_metric import MahalanobisMixin
 class _base_LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001, use_pca=True,
-               verbose=False, preprocessor=None):
+               verbose=False, preprocessor=None, num_dims=None):
     """Initialize the LMNN object.
 
     Parameters
@@ -46,6 +48,7 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     self.convergence_tol = convergence_tol
     self.use_pca = use_pca
     self.verbose = verbose
+    self.num_dims = num_dims
     super(_base_LMNN, self).__init__(preprocessor)
 
 
@@ -60,13 +63,14 @@ class python_LMNN(_base_LMNN):
     X, y = self._prepare_inputs(X, y, dtype=float,
                                 ensure_min_samples=2)
     num_pts, num_dims = X.shape
+    output_dim = _check_num_dims(num_dims, self.num_dims)
     unique_labels, label_inds = np.unique(y, return_inverse=True)
     if len(label_inds) != num_pts:
       raise ValueError('Must have one label per point.')
     self.labels_ = np.arange(len(unique_labels))
     if self.use_pca:
       warnings.warn('use_pca does nothing for the python_LMNN implementation')
-    self.transformer_ = np.eye(num_dims)
+    self.transformer_ = np.eye(output_dim, num_dims)
     required_k = np.bincount(label_inds).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'

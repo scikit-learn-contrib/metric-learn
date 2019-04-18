@@ -10,7 +10,7 @@ from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
                                 check_collapsed_pairs, validate_vector,
-                                _check_sdp_from_eigen)
+                                _check_sdp_from_eigen, _check_num_dims)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -1070,3 +1070,20 @@ def _check_sdp_from_eigen_positive_err_messages():
   with pytest.raises(ValueError) as raised_error:
     _check_sdp_from_eigen(w, 0.)
   assert str(raised_error.value) == 0
+
+
+def test__check_num_dims():
+  """Checks that num_dims returns what is expected (including the errors)"""
+  dim = _check_num_dims(5, None)
+  assert dim == 5
+
+  dim = _check_num_dims(5, 3)
+  assert dim == 3
+
+  with pytest.raises(ValueError) as expected_err:
+    _check_num_dims(5, 10)
+  assert str(expected_err.value) == 'Invalid num_dims, must be in [1, 5]'
+
+  with pytest.raises(ValueError) as expected_err:
+    _check_num_dims(5, 0)
+  assert str(expected_err.value) == 'Invalid num_dims, must be in [1, 5]'
