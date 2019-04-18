@@ -18,7 +18,7 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.base import TransformerMixin
 
-from metric_learn._util import _check_num_dims
+from ._util import _check_num_dims
 from .base_metric import MahalanobisMixin
 
 

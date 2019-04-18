@@ -18,7 +18,7 @@ from six.moves import xrange
 from sklearn import decomposition
 from sklearn.base import TransformerMixin
 
-from metric_learn._util import _check_num_dims
+from ._util import _check_num_dims
 from .base_metric import MahalanobisMixin
 from .constraints import Constraints
 
