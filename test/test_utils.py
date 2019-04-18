@@ -1054,22 +1054,19 @@ def test__validate_vector():
     validate_vector(x)
 
 
-def _check_sdp_from_eigen_positive_err_messages():
+def test_check_sdp_from_eigen_positive_err_messages():
   """Tests that if _check_sdp_from_eigen is given a negative tol it returns
-  an error, and if positive it does not"""
-  w = np.random.RandomState(42).randn(10)
+  an error, and if positive (or None) it does not"""
+  w = np.abs(np.random.RandomState(42).randn(10)) + 1
   with pytest.raises(ValueError) as raised_error:
     _check_sdp_from_eigen(w, -5.)
   assert str(raised_error.value) == "tol should be positive."
   with pytest.raises(ValueError) as raised_error:
     _check_sdp_from_eigen(w, -1e-10)
   assert str(raised_error.value) == "tol should be positive."
-  with pytest.raises(ValueError) as raised_error:
-    _check_sdp_from_eigen(w, 1.)
-  assert len(raised_error.value) == 0
-  with pytest.raises(ValueError) as raised_error:
-    _check_sdp_from_eigen(w, 0.)
-  assert str(raised_error.value) == 0
+  _check_sdp_from_eigen(w, 1.)
+  _check_sdp_from_eigen(w, 0.)
+  _check_sdp_from_eigen(w, None)
 
 
 def test__check_num_dims():
