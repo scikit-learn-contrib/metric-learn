@@ -44,7 +44,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, pca_comps=None, preprocessor=None):
+  def __init__(self, num_dims=None, pca_comps='deprecated', preprocessor=None):
     """Initialize the learner.
 
     Parameters
@@ -52,12 +52,10 @@ class RCA(MahalanobisMixin, TransformerMixin):
     num_dims : int, optional
         embedding dimension (default: original dimension of data)
 
-    pca_comps : int, float, None or string
-        Number of components to keep during PCA preprocessing.
-        If None (default), does not perform PCA.
-        If ``0 < pca_comps < 1``, it is used as
-        the minimum explained variance ratio.
-        See sklearn.decomposition.PCA for more details.
+    pca_comps : Not used
+      .. deprecated:: 0.5.0
+         `pca_comps` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0.
 
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
@@ -98,26 +96,24 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
+    if self.pca_comps != 'deprecated':
+      warnings.warn('"pca_comps" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0', DeprecationWarning)
+
     X = self._prepare_inputs(X, ensure_min_samples=2)
 
     # PCA projection to remove noise and redundant information.
-    if self.pca_comps is not None:
-      pca = decomposition.PCA(n_components=self.pca_comps)
-      X_t = pca.fit_transform(X)
-      M_pca = pca.components_
-    else:
-      X_t = X - X.mean(axis=0)
-      M_pca = None
 
     chunks = np.asanyarray(chunks, dtype=int)
-    chunk_mask, chunked_data = _chunk_mean_centering(X_t, chunks)
+    chunk_mask, chunked_data = _chunk_mean_centering(X, chunks)
 
     inner_cov = np.atleast_2d(np.cov(chunked_data, rowvar=0, bias=1))
-    dim = self._check_dimension(np.linalg.matrix_rank(inner_cov), X_t)
+    dim = self._check_dimension(np.linalg.matrix_rank(inner_cov), X)
 
     # Fisher Linear Discriminant projection
-    if dim < X_t.shape[1]:
-      total_cov = np.cov(X_t[chunk_mask], rowvar=0)
+    if dim < X.shape[1]:
+      total_cov = np.cov(X[chunk_mask], rowvar=0)
       tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
       vals, vecs = np.linalg.eig(tmp)
       inds = np.argsort(vals)[:dim]
@@ -126,9 +122,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
       self.transformer_ = _inv_sqrtm(inner_cov).dot(A.T)
     else:
       self.transformer_ = _inv_sqrtm(inner_cov).T
-
-    if M_pca is not None:
-        self.transformer_ = np.atleast_2d(self.transformer_.dot(M_pca))
 
     return self
 

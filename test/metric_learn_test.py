@@ -18,7 +18,7 @@ else:
   HAS_SKGGM = True
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
-                          RCA_Supervised, MMC_Supervised, SDML)
+                          RCA_Supervised, MMC_Supervised, SDML, RCA)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
@@ -529,6 +529,23 @@ class TestRCA(MetricTestCase):
     rca.fit(X, self.iris_labels)
     csep = class_separation(rca.transform(X), self.iris_labels)
     self.assertLess(csep, 0.30)
+
+  def test_deprecation_pca_comps(self):
+    # test that a deprecation message is thrown if pca_comps is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X, y = make_classification(random_state=42, n_samples=100)
+    rca_supervised = RCA_Supervised(pca_comps=X.shape[1], num_chunks=20)
+    msg = ('"pca_comps" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0')
+    assert_warns_message(DeprecationWarning, msg, rca_supervised.fit, X, y)
+
+    rca = RCA(pca_comps=X.shape[1])
+    msg = ('"pca_comps" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0')
+    assert_warns_message(DeprecationWarning, msg, rca.fit, X, y)
 
 
 class TestMLKR(MetricTestCase):
