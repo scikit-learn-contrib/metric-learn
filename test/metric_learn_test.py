@@ -8,7 +8,7 @@ from sklearn.metrics import pairwise_distances
 from sklearn.datasets import load_iris, make_classification, make_regression
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.validation import check_X_y
 try:
   from inverse_covariance import quic
@@ -539,13 +539,36 @@ class TestRCA(MetricTestCase):
     msg = ('"pca_comps" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
            'removed in 0.6.0')
-    assert_warns_message(DeprecationWarning, msg, rca_supervised.fit, X, y)
+    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
+      rca_supervised.fit(X, y)
+    assert str(expected_msg[0].message) == msg
 
     rca = RCA(pca_comps=X.shape[1])
-    msg = ('"pca_comps" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0')
-    assert_warns_message(DeprecationWarning, msg, rca.fit, X, y)
+    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
+      rca.fit(X, y)
+    assert str(expected_msg[0].message) == msg
+
+  def test_changedbehaviorwarning_preprocessing(self):
+    # test that a ChangedBehaviorWarning is thrown when using RCA
+    # TODO: remove in v.0.6
+
+    msg = ("RCA will no longer be trained on a preprocessed version "
+           "of the input as before (which was a bug since it was not "
+           "coherent with transform time). If you want to do some "
+           "preprocessing, you should do it manually (you can also use "
+           "an sklearn.pipeline.Pipeline for instance). This warning "
+           "will disappear in version 0.6.0.")
+
+    X, y = make_classification(random_state=42, n_samples=100)
+    rca_supervised = RCA_Supervised(num_chunks=20)
+    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
+      rca_supervised.fit(X, y)
+    assert str(expected_msg[0].message) == msg
+
+    rca = RCA()
+    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
+      rca.fit(X, y)
+    assert str(expected_msg[0].message) == msg
 
 
 class TestMLKR(MetricTestCase):

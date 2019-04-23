@@ -17,6 +17,7 @@ import warnings
 from six.moves import xrange
 from sklearn import decomposition
 from sklearn.base import TransformerMixin
+from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import MahalanobisMixin
 from .constraints import Constraints
@@ -102,6 +103,14 @@ class RCA(MahalanobisMixin, TransformerMixin):
                     'removed in 0.6.0', DeprecationWarning)
 
     X = self._prepare_inputs(X, ensure_min_samples=2)
+
+    warnings.warn("RCA will no longer be trained on a preprocessed version "
+                  "of the input as before (which was a bug since it was not "
+                  "coherent with transform time). If you want to do some "
+                  "preprocessing, you should do it manually (you can also use "
+                  "an sklearn.pipeline.Pipeline for instance). This warning "
+                  "will disappear in version 0.6.0.",
+                  ChangedBehaviorWarning)
 
     chunks = np.asanyarray(chunks, dtype=int)
     chunk_mask, chunked_data = _chunk_mean_centering(X, chunks)
