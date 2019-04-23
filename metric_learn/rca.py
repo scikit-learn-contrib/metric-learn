@@ -103,8 +103,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
 
     X = self._prepare_inputs(X, ensure_min_samples=2)
 
-    # PCA projection to remove noise and redundant information.
-
     chunks = np.asanyarray(chunks, dtype=int)
     chunk_mask, chunked_data = _chunk_mean_centering(X, chunks)
 
