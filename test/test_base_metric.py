@@ -68,7 +68,7 @@ SDML_Supervised(balance_param=0.5, num_constraints=None,
                      "preprocessor=None)")
     self.assertEqual(str(metric_learn.RCA_Supervised()),
                      "RCA_Supervised(chunk_size=2, num_chunks=100, "
-                     "num_dims=None, pca_comps=None,\n        "
+                     "num_dims=None,\n        pca_comps='deprecated', "
                      "preprocessor=None)")
 
   def test_mlkr(self):

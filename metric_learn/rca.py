@@ -141,7 +141,7 @@ class RCA_Supervised(RCA):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, pca_comps=None, num_chunks=100,
+  def __init__(self, num_dims=None, pca_comps='deprecated', num_chunks=100,
                chunk_size=2, preprocessor=None):
     """Initialize the supervised version of `RCA`.
 
