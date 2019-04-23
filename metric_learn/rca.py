@@ -71,8 +71,9 @@ class RCA(MahalanobisMixin, TransformerMixin):
     if rank < d:
       warnings.warn('The inner covariance matrix is not invertible, '
                     'so the transformation matrix may contain Nan values. '
-                    'You should adjust pca_comps to remove noise and '
-                    'redundant information.')
+                    'You should reduce the dimensionality of your input,'
+                    'for instance using sklearn.decomposition.PCA as a '
+                    'preprocessing step.')
 
     if self.num_dims is None:
       dim = d
