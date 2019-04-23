@@ -553,8 +553,7 @@ class TestRCA(MetricTestCase):
     # TODO: remove in v.0.6
 
     msg = ("RCA will no longer be trained on a preprocessed version "
-           "of the input as before (which was a bug since it was not "
-           "coherent with transform time). If you want to do some "
+           "of the input as before. If you want to do some "
            "preprocessing, you should do it manually (you can also use "
            "an sklearn.pipeline.Pipeline for instance). This warning "
            "will disappear in version 0.6.0.")
