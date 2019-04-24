@@ -14,7 +14,8 @@ from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
                                       _PairsClassifierMixin)
 
 from test.test_utils import (ids_metric_learners, metric_learners,
-                             remove_y_quadruplets)
+                             remove_y_quadruplets, ids_regressors,
+                             ids_supervised_learners, supervised_learners)
 
 RNG = check_random_state(0)
 
@@ -56,7 +57,7 @@ def test_score_pairs_toy_example(estimator, build_dataset):
     pairs = np.stack([X[:10], X[10:20]], axis=1)
     embedded_pairs = pairs.dot(model.transformer_.T)
     distances = np.sqrt(np.sum((embedded_pairs[:, 1] -
-                               embedded_pairs[:, 0])**2,
+                                embedded_pairs[:, 0])**2,
                                axis=-1))
     assert_array_almost_equal(model.score_pairs(pairs), distances)
 
@@ -138,9 +139,6 @@ def test_embed_dim(estimator, build_dataset):
   assert str(raised_error.value) == err_msg
   # we test that the shape is also OK when doing dimensionality reduction
   if type(model).__name__ in {'LFDA', 'MLKR', 'NCA', 'RCA'}:
-    # TODO:
-    #  avoid this enumeration and rather test if hasattr n_components
-    #  as soon as we have made the arguments names as such (issue #167)
     model.set_params(num_dims=2)
     model.fit(*remove_y_quadruplets(estimator, input_data, labels))
     assert model.transform(X).shape == (X.shape[0], 2)
@@ -303,3 +301,149 @@ def test_transformer_is_2D(estimator, build_dataset):
     labels = labels[to_keep]
   model.fit(*remove_y_quadruplets(estimator, trunc_data, labels))
   assert model.transformer_.shape == (1, 1)  # the transformer must be 2D
+
+
+@pytest.mark.parametrize('estimator, build_dataset',
+                         [(ml, bd) for idml, (ml, bd)
+                          in zip(ids_supervised_learners,
+                                 supervised_learners)
+                          if hasattr(ml, 'num_dims') and
+                          hasattr(ml, 'init') and
+                          (idml not in ids_regressors)],
+                         ids=[idml for idml, (ml, _)
+                              in zip(ids_supervised_learners,
+                                     supervised_learners)
+                              if hasattr(ml, 'num_dims') and
+                              hasattr(ml, 'init') and
+                              (idml not in ids_regressors)])
+def test_init_transformation(estimator, build_dataset):
+    input_data, labels, _, X = build_dataset()
+    model = clone(estimator)
+    rng = np.random.RandomState(42)
+
+    # Start learning from scratch
+    model.set_params(init='identity')
+    model.fit(input_data, labels)
+
+    # Initialize with random
+    model.set_params(init='random')
+    model.fit(input_data, labels)
+
+    # Initialize with auto
+    model.set_params(init='auto')
+    model.fit(input_data, labels)
+
+    # Initialize with PCA
+    model.set_params(init='pca')
+    model.fit(input_data, labels)
+
+    # Initialize with LDA
+    model.set_params(init='lda')
+    model.fit(input_data, labels)
+
+    init = rng.rand(X.shape[1], X.shape[1])
+    model.set_params(init=init)
+    model.fit(input_data, labels)
+
+    # init.shape[1] must match X.shape[1]
+    init = rng.rand(X.shape[1], X.shape[1] + 1)
+    model.set_params(init=init)
+    msg = ('The input dimensionality ({}) of the given '
+           'linear transformation `init` must match the '
+           'dimensionality of the given inputs `X` ({}).'
+           .format(init.shape[1], X.shape[1]))
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(input_data, labels)
+    assert str(raised_error.value) == msg
+
+    # init.shape[0] must be <= init.shape[1]
+    init = rng.rand(X.shape[1] + 1, X.shape[1])
+    model.set_params(init=init)
+    msg = ('The output dimensionality ({}) of the given '
+           'linear transformation `init` cannot be '
+           'greater than its input dimensionality ({}).'
+           .format(init.shape[0], init.shape[1]))
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(input_data, labels)
+    assert str(raised_error.value) == msg
+
+    # init.shape[0] must match num_dims
+    init = rng.rand(X.shape[1], X.shape[1])
+    num_dims = X.shape[1] - 1
+    model.set_params(init=init, num_dims=num_dims)
+    msg = ('The preferred dimensionality of the '
+           'projected space `num_dims` ({}) does not match '
+           'the output dimensionality of the given '
+           'linear transformation `init` ({})!'
+           .format(num_dims, init.shape[0]))
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(input_data, labels)
+    assert str(raised_error.value) == msg
+
+    # init must be as specified in the docstring
+    model.set_params(init=1)
+    msg = ("`init` must be 'auto', 'pca', 'lda', 'identity', "
+           "'random' or a numpy array of shape "
+           "(num_dims, n_features).")
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(input_data, labels)
+    assert str(raised_error.value) == msg
+
+
+@pytest.mark.parametrize('n_samples', [3, 5, 7, 11])
+@pytest.mark.parametrize('n_features', [3, 5, 7, 11])
+@pytest.mark.parametrize('n_classes', [5, 7, 11])
+@pytest.mark.parametrize('num_dims', [3, 5, 7, 11])
+@pytest.mark.parametrize('estimator, build_dataset',
+                         [(ml, bd) for idml, (ml, bd)
+                          in zip(ids_supervised_learners,
+                                 supervised_learners)
+                          if hasattr(ml, 'num_dims') and
+                          hasattr(ml, 'init') and
+                          (idml not in ids_regressors)],
+                         ids=[idml for idml, (ml, _)
+                              in zip(ids_supervised_learners,
+                                     supervised_learners)
+                              if hasattr(ml, 'num_dims') and
+                              hasattr(ml, 'init') and
+                              (idml not in ids_regressors)])
+def test_auto_init(n_samples, n_features, n_classes, num_dims,
+                   estimator, build_dataset):
+  # Test that auto choose the init as expected with every configuration
+  # of order of n_samples, n_features, n_classes and num_dims.
+  input_data, labels, _, X = build_dataset()
+  model_base = clone(estimator)
+  rng = np.random.RandomState(42)
+  model_base.set_params(init='auto',
+                        num_dims=num_dims,
+                        random_state=rng)
+
+  # To make the test work for LMNN:
+  if 'LMNN' in model_base.__class__.__name__:
+    model_base.set_params(k=1)
+  # To make the test faster for estimators that have a max_iter:
+  if hasattr(model_base, 'max_iter'):
+    model_base.set_params(max_iter=1)
+  if n_classes >= n_samples:
+    pass
+    # n_classes > n_samples is impossible, and n_classes == n_samples
+    # throws an error from lda but is an absurd case
+  else:
+    X = rng.randn(n_samples, n_features)
+    y = np.tile(range(n_classes), n_samples // n_classes + 1)[:n_samples]
+    if num_dims > n_features:
+      # this would return a ValueError, which is tested in
+      # test_init_transformation
+      pass
+    else:
+      model = clone(model_base)
+      model.fit(X, y)
+      if num_dims <= min(n_classes - 1, n_features):
+        model_other = clone(model_base).set_params(init='lda')
+      elif num_dims < min(n_features, n_samples):
+        model_other = clone(model_base).set_params(init='pca')
+      else:
+        model_other = clone(model_base).set_params(init='identity')
+      model_other.fit(X, y)
+      assert_array_almost_equal(model.transformer_,
+                                model_other.transformer_)

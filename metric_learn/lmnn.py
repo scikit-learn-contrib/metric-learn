@@ -16,18 +16,61 @@ from collections import Counter
 from six.moves import xrange
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
+
+from metric_learn._util import _initialize_transformer
 from .base_metric import MahalanobisMixin
 
 
 # commonality between LMNN implementations
 class _base_LMNN(MahalanobisMixin, TransformerMixin):
-  def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
-               regularization=0.5, convergence_tol=0.001, use_pca=True,
-               verbose=False, preprocessor=None):
+  def __init__(self, init='auto', k=3, min_iter=50, max_iter=1000,
+               learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
+               use_pca=True, num_dims=None,
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize the LMNN object.
 
     Parameters
     ----------
+    init : string or numpy array, optional (default='auto')
+        Initialization of the linear transformation. Possible options are
+        'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
+        (n_features_a, n_features_b).
+
+        'auto'
+            Depending on ``num_dims``, the most reasonable initialization
+            will be chosen. If ``num_dims <= n_classes`` we use 'lda', as
+            it uses labels information. If not, but
+            ``num_dims < min(n_features, n_samples)``, we use 'pca', as
+            it projects data in meaningful directions (those of higher
+            variance). Otherwise, we just use 'identity'.
+
+        'pca'
+            ``num_dims`` principal components of the inputs passed
+            to :meth:`fit` will be used to initialize the transformation.
+            (See `sklearn.decomposition.PCA`)
+
+        'lda'
+            ``min(num_dims, n_classes)`` most discriminative
+            components of the inputs passed to :meth:`fit` will be used to
+            initialize the transformation. (If ``num_dims > n_classes``,
+            the rest of the components will be zero.) (See
+            `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)
+
+        'identity'
+            If ``num_dims`` is strictly smaller than the
+            dimensionality of the inputs passed to :meth:`fit`, the identity
+            matrix will be truncated to the first ``num_dims`` rows.
+
+        'random'
+            The initial transformation will be a random array of shape
+            `(num_dims, n_features)`. Each value is sampled from the
+            standard normal distribution.
+
+        numpy array
+            n_features_b must match the dimensionality of the inputs passed to
+            :meth:`fit` and n_features_a must be less than or equal to that.
+            If ``num_dims`` is not None, n_features_a must match it.
+
     k : int, optional
         Number of neighbors to consider, not including self-edges.
 
@@ -37,7 +80,14 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation. If ``init='pca'``, ``random_state`` is passed as an
+        argument to PCA when initializing the transformation.
     """
+    self.init = init
     self.k = k
     self.min_iter = min_iter
     self.max_iter = max_iter
@@ -45,7 +95,9 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     self.regularization = regularization
     self.convergence_tol = convergence_tol
     self.use_pca = use_pca
+    self.num_dims = num_dims  # FIXME Tmp fix waiting for #167 to be merged:
     self.verbose = verbose
+    self.random_state = random_state
     super(_base_LMNN, self).__init__(preprocessor)
 
 
@@ -60,13 +112,15 @@ class python_LMNN(_base_LMNN):
     X, y = self._prepare_inputs(X, y, dtype=float,
                                 ensure_min_samples=2)
     num_pts, num_dims = X.shape
+    # FIXME Tmp fix waiting for #167 to be merged:
+    n_dims = self.num_dims if self.num_dims is not None else num_dims
     unique_labels, label_inds = np.unique(y, return_inverse=True)
     if len(label_inds) != num_pts:
       raise ValueError('Must have one label per point.')
     self.labels_ = np.arange(len(unique_labels))
-    if self.use_pca:
-      warnings.warn('use_pca does nothing for the python_LMNN implementation')
-    self.transformer_ = np.eye(num_dims)
+    self.transformer_ = _initialize_transformer(X, y, self.init, n_dims,
+                                                self.verbose,
+                                                self.random_state)
     required_k = np.bincount(label_inds).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'
@@ -98,6 +152,8 @@ class python_LMNN(_base_LMNN):
     G, objective, total_active, df, a1, a2 = (
         self._loss_grad(X, L, dfG, impostors, 1, k, reg, target_neighbors, df,
                         a1, a2))
+
+    it = 1  # we already made one iteration
 
     # main loop
     for it in xrange(2, self.max_iter):

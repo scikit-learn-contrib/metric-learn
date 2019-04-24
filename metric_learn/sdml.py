@@ -135,7 +135,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
 
@@ -183,7 +183,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """

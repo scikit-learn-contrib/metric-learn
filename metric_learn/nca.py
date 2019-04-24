@@ -14,6 +14,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
+from metric_learn._util import _initialize_transformer
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -31,12 +32,52 @@ class NCA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, max_iter=100, tol=None, verbose=False,
-               preprocessor=None):
+  def __init__(self, init='auto', num_dims=None, max_iter=100, tol=None,
+               verbose=False, preprocessor=None, random_state=None):
     """Neighborhood Components Analysis
 
     Parameters
     ----------
+    init : string or numpy array, optional (default='auto')
+        Initialization of the linear transformation. Possible options are
+        'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
+        (n_features_a, n_features_b).
+
+        'auto'
+            Depending on ``num_dims``, the most reasonable initialization
+            will be chosen. If ``num_dims <= n_classes`` we use 'lda', as
+            it uses labels information. If not, but
+            ``num_dims < min(n_features, n_samples)``, we use 'pca', as
+            it projects data in meaningful directions (those of higher
+            variance). Otherwise, we just use 'identity'.
+
+        'pca'
+            ``num_dims`` principal components of the inputs passed
+            to :meth:`fit` will be used to initialize the transformation.
+            (See `sklearn.decomposition.PCA`)
+
+        'lda'
+            ``min(num_dims, n_classes)`` most discriminative
+            components of the inputs passed to :meth:`fit` will be used to
+            initialize the transformation. (If ``num_dims > n_classes``,
+            the rest of the components will be zero.) (See
+            `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)
+
+        'identity'
+            If ``num_dims`` is strictly smaller than the
+            dimensionality of the inputs passed to :meth:`fit`, the identity
+            matrix will be truncated to the first ``num_dims`` rows.
+
+        'random'
+            The initial transformation will be a random array of shape
+            `(num_dims, n_features)`. Each value is sampled from the
+            standard normal distribution.
+
+        numpy array
+            n_features_b must match the dimensionality of the inputs passed to
+            :meth:`fit` and n_features_a must be less than or equal to that.
+            If ``num_dims`` is not None, n_features_a must match it.
+
     num_dims : int, optional (default=None)
       Embedding dimensionality. If None, will be set to ``n_features``
       (``d``) at fit time.
@@ -49,11 +90,19 @@ class NCA(MahalanobisMixin, TransformerMixin):
 
     verbose : bool, optional (default=False)
       Whether to print progress messages or not.
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation. If ``init='pca'``, ``random_state`` is passed as an
+        argument to PCA when initializing the transformation.
     """
+    self.init = init
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.tol = tol
     self.verbose = verbose
+    self.random_state = random_state
     super(NCA, self).__init__(preprocessor)
 
   def fit(self, X, y):
@@ -71,8 +120,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     train_time = time.time()
 
     # Initialize A to a scaling matrix
-    A = np.zeros((num_dims, d))
-    np.fill_diagonal(A, 1./(np.maximum(X.max(axis=0)-X.min(axis=0), EPS)))
+    A = _initialize_transformer(X, labels, self.init, num_dims, self.verbose)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]

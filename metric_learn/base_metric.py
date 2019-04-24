@@ -288,7 +288,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
     Returns
     -------
-    M : `numpy.ndarray`, shape=(n_components, n_features)
+    M : `numpy.ndarray`, shape=(num_dims, n_features)
       The copy of the learned Mahalanobis matrix.
     """
     return self.transformer_.T.dot(self.transformer_)

@@ -1,10 +1,13 @@
-import warnings
 import numpy as np
 import six
 from numpy.linalg import LinAlgError
+from sklearn.decomposition import PCA
 from sklearn.utils import check_array
-from sklearn.utils.validation import check_X_y
+from sklearn.utils.validation import check_X_y, check_random_state
 from metric_learn.exceptions import PreprocessorError
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+import sys
+import time
 
 # hack around lack of axis kwarg in older numpy versions
 try:
@@ -405,3 +408,126 @@ def validate_vector(u, dtype=None):
   if u.ndim > 1:
     raise ValueError("Input vector should be 1-D.")
   return u
+
+
+def _initialize_transformer(X, y=None, init='auto', num_dims=None,
+                            verbose=False, random_state=None):
+  """Returns the initial transformer to be used depending on the arguments.
+
+  Parameters
+  ----------
+  init : array-like or None or str
+    The initial matrix.
+
+  X : array-like
+    The input samples.
+
+  y : array-like or None
+    The input labels (or not if there are no labels).
+
+  num_dims : int
+    The number of components to take.
+
+  verbose : bool
+    Whether to print the details of the initialization or not.
+
+  random_state: int or `numpy.RandomState` or None, optional (default=None)
+    A pseudo random number generator object or a seed for it if int. If
+    ``init='random'``, ``random_state`` is used to initialize the random
+    transformation. If ``init='pca'``, ``random_state`` is passed as an
+    argument to PCA when initializing the transformation.
+
+  Returns
+  -------
+  init_transformer : `numpy.ndarray`
+    The initial transformer to use.
+  """
+
+  if num_dims > X.shape[1]:
+    raise ValueError('The preferred dimensionality of the '
+                     'projected space `num_dims` ({}) cannot '
+                     'be greater than the given data '
+                     'dimensionality ({})!'
+                     .format(num_dims, X.shape[1]))
+
+  if isinstance(init, np.ndarray):
+    init = check_array(init)
+
+    # Assert that init.shape[1] = X.shape[1]
+    if init.shape[1] != X.shape[1]:
+      raise ValueError('The input dimensionality ({}) of the given '
+                       'linear transformation `init` must match the '
+                       'dimensionality of the given inputs `X` ({}).'
+                       .format(init.shape[1], X.shape[1]))
+
+    # Assert that init.shape[0] <= init.shape[1]
+    if init.shape[0] > init.shape[1]:
+      raise ValueError('The output dimensionality ({}) of the given '
+                       'linear transformation `init` cannot be '
+                       'greater than its input dimensionality ({}).'
+                       .format(init.shape[0], init.shape[1]))
+
+    if num_dims is not None:
+      # TODO: check for all algos that _iinitialize_transformer is at the
+      #  right place (I think before the checks cf NCA)
+      # Assert that self.num_dims = init.shape[0]
+      if num_dims != init.shape[0]:
+        raise ValueError('The preferred dimensionality of the '
+                         'projected space `num_dims` ({}) does'
+                         ' not match the output dimensionality of '
+                         'the given linear transformation '
+                         '`init` ({})!'
+                         .format(num_dims,
+                                 init.shape[0]))
+  elif init in ['auto', 'pca', 'lda', 'identity', 'random']:
+    pass
+  else:
+    raise ValueError(
+        "`init` must be 'auto', 'pca', 'lda', 'identity', 'random' "
+        "or a numpy array of shape (num_dims, n_features).")
+
+  random_state = check_random_state(random_state)
+  transformation = init
+  if isinstance(init, np.ndarray):
+    pass
+  else:
+    n_samples, n_features = X.shape
+    num_dims = num_dims or n_features
+    if init == 'auto':
+      n_classes = len(np.unique(y))
+      if num_dims <= min(n_features, n_classes - 1):
+        init = 'lda'
+      elif num_dims < min(n_features, n_samples):
+        init = 'pca'
+      else:
+        init = 'identity'
+    if init == 'identity':
+      transformation = np.eye(num_dims, X.shape[1])
+    elif init == 'random':
+      transformation = random_state.randn(num_dims,
+                                          X.shape[1])
+    elif init in {'pca', 'lda'}:
+      init_time = time.time()
+      if init == 'pca':
+        pca = PCA(n_components=num_dims,
+                  random_state=random_state)
+        if verbose:
+          print('Finding principal components... ')
+          sys.stdout.flush()
+        pca.fit(X)
+        transformation = pca.components_
+      elif init == 'lda':
+        lda = LinearDiscriminantAnalysis(n_components=num_dims)
+        if verbose:
+          print('Finding most discriminative components... ')
+          sys.stdout.flush()
+        lda.fit(X, y)
+        transformation = lda.scalings_.T[:num_dims]
+      if verbose:
+        print('done in {:5.2f}s'.format(time.time() - init_time))
+  return transformation
+
+
+def _initialize_metric_mahalanobis():
+  """Returns the initial metric from arguments"""
+  raise NotImplementedError

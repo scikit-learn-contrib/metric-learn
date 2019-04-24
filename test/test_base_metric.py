@@ -16,13 +16,15 @@ class TestStringRepr(unittest.TestCase):
   def test_lmnn(self):
     self.assertRegexpMatches(
         str(metric_learn.LMNN()),
-        r"(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
-        r"max_iter=1000,\n      min_iter=50, preprocessor=None, "
-        r"regularization=0.5, use_pca=True,\n      verbose=False\)")
+        r"(python_)?LMNN\(convergence_tol=0.001, init='auto', k=3, "
+        r"learn_rate=1e-07,\n      max_iter=1000, min_iter=50, "
+        r"num_dims=None, preprocessor=None,\n      random_state=None, "
+        r"regularization=0.5, use_pca=True, verbose=False\)")
 
   def test_nca(self):
     self.assertEqual(str(metric_learn.NCA()),
-                     "NCA(max_iter=100, num_dims=None, preprocessor=None, "
+                     "NCA(init='auto', max_iter=100, num_dims=None, "
+                     "preprocessor=None,\n  random_state=None, "
                      "tol=None, verbose=False)")
 
   def test_lfda(self):

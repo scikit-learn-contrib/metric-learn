@@ -475,9 +475,7 @@ class TestNCA(MetricTestCase):
 
       EPS = np.finfo(float).eps
       A = np.zeros((X.shape[1], X.shape[1]))
-      np.fill_diagonal(A,
-                       1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
-      nca = NCA(max_iter=30, num_dims=X.shape[1])
+      nca = NCA(init=A, max_iter=30, num_dims=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
 
@@ -488,9 +486,7 @@ class TestNCA(MetricTestCase):
       y = self.iris_labels[self.iris_labels == 0]
       EPS = np.finfo(float).eps
       A = np.zeros((X.shape[1], X.shape[1]))
-      np.fill_diagonal(A,
-                       1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
-      nca = NCA(max_iter=30, num_dims=X.shape[1])
+      nca = NCA(init=A, max_iter=30, num_dims=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
 
