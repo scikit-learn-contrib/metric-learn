@@ -31,7 +31,7 @@ class _BaseITML(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               A0='deprecated', verbose=False, preprocessor=None):
+               A0=None, verbose=False, preprocessor=None):
     """Initialize ITML.
 
     Parameters
@@ -43,10 +43,8 @@ class _BaseITML(MahalanobisMixin):
 
     convergence_threshold : float, optional
 
-    A0 : Not used
-      .. deprecated:: 0.5.0
-        `A0` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Use parameter `init` instead.
+    A0 : (d x d) matrix, optional
+        initial regularization matrix, defaults to identity
 
     verbose : bool, optional
         if True, prints information while learning
