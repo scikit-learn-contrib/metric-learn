@@ -410,14 +410,16 @@ def validate_vector(u, dtype=None):
   return u
 
 
-def _initialize_transformer(X, y=None, init='auto', num_dims=None,
-                            verbose=False, random_state=None):
+def _initialize_transformer(num_dims, X, y=None, init='auto', verbose=False,
+                            random_state=None):
   """Returns the initial transformer to be used depending on the arguments.
 
   Parameters
   ----------
-  init : array-like or None or str
-    The initial matrix.
+  num_dims : int
+    The number of components to take. (Note: it should have been checked
+    before, meaning it should not be None and it should be a value in
+    [1, X.shape[1]])
 
   X : array-like
     The input samples.
@@ -425,8 +427,8 @@ def _initialize_transformer(X, y=None, init='auto', num_dims=None,
   y : array-like or None
     The input labels (or not if there are no labels).
 
-  num_dims : int
-    The number of components to take.
+  init : array-like or None or str
+    The initial matrix.
 
   verbose : bool
     Whether to print the details of the initialization or not.
@@ -442,13 +444,6 @@ def _initialize_transformer(X, y=None, init='auto', num_dims=None,
   init_transformer : `numpy.ndarray`
     The initial transformer to use.
   """
-
-  if num_dims > X.shape[1]:
-    raise ValueError('The preferred dimensionality of the '
-                     'projected space `num_dims` ({}) cannot '
-                     'be greater than the given data '
-                     'dimensionality ({})!'
-                     .format(num_dims, X.shape[1]))
 
   if isinstance(init, np.ndarray):
     init = check_array(init)
@@ -468,8 +463,6 @@ def _initialize_transformer(X, y=None, init='auto', num_dims=None,
                        .format(init.shape[0], init.shape[1]))
 
     if num_dims is not None:
-      # TODO: check for all algos that _iinitialize_transformer is at the
-      #  right place (I think before the checks cf NCA)
       # Assert that self.num_dims = init.shape[0]
       if num_dims != init.shape[0]:
         raise ValueError('The preferred dimensionality of the '

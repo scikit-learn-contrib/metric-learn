@@ -118,7 +118,7 @@ class python_LMNN(_base_LMNN):
     if len(label_inds) != num_pts:
       raise ValueError('Must have one label per point.')
     self.labels_ = np.arange(len(unique_labels))
-    self.transformer_ = _initialize_transformer(X, y, self.init, n_dims,
+    self.transformer_ = _initialize_transformer(n_dims, X, y, self.init,
                                                 self.verbose,
                                                 self.random_state)
     required_k = np.bincount(label_inds).min()

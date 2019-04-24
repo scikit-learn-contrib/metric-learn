@@ -120,7 +120,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     train_time = time.time()
 
     # Initialize A to a scaling matrix
-    A = _initialize_transformer(X, labels, self.init, num_dims, self.verbose)
+    A = _initialize_transformer(num_dims, X, labels, self.init, self.verbose)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]
