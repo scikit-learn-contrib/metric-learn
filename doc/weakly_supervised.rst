@@ -151,6 +151,7 @@ tuples you're working with (pairs, triplets...). See the docstring of the
 Algorithms
 ==================
 
+.. _itml:
 
 ITML
 ----
@@ -180,12 +181,15 @@ where :math:`Z` is the normalization constant, the inverse of Mahalanobis
 matrix :math:`\mathbf{A}^{-1}` is the covariance of the Gaussian.
 
 Given pairs of similar points :math:`S` and pairs of dissimilar points 
-:math:`D`, the distance metric learning problem is:
+:math:`D`, the distance metric learning problem is to minimize the LogDet
+divergence, which is equivalent as minimizing :math:`\textbf{KL}(p(\mathbf{x}; 
+\mathbf{A}_0) || p(\mathbf{x}; \mathbf{A}))`:
 
 .. math::
 
-    \min_\mathbf{A} \textbf{KL}(p(\mathbf{x}; \mathbf{A}_0) || p(\mathbf{x}; 
-    \mathbf{A})) \qquad\qquad\\
+    \min_\mathbf{A} D_{\ell \mathrm{d}}\left(A, A_{0}\right) = 
+    \operatorname{tr}\left(A A_{0}^{-1}\right)-\log \operatorname{det}
+    \left(A A_{0}^{-1}\right)-n\\
     \text{subject to } \quad d_\mathbf{A}(\mathbf{x}_i, \mathbf{x}_j) 
     \leq u \qquad (\mathbf{x}_i, \mathbf{x}_j)\in S \\
     d_\mathbf{A}(\mathbf{x}_i, \mathbf{x}_j) \geq l \qquad (\mathbf{x}_i, 
@@ -194,7 +198,8 @@ Given pairs of similar points :math:`S` and pairs of dissimilar points
 
 where :math:`u` and :math:`l` is the upper and the lower bound of distance
 for similar and dissimilar pairs respectively, and :math:`\mathbf{A}_0` 
-is the prior distance metric, set to identity matrix by default.
+is the prior distance metric, set to identity matrix by default, 
+:math:`D_{\ell \mathrm{d}}(\cdot)` is the log determinant.
 
 .. topic:: Example Code:
 
@@ -224,6 +229,7 @@ is the prior distance metric, set to identity matrix by default.
     .. [2] Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/
        itml/
 
+.. _lsml:
 
 LSML
 ----
@@ -246,7 +252,6 @@ denoted as:
 
 .. math::
 
-    L(d(\mathbf{x}_a, \mathbf{x}_b) < d(\mathbf{x}_c, \mathbf{x}_d)) = 
     H(d_\mathbf{M}(\mathbf{x}_a, \mathbf{x}_b) 
     - d_\mathbf{M}(\mathbf{x}_c, \mathbf{x}_d))
 
@@ -308,6 +313,7 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
 
     .. [2] Adapted from https://gist.github.com/kcarnold/5439917
 
+.. _sdml:
 
 SDML
 ----
@@ -331,11 +337,12 @@ is convex:
     \cdot \mathbf{M}) - \log\det \mathbf{M} + \lambda ||\mathbf{M}||_{1, off}
 
 where :math:`\mathbf{X}=[\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_n]` is 
-the training data, incidence matrix :math:`\mathbf{K}_{ij} = 1` if 
+the training data, the incidence matrix :math:`\mathbf{K}_{ij} = 1` if 
 :math:`(\mathbf{x}_i, \mathbf{x}_j)` is a similar pair, otherwise -1. The 
-Laplacian matrix :math:`\mathbf{L}` is calculated from :math:`\mathbf{K}` 
-(see original paper for more details), :math:`||\cdot||_{1, off}` is the 
-off-diagonal L1 norm.
+Laplacian matrix :math:`\mathbf{L}=\mathbf{D}-\mathbf{K}` is calculated from 
+:math:`\mathbf{K}` and :math:`\mathbf{D}`, a diagonal matrix whose entries are 
+the sums of the row elements of :math:`\mathbf{K}`., :math:`||\cdot||_{1, off}` 
+is the off-diagonal L1 norm.
 
 
 .. topic:: Example Code:
@@ -366,6 +373,7 @@ off-diagonal L1 norm.
 
     .. [2] Adapted from https://gist.github.com/kcarnold/5439945
 
+.. _rca:
 
 RCA
 ---
@@ -421,6 +429,7 @@ as the Mahalanobis matrix.
     .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
        2005
 
+.. _mmc:
 
 MMC
 ---

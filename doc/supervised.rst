@@ -41,6 +41,7 @@ the covariance matrix of the input data. This is a simple baseline method.
 
     .. [1] On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
+.. _lmnn:
 
 LMNN
 -----
@@ -99,6 +100,7 @@ The two implementations differ slightly, and the C++ version is more complete.
        -margin -nearest-neighbor-classification>`_ Kilian Q. Weinberger, John
        Blitzer, Lawrence K. Saul
 
+.. _nca:
 
 NCA
 ---
@@ -108,7 +110,7 @@ Neighborhood Components Analysis(:py:class:`NCA <metric_learn.nca.NCA>`)
 `NCA` is a distance metric learning algorithm which aims to improve the 
 accuracy of nearest neighbors classification compared to the standard 
 Euclidean distance. The algorithm directly maximizes a stochastic variant 
-of the leave-one-out k-nearest neighbors(KNN) score on the training set. 
+of the leave-one-out k-nearest neighbors (KNN) score on the training set. 
 It can also learn a low-dimensional linear transformation of data that can 
 be used for data visualization and fast classification.
 
@@ -162,6 +164,7 @@ the sum of probability of being correctly classified:
     .. [2] Wikipedia entry on Neighborhood Components Analysis
        https://en.wikipedia.org/wiki/Neighbourhood_components_analysis
 
+.. _lfda:
 
 LFDA
 ----
@@ -194,7 +197,7 @@ where
     \,\,\mathbf{A}_{i,j}(1/n-1/n_l) \qquad y_i = y_j\end{aligned}\right.\\
 
 here :math:`\mathbf{A}_{i,j}` is the :math:`(i,j)`-th entry of the affinity
-matrix :math:`\mathbf{A}`:
+matrix :math:`\mathbf{A}`:, which can be calculated with local scaling methods.
 
 Then the learning problem becomes derive the LFDA transformation matrix 
 :math:`\mathbf{T}_{LFDA}`:
@@ -235,6 +238,7 @@ same class are not imposed to be close.
        <https://gastrograph.com/resources/whitepapers/local-fisher
        -discriminant-analysis-on-beer-style-clustering.html#>`_ Yuan Tang.
 
+.. _mlkr:
 
 MLKR
 ----
@@ -277,15 +281,6 @@ calculating a weighted average of all the training samples:
 .. math::
 
     \hat{y}_i = \frac{\sum_{j\neq i}y_jk_{ij}}{\sum_{j\neq i}k_{ij}}
-
-The tractable property has enabled the distance metric learning problem to 
-be solved by stochastic gradient descent, where the gradient is:
-
-.. math::
-
-    \frac{\partial\mathcal{L}}{\partial\mathbf{A}} = 4\mathbf{A}\sum_i
-    (\hat{y}_i - y_i)\sum_j(\hat{y}_j - y_j)k_{ij}(\mathbf{x}_i - 
-    \mathbf{x}_j)(\mathbf{x}_i - \mathbf{x}_j)^T
 
 .. topic:: Example Code:
 
