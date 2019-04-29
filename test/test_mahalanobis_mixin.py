@@ -137,8 +137,8 @@ def test_embed_dim(estimator, build_dataset):
     model.score_pairs(model.transform(X[0, :]))
   assert str(raised_error.value) == err_msg
   # we test that the shape is also OK when doing dimensionality reduction
-  if hasattr(model, 'num_dims'):
-    model.set_params(num_dims=2)
+  if hasattr(model, 'n_components'):
+    model.set_params(n_components=2)
     model.fit(*remove_y_quadruplets(estimator, input_data, labels))
     assert model.transform(X).shape == (X.shape[0], 2)
     # assert that ValueError is thrown if input shape is 1D

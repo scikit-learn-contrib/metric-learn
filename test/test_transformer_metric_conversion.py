@@ -63,20 +63,20 @@ class TestTransformerMetricConversion(unittest.TestCase):
     assert_array_almost_equal(L.T.dot(L), nca.get_mahalanobis_matrix())
 
   def test_lfda(self):
-    lfda = LFDA(k=2, num_dims=2)
+    lfda = LFDA(k=2, n_components=2)
     lfda.fit(self.X, self.y)
     L = lfda.transformer_
     assert_array_almost_equal(L.T.dot(L), lfda.get_mahalanobis_matrix())
 
   def test_rca_supervised(self):
     seed = np.random.RandomState(1234)
-    rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
     rca.fit(self.X, self.y, random_state=seed)
     L = rca.transformer_
     assert_array_almost_equal(L.T.dot(L), rca.get_mahalanobis_matrix())
 
   def test_mlkr(self):
-    mlkr = MLKR(num_dims=2)
+    mlkr = MLKR(n_components=2)
     mlkr.fit(self.X, self.y)
     L = mlkr.transformer_
     assert_array_almost_equal(L.T.dot(L), mlkr.get_mahalanobis_matrix())

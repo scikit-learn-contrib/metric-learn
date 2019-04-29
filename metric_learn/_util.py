@@ -407,11 +407,11 @@ def validate_vector(u, dtype=None):
   return u
 
 
-def _check_num_dims(n_features, num_dims):
-  """Checks that num_dims is less than n_features and deal with the None
+def _check_n_components(n_features, n_components):
+  """Checks that n_components is less than n_features and deal with the None
   case"""
-  if num_dims is None:
+  if n_components is None:
     return n_features
-  if 0 < num_dims <= n_features:
+  if 0 < n_components <= n_features:
     return n_features
-  raise ValueError('Invalid num_dims, must be in [1, %d]' % n_features)
+  raise ValueError('Invalid n_components, must be in [1, %d]' % n_features)

@@ -33,19 +33,25 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, A0=None, tol=None, max_iter=1000,
-               verbose=False, preprocessor=None):
+  def __init__(self, n_components=None, num_dims='deprecated', A0=None,
+               tol=None, max_iter=1000, verbose=False, preprocessor=None):
     """
     Initialize MLKR.
 
     Parameters
     ----------
-    num_dims : int, optional
-        Dimensionality of reduced space (defaults to dimension of X)
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
 
     A0: array-like, optional
         Initialization of transformation matrix. Defaults to PCA loadings.
@@ -63,6 +69,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
     """
+    self.n_components = n_components
     self.num_dims = num_dims
     self.A0 = A0
     self.tol = tol
@@ -79,6 +86,11 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       X : (n x d) array of samples
       y : (n) data labels
       """
+      if self.num_dims != 'deprecated':
+        warnings.warn('"num_dims" parameter is not used.'
+                      ' It has been deprecated in version 0.5.0 and will be'
+                      'removed in 0.6.0. Use "n_components" instead',
+                      DeprecationWarning)
       X, y = self._prepare_inputs(X, y, y_numeric=True,
                                   ensure_min_samples=2)
       n, d = X.shape
@@ -87,7 +99,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
                            % (n, y.shape[0]))
 
       A = self.A0
-      m = self.num_dims
+      m = self.n_components
       if m is None:
           m = d
       if A is None:

@@ -18,7 +18,7 @@ from six.moves import xrange
 from sklearn import decomposition
 from sklearn.base import TransformerMixin
 
-from ._util import _check_num_dims
+from ._util import _check_n_components
 from .base_metric import MahalanobisMixin
 from .constraints import Constraints
 
@@ -41,17 +41,24 @@ class RCA(MahalanobisMixin, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, pca_comps=None, preprocessor=None):
+  def __init__(self, n_components=None, num_dims='deprecated',
+               pca_comps=None, preprocessor=None):
     """Initialize the learner.
 
     Parameters
     ----------
-    num_dims : int, optional
-        embedding dimension (default: original dimension of data)
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
 
     pca_comps : int, float, None or string
         Number of components to keep during PCA preprocessing.
@@ -64,6 +71,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
     """
+    self.n_components = n_components
     self.num_dims = num_dims
     self.pca_comps = pca_comps
     super(RCA, self).__init__(preprocessor)
@@ -76,7 +84,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
                     'You should adjust pca_comps to remove noise and '
                     'redundant information.')
 
-    dim = _check_num_dims(d, self.num_dims)
+    dim = _check_n_components(d, self.n_components)
     return dim
 
   def fit(self, X, chunks):
@@ -90,6 +98,11 @@ class RCA(MahalanobisMixin, TransformerMixin):
         When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
         When ``chunks[i] == j``, point i belongs to chunklet j.
     """
+    if self.num_dims != 'deprecated':
+      warnings.warn('"num_dims" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "n_components" instead',
+                    DeprecationWarning)
     X = self._prepare_inputs(X, ensure_min_samples=2)
 
     # PCA projection to remove noise and redundant information.
@@ -136,12 +149,13 @@ class RCA_Supervised(RCA):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, pca_comps=None, num_chunks=100,
-               chunk_size=2, preprocessor=None):
+  def __init__(self, num_dims='deprecated', n_components=None,
+               pca_comps=None, num_chunks=100, chunk_size=2,
+               preprocessor=None):
     """Initialize the supervised version of `RCA`.
 
     `RCA_Supervised` creates chunks of similar points by first sampling a
@@ -150,16 +164,23 @@ class RCA_Supervised(RCA):
 
     Parameters
     ----------
-    num_dims : int, optional
-        embedding dimension (default: original dimension of data)
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
+
     num_chunks: int, optional
     chunk_size: int, optional
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
     """
-    RCA.__init__(self, num_dims=num_dims, pca_comps=pca_comps,
-                 preprocessor=preprocessor)
+    RCA.__init__(self, num_dims=num_dims, n_components=n_components,
+                 pca_comps=pca_comps, preprocessor=preprocessor)
     self.num_chunks = num_chunks
     self.chunk_size = chunk_size
 

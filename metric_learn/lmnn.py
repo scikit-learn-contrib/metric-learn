@@ -17,7 +17,7 @@ from six.moves import xrange
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
 
-from ._util import _check_num_dims
+from ._util import _check_n_components
 from .base_metric import MahalanobisMixin
 
 
@@ -25,7 +25,8 @@ from .base_metric import MahalanobisMixin
 class _base_LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, k=3, min_iter=50, max_iter=1000, learn_rate=1e-7,
                regularization=0.5, convergence_tol=0.001, use_pca=True,
-               verbose=False, preprocessor=None, num_dims=None):
+               verbose=False, preprocessor=None, n_components=None,
+               num_dims='deprecated'):
     """Initialize the LMNN object.
 
     Parameters
@@ -39,6 +40,15 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
     """
     self.k = k
     self.min_iter = min_iter
@@ -48,6 +58,7 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     self.convergence_tol = convergence_tol
     self.use_pca = use_pca
     self.verbose = verbose
+    self.n_components = n_components
     self.num_dims = num_dims
     super(_base_LMNN, self).__init__(preprocessor)
 
@@ -56,21 +67,26 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
 class python_LMNN(_base_LMNN):
 
   def fit(self, X, y):
+    if self.num_dims != 'deprecated':
+      warnings.warn('"num_dims" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "n_components" instead',
+                    DeprecationWarning)
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate
 
     X, y = self._prepare_inputs(X, y, dtype=float,
                                 ensure_min_samples=2)
-    num_pts, num_dims = X.shape
-    output_dim = _check_num_dims(num_dims, self.num_dims)
+    num_pts, d = X.shape
+    output_dim = _check_n_components(d, self.n_components)
     unique_labels, label_inds = np.unique(y, return_inverse=True)
     if len(label_inds) != num_pts:
       raise ValueError('Must have one label per point.')
     self.labels_ = np.arange(len(unique_labels))
     if self.use_pca:
       warnings.warn('use_pca does nothing for the python_LMNN implementation')
-    self.transformer_ = np.eye(output_dim, num_dims)
+    self.transformer_ = np.eye(output_dim, d)
     required_k = np.bincount(label_inds).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'
@@ -272,7 +288,7 @@ try:
     n_iter_ : `int`
         The number of iterations the solver has run.
 
-    transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+    transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
         The learned linear transformation ``L``.
     """
 

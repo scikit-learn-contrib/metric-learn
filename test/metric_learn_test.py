@@ -16,7 +16,7 @@ except ImportError:
   HAS_SKGGM = False
 else:
   HAS_SKGGM = True
-from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
+from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC, RCA,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
                           RCA_Supervised, MMC_Supervised, SDML)
 # Import this specially for testing.
@@ -390,13 +390,13 @@ class TestNCA(MetricTestCase):
     n = self.iris_points.shape[0]
 
     # Without dimension reduction
-    nca = NCA(max_iter=(100000//n))
+    nca = NCA(max_iter=(100000 // n))
     nca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(nca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.15)
 
     # With dimension reduction
-    nca = NCA(max_iter=(100000//n), num_dims=2)
+    nca = NCA(max_iter=(100000 // n), n_components=2)
     nca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(nca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.20)
@@ -434,7 +434,7 @@ class TestNCA(MetricTestCase):
     """
     X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
     y = np.array([1, 0, 1, 0])
-    nca = NCA(num_dims=2,)
+    nca = NCA(n_components=2,)
     nca.fit(X, y)
     Xansformed = nca.transform(X)
     np.testing.assert_equal(pairwise_distances(Xansformed).argsort()[:, 1],
@@ -477,7 +477,7 @@ class TestNCA(MetricTestCase):
       A = np.zeros((X.shape[1], X.shape[1]))
       np.fill_diagonal(A,
                        1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
-      nca = NCA(max_iter=30, num_dims=X.shape[1])
+      nca = NCA(max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
 
@@ -490,14 +490,30 @@ class TestNCA(MetricTestCase):
       A = np.zeros((X.shape[1], X.shape[1]))
       np.fill_diagonal(A,
                        1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
-      nca = NCA(max_iter=30, num_dims=X.shape[1])
+      nca = NCA(max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
+
+  @pytest.mark.parametrize('num_dims', [None, 2])
+  def test_deprecation_num_dims(self, num_dims):
+    # test that a deprecation message is thrown if num_labeled is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    nca = NCA(num_dims=num_dims)
+    msg = ('"num_dims" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "n_components" instead',
+           DeprecationWarning)
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      nca.fit(X, y)
+    assert (str(raised_warning[0].message) == msg)
 
 
 class TestLFDA(MetricTestCase):
   def test_iris(self):
-    lfda = LFDA(k=2, num_dims=2)
+    lfda = LFDA(k=2, n_components=2)
     lfda.fit(self.iris_points, self.iris_labels)
     csep = class_separation(lfda.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.15)
@@ -506,25 +522,67 @@ class TestLFDA(MetricTestCase):
     self.assertEqual(lfda.get_mahalanobis_matrix().shape, (4, 4))
     self.assertEqual(lfda.transformer_.shape, (2, 4))
 
+  @pytest.mark.parametrize('num_dims', [None, 2])
+  def test_deprecation_num_dims(self, num_dims):
+    # test that a deprecation message is thrown if num_labeled is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    lfda = LFDA(num_dims=num_dims)
+    msg = ('"num_dims" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "n_components" instead',
+           DeprecationWarning)
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      lfda.fit(X, y)
+    assert (str(raised_warning[0].message) == msg)
+
 
 class TestRCA(MetricTestCase):
   def test_iris(self):
-    rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.25)
+
+  @pytest.mark.parametrize('num_dims', [None, 2])
+  def test_deprecation_num_dims(self, num_dims):
+    # test that a deprecation message is thrown if num_labeled is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    rca = RCA(num_dims=num_dims)
+    msg = ('"num_dims" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "n_components" instead',
+           DeprecationWarning)
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      rca.fit(X, y)
+    assert (str(raised_warning[0].message) == msg)
+
+    rca_supervised = RCA_Supervised(num_dims=num_dims)
+    msg = ('"num_dims" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "n_components" instead',
+           DeprecationWarning)
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      rca_supervised.fit(X, y)
+    assert (str(raised_warning[0].message) == msg)
 
   def test_feature_null_variance(self):
     X = np.hstack((self.iris_points, np.eye(len(self.iris_points), M=1)))
 
     # Apply PCA with the number of components
-    rca = RCA_Supervised(num_dims=2, pca_comps=3, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, pca_comps=3, num_chunks=30,
+                         chunk_size=2)
     rca.fit(X, self.iris_labels)
     csep = class_separation(rca.transform(X), self.iris_labels)
     self.assertLess(csep, 0.30)
 
     # Apply PCA with the minimum variance ratio
-    rca = RCA_Supervised(num_dims=2, pca_comps=0.95, num_chunks=30,
+    rca = RCA_Supervised(n_components=2, pca_comps=0.95, num_chunks=30,
                          chunk_size=2)
     rca.fit(X, self.iris_labels)
     csep = class_separation(rca.transform(X), self.iris_labels)
@@ -560,6 +618,22 @@ class TestMLKR(MetricTestCase):
     # compute relative error
     rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
     np.testing.assert_almost_equal(rel_diff, 0.)
+
+  @pytest.mark.parametrize('num_dims', [None, 2])
+  def test_deprecation_num_dims(self, num_dims):
+    # test that a deprecation message is thrown if num_labeled is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mlkr = MLKR(num_dims=num_dims)
+    msg = ('"num_dims" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "n_components" instead',
+           DeprecationWarning)
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      mlkr.fit(X, y)
+    assert (str(raised_warning[0].message) == msg)
 
 
 class TestMMC(MetricTestCase):
