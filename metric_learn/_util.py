@@ -137,6 +137,11 @@ def check_input(input_data, y=None, preprocessor=None,
     input_data = check_input_tuples(input_data, context, preprocessor,
                                     args_for_sk_checks, tuple_size)
 
+    # if we have y and the input data are pairs, we need to ensure
+    # the labels are in [-1, 1]:
+    if y is not None and input_data.shape[1] == 2:
+      check_y_valid_values_for_pairs(y)
+
   else:
     raise ValueError("Unknown value {} for type_of_inputs. Valid values are "
                      "'classic' or 'tuples'.".format(type_of_inputs))
@@ -295,6 +300,13 @@ def check_tuple_size(tuples, tuple_size, context):
              .format(tuple_size, context, tuples.shape[1], tuples.shape,
                      tuples))
     raise ValueError(msg_t)
+
+
+def check_y_valid_values_for_pairs(y):
+  """Checks that y values are in [-1, 1]"""
+  if not np.array_equal(np.abs(y), np.ones_like(y)):
+    raise ValueError("When training on pairs, the labels (y) should contain "
+                     "only values in [-1, 1]. Found an incorrect value.")
 
 
 class ArrayIndexer:
