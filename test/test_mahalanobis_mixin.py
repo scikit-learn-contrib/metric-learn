@@ -493,10 +493,10 @@ def test_init_mahalanobis(estimator, build_dataset):
     # init.shape[1] must match X.shape[1]
     init = rng.rand(X.shape[1], X.shape[1] + 1)
     model.set_params(init=init)
-    msg = ('The input dimensionality ({}, {}) of the given '
+    msg = ('The input dimensionality {} of the given '
            'mahalanobis matrix `init` must match the '
            'dimensionality of the given inputs ({}).'
-           .format(init.shape[0], init.shape[1], input_data.shape[-1]))
+           .format(init.shape, input_data.shape[-1]))
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, labels)
     assert str(raised_error.value) == msg

@@ -599,10 +599,10 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
 
     # Assert that init.shape[1] = n_features
     if (init.shape) != (n_features,) * 2:
-      raise ValueError('The input dimensionality ({}, {}) of the given '
+      raise ValueError('The input dimensionality {} of the given '
                        'mahalanobis matrix `init` must match the '
                        'dimensionality of the given inputs ({}).'
-                       .format(*(init.shape), n_features))
+                       .format(init.shape, n_features))
 
   elif init in ['identity', 'covariance', 'random']:
     pass
