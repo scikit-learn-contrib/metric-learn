@@ -6,6 +6,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y, check_random_state
 from .exceptions import PreprocessorError
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.utils.multiclass import type_of_target
 from scipy.linalg import pinvh
 import sys
 import time
@@ -411,8 +412,8 @@ def validate_vector(u, dtype=None):
   return u
 
 
-def _initialize_transformer(num_dims, X, y=None, init='auto', verbose=False,
-                            random_state=None):
+def _initialize_transformer(num_dims, input, y=None, init='auto',
+                            verbose=False, random_state=None):
   """Returns the initial transformer to be used depending on the arguments.
 
   Parameters
@@ -422,15 +423,31 @@ def _initialize_transformer(num_dims, X, y=None, init='auto', verbose=False,
     before, meaning it should not be None and it should be a value in
     [1, X.shape[1]])
 
-  X : array-like
-    The input samples.
+  input : array-like
+    The input samples (can be tuples or regular samples).
 
   y : array-like or None
     The input labels (or not if there are no labels).
 
-  init : array-like or None or str
-    The initial matrix.
-    # TODO: put the complete doc here
+  init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
 
   verbose : bool
     Whether to print the details of the initialization or not.
@@ -446,16 +463,23 @@ def _initialize_transformer(num_dims, X, y=None, init='auto', verbose=False,
   init_transformer : `numpy.ndarray`
     The initial transformer to use.
   """
+  # if we are doing a regression we cannot use lda:
+  n_features = input.shape[-1]
+  authorized_inits = ['auto', 'pca', 'identity', 'random']
+  is_classification = (type_of_target(y) in ['multiclass',
+                                             'binary'])
+  if is_classification:
+    authorized_inits.append('lda')
 
   if isinstance(init, np.ndarray):
     init = check_array(init)
 
     # Assert that init.shape[1] = X.shape[1]
-    if init.shape[1] != X.shape[1]:
+    if init.shape[1] != n_features:
       raise ValueError('The input dimensionality ({}) of the given '
                        'linear transformation `init` must match the '
                        'dimensionality of the given inputs `X` ({}).'
-                       .format(init.shape[1], X.shape[1]))
+                       .format(init.shape[1], n_features))
 
     # Assert that init.shape[0] <= init.shape[1]
     if init.shape[0] > init.shape[1]:
@@ -464,43 +488,43 @@ def _initialize_transformer(num_dims, X, y=None, init='auto', verbose=False,
                        'greater than its input dimensionality ({}).'
                        .format(init.shape[0], init.shape[1]))
 
-    if num_dims is not None:
-      # Assert that self.num_dims = init.shape[0]
-      if num_dims != init.shape[0]:
-        raise ValueError('The preferred dimensionality of the '
-                         'projected space `num_dims` ({}) does'
-                         ' not match the output dimensionality of '
-                         'the given linear transformation '
-                         '`init` ({})!'
-                         .format(num_dims,
-                                 init.shape[0]))
-  elif init in ['auto', 'pca', 'lda', 'identity', 'random']:
+    # Assert that self.num_dims = init.shape[0]
+    if num_dims != init.shape[0]:
+      raise ValueError('The preferred dimensionality of the '
+                       'projected space `num_dims` ({}) does'
+                       ' not match the output dimensionality of '
+                       'the given linear transformation '
+                       '`init` ({})!'
+                       .format(num_dims,
+                               init.shape[0]))
+  elif init in authorized_inits:
     pass
   else:
     raise ValueError(
-        "`init` must be 'auto', 'pca', 'lda', 'identity', 'random' "
-        "or a numpy array of shape (num_dims, n_features).")
+        "`init` must be '{}' "
+        "or a numpy array of shape (num_dims, n_features)."
+        .format("', '".join(authorized_inits)))
 
   random_state = check_random_state(random_state)
   transformation = init
   if isinstance(init, np.ndarray):
     pass
   else:
-    n_samples, n_features = X.shape
-    num_dims = num_dims or n_features
+    n_samples = input.shape[0]
     if init == 'auto':
-      n_classes = len(np.unique(y))
-      if num_dims <= min(n_features, n_classes - 1):
+      if is_classification:
+        n_classes = len(np.unique(y))
+      if (is_classification and num_dims <= min(n_features, n_classes - 1)):
         init = 'lda'
       elif num_dims < min(n_features, n_samples):
         init = 'pca'
       else:
         init = 'identity'
     if init == 'identity':
-      transformation = np.eye(num_dims, X.shape[1])
+      transformation = np.eye(num_dims, input.shape[-1])
     elif init == 'random':
       transformation = random_state.randn(num_dims,
-                                          X.shape[1])
+                                          input.shape[-1])
     elif init in {'pca', 'lda'}:
       init_time = time.time()
       if init == 'pca':
@@ -509,32 +533,49 @@ def _initialize_transformer(num_dims, X, y=None, init='auto', verbose=False,
         if verbose:
           print('Finding principal components... ')
           sys.stdout.flush()
-        pca.fit(X)
+        pca.fit(input)
         transformation = pca.components_
       elif init == 'lda':
         lda = LinearDiscriminantAnalysis(n_components=num_dims)
         if verbose:
           print('Finding most discriminative components... ')
           sys.stdout.flush()
-        lda.fit(X, y)
+        lda.fit(input, y)
         transformation = lda.scalings_.T[:num_dims]
       if verbose:
         print('done in {:5.2f}s'.format(time.time() - init_time))
   return transformation
 
 
-def _initialize_metric_mahalanobis(pairs, init='identity', random_state=None,
+def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                                    return_inverse=False):
   """Returns the initial mahalanobis matrix to be used depending on the
   arguments.
 
   Parameters
   ----------
-  pairs : array-like
-    The input samples.
+  input : array-like
+    The input samples (can be tuples or regular samples).
 
-  init : array-like or None or str
-    The initial matrix.
+  init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
 
   random_state : int or `numpy.RandomState` or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If
@@ -551,24 +592,24 @@ def _initialize_metric_mahalanobis(pairs, init='identity', random_state=None,
   M, or (M, M_inv) : `numpy.ndarray`
     The initial matrix to use M, and its inverse if `return_inverse=True`.
   """
-
+  n_features = input.shape[-1]
   if isinstance(init, np.ndarray):
     init = check_array(init)  # TODO: do we want to copy the array ?
     # see how they do it in scikit-learn for instance
 
-    # Assert that init.shape[1] = pairs.shape[2]
-    if (init.shape) != (pairs.shape[2],) * 2:
-      raise ValueError('The input dimensionality ({}) of the given '
+    # Assert that init.shape[1] = n_features
+    if (init.shape) != (n_features,) * 2:
+      raise ValueError('The input dimensionality ({}, {}) of the given '
                        'mahalanobis matrix `init` must match the '
                        'dimensionality of the given inputs ({}).'
-                       .format(init.shape, pairs.shape[2]))
+                       .format(*(init.shape), n_features))
 
   elif init in ['identity', 'covariance', 'random']:
     pass
   else:
     raise ValueError(
         "`init` must be 'identity', 'covariance', 'random' "
-        "or a numpy array of shape (num_dims, n_features).")
+        "or a numpy array of shape (n_features, n_features).")
 
   random_state = check_random_state(random_state)
   M = init
@@ -576,13 +617,16 @@ def _initialize_metric_mahalanobis(pairs, init='identity', random_state=None,
     if return_inverse:
       M_inv = pinvh(M)
   else:
-    n_features = pairs.shape[2]
     if init == 'identity':
       M = np.eye(n_features, n_features)
       if return_inverse:
         M_inv = M.copy()
     if init == 'covariance':
-      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
+      if input.ndim == 3:
+        # if the input are tuples, we need to form an X by deduplication
+        X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
+      else:
+        X = input
       M_inv = np.atleast_2d(np.cov(X, rowvar=False))
       # TODO: check atleast_2d necessary
       M = pinvh(M_inv)

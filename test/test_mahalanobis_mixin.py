@@ -7,6 +7,7 @@ from scipy.spatial.distance import pdist, squareform, mahalanobis
 from sklearn import clone
 from sklearn.cluster import DBSCAN
 from sklearn.utils import check_random_state
+from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.testing import set_random_state
 
 from metric_learn._util import make_context
@@ -305,19 +306,18 @@ def test_transformer_is_2D(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
-                          in zip(ids_supervised_learners,
-                                 supervised_learners)
+                          in zip(ids_metric_learners,
+                                 metric_learners)
                           if hasattr(ml, 'num_dims') and
-                          hasattr(ml, 'init') and
-                          (idml not in ids_regressors)],
+                          hasattr(ml, 'init')],
                          ids=[idml for idml, (ml, _)
-                              in zip(ids_supervised_learners,
-                                     supervised_learners)
+                              in zip(ids_metric_learners,
+                                     metric_learners)
                               if hasattr(ml, 'num_dims') and
-                              hasattr(ml, 'init') and
-                              (idml not in ids_regressors)])
+                              hasattr(ml, 'init')])
 def test_init_transformation(estimator, build_dataset):
     input_data, labels, _, X = build_dataset()
+    is_classification = (type_of_target(labels) in ['multiclass', 'binary'])
     model = clone(estimator)
     rng = np.random.RandomState(42)
 
@@ -338,8 +338,9 @@ def test_init_transformation(estimator, build_dataset):
     model.fit(input_data, labels)
 
     # Initialize with LDA
-    model.set_params(init='lda')
-    model.fit(input_data, labels)
+    if is_classification:
+      model.set_params(init='lda')
+      model.fit(input_data, labels)
 
     # Initialize with a numpy array
     init = rng.rand(X.shape[1], X.shape[1])
@@ -383,9 +384,10 @@ def test_init_transformation(estimator, build_dataset):
 
     # init must be as specified in the docstring
     model.set_params(init=1)
-    msg = ("`init` must be 'auto', 'pca', 'lda', 'identity', "
-           "'random' or a numpy array of shape "
-           "(num_dims, n_features).")
+    msg = ("`init` must be 'auto', 'pca', 'identity', "
+           "'random'{} or a numpy array of shape "
+           "(num_dims, n_features)."
+           .format(", 'lda'" if is_classification else ''))
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, labels)
     assert str(raised_error.value) == msg
@@ -397,17 +399,15 @@ def test_init_transformation(estimator, build_dataset):
 @pytest.mark.parametrize('num_dims', [3, 5, 7, 11])
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
-                          in zip(ids_supervised_learners,
-                                 supervised_learners)
+                          in zip(ids_metric_learners,
+                                 metric_learners)
                           if hasattr(ml, 'num_dims') and
-                          hasattr(ml, 'init') and
-                          (idml not in ids_regressors)],
+                          hasattr(ml, 'init')],
                          ids=[idml for idml, (ml, _)
-                              in zip(ids_supervised_learners,
-                                     supervised_learners)
+                              in zip(ids_metric_learners,
+                                     metric_learners)
                               if hasattr(ml, 'num_dims') and
-                              hasattr(ml, 'init') and
-                              (idml not in ids_regressors)])
+                              hasattr(ml, 'init')])
 def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
                                   estimator, build_dataset):
   # Test that auto choose the init as expected with every configuration
@@ -439,7 +439,8 @@ def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
     else:
       model = clone(model_base)
       model.fit(X, y)
-      if num_dims <= min(n_classes - 1, n_features):
+      if (num_dims <= min(n_classes - 1, n_features) and
+              type_of_target(labels) in ['multiclass', 'binary']):
         model_other = clone(model_base).set_params(init='lda')
       elif num_dims < min(n_features, n_samples):
         model_other = clone(model_base).set_params(init='pca')
@@ -492,17 +493,17 @@ def test_init_mahalanobis(estimator, build_dataset):
     # init.shape[1] must match X.shape[1]
     init = rng.rand(X.shape[1], X.shape[1] + 1)
     model.set_params(init=init)
-    msg = ('The input dimensionality ({}) of the given '
-           'linear transformation `init` must match the '
-           'dimensionality of the given inputs `X` ({}).'
-           .format(init.shape[1], X.shape[1]))
+    msg = ('The input dimensionality ({}, {}) of the given '
+           'mahalanobis matrix `init` must match the '
+           'dimensionality of the given inputs ({}).'
+           .format(init.shape[0], init.shape[1], input_data.shape[-1]))
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, labels)
     assert str(raised_error.value) == msg
 
     # init must be as specified in the docstring
     model.set_params(init=1)
-    msg = ("`init` must be 'identity', 'covariance'"
+    msg = ("`init` must be 'identity', 'covariance', "
            "'random' or a numpy array of shape "
            "(n_features, n_features).")
     with pytest.raises(ValueError) as raised_error:

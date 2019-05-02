@@ -21,6 +21,7 @@ from sklearn.decomposition import PCA
 
 from sklearn.metrics import pairwise_distances
 from .base_metric import MahalanobisMixin
+from metric_learn._util import _initialize_transformer
 
 EPS = np.finfo(float).eps
 
@@ -37,8 +38,9 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, A0=None, tol=None, max_iter=1000,
-               verbose=False, preprocessor=None):
+  def __init__(self, num_dims=None, init='auto', A0=None,
+               tol=None, max_iter=1000, verbose=False, preprocessor=None,
+               random_state=None):
     """
     Initialize MLKR.
 
@@ -47,7 +49,38 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     num_dims : int, optional
         Dimensionality of reduced space (defaults to dimension of X)
 
-    A0: array-like, optional
+    init : string or numpy array, optional (default='auto')
+        Initialization of the linear transformation. Possible options are
+        'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
+        (n_features_a, n_features_b).
+
+        'auto'
+            Depending on ``num_dims``, the most reasonable initialization
+            will be chosen. If ``num_dims < min(n_features, n_samples)``, we
+            use 'pca', as it projects data in meaningful directions (those
+            of higher variance). Otherwise, we just use 'identity'.
+
+        'pca'
+            ``num_dims`` principal components of the inputs passed
+            to :meth:`fit` will be used to initialize the transformation.
+            (See `sklearn.decomposition.PCA`)
+
+        'identity'
+            If ``num_dims`` is strictly smaller than the
+            dimensionality of the inputs passed to :meth:`fit`, the identity
+            matrix will be truncated to the first ``num_dims`` rows.
+
+        'random'
+            The initial transformation will be a random array of shape
+            `(num_dims, n_features)`. Each value is sampled from the
+            standard normal distribution.
+
+        numpy array
+            n_features_b must match the dimensionality of the inputs passed to
+            :meth:`fit` and n_features_a must be less than or equal to that.
+            If ``num_dims`` is not None, n_features_a must match it.
+
+    A0: array-like, optional # TODO: deprecate
         Initialization of transformation matrix. Defaults to PCA loadings.
 
     tol: float, optional (default=None)
@@ -62,12 +95,20 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation. If ``init='pca'``, ``random_state`` is passed as an
+        argument to PCA when initializing the transformation.
     """
     self.num_dims = num_dims
-    self.A0 = A0
+    self.init = init
+    self.A0 = A0  # TODO: deprecate
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
+    self.random_state = random_state
     super(MLKR, self).__init__(preprocessor)
 
   def fit(self, X, y):
@@ -86,17 +127,11 @@ class MLKR(MahalanobisMixin, TransformerMixin):
           raise ValueError('Data and label lengths mismatch: %d != %d'
                            % (n, y.shape[0]))
 
-      A = self.A0
       m = self.num_dims
       if m is None:
           m = d
-      if A is None:
-          # initialize to PCA transformation matrix
-          # note: not the same as n_components=m !
-          A = PCA().fit(X).components_.T[:m]
-      elif A.shape != (m, d):
-          raise ValueError('A0 needs shape (%d,%d) but got %s' % (
-              m, d, A.shape))
+      A = _initialize_transformer(m, X, y, init=self.init,
+                                  random_state=self.random_state)
 
       # Measure the total training time
       train_time = time.time()
