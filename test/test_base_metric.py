@@ -76,9 +76,10 @@ SDML_Supervised(balance_param=0.5, init='identity', num_constraints=None,
                      "preprocessor=None)")
 
   def test_mlkr(self):
-    self.assertEqual(str(metric_learn.MLKR()),
-                     "MLKR(A0=None, max_iter=1000, num_dims=None, "
-                     "preprocessor=None, tol=None,\n   verbose=False)")
+    self.assertEqual(str(metric_learn.MLKR()), """
+MLKR(A0=None, init='auto', max_iter=1000, num_dims=None, preprocessor=None,
+   random_state=None, tol=None, verbose=False)
+""".strip('\n'))
 
   def test_mmc(self):
     self.assertEqual(str(metric_learn.MMC()), """
