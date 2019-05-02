@@ -89,7 +89,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       if self.num_dims != 'deprecated':
         warnings.warn('"num_dims" parameter is not used.'
                       ' It has been deprecated in version 0.5.0 and will be'
-                      'removed in 0.6.0. Use "n_components" instead',
+                      ' removed in 0.6.0. Use "n_components" instead',
                       DeprecationWarning)
       X, y = self._prepare_inputs(X, y, y_numeric=True,
                                   ensure_min_samples=2)

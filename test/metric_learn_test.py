@@ -71,7 +71,7 @@ class TestLSML(MetricTestCase):
     lsml_supervised = LSML_Supervised(num_labeled=np.inf)
     msg = ('"num_labeled" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0')
+           ' removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, lsml_supervised.fit, X, y)
 
 
@@ -92,7 +92,7 @@ class TestITML(MetricTestCase):
     itml_supervised = ITML_Supervised(num_labeled=np.inf)
     msg = ('"num_labeled" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0')
+           ' removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
 
   def test_deprecation_bounds(self):
@@ -104,7 +104,7 @@ class TestITML(MetricTestCase):
     itml_supervised = ITML_Supervised(bounds=None)
     msg = ('"bounds" parameter from initialization is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use the "bounds" parameter of this '
+           ' removed in 0.6.0. Use the "bounds" parameter of this '
            'fit method instead.')
     assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
 
@@ -282,7 +282,7 @@ class TestSDML(MetricTestCase):
                                       balance_param=5e-5)
     msg = ('"num_labeled" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0')
+           ' removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, sdml_supervised.fit, X, y)
 
   def test_sdml_raises_warning_non_psd(self):
@@ -505,8 +505,7 @@ def test_deprecation_num_dims_nca(num_dims):
   nca = NCA(num_dims=num_dims)
   msg = ('"num_dims" parameter is not used.'
          ' It has been deprecated in version 0.5.0 and will be'
-         'removed in 0.6.0. Use "n_components" instead',
-         DeprecationWarning)
+         ' removed in 0.6.0. Use "n_components" instead')
   with pytest.warns(DeprecationWarning) as raised_warning:
     nca.fit(X, y)
   assert (str(raised_warning[0].message) == msg)
@@ -534,8 +533,7 @@ def test_deprecation_num_dims_lfda(num_dims):
   lfda = LFDA(num_dims=num_dims)
   msg = ('"num_dims" parameter is not used.'
          ' It has been deprecated in version 0.5.0 and will be'
-         'removed in 0.6.0. Use "n_components" instead',
-         DeprecationWarning)
+         ' removed in 0.6.0. Use "n_components" instead')
   with pytest.warns(DeprecationWarning) as raised_warning:
     lfda.fit(X, y)
   assert (str(raised_warning[0].message) == msg)
@@ -571,22 +569,20 @@ def test_deprecation_num_dims_rca(num_dims):
   # test that a deprecation message is thrown if num_labeled is set at
   # initialization
   # TODO: remove in v.0.6
-  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-  y = np.array([1, 0, 1, 0])
+  X, y = load_iris(return_X_y=True)
   rca = RCA(num_dims=num_dims)
   msg = ('"num_dims" parameter is not used.'
          ' It has been deprecated in version 0.5.0 and will be'
-         'removed in 0.6.0. Use "n_components" instead',
-         DeprecationWarning)
+         ' removed in 0.6.0. Use "n_components" instead')
   with pytest.warns(DeprecationWarning) as raised_warning:
     rca.fit(X, y)
   assert (str(raised_warning[0].message) == msg)
 
-  rca_supervised = RCA_Supervised(num_dims=num_dims)
+  # we take a small number of chunks so that RCA works on iris
+  rca_supervised = RCA_Supervised(num_dims=num_dims, num_chunks=10)
   msg = ('"num_dims" parameter is not used.'
          ' It has been deprecated in version 0.5.0 and will be'
-         'removed in 0.6.0. Use "n_components" instead',
-         DeprecationWarning)
+         ' removed in 0.6.0. Use "n_components" instead')
   with pytest.warns(DeprecationWarning) as raised_warning:
     rca_supervised.fit(X, y)
   assert (str(raised_warning[0].message) == msg)
@@ -633,8 +629,7 @@ def test_deprecation_num_dims_mlkr(num_dims):
   mlkr = MLKR(num_dims=num_dims)
   msg = ('"num_dims" parameter is not used.'
          ' It has been deprecated in version 0.5.0 and will be'
-         'removed in 0.6.0. Use "n_components" instead',
-         DeprecationWarning)
+         ' removed in 0.6.0. Use "n_components" instead')
   with pytest.warns(DeprecationWarning) as raised_warning:
     mlkr.fit(X, y)
   assert (str(raised_warning[0].message) == msg)
@@ -687,7 +682,7 @@ class TestMMC(MetricTestCase):
     mmc_supervised = MMC_Supervised(num_labeled=np.inf)
     msg = ('"num_labeled" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0')
+           ' removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, mmc_supervised.fit, X, y)
 
 
