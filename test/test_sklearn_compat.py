@@ -89,9 +89,13 @@ class TestSklearnCompat(unittest.TestCase):
     dSDML.__init__ = stable_init
     check_estimator(dSDML)
 
-  # This fails because the default num_chunks isn't data-dependent.
-  # def test_rca(self):
-  #   check_estimator(RCA_Supervised)
+  def test_rca(self):
+    def stable_init(self, num_dims=None, pca_comps=None,
+                    chunk_size=2, preprocessor=None):
+      # this init makes RCA stable for scikit-learn examples.
+      RCA_Supervised.__init__(self, num_chunks=2)
+    dRCA.__init__ = stable_init
+    check_estimator(dRCA)
 
 
 RNG = check_random_state(0)
