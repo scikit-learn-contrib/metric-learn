@@ -1,6 +1,6 @@
 metric-learn: Metric Learning in Python
 =======================================
-|License| |PyPI version|
+|Travis-CI Build Status| |License| |PyPI version| |Code coverage|
 
 Metric-learn contains efficient Python implementations of several
 popular supervised and weakly-supervised metric learning algorithms. The API
@@ -34,7 +34,11 @@ Documentation outline
 
 :ref:`genindex` | :ref:`modindex` | :ref:`search`
 
+.. |Travis-CI Build Status| image:: https://api.travis-ci.org/metric-learn/metric-learn.svg?branch=master
+   :target: https://travis-ci.org/metric-learn/metric-learn
 .. |PyPI version| image:: https://badge.fury.io/py/metric-learn.svg
    :target: http://badge.fury.io/py/metric-learn
 .. |License| image:: http://img.shields.io/:license-mit-blue.svg?style=flat
    :target: http://badges.mit-license.org
+.. |Code coverage| image:: https://codecov.io/gh/metric-learn/metric-learn/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/metric-learn/metric-learn

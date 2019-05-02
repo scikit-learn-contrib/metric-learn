@@ -9,7 +9,8 @@ from sklearn.utils.testing import set_random_state
 from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
-                                check_collapsed_pairs, validate_vector)
+                                check_collapsed_pairs, validate_vector,
+                                _check_sdp_from_eigen)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -30,7 +31,6 @@ Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 # and to_transform is some additional data that we would want to transform
 
 
-@pytest.fixture
 def build_classification(with_preprocessor=False):
   """Basic array for testing when using a preprocessor"""
   X, y = shuffle(*make_blobs(random_state=SEED),
@@ -42,7 +42,6 @@ def build_classification(with_preprocessor=False):
     return Dataset(X[indices], y[indices], None, X[indices])
 
 
-@pytest.fixture
 def build_regression(with_preprocessor=False):
   """Basic array for testing when using a preprocessor"""
   X, y = shuffle(*make_regression(n_samples=100, n_features=5,
@@ -102,28 +101,30 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
                                  quadruplets_learners]))
 
-pairs_learners = [(ITML(), build_pairs),
-                  (MMC(max_iter=2), build_pairs),  # max_iter=2 for faster
-                  (SDML(), build_pairs),
-                  ]
+pairs_learners = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be
+                  # faster, also make tests pass while waiting for #175 to
+                  # be solved
+                  # TODO: remove this comment when #175 is solved
+                  (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster
+                  (SDML(use_cov=False, balance_param=1e-5), build_pairs)]
 ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
-                                [learner for (learner, _) in
-                                 pairs_learners]))
+                              [learner for (learner, _) in
+                               pairs_learners]))
 
-classifiers =   [(Covariance(), build_classification),
-                 (LFDA(), build_classification),
-                 (LMNN(), build_classification),
-                 (NCA(), build_classification),
-                 (RCA(), build_classification),
-                 (ITML_Supervised(max_iter=5), build_classification),
-                 (LSML_Supervised(), build_classification),
-                 (MMC_Supervised(max_iter=5), build_classification),
-                 (RCA_Supervised(num_chunks=10), build_classification),
-                 (SDML_Supervised(), build_classification)
-                 ]
+classifiers = [(Covariance(), build_classification),
+               (LFDA(), build_classification),
+               (LMNN(), build_classification),
+               (NCA(), build_classification),
+               (RCA(), build_classification),
+               (ITML_Supervised(max_iter=5), build_classification),
+               (LSML_Supervised(), build_classification),
+               (MMC_Supervised(max_iter=5), build_classification),
+               (RCA_Supervised(num_chunks=10), build_classification),
+               (SDML_Supervised(use_cov=False, balance_param=1e-5),
+               build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
-                                [learner for (learner, _) in
-                                 classifiers]))
+                           [learner for (learner, _) in
+                            classifiers]))
 
 regressors = [(MLKR(), build_regression)]
 ids_regressors = list(map(lambda x: x.__class__.__name__,
@@ -140,6 +141,18 @@ ids_supervised_learners = ids_classifiers + ids_regressors
 
 metric_learners = tuples_learners + supervised_learners
 ids_metric_learners = ids_tuples_learners + ids_supervised_learners
+
+
+def remove_y_quadruplets(estimator, X, y):
+  """Quadruplets learners have no y in fit, but to write test for all
+  estimators, it is convenient to have this function, that will return X and y
+  if the estimator needs a y to fit on, and just X otherwise."""
+  if estimator.__class__.__name__ in [e.__class__.__name__
+                                      for (e, _) in
+                                      quadruplets_learners]:
+    return (X,)
+  else:
+    return (X, y)
 
 
 def mock_preprocessor(indices):
@@ -162,7 +175,6 @@ def test_check_input_invalid_type_of_inputs(type_of_inputs):
 #  ---------------- test check_input with 'tuples' type_of_input' ------------
 
 
-@pytest.fixture
 def tuples_prep():
   """Basic array for testing when using a preprocessor"""
   tuples = np.array([[1, 2],
@@ -170,7 +182,6 @@ def tuples_prep():
   return tuples
 
 
-@pytest.fixture
 def tuples_no_prep():
   """Basic array for testing when using no preprocessor"""
   tuples = np.array([[[1., 2.3], [2.3, 5.3]],
@@ -252,15 +263,15 @@ def test_check_tuples_invalid_shape(estimator, context, tuples, found,
 
 @pytest.mark.parametrize('estimator, context',
                          [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-def test_check_tuples_invalid_n_features(estimator, context, tuples_no_prep):
+def test_check_tuples_invalid_n_features(estimator, context):
   """Checks that the right warning is printed if not enough features
   Here we only test if no preprocessor (otherwise we don't ensure this)
   """
   msg = ("Found array with 2 feature(s) (shape={}) while"
-         " a minimum of 3 is required{}.".format(tuples_no_prep.shape,
+         " a minimum of 3 is required{}.".format(tuples_no_prep().shape,
                                                  context))
   with pytest.raises(ValueError) as raised_error:
-      check_input(tuples_no_prep, type_of_inputs='tuples',
+      check_input(tuples_no_prep(), type_of_inputs='tuples',
                   preprocessor=None, ensure_min_features=3,
                   estimator=estimator)
   assert str(raised_error.value) == msg
@@ -317,8 +328,7 @@ def test_check_tuples_invalid_dtype_convertible(estimator, context,
   assert str(raised_warning[0].message) == msg
 
 
-def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor(
-        tuples_prep):
+def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor():
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float, when using a preprocessor
   """
@@ -328,31 +338,30 @@ def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor(
     return np.full((indices.shape[0], 3), 'a')
 
   with pytest.raises(ValueError):
-    check_input(tuples_prep, type_of_inputs='tuples',
+    check_input(tuples_prep(), type_of_inputs='tuples',
                 preprocessor=preprocessor, dtype=np.float64)
 
 
-def test_check_tuples_invalid_dtype_not_convertible_without_preprocessor(
-        tuples_no_prep):
+def test_check_tuples_invalid_dtype_not_convertible_without_preprocessor():
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float, when using no preprocessor
   """
-  tuples = np.full_like(tuples_no_prep, 'a', dtype=object)
+  tuples = np.full_like(tuples_no_prep(), 'a', dtype=object)
   with pytest.raises(ValueError):
     check_input(tuples, type_of_inputs='tuples',
                 preprocessor=None, dtype=np.float64)
 
 
 @pytest.mark.parametrize('tuple_size', [2, None])
-def test_check_tuples_valid_tuple_size(tuple_size, tuples_prep, tuples_no_prep):
+def test_check_tuples_valid_tuple_size(tuple_size):
   """For inputs that have the right matrix dimension (2D or 3D for instance),
   checks that checking the number of tuples (pairs, quadruplets, etc) raises
   no warning if there is the right number of points in a tuple.
   """
   with pytest.warns(None) as record:
-    check_input(tuples_prep, type_of_inputs='tuples',
+    check_input(tuples_prep(), type_of_inputs='tuples',
                 preprocessor=mock_preprocessor, tuple_size=tuple_size)
-    check_input(tuples_no_prep, type_of_inputs='tuples', preprocessor=None,
+    check_input(tuples_no_prep(), type_of_inputs='tuples', preprocessor=None,
                 tuple_size=tuple_size)
   assert len(record) == 0
 
@@ -400,7 +409,7 @@ def test_check_tuples_valid_without_preprocessor(tuples):
   assert len(record) == 0
 
 
-def test_check_tuples_behaviour_auto_dtype(tuples_no_prep):
+def test_check_tuples_behaviour_auto_dtype():
   """Checks that check_tuples allows by default every type if using a
   preprocessor, and numeric types if using no preprocessor"""
   tuples_prep = [['img1.png', 'img2.png'], ['img3.png', 'img5.png']]
@@ -410,15 +419,15 @@ def test_check_tuples_behaviour_auto_dtype(tuples_no_prep):
   assert len(record) == 0
 
   with pytest.warns(None) as record:
-      check_input(tuples_no_prep, type_of_inputs='tuples')  # numeric type
+      check_input(tuples_no_prep(), type_of_inputs='tuples')  # numeric type
   assert len(record) == 0
 
   # not numeric type
-  tuples_no_prep = np.array([[['img1.png'], ['img2.png']],
-                             [['img3.png'], ['img5.png']]])
-  tuples_no_prep = tuples_no_prep.astype(object)
+  tuples_no_prep_bis = np.array([[['img1.png'], ['img2.png']],
+                                 [['img3.png'], ['img5.png']]])
+  tuples_no_prep_bis = tuples_no_prep_bis.astype(object)
   with pytest.raises(ValueError):
-      check_input(tuples_no_prep, type_of_inputs='tuples')
+      check_input(tuples_no_prep_bis, type_of_inputs='tuples')
 
 
 def test_check_tuples_invalid_complex_data():
@@ -436,14 +445,12 @@ def test_check_tuples_invalid_complex_data():
 # ------------- test check_input with 'classic' type_of_inputs ----------------
 
 
-@pytest.fixture
 def points_prep():
   """Basic array for testing when using a preprocessor"""
   points = np.array([1, 2])
   return points
 
 
-@pytest.fixture
 def points_no_prep():
   """Basic array for testing when using no preprocessor"""
   points = np.array([[1., 2.3],
@@ -484,17 +491,16 @@ def test_check_classic_invalid_shape(estimator, context, points, found,
 
 @pytest.mark.parametrize('estimator, context',
                          [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-def test_check_classic_invalid_n_features(estimator, context,
-                                          points_no_prep):
+def test_check_classic_invalid_n_features(estimator, context):
   """Checks that the right warning is printed if not enough features
   Here we only test if no preprocessor (otherwise we don't ensure this)
   """
   msg = ("Found array with 2 feature(s) (shape={}) while"
-         " a minimum of 3 is required{}.".format(points_no_prep.shape,
+         " a minimum of 3 is required{}.".format(points_no_prep().shape,
                                                  context))
   with pytest.raises(ValueError) as raised_error:
-      check_input(points_no_prep, type_of_inputs='classic', preprocessor=None,
-                  ensure_min_features=3,
+      check_input(points_no_prep(), type_of_inputs='classic',
+                  preprocessor=None, ensure_min_features=3,
                   estimator=estimator)
   assert str(raised_error.value) == msg
 
@@ -610,7 +616,7 @@ def test_check_classic_by_default():
           check_input([[2, 3], [3, 2]], type_of_inputs='classic')).all()
 
 
-def test_check_classic_behaviour_auto_dtype(points_no_prep):
+def test_check_classic_behaviour_auto_dtype():
   """Checks that check_input (for points) allows by default every type if
   using a preprocessor, and numeric types if using no preprocessor"""
   points_prep = ['img1.png', 'img2.png', 'img3.png', 'img5.png']
@@ -620,15 +626,15 @@ def test_check_classic_behaviour_auto_dtype(points_no_prep):
   assert len(record) == 0
 
   with pytest.warns(None) as record:
-      check_input(points_no_prep, type_of_inputs='classic')  # numeric type
+      check_input(points_no_prep(), type_of_inputs='classic')  # numeric type
   assert len(record) == 0
 
   # not numeric type
-  points_no_prep = np.array(['img1.png', 'img2.png', 'img3.png',
-                             'img5.png'])
-  points_no_prep = points_no_prep.astype(object)
+  points_no_prep_bis = np.array(['img1.png', 'img2.png', 'img3.png',
+                                 'img5.png'])
+  points_no_prep_bis = points_no_prep_bis.astype(object)
   with pytest.raises(ValueError):
-      check_input(points_no_prep, type_of_inputs='classic')
+      check_input(points_no_prep_bis, type_of_inputs='classic')
 
 
 def test_check_classic_invalid_complex_data():
@@ -839,9 +845,9 @@ def test_error_message_check_preprocessor(preprocessor):
                           "or a callable.".format(type(preprocessor)))
 
 
-@pytest.mark.parametrize('estimator', [ITML(), LSML(), MMC(), SDML()],
-                         ids=['ITML', 'LSML', 'MMC', 'SDML'])
-def test_error_message_tuple_size(estimator):
+@pytest.mark.parametrize('estimator, _', tuples_learners,
+                         ids=ids_tuples_learners)
+def test_error_message_tuple_size(estimator, _):
   """Tests that if a tuples learner is not given the good number of points
   per tuple, it throws an error message"""
   estimator = clone(estimator)
@@ -850,7 +856,7 @@ def test_error_message_tuple_size(estimator):
                             [[1.9, 5.3], [1., 7.8], [3.2, 1.2]]])
   y = [1, 1]
   with pytest.raises(ValueError) as raised_err:
-    estimator.fit(invalid_pairs, y)
+    estimator.fit(*remove_y_quadruplets(estimator, invalid_pairs, y))
   expected_msg = ("Tuples of {} element(s) expected{}. Got tuples of 3 "
                   "element(s) instead (shape=(2, 3, 2)):\ninput={}.\n"
                   .format(estimator._tuple_size, make_context(estimator),
@@ -935,19 +941,25 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)
   estimator_with_preprocessor.set_params(preprocessor=X)
-  estimator_with_preprocessor.fit(indices_train, y_train,
+  estimator_with_preprocessor.fit(*remove_y_quadruplets(estimator,
+                                                        indices_train,
+                                                        y_train),
                                   **make_random_state(estimator))
 
   estimator_without_preprocessor = clone(estimator)
   set_random_state(estimator_without_preprocessor)
   estimator_without_preprocessor.set_params(preprocessor=None)
-  estimator_without_preprocessor.fit(formed_train, y_train,
+  estimator_without_preprocessor.fit(*remove_y_quadruplets(estimator,
+                                                           formed_train,
+                                                           y_train),
                                      **make_random_state(estimator))
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=X)
-  estimator_with_prep_formed.fit(indices_train, y_train,
+  estimator_with_prep_formed.fit(*remove_y_quadruplets(estimator,
+                                                       indices_train,
+                                                       y_train),
                                  **make_random_state(estimator))
 
   # test prediction methods
@@ -1040,3 +1052,18 @@ def test__validate_vector():
   x = [[1, 2], [3, 4]]
   with pytest.raises(ValueError):
     validate_vector(x)
+
+
+def test_check_sdp_from_eigen_positive_err_messages():
+  """Tests that if _check_sdp_from_eigen is given a negative tol it returns
+  an error, and if positive (or None) it does not"""
+  w = np.abs(np.random.RandomState(42).randn(10)) + 1
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, -5.)
+  assert str(raised_error.value) == "tol should be positive."
+  with pytest.raises(ValueError) as raised_error:
+    _check_sdp_from_eigen(w, -1e-10)
+  assert str(raised_error.value) == "tol should be positive."
+  _check_sdp_from_eigen(w, 1.)
+  _check_sdp_from_eigen(w, 0.)
+  _check_sdp_from_eigen(w, None)

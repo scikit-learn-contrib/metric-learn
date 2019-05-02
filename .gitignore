@@ -5,7 +5,5 @@ dist/
 .coverage
 htmlcov/
 .cache/
+.pytest_cache/
 doc/auto_examples/*
-.idea/workspace.xml
-.DS_Store
-.idea/

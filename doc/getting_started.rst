@@ -16,7 +16,12 @@ Alternately, download the source repository and run:
 
 -  Python 2.7+, 3.4+
 -  numpy, scipy, scikit-learn
--  (for running the examples only: matplotlib)
+
+**Optional dependencies**
+
+- For SDML, using skggm will allow the algorithm to solve problematic cases
+  (install from commit `a0ed406 <https://github.com/skggm/skggm/commit/a0ed406586c4364ea3297a658f415e13b5cbdaf8>`_).
+-  For running the examples only: matplotlib
 
 **Notes**
 
