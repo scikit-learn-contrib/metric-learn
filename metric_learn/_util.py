@@ -4,8 +4,9 @@ from numpy.linalg import LinAlgError
 from sklearn.decomposition import PCA
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y, check_random_state
-from metric_learn.exceptions import PreprocessorError
+from .exceptions import PreprocessorError
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from scipy.linalg import pinvh
 import sys
 import time
 
@@ -429,6 +430,7 @@ def _initialize_transformer(num_dims, X, y=None, init='auto', verbose=False,
 
   init : array-like or None or str
     The initial matrix.
+    # TODO: put the complete doc here
 
   verbose : bool
     Whether to print the details of the initialization or not.
@@ -521,6 +523,77 @@ def _initialize_transformer(num_dims, X, y=None, init='auto', verbose=False,
   return transformation
 
 
-def _initialize_metric_mahalanobis():
-  """Returns the initial metric from arguments"""
-  raise NotImplementedError
+def _initialize_metric_mahalanobis(pairs, init='identity', random_state=None,
+                                   return_inverse=False):
+  """Returns the initial mahalanobis matrix to be used depending on the
+  arguments.
+
+  Parameters
+  ----------
+  pairs : array-like
+    The input samples.
+
+  init : array-like or None or str
+    The initial matrix.
+
+  random_state : int or `numpy.RandomState` or None, optional (default=None)
+    A pseudo random number generator object or a seed for it if int. If
+    ``init='random'``, ``random_state`` is used to initialize the random
+    matrix. If ``init='pca'``, ``random_state`` is passed as an
+    argument to PCA when initializing the matrix.
+
+  return_inverse : bool, optional (default=False)
+    Whether to return the inverse of the matrix initializing the metric. This
+    can be sometimes useful.
+
+  Returns
+  -------
+  M, or (M, M_inv) : `numpy.ndarray`
+    The initial matrix to use M, and its inverse if `return_inverse=True`.
+  """
+
+  if isinstance(init, np.ndarray):
+    init = check_array(init)  # TODO: do we want to copy the array ?
+    # see how they do it in scikit-learn for instance
+
+    # Assert that init.shape[1] = pairs.shape[2]
+    if (init.shape) != (pairs.shape[2],) * 2:
+      raise ValueError('The input dimensionality ({}) of the given '
+                       'mahalanobis matrix `init` must match the '
+                       'dimensionality of the given inputs ({}).'
+                       .format(init.shape, pairs.shape[2]))
+
+  elif init in ['identity', 'covariance', 'random']:
+    pass
+  else:
+    raise ValueError(
+        "`init` must be 'identity', 'covariance', 'random' "
+        "or a numpy array of shape (num_dims, n_features).")
+
+  random_state = check_random_state(random_state)
+  M = init
+  if isinstance(init, np.ndarray):
+    if return_inverse:
+      M_inv = pinvh(M)
+  else:
+    n_features = pairs.shape[2]
+    if init == 'identity':
+      M = np.eye(n_features, n_features)
+      if return_inverse:
+        M_inv = M.copy()
+    if init == 'covariance':
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
+      M_inv = np.atleast_2d(np.cov(X, rowvar=False))
+      # TODO: check atleast_2d necessary
+      M = pinvh(M_inv)
+    elif init == 'random':
+      # we need to create a random symmetric matrix
+      M = random_state.randn(n_features,
+                             n_features)
+      M = np.tril(M) + np.tril(M, -1).T
+      if return_inverse:
+        M_inv = pinvh(M)
+  if return_inverse:
+    return (M, M_inv)
+  else:
+    return M

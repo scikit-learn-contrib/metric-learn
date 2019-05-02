@@ -22,7 +22,7 @@ from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm, transformer_from_metric
+from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseITML(MahalanobisMixin):
@@ -31,7 +31,8 @@ class _BaseITML(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               A0=None, verbose=False, preprocessor=None):
+               init='identity', A0=None, verbose=False, preprocessor=None,
+               random_state=None):
     """Initialize ITML.
 
     Parameters
@@ -43,6 +44,26 @@ class _BaseITML(MahalanobisMixin):
 
     convergence_threshold : float, optional
 
+    init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
+
     A0 : (d x d) matrix, optional
         initial regularization matrix, defaults to identity
 
@@ -52,12 +73,21 @@ class _BaseITML(MahalanobisMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
-    self.A0 = A0
+    self.init = init  # explain that it is good to keep the scale with
+    # the bounds
+    # TODO: see for other inits how it behave wrt the bound
+    self.A0 = A0  # TODO: deprecate
     self.verbose = verbose
+    self.random_state = random_state
     super(_BaseITML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y, bounds=None):
@@ -70,12 +100,11 @@ class _BaseITML(MahalanobisMixin):
     else:
       assert len(bounds) == 2
       self.bounds_ = bounds
-    self.bounds_[self.bounds_==0] = 1e-9
+    self.bounds_[self.bounds_ == 0] = 1e-9
     # init metric
-    if self.A0 is None:
-      A = np.identity(pairs.shape[2])
-    else:
-      A = check_array(self.A0, copy=True)
+    # pairs will be deduplicated into X two times, see how to avoid that
+    A = _initialize_metric_mahalanobis(pairs, self.init, self.random_state)
+
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
     num_pos = len(pos_pairs)
@@ -220,7 +249,8 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled='deprecated', num_constraints=None,
-               bounds='deprecated', A0=None, verbose=False, preprocessor=None):
+               bounds='deprecated', init='identity', A0=None, verbose=False,
+               preprocessor=None, random_state=None):
     """Initialize the supervised version of `ITML`.
 
     `ITML_Supervised` creates pairs of similar sample by taking same class
@@ -244,17 +274,43 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
           `bounds` was deprecated in version 0.5.0 and will
           be removed in 0.6.0. Set `bounds` at fit time instead :
           `itml_supervised.fit(X, y, bounds=...)`
-    A0 : (d x d) matrix, optional
+
+    init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
+
+    A0 : (d x d) matrix, optional  # TODO: deprecate
         initial regularization matrix, defaults to identity
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
-                       A0=A0, verbose=verbose, preprocessor=preprocessor)
+                       A0=A0, verbose=verbose, preprocessor=preprocessor,
+                       random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds

@@ -341,6 +341,7 @@ def test_init_transformation(estimator, build_dataset):
     model.set_params(init='lda')
     model.fit(input_data, labels)
 
+    # Initialize with a numpy array
     init = rng.rand(X.shape[1], X.shape[1])
     model.set_params(init=init)
     model.fit(input_data, labels)
@@ -407,8 +408,8 @@ def test_init_transformation(estimator, build_dataset):
                               if hasattr(ml, 'num_dims') and
                               hasattr(ml, 'init') and
                               (idml not in ids_regressors)])
-def test_auto_init(n_samples, n_features, n_classes, num_dims,
-                   estimator, build_dataset):
+def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
+                                  estimator, build_dataset):
   # Test that auto choose the init as expected with every configuration
   # of order of n_samples, n_features, n_classes and num_dims.
   input_data, labels, _, X = build_dataset()
@@ -447,3 +448,63 @@ def test_auto_init(n_samples, n_features, n_classes, num_dims,
       model_other.fit(X, y)
       assert_array_almost_equal(model.transformer_,
                                 model_other.transformer_)
+
+
+@pytest.mark.parametrize('estimator, build_dataset',
+                         [(ml, bd) for idml, (ml, bd)
+                          in zip(ids_metric_learners,
+                                 metric_learners)
+                          if not hasattr(ml, 'num_dims') and
+                          hasattr(ml, 'init')],
+                         ids=[idml for idml, (ml, _)
+                              in zip(ids_metric_learners,
+                                     metric_learners)
+                              if not hasattr(ml, 'num_dims') and
+                              hasattr(ml, 'init')])
+def test_init_mahalanobis(estimator, build_dataset):
+    """Tests that for estimators that learn a mahalanobis matrix
+    instead of a transformer, i.e. those that are mahalanobis metric learners
+    where we can change the init, but not choose the num_dims, (TODO: be more
+    explicit on this characterization, for instance with safe_flags like in
+    scikit-learn) that the init has an expected behaviour.
+    """
+    input_data, labels, _, X = build_dataset()
+    model = clone(estimator)
+    rng = np.random.RandomState(42)
+
+    # Start learning from scratch
+    model.set_params(init='identity')
+    model.fit(input_data, labels)
+
+    # Initialize with random
+    model.set_params(init='random')
+    model.fit(input_data, labels)
+
+    # Initialize with covariance
+    model.set_params(init='covariance')
+    model.fit(input_data, labels)
+
+    # Initialize with a numpy array
+    init = rng.rand(X.shape[1], X.shape[1])
+    model.set_params(init=init)
+    model.fit(input_data, labels)
+
+    # init.shape[1] must match X.shape[1]
+    init = rng.rand(X.shape[1], X.shape[1] + 1)
+    model.set_params(init=init)
+    msg = ('The input dimensionality ({}) of the given '
+           'linear transformation `init` must match the '
+           'dimensionality of the given inputs `X` ({}).'
+           .format(init.shape[1], X.shape[1]))
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(input_data, labels)
+    assert str(raised_error.value) == msg
+
+    # init must be as specified in the docstring
+    model.set_params(init=1)
+    msg = ("`init` must be 'identity', 'covariance'"
+           "'random' or a numpy array of shape "
+           "(n_features, n_features).")
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(input_data, labels)
+    assert str(raised_error.value) == msg

@@ -18,7 +18,7 @@ from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import transformer_from_metric
+from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 try:
   from inverse_covariance import quic
 except ImportError:
@@ -31,8 +31,9 @@ class _BaseSDML(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               verbose=False, preprocessor=None):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, init='identity',
+               use_cov=True, verbose=False, preprocessor=None,
+               random_state=None):
     """
     Parameters
     ----------
@@ -42,7 +43,27 @@ class _BaseSDML(MahalanobisMixin):
     sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
 
-    use_cov : bool, optional
+    init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
+
+    use_cov : bool, optional  # TODO: to deprecate
         controls prior matrix, will use the identity if use_cov=False
 
     verbose : bool, optional
@@ -51,11 +72,18 @@ class _BaseSDML(MahalanobisMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be gotten like this: X[indices].
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
-    self.use_cov = use_cov
+    self.init = init
+    self.use_cov = use_cov  # TODO: deprecate and replace by init
     self.verbose = verbose
+    self.random_state = random_state
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
@@ -69,11 +97,7 @@ class _BaseSDML(MahalanobisMixin):
                                     type_of_inputs='tuples')
 
     # set up (the inverse of) the prior M
-    if self.use_cov:
-      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-      prior_inv = np.atleast_2d(np.cov(X, rowvar=False))
-    else:
-      prior_inv = np.identity(pairs.shape[2])
+    prior_inv = pinvh(_initialize_metric_mahalanobis(pairs, self.init))
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = prior_inv + self.balance_param * loss_matrix
@@ -188,20 +212,40 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
       metric (See function `transformer_from_metric`.)
   """
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_labeled='deprecated', num_constraints=None, verbose=False,
-               preprocessor=None):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, init='identity',
+               use_cov=True, num_labeled='deprecated', num_constraints=None,
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize the supervised version of `SDML`.
 
     `SDML_Supervised` creates pairs of similar sample by taking same class
     samples, and pairs of dissimilar samples by taking different class
     samples. It then passes these pairs to `SDML` for training.
+
     Parameters
     ----------
     balance_param : float, optional
         trade off between sparsity and M0 prior
     sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
+    init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
     use_cov : bool, optional
         controls prior matrix, will use the identity if use_cov=False
     num_labeled : Not used
@@ -215,10 +259,15 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
     _BaseSDML.__init__(self, balance_param=balance_param,
-                       sparsity_param=sparsity_param, use_cov=use_cov,
-                       verbose=verbose, preprocessor=preprocessor)
+                       sparsity_param=sparsity_param, init=init,
+                       use_cov=use_cov, verbose=verbose,
+                       preprocessor=preprocessor, random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 

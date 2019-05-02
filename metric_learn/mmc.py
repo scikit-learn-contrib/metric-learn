@@ -25,7 +25,7 @@ from sklearn.utils.validation import check_array, assert_all_finite
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm, transformer_from_metric
+from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseMMC(MahalanobisMixin):
@@ -34,14 +34,40 @@ class _BaseMMC(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
-               preprocessor=None):
+               init='identity', A0=None, diagonal=False, diagonal_c=1.0,
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize MMC.
     Parameters
     ----------
     max_iter : int, optional
     max_proj : int, optional
     convergence_threshold : float, optional
+    init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
+
+    verbose : bool, optional
+        if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
     A0 : (d x d) matrix, optional
         initial metric, defaults to identity
         only the main diagonal is taken if `diagonal == True`
@@ -56,29 +82,28 @@ class _BaseMMC(MahalanobisMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be gotten like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
     self.max_iter = max_iter
     self.max_proj = max_proj
     self.convergence_threshold = convergence_threshold
-    self.A0 = A0
+    self.init = init
+    self.A0 = A0  # TODO: deprecate
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
     self.verbose = verbose
+    self.random_state = random_state
     super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
-    # init metric
-    if self.A0 is None:
-      self.A_ = np.identity(pairs.shape[2])
-      if not self.diagonal:
-        # Don't know why division by 10... it's in the original code
-        # and seems to affect the overall scale of the learned metric.
-        self.A_ /= 10.0
-    else:
-      self.A_ = check_array(self.A0)
+    self.A_ = _initialize_metric_mahalanobis(pairs, self.init,
+                                             random_state=self.random_state)
 
     if self.diagonal:
       return self._fit_diag(pairs, y)
@@ -412,9 +437,9 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_labeled='deprecated', num_constraints=None, A0=None,
-               diagonal=False, diagonal_c=1.0, verbose=False,
-               preprocessor=None):
+               num_labeled='deprecated', num_constraints=None, init='identity',
+               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
+               preprocessor=None, random_state=None):
     """Initialize the supervised version of `MMC`.
 
     `MMC_Supervised` creates pairs of similar sample by taking same class
@@ -432,6 +457,32 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
          be removed in 0.6.0.
     num_constraints: int, optional
         number of constraints to generate
+    init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
+
+    verbose : bool, optional
+        if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
     A0 : (d x d) matrix, optional
         initial metric, defaults to identity
         only the main diagonal is taken if `diagonal == True`
@@ -446,11 +497,16 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,
-                      A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
-                      verbose=verbose, preprocessor=preprocessor)
+                      init=init, A0=A0, diagonal=diagonal,
+                      diagonal_c=diagonal_c, verbose=verbose,
+                      preprocessor=preprocessor, random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 

@@ -16,33 +16,61 @@ from sklearn.base import TransformerMixin
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
-from ._util import transformer_from_metric
+from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseLSML(MahalanobisMixin):
 
   _tuple_size = 4  # constraints are quadruplets
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False,
-               preprocessor=None):
+  def __init__(self, tol=1e-3, max_iter=1000, init='identity',
+               prior=None, verbose=False, preprocessor=None,
+               random_state=None):
     """Initialize LSML.
 
     Parameters
     ----------
+    init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+        'covariance'
+            The inverse covariance matrix.
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
+
     tol : float, optional
     max_iter : int, optional
-    prior : (d x d) matrix, optional
+    prior : (d x d) matrix, optional  # TODO: deprecate, and explain how to set
+        #the new init (the inverse of the prior)
         guess at a metric [default: inv(covariance(X))]
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
+    self.init = init
     self.prior = prior
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
+    self.random_state = random_state
     super(_BaseLSML, self).__init__(preprocessor)
 
   def _fit(self, quadruplets, weights=None):
@@ -59,6 +87,8 @@ class _BaseLSML(MahalanobisMixin):
     else:
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
+    M, prior_inv = _initialize_metric_mahalanobis(quadruplets, self.init,
+                                                  return_inverse=True)
     if self.prior is None:
       X = np.vstack({tuple(row) for row in
                      quadruplets.reshape(-1, quadruplets.shape[2])})
@@ -180,10 +210,9 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       metric (See function `transformer_from_metric`.)
   """
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
+  def __init__(self, tol=1e-3, max_iter=1000, init='identity', prior=None,
                num_labeled='deprecated', num_constraints=None, weights=None,
-               verbose=False,
-               preprocessor=None):
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize the supervised version of `LSML`.
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
@@ -195,6 +224,18 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     ----------
     tol : float, optional
     max_iter : int, optional
+    init : string or numpy array, optional (default='identity')
+         Initialization of the linear transformation. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+         'random'
+             The initial transformation will be a random array of shape
+             `(n_features, n_features)`. Each value is sampled from the
+             standard normal distribution.
     prior : (d x d) matrix, optional
         guess at a metric [default: covariance(X)]
     num_labeled : Not used
@@ -210,9 +251,14 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
-    _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
-                       verbose=verbose, preprocessor=preprocessor)
+    _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, init=init,
+                       prior=prior, verbose=verbose, preprocessor=preprocessor,
+                       random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights
