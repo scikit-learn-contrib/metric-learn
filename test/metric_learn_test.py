@@ -494,21 +494,22 @@ class TestNCA(MetricTestCase):
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
 
-  @pytest.mark.parametrize('num_dims', [None, 2])
-  def test_deprecation_num_dims(self, num_dims):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    nca = NCA(num_dims=num_dims)
-    msg = ('"num_dims" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "n_components" instead',
-           DeprecationWarning)
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      nca.fit(X, y)
-    assert (str(raised_warning[0].message) == msg)
+
+@pytest.mark.parametrize('num_dims', [None, 2])
+def test_deprecation_num_dims_nca(num_dims):
+  # test that a deprecation message is thrown if num_labeled is set at
+  # initialization
+  # TODO: remove in v.0.6
+  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+  y = np.array([1, 0, 1, 0])
+  nca = NCA(num_dims=num_dims)
+  msg = ('"num_dims" parameter is not used.'
+         ' It has been deprecated in version 0.5.0 and will be'
+         'removed in 0.6.0. Use "n_components" instead',
+         DeprecationWarning)
+  with pytest.warns(DeprecationWarning) as raised_warning:
+    nca.fit(X, y)
+  assert (str(raised_warning[0].message) == msg)
 
 
 class TestLFDA(MetricTestCase):
@@ -522,21 +523,22 @@ class TestLFDA(MetricTestCase):
     self.assertEqual(lfda.get_mahalanobis_matrix().shape, (4, 4))
     self.assertEqual(lfda.transformer_.shape, (2, 4))
 
-  @pytest.mark.parametrize('num_dims', [None, 2])
-  def test_deprecation_num_dims(self, num_dims):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    lfda = LFDA(num_dims=num_dims)
-    msg = ('"num_dims" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "n_components" instead',
-           DeprecationWarning)
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      lfda.fit(X, y)
-    assert (str(raised_warning[0].message) == msg)
+
+@pytest.mark.parametrize('num_dims', [None, 2])
+def test_deprecation_num_dims_lfda(num_dims):
+  # test that a deprecation message is thrown if num_labeled is set at
+  # initialization
+  # TODO: remove in v.0.6
+  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+  y = np.array([1, 0, 1, 0])
+  lfda = LFDA(num_dims=num_dims)
+  msg = ('"num_dims" parameter is not used.'
+         ' It has been deprecated in version 0.5.0 and will be'
+         'removed in 0.6.0. Use "n_components" instead',
+         DeprecationWarning)
+  with pytest.warns(DeprecationWarning) as raised_warning:
+    lfda.fit(X, y)
+  assert (str(raised_warning[0].message) == msg)
 
 
 class TestRCA(MetricTestCase):
@@ -545,31 +547,6 @@ class TestRCA(MetricTestCase):
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.25)
-
-  @pytest.mark.parametrize('num_dims', [None, 2])
-  def test_deprecation_num_dims(self, num_dims):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    rca = RCA(num_dims=num_dims)
-    msg = ('"num_dims" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "n_components" instead',
-           DeprecationWarning)
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      rca.fit(X, y)
-    assert (str(raised_warning[0].message) == msg)
-
-    rca_supervised = RCA_Supervised(num_dims=num_dims)
-    msg = ('"num_dims" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "n_components" instead',
-           DeprecationWarning)
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      rca_supervised.fit(X, y)
-    assert (str(raised_warning[0].message) == msg)
 
   def test_feature_null_variance(self):
     X = np.hstack((self.iris_points, np.eye(len(self.iris_points), M=1)))
@@ -587,6 +564,32 @@ class TestRCA(MetricTestCase):
     rca.fit(X, self.iris_labels)
     csep = class_separation(rca.transform(X), self.iris_labels)
     self.assertLess(csep, 0.30)
+
+
+@pytest.mark.parametrize('num_dims', [None, 2])
+def test_deprecation_num_dims_rca(num_dims):
+  # test that a deprecation message is thrown if num_labeled is set at
+  # initialization
+  # TODO: remove in v.0.6
+  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+  y = np.array([1, 0, 1, 0])
+  rca = RCA(num_dims=num_dims)
+  msg = ('"num_dims" parameter is not used.'
+         ' It has been deprecated in version 0.5.0 and will be'
+         'removed in 0.6.0. Use "n_components" instead',
+         DeprecationWarning)
+  with pytest.warns(DeprecationWarning) as raised_warning:
+    rca.fit(X, y)
+  assert (str(raised_warning[0].message) == msg)
+
+  rca_supervised = RCA_Supervised(num_dims=num_dims)
+  msg = ('"num_dims" parameter is not used.'
+         ' It has been deprecated in version 0.5.0 and will be'
+         'removed in 0.6.0. Use "n_components" instead',
+         DeprecationWarning)
+  with pytest.warns(DeprecationWarning) as raised_warning:
+    rca_supervised.fit(X, y)
+  assert (str(raised_warning[0].message) == msg)
 
 
 class TestMLKR(MetricTestCase):
@@ -619,21 +622,22 @@ class TestMLKR(MetricTestCase):
     rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
     np.testing.assert_almost_equal(rel_diff, 0.)
 
-  @pytest.mark.parametrize('num_dims', [None, 2])
-  def test_deprecation_num_dims(self, num_dims):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    mlkr = MLKR(num_dims=num_dims)
-    msg = ('"num_dims" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "n_components" instead',
-           DeprecationWarning)
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      mlkr.fit(X, y)
-    assert (str(raised_warning[0].message) == msg)
+
+@pytest.mark.parametrize('num_dims', [None, 2])
+def test_deprecation_num_dims_mlkr(num_dims):
+  # test that a deprecation message is thrown if num_labeled is set at
+  # initialization
+  # TODO: remove in v.0.6
+  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+  y = np.array([1, 0, 1, 0])
+  mlkr = MLKR(num_dims=num_dims)
+  msg = ('"num_dims" parameter is not used.'
+         ' It has been deprecated in version 0.5.0 and will be'
+         'removed in 0.6.0. Use "n_components" instead',
+         DeprecationWarning)
+  with pytest.warns(DeprecationWarning) as raised_warning:
+    mlkr.fit(X, y)
+  assert (str(raised_warning[0].message) == msg)
 
 
 class TestMMC(MetricTestCase):

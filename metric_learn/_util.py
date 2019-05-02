@@ -413,5 +413,5 @@ def _check_n_components(n_features, n_components):
   if n_components is None:
     return n_features
   if 0 < n_components <= n_features:
-    return n_features
+    return n_components
   raise ValueError('Invalid n_components, must be in [1, %d]' % n_features)
