@@ -51,7 +51,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
 
     init : string or numpy array, optional (default='auto')
         Initialization of the linear transformation. Possible options are
-        'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
+        'auto', 'pca', 'identity', 'random', and a numpy array of shape
         (n_features_a, n_features_b).
 
         'auto'
