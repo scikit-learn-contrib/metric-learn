@@ -1,14 +1,14 @@
-"""Relative Components Analysis (RCA)
+r"""
+Relative Components Analysis(RCA)
 
-RCA learns a full rank Mahalanobis distance metric based on a
-weighted sum of in-class covariance matrices.
-It applies a global linear transformation to assign large weights to
-relevant dimensions and low weights to irrelevant dimensions.
-Those relevant dimensions are estimated using "chunklets",
-subsets of points that are known to belong to the same class.
+RCA learns a full rank Mahalanobis distance metric based on a weighted sum of
+in-chunklets covariance matrices. It applies a global linear transformation to
+assign large weights to relevant dimensions and low weights to irrelevant
+dimensions. Those relevant dimensions are estimated using "chunklets", subsets
+of points that are known to belong to the same class.
 
-'Learning distance functions using equivalence relations', ICML 2003
-'Learning a Mahalanobis metric from equivalence constraints', JMLR 2005
+Read more in the :ref:`User Guide <rca>`.
+
 """
 
 from __future__ import absolute_import
