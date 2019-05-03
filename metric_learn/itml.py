@@ -1,7 +1,7 @@
 r"""
 Information Theoretic Metric Learning(ITML)
 
-`ITML` minimizes the (differential) relative entropy, aka Kullback–Leibler
+`ITML` minimizes the (differential) relative entropy, aka Kullback-Leibler
 divergence, between two multivariate Gaussians subject to constraints on the
 associated Mahalanobis distance, which can be formulated into a Bregman
 optimization problem by minimizing the LogDet divergence subject to
