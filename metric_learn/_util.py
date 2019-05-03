@@ -413,7 +413,8 @@ def validate_vector(u, dtype=None):
 
 
 def _initialize_transformer(num_dims, input, y=None, init='auto',
-                            verbose=False, random_state=None):
+                            verbose=False, random_state=None,
+                            has_classes=True):
   """Returns the initial transformer to be used depending on the arguments.
 
   Parameters
@@ -429,34 +430,59 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
   y : array-like or None
     The input labels (or not if there are no labels).
 
-  init : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+  init : string or numpy array, optional (default='auto')
+      Initialization of the linear transformation. Possible options are
+      'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
+      (n_features_a, n_features_b).
 
-         'identity'
-            An identity matrix of shape (n_features, n_features).
+      'auto'
+          Depending on ``num_dims``, the most reasonable initialization will
+          be chosen. If ``num_dims <= n_classes`` we use 'lda' (if possible,
+          see the description of 'lda' init), as it uses labels information.
+          If not, but ``num_dims < min(n_features, n_samples)``, we use
+          'pca', as it projects data in meaningful directions (those of
+          higher variance). Otherwise, we just use 'identity'.
 
-        'covariance'
-            The inverse covariance matrix.
+      'pca'
+          ``num_dims`` principal components of the inputs passed
+          to :meth:`fit` will be used to initialize the transformation.
+          (See `sklearn.decomposition.PCA`)
 
-         'random'
-             The initial transformation will be a random array of shape
-             `(n_features, n_features)`. Each value is sampled from the
-             standard normal distribution.
+      'lda'
+          ``min(num_dims, n_classes)`` most discriminative
+          components of the inputs passed to :meth:`fit` will be used to
+          initialize the transformation. (If ``num_dims > n_classes``,
+          the rest of the components will be zero.) (See
+          `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`).
+          This initialization is possible only if `has_classes == True`.
 
-         numpy array
-             A numpy array of shape (n_features, n_features), that will
-             be used as such to initialize the metric.
+      'identity'
+          If ``num_dims`` is strictly smaller than the
+          dimensionality of the inputs passed to :meth:`fit`, the identity
+          matrix will be truncated to the first ``num_dims`` rows.
+
+      'random'
+          The initial transformation will be a random array of shape
+          `(num_dims, n_features)`. Each value is sampled from the
+          standard normal distribution.
+
+      numpy array
+          n_features_b must match the dimensionality of the inputs passed to
+          :meth:`fit` and n_features_a must be less than or equal to that.
+          If ``num_dims`` is not None, n_features_a must match it.
 
   verbose : bool
     Whether to print the details of the initialization or not.
 
-  random_state: int or `numpy.RandomState` or None, optional (default=None)
+  random_state : int or `numpy.RandomState` or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If
     ``init='random'``, ``random_state`` is used to initialize the random
     transformation. If ``init='pca'``, ``random_state`` is passed as an
     argument to PCA when initializing the transformation.
+
+  has_classes : bool (default=True)
+    Whether the labels are in fact classes. If true, this will allow to use
+    the 'lda' initialization.
 
   Returns
   -------
@@ -466,9 +492,7 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
   # if we are doing a regression we cannot use lda:
   n_features = input.shape[-1]
   authorized_inits = ['auto', 'pca', 'identity', 'random']
-  is_classification = (type_of_target(y) in ['multiclass',
-                                             'binary'])
-  if is_classification:
+  if has_classes:
     authorized_inits.append('lda')
 
   if isinstance(init, np.ndarray):
@@ -512,9 +536,9 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
   else:
     n_samples = input.shape[0]
     if init == 'auto':
-      if is_classification:
+      if has_classes:
         n_classes = len(np.unique(y))
-      if (is_classification and num_dims <= min(n_features, n_classes - 1)):
+      if (has_classes and num_dims <= min(n_features, n_classes - 1)):
         init = 'lda'
       elif num_dims < min(n_features, n_samples):
         init = 'pca'
@@ -565,7 +589,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
          'identity'
             An identity matrix of shape (n_features, n_features).
 
-        'covariance'
+         'covariance'
             The inverse covariance matrix.
 
          'random'

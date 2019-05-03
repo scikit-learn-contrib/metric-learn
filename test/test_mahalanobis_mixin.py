@@ -16,7 +16,8 @@ from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
 
 from test.test_utils import (ids_metric_learners, metric_learners,
                              remove_y_quadruplets, ids_regressors,
-                             ids_supervised_learners, supervised_learners)
+                             ids_supervised_learners, supervised_learners,
+                             ids_classifiers)
 
 RNG = check_random_state(0)
 
@@ -410,43 +411,57 @@ def test_init_transformation(estimator, build_dataset):
                               hasattr(ml, 'init')])
 def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
                                   estimator, build_dataset):
-  # Test that auto choose the init as expected with every configuration
-  # of order of n_samples, n_features, n_classes and num_dims.
-  input_data, labels, _, X = build_dataset()
-  model_base = clone(estimator)
-  rng = np.random.RandomState(42)
-  model_base.set_params(init='auto',
-                        num_dims=num_dims,
-                        random_state=rng)
-
-  # To make the test work for LMNN:
-  if 'LMNN' in model_base.__class__.__name__:
-    model_base.set_params(k=1)
-  # To make the test faster for estimators that have a max_iter:
-  if hasattr(model_base, 'max_iter'):
-    model_base.set_params(max_iter=1)
+  # Test that auto choose the init transformation as expected with every
+  # configuration of order of n_samples, n_features, n_classes and num_dims,
+  # for all metric learners that learn a transformation.
   if n_classes >= n_samples:
     pass
     # n_classes > n_samples is impossible, and n_classes == n_samples
     # throws an error from lda but is an absurd case
   else:
-    X = rng.randn(n_samples, n_features)
-    y = np.tile(range(n_classes), n_samples // n_classes + 1)[:n_samples]
+    input_data, labels, _, X = build_dataset()
+    model_base = clone(estimator)
+    rng = np.random.RandomState(42)
+    model_base.set_params(init='auto',
+                          num_dims=num_dims,
+                          random_state=rng)
+    # To make the test work for LMNN:
+    if 'LMNN' in model_base.__class__.__name__:
+      model_base.set_params(k=1)
+    # To make the test faster for estimators that have a max_iter:
+    if hasattr(model_base, 'max_iter'):
+      model_base.set_params(max_iter=1)
     if num_dims > n_features:
       # this would return a ValueError, which is tested in
       # test_init_transformation
       pass
     else:
+      # We need to build a dataset of the right shape:
+      num_to_pad_n_samples = ((n_samples // input_data.shape[0] + 1))
+      num_to_pad_n_features = ((n_samples // input_data.shape[-1] + 1))
+      if input_data.ndim == 3:
+        input_data = np.tile(input_data,
+                             (num_to_pad_n_samples, input_data.shape[1],
+                              num_to_pad_n_features))
+      else:
+        input_data = np.tile(input_data,
+                             (num_to_pad_n_samples, num_to_pad_n_features))
+      input_data = input_data[:n_samples, ..., :n_features]
+      has_classes = model_base.__class__.__name__ in ids_classifiers
+      if has_classes:
+        labels = np.tile(range(n_classes), n_samples //
+                          n_classes + 1)[:n_samples]
+      else:
+        labels = np.tile(labels, n_samples // labels.shape[0] + 1)[:n_samples]
       model = clone(model_base)
-      model.fit(X, y)
-      if (num_dims <= min(n_classes - 1, n_features) and
-              type_of_target(labels) in ['multiclass', 'binary']):
+      model.fit(input_data, labels)
+      if num_dims <= min(n_classes - 1, n_features) and has_classes:
         model_other = clone(model_base).set_params(init='lda')
       elif num_dims < min(n_features, n_samples):
         model_other = clone(model_base).set_params(init='pca')
       else:
         model_other = clone(model_base).set_params(init='identity')
-      model_other.fit(X, y)
+      model_other.fit(input_data, labels)
       assert_array_almost_equal(model.transformer_,
                                 model_other.transformer_)
 

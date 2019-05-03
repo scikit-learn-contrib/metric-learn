@@ -131,7 +131,9 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       if m is None:
           m = d
       A = _initialize_transformer(m, X, y, init=self.init,
-                                  random_state=self.random_state)
+                                  random_state=self.random_state,
+                                  # MLKR works on regression targets:
+                                  has_classes=False)
 
       # Measure the total training time
       train_time = time.time()
