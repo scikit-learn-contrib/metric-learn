@@ -928,9 +928,9 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   formed_points_to_transform = dataset_formed.to_transform
   (indices_train, indices_test, y_train, y_test, formed_train,
    formed_test) = train_test_split(dataset_indices.data,
-                                          dataset_indices.target,
-                                          dataset_formed.data,
-                                          random_state=SEED)
+                                   dataset_indices.target,
+                                   dataset_formed.data,
+                                   random_state=SEED)
 
   def make_random_state(estimator):
     rs = {}

@@ -101,7 +101,7 @@ class _BaseMMC(MahalanobisMixin):
     super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
-    if self.init != 'deprecated':
+    if self.A0 != 'deprecated':
       warnings.warn('"A0" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
                     'removed in 0.6.0. Use "init" instead.',
