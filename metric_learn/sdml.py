@@ -32,7 +32,7 @@ class _BaseSDML(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, init='identity',
-               use_cov=True, verbose=False, preprocessor=None,
+               use_cov='deprecated', verbose=False, preprocessor=None,
                random_state=None):
     """
     Parameters
@@ -63,8 +63,10 @@ class _BaseSDML(MahalanobisMixin):
              A numpy array of shape (n_features, n_features), that will
              be used as such to initialize the metric.
 
-    use_cov : bool, optional  # TODO: to deprecate
-        controls prior matrix, will use the identity if use_cov=False
+    use_cov : Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'init' instead.
 
     verbose : bool, optional
         if True, prints information while learning
@@ -87,6 +89,11 @@ class _BaseSDML(MahalanobisMixin):
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
+    if self.use_cov != 'deprecated':
+      warnings.warn('"use_cov" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "init" instead.',
+                    DeprecationWarning)
     if not HAS_SKGGM:
       if self.verbose:
         print("SDML will use scikit-learn's graphical lasso solver.")
@@ -213,8 +220,9 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   """
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, init='identity',
-               use_cov=True, num_labeled='deprecated', num_constraints=None,
-               verbose=False, preprocessor=None, random_state=None):
+               use_cov='deprecated', num_labeled='deprecated',
+               num_constraints=None, verbose=False, preprocessor=None,
+               random_state=None):
     """Initialize the supervised version of `SDML`.
 
     `SDML_Supervised` creates pairs of similar sample by taking same class
@@ -246,8 +254,11 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
          numpy array
              A numpy array of shape (n_features, n_features), that will
              be used as such to initialize the metric.
-    use_cov : bool, optional
-        controls prior matrix, will use the identity if use_cov=False
+    use_cov : Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'init' instead.
+
     num_labeled : Not used
       .. deprecated:: 0.5.0
          `num_labeled` was deprecated in version 0.5.0 and will

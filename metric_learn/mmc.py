@@ -34,8 +34,9 @@ class _BaseMMC(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               init='identity', A0=None, diagonal=False, diagonal_c=1.0,
-               verbose=False, preprocessor=None, random_state=None):
+               init='identity', A0='deprecated', diagonal=False,
+               diagonal_c=1.0, verbose=False, preprocessor=None,
+               random_state=None):
     """Initialize MMC.
     Parameters
     ----------
@@ -68,9 +69,10 @@ class _BaseMMC(MahalanobisMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be gotten like this: X[indices].
-    A0 : (d x d) matrix, optional
-        initial metric, defaults to identity
-        only the main diagonal is taken if `diagonal == True`
+    A0 : Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'init' instead.
     diagonal : bool, optional
         if True, a diagonal metric will be learned,
         i.e., a simple scaling of dimensions
@@ -91,7 +93,7 @@ class _BaseMMC(MahalanobisMixin):
     self.max_proj = max_proj
     self.convergence_threshold = convergence_threshold
     self.init = init
-    self.A0 = A0  # TODO: deprecate
+    self.A0 = A0
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
     self.verbose = verbose
@@ -99,6 +101,11 @@ class _BaseMMC(MahalanobisMixin):
     super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
+    if self.init != 'deprecated':
+      warnings.warn('"A0" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "init" instead.',
+                    DeprecationWarning)
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
@@ -438,7 +445,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
                num_labeled='deprecated', num_constraints=None, init='identity',
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
+               A0='deprecated', diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None, random_state=None):
     """Initialize the supervised version of `MMC`.
 
@@ -483,9 +490,10 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be gotten like this: X[indices].
-    A0 : (d x d) matrix, optional
-        initial metric, defaults to identity
-        only the main diagonal is taken if `diagonal == True`
+    A0 : Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'init' instead.
     diagonal : bool, optional
         if True, a diagonal metric will be learned,
         i.e., a simple scaling of dimensions

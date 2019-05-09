@@ -18,7 +18,7 @@ else:
   HAS_SKGGM = True
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
-                          RCA_Supervised, MMC_Supervised, SDML)
+                          RCA_Supervised, MMC_Supervised, SDML, ITML, LSML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
@@ -74,6 +74,27 @@ class TestLSML(MetricTestCase):
            'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, lsml_supervised.fit, X, y)
 
+  def test_deprecation_prior(self):
+    # test that a deprecation message is thrown if A0 is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    lsml_supervised = LSML_Supervised(prior=np.ones_like(X))
+    msg = ('"prior" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "init" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      lsml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    quadruplets = np.array([[[-10., 0.], [10., 0.], [0., 50.], [0., -60]],
+                            [[-27., 31.], [12., 52.], [71., 30.], [41., -24]]])
+    lsml = LSML(prior=np.ones_like(X))
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      lsml.fit(quadruplets)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 class TestITML(MetricTestCase):
   def test_iris(self):
@@ -107,6 +128,27 @@ class TestITML(MetricTestCase):
            'removed in 0.6.0. Use the "bounds" parameter of this '
            'fit method instead.')
     assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
+
+  def test_deprecation_A0(self):
+    # test that a deprecation message is thrown if A0 is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    itml_supervised = ITML_Supervised(A0=np.ones_like(X))
+    msg = ('"A0" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "init" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      itml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    itml = ITML(A0=np.ones_like(X))
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      itml.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 class TestLMNN(MetricTestCase):
@@ -325,6 +367,28 @@ class TestSDML(MetricTestCase):
     sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
                            use_cov=True)
     sdml.fit(X, y)
+
+  def test_deprecation_use_cov(self):
+    # test that a deprecation message is thrown if use_cov  is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    sdml_supervised = SDML_Supervised(use_cov=np.ones_like(X),
+                                      balance_param=1e-5)
+    msg = ('"use_cov" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "init" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      sdml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    sdml = SDML(use_cov=np.ones_like(X), balance_param=1e-5)
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      sdml.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 @pytest.mark.skipif(not HAS_SKGGM,
@@ -557,6 +621,20 @@ class TestMLKR(MetricTestCase):
     rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
     np.testing.assert_almost_equal(rel_diff, 0.)
 
+  def test_deprecation_A0(self):
+    # test that a deprecation message is thrown if A0 is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mlkr = MLKR(A0=np.ones_like(X))
+    msg = ('"A0" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "init" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      mlkr.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 class TestMMC(MetricTestCase):
   def test_iris(self):
@@ -607,6 +685,27 @@ class TestMMC(MetricTestCase):
            ' It has been deprecated in version 0.5.0 and will be'
            'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, mmc_supervised.fit, X, y)
+
+  def test_deprecation_A0(self):
+    # test that a deprecation message is thrown if A0 is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mmc_supervised = MMC_Supervised(A0=np.ones_like(X))
+    msg = ('"A0" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "init" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      mmc_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    mmc = MMC(A0=np.ones_like(X))
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      mmc.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 @pytest.mark.parametrize(('algo_class', 'dataset'),

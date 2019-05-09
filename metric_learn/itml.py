@@ -31,8 +31,8 @@ class _BaseITML(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               init='identity', A0=None, verbose=False, preprocessor=None,
-               random_state=None):
+               init='identity', A0='deprecated', verbose=False,
+               preprocessor=None, random_state=None):
     """Initialize ITML.
 
     Parameters
@@ -52,8 +52,8 @@ class _BaseITML(MahalanobisMixin):
          'identity'
             An identity matrix of shape (n_features, n_features).
 
-        'covariance'
-            The inverse covariance matrix.
+         'covariance'
+           The inverse covariance matrix.
 
          'random'
              The initial transformation will be a random array of shape
@@ -64,8 +64,10 @@ class _BaseITML(MahalanobisMixin):
              A numpy array of shape (n_features, n_features), that will
              be used as such to initialize the metric.
 
-    A0 : (d x d) matrix, optional
-        initial regularization matrix, defaults to identity
+    A0 : Not used
+      .. deprecated:: 0.5.0
+         `A0` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0. Use 'init' instead.
 
     verbose : bool, optional
         if True, prints information while learning
@@ -91,6 +93,11 @@ class _BaseITML(MahalanobisMixin):
     super(_BaseITML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y, bounds=None):
+    if self.A0 != 'deprecated':
+      warnings.warn('"A0" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "init" instead.',
+                    DeprecationWarning)
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
     # init bounds
@@ -249,8 +256,8 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled='deprecated', num_constraints=None,
-               bounds='deprecated', init='identity', A0=None, verbose=False,
-               preprocessor=None, random_state=None):
+               bounds='deprecated', init='identity', A0='deprecated',
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize the supervised version of `ITML`.
 
     `ITML_Supervised` creates pairs of similar sample by taking same class
@@ -295,8 +302,10 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
              A numpy array of shape (n_features, n_features), that will
              be used as such to initialize the metric.
 
-    A0 : (d x d) matrix, optional  # TODO: deprecate
-        initial regularization matrix, defaults to identity
+    A0 : Not used
+      .. deprecated:: 0.5.0
+         `A0` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0. Use 'init' instead.
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
@@ -309,8 +318,8 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     """
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
-                       A0=A0, verbose=verbose, preprocessor=preprocessor,
-                       random_state=random_state)
+                       A0=A0, init=init, verbose=verbose,
+                       preprocessor=preprocessor, random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds

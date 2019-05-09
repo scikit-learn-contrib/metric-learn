@@ -34,37 +34,37 @@ class TestStringRepr(unittest.TestCase):
 
   def test_itml(self):
     self.assertEqual(str(metric_learn.ITML()), """
-ITML(A0=None, convergence_threshold=0.001, gamma=1.0, init='identity',
+ITML(A0='deprecated', convergence_threshold=0.001, gamma=1.0, init='identity',
    max_iter=1000, preprocessor=None, random_state=None, verbose=False)
 """.strip('\n'))
     self.assertEqual(str(metric_learn.ITML_Supervised()), """
-ITML_Supervised(A0=None, bounds='deprecated', convergence_threshold=0.001,
-        gamma=1.0, init='identity', max_iter=1000, num_constraints=None,
-        num_labeled='deprecated', preprocessor=None, random_state=None,
-        verbose=False)
+ITML_Supervised(A0='deprecated', bounds='deprecated',
+        convergence_threshold=0.001, gamma=1.0, init='identity',
+        max_iter=1000, num_constraints=None, num_labeled='deprecated',
+        preprocessor=None, random_state=None, verbose=False)
 """.strip('\n'))
 
   def test_lsml(self):
     self.assertEqual(
         str(metric_learn.LSML()), """
-LSML(init='identity', max_iter=1000, preprocessor=None, prior=None,
+LSML(init='identity', max_iter=1000, preprocessor=None, prior='deprecated',
    random_state=None, tol=0.001, verbose=False)
 """.strip('\n'))
     self.assertEqual(str(metric_learn.LSML_Supervised()), """
 LSML_Supervised(init='identity', max_iter=1000, num_constraints=None,
-        num_labeled='deprecated', preprocessor=None, prior=None,
+        num_labeled='deprecated', preprocessor=None, prior='deprecated',
         random_state=None, tol=0.001, verbose=False, weights=None)
 """.strip('\n'))
 
   def test_sdml(self):
     self.assertEqual(str(metric_learn.SDML()), """
 SDML(balance_param=0.5, init='identity', preprocessor=None, random_state=None,
-   sparsity_param=0.01, use_cov=True, verbose=False)
+   sparsity_param=0.01, use_cov='deprecated', verbose=False)
 """.strip('\n'))
     self.assertEqual(str(metric_learn.SDML_Supervised()), """
 SDML_Supervised(balance_param=0.5, init='identity', num_constraints=None,
         num_labeled='deprecated', preprocessor=None, random_state=None,
-        sparsity_param=0.01, use_cov=True, verbose=False)
+        sparsity_param=0.01, use_cov='deprecated', verbose=False)
 """.strip('\n'))
 
   def test_rca(self):
@@ -77,18 +77,18 @@ SDML_Supervised(balance_param=0.5, init='identity', num_constraints=None,
 
   def test_mlkr(self):
     self.assertEqual(str(metric_learn.MLKR()), """
-MLKR(A0=None, init='auto', max_iter=1000, num_dims=None, preprocessor=None,
-   random_state=None, tol=None, verbose=False)
+MLKR(A0='deprecated', init='auto', max_iter=1000, num_dims=None,
+   preprocessor=None, random_state=None, tol=None, verbose=False)
 """.strip('\n'))
 
   def test_mmc(self):
     self.assertEqual(str(metric_learn.MMC()), """
-MMC(A0=None, convergence_threshold=0.001, diagonal=False, diagonal_c=1.0,
-  init='identity', max_iter=100, max_proj=10000, preprocessor=None,
-  random_state=None, verbose=False)
+MMC(A0='deprecated', convergence_threshold=0.001, diagonal=False,
+  diagonal_c=1.0, init='identity', max_iter=100, max_proj=10000,
+  preprocessor=None, random_state=None, verbose=False)
 """.strip('\n'))
     self.assertEqual(str(metric_learn.MMC_Supervised()), """
-MMC_Supervised(A0=None, convergence_threshold=1e-06, diagonal=False,
+MMC_Supervised(A0='deprecated', convergence_threshold=1e-06, diagonal=False,
         diagonal_c=1.0, init='identity', max_iter=100, max_proj=10000,
         num_constraints=None, num_labeled='deprecated', preprocessor=None,
         random_state=None, verbose=False)

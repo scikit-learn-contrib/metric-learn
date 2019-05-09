@@ -38,7 +38,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, init='auto', A0=None,
+  def __init__(self, num_dims=None, init='auto', A0='deprecated',
                tol=None, max_iter=1000, verbose=False, preprocessor=None,
                random_state=None):
     """
@@ -80,8 +80,10 @@ class MLKR(MahalanobisMixin, TransformerMixin):
             :meth:`fit` and n_features_a must be less than or equal to that.
             If ``num_dims`` is not None, n_features_a must match it.
 
-    A0: array-like, optional # TODO: deprecate
-        Initialization of transformation matrix. Defaults to PCA loadings.
+    A0: Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'init' instead.
 
     tol: float, optional (default=None)
         Convergence tolerance for the optimization.
@@ -104,7 +106,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     """
     self.num_dims = num_dims
     self.init = init
-    self.A0 = A0  # TODO: deprecate
+    self.A0 = A0
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
@@ -120,6 +122,12 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       X : (n x d) array of samples
       y : (n) data labels
       """
+      if self.init != 'deprecated':
+        warnings.warn('"A0" parameter is not used.'
+                      ' It has been deprecated in version 0.5.0 and will be'
+                      'removed in 0.6.0. Use "init" instead.',
+                      DeprecationWarning)
+
       X, y = self._prepare_inputs(X, y, y_numeric=True,
                                   ensure_min_samples=2)
       n, d = X.shape

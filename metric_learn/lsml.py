@@ -24,7 +24,7 @@ class _BaseLSML(MahalanobisMixin):
   _tuple_size = 4  # constraints are quadruplets
 
   def __init__(self, tol=1e-3, max_iter=1000, init='identity',
-               prior=None, verbose=False, preprocessor=None,
+               prior='deprecated', verbose=False, preprocessor=None,
                random_state=None):
     """Initialize LSML.
 
@@ -52,9 +52,10 @@ class _BaseLSML(MahalanobisMixin):
 
     tol : float, optional
     max_iter : int, optional
-    prior : (d x d) matrix, optional  # TODO: deprecate, and explain how to set
-        #the new init (the inverse of the prior)
-        guess at a metric [default: inv(covariance(X))]
+    prior : Not used.
+       .. deprecated:: 0.5.0
+         `prior` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0. Use 'init' instead.
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
@@ -74,6 +75,11 @@ class _BaseLSML(MahalanobisMixin):
     super(_BaseLSML, self).__init__(preprocessor)
 
   def _fit(self, quadruplets, weights=None):
+    if self.prior != 'deprecated':
+      warnings.warn('"prior" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "init" instead.',
+                    DeprecationWarning)
     quadruplets = self._prepare_inputs(quadruplets,
                                        type_of_inputs='tuples')
 
@@ -89,14 +95,6 @@ class _BaseLSML(MahalanobisMixin):
     self.w_ /= self.w_.sum()  # weights must sum to 1
     M, prior_inv = _initialize_metric_mahalanobis(quadruplets, self.init,
                                                   return_inverse=True)
-    if self.prior is None:
-      X = np.vstack({tuple(row) for row in
-                     quadruplets.reshape(-1, quadruplets.shape[2])})
-      prior_inv = np.atleast_2d(np.cov(X, rowvar=False))
-      M = np.linalg.inv(prior_inv)
-    else:
-      M = self.prior
-      prior_inv = np.linalg.inv(self.prior)
 
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -210,9 +208,10 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       metric (See function `transformer_from_metric`.)
   """
 
-  def __init__(self, tol=1e-3, max_iter=1000, init='identity', prior=None,
-               num_labeled='deprecated', num_constraints=None, weights=None,
-               verbose=False, preprocessor=None, random_state=None):
+  def __init__(self, tol=1e-3, max_iter=1000, init='identity',
+               prior='deprecated', num_labeled='deprecated',
+               num_constraints=None, weights=None, verbose=False,
+               preprocessor=None, random_state=None):
     """Initialize the supervised version of `LSML`.
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
@@ -236,8 +235,10 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
              The initial transformation will be a random array of shape
              `(n_features, n_features)`. Each value is sampled from the
              standard normal distribution.
-    prior : (d x d) matrix, optional
-        guess at a metric [default: covariance(X)]
+    prior : Not used.
+       .. deprecated:: 0.5.0
+         `prior` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0. Use 'init' instead.
     num_labeled : Not used
       .. deprecated:: 0.5.0
          `num_labeled` was deprecated in version 0.5.0 and will
