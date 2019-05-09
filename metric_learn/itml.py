@@ -61,7 +61,7 @@ class _BaseITML(MahalanobisMixin):
            `sklearn.datasets.make_spd_matrix`.
 
          numpy array
-             A numpy array of shape (n_features, n_features), that will
+             An SPD matrix of shape (n_features, n_features), that will
              be used as such to initialize the metric.
 
     A0 : Not used

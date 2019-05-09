@@ -507,12 +507,22 @@ def test_init_mahalanobis(estimator, build_dataset):
     model.fit(input_data, labels)
 
     # init.shape[1] must match X.shape[1]
-    init = rng.rand(X.shape[1], X.shape[1] + 1)
+    init = make_spd_matrix(X.shape[1] + 1, X.shape[1] + 1)
     model.set_params(init=init)
     msg = ('The input dimensionality {} of the given '
            'mahalanobis matrix `init` must match the '
            'dimensionality of the given inputs ({}).'
            .format(init.shape, input_data.shape[-1]))
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(input_data, labels)
+    assert str(raised_error.value) == msg
+
+    # The input matrix must be symmetric
+    init = rng.rand(X.shape[1], X.shape[1])
+    model.set_params(init=init)
+    msg = ("The initialization matrix should be semi-definite "
+           "positive (SPD). It is not, since it appears not to be "
+           "symmetric.")
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, labels)
     assert str(raised_error.value) == msg

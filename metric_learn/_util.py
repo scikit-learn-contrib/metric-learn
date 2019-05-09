@@ -599,7 +599,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
              `sklearn.datasets.make_spd_matrix`.
 
          numpy array
-             A numpy array of shape (n_features, n_features), that will
+             An SPD matrix of shape (n_features, n_features), that will
              be used as such to initialize the metric.
 
   random_state : int or `numpy.RandomState` or None, optional (default=None)
@@ -628,6 +628,12 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                        'mahalanobis matrix `init` must match the '
                        'dimensionality of the given inputs ({}).'
                        .format(init.shape, n_features))
+
+    # Assert that the matrix is symmetric
+    if not np.allclose(init, init.T):
+      raise ValueError("The initialization matrix should be semi-definite "
+                       "positive (SPD). It is not, since it appears not to be "
+                       "symmetric.")
 
   elif init in ['identity', 'covariance', 'random']:
     pass
