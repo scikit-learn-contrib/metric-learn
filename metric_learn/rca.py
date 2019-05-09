@@ -26,9 +26,7 @@ from .constraints import Constraints
 def _chunk_mean_centering(data, chunks):
   num_chunks = chunks.max() + 1
   chunk_mask = chunks != -1
-  # Warning: we need to ensure we don't overwrite the data
-  # through slices hence we do a copy. We will also need to
-  # ensure the data is float so that we can substract the
+  # We need to ensure the data is float so that we can substract the
   # mean on it
   chunk_data = data[chunk_mask].astype(float, copy=False)
   chunk_labels = chunks[chunk_mask]
