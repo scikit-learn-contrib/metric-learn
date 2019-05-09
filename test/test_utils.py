@@ -126,7 +126,7 @@ ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
 
-regressors = [(MLKR(), build_regression)]
+regressors = [(MLKR(init='pca'), build_regression)]
 ids_regressors = list(map(lambda x: x.__class__.__name__,
                           [learner for (learner, _) in regressors]))
 

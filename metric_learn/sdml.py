@@ -104,7 +104,8 @@ class _BaseSDML(MahalanobisMixin):
                                     type_of_inputs='tuples')
 
     # set up (the inverse of) the prior M
-    prior_inv = pinvh(_initialize_metric_mahalanobis(pairs, self.init))
+    _, prior_inv = _initialize_metric_mahalanobis(pairs, self.init,
+                                                  return_inverse=True)
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = prior_inv + self.balance_param * loss_matrix
