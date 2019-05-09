@@ -332,7 +332,7 @@ class TestSDML(MetricTestCase):
     pseudo-covariance matrix is not PSD"""
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
     y = [1, -1]
-    sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
+    sdml = SDML(init='covariance', sparsity_param=0.01, balance_param=0.5)
     msg = ("Warning, the input matrix of graphical lasso is not "
            "positive semi-definite (PSD). The algorithm may diverge, "
            "and lead to degenerate solutions. "
@@ -429,7 +429,7 @@ def test_verbose_has_not_installed_skggm_sdml(capsys):
   # TODO: remove if we don't need skggm anymore
   pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
   y_pairs = [1, -1]
-  sdml = SDML(verbose=True)
+  sdml = SDML(verbose=True, init='covariance')
   sdml.fit(pairs, y_pairs)
   out, _ = capsys.readouterr()
   assert "SDML will use scikit-learn's graphical lasso solver." in out
