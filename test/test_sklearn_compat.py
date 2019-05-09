@@ -93,7 +93,9 @@ class TestSklearnCompat(unittest.TestCase):
     def stable_init(self, num_dims=None, pca_comps=None,
                     chunk_size=2, preprocessor=None):
       # this init makes RCA stable for scikit-learn examples.
-      RCA_Supervised.__init__(self, num_chunks=2)
+      RCA_Supervised.__init__(self, num_chunks=2, num_dims=num_dims,
+                              pca_comps=pca_comps, chunk_size=chunk_size,
+                              preprocessor=preprocessor)
     dRCA.__init__ = stable_init
     check_estimator(dRCA)
 

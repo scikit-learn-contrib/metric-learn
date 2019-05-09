@@ -30,7 +30,7 @@ def _chunk_mean_centering(data, chunks):
   # through slices hence we do a copy. We will also need to
   # ensure the data is float so that we can substract the
   # mean on it
-  chunk_data = data[chunk_mask].astype(float, copy=True)
+  chunk_data = data[chunk_mask].astype(float, copy=False)
   chunk_labels = chunks[chunk_mask]
   for c in xrange(num_chunks):
     mask = chunk_labels == c
