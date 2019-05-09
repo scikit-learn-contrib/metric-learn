@@ -231,7 +231,7 @@ class TestSDML(MetricTestCase):
     # because it will return a non SPD matrix
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
     y_pairs = [1, -1]
-    sdml = SDML(use_cov=False, balance_param=100, verbose=True)
+    sdml = SDML(init='identity', balance_param=100, verbose=True)
 
     msg = ("There was a problem in SDML when using scikit-learn's graphical "
            "lasso solver. skggm's graphical lasso can sometimes converge on "
@@ -254,7 +254,7 @@ class TestSDML(MetricTestCase):
     # because it will return non finite values
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
     y_pairs = [1, -1]
-    sdml = SDML(use_cov=False, balance_param=100, verbose=True)
+    sdml = SDML(init='identity', balance_param=100, verbose=True)
 
     msg = ("There was a problem in SDML when using skggm's graphical "
            "lasso solver.")
@@ -277,7 +277,7 @@ class TestSDML(MetricTestCase):
     # pathological case)
     X = np.array([[-10., 0.], [10., 0.], [5., 0.], [3., 0.]])
     y = [0, 0, 1, 1]
-    sdml_supervised = SDML_Supervised(balance_param=0.5, use_cov=False,
+    sdml_supervised = SDML_Supervised(balance_param=0.5, init='identity',
                                       sparsity_param=0.01)
     msg = ("There was a problem in SDML when using skggm's graphical "
            "lasso solver.")
@@ -295,11 +295,11 @@ class TestSDML(MetricTestCase):
     y_pairs = [1, -1]
     X, y = make_classification(random_state=42)
     with pytest.warns(None) as record:
-      sdml = SDML()
+      sdml = SDML(init='covariance')
       sdml.fit(pairs, y_pairs)
     assert len(record) == 0
     with pytest.warns(None) as record:
-      sdml = SDML_Supervised(use_cov=False, balance_param=1e-5)
+      sdml = SDML_Supervised(init='identity', balance_param=1e-5)
       sdml.fit(X, y)
     assert len(record) == 0
 
@@ -308,7 +308,7 @@ class TestSDML(MetricTestCase):
     # TODO: un-flake it!
     rs = np.random.RandomState(5555)
 
-    sdml = SDML_Supervised(num_constraints=1500, use_cov=False,
+    sdml = SDML_Supervised(num_constraints=1500, init='identity',
                            balance_param=5e-5)
     sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
     csep = class_separation(sdml.transform(self.iris_points),
@@ -320,7 +320,7 @@ class TestSDML(MetricTestCase):
     # initialization
     # TODO: remove in v.0.6
     X, y = make_classification(random_state=42)
-    sdml_supervised = SDML_Supervised(num_labeled=np.inf, use_cov=False,
+    sdml_supervised = SDML_Supervised(num_labeled=np.inf, init='identity',
                                       balance_param=5e-5)
     msg = ('"num_labeled" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
@@ -337,7 +337,7 @@ class TestSDML(MetricTestCase):
            "positive semi-definite (PSD). The algorithm may diverge, "
            "and lead to degenerate solutions. "
            "To prevent that, try to decrease the balance parameter "
-           "`balance_param` and/or to set use_cov=False.")
+           "`balance_param` and/or to set init='identity'.")
     with pytest.warns(ConvergenceWarning) as raised_warning:
       try:
         sdml.fit(pairs, y)
@@ -352,7 +352,7 @@ class TestSDML(MetricTestCase):
     pseudo-covariance matrix is PSD"""
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
     y = [1, -1]
-    sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
+    sdml = SDML(init='covariance', sparsity_param=0.01, balance_param=0.5)
     sdml.fit(pairs, y)
     assert np.isfinite(sdml.get_mahalanobis_matrix()).all()
 
@@ -365,7 +365,7 @@ class TestSDML(MetricTestCase):
     it should work, but scikit-learn's graphical_lasso does not work"""
     X, y = load_iris(return_X_y=True)
     sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
-                           use_cov=True)
+                           init='covariance')
     sdml.fit(X, y)
 
   def test_deprecation_use_cov(self):
@@ -400,7 +400,7 @@ def test_verbose_has_installed_skggm_sdml(capsys):
   # TODO: remove if we don't need skggm anymore
   pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
   y_pairs = [1, -1]
-  sdml = SDML(verbose=True)
+  sdml = SDML(verbose=True, init='covariance')
   sdml.fit(pairs, y_pairs)
   out, _ = capsys.readouterr()
   assert "SDML will use skggm's graphical lasso solver." in out
@@ -414,7 +414,7 @@ def test_verbose_has_installed_skggm_sdml_supervised(capsys):
   # skggm's solver is used (when they use SDML_Supervised)
   # TODO: remove if we don't need skggm anymore
   X, y = make_classification(random_state=42)
-  sdml = SDML_Supervised(verbose=True)
+  sdml = SDML_Supervised(verbose=True, init='covariance')
   sdml.fit(X, y)
   out, _ = capsys.readouterr()
   assert "SDML will use skggm's graphical lasso solver." in out
@@ -443,7 +443,7 @@ def test_verbose_has_not_installed_skggm_sdml_supervised(capsys):
   # skggm's solver is used (when they use SDML_Supervised)
   # TODO: remove if we don't need skggm anymore
   X, y = make_classification(random_state=42)
-  sdml = SDML_Supervised(verbose=True, balance_param=1e-5, use_cov=False)
+  sdml = SDML_Supervised(verbose=True, balance_param=1e-5, init='identity')
   sdml.fit(X, y)
   out, _ = capsys.readouterr()
   assert "SDML will use scikit-learn's graphical lasso solver." in out
@@ -646,8 +646,9 @@ class TestMMC(MetricTestCase):
     c, d = np.nonzero(np.triu(~mask, k=1))
 
     # Full metric
-    mmc = MMC(convergence_threshold=0.01)
-    mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
+    n_features = self.iris_points.shape[1]
+    mmc = MMC(convergence_threshold=0.01, init=np.eye(n_features) / 10)
+    mmc.fit(*wrap_pairs(self.iris_points, [a, b, c, d]))
     expected = [[+0.000514, +0.000868, -0.001195, -0.001703],
                 [+0.000868, +0.001468, -0.002021, -0.002879],
                 [-0.001195, -0.002021, +0.002782, +0.003964],

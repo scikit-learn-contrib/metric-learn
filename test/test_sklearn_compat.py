@@ -85,7 +85,7 @@ class TestSklearnCompat(unittest.TestCase):
                                num_constraints=num_constraints,
                                verbose=verbose,
                                preprocessor=preprocessor,
-                               balance_param=1e-5, use_cov=False)
+                               balance_param=1e-5, init='identity')
     dSDML.__init__ = stable_init
     check_estimator(dSDML)
 

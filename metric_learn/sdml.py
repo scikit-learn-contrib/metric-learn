@@ -119,7 +119,7 @@ class _BaseSDML(MahalanobisMixin):
                     "positive semi-definite (PSD). The algorithm may diverge, "
                     "and lead to degenerate solutions. "
                     "To prevent that, try to decrease the balance parameter "
-                    "`balance_param` and/or to set use_cov=False.",
+                    "`balance_param` and/or to set init='identity'.",
                     ConvergenceWarning)
       w -= min_eigval  # we translate the eigenvalues to make them all positive
     w += 1e-10  # we add a small offset to avoid definiteness problems
