@@ -6,6 +6,7 @@ from numpy.testing import assert_array_almost_equal, assert_allclose
 from scipy.spatial.distance import pdist, squareform, mahalanobis
 from sklearn import clone
 from sklearn.cluster import DBSCAN
+from sklearn.datasets import make_spd_matrix
 from sklearn.utils import check_random_state
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.testing import set_random_state
@@ -500,8 +501,8 @@ def test_init_mahalanobis(estimator, build_dataset):
     model.set_params(init='covariance')
     model.fit(input_data, labels)
 
-    # Initialize with a numpy array
-    init = rng.rand(X.shape[1], X.shape[1])
+    # Initialize with a random spd matrix
+    init = make_spd_matrix(X.shape[1], random_state=rng)
     model.set_params(init=init)
     model.fit(input_data, labels)
 

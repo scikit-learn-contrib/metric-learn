@@ -1,6 +1,7 @@
 import numpy as np
 import six
 from numpy.linalg import LinAlgError
+from sklearn.datasets import make_spd_matrix
 from sklearn.decomposition import PCA
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y, check_random_state
@@ -593,9 +594,9 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
             The inverse covariance matrix.
 
          'random'
-             The initial transformation will be a random array of shape
-             `(n_features, n_features)`. Each value is sampled from the
-             standard normal distribution.
+             The initial transformation will be a random SPD matrix of shape
+             `(n_features, n_features)`, using
+             `sklearn.datasets.make_spd_matrix`.
 
          numpy array
              A numpy array of shape (n_features, n_features), that will
@@ -656,9 +657,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       M = pinvh(M_inv)
     elif init == 'random':
       # we need to create a random symmetric matrix
-      M = random_state.randn(n_features,
-                             n_features)
-      M = np.tril(M) + np.tril(M, -1).T
+      M = make_spd_matrix(n_features, random_state=random_state)
       if return_inverse:
         M_inv = pinvh(M)
   if return_inverse:

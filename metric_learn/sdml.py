@@ -51,13 +51,13 @@ class _BaseSDML(MahalanobisMixin):
          'identity'
             An identity matrix of shape (n_features, n_features).
 
-        'covariance'
+         'covariance'
             The inverse covariance matrix.
 
          'random'
-             The initial transformation will be a random array of shape
-             `(n_features, n_features)`. Each value is sampled from the
-             standard normal distribution.
+            The initial transformation will be a random SPD matrix of shape
+            `(n_features, n_features)`, using
+            `sklearn.datasets.make_spd_matrix`.
 
          numpy array
              A numpy array of shape (n_features, n_features), that will
@@ -243,13 +243,13 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
          'identity'
             An identity matrix of shape (n_features, n_features).
 
-        'covariance'
+         'covariance'
             The inverse covariance matrix.
 
          'random'
-             The initial transformation will be a random array of shape
-             `(n_features, n_features)`. Each value is sampled from the
-             standard normal distribution.
+            The initial transformation will be a random SPD matrix of shape
+            `(n_features, n_features)`, using
+            `sklearn.datasets.make_spd_matrix`.
 
          numpy array
              A numpy array of shape (n_features, n_features), that will

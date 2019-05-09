@@ -38,13 +38,13 @@ class _BaseLSML(MahalanobisMixin):
          'identity'
             An identity matrix of shape (n_features, n_features).
 
-        'covariance'
+         'covariance'
             The inverse covariance matrix.
 
          'random'
-             The initial transformation will be a random array of shape
-             `(n_features, n_features)`. Each value is sampled from the
-             standard normal distribution.
+            The initial transformation will be a random SPD matrix of shape
+            `(n_features, n_features)`, using
+            `sklearn.datasets.make_spd_matrix`.
 
          numpy array
              A numpy array of shape (n_features, n_features), that will
@@ -231,10 +231,18 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
          'identity'
             An identity matrix of shape (n_features, n_features).
 
+         'covariance'
+            The inverse covariance matrix.
+
          'random'
-             The initial transformation will be a random array of shape
-             `(n_features, n_features)`. Each value is sampled from the
-             standard normal distribution.
+            The initial transformation will be a random SPD matrix of shape
+            `(n_features, n_features)`, using
+            `sklearn.datasets.make_spd_matrix`.
+
+          numpy array
+            A numpy array of shape (n_features, n_features), that will
+            be used as such to initialize the metric.
+
     prior : Not used.
        .. deprecated:: 0.5.0
          `prior` was deprecated in version 0.5.0 and will
