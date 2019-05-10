@@ -22,8 +22,8 @@ class TestStringRepr(unittest.TestCase):
     self.assertRegexpMatches(
       str(metric_learn.LMNN()),
       r"(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
-      r"max_iter=1000,(\s+)min_iter=50, preprocessor=None, "
-      r"regularization=0.5, use_pca=True,(\s+)verbose=False\)")
+      r"max_iter=1000,\s+min_iter=50, preprocessor=None, "
+      r"regularization=0.5, use_pca=True,\s+verbose=False\)")
 
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
