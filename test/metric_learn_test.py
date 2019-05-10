@@ -366,7 +366,7 @@ class TestSDML(MetricTestCase):
     X, y = load_iris(return_X_y=True)
     sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
                            init='covariance')
-    sdml.fit(X, y)
+    sdml.fit(X, y, random_state=np.random.RandomState(42))
 
   def test_deprecation_use_cov(self):
     # test that a deprecation message is thrown if use_cov  is set at
