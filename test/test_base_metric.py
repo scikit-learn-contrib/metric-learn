@@ -9,7 +9,9 @@ import string
 
 
 def remove_spaces(s):
-  return s.translate(s.maketrans('', '', string.whitespace))
+  s = s.replace(' ', '')
+  s = s.replace('\n', '')
+  return s
 
 
 class TestStringRepr(unittest.TestCase):
