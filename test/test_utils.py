@@ -299,35 +299,6 @@ def test_check_tuples_invalid_n_samples(estimator, context, load_tuples,
   assert str(raised_error.value) == msg
 
 
-@pytest.mark.parametrize('estimator, context',
-                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-@pytest.mark.parametrize('load_tuples, preprocessor',
-                         [(tuples_prep, mock_preprocessor),
-                          (tuples_no_prep, None),
-                          (tuples_no_prep, mock_preprocessor)])
-def test_check_tuples_invalid_dtype_convertible(estimator, context,
-                                                load_tuples, preprocessor):
-  """Checks that a warning is raised if a convertible input is converted to
-  float"""
-  tuples = load_tuples().astype(object)  # here the object conversion is
-  # useless for the tuples_prep case, but this allows to test the
-  # tuples_prep case
-
-  if preprocessor is not None:  # if the preprocessor is not None we
-    # overwrite it to have a preprocessor that returns objects
-    def preprocessor(indices):  #
-      # preprocessor that returns objects
-      return np.ones((indices.shape[0], 3)).astype(object)
-
-  msg = ("Data with input dtype object was converted to float64{}."
-         .format(context))
-  with pytest.warns(DataConversionWarning) as raised_warning:
-    check_input(tuples, type_of_inputs='tuples',
-                preprocessor=preprocessor, dtype=np.float64,
-                warn_on_dtype=True, estimator=estimator)
-  assert str(raised_warning[0].message) == msg
-
-
 def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor():
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float, when using a preprocessor
@@ -527,36 +498,6 @@ def test_check_classic_invalid_n_samples(estimator, context, load_points,
                 ensure_min_samples=3,
                 estimator=estimator)
   assert str(raised_error.value) == msg
-
-
-@pytest.mark.parametrize('estimator, context',
-                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-@pytest.mark.parametrize('load_points, preprocessor',
-                         [(points_prep, mock_preprocessor),
-                          (points_no_prep, None),
-                          (points_no_prep, mock_preprocessor)])
-def test_check_classic_invalid_dtype_convertible(estimator, context,
-                                                 load_points,
-                                                 preprocessor):
-  """Checks that a warning is raised if a convertible input is converted to
-  float"""
-  points = load_points().astype(object)  # here the object conversion is
-  # useless for the points_prep case, but this allows to test the
-  # points_prep case
-
-  if preprocessor is not None:  # if the preprocessor is not None we
-    # overwrite it to have a preprocessor that returns objects
-    def preprocessor(indices):
-      # preprocessor that returns objects
-      return np.ones((indices.shape[0], 3)).astype(object)
-
-  msg = ("Data with input dtype object was converted to float64{}."
-         .format(context))
-  with pytest.warns(DataConversionWarning) as raised_warning:
-    check_input(points, type_of_inputs='classic',
-                preprocessor=preprocessor, dtype=np.float64,
-                warn_on_dtype=True, estimator=estimator)
-  assert str(raised_warning[0].message) == msg
 
 
 @pytest.mark.parametrize('preprocessor, points',
