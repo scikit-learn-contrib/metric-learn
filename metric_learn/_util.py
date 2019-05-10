@@ -595,7 +595,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
 
          'random'
              The initial transformation will be a random SPD matrix of shape
-             `(n_features, n_features)`, using
+             `(n_features, n_features)`, generated using
              `sklearn.datasets.make_spd_matrix`.
 
          numpy array

@@ -56,7 +56,7 @@ class _BaseSDML(MahalanobisMixin):
 
          'random'
             The initial transformation will be a random SPD matrix of shape
-            `(n_features, n_features)`, using
+            `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
          numpy array
@@ -249,7 +249,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
 
          'random'
             The initial transformation will be a random SPD matrix of shape
-            `(n_features, n_features)`, using
+            `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
          numpy array
