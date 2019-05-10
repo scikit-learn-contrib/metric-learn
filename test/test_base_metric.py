@@ -1,17 +1,15 @@
 import pytest
+import re
 import unittest
 import metric_learn
 import numpy as np
 from sklearn import clone
 from sklearn.utils.testing import set_random_state
 from test.test_utils import ids_metric_learners, metric_learners
-import string
 
 
 def remove_spaces(s):
-  s = s.replace(' ', '')
-  s = s.replace('\n', '')
-  return s
+  return re.sub('\s+', '', s)
 
 
 class TestStringRepr(unittest.TestCase):
@@ -22,10 +20,10 @@ class TestStringRepr(unittest.TestCase):
 
   def test_lmnn(self):
     self.assertRegexpMatches(
-        str(metric_learn.LMNN()),
-        r"(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
-        r"max_iter=1000,\n(\ +)min_iter=50, preprocessor=None, "
-        r"regularization=0.5, use_pca=True,\n(\ +)verbose=False\)")
+      str(metric_learn.LMNN()),
+      r"(python_)?LMNN\(convergence_tol=0.001, k=3, learn_rate=1e-07, "
+      r"max_iter=1000,(\s+)min_iter=50, preprocessor=None, "
+      r"regularization=0.5, use_pca=True,(\s+)verbose=False\)")
 
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
@@ -45,13 +43,13 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces("""
 ITML(A0=None, convergence_threshold=0.001, gamma=1.0, max_iter=1000,
    preprocessor=None, verbose=False)
-""".strip('\n')))
+"""))
     self.assertEqual(remove_spaces(str(metric_learn.ITML_Supervised())),
                      remove_spaces("""
 ITML_Supervised(A0=None, bounds='deprecated', convergence_threshold=0.001,
         gamma=1.0, max_iter=1000, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, verbose=False)
-""".strip('\n')))
+"""))
 
   def test_lsml(self):
     self.assertEqual(
@@ -64,7 +62,7 @@ ITML_Supervised(A0=None, bounds='deprecated', convergence_threshold=0.001,
 LSML_Supervised(max_iter=1000, num_constraints=None, num_labeled='deprecated',
         preprocessor=None, prior=None, tol=0.001, verbose=False,
         weights=None)
-""".strip('\n')))
+"""))
 
   def test_sdml(self):
     self.assertEqual(remove_spaces(str(metric_learn.SDML())),
@@ -77,7 +75,7 @@ LSML_Supervised(max_iter=1000, num_constraints=None, num_labeled='deprecated',
 SDML_Supervised(balance_param=0.5, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, sparsity_param=0.01,
         use_cov=True, verbose=False)
-""".strip('\n')))
+"""))
 
   def test_rca(self):
     self.assertEqual(remove_spaces(str(metric_learn.RCA())),
@@ -100,13 +98,13 @@ SDML_Supervised(balance_param=0.5, num_constraints=None,
                      remove_spaces("""
 MMC(A0=None, convergence_threshold=0.001, diagonal=False, diagonal_c=1.0,
   max_iter=100, max_proj=10000, preprocessor=None, verbose=False)
-""".strip('\n')))
+"""))
     self.assertEqual(remove_spaces(str(metric_learn.MMC_Supervised())),
                      remove_spaces("""
 MMC_Supervised(A0=None, convergence_threshold=1e-06, diagonal=False,
         diagonal_c=1.0, max_iter=100, max_proj=10000, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, verbose=False)
-""".strip('\n')))
+"""))
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
