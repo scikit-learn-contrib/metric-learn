@@ -74,6 +74,14 @@ class TestLSML(MetricTestCase):
            'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, lsml_supervised.fit, X, y)
 
+  def test_singular_covariance_does_not_diverge(self):
+    # Test that LSML does not diverge when using the covariance prior and
+    # when this covariance has null eigenvalues (See
+    # https://github.com/metric-learn/metric-learn/issues/202)
+    X, Y = make_classification(n_redundant=2, random_state=42)
+    lsml = LSML_Supervised()
+    lsml.fit(X, Y)
+
 
 class TestITML(MetricTestCase):
   def test_iris(self):

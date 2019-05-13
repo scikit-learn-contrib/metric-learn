@@ -70,10 +70,10 @@ class _BaseLSML(MahalanobisMixin):
       X = np.vstack({tuple(row) for row in
                      quadruplets.reshape(-1, quadruplets.shape[2])})
       prior_inv = np.atleast_2d(np.cov(X, rowvar=False))
-      M = np.linalg.inv(prior_inv)
+      M = scipy.linalg.pinvh(prior_inv)
     else:
       M = self.prior
-      prior_inv = np.linalg.inv(self.prior)
+      prior_inv = scipy.linalg.pinvh(self.prior)
 
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
