@@ -78,6 +78,7 @@ class TestLSML(MetricTestCase):
     # Test that LSML does not diverge when using the covariance prior and
     # when this covariance has null eigenvalues (See
     # https://github.com/metric-learn/metric-learn/issues/202)
+    # TODO: remove when # 195 is merged
     X, Y = make_classification(n_redundant=2, random_state=42)
     lsml = LSML_Supervised()
     lsml.fit(X, Y)
