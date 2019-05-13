@@ -39,7 +39,7 @@ class _BaseLSML(MahalanobisMixin):
     tol : float, optional
     max_iter : int, optional
     prior : (d x d) matrix, optional
-        guess at a metric [default: inv(covariance(X))]
+        guess at a metric [default: pinvh(covariance(X))]
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
@@ -126,7 +126,7 @@ class _BaseLSML(MahalanobisMixin):
     return self._comparison_loss(metric, vab, vcd) + reg_loss
 
   def _gradient(self, metric, vab, vcd, prior_inv):
-    dMetric = prior_inv - np.linalg.inv(metric)
+    dMetric = prior_inv - scipy.linalg.pinvh(metric)
     dabs = np.sum(vab.dot(metric) * vab, axis=1)
     dcds = np.sum(vcd.dot(metric) * vcd, axis=1)
     violations = dabs > dcds

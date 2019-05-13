@@ -79,9 +79,12 @@ class TestLSML(MetricTestCase):
     # when this covariance has null eigenvalues (See
     # https://github.com/metric-learn/metric-learn/issues/202)
     # TODO: remove when # 195 is merged
-    X, Y = make_classification(n_redundant=2, random_state=42)
+    rng = np.random.RandomState(42)
+    X, y = load_iris(return_X_y=True)
+    # we add a feature that is a linear combination of the two first ones
+    X = np.concatenate([X, X[:, :2].dot(rng.randn(2, 1))], axis=-1)
     lsml = LSML_Supervised()
-    lsml.fit(X, Y)
+    lsml.fit(X, y, random_state=rng)
 
 
 class TestITML(MetricTestCase):
