@@ -194,7 +194,7 @@ def test_get_metric_equivalent_to_explicit_mahalanobis(estimator,
   a, b = (rng.randn(n_features), rng.randn(n_features))
   expected_dist = mahalanobis(a[None], b[None],
                               VI=model.get_mahalanobis_matrix())
-  assert_allclose(metric(a, b), expected_dist, rtol=1e-15)
+  assert_allclose(metric(a, b), expected_dist, rtol=1e-13)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
