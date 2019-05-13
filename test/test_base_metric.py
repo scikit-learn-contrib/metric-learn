@@ -30,7 +30,7 @@ class TestStringRepr(unittest.TestCase):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
                      remove_spaces(
                        "NCA(init='auto', max_iter=100, num_dims=None, "
-                     "preprocessor=None,\n  random_state=None, "
+                       "preprocessor=None,\n  random_state=None, "
                        "tol=None, verbose=False)"))
 
   def test_lfda(self):
@@ -55,12 +55,13 @@ ITML_Supervised(A0='deprecated', bounds='deprecated',
 """))
 
   def test_lsml(self):
-    self.assertEqual(
-        remove_spaces(str(metric_learn.LSML()), """
+    self.assertEqual(remove_spaces(str(metric_learn.LSML())),
+                     remove_spaces("""
 LSML(init='identity', max_iter=1000, preprocessor=None, prior='deprecated',
    random_state=None, tol=0.001, verbose=False)
-""".strip('\n')))
-    remove_spaces(self.assertEqual(str(metric_learn.LSML_Supervised()), """
+"""))
+    self.assertEqual(remove_spaces(str(metric_learn.LSML_Supervised())),
+                     remove_spaces("""
 LSML_Supervised(init='identity', max_iter=1000, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, prior='deprecated',
         random_state=None, tol=0.001, verbose=False, weights=None)
