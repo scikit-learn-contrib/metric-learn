@@ -559,13 +559,18 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
     elif init in {'pca', 'lda'}:
       init_time = time.time()
       if init == 'pca':
-        pca = PCA(n_components=num_dims,
+        # TODO: set back with n_components=num_dims
+        # pca = PCA(n_components=num_dims,
+        #           random_state=random_state)
+        pca = PCA(n_components=n_features,
                   random_state=random_state)
         if verbose:
           print('Finding principal components... ')
           sys.stdout.flush()
         pca.fit(input)
-        transformation = pca.components_
+        # TODO: change here too
+        transformation = pca.components_[:num_dims]
+        # transformation = pca.components_
       elif init == 'lda':
         lda = LinearDiscriminantAnalysis(n_components=num_dims)
         if verbose:
