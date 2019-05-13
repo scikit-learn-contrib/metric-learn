@@ -487,6 +487,7 @@ def test_init_mahalanobis(estimator, build_dataset):
     """
     input_data, labels, _, X = build_dataset()
     model = clone(estimator)
+    set_random_state(model)
     rng = np.random.RandomState(42)
 
     # Start learning from scratch
@@ -535,3 +536,34 @@ def test_init_mahalanobis(estimator, build_dataset):
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, labels)
     assert str(raised_error.value) == msg
+
+
+@pytest.mark.parametrize('estimator, build_dataset',
+                         [(ml, bd) for idml, (ml, bd)
+                          in zip(ids_metric_learners,
+                                 metric_learners)
+                          if not hasattr(ml, 'num_dims') and
+                          hasattr(ml, 'init')],
+                         ids=[idml for idml, (ml, _)
+                              in zip(ids_metric_learners,
+                                     metric_learners)
+                              if not hasattr(ml, 'num_dims') and
+                              hasattr(ml, 'init')])
+def test_singular_covariance_init(estimator, build_dataset):
+    """Tests that when using the 'covariance' init, it works even if the
+    covariance matrix is singular (see
+    https://github.com/metric-learn/metric-learn/issues/202)
+    """
+    input_data, labels, _, X = build_dataset()
+    model = clone(estimator)
+    set_random_state(model)
+    # We create a feature that is a linear combination of the first two
+    # features:
+    coefs = np.random.RandomState(42).randn(2, 1)
+    input_data = np.concatenate([input_data, input_data[:, ..., :2]
+                                .dot(coefs)],
+                                axis=-1)
+
+    # Fitting the model should return no error
+    model.set_params(init='covariance')
+    model.fit(input_data, labels)
