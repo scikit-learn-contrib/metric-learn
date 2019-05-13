@@ -29,16 +29,16 @@ class TestStringRepr(unittest.TestCase):
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
                      remove_spaces(
-                       "NCA(init='auto', max_iter=100, num_dims=None, "
-                       "preprocessor=None,\n  random_state=None, "
-                       "tol=None, verbose=False)"))
+        "NCA(init='auto', max_iter=100, num_dims=None, "
+        "preprocessor=None,\n  random_state=None, "
+        "tol=None, verbose=False)"))
 
   def test_lfda(self):
     self.assertEqual(remove_spaces(str(metric_learn.LFDA())),
                      remove_spaces(
-                       "LFDA(embedding_type='weighted', k=None, "
-                       "num_dims=None, "
-                       "preprocessor=None)"))
+        "LFDA(embedding_type='weighted', k=None, "
+        "num_dims=None, "
+        "preprocessor=None)"))
 
   def test_itml(self):
     self.assertEqual(remove_spaces(str(metric_learn.ITML())),
