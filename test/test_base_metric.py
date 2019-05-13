@@ -1,4 +1,5 @@
 import pytest
+import re
 import unittest
 import metric_learn
 import numpy as np
@@ -7,92 +8,108 @@ from sklearn.utils.testing import set_random_state
 from test.test_utils import ids_metric_learners, metric_learners
 
 
+def remove_spaces(s):
+  return re.sub('\s+', '', s)
+
+
 class TestStringRepr(unittest.TestCase):
 
   def test_covariance(self):
-    self.assertEqual(str(metric_learn.Covariance()),
-                     "Covariance(preprocessor=None)")
+    self.assertEqual(remove_spaces(str(metric_learn.Covariance())),
+                     remove_spaces("Covariance(preprocessor=None)"))
 
   def test_lmnn(self):
     self.assertRegexpMatches(
         str(metric_learn.LMNN()),
         r"(python_)?LMNN\(convergence_tol=0.001, init='auto', k=3, "
-        r"learn_rate=1e-07,\n      max_iter=1000, min_iter=50, "
-        r"num_dims=None, preprocessor=None,\n      random_state=None, "
+        r"learn_rate=1e-07,\s+max_iter=1000, min_iter=50, "
+        r"num_dims=None, preprocessor=None,\s+random_state=None, "
         r"regularization=0.5, use_pca=True, verbose=False\)")
 
   def test_nca(self):
-    self.assertEqual(str(metric_learn.NCA()),
-                     "NCA(init='auto', max_iter=100, num_dims=None, "
+    self.assertEqual(remove_spaces(str(metric_learn.NCA())),
+                     remove_spaces(
+                       "NCA(init='auto', max_iter=100, num_dims=None, "
                      "preprocessor=None,\n  random_state=None, "
-                     "tol=None, verbose=False)")
+                       "tol=None, verbose=False)"))
 
   def test_lfda(self):
-    self.assertEqual(str(metric_learn.LFDA()),
-                     "LFDA(embedding_type='weighted', k=None, num_dims=None, "
-                     "preprocessor=None)")
+    self.assertEqual(remove_spaces(str(metric_learn.LFDA())),
+                     remove_spaces(
+                       "LFDA(embedding_type='weighted', k=None, "
+                       "num_dims=None, "
+                       "preprocessor=None)"))
 
   def test_itml(self):
-    self.assertEqual(str(metric_learn.ITML()), """
+    self.assertEqual(remove_spaces(str(metric_learn.ITML())),
+                     remove_spaces("""
 ITML(A0='deprecated', convergence_threshold=0.001, gamma=1.0, init='identity',
    max_iter=1000, preprocessor=None, random_state=None, verbose=False)
-""".strip('\n'))
-    self.assertEqual(str(metric_learn.ITML_Supervised()), """
+"""))
+    self.assertEqual(remove_spaces(str(metric_learn.ITML_Supervised())),
+                     remove_spaces("""
 ITML_Supervised(A0='deprecated', bounds='deprecated',
         convergence_threshold=0.001, gamma=1.0, init='identity',
         max_iter=1000, num_constraints=None, num_labeled='deprecated',
         preprocessor=None, random_state=None, verbose=False)
-""".strip('\n'))
+"""))
 
   def test_lsml(self):
     self.assertEqual(
-        str(metric_learn.LSML()), """
+        remove_spaces(str(metric_learn.LSML()), """
 LSML(init='identity', max_iter=1000, preprocessor=None, prior='deprecated',
    random_state=None, tol=0.001, verbose=False)
-""".strip('\n'))
-    self.assertEqual(str(metric_learn.LSML_Supervised()), """
+""".strip('\n')))
+    remove_spaces(self.assertEqual(str(metric_learn.LSML_Supervised()), """
 LSML_Supervised(init='identity', max_iter=1000, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, prior='deprecated',
         random_state=None, tol=0.001, verbose=False, weights=None)
-""".strip('\n'))
+"""))
 
   def test_sdml(self):
-    self.assertEqual(str(metric_learn.SDML()), """
+    self.assertEqual(remove_spaces(str(metric_learn.SDML())),
+                     remove_spaces("""
 SDML(balance_param=0.5, init='identity', preprocessor=None, random_state=None,
    sparsity_param=0.01, use_cov='deprecated', verbose=False)
-""".strip('\n'))
-    self.assertEqual(str(metric_learn.SDML_Supervised()), """
+"""))
+    self.assertEqual(remove_spaces(str(metric_learn.SDML_Supervised())),
+                     remove_spaces("""
 SDML_Supervised(balance_param=0.5, init='identity', num_constraints=None,
         num_labeled='deprecated', preprocessor=None, random_state=None,
         sparsity_param=0.01, use_cov='deprecated', verbose=False)
-""".strip('\n'))
+"""))
 
   def test_rca(self):
-    self.assertEqual(str(metric_learn.RCA()),
-                     "RCA(num_dims=None, pca_comps=None, preprocessor=None)")
-    self.assertEqual(str(metric_learn.RCA_Supervised()),
-                     "RCA_Supervised(chunk_size=2, num_chunks=100, "
-                     "num_dims=None, pca_comps=None,\n        "
-                     "preprocessor=None)")
+    self.assertEqual(remove_spaces(str(metric_learn.RCA())),
+                     remove_spaces("RCA(num_dims=None, pca_comps=None, "
+                                   "preprocessor=None)"))
+    self.assertEqual(remove_spaces(str(metric_learn.RCA_Supervised())),
+                     remove_spaces(
+                       "RCA_Supervised(chunk_size=2, num_chunks=100, "
+                       "num_dims=None, pca_comps=None,\n        "
+                       "preprocessor=None)"))
 
   def test_mlkr(self):
-    self.assertEqual(str(metric_learn.MLKR()), """
+    self.assertEqual(remove_spaces(str(metric_learn.MLKR())),
+                     remove_spaces("""
 MLKR(A0='deprecated', init='auto', max_iter=1000, num_dims=None,
    preprocessor=None, random_state=None, tol=None, verbose=False)
-""".strip('\n'))
+"""))
 
   def test_mmc(self):
-    self.assertEqual(str(metric_learn.MMC()), """
+    self.assertEqual(remove_spaces(str(metric_learn.MMC())),
+                     remove_spaces("""
 MMC(A0='deprecated', convergence_threshold=0.001, diagonal=False,
   diagonal_c=1.0, init='identity', max_iter=100, max_proj=10000,
   preprocessor=None, random_state=None, verbose=False)
-""".strip('\n'))
-    self.assertEqual(str(metric_learn.MMC_Supervised()), """
+"""))
+    self.assertEqual(remove_spaces(str(metric_learn.MMC_Supervised())),
+                     remove_spaces("""
 MMC_Supervised(A0='deprecated', convergence_threshold=1e-06, diagonal=False,
         diagonal_c=1.0, init='identity', max_iter=100, max_proj=10000,
         num_constraints=None, num_labeled='deprecated', preprocessor=None,
         random_state=None, verbose=False)
-""".strip('\n'))
+"""))
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,

@@ -190,18 +190,55 @@ See also: `sklearn.calibration`.
 Algorithms
 ==========
 
+.. _itml:
+
 ITML
 ----
 
-Information Theoretic Metric Learning, Davis et al., ICML 2007
+Information Theoretic Metric Learning(:py:class:`ITML <metric_learn.itml.ITML>`)
 
-`ITML` minimizes the differential relative entropy between two multivariate
-Gaussians under constraints on the distance function, which can be formulated
-into a Bregman optimization problem by minimizing the LogDet divergence subject
-to linear constraints. This algorithm can handle a wide variety of constraints
+`ITML` minimizes the (differential) relative entropy, aka Kullback–Leibler 
+divergence, between two multivariate Gaussians subject to constraints on the 
+associated Mahalanobis distance, which can be formulated into a Bregman 
+optimization problem by minimizing the LogDet divergence subject to 
+linear constraints. This algorithm can handle a wide variety of constraints
 and can optionally incorporate a prior on the distance function. Unlike some
-other methods, ITML does not rely on an eigenvalue computation or semi-definite
-programming.
+other methods, `ITML` does not rely on an eigenvalue computation or 
+semi-definite programming.
+
+
+Given a Mahalanobis distance parameterized by :math:`A`, its corresponding 
+multivariate Gaussian is denoted as:
+
+.. math::
+    p(\mathbf{x}; \mathbf{A}) = \frac{1}{Z}\exp(-\frac{1}{2}d_\mathbf{A}
+    (\mathbf{x}, \mu)) 
+    =  \frac{1}{Z}\exp(-\frac{1}{2}((\mathbf{x} - \mu)^T\mathbf{A}
+    (\mathbf{x} - \mu)) 
+
+where :math:`Z` is the normalization constant, the inverse of Mahalanobis 
+matrix :math:`\mathbf{A}^{-1}` is the covariance of the Gaussian.
+
+Given pairs of similar points :math:`S` and pairs of dissimilar points 
+:math:`D`, the distance metric learning problem is to minimize the LogDet
+divergence, which is equivalent as minimizing :math:`\textbf{KL}(p(\mathbf{x}; 
+\mathbf{A}_0) || p(\mathbf{x}; \mathbf{A}))`:
+
+.. math::
+
+    \min_\mathbf{A} D_{\ell \mathrm{d}}\left(A, A_{0}\right) = 
+    \operatorname{tr}\left(A A_{0}^{-1}\right)-\log \operatorname{det}
+    \left(A A_{0}^{-1}\right)-n\\
+    \text{subject to } \quad d_\mathbf{A}(\mathbf{x}_i, \mathbf{x}_j) 
+    \leq u \qquad (\mathbf{x}_i, \mathbf{x}_j)\in S \\
+    d_\mathbf{A}(\mathbf{x}_i, \mathbf{x}_j) \geq l \qquad (\mathbf{x}_i, 
+    \mathbf{x}_j)\in D
+
+
+where :math:`u` and :math:`l` is the upper and the lower bound of distance
+for similar and dissimilar pairs respectively, and :math:`\mathbf{A}_0` 
+is the prior distance metric, set to identity matrix by default, 
+:math:`D_{\ell \mathrm{d}}(\cdot)` is the log determinant.
 
 .. topic:: Example Code:
 
@@ -231,11 +268,124 @@ programming.
     .. [2] Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/
        itml/
 
+
+.. _lsml:
+
+LSML
+----
+
+Metric Learning from Relative Comparisons by Minimizing Squared Residual
+(:py:class:`LSML <metric_learn.lsml.LSML>`)
+
+`LSML` proposes a simple, yet effective, algorithm that minimizes a convex 
+objective function corresponding to the sum of squared residuals of 
+constraints. This algorithm uses the constraints in the form of the 
+relative distance comparisons, such method is especially useful where 
+pairwise constraints are not natural to obtain, thus pairwise constraints 
+based algorithms become infeasible to be deployed. Furthermore, its sparsity 
+extension leads to more stable estimation when the dimension is high and 
+only a small amount of constraints is given.
+
+The loss function of each constraint 
+:math:`d(\mathbf{x}_a, \mathbf{x}_b) < d(\mathbf{x}_c, \mathbf{x}_d)` is 
+denoted as:
+
+.. math::
+
+    H(d_\mathbf{M}(\mathbf{x}_a, \mathbf{x}_b) 
+    - d_\mathbf{M}(\mathbf{x}_c, \mathbf{x}_d))
+
+where :math:`H(\cdot)` is the squared Hinge loss function defined as:
+
+.. math::
+
+    H(x) = \left\{\begin{aligned}0 \qquad x\leq 0 \\
+    \,\,x^2 \qquad x>0\end{aligned}\right.\\
+
+The summed loss function :math:`L(C)` is the simple sum over all constraints 
+:math:`C = \{(\mathbf{x}_a , \mathbf{x}_b , \mathbf{x}_c , \mathbf{x}_d) 
+: d(\mathbf{x}_a , \mathbf{x}_b) < d(\mathbf{x}_c , \mathbf{x}_d)\}`. The 
+original paper suggested here should be a weighted sum since the confidence 
+or probability of each constraint might differ. However, for the sake of 
+simplicity and assumption of no extra knowledge provided, we just deploy 
+the simple sum here as well as what the authors did in the experiments.
+
+The distance metric learning problem becomes minimizing the summed loss 
+function of all constraints plus a regularization term w.r.t. the prior 
+knowledge:
+
+.. math::
+
+    \min_\mathbf{M}(D_{ld}(\mathbf{M, M_0}) + \sum_{(\mathbf{x}_a, 
+    \mathbf{x}_b, \mathbf{x}_c, \mathbf{x}_d)\in C}H(d_\mathbf{M}(
+    \mathbf{x}_a, \mathbf{x}_b) - d_\mathbf{M}(\mathbf{x}_c, \mathbf{x}_c))\\
+
+where :math:`\mathbf{M}_0` is the prior metric matrix, set as identity 
+by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
+
+.. math::
+
+    D_{ld}(\mathbf{M, M_0}) = \text{tr}(\mathbf{MM_0}) − \text{logdet}
+    (\mathbf{M})
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import LSML
+
+    quadruplets = [[[1.2, 7.5], [1.3, 1.5], [6.4, 2.6], [6.2, 9.7]],
+                   [[1.3, 4.5], [3.2, 4.6], [6.2, 5.5], [5.4, 5.4]],
+                   [[3.2, 7.5], [3.3, 1.5], [8.4, 2.6], [8.2, 9.7]],
+                   [[3.3, 4.5], [5.2, 4.6], [8.2, 5.5], [7.4, 5.4]]]
+
+    # we want to make closer points where the first feature is close, and
+    # further if the second feature is close
+
+    lsml = LSML()
+    lsml.fit(quadruplets)
+
+.. topic:: References:
+
+    .. [1] Liu et al.
+       "Metric Learning from Relative Comparisons by Minimizing Squared
+       Residual". ICDM 2012. http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
+
+    .. [2] Adapted from https://gist.github.com/kcarnold/5439917
+
+.. _sdml:
+
+=======
+
 SDML
 ----
 
-`SDML`: An efficient sparse metric learning in high-dimensional space via
-L1-penalized log-determinant regularization
+Sparse High-Dimensional Metric Learning
+(:py:class:`SDML <metric_learn.sdml.SDML>`)
+
+`SDML` is an efficient sparse metric learning in high-dimensional space via 
+double regularization: an L1-penalization on the off-diagonal elements of the 
+Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between 
+:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}` 
+or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
+covariance matrix).
+
+The formulated optimization on the semidefinite matrix :math:`\mathbf{M}` 
+is convex:
+
+.. math::
+
+    \min_{\mathbf{M}} = \text{tr}((\mathbf{M}_0 + \eta \mathbf{XLX}^{T})
+    \cdot \mathbf{M}) - \log\det \mathbf{M} + \lambda ||\mathbf{M}||_{1, off}
+
+where :math:`\mathbf{X}=[\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_n]` is 
+the training data, the incidence matrix :math:`\mathbf{K}_{ij} = 1` if 
+:math:`(\mathbf{x}_i, \mathbf{x}_j)` is a similar pair, otherwise -1. The 
+Laplacian matrix :math:`\mathbf{L}=\mathbf{D}-\mathbf{K}` is calculated from 
+:math:`\mathbf{K}` and :math:`\mathbf{D}`, a diagonal matrix whose entries are 
+the sums of the row elements of :math:`\mathbf{K}`., :math:`||\cdot||_{1, off}` 
+is the off-diagonal L1 norm.
+
 
 .. topic:: Example Code:
 
@@ -265,17 +415,32 @@ L1-penalized log-determinant regularization
 
     .. [2] Adapted from https://gist.github.com/kcarnold/5439945
 
+.. _rca:
 
 RCA
 ---
 
-Relative Components Analysis (RCA)
+Relative Components Analysis (:py:class:`RCA <metric_learn.rca.RCA>`)
 
 `RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
-in-class covariance matrices. It applies a global linear transformation to
-assign large weights to relevant dimensions and low weights to irrelevant
-dimensions. Those relevant dimensions are estimated using "chunklets", subsets
+in-chunklets covariance matrices. It applies a global linear transformation to 
+assign large weights to relevant dimensions and low weights to irrelevant 
+dimensions. Those relevant dimensions are estimated using "chunklets", subsets 
 of points that are known to belong to the same class.
+
+For a training set with :math:`n` training points in :math:`k` chunklets, the 
+algorithm is efficient since it simply amounts to computing
+
+.. math::
+
+      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}
+      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)
+      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)^T
+
+
+where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}` 
+with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used 
+as the Mahalanobis matrix.
 
 .. topic:: Example Code:
 
@@ -295,7 +460,6 @@ of points that are known to belong to the same class.
     rca = RCA()
     rca.fit(pairs, y)
 
-
 .. topic:: References:
 
     .. [1] `Adjustment learning and relevant component analysis
@@ -307,21 +471,34 @@ of points that are known to belong to the same class.
     .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
        2005
 
+.. _mmc:
+
 MMC
 ---
 
-Mahalanobis Metric Learning with Application for Clustering with
-Side-Information, Xing et al., NIPS 2002
+Metric Learning with Application for Clustering with Side Information
+(:py:class:`MMC <metric_learn.mmc.MMC>`)
 
-`MMC` minimizes the sum of squared distances between similar examples, while
-enforcing the sum of distances between dissimilar examples to be greater than a
-certain margin. This leads to a convex and, thus, local-minima-free
-optimization problem that can be solved efficiently. However, the algorithm
-involves the computation of eigenvalues, which is the main speed-bottleneck.
-Since it has initially been designed for clustering applications, one of the
-implicit assumptions of MMC is that all classes form a compact set, i.e.,
-follow a unimodal distribution, which restricts the possible use-cases of this
-method. However, it is one of the earliest and a still often cited technique.
+`MMC` minimizes the sum of squared distances between similar points, while
+enforcing the sum of distances between dissimilar ones to be greater than one. 
+This leads to a convex and, thus, local-minima-free optimization problem that 
+can be solved efficiently. 
+However, the algorithm involves the computation of eigenvalues, which is the 
+main speed-bottleneck. Since it has initially been designed for clustering 
+applications, one of the implicit assumptions of MMC is that all classes form 
+a compact set, i.e., follow a unimodal distribution, which restricts the 
+possible use-cases of this method. However, it is one of the earliest and a 
+still often cited technique.
+
+The algorithm aims at minimizing the sum of distances between all the similar 
+points, while constrains the sum of distances between dissimilar points:
+
+.. math::
+
+      \min_{\mathbf{M}\in\mathbb{S}_+^d}\sum_{(\mathbf{x}_i, 
+      \mathbf{x}_j)\in S} d_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j)
+      \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}_i, \mathbf{x}_j)
+      \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
 
 .. topic:: Example Code:
 

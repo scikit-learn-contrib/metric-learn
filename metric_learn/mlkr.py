@@ -1,10 +1,13 @@
-"""
-Metric Learning for Kernel Regression (MLKR), Weinberger et al.,
+r"""
+Metric Learning for Kernel Regression(MLKR)
 
-MLKR is an algorithm for supervised metric learning, which learns a distance
-function by directly minimising the leave-one-out regression error. This
-algorithm can also be viewed as a supervised variation of PCA and can be used
-for dimensionality reduction and high dimensional data visualization.
+MLKR is an algorithm for supervised metric learning, which learns a
+distance function by directly minimizing the leave-one-out regression error.
+This algorithm can also be viewed as a supervised variation of PCA and can be
+used for dimensionality reduction and high dimensional data visualization.
+
+Read more in the :ref:`User Guide <mlkr>`.
+
 """
 from __future__ import division, print_function
 import time

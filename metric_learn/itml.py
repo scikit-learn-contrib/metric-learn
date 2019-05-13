@@ -1,16 +1,17 @@
-"""
-Information Theoretic Metric Learning, Kulis et al., ICML 2007
+r"""
+Information Theoretic Metric Learning(ITML)
 
-ITML minimizes the differential relative entropy between two multivariate
-Gaussians under constraints on the distance function,
-which can be formulated into a Bregman optimization problem by minimizing the
-LogDet divergence subject to linear constraints.
-This algorithm can handle a wide variety of constraints and can optionally
-incorporate a prior on the distance function.
-Unlike some other methods, ITML does not rely on an eigenvalue computation
-or semi-definite programming.
+`ITML` minimizes the (differential) relative entropy, aka Kullback-Leibler
+divergence, between two multivariate Gaussians subject to constraints on the
+associated Mahalanobis distance, which can be formulated into a Bregman
+optimization problem by minimizing the LogDet divergence subject to
+linear constraints. This algorithm can handle a wide variety of constraints
+and can optionally incorporate a prior on the distance function. Unlike some
+other methods, `ITML` does not rely on an eigenvalue computation or
+semi-definite programming.
 
-Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
+Read more in the :ref:`User Guide <itml>`.
+
 """
 
 from __future__ import print_function, absolute_import

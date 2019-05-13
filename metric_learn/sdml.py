@@ -1,11 +1,15 @@
-"""
-Qi et al.
-An efficient sparse metric learning in high-dimensional space via
-L1-penalized log-determinant regularization.
-ICML 2009
+r"""
+Sparse High-Dimensional Metric Learning(SDML)
 
-Adapted from https://gist.github.com/kcarnold/5439945
-Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf
+SDML is an efficient sparse metric learning in high-dimensional space via
+double regularization: an L1-penalization on the off-diagonal elements of the
+Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between
+:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}`
+or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the
+covariance matrix).
+
+Read more in the :ref:`User Guide <sdml>`.
+
 """
 
 from __future__ import absolute_import

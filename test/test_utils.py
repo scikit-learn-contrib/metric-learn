@@ -10,7 +10,8 @@ from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
                                 check_collapsed_pairs, validate_vector,
-                                _check_sdp_from_eigen)
+                                _check_sdp_from_eigen,
+                                check_y_valid_values_for_pairs)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -299,35 +300,6 @@ def test_check_tuples_invalid_n_samples(estimator, context, load_tuples,
   assert str(raised_error.value) == msg
 
 
-@pytest.mark.parametrize('estimator, context',
-                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-@pytest.mark.parametrize('load_tuples, preprocessor',
-                         [(tuples_prep, mock_preprocessor),
-                          (tuples_no_prep, None),
-                          (tuples_no_prep, mock_preprocessor)])
-def test_check_tuples_invalid_dtype_convertible(estimator, context,
-                                                load_tuples, preprocessor):
-  """Checks that a warning is raised if a convertible input is converted to
-  float"""
-  tuples = load_tuples().astype(object)  # here the object conversion is
-  # useless for the tuples_prep case, but this allows to test the
-  # tuples_prep case
-
-  if preprocessor is not None:  # if the preprocessor is not None we
-    # overwrite it to have a preprocessor that returns objects
-    def preprocessor(indices):  #
-      # preprocessor that returns objects
-      return np.ones((indices.shape[0], 3)).astype(object)
-
-  msg = ("Data with input dtype object was converted to float64{}."
-         .format(context))
-  with pytest.warns(DataConversionWarning) as raised_warning:
-    check_input(tuples, type_of_inputs='tuples',
-                preprocessor=preprocessor, dtype=np.float64,
-                warn_on_dtype=True, estimator=estimator)
-  assert str(raised_warning[0].message) == msg
-
-
 def test_check_tuples_invalid_dtype_not_convertible_with_preprocessor():
   """Checks that a value error is thrown if attempting to convert an
   input not convertible to float, when using a preprocessor
@@ -527,36 +499,6 @@ def test_check_classic_invalid_n_samples(estimator, context, load_points,
                 ensure_min_samples=3,
                 estimator=estimator)
   assert str(raised_error.value) == msg
-
-
-@pytest.mark.parametrize('estimator, context',
-                         [(NCA(), " by NCA"), ('NCA', " by NCA"), (None, "")])
-@pytest.mark.parametrize('load_points, preprocessor',
-                         [(points_prep, mock_preprocessor),
-                          (points_no_prep, None),
-                          (points_no_prep, mock_preprocessor)])
-def test_check_classic_invalid_dtype_convertible(estimator, context,
-                                                 load_points,
-                                                 preprocessor):
-  """Checks that a warning is raised if a convertible input is converted to
-  float"""
-  points = load_points().astype(object)  # here the object conversion is
-  # useless for the points_prep case, but this allows to test the
-  # points_prep case
-
-  if preprocessor is not None:  # if the preprocessor is not None we
-    # overwrite it to have a preprocessor that returns objects
-    def preprocessor(indices):
-      # preprocessor that returns objects
-      return np.ones((indices.shape[0], 3)).astype(object)
-
-  msg = ("Data with input dtype object was converted to float64{}."
-         .format(context))
-  with pytest.warns(DataConversionWarning) as raised_warning:
-    check_input(points, type_of_inputs='classic',
-                preprocessor=preprocessor, dtype=np.float64,
-                warn_on_dtype=True, estimator=estimator)
-  assert str(raised_warning[0].message) == msg
 
 
 @pytest.mark.parametrize('preprocessor, points',
@@ -1067,3 +1009,73 @@ def test_check_sdp_from_eigen_positive_err_messages():
   _check_sdp_from_eigen(w, 1.)
   _check_sdp_from_eigen(w, 0.)
   _check_sdp_from_eigen(w, None)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('wrong_labels',
+                         [[0.5, 0.6, 0.7, 0.8, 0.9],
+                          np.random.RandomState(42).randn(5),
+                          np.random.RandomState(42).choice([0, 1], size=5)])
+def test_check_y_valid_values_for_pairs(wrong_labels):
+  expected_msg = ("When training on pairs, the labels (y) should contain "
+                  "only values in [-1, 1]. Found an incorrect value.")
+  with pytest.raises(ValueError) as raised_error:
+    check_y_valid_values_for_pairs(wrong_labels)
+  assert str(raised_error.value) == expected_msg
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize('wrong_labels',
+                         [[0.5, 0.6, 0.7, 0.8, 0.9],
+                          np.random.RandomState(42).randn(5),
+                          np.random.RandomState(42).choice([0, 1], size=5)])
+def test_check_input_invalid_tuples_without_preprocessor(wrong_labels):
+  pairs = np.random.RandomState(42).randn(5, 2, 3)
+  expected_msg = ("When training on pairs, the labels (y) should contain "
+                  "only values in [-1, 1]. Found an incorrect value.")
+  with pytest.raises(ValueError) as raised_error:
+    check_input(pairs, wrong_labels, preprocessor=None,
+                type_of_inputs='tuples')
+  assert str(raised_error.value) == expected_msg
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize('wrong_labels',
+                         [[0.5, 0.6, 0.7, 0.8, 0.9],
+                          np.random.RandomState(42).randn(5),
+                          np.random.RandomState(42).choice([0, 1], size=5)])
+def test_check_input_invalid_tuples_with_preprocessor(wrong_labels):
+  n_samples, n_features, n_pairs = 10, 4, 5
+  rng = np.random.RandomState(42)
+  pairs = rng.randint(10, size=(n_pairs, 2))
+  preprocessor = rng.randn(n_samples, n_features)
+  expected_msg = ("When training on pairs, the labels (y) should contain "
+                  "only values in [-1, 1]. Found an incorrect value.")
+  with pytest.raises(ValueError) as raised_error:
+    check_input(pairs, wrong_labels, preprocessor=ArrayIndexer(preprocessor),
+                type_of_inputs='tuples')
+  assert str(raised_error.value) == expected_msg
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize('with_preprocessor', [True, False])
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
+                         ids=ids_pairs_learners)
+def test_check_input_pairs_learners_invalid_y(estimator, build_dataset,
+                                              with_preprocessor):
+  """checks that the only allowed labels for learning pairs are +1 and -1"""
+  input_data, labels, _, X = build_dataset()
+  wrong_labels_list = [labels + 0.5,
+                       np.random.RandomState(42).randn(len(labels)),
+                       np.random.RandomState(42).choice([0, 1],
+                                                        size=len(labels))]
+  model = clone(estimator)
+  set_random_state(model)
+
+  expected_msg = ("When training on pairs, the labels (y) should contain "
+                  "only values in [-1, 1]. Found an incorrect value.")
+
+  for wrong_labels in wrong_labels_list:
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(input_data, wrong_labels)
+  assert str(raised_error.value) == expected_msg
