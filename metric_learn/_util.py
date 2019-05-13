@@ -22,8 +22,7 @@ def check_input(input_data, y=None, preprocessor=None,
                 dtype='numeric', order=None,
                 copy=False, force_all_finite=True,
                 multi_output=False, ensure_min_samples=1,
-                ensure_min_features=1, y_numeric=False,
-                warn_on_dtype=False, estimator=None):
+                ensure_min_features=1, y_numeric=False, estimator=None):
   """Checks that the input format is valid, and converts it if specified
   (this is the equivalent of scikit-learn's `check_array` or `check_X_y`).
   All arguments following tuple_size are scikit-learn's `check_X_y`
@@ -88,10 +87,6 @@ def check_input(input_data, y=None, preprocessor=None,
     is originally 1D and ``ensure_2d`` is True. Setting to 0 disables
     this check.
 
-  warn_on_dtype : boolean (default=False)
-    Raise DataConversionWarning if the dtype of the input data structure
-    does not match the requested dtype, causing a memory copy.
-
   estimator : str or estimator instance (default=`None`)
     If passed, include the name of the estimator in warning messages.
 
@@ -111,7 +106,7 @@ def check_input(input_data, y=None, preprocessor=None,
                             copy=copy, force_all_finite=force_all_finite,
                             ensure_min_samples=ensure_min_samples,
                             ensure_min_features=ensure_min_features,
-                            warn_on_dtype=warn_on_dtype, estimator=estimator)
+                            estimator=estimator)
 
   # We need to convert input_data into a numpy.ndarray if possible, before
   # any further checks or conversions, and deal with y if needed. Therefore
@@ -321,9 +316,8 @@ class ArrayIndexer:
                     accept_sparse=True, dtype=None,
                     force_all_finite=False,
                     ensure_2d=False, allow_nd=True,
-                    ensure_min_samples=0,
-                    ensure_min_features=0,
-                    warn_on_dtype=False, estimator=None)
+                    ensure_min_samples=0, ensure_min_features=0,
+                    estimator=None)
     self.X = X
 
   def __call__(self, indices):
