@@ -154,7 +154,7 @@ class _BaseLSML(MahalanobisMixin):
     return self._comparison_loss(metric, vab, vcd) + reg_loss
 
   def _gradient(self, metric, vab, vcd, prior_inv):
-    dMetric = prior_inv - np.linalg.inv(metric)
+    dMetric = prior_inv - scipy.linalg.pinvh(metric)
     dabs = np.sum(vab.dot(metric) * vab, axis=1)
     dcds = np.sum(vcd.dot(metric) * vcd, axis=1)
     violations = dabs > dcds
