@@ -46,7 +46,7 @@ class _BaseLSML(MahalanobisMixin):
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The (pseudo-)inverse of the covariance matrix.
+            The inverse covariance matrix.
 
          'random'
             The initial transformation will be a random SPD matrix of shape
@@ -154,7 +154,7 @@ class _BaseLSML(MahalanobisMixin):
     return self._comparison_loss(metric, vab, vcd) + reg_loss
 
   def _gradient(self, metric, vab, vcd, prior_inv):
-    dMetric = prior_inv - scipy.linalg.pinvh(metric)
+    dMetric = prior_inv - np.linalg.inv(metric)
     dabs = np.sum(vab.dot(metric) * vab, axis=1)
     dcds = np.sum(vcd.dot(metric) * vcd, axis=1)
     violations = dabs > dcds
@@ -239,7 +239,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The (pseudo-)inverse of the covariance matrix.
+            The inverse covariance matrix.
 
          'random'
             The initial transformation will be a random SPD matrix of shape

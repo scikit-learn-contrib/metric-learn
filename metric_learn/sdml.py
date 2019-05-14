@@ -56,7 +56,7 @@ class _BaseSDML(MahalanobisMixin):
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The (pseudo-)inverse of the covariance matrix.
+            The inverse covariance matrix.
 
          'random'
             The initial transformation will be a random SPD matrix of shape
@@ -112,11 +112,7 @@ class _BaseSDML(MahalanobisMixin):
                                                   return_inverse=True)
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
-    emp_cov = (prior_inv + self.balance_param * loss_matrix +
-               # We add a small value on the diagonal in case the
-               # emp_cov matrix is singular (see
-               # #https://github.com/metric-learn/metric-learn/issues/202)
-               np.eye(diff.shape[1]) * 1e-10)
+    emp_cov = prior_inv + self.balance_param * loss_matrix
 
     # our initialization will be the matrix with emp_cov's eigenvalues,
     # with a constant added so that they are all positive (plus an epsilon
@@ -253,7 +249,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The (pseudo-)inverse of the covariance matrix.
+            The inverse covariance matrix.
 
          'random'
             The initial transformation will be a random SPD matrix of shape

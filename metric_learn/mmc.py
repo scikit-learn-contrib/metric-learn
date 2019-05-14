@@ -52,7 +52,7 @@ class _BaseMMC(MahalanobisMixin):
             An identity matrix of shape (n_features, n_features).
 
         'covariance'
-            The (pseudo-)inverse of the covariance matrix.
+            The inverse covariance matrix.
 
          'random'
             The initial transformation will be a random SPD matrix of shape
@@ -473,7 +473,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The (pseudo-)inverse of the covariance matrix.
+            The inverse covariance matrix.
 
          'random'
              The initial transformation will be a random SPD matrix of shape
