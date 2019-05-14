@@ -597,7 +597,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The inverse covariance matrix.
+            The (pseudo-)inverse of the covariance matrix.
 
          'random'
              The initial transformation will be a random SPD matrix of shape

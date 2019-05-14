@@ -56,7 +56,7 @@ class _BaseSDML(MahalanobisMixin):
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The inverse covariance matrix.
+            The (pseudo-)inverse of the covariance matrix.
 
          'random'
             The initial transformation will be a random SPD matrix of shape
@@ -253,7 +253,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The inverse covariance matrix.
+            The (pseudo-)inverse of the covariance matrix.
 
          'random'
             The initial transformation will be a random SPD matrix of shape
