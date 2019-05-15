@@ -19,7 +19,7 @@ from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
                                       _PairsClassifierMixin,
                                       _QuadrupletsClassifierMixin)
-from metric_learn.exceptions import PreprocessorError
+from metric_learn.exceptions import PreprocessorError, NonPSDError
 from sklearn.datasets import make_regression, make_blobs, load_iris
 
 
@@ -996,7 +996,7 @@ def test__validate_vector():
     validate_vector(x)
 
 
-def test_check_sdp_from_eigen_positive_err_messages():
+def test__check_sdp_from_eigen_positive_err_messages():
   """Tests that if _check_sdp_from_eigen is given a negative tol it returns
   an error, and if positive (or None) it does not"""
   w = np.abs(np.random.RandomState(42).randn(10)) + 1
@@ -1009,6 +1009,37 @@ def test_check_sdp_from_eigen_positive_err_messages():
   _check_sdp_from_eigen(w, 1.)
   _check_sdp_from_eigen(w, 0.)
   _check_sdp_from_eigen(w, None)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w', [np.array([-1.2, 5.5, 6.6]),
+                               np.array([-1.2, -5.6])])
+def test__check_sdp_from_eigen_positive_eigenvalues(w):
+  """Tests that _check_sdp_from_eigen, returns a NonPSDError when
+  the eigenvalues are negatives or null."""
+  with pytest.raises(NonPSDError):
+    _check_sdp_from_eigen(w)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w', [np.array([0., 2.3, 5.3]),
+                               np.array([1e-20, 3.5]),
+                               np.array([1.5, 2.4, 4.6])])
+def test__check_sdp_from_eigen_negative_eigenvalues(w):
+  """Tests that _check_sdp_from_eigen, returns no error when the
+  eigenvalues are positive."""
+  _check_sdp_from_eigen(w)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w, is_definite', [(np.array([1e-15, 5.6]), False),
+                                            (np.array([-1e-15, 5.6]), False),
+                                            (np.array([3.2, 5.6, 0.01]), True),
+                                            ])
+def test__check_sdp_from_eigen_returns_definiteness(w, is_definite):
+  """Tests that _check_sdp_from_eigen returns the definiteness of the
+  matrix (when it is PSD), based on the given eigenvalues"""
+  assert _check_sdp_from_eigen(w) == is_definite
 
 
 @pytest.mark.unit

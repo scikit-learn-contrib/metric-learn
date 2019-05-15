@@ -1,13 +1,13 @@
 import numpy as np
+import scipy
 import six
 from numpy.linalg import LinAlgError
 from sklearn.datasets import make_spd_matrix
 from sklearn.decomposition import PCA
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y, check_random_state
-from .exceptions import PreprocessorError
+from .exceptions import PreprocessorError, NonPSDError
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.utils.multiclass import type_of_target
 from scipy.linalg import pinvh
 import sys
 import time
@@ -341,6 +341,7 @@ def check_collapsed_pairs(pairs):
 def _check_sdp_from_eigen(w, tol=None):
   """Checks if some of the eigenvalues given are negative, up to a tolerance
   level, with a default value of the tolerance depending on the eigenvalues.
+  It also returns whether the matrix is definite.
 
   Parameters
   ----------
@@ -348,9 +349,14 @@ def _check_sdp_from_eigen(w, tol=None):
     Eigenvalues to check for non semidefinite positiveness.
 
   tol : positive `float`, optional
-    Negative eigenvalues above - tol are considered zero. If
+    Absolute eigenvalues below tol are considered zero. If
     tol is None, and eps is the epsilon value for datatype of w, then tol
-    is set to w.max() * len(w) * eps.
+    is set to abs(w).max() * len(w) * eps.
+
+  Returns
+  -------
+  is_definite : bool
+    Whether the matrix is definite or not.
 
   See Also
   --------
@@ -358,11 +364,14 @@ def _check_sdp_from_eigen(w, tol=None):
     strategy is applied here)
   """
   if tol is None:
-    tol = w.max() * len(w) * np.finfo(w.dtype).eps
+    tol = np.abs(w).max() * len(w) * np.finfo(w.dtype).eps
   if tol < 0:
     raise ValueError("tol should be positive.")
   if any(w < - tol):
-      raise ValueError("Matrix is not positive semidefinite (PSD).")
+    raise NonPSDError
+  if any(abs(w) < tol):
+    return False
+  return True
 
 
 def transformer_from_metric(metric, tol=None):
@@ -651,8 +660,13 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
   random_state = check_random_state(random_state)
   M = init
   if isinstance(init, np.ndarray):
+    s, u = scipy.linalg.eigh(init)
+    init_is_definite = _check_sdp_from_eigen(s)
     if return_inverse:
-      M_inv = pinvh(M)
+      if not init_is_definite:
+        raise LinAlgError("Cannot inverse the initialization matrix "
+                          "(it is not definite). Try another initialization.")
+      M_inv = np.dot(u / s, u.T)
   else:
     if init == 'identity':
       M = np.eye(n_features, n_features)
@@ -666,11 +680,20 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
         X = input
       M_inv = np.atleast_2d(np.cov(X, rowvar=False))
       # TODO: check atleast_2d necessary
-      M = pinvh(M_inv)
+      s, u = scipy.linalg.eigh(M_inv)
+      s_is_definite = _check_sdp_from_eigen(s)
+      if not s_is_definite:
+        raise LinAlgError("Cannot inverse the covariance matrix (it is not "
+                          "definite). Try another initialization.")
+      M = np.dot(u / s, u.T)
     elif init == 'random':
       # we need to create a random symmetric matrix
       M = make_spd_matrix(n_features, random_state=random_state)
       if return_inverse:
+        # we use pinvh even if we know the matrix is definite, just because
+        # we need the returned matrix to be symmetric (and sometimes
+        # np.linalg.inv returns not symmetric inverses of symmetric matrices)
+        # TODO: there might be a more efficient method to do so
         M_inv = pinvh(M)
   if return_inverse:
     return (M, M_inv)

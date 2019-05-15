@@ -2,6 +2,7 @@ from itertools import product
 
 import pytest
 import numpy as np
+from numpy.linalg import LinAlgError
 from numpy.testing import assert_array_almost_equal, assert_allclose
 from scipy.spatial.distance import pdist, squareform, mahalanobis
 from sklearn import clone
@@ -550,8 +551,8 @@ def test_init_mahalanobis(estimator, build_dataset):
                               if not hasattr(ml, 'num_dims') and
                               hasattr(ml, 'init')])
 def test_singular_covariance_init(estimator, build_dataset):
-    """Tests that when using the 'covariance' init, it works even if the
-    covariance matrix is singular (see
+    """Tests that when using the 'covariance' init, it returns the
+    appropriate error if the covariance matrix is singular (see
     https://github.com/metric-learn/metric-learn/issues/202)
     """
     input_data, labels, _, X = build_dataset()
@@ -559,11 +560,13 @@ def test_singular_covariance_init(estimator, build_dataset):
     set_random_state(model)
     # We create a feature that is a linear combination of the first two
     # features:
-    coefs = np.random.RandomState(42).randn(2, 1)
     input_data = np.concatenate([input_data, input_data[:, ..., :2]
-                                .dot(coefs)],
+                                 .dot([[2], [3]])],
                                 axis=-1)
 
-    # Fitting the model should return no error
     model.set_params(init='covariance')
-    model.fit(input_data, labels)
+    msg = ("Cannot inverse the covariance matrix "
+           "(it is not definite). Try another initialization.")
+    with pytest.raises(LinAlgError) as raised_err:
+      model.fit(input_data, labels)
+    assert str(raised_err.value) == msg

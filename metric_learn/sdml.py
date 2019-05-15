@@ -50,7 +50,8 @@ class _BaseSDML(MahalanobisMixin):
     init : string or numpy array, optional (default='identity')
          Initialization of the linear transformation. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+         (n_features, n_features). For SDML, the init should be strictly
+         positive definite (PD).
 
          'identity'
             An identity matrix of shape (n_features, n_features).
@@ -64,8 +65,9 @@ class _BaseSDML(MahalanobisMixin):
             `sklearn.datasets.make_spd_matrix`.
 
          numpy array
-             An SPD matrix of shape (n_features, n_features), that will
-             be used as such to initialize the metric.
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to initialize
+             the metric.
 
     use_cov : Not used.
         .. deprecated:: 0.5.0
