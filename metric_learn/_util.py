@@ -588,9 +588,9 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
 
 
 def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
-                                   return_inverse=False):
-  """Returns the initial mahalanobis matrix to be used depending on the
-  arguments.
+                                   return_inverse=False, strict_pd=False):
+  """Returns a standard mahalanobis matrix that can be used as a prior or an
+  initialization
 
   Parameters
   ----------
@@ -614,8 +614,9 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
              `sklearn.datasets.make_spd_matrix`.
 
          numpy array
-             An SPD matrix of shape (n_features, n_features), that will
-             be used as such to initialize the metric.
+             A PSD matrix (or strictly PD if strict_pd==True) of
+             shape (n_features, n_features), that will be used as such to
+             initialize the metric, or set the prior.
 
   random_state : int or `numpy.RandomState` or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If
@@ -625,7 +626,12 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
 
   return_inverse : bool, optional (default=False)
     Whether to return the inverse of the matrix initializing the metric. This
-    can be sometimes useful.
+    can be sometimes useful. It will return the pseudo-inverse (which is the
+    same as the inverse if the matrix is definite (i.e. invertible))
+
+  strict_pd : bool, optional (default=False)
+    Whether to enforce that the provided matrix is definite (in addition to
+    being PSD).
 
   Returns
   -------
@@ -646,9 +652,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
 
     # Assert that the matrix is symmetric
     if not np.allclose(init, init.T):
-      raise ValueError("The initialization matrix should be semi-definite "
-                       "positive (SPD). It is not, since it appears not to be "
-                       "symmetric.")
+      raise ValueError("The given matrix is not symmetric.")
 
   elif init in ['identity', 'covariance', 'random']:
     pass
@@ -662,10 +666,12 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
   if isinstance(init, np.ndarray):
     s, u = scipy.linalg.eigh(init)
     init_is_definite = _check_sdp_from_eigen(s)
+    if strict_pd and not init_is_definite:
+      raise LinAlgError("You should provide a strictly positive definite "
+                        "matrix. This one is not definite. Try another "
+                        "initialization, or an algorithm that does not "
+                        "require the init to be strictly positive definite.")
     if return_inverse:
-      if not init_is_definite:
-        raise LinAlgError("Cannot inverse the initialization matrix "
-                          "(it is not definite). Try another initialization.")
       M_inv = np.dot(u / s, u.T)
   else:
     if init == 'identity':
@@ -681,10 +687,12 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       M_inv = np.atleast_2d(np.cov(X, rowvar=False))
       # TODO: check atleast_2d necessary
       s, u = scipy.linalg.eigh(M_inv)
-      s_is_definite = _check_sdp_from_eigen(s)
-      if not s_is_definite:
-        raise LinAlgError("Cannot inverse the covariance matrix (it is not "
-                          "definite). Try another initialization.")
+      cov_is_definite = _check_sdp_from_eigen(s)
+      if strict_pd and not cov_is_definite:
+        raise LinAlgError("Unable to get a true inverse of the covariance "
+                          "matrix since it is not definite. Try another "
+                          "initialization, or an algorithm that does not "
+                          "require the init to be strictly positive definite.")
       M = np.dot(u / s, u.T)
     elif init == 'random':
       # we need to create a random symmetric matrix

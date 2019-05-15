@@ -66,8 +66,8 @@ class _BaseSDML(MahalanobisMixin):
 
          numpy array
              A positive definite (PD) matrix of shape
-             (n_features, n_features), that will be used as such to initialize
-             the metric.
+             (n_features, n_features), that will be used as such to set the
+             prior.
 
     use_cov : Not used.
         .. deprecated:: 0.5.0
@@ -111,7 +111,8 @@ class _BaseSDML(MahalanobisMixin):
 
     # set up (the inverse of) the prior M
     _, prior_inv = _initialize_metric_mahalanobis(pairs, self.init,
-                                                  return_inverse=True)
+                                                  return_inverse=True,
+                                                  strict_pd=True)
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = prior_inv + self.balance_param * loss_matrix
@@ -245,7 +246,8 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     init : string or numpy array, optional (default='identity')
          Initialization of the linear transformation. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+         (n_features, n_features). For SDML, the init should be strictly
+         positive definite (PD).
 
          'identity'
             An identity matrix of shape (n_features, n_features).
@@ -259,8 +261,10 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
             `sklearn.datasets.make_spd_matrix`.
 
          numpy array
-             A numpy array of shape (n_features, n_features), that will
-             be used as such to initialize the metric.
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
+
     use_cov : Not used.
         .. deprecated:: 0.5.0
           `A0` was deprecated in version 0.5.0 and will

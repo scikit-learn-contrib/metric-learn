@@ -48,22 +48,24 @@ class _BaseITML(MahalanobisMixin):
     init : string or numpy array, optional (default='identity')
          Initialization of the linear transformation. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+         (n_features, n_features). For ITML, the init should be strictly
+         positive definite (PD).
 
          'identity'
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-           The inverse covariance matrix.
+            The inverse covariance matrix.
 
          'random'
-           The initial transformation will be a random SPD matrix of shape
-           `(n_features, n_features)`, generated using
-           `sklearn.datasets.make_spd_matrix`.
+            The initial transformation will be a random SPD matrix of shape
+            `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
 
          numpy array
-             An SPD matrix of shape (n_features, n_features), that will
-             be used as such to initialize the metric.
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
 
     A0 : Not used
       .. deprecated:: 0.5.0
@@ -111,7 +113,8 @@ class _BaseITML(MahalanobisMixin):
     self.bounds_[self.bounds_ == 0] = 1e-9
     # init metric
     # pairs will be deduplicated into X two times, see how to avoid that
-    A = _initialize_metric_mahalanobis(pairs, self.init, self.random_state)
+    A = _initialize_metric_mahalanobis(pairs, self.init, self.random_state,
+                                       strict_pd=True)
 
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -286,22 +289,24 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     init : string or numpy array, optional (default='identity')
          Initialization of the linear transformation. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+         (n_features, n_features). For ITML, the init should be strictly
+         positive definite (PD).
 
          'identity'
             An identity matrix of shape (n_features, n_features).
 
-        'covariance'
+         'covariance'
             The inverse covariance matrix.
 
          'random'
-             The initial transformation will be a random array of shape
-             `(n_features, n_features)`. Each value is sampled from the
-             standard normal distribution.
+            The initial transformation will be a random SPD matrix of shape
+            `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
 
          numpy array
-             A numpy array of shape (n_features, n_features), that will
-             be used as such to initialize the metric.
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
 
     A0 : Not used
       .. deprecated:: 0.5.0

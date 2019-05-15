@@ -56,8 +56,8 @@ class _BaseLSML(MahalanobisMixin):
 
          numpy array
              A positive definite (PD) matrix of shape
-             (n_features, n_features), that will be used as such to initialize
-             the metric.
+             (n_features, n_features), that will be used as such to set the
+             prior.
 
     tol : float, optional
     max_iter : int, optional
@@ -103,7 +103,8 @@ class _BaseLSML(MahalanobisMixin):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     M, prior_inv = _initialize_metric_mahalanobis(quadruplets, self.init,
-                                                  return_inverse=True)
+                                                  return_inverse=True,
+                                                  strict_pd=True)
 
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -235,7 +236,8 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     init : string or numpy array, optional (default='identity')
          Initialization of the linear transformation. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+         (n_features, n_features). For LSML, the init should be strictly
+         positive definite (PD).
 
          'identity'
             An identity matrix of shape (n_features, n_features).
@@ -248,9 +250,10 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
-          numpy array
-            A numpy array of shape (n_features, n_features), that will
-            be used as such to initialize the metric.
+         numpy array
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
 
     prior : Not used.
        .. deprecated:: 0.5.0

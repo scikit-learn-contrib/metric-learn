@@ -5,6 +5,7 @@ import numpy as np
 from numpy.linalg import LinAlgError
 from numpy.testing import assert_array_almost_equal, assert_allclose
 from scipy.spatial.distance import pdist, squareform, mahalanobis
+from scipy.stats import ortho_group
 from sklearn import clone
 from sklearn.cluster import DBSCAN
 from sklearn.datasets import make_spd_matrix
@@ -15,11 +16,10 @@ from sklearn.utils.testing import set_random_state
 from metric_learn._util import make_context
 from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
                                       _PairsClassifierMixin)
+from metric_learn.exceptions import NonPSDError
 
 from test.test_utils import (ids_metric_learners, metric_learners,
-                             remove_y_quadruplets, ids_regressors,
-                             ids_supervised_learners, supervised_learners,
-                             ids_classifiers)
+                             remove_y_quadruplets, ids_classifiers)
 
 RNG = check_random_state(0)
 
@@ -522,12 +522,21 @@ def test_init_mahalanobis(estimator, build_dataset):
     # The input matrix must be symmetric
     init = rng.rand(X.shape[1], X.shape[1])
     model.set_params(init=init)
-    msg = ("The initialization matrix should be semi-definite "
-           "positive (SPD). It is not, since it appears not to be "
-           "symmetric.")
+    msg = ("The given matrix is not symmetric.")
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, labels)
     assert str(raised_error.value) == msg
+
+    # The input matrix must be SPD
+    P = ortho_group.rvs(X.shape[1], random_state=rng)
+    w = np.abs(rng.randn(X.shape[1]))
+    w[0] = -10.
+    M = P.dot(np.diag(w)).dot(P.T)
+    model.set_params(init=M)
+    msg = ("Matrix is not positive semidefinite (PSD).")
+    with pytest.raises(NonPSDError) as raised_err:
+      model.fit(input_data, labels)
+    assert str(raised_err.value) == msg
 
     # init must be as specified in the docstring
     model.set_params(init=1)
@@ -543,17 +552,18 @@ def test_init_mahalanobis(estimator, build_dataset):
                          [(ml, bd) for idml, (ml, bd)
                           in zip(ids_metric_learners,
                                  metric_learners)
-                          if not hasattr(ml, 'num_dims') and
-                          hasattr(ml, 'init')],
+                          if idml[:4] in ['ITML', 'SDML', 'LSML']],
                          ids=[idml for idml, (ml, _)
                               in zip(ids_metric_learners,
                                      metric_learners)
-                              if not hasattr(ml, 'num_dims') and
-                              hasattr(ml, 'init')])
+                              if idml[:4] in ['ITML', 'SDML', 'LSML']])
 def test_singular_covariance_init(estimator, build_dataset):
     """Tests that when using the 'covariance' init, it returns the
-    appropriate error if the covariance matrix is singular (see
-    https://github.com/metric-learn/metric-learn/issues/202)
+    appropriate error if the covariance matrix is singular, for algorithms
+    that need a strictly PD prior or init (see
+    https://github.com/metric-learn/metric-learn/issues/202 and
+    https://github.com/metric-learn/metric-learn/pull/195#issuecomment
+    -492332451)
     """
     input_data, labels, _, X = build_dataset()
     model = clone(estimator)
@@ -565,8 +575,48 @@ def test_singular_covariance_init(estimator, build_dataset):
                                 axis=-1)
 
     model.set_params(init='covariance')
-    msg = ("Cannot inverse the covariance matrix "
-           "(it is not definite). Try another initialization.")
+    msg = ("Unable to get a true inverse of the covariance "
+           "matrix since it is not definite. Try another "
+           "initialization, or an algorithm that does not "
+           "require the init to be strictly positive definite.")
+    with pytest.raises(LinAlgError) as raised_err:
+      model.fit(input_data, labels)
+    assert str(raised_err.value) == msg
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize('estimator, build_dataset',
+                         [(ml, bd) for idml, (ml, bd)
+                          in zip(ids_metric_learners,
+                                 metric_learners)
+                          if idml[:4] in ['ITML', 'SDML', 'LSML']],
+                         ids=[idml for idml, (ml, _)
+                              in zip(ids_metric_learners,
+                                     metric_learners)
+                              if idml[:4] in ['ITML', 'SDML', 'LSML']])
+@pytest.mark.parametrize('w0', [1e-20, 0., -1e-20])
+def test_singular_array_init(estimator, build_dataset, w0):
+    """Tests that when using a custom array init, it returns the
+    appropriate error if it is singular, for algorithms
+    that need a strictly PD prior or init (see
+    https://github.com/metric-learn/metric-learn/issues/202 and
+    https://github.com/metric-learn/metric-learn/pull/195#issuecomment
+    -492332451)
+    """
+    rng = np.random.RandomState(42)
+    input_data, labels, _, X = build_dataset()
+    model = clone(estimator)
+    set_random_state(model)
+
+    P = ortho_group.rvs(X.shape[1], random_state=rng)
+    w = np.abs(rng.randn(X.shape[1]))
+    w[0] = w0
+    M = P.dot(np.diag(w)).dot(P.T)
+    model.set_params(init=M)
+    msg = ("You should provide a strictly positive definite matrix. "
+           "This one is not definite. Try another "
+           "initialization, or an algorithm that does not "
+           "require the init to be strictly positive definite.")
     with pytest.raises(LinAlgError) as raised_err:
       model.fit(input_data, labels)
     assert str(raised_err.value) == msg
