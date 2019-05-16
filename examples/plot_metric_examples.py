@@ -118,6 +118,10 @@ plot(X, Y)
 # all data instances in the training set are surrounded by at least k
 # instances that share the same class label. If this is achieved, the
 # leave-one-out error (a special case of cross validation) is minimized.
+# You'll notice that the points from the same labels are closer together,
+# but they are not necessary in a same cluster. This is particular to LMNN
+# and we'll see that some other algorithms implicitly enforce points from
+# the same class to cluster together.
 # 
 # You can find the paper
 # `here <http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf>`__.
@@ -173,7 +177,8 @@ plot(X_lmnn, Y)
 # ITML uses a regularizer that automatically enforces a Semi-Definite
 # Positive Matrix condition - the LogDet divergence. It uses soft
 # must-link or cannot like constraints, and a simple algorithm based on
-# Bregman projections.
+# Bregman projections. Unlike LMNN, ITML will implicitly enforce points from
+# the same class to belong to the same cluster, as you can see below.
 # 
 # Link to paper:
 # `ITML <http://www.cs.utexas.edu/users/pjain/pubs/metriclearning_icml.pdf>`__.
@@ -246,8 +251,11 @@ plot(X_lsml, Y)
 # iterative solver such as conjugate gradient descent. One of the benefits
 # of this algorithm is that the number of classes :math:`k` can be
 # determined as a function of :math:`A`, up to a scalar constant. This use
-# of the algorithm therefore addresses the issue of model selection.
-# 
+# of the algorithm therefore addresses the issue of model selection. Like
+# LMNN, this algorithm does not try to cluster points from the same class in
+# a unique cluster, because it enforces conditions at a local
+# neighborhood scale.
+#
 # You can read more about it in the paper here:
 # `NCA <https://papers.nips.cc/paper/2566-neighbourhood-components-analysis.pdf>`__.
 # 
@@ -266,7 +274,8 @@ plot(X_nca, Y)
 # particularly useful when dealing with multimodality, where one ore more
 # classes consist of separate clusters in input space. The core
 # optimization problem of LFDA is solved as a generalized eigenvalue
-# problem.
+# problem. Like LMNN, and NCA, this algorithm does not try to cluster points
+# from the same class in a unique cluster.
 # 
 # Link to paper:
 # `LFDA <http://www.machinelearning.org/proceedings/icml2006/114_Local_Fisher_Discrim.pdf>`__
