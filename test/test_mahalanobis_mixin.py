@@ -558,7 +558,7 @@ def test_init_mahalanobis(estimator, build_dataset):
                                      metric_learners)
                               if idml[:4] in ['ITML', 'SDML', 'LSML']])
 def test_singular_covariance_init(estimator, build_dataset):
-    """Tests that when using the 'covariance' init, it returns the
+    """Tests that when using the 'covariance' init or prior, it returns the
     appropriate error if the covariance matrix is singular, for algorithms
     that need a strictly PD prior or init (see
     https://github.com/metric-learn/metric-learn/issues/202 and
@@ -573,8 +573,12 @@ def test_singular_covariance_init(estimator, build_dataset):
     input_data = np.concatenate([input_data, input_data[:, ..., :2]
                                  .dot([[2], [3]])],
                                 axis=-1)
-
-    model.set_params(init='covariance')
+    if hasattr(model, 'init'):
+      model.set_params(init='covariance')
+    if hasattr(model, 'prior'):
+      model.set_params(prior='covariance')
+    if not hasattr(model, 'prior') and not hasattr(model, 'init'):
+      raise RuntimeError("Neither prior or init could be set in the model.")
     msg = ("Unable to get a true inverse of the covariance "
            "matrix since it is not definite. Try another "
            "initialization, or an algorithm that does not "
@@ -595,8 +599,8 @@ def test_singular_covariance_init(estimator, build_dataset):
                                      metric_learners)
                               if idml[:4] in ['ITML', 'SDML', 'LSML']])
 @pytest.mark.parametrize('w0', [1e-20, 0., -1e-20])
-def test_singular_array_init(estimator, build_dataset, w0):
-    """Tests that when using a custom array init, it returns the
+def test_singular_array_init_or_prior(estimator, build_dataset, w0):
+    """Tests that when using a custom array init (or prior), it returns the
     appropriate error if it is singular, for algorithms
     that need a strictly PD prior or init (see
     https://github.com/metric-learn/metric-learn/issues/202 and
@@ -612,7 +616,12 @@ def test_singular_array_init(estimator, build_dataset, w0):
     w = np.abs(rng.randn(X.shape[1]))
     w[0] = w0
     M = P.dot(np.diag(w)).dot(P.T)
-    model.set_params(init=M)
+    if hasattr(model, 'init'):
+      model.set_params(init=M)
+    if hasattr(model, 'prior'):
+      model.set_params(prior=M)
+    if not hasattr(model, 'prior') and not hasattr(model, 'init'):
+      raise RuntimeError("Neither prior or init could be set in the model.")
     msg = ("You should provide a strictly positive definite matrix. "
            "This one is not definite. Try another "
            "initialization, or an algorithm that does not "

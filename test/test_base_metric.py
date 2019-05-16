@@ -57,27 +57,28 @@ ITML_Supervised(A0='deprecated', bounds='deprecated',
   def test_lsml(self):
     self.assertEqual(remove_spaces(str(metric_learn.LSML())),
                      remove_spaces("""
-LSML(init='identity', max_iter=1000, preprocessor=None, prior='deprecated',
+LSML(max_iter=1000, preprocessor=None, prior='identity',
    random_state=None, tol=0.001, verbose=False)
 """))
     self.assertEqual(remove_spaces(str(metric_learn.LSML_Supervised())),
                      remove_spaces("""
-LSML_Supervised(init='identity', max_iter=1000, num_constraints=None,
-        num_labeled='deprecated', preprocessor=None, prior='deprecated',
+LSML_Supervised(max_iter=1000, num_constraints=None,
+        num_labeled='deprecated', preprocessor=None, prior='identity',
         random_state=None, tol=0.001, verbose=False, weights=None)
 """))
 
   def test_sdml(self):
     self.assertEqual(remove_spaces(str(metric_learn.SDML())),
                      remove_spaces("""
-SDML(balance_param=0.5, init='identity', preprocessor=None, random_state=None,
+SDML(balance_param=0.5, preprocessor=None, prior='identity', random_state=None,
    sparsity_param=0.01, use_cov='deprecated', verbose=False)
 """))
     self.assertEqual(remove_spaces(str(metric_learn.SDML_Supervised())),
                      remove_spaces("""
-SDML_Supervised(balance_param=0.5, init='identity', num_constraints=None,
-        num_labeled='deprecated', preprocessor=None, random_state=None,
-        sparsity_param=0.01, use_cov='deprecated', verbose=False)
+SDML_Supervised(balance_param=0.5, num_constraints=None,
+        num_labeled='deprecated', preprocessor=None, prior='identity',
+        random_state=None, sparsity_param=0.01, use_cov='deprecated', 
+        verbose=False)
 """))
 
   def test_rca(self):

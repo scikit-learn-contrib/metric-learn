@@ -30,17 +30,16 @@ class _BaseLSML(MahalanobisMixin):
 
   _tuple_size = 4  # constraints are quadruplets
 
-  def __init__(self, tol=1e-3, max_iter=1000, init='identity',
-               prior='deprecated', verbose=False, preprocessor=None,
-               random_state=None):
+  def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize LSML.
 
     Parameters
     ----------
-    init : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+    prior : string or numpy array, optional (default='identity')
+         Prior to set for the metric. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For LSML, the init should be strictly
+         (n_features, n_features). For LSML, the prior should be strictly
          positive definite (PD).
 
          'identity'
@@ -50,7 +49,7 @@ class _BaseLSML(MahalanobisMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random SPD matrix of shape
+            The initial transformation will be a random PD matrix of shape
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
@@ -61,10 +60,6 @@ class _BaseLSML(MahalanobisMixin):
 
     tol : float, optional
     max_iter : int, optional
-    prior : Not used.
-       .. deprecated:: 0.5.0
-         `prior` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0. Use 'init' instead.
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
@@ -75,7 +70,6 @@ class _BaseLSML(MahalanobisMixin):
         ``init='random'``, ``random_state`` is used to initialize the random
         transformation.
     """
-    self.init = init
     self.prior = prior
     self.tol = tol
     self.max_iter = max_iter
@@ -84,11 +78,6 @@ class _BaseLSML(MahalanobisMixin):
     super(_BaseLSML, self).__init__(preprocessor)
 
   def _fit(self, quadruplets, weights=None):
-    if self.prior != 'deprecated':
-      warnings.warn('"prior" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0. Use "init" instead.',
-                    DeprecationWarning)
     quadruplets = self._prepare_inputs(quadruplets,
                                        type_of_inputs='tuples')
 
@@ -102,7 +91,7 @@ class _BaseLSML(MahalanobisMixin):
     else:
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
-    M, prior_inv = _initialize_metric_mahalanobis(quadruplets, self.init,
+    M, prior_inv = _initialize_metric_mahalanobis(quadruplets, self.prior,
                                                   return_inverse=True,
                                                   strict_pd=True)
 
@@ -218,10 +207,9 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       metric (See function `transformer_from_metric`.)
   """
 
-  def __init__(self, tol=1e-3, max_iter=1000, init='identity',
-               prior='deprecated', num_labeled='deprecated',
-               num_constraints=None, weights=None, verbose=False,
-               preprocessor=None, random_state=None):
+  def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
+               num_labeled='deprecated', num_constraints=None, weights=None,
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize the supervised version of `LSML`.
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
@@ -233,10 +221,10 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     ----------
     tol : float, optional
     max_iter : int, optional
-    init : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+    prior : string or numpy array, optional (default='identity')
+         Prior to set for the metric. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For LSML, the init should be strictly
+         (n_features, n_features). For LSML, the prior should be strictly
          positive definite (PD).
 
          'identity'
@@ -246,7 +234,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random SPD matrix of shape
+            The initial transformation will be a random PD matrix of shape
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
@@ -254,11 +242,6 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
              A positive definite (PD) matrix of shape
              (n_features, n_features), that will be used as such to set the
              prior.
-
-    prior : Not used.
-       .. deprecated:: 0.5.0
-         `prior` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0. Use 'init' instead.
     num_labeled : Not used
       .. deprecated:: 0.5.0
          `num_labeled` was deprecated in version 0.5.0 and will
@@ -277,8 +260,8 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
         ``init='random'``, ``random_state`` is used to initialize the random
         transformation.
     """
-    _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, init=init,
-                       prior=prior, verbose=verbose, preprocessor=preprocessor,
+    _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
+                       verbose=verbose, preprocessor=preprocessor,
                        random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints

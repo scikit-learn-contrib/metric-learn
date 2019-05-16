@@ -35,7 +35,7 @@ class _BaseSDML(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, init='identity',
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior='identity',
                use_cov='deprecated', verbose=False, preprocessor=None,
                random_state=None):
     """
@@ -47,10 +47,10 @@ class _BaseSDML(MahalanobisMixin):
     sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
 
-    init : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+    prior : string or numpy array, optional (default='identity')
+         Prior to set for the metric. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For SDML, the init should be strictly
+         (n_features, n_features). For SDML, the prior should be strictly
          positive definite (PD).
 
          'identity'
@@ -60,7 +60,7 @@ class _BaseSDML(MahalanobisMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random SPD matrix of shape
+            The initial transformation will be a random PD matrix of shape
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
@@ -72,7 +72,7 @@ class _BaseSDML(MahalanobisMixin):
     use_cov : Not used.
         .. deprecated:: 0.5.0
           `A0` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use 'init' instead.
+          be removed in 0.6.0. Use 'prior' instead.
 
     verbose : bool, optional
         if True, prints information while learning
@@ -83,12 +83,11 @@ class _BaseSDML(MahalanobisMixin):
 
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        transformation.
+        ``prior='random'``, ``random_state`` is used to set the prior.
     """
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
-    self.init = init
+    self.prior = prior
     self.use_cov = use_cov  # TODO: deprecate and replace by init
     self.verbose = verbose
     self.random_state = random_state
@@ -98,7 +97,7 @@ class _BaseSDML(MahalanobisMixin):
     if self.use_cov != 'deprecated':
       warnings.warn('"use_cov" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0. Use "init" instead.',
+                    'removed in 0.6.0. Use "prior" instead.',
                     DeprecationWarning)
     if not HAS_SKGGM:
       if self.verbose:
@@ -110,7 +109,7 @@ class _BaseSDML(MahalanobisMixin):
                                     type_of_inputs='tuples')
 
     # set up (the inverse of) the prior M
-    _, prior_inv = _initialize_metric_mahalanobis(pairs, self.init,
+    _, prior_inv = _initialize_metric_mahalanobis(pairs, self.prior,
                                                   return_inverse=True,
                                                   strict_pd=True)
     diff = pairs[:, 0] - pairs[:, 1]
@@ -127,7 +126,7 @@ class _BaseSDML(MahalanobisMixin):
                     "positive semi-definite (PSD). The algorithm may diverge, "
                     "and lead to degenerate solutions. "
                     "To prevent that, try to decrease the balance parameter "
-                    "`balance_param` and/or to set init='identity'.",
+                    "`balance_param` and/or to set prior='identity'.",
                     ConvergenceWarning)
       w -= min_eigval  # we translate the eigenvalues to make them all positive
     w += 1e-10  # we add a small offset to avoid definiteness problems
@@ -227,7 +226,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
       metric (See function `transformer_from_metric`.)
   """
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, init='identity',
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior='identity',
                use_cov='deprecated', num_labeled='deprecated',
                num_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
@@ -243,10 +242,10 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
         trade off between sparsity and M0 prior
     sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
-    init : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+    prior : string or numpy array, optional (default='identity')
+          Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For SDML, the init should be strictly
+         (n_features, n_features). For SDML, the prior should be strictly
          positive definite (PD).
 
          'identity'
@@ -256,7 +255,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random SPD matrix of shape
+            The prior will be a random SPD matrix of shape
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
@@ -268,7 +267,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     use_cov : Not used.
         .. deprecated:: 0.5.0
           `A0` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use 'init' instead.
+          be removed in 0.6.0. Use 'prior' instead.
 
     num_labeled : Not used
       .. deprecated:: 0.5.0
@@ -287,7 +286,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
         transformation.
     """
     _BaseSDML.__init__(self, balance_param=balance_param,
-                       sparsity_param=sparsity_param, init=init,
+                       sparsity_param=sparsity_param, prior=prior,
                        use_cov=use_cov, verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
     self.num_labeled = num_labeled
