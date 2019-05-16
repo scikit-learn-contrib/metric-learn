@@ -22,13 +22,15 @@ and constraints accordingly.
 #
 
 from sklearn.manifold import TSNE
+from sklearn.utils import shuffle
 
 import metric_learn
 import numpy as np
-from sklearn.datasets import load_iris
+from sklearn.datasets import make_classification
 
 # visualisation imports
 import matplotlib.pyplot as plt
+np.random.seed(42)
 
 
 ######################################################################
@@ -39,20 +41,20 @@ import matplotlib.pyplot as plt
 # read more about the IRIS data-set here:
 # `link <https://en.wikipedia.org/wiki/Iris_flower_data_set>`__.
 
-iris_data = load_iris()
-# this is our data
-X = iris_data['data']
-# these are our constraints
-Y = iris_data['target']
+X, Y = make_classification(n_classes=3, n_clusters_per_class=2,
+                           n_informative=3, class_sep=4., n_features=5,
+                           n_redundant=0, shuffle=True)
 
-########################################################################
-# To make the task more difficult, we will add five noise columns to the
-# data, of variance 5.
-rng = np.random.RandomState(42)
-X = np.hstack([X, rng.randn(X.shape[0], 5)*5])
+##########################################################################
+# Let's make the noise of the non-informative features higher, and shuffle
+# the dataset:
+
+X[:, 3:] *= 20
+X, Y = shuffle(X, Y)
+
 
 ###########################################################################
-# Note that the dimensionality of the data is now 4 + 5 = 9, so to plot the
+# Note that the dimensionality of the data is 5, so to plot the
 # transformed data in 2D, we will use the t-sne algorithm. (See
 # `sklearn.manifold.TSNE`).
 
@@ -284,7 +286,7 @@ plot(X_lfda, Y)
 # Mahalanobis distance metric based on a weighted sum of in-class
 # covariance matrices. It applies a global linear transformation to assign
 # large weights to relevant dimensions and low weights to irrelevant
-# dimensions. Those relevant dimensions are estimated using “chunklets”,
+# dimensions. Those relevant dimensions are estimated using "chunklets",
 # subsets of points that are known to belong to the same class.
 # 
 # Link to paper:
