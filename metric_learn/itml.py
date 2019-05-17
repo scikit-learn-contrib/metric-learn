@@ -87,10 +87,8 @@ class _BaseITML(MahalanobisMixin):
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
-    self.init = init  # explain that it is good to keep the scale with
-    # the bounds
-    # TODO: see for other inits how it behave wrt the bound
-    self.A0 = A0  # TODO: deprecate
+    self.init = init
+    self.A0 = A0
     self.verbose = verbose
     self.random_state = random_state
     super(_BaseITML, self).__init__(preprocessor)
