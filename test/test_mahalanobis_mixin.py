@@ -143,6 +143,9 @@ def test_embed_dim(estimator, build_dataset):
   assert str(raised_error.value) == err_msg
   # we test that the shape is also OK when doing dimensionality reduction
   if type(model).__name__ in {'LFDA', 'MLKR', 'NCA', 'RCA'}:
+    # TODO:
+    #  avoid this enumeration and rather test if hasattr n_components
+    #  as soon as we have made the arguments names as such (issue #167)
     model.set_params(num_dims=2)
     model.fit(*remove_y_quadruplets(estimator, input_data, labels))
     assert model.transform(X).shape == (X.shape[0], 2)
@@ -487,65 +490,74 @@ def test_init_mahalanobis(estimator, build_dataset):
     scikit-learn) that the init has an expected behaviour.
     """
     input_data, labels, _, X = build_dataset()
-    model = clone(estimator)
-    set_random_state(model)
-    rng = np.random.RandomState(42)
 
-    # Start learning from scratch
-    model.set_params(init='identity')
-    model.fit(input_data, labels)
+    matrices_to_set = []
+    if hasattr(estimator, 'init'):
+      matrices_to_set.append('init')
+    if hasattr(estimator, 'prior'):
+      matrices_to_set.append('prior')
 
-    # Initialize with random
-    model.set_params(init='random')
-    model.fit(input_data, labels)
+    for param in matrices_to_set:
+      model = clone(estimator)
+      set_random_state(model)
+      rng = np.random.RandomState(42)
 
-    # Initialize with covariance
-    model.set_params(init='covariance')
-    model.fit(input_data, labels)
-
-    # Initialize with a random spd matrix
-    init = make_spd_matrix(X.shape[1], random_state=rng)
-    model.set_params(init=init)
-    model.fit(input_data, labels)
-
-    # init.shape[1] must match X.shape[1]
-    init = make_spd_matrix(X.shape[1] + 1, X.shape[1] + 1)
-    model.set_params(init=init)
-    msg = ('The input dimensionality {} of the given '
-           'mahalanobis matrix `init` must match the '
-           'dimensionality of the given inputs ({}).'
-           .format(init.shape, input_data.shape[-1]))
-    with pytest.raises(ValueError) as raised_error:
+      # Start learning from scratch
+      model.set_params(**{param: 'identity'})
       model.fit(input_data, labels)
-    assert str(raised_error.value) == msg
 
-    # The input matrix must be symmetric
-    init = rng.rand(X.shape[1], X.shape[1])
-    model.set_params(init=init)
-    msg = ("The given matrix is not symmetric.")
-    with pytest.raises(ValueError) as raised_error:
+      # Initialize with random
+      model.set_params(**{param: 'random'})
       model.fit(input_data, labels)
-    assert str(raised_error.value) == msg
 
-    # The input matrix must be SPD
-    P = ortho_group.rvs(X.shape[1], random_state=rng)
-    w = np.abs(rng.randn(X.shape[1]))
-    w[0] = -10.
-    M = P.dot(np.diag(w)).dot(P.T)
-    model.set_params(init=M)
-    msg = ("Matrix is not positive semidefinite (PSD).")
-    with pytest.raises(NonPSDError) as raised_err:
+      # Initialize with covariance
+      model.set_params(**{param: 'covariance'})
       model.fit(input_data, labels)
-    assert str(raised_err.value) == msg
 
-    # init must be as specified in the docstring
-    model.set_params(init=1)
-    msg = ("`init` must be 'identity', 'covariance', "
-           "'random' or a numpy array of shape "
-           "(n_features, n_features).")
-    with pytest.raises(ValueError) as raised_error:
+      # Initialize with a random spd matrix
+      init = make_spd_matrix(X.shape[1], random_state=rng)
+      model.set_params(**{param: init})
       model.fit(input_data, labels)
-    assert str(raised_error.value) == msg
+
+      # init.shape[1] must match X.shape[1]
+      init = make_spd_matrix(X.shape[1] + 1, X.shape[1] + 1)
+      model.set_params(**{param: init})
+      msg = ('The input dimensionality {} of the given '
+             'mahalanobis matrix `{}` must match the '
+             'dimensionality of the given inputs ({}).'
+             .format(init.shape, param, input_data.shape[-1]))
+
+      with pytest.raises(ValueError) as raised_error:
+        model.fit(input_data, labels)
+      assert str(raised_error.value) == msg
+
+      # The input matrix must be symmetric
+      init = rng.rand(X.shape[1], X.shape[1])
+      model.set_params(**{param: init})
+      msg = ("`{}` is not symmetric.".format(param))
+      with pytest.raises(ValueError) as raised_error:
+        model.fit(input_data, labels)
+      assert str(raised_error.value) == msg
+
+      # The input matrix must be SPD
+      P = ortho_group.rvs(X.shape[1], random_state=rng)
+      w = np.abs(rng.randn(X.shape[1]))
+      w[0] = -10.
+      M = P.dot(np.diag(w)).dot(P.T)
+      model.set_params(**{param: M})
+      msg = ("Matrix is not positive semidefinite (PSD).")
+      with pytest.raises(NonPSDError) as raised_err:
+        model.fit(input_data, labels)
+      assert str(raised_err.value) == msg
+
+      # init must be as specified in the docstring
+      model.set_params(**{param: 1})
+      msg = ("`{}` must be 'identity', 'covariance', "
+             "'random' or a numpy array of shape "
+             "(n_features, n_features).".format(param))
+      with pytest.raises(ValueError) as raised_error:
+        model.fit(input_data, labels)
+      assert str(raised_error.value) == msg
 
 
 @pytest.mark.parametrize('estimator, build_dataset',
@@ -557,7 +569,7 @@ def test_init_mahalanobis(estimator, build_dataset):
                               in zip(ids_metric_learners,
                                      metric_learners)
                               if idml[:4] in ['ITML', 'SDML', 'LSML']])
-def test_singular_covariance_init(estimator, build_dataset):
+def test_singular_covariance_init_or_prior(estimator, build_dataset):
     """Tests that when using the 'covariance' init or prior, it returns the
     appropriate error if the covariance matrix is singular, for algorithms
     that need a strictly PD prior or init (see
@@ -565,27 +577,30 @@ def test_singular_covariance_init(estimator, build_dataset):
     https://github.com/metric-learn/metric-learn/pull/195#issuecomment
     -492332451)
     """
+    matrices_to_set = []
+    if hasattr(estimator, 'init'):
+      matrices_to_set.append('init')
+    if hasattr(estimator, 'prior'):
+      matrices_to_set.append('prior')
+
     input_data, labels, _, X = build_dataset()
-    model = clone(estimator)
-    set_random_state(model)
-    # We create a feature that is a linear combination of the first two
-    # features:
-    input_data = np.concatenate([input_data, input_data[:, ..., :2]
-                                 .dot([[2], [3]])],
-                                axis=-1)
-    if hasattr(model, 'init'):
-      model.set_params(init='covariance')
-    if hasattr(model, 'prior'):
-      model.set_params(prior='covariance')
-    if not hasattr(model, 'prior') and not hasattr(model, 'init'):
-      raise RuntimeError("Neither prior or init could be set in the model.")
-    msg = ("Unable to get a true inverse of the covariance "
-           "matrix since it is not definite. Try another "
-           "initialization, or an algorithm that does not "
-           "require the init to be strictly positive definite.")
-    with pytest.raises(LinAlgError) as raised_err:
-      model.fit(input_data, labels)
-    assert str(raised_err.value) == msg
+    for param in matrices_to_set:
+      model = clone(estimator)
+      set_random_state(model)
+      # We create a feature that is a linear combination of the first two
+      # features:
+      input_data = np.concatenate([input_data, input_data[:, ..., :2]
+                                   .dot([[2], [3]])],
+                                  axis=-1)
+      model.set_params(**{param: 'covariance'})
+      msg = ("Unable to get a true inverse of the covariance "
+             "matrix since it is not definite. Try another "
+             "`{}`, or an algorithm that does not "
+             "require the `{}` to be strictly positive definite."
+             .format(param, param))
+      with pytest.raises(LinAlgError) as raised_err:
+        model.fit(input_data, labels)
+      assert str(raised_err.value) == msg
 
 
 @pytest.mark.integration
@@ -607,25 +622,33 @@ def test_singular_array_init_or_prior(estimator, build_dataset, w0):
     https://github.com/metric-learn/metric-learn/pull/195#issuecomment
     -492332451)
     """
+    matrices_to_set = []
+    if hasattr(estimator, 'init'):
+      matrices_to_set.append('init')
+    if hasattr(estimator, 'prior'):
+      matrices_to_set.append('prior')
+
     rng = np.random.RandomState(42)
     input_data, labels, _, X = build_dataset()
-    model = clone(estimator)
-    set_random_state(model)
+    for param in matrices_to_set:
+      model = clone(estimator)
+      set_random_state(model)
 
-    P = ortho_group.rvs(X.shape[1], random_state=rng)
-    w = np.abs(rng.randn(X.shape[1]))
-    w[0] = w0
-    M = P.dot(np.diag(w)).dot(P.T)
-    if hasattr(model, 'init'):
-      model.set_params(init=M)
-    if hasattr(model, 'prior'):
-      model.set_params(prior=M)
-    if not hasattr(model, 'prior') and not hasattr(model, 'init'):
-      raise RuntimeError("Neither prior or init could be set in the model.")
-    msg = ("You should provide a strictly positive definite matrix. "
-           "This one is not definite. Try another "
-           "initialization, or an algorithm that does not "
-           "require the init to be strictly positive definite.")
-    with pytest.raises(LinAlgError) as raised_err:
-      model.fit(input_data, labels)
-    assert str(raised_err.value) == msg
+      P = ortho_group.rvs(X.shape[1], random_state=rng)
+      w = np.abs(rng.randn(X.shape[1]))
+      w[0] = w0
+      M = P.dot(np.diag(w)).dot(P.T)
+      if hasattr(model, 'init'):
+        model.set_params(init=M)
+      if hasattr(model, 'prior'):
+        model.set_params(prior=M)
+      if not hasattr(model, 'prior') and not hasattr(model, 'init'):
+        raise RuntimeError("Neither prior or init could be set in the model.")
+      msg = ("You should provide a strictly positive definite "
+             "matrix as `{}`. This one is not definite. Try another"
+             " {}, or an algorithm that does not "
+             "require the {} to be strictly positive definite."
+             .format(*(param,) * 3))
+      with pytest.raises(LinAlgError) as raised_err:
+        model.fit(input_data, labels)
+      assert str(raised_err.value) == msg

@@ -114,7 +114,8 @@ class _BaseITML(MahalanobisMixin):
     # init metric
     # pairs will be deduplicated into X two times, see how to avoid that
     A = _initialize_metric_mahalanobis(pairs, self.init, self.random_state,
-                                       strict_pd=True)
+                                       strict_pd=True,
+                                       matrix_name='init')
 
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]

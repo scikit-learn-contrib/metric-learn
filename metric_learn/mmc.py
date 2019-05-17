@@ -110,7 +110,8 @@ class _BaseMMC(MahalanobisMixin):
                                     type_of_inputs='tuples')
 
     self.A_ = _initialize_metric_mahalanobis(pairs, self.init,
-                                             random_state=self.random_state)
+                                             random_state=self.random_state,
+                                             matrix_name='init')
 
     if self.diagonal:
       return self._fit_diag(pairs, y)

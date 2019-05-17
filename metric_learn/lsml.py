@@ -93,7 +93,8 @@ class _BaseLSML(MahalanobisMixin):
     self.w_ /= self.w_.sum()  # weights must sum to 1
     M, prior_inv = _initialize_metric_mahalanobis(quadruplets, self.prior,
                                                   return_inverse=True,
-                                                  strict_pd=True)
+                                                  strict_pd=True,
+                                                  matrix_name='prior')
 
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
