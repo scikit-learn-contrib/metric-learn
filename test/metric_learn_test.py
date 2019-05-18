@@ -5,8 +5,8 @@ import numpy as np
 from scipy.optimize import check_grad
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris, make_classification, make_regression, \
-  make_spd_matrix
+from sklearn.datasets import (load_iris, make_classification, make_regression,
+                              make_spd_matrix)
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
@@ -527,7 +527,7 @@ class TestNCA(MetricTestCase):
       #  must stay like the initialization
       X = self.iris_points[self.iris_labels == 0]
       y = self.iris_labels[self.iris_labels == 0]
-      
+
       A = make_spd_matrix(X.shape[1], X.shape[1])
       nca = NCA(init=A, max_iter=30, num_dims=X.shape[1])
       nca.fit(X, y)
