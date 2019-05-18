@@ -607,10 +607,11 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
             An identity matrix of shape (n_features, n_features).
 
          'covariance'
-            The inverse covariance matrix.
+            The (pseudo-)inverse covariance matrix (raises an error if the
+            covariance matrix is not definite and `strict_pd == True`)
 
          'random'
-             The initial transformation will be a random SPD matrix of shape
+             The initial transformation will be a random PD matrix of shape
              `(n_features, n_features)`, generated using
              `sklearn.datasets.make_spd_matrix`.
 
@@ -626,9 +627,11 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
     argument to PCA when initializing the matrix.
 
   return_inverse : bool, optional (default=False)
-    Whether to return the inverse of the matrix initializing the metric. This
+    Whether to return the inverse of the specified matrix. This
     can be sometimes useful. It will return the pseudo-inverse (which is the
-    same as the inverse if the matrix is definite (i.e. invertible))
+    same as the inverse if the matrix is definite (i.e. invertible)). If
+    `strict_pd == True` and the matrix is not definite, it will return an
+    error.
 
   strict_pd : bool, optional (default=False)
     Whether to enforce that the provided matrix is definite (in addition to
