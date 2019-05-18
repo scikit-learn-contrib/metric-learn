@@ -5,7 +5,8 @@ import numpy as np
 from scipy.optimize import check_grad
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris, make_classification, make_regression
+from sklearn.datasets import load_iris, make_classification, make_regression, \
+  make_spd_matrix
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
@@ -18,7 +19,7 @@ else:
   HAS_SKGGM = True
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
-                          RCA_Supervised, MMC_Supervised, SDML, ITML, LSML)
+                          RCA_Supervised, MMC_Supervised, SDML, ITML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
@@ -516,8 +517,7 @@ class TestNCA(MetricTestCase):
       X = X[[ind_0[0], ind_1[0], ind_2[0]]]
       y = y[[ind_0[0], ind_1[0], ind_2[0]]]
 
-      EPS = np.finfo(float).eps
-      A = np.zeros((X.shape[1], X.shape[1]))
+      A = make_spd_matrix(X.shape[1], X.shape[1])
       nca = NCA(init=A, max_iter=30, num_dims=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
@@ -527,8 +527,8 @@ class TestNCA(MetricTestCase):
       #  must stay like the initialization
       X = self.iris_points[self.iris_labels == 0]
       y = self.iris_labels[self.iris_labels == 0]
-      EPS = np.finfo(float).eps
-      A = np.zeros((X.shape[1], X.shape[1]))
+      
+      A = make_spd_matrix(X.shape[1], X.shape[1])
       nca = NCA(init=A, max_iter=30, num_dims=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)

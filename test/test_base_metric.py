@@ -77,7 +77,7 @@ SDML(balance_param=0.5, preprocessor=None, prior='identity', random_state=None,
                      remove_spaces("""
 SDML_Supervised(balance_param=0.5, num_constraints=None,
         num_labeled='deprecated', preprocessor=None, prior='identity',
-        random_state=None, sparsity_param=0.01, use_cov='deprecated', 
+        random_state=None, sparsity_param=0.01, use_cov='deprecated',
         verbose=False)
 """))
 

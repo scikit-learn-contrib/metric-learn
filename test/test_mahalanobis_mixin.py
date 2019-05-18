@@ -455,7 +455,7 @@ def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
       has_classes = model_base.__class__.__name__ in ids_classifiers
       if has_classes:
         labels = np.tile(range(n_classes), n_samples //
-                          n_classes + 1)[:n_samples]
+                         n_classes + 1)[:n_samples]
       else:
         labels = np.tile(labels, n_samples // labels.shape[0] + 1)[:n_samples]
       model = clone(model_base)
