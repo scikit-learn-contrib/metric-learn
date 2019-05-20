@@ -88,7 +88,7 @@ class _BaseSDML(MahalanobisMixin):
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
     self.prior = prior
-    self.use_cov = use_cov  # TODO: deprecate and replace by init
+    self.use_cov = use_cov
     self.verbose = verbose
     self.random_state = random_state
     super(_BaseSDML, self).__init__(preprocessor)

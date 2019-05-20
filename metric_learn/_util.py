@@ -512,7 +512,9 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
     authorized_inits.append('lda')
 
   if isinstance(init, np.ndarray):
-    init = check_array(init)
+    # we copy the array, so that if we update the metric, we don't want to
+    # update the init
+    init = check_array(init, copy=True)
 
     # Assert that init.shape[1] = X.shape[1]
     if init.shape[1] != n_features:
@@ -648,8 +650,9 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
   """
   n_features = input.shape[-1]
   if isinstance(init, np.ndarray):
-    init = check_array(init)  # TODO: do we want to copy the array ?
-    # see how they do it in scikit-learn for instance
+    # we copy the array, so that if we update the metric, we don't want to
+    # update the init
+    init = check_array(init, copy=True)
 
     # Assert that init.shape[1] = n_features
     if (init.shape) != (n_features,) * 2:
@@ -694,8 +697,8 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
         X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
       else:
         X = input
+      # atleast2d is necessary to deal with scalar covariance matrices
       M_inv = np.atleast_2d(np.cov(X, rowvar=False))
-      # TODO: check atleast_2d necessary
       s, u = scipy.linalg.eigh(M_inv)
       cov_is_definite = _check_sdp_from_eigen(s)
       if strict_pd and not cov_is_definite:
