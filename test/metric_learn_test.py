@@ -530,7 +530,7 @@ class TestNCA(MetricTestCase):
     epsilon = np.sqrt(np.finfo(float).eps)
     rel_diff = (check_grad(fun, grad, M.ravel()) /
                 np.linalg.norm(approx_fprime(M.ravel(), fun, epsilon)))
-    np.testing.assert_almost_equal(rel_diff, 0., decimal=10)
+    np.testing.assert_almost_equal(rel_diff, 0., decimal=6)
 
   def test_simple_example(self):
     """Test on a simple example.
