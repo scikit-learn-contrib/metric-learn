@@ -156,20 +156,16 @@ class TestLMNN(MetricTestCase):
       a2[nn_idx] = np.array([])
 
     # initialize L
+    def loss_grad(flat_L):
+      return lmnn._loss_grad(X, flat_L.reshape(-1, X.shape[1]), dfG, impostors,
+                             1, k, reg, target_neighbors, df.copy(),
+                             list(a1), list(a2))
 
-    def fun(L):
-        # we copy variables that can be modified by _loss_grad, because we
-        # want to have the same result when applying the function twice
-        return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors,
-                               1, k, reg, target_neighbors, df.copy(),
-                               list(a1), list(a2))[1]
+    def fun(x):
+      loss_grad(x)[1]
 
-    def grad(L):
-        # we copy variables that can be modified by _loss_grad, because we
-        # want to have the same result when applying the function twice
-        return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors,
-                               1, k, reg, target_neighbors, df.copy(),
-                               list(a1), list(a2))[0].ravel()
+    def grad(x):
+      loss_grad(x)[0].ravel()
 
     # compute relative error
     epsilon = np.sqrt(np.finfo(float).eps)
@@ -212,19 +208,9 @@ def test_toy_ex_lmnn(X, y, loss):
     a1[nn_idx] = np.array([])
     a2[nn_idx] = np.array([])
 
-  # initialize L
-
-  def fun(L):
-      return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors, 1,
-                             k, reg,
-                             target_neighbors, df, a1, a2)[1]
-
-  def grad(L):
-      return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors, 1,
-                             k, reg, target_neighbors, df, a1, a2)[0].ravel()
-
-  # compute relative error
-  assert fun(L) == loss
+  #  assert that the loss equals the one computed by hand
+  assert lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors, 1, k,
+                         reg, target_neighbors, df, a1, a2)[1] == loss
 
 
 def test_convergence_simple_example(capsys):
