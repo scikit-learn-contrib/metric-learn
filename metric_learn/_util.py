@@ -1,5 +1,7 @@
+import warnings
 import numpy as np
 import six
+from numpy.linalg import LinAlgError
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y
 from metric_learn.exceptions import PreprocessorError
@@ -20,8 +22,7 @@ def check_input(input_data, y=None, preprocessor=None,
                 dtype='numeric', order=None,
                 copy=False, force_all_finite=True,
                 multi_output=False, ensure_min_samples=1,
-                ensure_min_features=1, y_numeric=False,
-                warn_on_dtype=False, estimator=None):
+                ensure_min_features=1, y_numeric=False, estimator=None):
   """Checks that the input format is valid, and converts it if specified
   (this is the equivalent of scikit-learn's `check_array` or `check_X_y`).
   All arguments following tuple_size are scikit-learn's `check_X_y`
@@ -86,10 +87,6 @@ def check_input(input_data, y=None, preprocessor=None,
     is originally 1D and ``ensure_2d`` is True. Setting to 0 disables
     this check.
 
-  warn_on_dtype : boolean (default=False)
-    Raise DataConversionWarning if the dtype of the input data structure
-    does not match the requested dtype, causing a memory copy.
-
   estimator : str or estimator instance (default=`None`)
     If passed, include the name of the estimator in warning messages.
 
@@ -109,7 +106,7 @@ def check_input(input_data, y=None, preprocessor=None,
                             copy=copy, force_all_finite=force_all_finite,
                             ensure_min_samples=ensure_min_samples,
                             ensure_min_features=ensure_min_features,
-                            warn_on_dtype=warn_on_dtype, estimator=estimator)
+                            estimator=estimator)
 
   # We need to convert input_data into a numpy.ndarray if possible, before
   # any further checks or conversions, and deal with y if needed. Therefore
@@ -134,6 +131,11 @@ def check_input(input_data, y=None, preprocessor=None,
   elif type_of_inputs == 'tuples':
     input_data = check_input_tuples(input_data, context, preprocessor,
                                     args_for_sk_checks, tuple_size)
+
+    # if we have y and the input data are pairs, we need to ensure
+    # the labels are in [-1, 1]:
+    if y is not None and input_data.shape[1] == 2:
+      check_y_valid_values_for_pairs(y)
 
   else:
     raise ValueError("Unknown value {} for type_of_inputs. Valid values are "
@@ -295,6 +297,13 @@ def check_tuple_size(tuples, tuple_size, context):
     raise ValueError(msg_t)
 
 
+def check_y_valid_values_for_pairs(y):
+  """Checks that y values are in [-1, 1]"""
+  if not np.array_equal(np.abs(y), np.ones_like(y)):
+    raise ValueError("When training on pairs, the labels (y) should contain "
+                     "only values in [-1, 1]. Found an incorrect value.")
+
+
 class ArrayIndexer:
 
   def __init__(self, X):
@@ -307,9 +316,8 @@ class ArrayIndexer:
                     accept_sparse=True, dtype=None,
                     force_all_finite=False,
                     ensure_2d=False, allow_nd=True,
-                    ensure_min_samples=0,
-                    ensure_min_features=0,
-                    warn_on_dtype=False, estimator=None)
+                    ensure_min_samples=0, ensure_min_features=0,
+                    estimator=None)
     self.X = X
 
   def __call__(self, indices):
@@ -324,31 +332,74 @@ def check_collapsed_pairs(pairs):
                        "in total.".format(num_ident, pairs.shape[0]))
 
 
-def transformer_from_metric(metric):
-  """Computes the transformation matrix from the Mahalanobis matrix.
+def _check_sdp_from_eigen(w, tol=None):
+  """Checks if some of the eigenvalues given are negative, up to a tolerance
+  level, with a default value of the tolerance depending on the eigenvalues.
 
-  Since by definition the metric `M` is positive semi-definite (PSD), it
-  admits a Cholesky decomposition: L = cholesky(M).T. However, currently the
-  computation of the Cholesky decomposition used does not support
-  non-definite matrices. If the metric is not definite, this method will
-  return L = V.T w^( -1/2), with M = V*w*V.T being the eigenvector
-  decomposition of M with the eigenvalues in the diagonal matrix w and the
-  columns of V being the eigenvectors. If M is diagonal, this method will
-  just return its elementwise square root (since the diagonalization of
-  the matrix is itself).
+  Parameters
+  ----------
+  w : array-like, shape=(n_eigenvalues,)
+    Eigenvalues to check for non semidefinite positiveness.
+
+  tol : positive `float`, optional
+    Negative eigenvalues above - tol are considered zero. If
+    tol is None, and eps is the epsilon value for datatype of w, then tol
+    is set to w.max() * len(w) * eps.
+
+  See Also
+  --------
+  np.linalg.matrix_rank for more details on the choice of tolerance (the same
+    strategy is applied here)
+  """
+  if tol is None:
+    tol = w.max() * len(w) * np.finfo(w.dtype).eps
+  if tol < 0:
+    raise ValueError("tol should be positive.")
+  if any(w < - tol):
+      raise ValueError("Matrix is not positive semidefinite (PSD).")
+
+
+def transformer_from_metric(metric, tol=None):
+  """Returns the transformation matrix from the Mahalanobis matrix.
+
+  Returns the transformation matrix from the Mahalanobis matrix, i.e. the
+  matrix L such that metric=L.T.dot(L).
+
+  Parameters
+  ----------
+  metric : symmetric `np.ndarray`, shape=(d x d)
+    The input metric, from which we want to extract a transformation matrix.
+
+  tol : positive `float`, optional
+    Eigenvalues of `metric` between 0 and - tol are considered zero. If tol is
+    None, and w_max is `metric`'s largest eigenvalue, and eps is the epsilon
+    value for datatype of w, then tol is set to w_max * metric.shape[0] * eps.
 
   Returns
   -------
-  L : (d x d) matrix
+  L : np.ndarray, shape=(d x d)
+    The transformation matrix, such that L.T.dot(L) == metric.
   """
-
-  if np.allclose(metric, np.diag(np.diag(metric))):
-    return np.sqrt(metric)
-  elif not np.isclose(np.linalg.det(metric), 0):
-    return np.linalg.cholesky(metric).T
+  if not np.allclose(metric, metric.T):
+    raise ValueError("The input metric should be symmetric.")
+  # If M is diagonal, we will just return the elementwise square root:
+  if np.array_equal(metric, np.diag(np.diag(metric))):
+    _check_sdp_from_eigen(np.diag(metric), tol)
+    return np.diag(np.sqrt(np.maximum(0, np.diag(metric))))
   else:
-    w, V = np.linalg.eigh(metric)
-    return V.T * np.sqrt(np.maximum(0, w[:, None]))
+    try:
+      # if `M` is positive semi-definite, it will admit a Cholesky
+      # decomposition: L = cholesky(M).T
+      return np.linalg.cholesky(metric).T
+    except LinAlgError:
+      # However, currently np.linalg.cholesky does not support indefinite
+      # matrices. So if the latter does not work we will return L = V.T w^(
+      # -1/2), with M = V*w*V.T being the eigenvector decomposition of M with
+      # the eigenvalues in the diagonal matrix w and the columns of V being the
+      # eigenvectors.
+      w, V = np.linalg.eigh(metric)
+      _check_sdp_from_eigen(w, tol)
+      return V.T * np.sqrt(np.maximum(0, w[:, None]))
 
 
 def validate_vector(u, dtype=None):

@@ -1,19 +1,19 @@
-"""
-Mahalanobis Metric Learning with Application for Clustering with Side-Information, Xing et al., NIPS 2002
+r"""
+Metric Learning with Application for Clustering with Side Information(MMC)
 
-MMC minimizes the sum of squared distances between similar examples,
-while enforcing the sum of distances between dissimilar examples to be
-greater than a certain margin.
-This leads to a convex and, thus, local-minima-free optimization problem
-that can be solved efficiently.
+MMC minimizes the sum of squared distances between similar points, while
+enforcing the sum of distances between dissimilar ones to be greater than one.
+This leads to a convex and, thus, local-minima-free optimization problem that
+can be solved efficiently.
 However, the algorithm involves the computation of eigenvalues, which is the
-main speed-bottleneck.
-Since it has initially been designed for clustering applications, one of the
-implicit assumptions of MMC is that all classes form a compact set, i.e.,
-follow a unimodal distribution, which restricts the possible use-cases of
-this method. However, it is one of the earliest and a still often cited technique.
+main speed-bottleneck. Since it has initially been designed for clustering
+applications, one of the implicit assumptions of MMC is that all classes form
+a compact set, i.e., follow a unimodal distribution, which restricts the
+possible use-cases of this method. However, it is one of the earliest and a
+still often cited technique.
 
-Adapted from Matlab code at http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
+Read more in the :ref:`User Guide <mmc>`.
+
 """
 
 from __future__ import print_function, absolute_import, division
@@ -368,27 +368,43 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  threshold_ : `float`
+      If the distance metric between two points is lower than this threshold,
+      points will be classified as similar, otherwise they will be
+      classified as dissimilar.
   """
 
-  def fit(self, pairs, y):
+  def fit(self, pairs, y, calibration_params=None):
     """Learn the MMC model.
+
+    The threshold will be calibrated on the trainset using the parameters
+    `calibration_params`.
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features) or
+    pairs : array-like, shape=(n_constraints, 2, n_features) or
            (n_constraints, 2)
         3D Array of pairs with each row corresponding to two points,
         or 2D array of indices of pairs if the metric learner uses a
         preprocessor.
-    y: array-like, of shape (n_constraints,)
+    y : array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
-
+    calibration_params : `dict` or `None`
+        Dictionary of parameters to give to `calibrate_threshold` for the
+        threshold calibration step done at the end of `fit`. If `None` is
+        given, `calibrate_threshold` will use the default parameters.
     Returns
     -------
     self : object
         Returns the instance.
     """
-    return self._fit(pairs, y)
+    calibration_params = (calibration_params if calibration_params is not
+                          None else dict())
+    self._validate_calibration_params(**calibration_params)
+    self._fit(pairs, y)
+    self.calibrate_threshold(pairs, y, **calibration_params)
+    return self
 
 
 class MMC_Supervised(_BaseMMC, TransformerMixin):

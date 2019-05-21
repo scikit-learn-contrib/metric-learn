@@ -1,10 +1,17 @@
-"""
-Liu et al.
-"Metric Learning from Relative Comparisons by Minimizing Squared Residual".
-ICDM 2012.
+r"""
+Metric Learning from Relative Comparisons by Minimizing Squared Residual(LSML)
 
-Adapted from https://gist.github.com/kcarnold/5439917
-Paper: http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
+`LSML` proposes a simple, yet effective, algorithm that minimizes a convex
+objective function corresponding to the sum of squared residuals of
+constraints. This algorithm uses the constraints in the form of the
+relative distance comparisons, such method is especially useful where
+pairwise constraints are not natural to obtain, thus pairwise constraints
+based algorithms become infeasible to be deployed. Furthermore, its sparsity
+extension leads to more stable estimation when the dimension is high and
+only a small amount of constraints is given.
+
+Read more in the :ref:`User Guide <lsml>`.
+
 """
 
 from __future__ import print_function, absolute_import, division
@@ -45,7 +52,7 @@ class _BaseLSML(MahalanobisMixin):
     self.verbose = verbose
     super(_BaseLSML, self).__init__(preprocessor)
 
-  def _fit(self, quadruplets, y=None, weights=None):
+  def _fit(self, quadruplets, weights=None):
     quadruplets = self._prepare_inputs(quadruplets,
                                        type_of_inputs='tuples')
 

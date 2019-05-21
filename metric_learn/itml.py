@@ -1,16 +1,17 @@
-"""
-Information Theoretic Metric Learning, Kulis et al., ICML 2007
+r"""
+Information Theoretic Metric Learning(ITML)
 
-ITML minimizes the differential relative entropy between two multivariate
-Gaussians under constraints on the distance function,
-which can be formulated into a Bregman optimization problem by minimizing the
-LogDet divergence subject to linear constraints.
-This algorithm can handle a wide variety of constraints and can optionally
-incorporate a prior on the distance function.
-Unlike some other methods, ITML does not rely on an eigenvalue computation
-or semi-definite programming.
+`ITML` minimizes the (differential) relative entropy, aka Kullback-Leibler
+divergence, between two multivariate Gaussians subject to constraints on the
+associated Mahalanobis distance, which can be formulated into a Bregman
+optimization problem by minimizing the LogDet divergence subject to
+linear constraints. This algorithm can handle a wide variety of constraints
+and can optionally incorporate a prior on the distance function. Unlike some
+other methods, `ITML` does not rely on an eigenvalue computation or
+semi-definite programming.
 
-Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
+Read more in the :ref:`User Guide <itml>`.
+
 """
 
 from __future__ import print_function, absolute_import
@@ -153,10 +154,18 @@ class ITML(_BaseITML, _PairsClassifierMixin):
       The possible labels of the pairs `ITML` can fit on. `classes_ = [-1, 1]`,
       where -1 means points in a pair are dissimilar (negative label), and 1
       means they are similar (positive label).
+
+  threshold_ : `float`
+      If the distance metric between two points is lower than this threshold,
+      points will be classified as similar, otherwise they will be
+      classified as dissimilar.
   """
 
-  def fit(self, pairs, y, bounds=None):
+  def fit(self, pairs, y, bounds=None, calibration_params=None):
     """Learn the ITML model.
+
+    The threshold will be calibrated on the trainset using the parameters
+    `calibration_params`.
 
     Parameters
     ----------
@@ -175,13 +184,22 @@ class ITML(_BaseITML, _PairsClassifierMixin):
         If not provided at initialization, bounds_[0] and bounds_[1] will be
         set to the 5th and 95th percentile of the pairwise distances among all
         points present in the input `pairs`.
+    calibration_params : `dict` or `None`
+        Dictionary of parameters to give to `calibrate_threshold` for the
+        threshold calibration step done at the end of `fit`. If `None` is
+        given, `calibrate_threshold` will use the default parameters.
 
     Returns
     -------
     self : object
         Returns the instance.
     """
-    return self._fit(pairs, y, bounds=bounds)
+    calibration_params = (calibration_params if calibration_params is not
+                          None else dict())
+    self._validate_calibration_params(**calibration_params)
+    self._fit(pairs, y)
+    self.calibrate_threshold(pairs, y, **calibration_params)
+    return self
 
 
 class ITML_Supervised(_BaseITML, TransformerMixin):

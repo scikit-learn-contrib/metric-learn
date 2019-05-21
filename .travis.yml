@@ -4,18 +4,24 @@ cache: pip
 python:
   - "2.7"
   - "3.4"
+  - "3.6"
 before_install:
+  - sudo apt-get install liblapack-dev
   - pip install --upgrade pip pytest
-  - pip install wheel
-  - pip install codecov
-  - if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]];
-    then pip install pytest-cov;
+  - pip install wheel cython numpy scipy codecov pytest-cov
+  - if $TRAVIS_PYTHON_VERSION == "3.6"; then
+        pip install scikit-learn;
+    else
+        pip install scikit-learn==0.20.3;
     fi
-  - pip install numpy scipy scikit-learn
+  - if [[ ($TRAVIS_PYTHON_VERSION == "3.6") ||
+          ($TRAVIS_PYTHON_VERSION == "2.7")]]; then
+              pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
+    fi
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == "3.4" ]];
-    then pytest test --cov;
-    else pytest test;
-    fi
+  # we do coverage for all versions so that codecov will merge them: this
+  # way we will see that both paths (with or without skggm) are tested
+  - pytest test --cov;
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+

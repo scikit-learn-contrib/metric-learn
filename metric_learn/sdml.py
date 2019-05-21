@@ -1,23 +1,34 @@
-"""
-Qi et al.
-An efficient sparse metric learning in high-dimensional space via
-L1-penalized log-determinant regularization.
-ICML 2009
+r"""
+Sparse High-Dimensional Metric Learning(SDML)
 
-Adapted from https://gist.github.com/kcarnold/5439945
-Paper: http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf
+SDML is an efficient sparse metric learning in high-dimensional space via
+double regularization: an L1-penalization on the off-diagonal elements of the
+Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between
+:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}`
+or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the
+covariance matrix).
+
+Read more in the :ref:`User Guide <sdml>`.
+
 """
 
 from __future__ import absolute_import
 import warnings
 import numpy as np
 from sklearn.base import TransformerMixin
-from sklearn.covariance import graph_lasso
-from sklearn.utils.extmath import pinvh
+from scipy.linalg import pinvh
+from sklearn.covariance import graphical_lasso
+from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import transformer_from_metric
+try:
+  from inverse_covariance import quic
+except ImportError:
+  HAS_SKGGM = False
+else:
+  HAS_SKGGM = True
 
 
 class _BaseSDML(MahalanobisMixin):
@@ -52,24 +63,74 @@ class _BaseSDML(MahalanobisMixin):
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
+    if not HAS_SKGGM:
+      if self.verbose:
+        print("SDML will use scikit-learn's graphical lasso solver.")
+    else:
+      if self.verbose:
+        print("SDML will use skggm's graphical lasso solver.")
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
-    # set up prior M
+    # set up (the inverse of) the prior M
     if self.use_cov:
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-      M = pinvh(np.atleast_2d(np.cov(X, rowvar = False)))
+      prior_inv = np.atleast_2d(np.cov(X, rowvar=False))
     else:
-      M = np.identity(pairs.shape[2])
+      prior_inv = np.identity(pairs.shape[2])
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
-    P = M + self.balance_param * loss_matrix
-    emp_cov = pinvh(P)
-    # hack: ensure positive semidefinite
-    emp_cov = emp_cov.T.dot(emp_cov)
-    _, M = graph_lasso(emp_cov, self.sparsity_param, verbose=self.verbose)
+    emp_cov = prior_inv + self.balance_param * loss_matrix
 
-    self.transformer_ = transformer_from_metric(M)
+    # our initialization will be the matrix with emp_cov's eigenvalues,
+    # with a constant added so that they are all positive (plus an epsilon
+    # to ensure definiteness). This is empirical.
+    w, V = np.linalg.eigh(emp_cov)
+    min_eigval = np.min(w)
+    if min_eigval < 0.:
+      warnings.warn("Warning, the input matrix of graphical lasso is not "
+                    "positive semi-definite (PSD). The algorithm may diverge, "
+                    "and lead to degenerate solutions. "
+                    "To prevent that, try to decrease the balance parameter "
+                    "`balance_param` and/or to set use_cov=False.",
+                    ConvergenceWarning)
+      w -= min_eigval  # we translate the eigenvalues to make them all positive
+    w += 1e-10  # we add a small offset to avoid definiteness problems
+    sigma0 = (V * w).dot(V.T)
+    try:
+      if HAS_SKGGM:
+        theta0 = pinvh(sigma0)
+        M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
+                                msg=self.verbose,
+                                Theta0=theta0, Sigma0=sigma0)
+      else:
+        _, M = graphical_lasso(emp_cov, alpha=self.sparsity_param,
+                               verbose=self.verbose,
+                               cov_init=sigma0)
+      raised_error = None
+      w_mahalanobis, _ = np.linalg.eigh(M)
+      not_spd = any(w_mahalanobis < 0.)
+      not_finite = not np.isfinite(M).all()
+    except Exception as e:
+      raised_error = e
+      not_spd = False  # not_spd not applicable here so we set to False
+      not_finite = False  # not_finite not applicable here so we set to False
+    if raised_error is not None or not_spd or not_finite:
+      msg = ("There was a problem in SDML when using {}'s graphical "
+             "lasso solver.").format("skggm" if HAS_SKGGM else "scikit-learn")
+      if not HAS_SKGGM:
+        skggm_advice = (" skggm's graphical lasso can sometimes converge "
+                        "on non SPD cases where scikit-learn's graphical "
+                        "lasso fails to converge. Try to install skggm and "
+                        "rerun the algorithm (see the README.md for the "
+                        "right version of skggm).")
+        msg += skggm_advice
+      if raised_error is not None:
+        msg += " The following error message was thrown: {}.".format(
+            raised_error)
+      raise RuntimeError(msg)
+
+    self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self
 
 
@@ -86,27 +147,44 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
       The possible labels of the pairs `SDML` can fit on. `classes_ = [-1, 1]`,
       where -1 means points in a pair are dissimilar (negative label), and 1
       means they are similar (positive label).
+
+  threshold_ : `float`
+      If the distance metric between two points is lower than this threshold,
+      points will be classified as similar, otherwise they will be
+      classified as dissimilar.
   """
 
-  def fit(self, pairs, y):
+  def fit(self, pairs, y, calibration_params=None):
     """Learn the SDML model.
+
+    The threshold will be calibrated on the trainset using the parameters
+    `calibration_params`.
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features) or
+    pairs : array-like, shape=(n_constraints, 2, n_features) or
            (n_constraints, 2)
         3D Array of pairs with each row corresponding to two points,
         or 2D array of indices of pairs if the metric learner uses a
         preprocessor.
-    y: array-like, of shape (n_constraints,)
+    y : array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+    calibration_params : `dict` or `None`
+        Dictionary of parameters to give to `calibrate_threshold` for the
+        threshold calibration step done at the end of `fit`. If `None` is
+        given, `calibrate_threshold` will use the default parameters.
 
     Returns
     -------
     self : object
         Returns the instance.
     """
-    return self._fit(pairs, y)
+    calibration_params = (calibration_params if calibration_params is not
+                          None else dict())
+    self._validate_calibration_params(**calibration_params)
+    self._fit(pairs, y)
+    self.calibrate_threshold(pairs, y, **calibration_params)
+    return self
 
 
 class SDML_Supervised(_BaseSDML, TransformerMixin):
