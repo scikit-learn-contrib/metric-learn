@@ -37,7 +37,7 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     """
     X = self._prepare_inputs(X, ensure_min_samples=2)
     M = np.atleast_2d(np.cov(X, rowvar=False))
-    if len(M) == 1:
+    if M.size == 1:
       M = 1. / M
     else:
       M = scipy.linalg.pinvh(M)
