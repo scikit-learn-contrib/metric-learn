@@ -35,11 +35,11 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     y : unused
     """
     X = self._prepare_inputs(X, ensure_min_samples=2)
-    M = np.cov(X, rowvar = False)
-    if M.ndim == 0:
+    M = np.atleast2d(np.cov(X, rowvar = False))
+    if len(M) == 1:
       M = 1./M
     else:
-      M = np.linalg.inv(M)
+      M = np.linalg.pinvh(M)
 
     self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self
