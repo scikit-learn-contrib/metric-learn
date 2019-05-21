@@ -14,6 +14,7 @@ from sklearn.base import TransformerMixin
 
 from .base_metric import MahalanobisMixin
 from ._util import transformer_from_metric
+import scipy
 
 
 class Covariance(MahalanobisMixin, TransformerMixin):
@@ -35,11 +36,11 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     y : unused
     """
     X = self._prepare_inputs(X, ensure_min_samples=2)
-    M = np.atleast2d(np.cov(X, rowvar = False))
+    M = np.atleast_2d(np.cov(X, rowvar=False))
     if len(M) == 1:
-      M = 1./M
+      M = 1. / M
     else:
-      M = np.linalg.pinvh(M)
+      M = scipy.linalg.pinvh(M)
 
     self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self
