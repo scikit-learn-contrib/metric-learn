@@ -191,12 +191,11 @@ class python_LMNN(_base_LMNN):
     # do the gradient update
     assert not np.isnan(df).any()
     G = dfG * reg + df * (1 - reg)
-
-    grad = 2 * L.dot(G)
+    G = L.dot(G)
     # compute the objective function
     objective = total_active * (1 - reg)
-    objective += G.flatten().dot(L.T.dot(L).flatten())
-    return grad, objective, total_active, df, a1, a2
+    objective += G.flatten().dot(L.flatten())
+    return 2 * G, objective, total_active, df, a1, a2
 
   def _select_targets(self, X, label_inds):
     target_neighbors = np.empty((X.shape[0], self.k), dtype=int)
