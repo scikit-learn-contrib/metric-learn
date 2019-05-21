@@ -158,22 +158,73 @@ class TestLMNN(MetricTestCase):
     # initialize L
 
     def fun(L):
-        return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors, 1,
-                               k, reg,
-                               target_neighbors, df, a1, a2)[1]
+        # we copy variables that can be modified by _loss_grad, because we
+        # want to have the same result when applying the function twice
+        return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors,
+                               1, k, reg, target_neighbors, df.copy(),
+                               list(a1), list(a2))[1]
 
     def grad(L):
+        # we copy variables that can be modified by _loss_grad, because we
+        # want to have the same result when applying the function twice
         return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors,
-                               1, k, reg,
-          target_neighbors, df, a1, a2)[0].ravel()
+                               1, k, reg, target_neighbors, df.copy(),
+                               list(a1), list(a2))[0].ravel()
 
     # compute relative error
     epsilon = np.sqrt(np.finfo(float).eps)
     rel_diff = (check_grad(fun, grad, L.ravel()) /
-                           np.linalg.norm(approx_fprime(L.ravel(), fun,
-                                                       epsilon)))
-               # np.linalg.norm(grad(L))
+                np.linalg.norm(approx_fprime(L.ravel(), fun, epsilon)))
     np.testing.assert_almost_equal(rel_diff, 0., decimal=5)
+
+
+@pytest.mark.parametrize('X, y, loss', [(np.array([[0], [1], [2], [3]]),
+                                         [1, 1, 0, 0], 3.0),
+                                        (np.array([[0], [1], [2], [3]]),
+                                         [1, 0, 0, 1], 26.)])
+def test_toy_ex_lmnn(X, y, loss):
+  """Test that the loss give the right result on a toy example"""
+  L = np.array([[1]])
+  lmnn = LMNN(k=1, regularization=0.5)
+
+  k = lmnn.k
+  reg = lmnn.regularization
+
+  X, y = lmnn._prepare_inputs(X, y, dtype=float,
+                              ensure_min_samples=2)
+  num_pts, num_dims = X.shape
+  unique_labels, label_inds = np.unique(y, return_inverse=True)
+  lmnn.labels_ = np.arange(len(unique_labels))
+  lmnn.transformer_ = np.eye(num_dims)
+
+  target_neighbors = lmnn._select_targets(X, label_inds)
+  impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds)
+
+  # sum outer products
+  dfG = _sum_outer_products(X, target_neighbors.flatten(),
+                            np.repeat(np.arange(X.shape[0]), k))
+  df = np.zeros_like(dfG)
+
+  # storage
+  a1 = [None]*k
+  a2 = [None]*k
+  for nn_idx in xrange(k):
+    a1[nn_idx] = np.array([])
+    a2[nn_idx] = np.array([])
+
+  # initialize L
+
+  def fun(L):
+      return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors, 1,
+                             k, reg,
+                             target_neighbors, df, a1, a2)[1]
+
+  def grad(L):
+      return lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors, 1,
+                             k, reg, target_neighbors, df, a1, a2)[0].ravel()
+
+  # compute relative error
+  assert fun(L) == loss
 
 
 def test_convergence_simple_example(capsys):

@@ -105,7 +105,7 @@ class python_LMNN(_base_LMNN):
       # objective than the previous L, following the gradient:
       while True:
         # the next point next_L to try out is found by a gradient step
-        L_next = L - 2 * learn_rate * G
+        L_next = L - learn_rate * G
         # we compute the objective at next point
         # we copy variables that can be modified by _loss_grad, because if we
         # retry we don t want to modify them several times
@@ -191,10 +191,12 @@ class python_LMNN(_base_LMNN):
     # do the gradient update
     assert not np.isnan(df).any()
     G = dfG * reg + df * (1 - reg)
+
+    grad = 2 * L.dot(G)
     # compute the objective function
     objective = total_active * (1 - reg)
     objective += G.flatten().dot(L.T.dot(L).flatten())
-    return G, objective, total_active, df, a1, a2
+    return grad, objective, total_active, df, a1, a2
 
   def _select_targets(self, X, label_inds):
     target_neighbors = np.empty((X.shape[0], self.k), dtype=int)
