@@ -162,10 +162,10 @@ class TestLMNN(MetricTestCase):
                              list(a1), list(a2))
 
     def fun(x):
-      loss_grad(x)[1]
+      return loss_grad(x)[1]
 
     def grad(x):
-      loss_grad(x)[0].ravel()
+      return loss_grad(x)[0].ravel()
 
     # compute relative error
     epsilon = np.sqrt(np.finfo(float).eps)
