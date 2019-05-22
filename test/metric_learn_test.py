@@ -18,7 +18,7 @@ else:
   HAS_SKGGM = True
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
-                          RCA_Supervised, MMC_Supervised, SDML, ITML)
+                          RCA_Supervised, MMC_Supervised, SDML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN, _sum_outer_products
@@ -107,43 +107,6 @@ class TestITML(MetricTestCase):
            'removed in 0.6.0. Use the "bounds" parameter of this '
            'fit method instead.')
     assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
-
-
-@pytest.mark.parametrize('bounds', [None, (20., 100.), [20., 100.],
-                                    np.array([20., 100.]),
-                                    np.array([[20., 100.]]),
-                                    np.array([[20], [100]])])
-def test_bounds_parameters_valid(bounds):
-  """Asserts that we can provide any array-like of two elements as bounds,
-  and that the attribute bound_ is a numpy array"""
-
-  pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
-  y_pairs = [1, -1]
-  itml = ITML()
-  itml.fit(pairs, y_pairs, bounds=bounds)
-
-  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-  y = np.array([1, 0, 1, 0])
-  itml_supervised = ITML_Supervised()
-  itml_supervised.fit(X, y, bounds=bounds)
-
-
-@pytest.mark.parametrize('bounds', ['weird', ['weird1', 'weird2'],
-                                    np.array([1, 2, 3])])
-def test_bounds_parameters_invalid(bounds):
-  """Assert that if a non array-like is put for bounds, or an array-like
-  of length different than 2, an error is returned"""
-  pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
-  y_pairs = [1, -1]
-  itml = ITML()
-  with pytest.raises(Exception):
-    itml.fit(pairs, y_pairs, bounds=bounds)
-
-  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-  y = np.array([1, 0, 1, 0])
-  itml_supervised = ITML_Supervised()
-  with pytest.raises(Exception):
-    itml_supervised.fit(X, y, bounds=bounds)
 
 
 class TestLMNN(MetricTestCase):
