@@ -43,8 +43,8 @@ the covariance matrix of the input data. This is a simple baseline method.
 
 .. _lmnn:
 
-LMNN
------
+:py:class:`LMNN <metric_learn.lmnn.LMNN>`
+-----------------------------------------
 
 Large Margin Nearest Neighbor Metric Learning
 (:py:class:`LMNN <metric_learn.lmnn.LMNN>`)
@@ -102,8 +102,8 @@ The two implementations differ slightly, and the C++ version is more complete.
 
 .. _nca:
 
-NCA
----
+:py:class:`NCA <metric_learn.nca.NCA>`
+--------------------------------------
 
 Neighborhood Components Analysis(:py:class:`NCA <metric_learn.nca.NCA>`)
 
@@ -166,8 +166,8 @@ the sum of probability of being correctly classified:
 
 .. _lfda:
 
-LFDA
-----
+:py:class:`LFDA <metric_learn.lfda.LFDA>`
+-----------------------------------------
 
 Local Fisher Discriminant Analysis(:py:class:`LFDA <metric_learn.lfda.LFDA>`)
 
@@ -240,8 +240,8 @@ same class are not imposed to be close.
 
 .. _mlkr:
 
-MLKR
-----
+:py:class:`MLKR <metric_learn.mlkr.MLKR>`
+-----------------------------------------
 
 Metric Learning for Kernel Regression(:py:class:`MLKR <metric_learn.mlkr.MLKR>`)
 

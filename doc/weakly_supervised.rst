@@ -192,8 +192,8 @@ Algorithms
 
 .. _itml:
 
-ITML
-----
+:py:class:`ITML <metric_learn.itml.ITML>`
+-----------------------------------------
 
 Information Theoretic Metric Learning(:py:class:`ITML <metric_learn.itml.ITML>`)
 
@@ -269,10 +269,194 @@ is the prior distance metric, set to identity matrix by default,
        itml/
 
 
+.. _sdml:
+
+:py:class:`SDML <metric_learn.sdml.SDML>`
+-----------------------------------------
+
+Sparse High-Dimensional Metric Learning
+(:py:class:`SDML <metric_learn.sdml.SDML>`)
+
+`SDML` is an efficient sparse metric learning in high-dimensional space via 
+double regularization: an L1-penalization on the off-diagonal elements of the 
+Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between 
+:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}` 
+or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
+covariance matrix).
+
+The formulated optimization on the semidefinite matrix :math:`\mathbf{M}` 
+is convex:
+
+.. math::
+
+    \min_{\mathbf{M}} = \text{tr}((\mathbf{M}_0 + \eta \mathbf{XLX}^{T})
+    \cdot \mathbf{M}) - \log\det \mathbf{M} + \lambda ||\mathbf{M}||_{1, off}
+
+where :math:`\mathbf{X}=[\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_n]` is 
+the training data, the incidence matrix :math:`\mathbf{K}_{ij} = 1` if 
+:math:`(\mathbf{x}_i, \mathbf{x}_j)` is a similar pair, otherwise -1. The 
+Laplacian matrix :math:`\mathbf{L}=\mathbf{D}-\mathbf{K}` is calculated from 
+:math:`\mathbf{K}` and :math:`\mathbf{D}`, a diagonal matrix whose entries are 
+the sums of the row elements of :math:`\mathbf{K}`., :math:`||\cdot||_{1, off}` 
+is the off-diagonal L1 norm.
+
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import SDML
+
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
+    y = [1, 1, -1, -1]
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
+
+    sdml = SDML()
+    sdml.fit(pairs, y)
+
+.. topic:: References:
+
+    .. [1] Qi et al.
+       An efficient sparse metric learning in high-dimensional space via
+       L1-penalized log-determinant regularization. ICML 2009.
+       http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/
+       icml09-guojun.pdf
+
+    .. [2] Adapted from https://gist.github.com/kcarnold/5439945
+
+.. _rca:
+
+:py:class:`RCA <metric_learn.rca.RCA>`
+--------------------------------------
+
+Relative Components Analysis (:py:class:`RCA <metric_learn.rca.RCA>`)
+
+`RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
+in-chunklets covariance matrices. It applies a global linear transformation to 
+assign large weights to relevant dimensions and low weights to irrelevant 
+dimensions. Those relevant dimensions are estimated using "chunklets", subsets 
+of points that are known to belong to the same class.
+
+For a training set with :math:`n` training points in :math:`k` chunklets, the 
+algorithm is efficient since it simply amounts to computing
+
+.. math::
+
+      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}
+      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)
+      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)^T
+
+
+where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}` 
+with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used 
+as the Mahalanobis matrix.
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import RCA
+
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
+    y = [1, 1, -1, -1]
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
+
+    rca = RCA()
+    rca.fit(pairs, y)
+
+.. topic:: References:
+
+    .. [1] `Adjustment learning and relevant component analysis
+       <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871
+       &rep=rep1&type=pdf>`_ Noam Shental, et al.
+
+    .. [2] 'Learning distance functions using equivalence relations', ICML 2003
+
+    .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
+       2005
+
+.. _mmc:
+
+:py:class:`MMC <metric_learn.mmc.MMC>`
+--------------------------------------
+
+Metric Learning with Application for Clustering with Side Information
+(:py:class:`MMC <metric_learn.mmc.MMC>`)
+
+`MMC` minimizes the sum of squared distances between similar points, while
+enforcing the sum of distances between dissimilar ones to be greater than one. 
+This leads to a convex and, thus, local-minima-free optimization problem that 
+can be solved efficiently. 
+However, the algorithm involves the computation of eigenvalues, which is the 
+main speed-bottleneck. Since it has initially been designed for clustering 
+applications, one of the implicit assumptions of MMC is that all classes form 
+a compact set, i.e., follow a unimodal distribution, which restricts the 
+possible use-cases of this method. However, it is one of the earliest and a 
+still often cited technique.
+
+The algorithm aims at minimizing the sum of distances between all the similar 
+points, while constrains the sum of distances between dissimilar points:
+
+.. math::
+
+      \min_{\mathbf{M}\in\mathbb{S}_+^d}\sum_{(\mathbf{x}_i, 
+      \mathbf{x}_j)\in S} d_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j)
+      \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}_i, \mathbf{x}_j)
+      \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import MMC
+
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
+    y = [1, 1, -1, -1]
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
+
+    mmc = MMC()
+    mmc.fit(pairs, y)
+
+.. topic:: References:
+
+  .. [1] `Distance metric learning with application to clustering with
+        side-information <http://papers.nips
+        .cc/paper/2164-distance-metric-learning-with-application-to-clustering
+        -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
+  .. [2] Adapted from Matlab code `here <http://www.cs.cmu
+     .edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz>`_.
+
+Learning on quadruplets
+=======================
+
+A type of information even weaker than pairs is information about relative
+comparisons between pairs. The user should provide the algorithm with a
+quadruplet of points, where the two first points are closer than the two
+last points. No target vector (``y``) is needed, since the supervision is
+already in the order that points are given in the quadruplet.
+
+Algorithms
+==========
+
 .. _lsml:
 
-LSML
-----
+:py:class:`LSML <metric_learn.lsml.LSML>`
+-----------------------------------------
 
 Metric Learning from Relative Comparisons by Minimizing Squared Residual
 (:py:class:`LSML <metric_learn.lsml.LSML>`)
@@ -353,219 +537,4 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
 
     .. [2] Adapted from https://gist.github.com/kcarnold/5439917
 
-.. _sdml:
 
-=======
-
-SDML
-----
-
-Sparse High-Dimensional Metric Learning
-(:py:class:`SDML <metric_learn.sdml.SDML>`)
-
-`SDML` is an efficient sparse metric learning in high-dimensional space via 
-double regularization: an L1-penalization on the off-diagonal elements of the 
-Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between 
-:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}` 
-or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
-covariance matrix).
-
-The formulated optimization on the semidefinite matrix :math:`\mathbf{M}` 
-is convex:
-
-.. math::
-
-    \min_{\mathbf{M}} = \text{tr}((\mathbf{M}_0 + \eta \mathbf{XLX}^{T})
-    \cdot \mathbf{M}) - \log\det \mathbf{M} + \lambda ||\mathbf{M}||_{1, off}
-
-where :math:`\mathbf{X}=[\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_n]` is 
-the training data, the incidence matrix :math:`\mathbf{K}_{ij} = 1` if 
-:math:`(\mathbf{x}_i, \mathbf{x}_j)` is a similar pair, otherwise -1. The 
-Laplacian matrix :math:`\mathbf{L}=\mathbf{D}-\mathbf{K}` is calculated from 
-:math:`\mathbf{K}` and :math:`\mathbf{D}`, a diagonal matrix whose entries are 
-the sums of the row elements of :math:`\mathbf{K}`., :math:`||\cdot||_{1, off}` 
-is the off-diagonal L1 norm.
-
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import SDML
-
-    pairs = [[[1.2, 7.5], [1.3, 1.5]],
-             [[6.4, 2.6], [6.2, 9.7]],
-             [[1.3, 4.5], [3.2, 4.6]],
-             [[6.2, 5.5], [5.4, 5.4]]]
-    y = [1, 1, -1, -1]
-
-    # in this task we want points where the first feature is close to be closer
-    # to each other, no matter how close the second feature is
-
-    sdml = SDML()
-    sdml.fit(pairs, y)
-
-.. topic:: References:
-
-    .. [1] Qi et al.
-       An efficient sparse metric learning in high-dimensional space via
-       L1-penalized log-determinant regularization. ICML 2009.
-       http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/
-       icml09-guojun.pdf
-
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439945
-
-.. _rca:
-
-RCA
----
-
-Relative Components Analysis (:py:class:`RCA <metric_learn.rca.RCA>`)
-
-`RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
-in-chunklets covariance matrices. It applies a global linear transformation to 
-assign large weights to relevant dimensions and low weights to irrelevant 
-dimensions. Those relevant dimensions are estimated using "chunklets", subsets 
-of points that are known to belong to the same class.
-
-For a training set with :math:`n` training points in :math:`k` chunklets, the 
-algorithm is efficient since it simply amounts to computing
-
-.. math::
-
-      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}
-      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)
-      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)^T
-
-
-where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}` 
-with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used 
-as the Mahalanobis matrix.
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import RCA
-
-    pairs = [[[1.2, 7.5], [1.3, 1.5]],
-             [[6.4, 2.6], [6.2, 9.7]],
-             [[1.3, 4.5], [3.2, 4.6]],
-             [[6.2, 5.5], [5.4, 5.4]]]
-    y = [1, 1, -1, -1]
-
-    # in this task we want points where the first feature is close to be closer
-    # to each other, no matter how close the second feature is
-
-    rca = RCA()
-    rca.fit(pairs, y)
-
-.. topic:: References:
-
-    .. [1] `Adjustment learning and relevant component analysis
-       <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871
-       &rep=rep1&type=pdf>`_ Noam Shental, et al.
-
-    .. [2] 'Learning distance functions using equivalence relations', ICML 2003
-
-    .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
-       2005
-
-.. _mmc:
-
-MMC
----
-
-Metric Learning with Application for Clustering with Side Information
-(:py:class:`MMC <metric_learn.mmc.MMC>`)
-
-`MMC` minimizes the sum of squared distances between similar points, while
-enforcing the sum of distances between dissimilar ones to be greater than one. 
-This leads to a convex and, thus, local-minima-free optimization problem that 
-can be solved efficiently. 
-However, the algorithm involves the computation of eigenvalues, which is the 
-main speed-bottleneck. Since it has initially been designed for clustering 
-applications, one of the implicit assumptions of MMC is that all classes form 
-a compact set, i.e., follow a unimodal distribution, which restricts the 
-possible use-cases of this method. However, it is one of the earliest and a 
-still often cited technique.
-
-The algorithm aims at minimizing the sum of distances between all the similar 
-points, while constrains the sum of distances between dissimilar points:
-
-.. math::
-
-      \min_{\mathbf{M}\in\mathbb{S}_+^d}\sum_{(\mathbf{x}_i, 
-      \mathbf{x}_j)\in S} d_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j)
-      \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}_i, \mathbf{x}_j)
-      \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import MMC
-
-    pairs = [[[1.2, 7.5], [1.3, 1.5]],
-             [[6.4, 2.6], [6.2, 9.7]],
-             [[1.3, 4.5], [3.2, 4.6]],
-             [[6.2, 5.5], [5.4, 5.4]]]
-    y = [1, 1, -1, -1]
-
-    # in this task we want points where the first feature is close to be closer
-    # to each other, no matter how close the second feature is
-
-    mmc = MMC()
-    mmc.fit(pairs, y)
-
-.. topic:: References:
-
-  .. [1] `Distance metric learning with application to clustering with
-        side-information <http://papers.nips
-        .cc/paper/2164-distance-metric-learning-with-application-to-clustering
-        -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
-  .. [2] Adapted from Matlab code `here <http://www.cs.cmu
-     .edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz>`_.
-
-Learning on quadruplets
-=======================
-
-A type of information even weaker than pairs is information about relative
-comparisons between pairs. The user should provide the algorithm with a
-quadruplet of points, where the two first points are closer than the two
-last points. No target vector (``y``) is needed, since the supervision is
-already in the order that points are given in the quadruplet.
-
-Algorithms
-==========
-
-LSML
-----
-
-`LSML`: Metric Learning from Relative Comparisons by Minimizing Squared
-Residual
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import LSML
-
-    quadruplets = [[[1.2, 7.5], [1.3, 1.5], [6.4, 2.6], [6.2, 9.7]],
-                   [[1.3, 4.5], [3.2, 4.6], [6.2, 5.5], [5.4, 5.4]],
-                   [[3.2, 7.5], [3.3, 1.5], [8.4, 2.6], [8.2, 9.7]],
-                   [[3.3, 4.5], [5.2, 4.6], [8.2, 5.5], [7.4, 5.4]]]
-
-    # we want to make closer points where the first feature is close, and
-    # further if the second feature is close
-
-    lsml = LSML()
-    lsml.fit(quadruplets)
-
-.. topic:: References:
-
-    .. [1] Liu et al.
-       "Metric Learning from Relative Comparisons by Minimizing Squared
-       Residual". ICDM 2012. http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
-
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439917
