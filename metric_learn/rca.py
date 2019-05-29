@@ -1,14 +1,14 @@
-"""Relative Components Analysis (RCA)
+r"""
+Relative Components Analysis(RCA)
 
-RCA learns a full rank Mahalanobis distance metric based on a
-weighted sum of in-class covariance matrices.
-It applies a global linear transformation to assign large weights to
-relevant dimensions and low weights to irrelevant dimensions.
-Those relevant dimensions are estimated using "chunklets",
-subsets of points that are known to belong to the same class.
+RCA learns a full rank Mahalanobis distance metric based on a weighted sum of
+in-chunklets covariance matrices. It applies a global linear transformation to
+assign large weights to relevant dimensions and low weights to irrelevant
+dimensions. Those relevant dimensions are estimated using "chunklets", subsets
+of points that are known to belong to the same class.
 
-'Learning distance functions using equivalence relations', ICML 2003
-'Learning a Mahalanobis metric from equivalence constraints', JMLR 2005
+Read more in the :ref:`User Guide <rca>`.
+
 """
 
 from __future__ import absolute_import
@@ -27,7 +27,9 @@ from .constraints import Constraints
 def _chunk_mean_centering(data, chunks):
   num_chunks = chunks.max() + 1
   chunk_mask = chunks != -1
-  chunk_data = data[chunk_mask]
+  # We need to ensure the data is float so that we can substract the
+  # mean on it
+  chunk_data = data[chunk_mask].astype(float, copy=False)
   chunk_labels = chunks[chunk_mask]
   for c in xrange(num_chunks):
     mask = chunk_labels == c
@@ -103,7 +105,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
                     ' It has been deprecated in version 0.5.0 and will be'
                     ' removed in 0.6.0. Use "n_components" instead',
                     DeprecationWarning)
-    X = self._prepare_inputs(X, ensure_min_samples=2)
+    X, chunks = self._prepare_inputs(X, chunks, ensure_min_samples=2)
 
     # PCA projection to remove noise and redundant information.
     if self.pca_comps is not None:
@@ -114,7 +116,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
       X_t = X - X.mean(axis=0)
       M_pca = None
 
-    chunks = np.asanyarray(chunks, dtype=int)
     chunk_mask, chunked_data = _chunk_mean_centering(X_t, chunks)
 
     inner_cov = np.atleast_2d(np.cov(chunked_data, rowvar=0, bias=1))
