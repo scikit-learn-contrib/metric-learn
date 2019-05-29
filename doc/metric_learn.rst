@@ -6,6 +6,7 @@ Module Contents
 
 .. toctree::
 
+   metric_learn.constraints
    metric_learn.base_metric
    metric_learn.itml
    metric_learn.lfda

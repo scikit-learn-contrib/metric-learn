@@ -2,19 +2,15 @@
 Algorithms walkthrough
 ~~~~~~~~~~~~~~~~~~~~~~
 
-This is a small walkthrough which illustrates all the Metric Learning
-algorithms implemented in metric-learn, and also does a quick
-visualisation which can help understand which algorithm might be best
-suited for you.
-
-Of course, depending on the data set and the constraints your results
-will look very different; you can just follow this and change your data
-and constraints accordingly.
-
+This is a small walkthrough which illustrates most of the Metric Learning
+algorithms implemented in metric-learn by using them on synthetic data,
+with some visualizations to provide intuitions into what they are designed
+to achieve.
 """
 
 # License: BSD 3 clause
 # Authors: Bhargav Srinivasa Desikan <bhargavvader@gmail.com>
+#          William de Vazelhes <wdevazelhes@gmail.com>
 
 ######################################################################
 # Imports
@@ -22,11 +18,10 @@ and constraints accordingly.
 #
 
 from sklearn.manifold import TSNE
-from sklearn.utils import shuffle
 
 import metric_learn
 import numpy as np
-from sklearn.datasets import make_classification
+from sklearn.datasets import make_classification, make_regression
 
 # visualisation imports
 import matplotlib.pyplot as plt
@@ -34,31 +29,28 @@ np.random.seed(42)
 
 
 ######################################################################
-# Loading our data-set and setting up plotting
+# Loading our dataset and setting up plotting
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
-# We will be using the IRIS data-set to illustrate the plotting. You can
-# read more about the IRIS data-set here:
-# `link <https://en.wikipedia.org/wiki/Iris_flower_data_set>`__.
+#
+# We will be using a synthetic dataset to illustrate the plotting,
+# using the function `sklearn.datasets.make_classification` from
+# scikit-learn. The dataset will contain:
+#   - 100 points in 3 classes with 2 clusters per class
+#   - 5 features, among which 3 are informative (correlated with the class
+#     labels) and two are random noise with large magnitude
 
-X, Y = make_classification(n_classes=3, n_clusters_per_class=2,
+X, Y = make_classification(n_samples=100, n_classes=3, n_clusters_per_class=2,
                            n_informative=3, class_sep=4., n_features=5,
-                           n_redundant=0, shuffle=True)
-
-##########################################################################
-# Let's make the noise of the non-informative features higher, and shuffle
-# the dataset:
-
-X[:, 3:] *= 20
-X, Y = shuffle(X, Y)
-
+                           n_redundant=0, shuffle=True,
+                           scale=[1, 1, 20, 20, 20])
 
 ###########################################################################
 # Note that the dimensionality of the data is 5, so to plot the
 # transformed data in 2D, we will use the t-sne algorithm. (See
 # `sklearn.manifold.TSNE`).
 
-def plot(X, Y):
+
+def plot_tsne(X, Y, colormap=plt.cm.Paired):
     plt.figure(figsize=(8, 6))
 
     # clean the figure
@@ -66,7 +58,7 @@ def plot(X, Y):
 
     tsne = TSNE()
     X_embedded = tsne.fit_transform(X)
-    plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=Y, cmap=plt.cm.Paired)
+    plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=Y, cmap=colormap)
 
     plt.xticks(())
     plt.yticks(())
@@ -76,13 +68,21 @@ def plot(X, Y):
 ###################################
 # Let's now plot the dataset as is.
 
-plot(X, Y)
 
+plot_tsne(X, Y)
 
-######################################################################
+#########################################################################
+# We can see that the classes appear mixed up: this is because t-sne
+# is based on preserving the original neighborhood of points in the embedding
+# space, but this original neighborhood is based on the euclidean
+# distance in the input space, in which the contribution of the noisy
+# features is high. So even if points from the same class are close to
+# each other in some subspace of the input space, this is not the case in the
+# total input space.
+#
 # Metric Learning
 # ^^^^^^^^^^^^^^^
-# 
+#
 # Why is Metric Learning useful? We can, with prior knowledge of which
 # points are supposed to be closer, figure out a better way to understand
 # distances between points. Especially in higher dimensions when Euclidean
@@ -91,18 +91,19 @@ plot(X, Y)
 # Basically, we learn this distance:
 # :math:`D(x,y)=\sqrt{(x-y)\,M^{-1}(x-y)}`. And we learn this distance by
 # learning a Matrix :math:`M`, based on certain constraints.
-# 
-# Some good reading material for the same can be found
-# `here <https://arxiv.org/pdf/1306.6709.pdf>`__. It serves as a good
-# literature review of Metric Learning.
-# 
+#
+# For more information, check the :ref:`intro_metric_learning` section
+# from the documentation. Some good reading material can also be found
+# `here <https://arxiv.org/pdf/1306.6709.pdf>`__. It serves as a
+# good literature review of Metric Learning.
+#
 # We will briefly explain the metric-learning algorithms implemented by
 # metric-learn, before providing some examples for it's usage, and also
 # discuss how to go about doing manual constraints.
-# 
+#
 # Metric-learn can be easily integrated with your other machine learning
-# pipelines, and follows (for the most part) scikit-learn conventions.
-# 
+# pipelines, and follows scikit-learn conventions.
+#
 
 
 ######################################################################
@@ -122,10 +123,10 @@ plot(X, Y)
 # but they are not necessary in a same cluster. This is particular to LMNN
 # and we'll see that some other algorithms implicitly enforce points from
 # the same class to cluster together.
-# 
-# You can find the paper
-# `here <http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf>`__.
-# 
+#
+# - See more in the :ref:`User Guide <lmnn>`
+# - See more in the documentation of the class :py:class:`LMNN
+#   <metric_learn.lmnn.LMNN>`
 
 
 ######################################################################
@@ -145,18 +146,14 @@ X_lmnn = lmnn.transform(X)
 
 ######################################################################
 # So what have we learned? The matrix :math:`M` we talked about before.
-# Let's see what it looks like.
-# 
-
-lmnn.metric()
 
 
 ######################################################################
 # Now let us plot the transformed space - this tells us what the original
 # space looks like after being transformed with the new learned metric.
-# 
+#
 
-plot(X_lmnn, Y)
+plot_tsne(X_lmnn, Y)
 
 
 ######################################################################
@@ -167,8 +164,6 @@ plot(X_lmnn, Y)
 # and then ``transform`` to see our data transformed, we can also use
 # ``fit_transform``. The rest of the examples and illustrations will use
 # ``fit_transform``.
-# 
-
 
 ######################################################################
 # Information Theoretic Metric Learning
@@ -179,41 +174,53 @@ plot(X_lmnn, Y)
 # must-link or cannot like constraints, and a simple algorithm based on
 # Bregman projections. Unlike LMNN, ITML will implicitly enforce points from
 # the same class to belong to the same cluster, as you can see below.
-# 
-# Link to paper:
-# `ITML <http://www.cs.utexas.edu/users/pjain/pubs/metriclearning_icml.pdf>`__.
-# 
+#
+# - See more in the :ref:`User Guide <itml>`
+# - See more in the documentation of the class :py:class:`ITML
+#   <metric_learn.itml.ITML>`
 
-itml = metric_learn.ITML_Supervised(num_constraints=200)
+itml = metric_learn.ITML_Supervised()
 X_itml = itml.fit_transform(X, Y)
 
-plot(X_itml, Y)
+plot_tsne(X_itml, Y)
 
+
+######################################################################
+# Mahalanobis Metric for Clustering
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# MMC is an algorithm that will try to minimize the distance between similar
+# points, while ensuring that the sum of distances between dissimilar points is
+# higher than a threshold. This is done by optimizing a cost function
+# subject to an inequality constraint.
+#
+# - See more in the :ref:`User Guide <mmc>`
+# - See more in the documentation of the class :py:class:`MMC
+#   <metric_learn.mmc.MMC>`
+
+itml = metric_learn.ITML_Supervised()
+X_itml = itml.fit_transform(X, Y)
+
+plot_tsne(X_itml, Y)
 
 ######################################################################
 # Sparse Determinant Metric Learning
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
+#
 # Implements an efficient sparse metric learning algorithm in high
 # dimensional space via an :math:`l_1`-penalised log-determinant
-# regularization. Compare to the most existing distance metric learning
+# regularization. Compared to the most existing distance metric learning
 # algorithms, the algorithm exploits the sparsity nature underlying the
 # intrinsic high dimensional feature space.
-# 
-# Link to paper here:
-# `SDML <http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf>`__.
-# 
-# One feature which we'd like to show off here is the use of random seeds.
-# Some of the algorithms feature randomised algorithms for selecting
-# constraints - to fix these, and get constant results for each run, we
-# pass a numpy random seed as shown in the example below.
-# 
+#
+# - See more in the :ref:`User Guide <sdml>`
+# - See more in the documentation of the class :py:class:`SDML
+#   <metric_learn.sdml.SDML>`
 
-sdml = metric_learn.SDML_Supervised(num_constraints=200, sparsity_param=0.1,
-                                    balance_param=0.0015)
-X_sdml = sdml.fit_transform(X, Y, random_state=np.random.RandomState(1234))
+sdml = metric_learn.SDML_Supervised(sparsity_param=0.1, balance_param=0.0015)
+X_sdml = sdml.fit_transform(X, Y)
 
-plot(X_sdml, Y)
+plot_tsne(X_sdml, Y)
 
 
 ######################################################################
@@ -224,47 +231,42 @@ plot(X_sdml, Y)
 # metric from a given set of relative comparisons. This is done by
 # formulating and minimizing a convex loss function that corresponds to
 # the sum of squared hinge loss of violated constraints.
-# 
-# Link to paper:
-# `LSML <http://web.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`__
-# 
+#
+# - See more in the :ref:`User Guide <lsml>`
+# - See more in the documentation of the class :py:class:`LSML
+#   <metric_learn.lsml.LSML>`
 
-lsml = metric_learn.LSML_Supervised(num_constraints=200, tol=0.0001, max_iter=10000, verbose=True)
+lsml = metric_learn.LSML_Supervised(tol=0.0001, max_iter=10000)
 X_lsml = lsml.fit_transform(X, Y)
 
-plot(X_lsml, Y)
+plot_tsne(X_lsml, Y)
 
 
 ######################################################################
 # Neighborhood Components Analysis
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
-# NCA is an extrememly popular metric-learning algorithm, and one of the
-# first few (published back in 2005).
-# 
+#
+# NCA is an extremly popular metric-learning algorithm.
+#
 # Neighbourhood components analysis aims at "learning" a distance metric
 # by finding a linear transformation of input data such that the average
-# leave-one-out (LOO) classification performance is maximized in the
-# transformed space. The key insight to the algorithm is that a matrix
-# :math:`A` corresponding to the transformation can be found by defining a
-# differentiable objective function for :math:`A`, followed by use of an
-# iterative solver such as conjugate gradient descent. One of the benefits
-# of this algorithm is that the number of classes :math:`k` can be
-# determined as a function of :math:`A`, up to a scalar constant. This use
-# of the algorithm therefore addresses the issue of model selection. Like
-# LMNN, this algorithm does not try to cluster points from the same class in
-# a unique cluster, because it enforces conditions at a local
-# neighborhood scale.
+# leave-one-out (LOO) classification performance of a soft-nearest
+# neighbors rule is maximized in the transformed space. The key insight to
+# the algorithm is that a matrix :math:`A` corresponding to the
+# transformation can be found by defining a differentiable objective function
+# for :math:`A`, followed by use of an iterative solver such as
+# `scipy.optimize.fmin_l_bfgs_b`. Like LMNN, this algorithm does not try to
+# cluster points from the same class in a unique cluster, because it
+# enforces conditions at a local neighborhood scale.
 #
-# You can read more about it in the paper here:
-# `NCA <https://papers.nips.cc/paper/2566-neighbourhood-components-analysis.pdf>`__.
-# 
+# - See more in the :ref:`User Guide <nca>`
+# - See more in the documentation of the class :py:class:`NCA
+#   <metric_learn.nca.NCA>`
 
 nca = metric_learn.NCA(max_iter=1000)
 X_nca = nca.fit_transform(X, Y)
 
-plot(X_nca, Y)
-
+plot_tsne(X_nca, Y)
 
 ######################################################################
 # Local Fischer Discriminant Analysis
@@ -276,15 +278,15 @@ plot(X_nca, Y)
 # optimization problem of LFDA is solved as a generalized eigenvalue
 # problem. Like LMNN, and NCA, this algorithm does not try to cluster points
 # from the same class in a unique cluster.
-# 
-# Link to paper:
-# `LFDA <http://www.machinelearning.org/proceedings/icml2006/114_Local_Fisher_Discrim.pdf>`__
-# 
+#
+# - See more in the :ref:`User Guide <lfda>`
+# - See more in the documentation of the class :py:class:`LFDA
+#   <metric_learn.lfda.LFDA>`
 
 lfda = metric_learn.LFDA(k=2, num_dims=2)
 X_lfda = lfda.fit_transform(X, Y)
 
-plot(X_lfda, Y)
+plot_tsne(X_lfda, Y)
 
 
 ######################################################################
@@ -297,39 +299,89 @@ plot(X_lfda, Y)
 # large weights to relevant dimensions and low weights to irrelevant
 # dimensions. Those relevant dimensions are estimated using "chunklets",
 # subsets of points that are known to belong to the same class.
-# 
-# Link to paper:
-# `RCA <https://www.aaai.org/Papers/ICML/2003/ICML03-005.pdf>`__
-# 
+#
+# - See more in the :ref:`User Guide <rca>`
+# - See more in the documentation of the class :py:class:`RCA
+#   <metric_learn.rca.RCA>`
 
 rca = metric_learn.RCA_Supervised(num_chunks=30, chunk_size=2)
 X_rca = rca.fit_transform(X, Y)
 
-plot(X_rca, Y)
+plot_tsne(X_rca, Y)
+
+######################################################################
+# Metric Learning for Kernel Regression
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# An algorithm very similar to NCA but for regression is Metric
+# Learning for Kernel Regression (MLKR). It will optimize for the average
+# leave-one-out *regression* performance from a soft-nearest neighbors
+# regression.
+#
+# - See more in the :ref:`User Guide <mlkr>`
+# - See more in the documentation of the class :py:class:`MLKR
+#   <metric_learn.mlkr.MLKR>`
+#
+# To illustrate MLKR, let's use the dataset
+# `sklearn.datasets.make_regression` the same way as we did with the
+# classification  before. The dataset will contain: 100 points of 5 features
+# each, among which 3 are random noise but informative (used to generate the
+# regression target from a linear model, and two are random noise with the
+# same magnitude
+
+X_reg, Y_reg = make_regression(n_samples=100, n_informative=3, n_features=5,
+                               shuffle=True)
+
+######################################################################
+# Let's plot the dataset as is
+
+plot_tsne(X_reg, Y_reg, plt.cm.Oranges)
+
+######################################################################
+# And let's plot the dataset after transformation by MLKR:
+mlkr = metric_learn.MLKR()
+X_mlkr = mlkr.fit_transform(X_reg, Y_reg)
+plot_tsne(X_mlkr, Y_reg, plt.cm.Oranges)
+
+######################################################################
+# Points that have the same value to regress are now closer to each
+# other ! This could improve the performance of
+# `sklearn.neighbors.KNeighborsRegressor` for instance.
 
 
 ######################################################################
-# Manual Constraints
-# ^^^^^^^^^^^^^^^^^^
-# 
-# Some of the algorithms we've mentioned have alternate ways to pass
-# constraints. So far we've been passing them as just class labels - and
-# letting the internals of metric-learn deal with creating our constraints.
-# 
-# We'll be looking at one other way to do this - which is to pass a Matrix
-# X such that - (a,b,c,d) indices into X, such that
-# :math:`d(X[a],X[b]) < d(X[c],X[d])`.
-# 
-# This kind of input is possible for ITML and LSML.
-# 
+# Constraints
+# ^^^^^^^^^^^
+#
+# To learn the right metric, so far we have always given the labels of the
+# data to supervise the algorithms. However, in many applications,
+# it is easier to obtain information about whether two samples are
+# similar or dissimilar. For instance, when annotating a dataset of face
+# images, it is easier for an annotator to tell if two faces belong to the same
+# person or not, rather than finding the ID of the face among a huge database
+# of every person's faces.
+#
+# Fortunately, one of the strength of metric learning is the ability to
+# deal with such data. Indeed, some of the algorithms we've mentioned have
+# alternate ways to pass some supervision about the metric we want to learn.
+# The way to go is to pass a 3D array `pairs` of pairs, as well as an array
+# of labels `y` such that for each `i` between `0` and `n_pairs`
+# we want `X[i, 0, :]` and `X[i, 1, :]` to be similar if `y[i] == 1`, and we
+# want them to be dissimilar if `y[i] == -1`. In other words, we want to
+# enforce a metric that projects similar points closer together and
+# dissimilar points further away from each other.
+# (See also the section: :ref:`weakly_supervised_section`.)
+#
+# This kind of input is possible for ITML, SDML, and MMC.
+#
 # We're going to create these constraints through the labels we have, i.e
 # :math:`Y`.
-# 
+#
 # This is done internally through metric learn anyway (do check out the
-# ``constraints`` class!) - but we'll try our own version of this. I'm
+# `constraints` module!) - but we'll try our own version of this. I'm
 # going to go ahead and assume that two points labelled the same will be
 # closer than two points in different labels.
-# 
+#
 # Do keep in mind that we are doing this method because we know the labels
 # - we can actually create the constraints any way we want to depending on
 # the data!
@@ -392,7 +444,7 @@ itml.fit(pairs, pairs_labels)
 
 X_itml = itml.transform(X)
 
-plot(X_itml, Y)
+plot_tsne(X_itml, Y)
 
 
 ######################################################################
@@ -401,10 +453,22 @@ plot(X_itml, Y)
 # We can also notice that it might be better to rely on the randomised
 # algorithms under the hood to make our constraints if we are not very
 # sure how we want our transformed space to be.
-# 
-# RCA and SDML also have their own specific ways of taking in inputs -
+#
+# RCA and LSML also have their own specific ways of taking in inputs -
 # it's worth one's while to poke around in the constraints.py file to see
 # how exactly this is going on.
-# 
+#
+# Finally, one of the main advantages of metric-learn is its out-of-the box
+# compatibility with scikit-learn, for doing `model selection
+# <https://scikit-learn.org/stable/model_selection.html>`__,
+# cross-validation, and scoring for instance. Indeed, supervised algorithms are
+# regular `sklearn.base.TransformerMixin` that can be plugged into any
+# pipeline or cross-validation procedure. And weakly-supervised estimators are
+# also compatible with scikit-learn, since their input dataset format described
+# above allows to be sliced along the first dimension when doing
+# cross-validations (see also this :ref:`section <sklearn_compat_ws>`). See
+# also some :ref:`use cases <use_cases>` where you could use scikit-learn
+# estimators.
+
+########################################################################
 # This brings us to the end of this tutorial! Have fun Metric Learning :)
-# 
