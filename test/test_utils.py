@@ -10,7 +10,8 @@ from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
                                 check_collapsed_pairs, validate_vector,
-                                _check_sdp_from_eigen, _check_n_components)
+                                _check_sdp_from_eigen, _check_n_components,
+                                check_y_valid_values_from_pairs)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
