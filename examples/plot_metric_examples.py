@@ -76,9 +76,9 @@ plot_tsne(X, Y)
 # is based on preserving the original neighborhood of points in the embedding
 # space, but this original neighborhood is based on the euclidean
 # distance in the input space, in which the contribution of the noisy
-# features is high. So even if points from the same class are close to
-# each other in some subspace of the input space, this is not the case in the
-# total input space.
+# features is high. So even if points from the same class are close to each
+# other in some subspace of the input space, this is not the case when
+# considering all dimensions of the input space.
 #
 # Metric Learning
 # ^^^^^^^^^^^^^^^
@@ -89,8 +89,10 @@ plot_tsne(X, Y)
 # distances are a poor way to measure distance, this becomes very useful.
 # 
 # Basically, we learn this distance:
-# :math:`D(x,y)=\sqrt{(x-y)\,M^{-1}(x-y)}`. And we learn this distance by
-# learning a Matrix :math:`M`, based on certain constraints.
+# :math:`D(x,y)=\sqrt{(x-y)\,M^{-1}(x-y)}`. And we learn the parameters
+# :math:`M` of this distance to satisfy certain constraints on the distance
+# between points, for example requiring that points of the same class are
+# close together and points of different class are far away.
 #
 # For more information, check the :ref:`intro_metric_learning` section
 # from the documentation. Some good reading material can also be found
@@ -98,8 +100,9 @@ plot_tsne(X, Y)
 # good literature review of Metric Learning.
 #
 # We will briefly explain the metric-learning algorithms implemented by
-# metric-learn, before providing some examples for it's usage, and also
-# discuss how to go about doing manual constraints.
+# metric-learn, before providing some examples for its usage, and also
+# discuss how to perform metric learning with weaker supervision than class
+# labels.
 #
 # Metric-learn can be easily integrated with your other machine learning
 # pipelines, and follows scikit-learn conventions.
@@ -310,9 +313,11 @@ X_rca = rca.fit_transform(X, Y)
 plot_tsne(X_rca, Y)
 
 ######################################################################
-# Metric Learning for Kernel Regression
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# Regression example: Metric Learning for Kernel Regression
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
+# The previous algorithms took as input a dataset with class labels. Metric
+# learning can also be useful for regression, when the labels are real numbers.
 # An algorithm very similar to NCA but for regression is Metric
 # Learning for Kernel Regression (MLKR). It will optimize for the average
 # leave-one-out *regression* performance from a soft-nearest neighbors
@@ -326,7 +331,7 @@ plot_tsne(X_rca, Y)
 # `sklearn.datasets.make_regression` the same way as we did with the
 # classification  before. The dataset will contain: 100 points of 5 features
 # each, among which 3 are random noise but informative (used to generate the
-# regression target from a linear model, and two are random noise with the
+# regression target from a linear model), and two are random noise with the
 # same magnitude
 
 X_reg, Y_reg = make_regression(n_samples=100, n_informative=3, n_features=5,
@@ -350,42 +355,46 @@ plot_tsne(X_mlkr, Y_reg, plt.cm.Oranges)
 
 
 ######################################################################
-# Constraints
-# ^^^^^^^^^^^
+# Metric Learning from Weaker Supervision
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# To learn the right metric, so far we have always given the labels of the
+# To learn the metric, so far we have always given the labels of the
 # data to supervise the algorithms. However, in many applications,
 # it is easier to obtain information about whether two samples are
 # similar or dissimilar. For instance, when annotating a dataset of face
 # images, it is easier for an annotator to tell if two faces belong to the same
 # person or not, rather than finding the ID of the face among a huge database
 # of every person's faces.
-#
+# Note that for some problems (e.g., in information
+# retrieval where the goal is to rank documents by similarity to a query
+# document), there is no notion of individual label but one can gather
+# information on which pairs of points are similar or dissimilar.
 # Fortunately, one of the strength of metric learning is the ability to
-# deal with such data. Indeed, some of the algorithms we've mentioned have
-# alternate ways to pass some supervision about the metric we want to learn.
-# The way to go is to pass a 3D array `pairs` of pairs, as well as an array
-# of labels `y` such that for each `i` between `0` and `n_pairs`
-# we want `X[i, 0, :]` and `X[i, 1, :]` to be similar if `y[i] == 1`, and we
-# want them to be dissimilar if `y[i] == -1`. In other words, we want to
-# enforce a metric that projects similar points closer together and
-# dissimilar points further away from each other.
-# (See also the section: :ref:`weakly_supervised_section`.)
+# learn from such weaker supervision. Indeed, some of the algorithms we've
+# used above have alternate ways to pass some supervision about the metric
+# we want to learn. The way to go is to pass a 3D array `pairs` of pairs,
+# as well as an array of labels `y` such that for each `i` between `0` and
+# `n_pairs` we want `X[i, 0, :]` and `X[i, 1, :]` to be similar if `y[i] ==
+# 1`, and we want them to be dissimilar if `y[i] == -1`. In other words, we
+# want to enforce a metric that projects similar points closer together and
+# dissimilar points further away from each other. This kind of input is
+# possible for ITML, SDML, and MMC. See :ref:`weakly_supervised_section` for
+# details on other kinds of weak supervision that some algorithms can work
+# with.
 #
-# This kind of input is possible for ITML, SDML, and MMC.
-#
-# We're going to create these constraints through the labels we have, i.e
-# :math:`Y`.
-#
-# This is done internally through metric learn anyway (do check out the
-# `constraints` module!) - but we'll try our own version of this. I'm
-# going to go ahead and assume that two points labelled the same will be
-# closer than two points in different labels.
+# For the purpose of this example, we're going to explicitly create these
+# pairwise constraints through the labels we have, i.e :math:`Y`.
 #
 # Do keep in mind that we are doing this method because we know the labels
 # - we can actually create the constraints any way we want to depending on
 # the data!
-# 
+#
+# Note that this is what metric-learn did under the hood in the previous
+# examples (do check out the
+# `constraints` module!) - but we'll try our own version of this. We're
+# going to go ahead and assume that two points labelled the same will be
+# closer than two points in different labels.
+
 
 def create_constraints(labels):
     import itertools
@@ -433,11 +442,7 @@ print(pairs_labels)
 
 
 ######################################################################
-# Using our constraints, let's now train ITML again. We should keep in
-# mind that internally, ITML\_Supervised does pretty much the same thing
-# we are doing; I was just giving an example to better explain how the
-# constraints are structured.
-# 
+# Using our constraints, let's now train ITML again.
 
 itml = metric_learn.ITML(preprocessor=X)
 itml.fit(pairs, pairs_labels)
@@ -450,9 +455,6 @@ plot_tsne(X_itml, Y)
 ######################################################################
 # And that's the result of ITML after being trained on our manual
 # constraints! A bit different from our old result but not too different.
-# We can also notice that it might be better to rely on the randomised
-# algorithms under the hood to make our constraints if we are not very
-# sure how we want our transformed space to be.
 #
 # RCA and LSML also have their own specific ways of taking in inputs -
 # it's worth one's while to poke around in the constraints.py file to see
@@ -466,9 +468,9 @@ plot_tsne(X_itml, Y)
 # pipeline or cross-validation procedure. And weakly-supervised estimators are
 # also compatible with scikit-learn, since their input dataset format described
 # above allows to be sliced along the first dimension when doing
-# cross-validations (see also this :ref:`section <sklearn_compat_ws>`). See
-# also some :ref:`use cases <use_cases>` where you could use scikit-learn
-# estimators.
+# cross-validations (see also this :ref:`section <sklearn_compat_ws>`). You
+# can also look at some :ref:`use cases <use_cases>` where you could combine
+# metric-learning with scikit-learn estimators.
 
 ########################################################################
 # This brings us to the end of this tutorial! Have fun Metric Learning :)
