@@ -43,15 +43,16 @@ class TestStringRepr(unittest.TestCase):
   def test_itml(self):
     self.assertEqual(remove_spaces(str(metric_learn.ITML())),
                      remove_spaces("""
-ITML(A0='deprecated', convergence_threshold=0.001, gamma=1.0, init='identity',
-   max_iter=1000, preprocessor=None, random_state=None, verbose=False)
+ITML(A0='deprecated', convergence_threshold=0.001, gamma=1.0,
+   max_iter=1000, preprocessor=None, prior='identity', random_state=None, 
+   verbose=False)
 """))
     self.assertEqual(remove_spaces(str(metric_learn.ITML_Supervised())),
                      remove_spaces("""
 ITML_Supervised(A0='deprecated', bounds='deprecated',
-        convergence_threshold=0.001, gamma=1.0, init='identity',
+        convergence_threshold=0.001, gamma=1.0,
         max_iter=1000, num_constraints=None, num_labeled='deprecated',
-        preprocessor=None, random_state=None, verbose=False)
+        preprocessor=None, prior='identity', random_state=None, verbose=False)
 """))
 
   def test_lsml(self):

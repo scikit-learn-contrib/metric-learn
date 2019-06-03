@@ -32,7 +32,7 @@ class _BaseITML(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               init='identity', A0='deprecated', verbose=False,
+               prior='identity', A0='deprecated', verbose=False,
                preprocessor=None, random_state=None):
     """Initialize ITML.
 
@@ -45,10 +45,10 @@ class _BaseITML(MahalanobisMixin):
 
     convergence_threshold : float, optional
 
-    init : string or numpy array, optional (default='identity')
+    prior : string or numpy array, optional (default='identity')
          Initialization of the linear transformation. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For ITML, the init should be strictly
+         (n_features, n_features). For ITML, the prior should be strictly
          positive definite (PD).
 
          'identity'
@@ -58,7 +58,7 @@ class _BaseITML(MahalanobisMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random SPD matrix of shape
+            The prior will be a random SPD matrix of shape
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
@@ -70,7 +70,7 @@ class _BaseITML(MahalanobisMixin):
     A0 : Not used
       .. deprecated:: 0.5.0
          `A0` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0. Use 'init' instead.
+         be removed in 0.6.0. Use 'prior' instead.
 
     verbose : bool, optional
         if True, prints information while learning
@@ -81,13 +81,12 @@ class _BaseITML(MahalanobisMixin):
 
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        transformation.
+        ``prior='random'``, ``random_state`` is used to set the prior.
     """
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
-    self.init = init
+    self.prior = prior
     self.A0 = A0
     self.verbose = verbose
     self.random_state = random_state
@@ -97,7 +96,7 @@ class _BaseITML(MahalanobisMixin):
     if self.A0 != 'deprecated':
       warnings.warn('"A0" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0. Use "init" instead.',
+                    'removed in 0.6.0. Use "prior" instead.',
                     DeprecationWarning)
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
@@ -109,11 +108,11 @@ class _BaseITML(MahalanobisMixin):
       assert len(bounds) == 2
       self.bounds_ = bounds
     self.bounds_[self.bounds_ == 0] = 1e-9
-    # init metric
-    # pairs will be deduplicated into X two times, see how to avoid that
-    A = _initialize_metric_mahalanobis(pairs, self.init, self.random_state,
+    # set the prior
+    # pairs will be deduplicated into X two times, TODO: avoid that
+    A = _initialize_metric_mahalanobis(pairs, self.prior, self.random_state,
                                        strict_pd=True,
-                                       matrix_name='init')
+                                       matrix_name='prior')
 
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
@@ -259,7 +258,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled='deprecated', num_constraints=None,
-               bounds='deprecated', init='identity', A0='deprecated',
+               bounds='deprecated', prior='identity', A0='deprecated',
                verbose=False, preprocessor=None, random_state=None):
     """Initialize the supervised version of `ITML`.
 
@@ -285,10 +284,10 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
           be removed in 0.6.0. Set `bounds` at fit time instead :
           `itml_supervised.fit(X, y, bounds=...)`
 
-    init : string or numpy array, optional (default='identity')
+    prior : string or numpy array, optional (default='identity')
          Initialization of the linear transformation. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For ITML, the init should be strictly
+         (n_features, n_features). For ITML, the prior should be strictly
          positive definite (PD).
 
          'identity'
@@ -298,7 +297,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random SPD matrix of shape
+            The prior will be a random SPD matrix of shape
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
@@ -310,7 +309,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     A0 : Not used
       .. deprecated:: 0.5.0
          `A0` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0. Use 'init' instead.
+         be removed in 0.6.0. Use 'prior' instead.
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
@@ -318,12 +317,11 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
         tuples will be formed like this: X[indices].
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        transformation.
+        ``prior='random'``, ``random_state`` is used to set the prior.
     """
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
-                       A0=A0, init=init, verbose=verbose,
+                       A0=A0, prior=prior, verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
