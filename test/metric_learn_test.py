@@ -118,7 +118,7 @@ class TestITML(MetricTestCase):
     itml_supervised = ITML_Supervised(A0=np.ones_like(X))
     msg = ('"A0" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "init" instead.')
+           'removed in 0.6.0. Use "prior" instead.')
     with pytest.warns(DeprecationWarning) as raised_warning:
       itml_supervised.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
