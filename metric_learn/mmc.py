@@ -75,7 +75,8 @@ class _BaseMMC(MahalanobisMixin):
           be removed in 0.6.0. Use 'init' instead.
     diagonal : bool, optional
         if True, a diagonal metric will be learned,
-        i.e., a simple scaling of dimensions
+        i.e., a simple scaling of dimensions. The initialization will then
+        be the diagonal coefficients of the matrix given as 'init'.
     diagonal_c : float, optional
         weight of the dissimilarity constraint for diagonal
         metric learning
