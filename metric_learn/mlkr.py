@@ -14,13 +14,10 @@ import time
 import sys
 import warnings
 import numpy as np
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.fixes import logsumexp
 from scipy.optimize import minimize
-from scipy.spatial.distance import pdist, squareform
 from sklearn.base import TransformerMixin
-from sklearn.decomposition import PCA
-
 
 from sklearn.metrics import pairwise_distances
 from .base_metric import MahalanobisMixin
@@ -141,6 +138,13 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       m = self.num_dims
       if m is None:
           m = d
+      # if the init is the default (identity), we raise a warning just in case
+      if self.init == 'auto':
+        msg = ("Warning, as of version 0.5.0, the default init is now "
+               "'auto', instead of 'pca'. If you still want to use "
+               "PCA as an init, set 'init'=='pca'. This warning will "
+               "disappear in v0.6.0.")
+        warnings.warn(msg, ChangedBehaviorWarning)
       A = _initialize_transformer(m, X, y, init=self.init,
                                   random_state=self.random_state,
                                   # MLKR works on regression targets:

@@ -9,7 +9,7 @@ from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from sklearn.utils.testing import assert_warns_message
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.validation import check_X_y
 try:
   from inverse_covariance import quic
@@ -19,7 +19,7 @@ else:
   HAS_SKGGM = True
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
-                          RCA_Supervised, MMC_Supervised, SDML, ITML)
+                          RCA_Supervised, MMC_Supervised, SDML, ITML, LSML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN
@@ -74,6 +74,29 @@ class TestLSML(MetricTestCase):
            ' It has been deprecated in version 0.5.0 and will be'
            'removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, lsml_supervised.fit, X, y)
+
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    lsml_supervised = LSML_Supervised()
+    msg = ("Warning, as of version 0.5.0, the default prior is now "
+           "'identity', instead of 'covariance'. If you still want to use "
+           "the inverse of the covariance matrix as a prior, "
+           "set 'prior'=='covariance'. This warning will disappear in "
+           "v0.6.0.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      lsml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.], [-5., 3.], [5., 0.]],
+                      [[0., 50.], [0., -60], [-10., 0.], [10., 0.]]])
+    lsml = LSML()
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      lsml.fit(pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 class TestITML(MetricTestCase):
@@ -370,6 +393,31 @@ class TestSDML(MetricTestCase):
       sdml.fit(pairs, y_pairs)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used (except for the balance_param that we need
+    # to set for the algorithm to not diverge)
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    sdml_supervised = SDML_Supervised(balance_param=1e-5)
+    msg = ("Warning, as of version 0.5.0, the default prior is now "
+           "'identity', instead of 'covariance'. If you still want to use "
+           "the inverse of the covariance matrix as a prior, "
+           "set 'prior'=='covariance' (it was the default in previous "
+           "versions since there was 'use_cov'==True). "
+           "This warning will disappear in v0.6.0.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      sdml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    sdml = SDML(balance_param=1e-5)
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      sdml.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 @pytest.mark.skipif(not HAS_SKGGM,
                     reason='The message should be printed only if skggm is '
@@ -533,6 +581,22 @@ class TestNCA(MetricTestCase):
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
 
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    nca = NCA()
+    msg = ("Warning, as of version 0.5.0, the default init is now "
+           "'auto', instead of the previous scaling matrix. If you still "
+           "want to use the same scaling matrix as before as an init, "
+           "set 'init'==np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min("
+           "axis=0), EPS))). This warning will disappear in v0.6.0.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      nca.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 class TestLFDA(MetricTestCase):
   def test_iris(self):
@@ -614,6 +678,21 @@ class TestMLKR(MetricTestCase):
       mlkr.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([0.1, 0.2, 0.3, 0.4])
+    mlkr = MLKR()
+    msg = ("Warning, as of version 0.5.0, the default init is now "
+           "'auto', instead of 'pca'. If you still want to use "
+           "PCA as an init, set 'init'=='pca'. This warning will "
+           "disappear in v0.6.0.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      mlkr.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 class TestMMC(MetricTestCase):
   def test_iris(self):
@@ -684,6 +763,30 @@ class TestMMC(MetricTestCase):
     y_pairs = [1, -1]
     mmc = MMC(A0=np.ones_like(X))
     with pytest.warns(DeprecationWarning) as raised_warning:
+      mmc.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mmc_supervised = MMC_Supervised()
+    msg = ("Warning, as of version 0.5.0, the default prior is now "
+           "'identity', instead of the identity divided by a scaling factor "
+           "of 10. If you still want to use the same init as in previous "
+           "versions, set 'init' == np.eye(d)/10, where d is the dimension "
+           "of your input space (d=pairs.shape[1]). "
+           "This warning will disappear in v0.6.0.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      mmc_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    mmc = MMC()
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
       mmc.fit(pairs, y_pairs)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 

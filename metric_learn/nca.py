@@ -19,7 +19,7 @@ import sys
 import numpy as np
 from scipy.optimize import minimize
 from sklearn.metrics import pairwise_distances
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
@@ -128,7 +128,15 @@ class NCA(MahalanobisMixin, TransformerMixin):
     # Measure the total training time
     train_time = time.time()
 
-    # Initialize A to a scaling matrix
+    # Initialize A
+    # if the init is the default (auto), we raise a warning just in case
+    if self.init == 'auto':
+      msg = ("Warning, as of version 0.5.0, the default init is now "
+             "'auto', instead of the previous scaling matrix. If you still "
+             "want to use the same scaling matrix as before as an init, "
+             "set 'init'==np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min("
+             "axis=0), EPS))). This warning will disappear in v0.6.0.")
+      warnings.warn(msg, ChangedBehaviorWarning)
     A = _initialize_transformer(num_dims, X, labels, self.init, self.verbose)
 
     # Run NCA

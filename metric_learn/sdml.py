@@ -18,7 +18,7 @@ import numpy as np
 from sklearn.base import TransformerMixin
 from scipy.linalg import pinvh
 from sklearn.covariance import graphical_lasso
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
@@ -109,6 +109,15 @@ class _BaseSDML(MahalanobisMixin):
                                     type_of_inputs='tuples')
 
     # set up (the inverse of) the prior M
+    # if the prior is the default (identity), we raise a warning just in case
+    if self.prior == 'identity':
+      msg = ("Warning, as of version 0.5.0, the default prior is now "
+             "'identity', instead of 'covariance'. If you still want to use "
+             "the inverse of the covariance matrix as a prior, "
+             "set 'prior'=='covariance' (it was the default in previous "
+             "versions since there was 'use_cov'==True). "
+             "This warning will disappear in v0.6.0.")
+      warnings.warn(msg, ChangedBehaviorWarning)
     _, prior_inv = _initialize_metric_mahalanobis(pairs, self.prior,
                                                   return_inverse=True,
                                                   strict_pd=True,

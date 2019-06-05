@@ -21,7 +21,8 @@ import warnings
 import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_array, assert_all_finite
+from sklearn.utils.validation import assert_all_finite
+from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
@@ -109,6 +110,14 @@ class _BaseMMC(MahalanobisMixin):
                     DeprecationWarning)
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
+
+    msg = ("Warning, as of version 0.5.0, the default prior is now "
+           "'identity', instead of the identity divided by a scaling factor "
+           "of 10. If you still want to use the same init as in previous "
+           "versions, set 'init' == np.eye(d)/10, where d is the dimension "
+           "of your input space (d=pairs.shape[1]). "
+           "This warning will disappear in v0.6.0.")
+    warnings.warn(msg, ChangedBehaviorWarning)
 
     self.A_ = _initialize_metric_mahalanobis(pairs, self.init,
                                              random_state=self.random_state,
