@@ -39,7 +39,7 @@ np.random.seed(42)
 #   - 5 features, among which 3 are informative (correlated with the class
 #     labels) and two are random noise with large magnitude
 
-X, Y = make_classification(n_samples=100, n_classes=3, n_clusters_per_class=2,
+X, y = make_classification(n_samples=100, n_classes=3, n_clusters_per_class=2,
                            n_informative=3, class_sep=4., n_features=5,
                            n_redundant=0, shuffle=True,
                            scale=[1, 1, 20, 20, 20])
@@ -50,7 +50,7 @@ X, Y = make_classification(n_samples=100, n_classes=3, n_clusters_per_class=2,
 # `sklearn.manifold.TSNE`).
 
 
-def plot_tsne(X, Y, colormap=plt.cm.Paired):
+def plot_tsne(X, y, colormap=plt.cm.Paired):
     plt.figure(figsize=(8, 6))
 
     # clean the figure
@@ -58,7 +58,7 @@ def plot_tsne(X, Y, colormap=plt.cm.Paired):
 
     tsne = TSNE()
     X_embedded = tsne.fit_transform(X)
-    plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=Y, cmap=colormap)
+    plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=y, cmap=colormap)
 
     plt.xticks(())
     plt.yticks(())
@@ -69,7 +69,7 @@ def plot_tsne(X, Y, colormap=plt.cm.Paired):
 # Let's now plot the dataset as is.
 
 
-plot_tsne(X, Y)
+plot_tsne(X, y)
 
 #########################################################################
 # We can see that the classes appear mixed up: this is because t-sne
@@ -84,12 +84,13 @@ plot_tsne(X, Y)
 # ^^^^^^^^^^^^^^^
 #
 # Why is Metric Learning useful? We can, with prior knowledge of which
-# points are supposed to be closer, figure out a better way to understand
-# distances between points. Especially in higher dimensions when Euclidean
-# distances are a poor way to measure distance, this becomes very useful.
+# points are supposed to be closer, figure out a better way to compute
+# distances between points for the task at hand. Especially in higher
+# dimensions when Euclidean distances are a poor way to measure distance, this
+# becomes very useful.
 # 
 # Basically, we learn this distance:
-# :math:`D(x,y)=\sqrt{(x-y)\,M^{-1}(x-y)}`. And we learn the parameters
+# :math:`D(x, x') = \sqrt{(x-x')^\top M(x-x')}`. And we learn the parameters
 # :math:`M` of this distance to satisfy certain constraints on the distance
 # between points, for example requiring that points of the same class are
 # close together and points of different class are far away.
@@ -99,7 +100,7 @@ plot_tsne(X, Y)
 # `here <https://arxiv.org/pdf/1306.6709.pdf>`__. It serves as a
 # good literature review of Metric Learning.
 #
-# We will briefly explain the metric-learning algorithms implemented by
+# We will briefly explain the metric learning algorithms implemented by
 # metric-learn, before providing some examples for its usage, and also
 # discuss how to perform metric learning with weaker supervision than class
 # labels.
@@ -141,7 +142,7 @@ plot_tsne(X, Y)
 lmnn = metric_learn.LMNN(k=5, learn_rate=1e-6)
 
 # fit the data!
-lmnn.fit(X, Y)
+lmnn.fit(X, y)
 
 # transform our input space
 X_lmnn = lmnn.transform(X)
@@ -156,7 +157,7 @@ X_lmnn = lmnn.transform(X)
 # space looks like after being transformed with the new learned metric.
 #
 
-plot_tsne(X_lmnn, Y)
+plot_tsne(X_lmnn, y)
 
 
 ######################################################################
@@ -183,9 +184,9 @@ plot_tsne(X_lmnn, Y)
 #   <metric_learn.itml.ITML>`
 
 itml = metric_learn.ITML_Supervised()
-X_itml = itml.fit_transform(X, Y)
+X_itml = itml.fit_transform(X, y)
 
-plot_tsne(X_itml, Y)
+plot_tsne(X_itml, y)
 
 
 ######################################################################
@@ -202,16 +203,16 @@ plot_tsne(X_itml, Y)
 #   <metric_learn.mmc.MMC>`
 
 itml = metric_learn.ITML_Supervised()
-X_itml = itml.fit_transform(X, Y)
+X_itml = itml.fit_transform(X, y)
 
-plot_tsne(X_itml, Y)
+plot_tsne(X_itml, y)
 
 ######################################################################
 # Sparse Determinant Metric Learning
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # Implements an efficient sparse metric learning algorithm in high
-# dimensional space via an :math:`l_1`-penalised log-determinant
+# dimensional space via an :math:`l_1`-penalized log-determinant
 # regularization. Compared to the most existing distance metric learning
 # algorithms, the algorithm exploits the sparsity nature underlying the
 # intrinsic high dimensional feature space.
@@ -221,9 +222,9 @@ plot_tsne(X_itml, Y)
 #   <metric_learn.sdml.SDML>`
 
 sdml = metric_learn.SDML_Supervised(sparsity_param=0.1, balance_param=0.0015)
-X_sdml = sdml.fit_transform(X, Y)
+X_sdml = sdml.fit_transform(X, y)
 
-plot_tsne(X_sdml, Y)
+plot_tsne(X_sdml, y)
 
 
 ######################################################################
@@ -240,18 +241,18 @@ plot_tsne(X_sdml, Y)
 #   <metric_learn.lsml.LSML>`
 
 lsml = metric_learn.LSML_Supervised(tol=0.0001, max_iter=10000)
-X_lsml = lsml.fit_transform(X, Y)
+X_lsml = lsml.fit_transform(X, y)
 
-plot_tsne(X_lsml, Y)
+plot_tsne(X_lsml, y)
 
 
 ######################################################################
 # Neighborhood Components Analysis
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
-# NCA is an extremly popular metric-learning algorithm.
+# NCA is an extremly popular metric learning algorithm.
 #
-# Neighbourhood components analysis aims at "learning" a distance metric
+# Neighborhood components analysis aims at "learning" a distance metric
 # by finding a linear transformation of input data such that the average
 # leave-one-out (LOO) classification performance of a soft-nearest
 # neighbors rule is maximized in the transformed space. The key insight to
@@ -267,12 +268,12 @@ plot_tsne(X_lsml, Y)
 #   <metric_learn.nca.NCA>`
 
 nca = metric_learn.NCA(max_iter=1000)
-X_nca = nca.fit_transform(X, Y)
+X_nca = nca.fit_transform(X, y)
 
-plot_tsne(X_nca, Y)
+plot_tsne(X_nca, y)
 
 ######################################################################
-# Local Fischer Discriminant Analysis
+# Local Fisher Discriminant Analysis
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # 
 # LFDA is a linear supervised dimensionality reduction method. It is
@@ -287,9 +288,9 @@ plot_tsne(X_nca, Y)
 #   <metric_learn.lfda.LFDA>`
 
 lfda = metric_learn.LFDA(k=2, num_dims=2)
-X_lfda = lfda.fit_transform(X, Y)
+X_lfda = lfda.fit_transform(X, y)
 
-plot_tsne(X_lfda, Y)
+plot_tsne(X_lfda, y)
 
 
 ######################################################################
@@ -308,9 +309,9 @@ plot_tsne(X_lfda, Y)
 #   <metric_learn.rca.RCA>`
 
 rca = metric_learn.RCA_Supervised(num_chunks=30, chunk_size=2)
-X_rca = rca.fit_transform(X, Y)
+X_rca = rca.fit_transform(X, y)
 
-plot_tsne(X_rca, Y)
+plot_tsne(X_rca, y)
 
 ######################################################################
 # Regression example: Metric Learning for Kernel Regression
@@ -330,27 +331,27 @@ plot_tsne(X_rca, Y)
 # To illustrate MLKR, let's use the dataset
 # `sklearn.datasets.make_regression` the same way as we did with the
 # classification  before. The dataset will contain: 100 points of 5 features
-# each, among which 3 are random noise but informative (used to generate the
+# each, among which 3 are informative (i.e., used to generate the
 # regression target from a linear model), and two are random noise with the
-# same magnitude
+# same magnitude.
 
-X_reg, Y_reg = make_regression(n_samples=100, n_informative=3, n_features=5,
+X_reg, y_reg = make_regression(n_samples=100, n_informative=3, n_features=5,
                                shuffle=True)
 
 ######################################################################
 # Let's plot the dataset as is
 
-plot_tsne(X_reg, Y_reg, plt.cm.Oranges)
+plot_tsne(X_reg, y_reg, plt.cm.Oranges)
 
 ######################################################################
 # And let's plot the dataset after transformation by MLKR:
 mlkr = metric_learn.MLKR()
-X_mlkr = mlkr.fit_transform(X_reg, Y_reg)
-plot_tsne(X_mlkr, Y_reg, plt.cm.Oranges)
+X_mlkr = mlkr.fit_transform(X_reg, y_reg)
+plot_tsne(X_mlkr, y_reg, plt.cm.Oranges)
 
 ######################################################################
 # Points that have the same value to regress are now closer to each
-# other ! This could improve the performance of
+# other ! This would improve the performance of
 # `sklearn.neighbors.KNeighborsRegressor` for instance.
 
 
@@ -372,10 +373,11 @@ plot_tsne(X_mlkr, Y_reg, plt.cm.Oranges)
 # Fortunately, one of the strength of metric learning is the ability to
 # learn from such weaker supervision. Indeed, some of the algorithms we've
 # used above have alternate ways to pass some supervision about the metric
-# we want to learn. The way to go is to pass a 3D array `pairs` of pairs,
-# as well as an array of labels `y` such that for each `i` between `0` and
-# `n_pairs` we want `X[i, 0, :]` and `X[i, 1, :]` to be similar if `y[i] ==
-# 1`, and we want them to be dissimilar if `y[i] == -1`. In other words, we
+# we want to learn. The way to go is to pass a 2D array `pairs` of pairs,
+# as well as an array of labels `pairs_labels` such that for each `i` between
+# `0` and `n_pairs` we want `X[pairs[i, 0], :]` and `X[pairs[i, 1], :]` to be
+# similar if `pairs_labels[i] == 1`, and we want them to be dissimilar if
+# `pairs_labels[i] == -1`. In other words, we
 # want to enforce a metric that projects similar points closer together and
 # dissimilar points further away from each other. This kind of input is
 # possible for ITML, SDML, and MMC. See :ref:`weakly_supervised_section` for
@@ -383,8 +385,7 @@ plot_tsne(X_mlkr, Y_reg, plt.cm.Oranges)
 # with.
 #
 # For the purpose of this example, we're going to explicitly create these
-# pairwise constraints through the labels we have, i.e :math:`Y`.
-#
+# pairwise constraints through the labels we have, i.e. `y`.
 # Do keep in mind that we are doing this method because we know the labels
 # - we can actually create the constraints any way we want to depending on
 # the data!
@@ -392,7 +393,7 @@ plot_tsne(X_mlkr, Y_reg, plt.cm.Oranges)
 # Note that this is what metric-learn did under the hood in the previous
 # examples (do check out the
 # `constraints` module!) - but we'll try our own version of this. We're
-# going to go ahead and assume that two points labelled the same will be
+# going to go ahead and assume that two points labeled the same will be
 # closer than two points in different labels.
 
 
@@ -401,9 +402,9 @@ def create_constraints(labels):
     import random
     
     # aggregate indices of same class
-    zeros = np.where(Y==0)[0]
-    ones = np.where(Y==1)[0]
-    twos = np.where(Y==2)[0]
+    zeros = np.where(y == 0)[0]
+    ones = np.where(y == 1)[0]
+    twos = np.where(y == 2)[0]
     # make permutations of all those points in the same class
     zeros_ = list(itertools.combinations(zeros, 2))
     ones_ = list(itertools.combinations(ones, 2))
@@ -427,10 +428,10 @@ def create_constraints(labels):
     
     # return an array of pairs of indices of shape=(2*len(sim), 2), and the corresponding labels, array of shape=(2*len(sim))
     # Each pair of similar points have a label of +1 and each pair of dissimilar points have a label of -1
-    return (np.vstack([np.column_stack([sim[:,0], sim[:,1]]), np.column_stack([dis[:,0], dis[:,1]])]),
+    return (np.vstack([np.column_stack([sim[:, 0], sim[:, 1]]), np.column_stack([dis[:, 0], dis[:, 1]])]),
             np.concatenate([np.ones(len(sim)), -np.ones(len(sim))]))
 
-pairs, pairs_labels = create_constraints(Y)
+pairs, pairs_labels = create_constraints(y)
 
 
 ######################################################################
@@ -442,19 +443,27 @@ print(pairs_labels)
 
 
 ######################################################################
-# Using our constraints, let's now train ITML again.
+# Using our constraints, let's now train ITML again. Note that we are no
+# longer calling the supervised class :py:class:`ITML_Supervised
+# <metric_learn.itml.ITML_Supervised>` but the more generic
+# (weakly-supervised) :py:class:`ITML <metric_learn.itml.ITML>`, which
+# takes the dataset `X` through the `preprocessor` argument (see
+# :ref:`this section  <preprocessor_section>` of the documentation to learn
+# about more advanced uses of `preprocessor`) and the pair information `pairs`
+# and `pairs_labels` in the fit method.
 
 itml = metric_learn.ITML(preprocessor=X)
 itml.fit(pairs, pairs_labels)
 
 X_itml = itml.transform(X)
 
-plot_tsne(X_itml, Y)
+plot_tsne(X_itml, y)
 
 
 ######################################################################
-# And that's the result of ITML after being trained on our manual
-# constraints! A bit different from our old result but not too different.
+# And that's the result of ITML after being trained on our manually
+# constructed constraints! A bit different from our old result, but not too
+# different.
 #
 # RCA and LSML also have their own specific ways of taking in inputs -
 # it's worth one's while to poke around in the constraints.py file to see
@@ -470,7 +479,7 @@ plot_tsne(X_itml, Y)
 # above allows to be sliced along the first dimension when doing
 # cross-validations (see also this :ref:`section <sklearn_compat_ws>`). You
 # can also look at some :ref:`use cases <use_cases>` where you could combine
-# metric-learning with scikit-learn estimators.
+# metric-learn with scikit-learn estimators.
 
 ########################################################################
 # This brings us to the end of this tutorial! Have fun Metric Learning :)
