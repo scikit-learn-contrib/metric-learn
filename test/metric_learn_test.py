@@ -7,7 +7,8 @@ from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
-from numpy.testing import assert_array_almost_equal, assert_array_equal
+from numpy.testing import (assert_array_almost_equal, assert_array_equal,
+                           assert_allclose)
 from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.validation import check_X_y
@@ -53,6 +54,23 @@ class TestCovariance(MetricTestCase):
     csep = class_separation(cov.transform(self.iris_points), self.iris_labels)
     # deterministic result
     self.assertAlmostEqual(csep, 0.72981476)
+
+  def test_singular_returns_pseudo_inverse(self):
+    """Checks that if the input covariance matrix is singular, we return
+    the pseudo inverse"""
+    X, y = load_iris(return_X_y=True)
+    # We add a virtual column that is a linear combination of the other
+    # columns so that the covariance matrix will be singular
+    X = np.concatenate([X, X[:, :2].dot([[2], [3]])], axis=1)
+    cov_matrix = np.cov(X, rowvar=False)
+    covariance = Covariance()
+    covariance.fit(X)
+    pseudo_inverse = covariance.get_mahalanobis_matrix()
+    # here is the definition of a pseudo inverse according to wikipedia:
+    assert_allclose(cov_matrix.dot(pseudo_inverse).dot(cov_matrix),
+                    cov_matrix)
+    assert_allclose(pseudo_inverse.dot(cov_matrix).dot(pseudo_inverse),
+                    pseudo_inverse)
 
 
 class TestLSML(MetricTestCase):
