@@ -105,7 +105,11 @@ class _BaseITML(MahalanobisMixin):
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
       self.bounds_ = np.percentile(pairwise_distances(X), (5, 95))
     else:
-      assert len(bounds) == 2
+      bounds = check_array(bounds, allow_nd=False, ensure_min_samples=0,
+                           ensure_2d=False)
+      bounds = bounds.ravel()
+      if bounds.size != 2:
+        raise ValueError("`bounds` should be an array-like of two elements.")
       self.bounds_ = bounds
     self.bounds_[self.bounds_ == 0] = 1e-9
     # set the prior
@@ -113,7 +117,6 @@ class _BaseITML(MahalanobisMixin):
     A = _initialize_metric_mahalanobis(pairs, self.prior, self.random_state,
                                        strict_pd=True,
                                        matrix_name='prior')
-
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
     num_pos = len(pos_pairs)
@@ -171,7 +174,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
   Attributes
   ----------
-  bounds_ : array-like, shape=(2,)
+  bounds_ : `numpy.ndarray`, shape=(2,)
       Bounds on similarity, aside slack variables, s.t.
       ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
       and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
@@ -208,7 +211,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
         preprocessor.
     y: array-like, of shape (n_constraints,)
         Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
-    bounds : `list` of two numbers
+    bounds : array-like of two numbers
         Bounds on similarity, aside slack variables, s.t.
         ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
         and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
@@ -229,7 +232,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
     calibration_params = (calibration_params if calibration_params is not
                           None else dict())
     self._validate_calibration_params(**calibration_params)
-    self._fit(pairs, y)
+    self._fit(pairs, y, bounds=bounds)
     self.calibrate_threshold(pairs, y, **calibration_params)
     return self
 
@@ -239,7 +242,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   Attributes
   ----------
-  bounds_ : array-like, shape=(2,)
+  bounds_ : `numpy.ndarray`, shape=(2,)
       Bounds on similarity, aside slack variables, s.t.
       ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
       and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
@@ -342,7 +345,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     random_state : numpy.random.RandomState, optional
         If provided, controls random number generation.
 
-    bounds : `list` of two numbers
+    bounds : array-like of two numbers
         Bounds on similarity, aside slack variables, s.t.
         ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
         and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
