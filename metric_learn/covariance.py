@@ -10,11 +10,11 @@ On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
 from __future__ import absolute_import
 import numpy as np
+import scipy
 from sklearn.base import TransformerMixin
 
 from .base_metric import MahalanobisMixin
 from ._util import transformer_from_metric
-import scipy
 
 
 class Covariance(MahalanobisMixin, TransformerMixin):
