@@ -422,16 +422,20 @@ class TestSDML(MetricTestCase):
                              "that no warning should be thrown.")
   def test_raises_no_warning_installed_skggm(self):
     # otherwise we should be able to instantiate and fit SDML and it
-    # should raise no error
+    # should raise no error and no ConvergenceWarning
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
     y_pairs = [1, -1]
     X, y = make_classification(random_state=42)
-    with pytest.warns(None) as record:
+    with pytest.warns(None) as records:
       sdml = SDML(prior='covariance')
       sdml.fit(pairs, y_pairs)
-    assert len(record) == 0
-    sdml = SDML_Supervised(prior='identity', balance_param=1e-5)
-    sdml.fit(X, y)
+    for record in records:
+      assert record.category is not ConvergenceWarning
+    with pytest.warns(None) as records:
+      sdml_supervised = SDML_Supervised(prior='identity', balance_param=1e-5)
+      sdml_supervised.fit(X, y)
+    for record in records:
+      assert record.category is not ConvergenceWarning
 
   def test_iris(self):
     # Note: this is a flaky test, which fails for certain seeds.
