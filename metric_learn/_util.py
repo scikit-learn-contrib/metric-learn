@@ -556,7 +556,7 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
     if init == 'auto':
       if has_classes:
         n_classes = len(np.unique(y))
-      if (has_classes and num_dims <= min(n_features, n_classes - 1)):
+      if has_classes and num_dims <= min(n_features, n_classes - 1):
         init = 'lda'
       elif num_dims < min(n_features, n_samples):
         init = 'pca'
@@ -655,7 +655,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
     init = check_array(init, copy=True)
 
     # Assert that init.shape[1] = n_features
-    if (init.shape) != (n_features,) * 2:
+    if init.shape != (n_features,) * 2:
       raise ValueError('The input dimensionality {} of the given '
                        'mahalanobis matrix `{}` must match the '
                        'dimensionality of the given inputs ({}).'
