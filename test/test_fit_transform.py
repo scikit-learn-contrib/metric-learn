@@ -96,9 +96,7 @@ class TestFitTransform(unittest.TestCase):
     res_2 = lfda.fit_transform(self.X, self.y)
 
     # signs may be flipped, that's okay
-    if np.sign(res_1[0,0]) != np.sign(res_2[0,0]):
-        res_2 *= -1
-    assert_array_almost_equal(res_1, res_2)
+    assert_array_almost_equal(abs(res_1), abs(res_2))
 
   def test_rca_supervised(self):
     seed = np.random.RandomState(1234)
