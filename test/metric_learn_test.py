@@ -379,7 +379,7 @@ class TestSDML(MetricTestCase):
                              "installed.")
   def test_sdml_raises_warning_msg_installed_skggm(self):
     """Tests that the right warning message is raised if someone tries to
-    use SDML but has not installed skggm, and that the algorithm fails to
+    use SDML and has installed skggm, and that the algorithm fails to
     converge"""
     # TODO: remove if we don't need skggm anymore
     # case on which we know that skggm's graphical lasso fails
@@ -422,7 +422,7 @@ class TestSDML(MetricTestCase):
                              "that no warning should be thrown.")
   def test_raises_no_warning_installed_skggm(self):
     # otherwise we should be able to instantiate and fit SDML and it
-    # should raise no warning
+    # should raise no error
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
     y_pairs = [1, -1]
     X, y = make_classification(random_state=42)
@@ -430,10 +430,8 @@ class TestSDML(MetricTestCase):
       sdml = SDML(prior='covariance')
       sdml.fit(pairs, y_pairs)
     assert len(record) == 0
-    with pytest.warns(None) as record:
-      sdml = SDML_Supervised(prior='identity', balance_param=1e-5)
-      sdml.fit(X, y)
-    assert len(record) == 0
+    sdml = SDML_Supervised(prior='identity', balance_param=1e-5)
+    sdml.fit(X, y)
 
   def test_iris(self):
     # Note: this is a flaky test, which fails for certain seeds.
