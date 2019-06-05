@@ -27,16 +27,18 @@ class TestStringRepr(unittest.TestCase):
       r"regularization=0.5, use_pca=True, verbose=False\)")
 
   def test_nca(self):
-    self.assertEqual(str(metric_learn.NCA()),
-                     "NCA(max_iter=100, n_components=None, "
-                     "num_dims='deprecated', preprocessor=None, "
-                     "tol=None, verbose=False)")
+    self.assertEqual(remove_spaces(str(metric_learn.NCA())),
+                     remove_spaces(
+                       "NCA(max_iter=100, n_components=None, "
+                       "num_dims='deprecated', preprocessor=None, "
+                       "tol=None, verbose=False)"))
 
   def test_lfda(self):
-    self.assertEqual(str(metric_learn.LFDA()),
-                     "LFDA(embedding_type='weighted', k=None, "
-                     "n_components=None, num_dims='deprecated',"
-                     "preprocessor=None)")
+    self.assertEqual(remove_spaces(str(metric_learn.LFDA())),
+                     remove_spaces(
+                       "LFDA(embedding_type='weighted', k=None, "
+                       "n_components=None, num_dims='deprecated',"
+                       "preprocessor=None)"))
 
   def test_itml(self):
     self.assertEqual(remove_spaces(str(metric_learn.ITML())),

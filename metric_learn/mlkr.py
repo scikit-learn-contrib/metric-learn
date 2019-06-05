@@ -23,6 +23,8 @@ from sklearn.decomposition import PCA
 
 
 from sklearn.metrics import pairwise_distances
+
+from metric_learn._util import _check_n_components
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -102,6 +104,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
                            % (n, y.shape[0]))
 
       A = self.A0
+      m = _check_n_components(d, self.n_components)
       m = self.n_components
       if m is None:
           m = d
