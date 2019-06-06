@@ -686,7 +686,7 @@ class TestRCA(MetricTestCase):
     msg = ("RCA will no longer be trained on a preprocessed version "
            "of the input as before. If you want to do some "
            "preprocessing, you should do it manually (you can also use "
-           "an sklearn.pipeline.Pipeline for instance). This warning "
+           "an `sklearn.pipeline.Pipeline` for instance). This warning "
            "will disappear in version 0.6.0.")
 
     X, y = make_classification(random_state=42, n_samples=100)
