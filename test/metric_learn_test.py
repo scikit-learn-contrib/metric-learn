@@ -553,8 +553,7 @@ class TestSDML(MetricTestCase):
     msg = ("Warning, as of version 0.5.0, the default prior is now "
            "'identity', instead of 'covariance'. If you still want to use "
            "the inverse of the covariance matrix as a prior, "
-           "set 'prior'=='covariance' (it was the default in previous "
-           "versions since there was 'use_cov'==True). "
+           "set 'prior'=='covariance'. "
            "This warning will disappear in v0.6.0.")
     with pytest.warns(ChangedBehaviorWarning) as raised_warning:
       sdml_supervised.fit(X, y)
