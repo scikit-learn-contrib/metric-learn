@@ -700,6 +700,23 @@ class TestRCA(MetricTestCase):
       rca.fit(X, y)
     assert str(expected_msg[0].message) == msg
 
+  def test_rank_deficient_returns_warning(self):
+    """Checks that if the covariance matrix is not invertible, we raise a
+    warning message advising to use PCA"""
+    X, y = load_iris(return_X_y=True)
+    # we make the fourth column a linear combination of the two first,
+    # so that the covariance matrix will not be invertible:
+    X[:, 3] = X[:, 0] + 3 * X[:, 1]
+    rca = RCA()
+    msg = ('The inner covariance matrix is not invertible, '
+           'so the transformation matrix may contain Nan values. '
+           'You should reduce the dimensionality of your input,'
+           'for instance using `sklearn.decomposition.PCA` as a '
+           'preprocessing step.')
+    with pytest.warns(None) as raised_warnings:
+      rca.fit(X, y)
+    assert any(str(w.message) == msg for w in raised_warnings)
+
 
 class TestMLKR(MetricTestCase):
   def test_iris(self):
