@@ -74,7 +74,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
       warnings.warn('The inner covariance matrix is not invertible, '
                     'so the transformation matrix may contain Nan values. '
                     'You should reduce the dimensionality of your input,'
-                    'for instance using sklearn.decomposition.PCA as a '
+                    'for instance using `sklearn.decomposition.PCA` as a '
                     'preprocessing step.')
 
     if self.num_dims is None:
@@ -110,7 +110,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
     warnings.warn("RCA will no longer be trained on a preprocessed version "
                   "of the input as before. If you want to do some "
                   "preprocessing, you should do it manually (you can also use "
-                  "an sklearn.pipeline.Pipeline for instance). This warning "
+                  "an `sklearn.pipeline.Pipeline` for instance). This warning "
                   "will disappear in version 0.6.0.",
                   ChangedBehaviorWarning)
 
