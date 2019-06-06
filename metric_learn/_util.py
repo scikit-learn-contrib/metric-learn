@@ -540,18 +540,15 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
                        '`init` ({})!'
                        .format(num_dims,
                                init.shape[0]))
-  elif init in authorized_inits:
-    pass
-  else:
+  elif init not in authorized_inits:
     raise ValueError(
         "`init` must be '{}' "
         "or a numpy array of shape (num_dims, n_features)."
         .format("', '".join(authorized_inits)))
 
   random_state = check_random_state(random_state)
-  transformation = init
   if isinstance(init, np.ndarray):
-    pass
+    return init
   else:
     n_samples = input.shape[0]
     if init == 'auto':
@@ -564,10 +561,9 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
       else:
         init = 'identity'
     if init == 'identity':
-      transformation = np.eye(num_dims, input.shape[-1])
+      return np.eye(num_dims, input.shape[-1])
     elif init == 'random':
-      transformation = random_state.randn(num_dims,
-                                          input.shape[-1])
+      return random_state.randn(num_dims, input.shape[-1])
     elif init in {'pca', 'lda'}:
       init_time = time.time()
       if init == 'pca':
@@ -587,7 +583,7 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
         transformation = lda.scalings_.T[:num_dims]
       if verbose:
         print('done in {:5.2f}s'.format(time.time() - init_time))
-  return transformation
+      return transformation
 
 
 def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
@@ -666,9 +662,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
     if not np.allclose(init, init.T):
       raise ValueError("`{}` is not symmetric.".format(matrix_name))
 
-  elif init in ['identity', 'covariance', 'random']:
-    pass
-  else:
+  elif init not in ['identity', 'covariance', 'random']:
     raise ValueError(
         "`{}` must be 'identity', 'covariance', 'random' "
         "or a numpy array of shape (n_features, n_features)."
@@ -687,11 +681,17 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                         .format(*((matrix_name,) * 3)))
     if return_inverse:
       M_inv = np.dot(u / s, u.T)
+      return M, M_inv
+    else:
+      return M
   else:
     if init == 'identity':
       M = np.eye(n_features, n_features)
       if return_inverse:
         M_inv = M.copy()
+        return M, M_inv
+      else:
+        return M
     if init == 'covariance':
       if input.ndim == 3:
         # if the input are tuples, we need to form an X by deduplication
@@ -709,6 +709,10 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                           "require the `{}` to be strictly positive definite."
                           .format(*((matrix_name,) * 2)))
       M = np.dot(u / s, u.T)
+      if return_inverse:
+        return M, M_inv
+      else:
+        return M
     elif init == 'random':
       # we need to create a random symmetric matrix
       M = make_spd_matrix(n_features, random_state=random_state)
@@ -718,7 +722,6 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
         # np.linalg.inv returns not symmetric inverses of symmetric matrices)
         # TODO: there might be a more efficient method to do so
         M_inv = pinvh(M)
-  if return_inverse:
-    return (M, M_inv)
-  else:
-    return M
+        return M, M_inv
+      else:
+        return M
