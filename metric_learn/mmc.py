@@ -45,7 +45,7 @@ class _BaseMMC(MahalanobisMixin):
     max_proj : int, optional
     convergence_threshold : float, optional
     init : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+         Initialization of the Mahalanobis matrix. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
          (n_features, n_features).
 
@@ -56,7 +56,7 @@ class _BaseMMC(MahalanobisMixin):
             The (pseudo-)inverse of the covariance matrix.
 
          'random'
-            The initial transformation will be a random SPD matrix of shape
+            The initial Mahalanobis matrix will be a random SPD matrix of shape
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
@@ -111,7 +111,7 @@ class _BaseMMC(MahalanobisMixin):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
-    msg = ("Warning, as of version 0.5.0, the default prior is now "
+    msg = ("Warning, as of version 0.5.0, the default init is now "
            "'identity', instead of the identity divided by a scaling factor "
            "of 10. If you still want to use the same init as in previous "
            "versions, set 'init' == np.eye(d)/10, where d is the dimension "
@@ -476,7 +476,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     num_constraints: int, optional
         number of constraints to generate
     init : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+         Initialization of the Mahalanobis matrix. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
          (n_features, n_features).
 
@@ -519,7 +519,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
         ``init='random'``, ``random_state`` is used to initialize the random
-        transformation.
+        Mahalanobis matrix.
     """
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,

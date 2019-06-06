@@ -48,7 +48,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     Parameters
     ----------
     init : string or numpy array, optional (default='auto')
-        Initialization of the linear transformation. Possible options are
+        Initialization of the Mahalanobis matrix. Possible options are
         'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
         (n_features_a, n_features_b).
 

@@ -50,8 +50,8 @@ class _BaseLSML(MahalanobisMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random PD matrix of shape
-            `(n_features, n_features)`, generated using
+            The initial Mahalanobis matrix will be a random positive definite
+            (PD) matrix of shape `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
          numpy array
@@ -68,8 +68,8 @@ class _BaseLSML(MahalanobisMixin):
         tuples will be formed like this: X[indices].
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        transformation.
+        ``init='random'``, ``random_state`` is used to set the random
+        prior.
     """
     self.prior = prior
     self.tol = tol
@@ -244,8 +244,8 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random PD matrix of shape
-            `(n_features, n_features)`, generated using
+            The initial Mahalanobis matrix will be a random positive definite
+            (PD) matrix of shape `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
          numpy array
@@ -267,8 +267,8 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
         tuples will be formed like this: X[indices].
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        transformation.
+        ``init='random'``, ``random_state`` is used to set the random
+        prior.
     """
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                        verbose=verbose, preprocessor=preprocessor,

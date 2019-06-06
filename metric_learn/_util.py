@@ -341,7 +341,8 @@ def check_collapsed_pairs(pairs):
 def _check_sdp_from_eigen(w, tol=None):
   """Checks if some of the eigenvalues given are negative, up to a tolerance
   level, with a default value of the tolerance depending on the eigenvalues.
-  It also returns whether the matrix is definite.
+  It also returns whether the matrix is positive definite, up to the above
+  tolerance.
 
   Parameters
   ----------
@@ -356,7 +357,7 @@ def _check_sdp_from_eigen(w, tol=None):
   Returns
   -------
   is_definite : bool
-    Whether the matrix is definite or not.
+    Whether the matrix is positive definite or not.
 
   See Also
   --------
@@ -453,10 +454,10 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
 
       'auto'
           Depending on ``num_dims``, the most reasonable initialization will
-          be chosen. If ``num_dims <= n_classes`` we use 'lda' (if possible,
-          see the description of 'lda' init), as it uses labels information.
+          be chosen. If ``num_dims <= n_classes`` we use 'lda'
+          (see the description of 'lda' init), as it uses labels information.
           If not, but ``num_dims < min(n_features, n_samples)``, we use
-          'pca', as it projects data in meaningful directions (those of
+          'pca', as it projects data onto meaningful directions (those of
           higher variance). Otherwise, we just use 'identity'.
 
       'pca'
@@ -473,7 +474,7 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
           This initialization is possible only if `has_classes == True`.
 
       'identity'
-          If ``num_dims`` is strictly smaller than the
+          The identity matrix. If ``num_dims`` is strictly smaller than the
           dimensionality of the inputs passed to :meth:`fit`, the identity
           matrix will be truncated to the first ``num_dims`` rows.
 
@@ -592,8 +593,8 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
 def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                                    return_inverse=False, strict_pd=False,
                                    matrix_name='matrix'):
-  """Returns a standard mahalanobis matrix that can be used as a prior or an
-  initialization
+  """Returns a PSD matrix that can be used as a prior or an initialization
+  for the Mahalanobis distance
 
   Parameters
   ----------
@@ -601,7 +602,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
     The input samples (can be tuples or regular samples).
 
   init : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+         Specification for the matrix to initialize. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
          (n_features, n_features).
 
@@ -613,7 +614,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
             covariance matrix is not definite and `strict_pd == True`)
 
          'random'
-             The initial transformation will be a random PD matrix of shape
+             A random positive definite (PD) matrix of shape
              `(n_features, n_features)`, generated using
              `sklearn.datasets.make_spd_matrix`.
 
@@ -624,7 +625,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
 
   random_state : int or `numpy.RandomState` or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If
-    ``init='random'``, ``random_state`` is used to initialize the random
+    ``init='random'``, ``random_state`` is used to set the random Mahalanobis
     matrix. If ``init='pca'``, ``random_state`` is passed as an
     argument to PCA when initializing the matrix.
 

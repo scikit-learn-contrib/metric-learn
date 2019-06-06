@@ -46,7 +46,7 @@ class _BaseITML(MahalanobisMixin):
     convergence_threshold : float, optional
 
     prior : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+         The Mahalanobis matrix to use as a prior. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
          (n_features, n_features). For ITML, the prior should be strictly
          positive definite (PD).
@@ -288,7 +288,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
           `itml_supervised.fit(X, y, bounds=...)`
 
     prior : string or numpy array, optional (default='identity')
-         Initialization of the linear transformation. Possible options are
+         Initialization of the Mahalanobis matrix. Possible options are
          'identity', 'covariance', 'random', and a numpy array of shape
          (n_features, n_features). For ITML, the prior should be strictly
          positive definite (PD).

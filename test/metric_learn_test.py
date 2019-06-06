@@ -924,7 +924,7 @@ class TestMMC(MetricTestCase):
     X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
     y = np.array([1, 0, 1, 0])
     mmc_supervised = MMC_Supervised()
-    msg = ("Warning, as of version 0.5.0, the default prior is now "
+    msg = ("Warning, as of version 0.5.0, the default init is now "
            "'identity', instead of the identity divided by a scaling factor "
            "of 10. If you still want to use the same init as in previous "
            "versions, set 'init' == np.eye(d)/10, where d is the dimension "

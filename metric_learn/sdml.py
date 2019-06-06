@@ -60,7 +60,7 @@ class _BaseSDML(MahalanobisMixin):
             The inverse covariance matrix.
 
          'random'
-            The initial transformation will be a random PD matrix of shape
+            The prior will be a random positive definite (PD) matrix of shape
             `(n_features, n_features)`, generated using
             `sklearn.datasets.make_spd_matrix`.
 
@@ -114,8 +114,7 @@ class _BaseSDML(MahalanobisMixin):
       msg = ("Warning, as of version 0.5.0, the default prior is now "
              "'identity', instead of 'covariance'. If you still want to use "
              "the inverse of the covariance matrix as a prior, "
-             "set 'prior'=='covariance' (it was the default in previous "
-             "versions since there was 'use_cov'==True). "
+             "set 'prior'=='covariance'. "
              "This warning will disappear in v0.6.0.")
       warnings.warn(msg, ChangedBehaviorWarning)
     _, prior_inv = _initialize_metric_mahalanobis(pairs, self.prior,
@@ -292,8 +291,8 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
         tuples will be formed like this: X[indices].
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        transformation.
+        ``init='random'``, ``random_state`` is used to set the random
+        prior.
     """
     _BaseSDML.__init__(self, balance_param=balance_param,
                        sparsity_param=sparsity_param, prior=prior,
