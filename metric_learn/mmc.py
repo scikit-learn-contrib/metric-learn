@@ -487,8 +487,8 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
              The (pseudo-)inverse of the covariance matrix.
 
          'random'
-             The initial transformation will be a random SPD matrix of shape
-             `(n_features, n_features)`, generated using
+             The initial Mahalanobis matrix will be a random SPD matrix of
+             shape `(n_features, n_features)`, generated using
              `sklearn.datasets.make_spd_matrix`.
 
          numpy array
