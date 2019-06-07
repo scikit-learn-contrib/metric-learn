@@ -10,7 +10,7 @@ from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
                                 check_collapsed_pairs, validate_vector,
-                                _check_sdp_from_eigen,
+                                _check_sdp_from_eigen, _check_n_components,
                                 check_y_valid_values_for_pairs,
                                 _auto_select_init)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
@@ -1040,6 +1040,24 @@ def test__check_sdp_from_eigen_returns_definiteness(w, is_definite):
   assert _check_sdp_from_eigen(w) == is_definite
 
 
+def test__check_n_components():
+  """Checks that n_components returns what is expected
+  (including the errors)"""
+  dim = _check_n_components(5, None)
+  assert dim == 5
+
+  dim = _check_n_components(5, 3)
+  assert dim == 3
+
+  with pytest.raises(ValueError) as expected_err:
+    _check_n_components(5, 10)
+  assert str(expected_err.value) == 'Invalid n_components, must be in [1, 5]'
+
+  with pytest.raises(ValueError) as expected_err:
+    _check_n_components(5, 0)
+  assert str(expected_err.value) == 'Invalid n_components, must be in [1, 5]'
+
+
 @pytest.mark.unit
 @pytest.mark.parametrize('wrong_labels',
                          [[0.5, 0.6, 0.7, 0.8, 0.9],
@@ -1110,7 +1128,7 @@ def test_check_input_pairs_learners_invalid_y(estimator, build_dataset,
   assert str(raised_error.value) == expected_msg
 
 
-@pytest.mark.parametrize('has_classes, n_features, n_samples, num_dims, '
+@pytest.mark.parametrize('has_classes, n_features, n_samples, n_components, '
                          'n_classes, result',
                          [(False, 3, 20, 3, 0, 'identity'),
                           (False, 3, 2, 3, 0, 'identity'),
@@ -1122,9 +1140,9 @@ def test_check_input_pairs_learners_invalid_y(estimator, build_dataset,
                           (True, 2, 6, 2, 10, 'lda'),
                           (True, 4, 6, 2, 3, 'lda')
                           ])
-def test__auto_select_init(has_classes, n_features, n_samples, num_dims,
+def test__auto_select_init(has_classes, n_features, n_samples, n_components,
                            n_classes,
                            result):
   """Checks that the auto selection of the init works as expected"""
   assert (_auto_select_init(has_classes, n_features,
-                            n_samples, num_dims, n_classes) == result)
+                            n_samples, n_components, n_classes) == result)

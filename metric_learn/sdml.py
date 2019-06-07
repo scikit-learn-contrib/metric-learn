@@ -334,7 +334,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     if self.num_labeled != 'deprecated':
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0', DeprecationWarning)
+                    ' removed in 0.6.0', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:

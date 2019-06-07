@@ -429,14 +429,14 @@ def validate_vector(u, dtype=None):
   return u
 
 
-def _initialize_transformer(num_dims, input, y=None, init='auto',
+def _initialize_transformer(n_components, input, y=None, init='auto',
                             verbose=False, random_state=None,
                             has_classes=True):
   """Returns the initial transformer to be used depending on the arguments.
 
   Parameters
   ----------
-  num_dims : int
+  n_components : int
     The number of components to take. (Note: it should have been checked
     before, meaning it should not be None and it should be a value in
     [1, X.shape[1]])
@@ -453,40 +453,40 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
       (n_features_a, n_features_b).
 
       'auto'
-          Depending on ``num_dims``, the most reasonable initialization will
-          be chosen. If ``num_dims <= n_classes`` we use 'lda'
-          (see the description of 'lda' init), as it uses labels information.
-          If not, but ``num_dims < min(n_features, n_samples)``, we use
-          'pca', as it projects data onto meaningful directions (those of
-          higher variance). Otherwise, we just use 'identity'.
+          Depending on ``n_components``, the most reasonable initialization
+          will be chosen. If ``n_components <= n_classes`` we use 'lda' (see
+          the description of 'lda' init), as it uses labels information. If
+          not, but ``n_components < min(n_features, n_samples)``, we use 'pca',
+          as it projects data onto meaningful directions (those of higher
+          variance). Otherwise, we just use 'identity'.
 
       'pca'
-          ``num_dims`` principal components of the inputs passed
+          ``n_components`` principal components of the inputs passed
           to :meth:`fit` will be used to initialize the transformation.
           (See `sklearn.decomposition.PCA`)
 
       'lda'
-          ``min(num_dims, n_classes)`` most discriminative
+          ``min(n_components, n_classes)`` most discriminative
           components of the inputs passed to :meth:`fit` will be used to
-          initialize the transformation. (If ``num_dims > n_classes``,
+          initialize the transformation. (If ``n_components > n_classes``,
           the rest of the components will be zero.) (See
           `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`).
           This initialization is possible only if `has_classes == True`.
 
       'identity'
-          The identity matrix. If ``num_dims`` is strictly smaller than the
+          The identity matrix. If ``n_components`` is strictly smaller than the
           dimensionality of the inputs passed to :meth:`fit`, the identity
-          matrix will be truncated to the first ``num_dims`` rows.
+          matrix will be truncated to the first ``n_components`` rows.
 
       'random'
           The initial transformation will be a random array of shape
-          `(num_dims, n_features)`. Each value is sampled from the
+          `(n_components, n_features)`. Each value is sampled from the
           standard normal distribution.
 
       numpy array
           n_features_b must match the dimensionality of the inputs passed to
           :meth:`fit` and n_features_a must be less than or equal to that.
-          If ``num_dims`` is not None, n_features_a must match it.
+          If ``n_components`` is not None, n_features_a must match it.
 
   verbose : bool
     Whether to print the details of the initialization or not.
@@ -531,19 +531,19 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
                        'greater than its input dimensionality ({}).'
                        .format(init.shape[0], init.shape[1]))
 
-    # Assert that self.num_dims = init.shape[0]
-    if num_dims != init.shape[0]:
+    # Assert that self.n_components = init.shape[0]
+    if n_components != init.shape[0]:
       raise ValueError('The preferred dimensionality of the '
-                       'projected space `num_dims` ({}) does'
+                       'projected space `n_components` ({}) does'
                        ' not match the output dimensionality of '
                        'the given linear transformation '
                        '`init` ({})!'
-                       .format(num_dims,
+                       .format(n_components,
                                init.shape[0]))
   elif init not in authorized_inits:
     raise ValueError(
         "`init` must be '{}' "
-        "or a numpy array of shape (num_dims, n_features)."
+        "or a numpy array of shape (n_components, n_features)."
         .format("', '".join(authorized_inits)))
 
   random_state = check_random_state(random_state)
@@ -555,16 +555,16 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
       n_classes = len(np.unique(y))
     else:
       n_classes = -1
-    init = _auto_select_init(has_classes, n_features, n_samples, num_dims,
+    init = _auto_select_init(has_classes, n_features, n_samples, n_components,
                              n_classes)
   if init == 'identity':
-    return np.eye(num_dims, input.shape[-1])
+    return np.eye(n_components, input.shape[-1])
   elif init == 'random':
-    return random_state.randn(num_dims, input.shape[-1])
+    return random_state.randn(n_components, input.shape[-1])
   elif init in {'pca', 'lda'}:
     init_time = time.time()
     if init == 'pca':
-      pca = PCA(n_components=num_dims,
+      pca = PCA(n_components=n_components,
                 random_state=random_state)
       if verbose:
         print('Finding principal components... ')
@@ -572,21 +572,22 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
       pca.fit(input)
       transformation = pca.components_
     elif init == 'lda':
-      lda = LinearDiscriminantAnalysis(n_components=num_dims)
+      lda = LinearDiscriminantAnalysis(n_components=n_components)
       if verbose:
         print('Finding most discriminative components... ')
         sys.stdout.flush()
       lda.fit(input, y)
-      transformation = lda.scalings_.T[:num_dims]
+      transformation = lda.scalings_.T[:n_components]
     if verbose:
       print('done in {:5.2f}s'.format(time.time() - init_time))
     return transformation
 
 
-def _auto_select_init(has_classes, n_features, n_samples, num_dims, n_classes):
-  if has_classes and num_dims <= min(n_features, n_classes - 1):
+def _auto_select_init(has_classes, n_features, n_samples, n_components,
+                      n_classes):
+  if has_classes and n_components <= min(n_features, n_classes - 1):
     init = 'lda'
-  elif num_dims < min(n_features, n_samples):
+  elif n_components < min(n_features, n_samples):
     init = 'pca'
   else:
     init = 'identity'
@@ -731,3 +732,13 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       return M, M_inv
     else:
       return M
+
+
+def _check_n_components(n_features, n_components):
+  """Checks that n_components is less than n_features and deal with the None
+  case"""
+  if n_components is None:
+    return n_features
+  if 0 < n_components <= n_features:
+    return n_components
+  raise ValueError('Invalid n_components, must be in [1, %d]' % n_features)

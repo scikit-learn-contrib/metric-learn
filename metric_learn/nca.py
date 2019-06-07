@@ -23,7 +23,7 @@ from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
-from ._util import _initialize_transformer
+from ._util import _initialize_transformer, _check_n_components
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -37,12 +37,13 @@ class NCA(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, init=None, num_dims=None, max_iter=100, tol=None,
-               verbose=False, preprocessor=None, random_state=None):
+  def __init__(self, init=None, n_components=None, num_dims='deprecated',
+               max_iter=100, tol=None, verbose=False, preprocessor=None,
+               random_state=None):
     """Neighborhood Components Analysis
 
     Parameters
@@ -55,43 +56,48 @@ class NCA(MahalanobisMixin, TransformerMixin):
         and stays to its default value None, in v0.5.0).
 
         'auto'
-            Depending on ``num_dims``, the most reasonable initialization
-            will be chosen. If ``num_dims <= n_classes`` we use 'lda', as
+            Depending on ``n_components``, the most reasonable initialization
+            will be chosen. If ``n_components <= n_classes`` we use 'lda', as
             it uses labels information. If not, but
-            ``num_dims < min(n_features, n_samples)``, we use 'pca', as
+            ``n_components < min(n_features, n_samples)``, we use 'pca', as
             it projects data in meaningful directions (those of higher
             variance). Otherwise, we just use 'identity'.
 
         'pca'
-            ``num_dims`` principal components of the inputs passed
+            ``n_components`` principal components of the inputs passed
             to :meth:`fit` will be used to initialize the transformation.
             (See `sklearn.decomposition.PCA`)
 
         'lda'
-            ``min(num_dims, n_classes)`` most discriminative
+            ``min(n_components, n_classes)`` most discriminative
             components of the inputs passed to :meth:`fit` will be used to
-            initialize the transformation. (If ``num_dims > n_classes``,
+            initialize the transformation. (If ``n_components > n_classes``,
             the rest of the components will be zero.) (See
             `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)
 
         'identity'
-            If ``num_dims`` is strictly smaller than the
+            If ``n_components`` is strictly smaller than the
             dimensionality of the inputs passed to :meth:`fit`, the identity
-            matrix will be truncated to the first ``num_dims`` rows.
+            matrix will be truncated to the first ``n_components`` rows.
 
         'random'
             The initial transformation will be a random array of shape
-            `(num_dims, n_features)`. Each value is sampled from the
+            `(n_components, n_features)`. Each value is sampled from the
             standard normal distribution.
 
         numpy array
             n_features_b must match the dimensionality of the inputs passed to
             :meth:`fit` and n_features_a must be less than or equal to that.
-            If ``num_dims`` is not None, n_features_a must match it.
+            If ``n_components`` is not None, n_features_a must match it.
 
-    num_dims : int, optional (default=None)
-      Embedding dimensionality. If None, will be set to ``n_features``
-      (``d``) at fit time.
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
 
     max_iter : int, optional (default=100)
       Maximum number of iterations done by the optimization algorithm.
@@ -108,6 +114,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
         transformation. If ``init='pca'``, ``random_state`` is passed as an
         argument to PCA when initializing the transformation.
     """
+    self.n_components = n_components
     self.init = init
     self.num_dims = num_dims
     self.max_iter = max_iter
@@ -121,11 +128,14 @@ class NCA(MahalanobisMixin, TransformerMixin):
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
+    if self.num_dims != 'deprecated':
+      warnings.warn('"num_dims" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    ' removed in 0.6.0. Use "n_components" instead',
+                    DeprecationWarning)
     X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
-    num_dims = self.num_dims
-    if num_dims is None:
-        num_dims = d
+    n_components = _check_n_components(d, self.n_components)
 
     # Measure the total training time
     train_time = time.time()
@@ -145,7 +155,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
       init = 'auto'
     else:
       init = self.init
-    A = _initialize_transformer(num_dims, X, labels, init, self.verbose)
+    A = _initialize_transformer(n_components, X, labels, init, self.verbose)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]
@@ -194,7 +204,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     start_time = time.time()
 
     A = A.reshape(-1, X.shape[1])
-    X_embedded = np.dot(X, A.T)  # (n_samples, num_dims)
+    X_embedded = np.dot(X, A.T)  # (n_samples, n_components)
     # Compute softmax distances
     p_ij = pairwise_distances(X_embedded, squared=True)
     np.fill_diagonal(p_ij, np.inf)

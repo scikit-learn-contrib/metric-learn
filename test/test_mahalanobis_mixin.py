@@ -142,11 +142,8 @@ def test_embed_dim(estimator, build_dataset):
     model.score_pairs(model.transform(X[0, :]))
   assert str(raised_error.value) == err_msg
   # we test that the shape is also OK when doing dimensionality reduction
-  if type(model).__name__ in {'LFDA', 'MLKR', 'NCA', 'RCA'}:
-    # TODO:
-    #  avoid this enumeration and rather test if hasattr n_components
-    #  as soon as we have made the arguments names as such (issue #167)
-    model.set_params(num_dims=2)
+  if hasattr(model, 'n_components'):
+    model.set_params(n_components=2)
     model.fit(*remove_y_quadruplets(estimator, input_data, labels))
     assert model.transform(X).shape == (X.shape[0], 2)
     # assert that ValueError is thrown if input shape is 1D
@@ -314,12 +311,12 @@ def test_transformer_is_2D(estimator, build_dataset):
                          [(ml, bd) for idml, (ml, bd)
                           in zip(ids_metric_learners,
                                  metric_learners)
-                          if hasattr(ml, 'num_dims') and
+                          if hasattr(ml, 'n_components') and
                           hasattr(ml, 'init')],
                          ids=[idml for idml, (ml, _)
                               in zip(ids_metric_learners,
                                      metric_learners)
-                              if hasattr(ml, 'num_dims') and
+                              if hasattr(ml, 'n_components') and
                               hasattr(ml, 'init')])
 def test_init_transformation(estimator, build_dataset):
     input_data, labels, _, X = build_dataset()
@@ -375,15 +372,15 @@ def test_init_transformation(estimator, build_dataset):
       model.fit(input_data, labels)
     assert str(raised_error.value) == msg
 
-    # init.shape[0] must match num_dims
+    # init.shape[0] must match n_components
     init = rng.rand(X.shape[1], X.shape[1])
-    num_dims = X.shape[1] - 1
-    model.set_params(init=init, num_dims=num_dims)
+    n_components = X.shape[1] - 1
+    model.set_params(init=init, n_components=n_components)
     msg = ('The preferred dimensionality of the '
-           'projected space `num_dims` ({}) does not match '
+           'projected space `n_components` ({}) does not match '
            'the output dimensionality of the given '
            'linear transformation `init` ({})!'
-           .format(num_dims, init.shape[0]))
+           .format(n_components, init.shape[0]))
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, labels)
     assert str(raised_error.value) == msg
@@ -392,7 +389,7 @@ def test_init_transformation(estimator, build_dataset):
     model.set_params(init=1)
     msg = ("`init` must be 'auto', 'pca', 'identity', "
            "'random'{} or a numpy array of shape "
-           "(num_dims, n_features)."
+           "(n_components, n_features)."
            .format(", 'lda'" if is_classification else ''))
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, labels)
@@ -402,23 +399,23 @@ def test_init_transformation(estimator, build_dataset):
 @pytest.mark.parametrize('n_samples', [3, 5, 7, 11])
 @pytest.mark.parametrize('n_features', [3, 5, 7, 11])
 @pytest.mark.parametrize('n_classes', [5, 7, 11])
-@pytest.mark.parametrize('num_dims', [3, 5, 7, 11])
+@pytest.mark.parametrize('n_components', [3, 5, 7, 11])
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
                           in zip(ids_metric_learners,
                                  metric_learners)
-                          if hasattr(ml, 'num_dims') and
+                          if hasattr(ml, 'n_components') and
                           hasattr(ml, 'init')],
                          ids=[idml for idml, (ml, _)
                               in zip(ids_metric_learners,
                                      metric_learners)
-                              if hasattr(ml, 'num_dims') and
+                              if hasattr(ml, 'n_components') and
                               hasattr(ml, 'init')])
-def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
-                                  estimator, build_dataset):
+def test_auto_init_transformation(n_samples, n_features, n_classes,
+                                  n_components, estimator, build_dataset):
   # Test that auto choose the init transformation as expected with every
-  # configuration of order of n_samples, n_features, n_classes and num_dims,
-  # for all metric learners that learn a transformation.
+  # configuration of order of n_samples, n_features, n_classes and
+  # n_components, for all metric learners that learn a transformation.
   if n_classes >= n_samples:
     pass
     # n_classes > n_samples is impossible, and n_classes == n_samples
@@ -428,7 +425,7 @@ def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
     model_base = clone(estimator)
     rng = np.random.RandomState(42)
     model_base.set_params(init='auto',
-                          num_dims=num_dims,
+                          n_components=n_components,
                           random_state=rng)
     # To make the test work for LMNN:
     if 'LMNN' in model_base.__class__.__name__:
@@ -436,14 +433,14 @@ def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
     # To make the test faster for estimators that have a max_iter:
     if hasattr(model_base, 'max_iter'):
       model_base.set_params(max_iter=1)
-    if num_dims > n_features:
+    if n_components > n_features:
       # this would return a ValueError, which is tested in
       # test_init_transformation
       pass
     else:
       # We need to build a dataset of the right shape:
       num_to_pad_n_samples = ((n_samples // input_data.shape[0] + 1))
-      num_to_pad_n_features = ((n_samples // input_data.shape[-1] + 1))
+      num_to_pad_n_features = ((n_features // input_data.shape[-1] + 1))
       if input_data.ndim == 3:
         input_data = np.tile(input_data,
                              (num_to_pad_n_samples, input_data.shape[1],
@@ -452,6 +449,8 @@ def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
         input_data = np.tile(input_data,
                              (num_to_pad_n_samples, num_to_pad_n_features))
       input_data = input_data[:n_samples, ..., :n_features]
+      assert input_data.shape[0] == n_samples
+      assert input_data.shape[-1] == n_features
       has_classes = model_base.__class__.__name__ in ids_classifiers
       if has_classes:
         labels = np.tile(range(n_classes), n_samples //
@@ -460,9 +459,9 @@ def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
         labels = np.tile(labels, n_samples // labels.shape[0] + 1)[:n_samples]
       model = clone(model_base)
       model.fit(input_data, labels)
-      if num_dims <= min(n_classes - 1, n_features) and has_classes:
+      if n_components <= min(n_classes - 1, n_features) and has_classes:
         model_other = clone(model_base).set_params(init='lda')
-      elif num_dims < min(n_features, n_samples):
+      elif n_components < min(n_features, n_samples):
         model_other = clone(model_base).set_params(init='pca')
       else:
         model_other = clone(model_base).set_params(init='identity')
@@ -475,19 +474,19 @@ def test_auto_init_transformation(n_samples, n_features, n_classes, num_dims,
                          [(ml, bd) for idml, (ml, bd)
                           in zip(ids_metric_learners,
                                  metric_learners)
-                          if not hasattr(ml, 'num_dims') and
+                          if not hasattr(ml, 'n_components') and
                           hasattr(ml, 'init')],
                          ids=[idml for idml, (ml, _)
                               in zip(ids_metric_learners,
                                      metric_learners)
-                              if not hasattr(ml, 'num_dims') and
+                              if not hasattr(ml, 'n_components') and
                               hasattr(ml, 'init')])
 def test_init_mahalanobis(estimator, build_dataset):
     """Tests that for estimators that learn a mahalanobis matrix
     instead of a transformer, i.e. those that are mahalanobis metric learners
-    where we can change the init, but not choose the num_dims, (TODO: be more
-    explicit on this characterization, for instance with safe_flags like in
-    scikit-learn) that the init has an expected behaviour.
+    where we can change the init, but not choose the n_components,
+    (TODO: be more explicit on this characterization, for instance with
+    safe_flags like in scikit-learn) that the init has an expected behaviour.
     """
     input_data, labels, _, X = build_dataset()
 

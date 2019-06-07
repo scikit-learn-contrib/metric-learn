@@ -20,7 +20,7 @@ from six.moves import xrange
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
 
-from ._util import _initialize_transformer
+from ._util import _initialize_transformer, _check_n_components
 from .base_metric import MahalanobisMixin
 
 
@@ -28,8 +28,8 @@ from .base_metric import MahalanobisMixin
 class _base_LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, init='auto', k=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
-               use_pca=True, num_dims=None,
-               verbose=False, preprocessor=None, random_state=None):
+               use_pca=True, verbose=False, preprocessor=None,
+               n_components=None, num_dims='deprecated', random_state=None):
     """Initialize the LMNN object.
 
     Parameters
@@ -40,39 +40,39 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
         (n_features_a, n_features_b).
 
         'auto'
-            Depending on ``num_dims``, the most reasonable initialization
-            will be chosen. If ``num_dims <= n_classes`` we use 'lda', as
+            Depending on ``n_components``, the most reasonable initialization
+            will be chosen. If ``n_components <= n_classes`` we use 'lda', as
             it uses labels information. If not, but
-            ``num_dims < min(n_features, n_samples)``, we use 'pca', as
+            ``n_components < min(n_features, n_samples)``, we use 'pca', as
             it projects data in meaningful directions (those of higher
             variance). Otherwise, we just use 'identity'.
 
         'pca'
-            ``num_dims`` principal components of the inputs passed
+            ``n_components`` principal components of the inputs passed
             to :meth:`fit` will be used to initialize the transformation.
             (See `sklearn.decomposition.PCA`)
 
         'lda'
-            ``min(num_dims, n_classes)`` most discriminative
+            ``min(n_components, n_classes)`` most discriminative
             components of the inputs passed to :meth:`fit` will be used to
-            initialize the transformation. (If ``num_dims > n_classes``,
+            initialize the transformation. (If ``n_components > n_classes``,
             the rest of the components will be zero.) (See
             `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)
 
         'identity'
-            If ``num_dims`` is strictly smaller than the
+            If ``n_components`` is strictly smaller than the
             dimensionality of the inputs passed to :meth:`fit`, the identity
-            matrix will be truncated to the first ``num_dims`` rows.
+            matrix will be truncated to the first ``n_components`` rows.
 
         'random'
             The initial transformation will be a random array of shape
-            `(num_dims, n_features)`. Each value is sampled from the
+            `(n_components, n_features)`. Each value is sampled from the
             standard normal distribution.
 
         numpy array
             n_features_b must match the dimensionality of the inputs passed to
             :meth:`fit` and n_features_a must be less than or equal to that.
-            If ``num_dims`` is not None, n_features_a must match it.
+            If ``n_components`` is not None, n_features_a must match it.
 
     k : int, optional
         Number of neighbors to consider, not including self-edges.
@@ -83,6 +83,15 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
 
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
@@ -98,8 +107,9 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     self.regularization = regularization
     self.convergence_tol = convergence_tol
     self.use_pca = use_pca
-    self.num_dims = num_dims  # FIXME Tmp fix waiting for #167 to be merged:
     self.verbose = verbose
+    self.n_components = n_components
+    self.num_dims = num_dims
     self.random_state = random_state
     super(_base_LMNN, self).__init__(preprocessor)
 
@@ -108,20 +118,24 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
 class python_LMNN(_base_LMNN):
 
   def fit(self, X, y):
+    if self.num_dims != 'deprecated':
+      warnings.warn('"num_dims" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    ' removed in 0.6.0. Use "n_components" instead',
+                    DeprecationWarning)
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate
 
     X, y = self._prepare_inputs(X, y, dtype=float,
                                 ensure_min_samples=2)
-    num_pts, num_dims = X.shape
-    # FIXME Tmp fix waiting for #167 to be merged:
-    n_dims = self.num_dims if self.num_dims is not None else num_dims
+    num_pts, d = X.shape
+    output_dim = _check_n_components(d, self.n_components)
     unique_labels, label_inds = np.unique(y, return_inverse=True)
     if len(label_inds) != num_pts:
       raise ValueError('Must have one label per point.')
     self.labels_ = np.arange(len(unique_labels))
-    self.transformer_ = _initialize_transformer(n_dims, X, y, self.init,
+    self.transformer_ = _initialize_transformer(output_dim, X, y, self.init,
                                                 self.verbose,
                                                 self.random_state)
     required_k = np.bincount(label_inds).min()
@@ -328,7 +342,7 @@ try:
     n_iter_ : `int`
         The number of iterations the solver has run.
 
-    transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+    transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
         The learned linear transformation ``L``.
     """
 

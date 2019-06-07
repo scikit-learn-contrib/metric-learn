@@ -20,24 +20,26 @@ class TestStringRepr(unittest.TestCase):
 
   def test_lmnn(self):
     self.assertRegexpMatches(
-        str(metric_learn.LMNN()),
+      str(metric_learn.LMNN()),
         r"(python_)?LMNN\(convergence_tol=0.001, init='auto', k=3, "
-        r"learn_rate=1e-07,\s+max_iter=1000, min_iter=50, "
-        r"num_dims=None, preprocessor=None,\s+random_state=None, "
+        r"learn_rate=1e-07,\s+"
+        r"max_iter=1000, min_iter=50, n_components=None,\s+"
+        r"num_dims='deprecated', preprocessor=None, random_state=None,\s+"
         r"regularization=0.5, use_pca=True, verbose=False\)")
 
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
-                     remove_spaces(
-        "NCA(init=None, max_iter=100, num_dims=None, "
-        "preprocessor=None,\n  random_state=None, "
-        "tol=None, verbose=False)"))
+                     remove_spaces("NCA(init=None, max_iter=100,"
+                                   "n_components=None, "
+                                   "num_dims='deprecated', "
+                                   "preprocessor=None, random_state=None, "
+                                   "tol=None, verbose=False)"))
 
   def test_lfda(self):
     self.assertEqual(remove_spaces(str(metric_learn.LFDA())),
                      remove_spaces(
         "LFDA(embedding_type='weighted', k=None, "
-        "num_dims=None, "
+        "n_components=None, num_dims='deprecated',"
         "preprocessor=None)"))
 
   def test_itml(self):
@@ -84,20 +86,25 @@ SDML_Supervised(balance_param=0.5, num_constraints=None,
 
   def test_rca(self):
     self.assertEqual(remove_spaces(str(metric_learn.RCA())),
-                     remove_spaces("RCA(num_dims=None, pca_comps=None, "
+                     remove_spaces("RCA(n_components=None, "
+                                   "num_dims='deprecated', "
+                                   "pca_comps=None, "
                                    "preprocessor=None)"))
     self.assertEqual(remove_spaces(str(metric_learn.RCA_Supervised())),
                      remove_spaces(
-                       "RCA_Supervised(chunk_size=2, num_chunks=100, "
-                       "num_dims=None, pca_comps=None,\n        "
+                       "RCA_Supervised(chunk_size=2, "
+                       "n_components=None, num_chunks=100, "
+                       "num_dims='deprecated', pca_comps=None, "
                        "preprocessor=None)"))
 
   def test_mlkr(self):
     self.assertEqual(remove_spaces(str(metric_learn.MLKR())),
-                     remove_spaces("""
-MLKR(A0='deprecated', init=None, max_iter=1000, num_dims=None,
-   preprocessor=None, random_state=None, tol=None, verbose=False)
-"""))
+                     remove_spaces("MLKR(A0='deprecated', init=None,"
+                                   "max_iter=1000, n_components=None,"
+                                   "num_dims='deprecated', preprocessor=None,"
+                                   "random_state=None, tol=None, "
+                                   "verbose=False)"
+                                   ))
 
   def test_mmc(self):
     self.assertEqual(remove_spaces(str(metric_learn.MMC())),
@@ -189,6 +196,43 @@ def test_get_metric_works_does_not_raise(estimator, build_dataset):
     with pytest.warns(None) as record:
       metric(u, v)
     assert len(record) == 0
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_n_components(estimator, build_dataset):
+  """Check that estimators that have a n_components parameters can use it
+  and that it actually works as expected"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+
+  if hasattr(model, 'n_components'):
+    set_random_state(model)
+    model.set_params(n_components=None)
+    model.fit(input_data, labels)
+    assert model.transformer_.shape == (X.shape[1], X.shape[1])
+
+    model = clone(estimator)
+    set_random_state(model)
+    model.set_params(n_components=X.shape[1] - 1)
+    model.fit(input_data, labels)
+    assert model.transformer_.shape == (X.shape[1] - 1, X.shape[1])
+
+    model = clone(estimator)
+    set_random_state(model)
+    model.set_params(n_components=X.shape[1] + 1)
+    with pytest.raises(ValueError) as expected_err:
+      model.fit(input_data, labels)
+    assert (str(expected_err.value) ==
+            'Invalid n_components, must be in [1, {}]'.format(X.shape[1]))
+
+    model = clone(estimator)
+    set_random_state(model)
+    model.set_params(n_components=0)
+    with pytest.raises(ValueError) as expected_err:
+      model.fit(input_data, labels)
+    assert (str(expected_err.value) ==
+            'Invalid n_components, must be in [1, {}]'.format(X.shape[1]))
 
 
 if __name__ == '__main__':

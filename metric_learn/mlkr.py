@@ -20,6 +20,8 @@ from scipy.optimize import minimize
 from sklearn.base import TransformerMixin
 
 from sklearn.metrics import pairwise_distances
+
+from metric_learn._util import _check_n_components
 from .base_metric import MahalanobisMixin
 from ._util import _initialize_transformer
 
@@ -34,20 +36,26 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, init=None, A0='deprecated',
-               tol=None, max_iter=1000, verbose=False, preprocessor=None,
-               random_state=None):
+  def __init__(self, n_components=None, num_dims='deprecated', init=None,
+               A0='deprecated', tol=None, max_iter=1000, verbose=False,
+               preprocessor=None, random_state=None):
     """
     Initialize MLKR.
 
     Parameters
     ----------
-    num_dims : int, optional
-        Dimensionality of reduced space (defaults to dimension of X)
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
 
     init : None, string or numpy array, optional (default=None)
         Initialization of the linear transformation. Possible options are
@@ -57,24 +65,24 @@ class MLKR(MahalanobisMixin, TransformerMixin):
         and stays to its default value None, in v0.5.0).
 
         'auto'
-            Depending on ``num_dims``, the most reasonable initialization
-            will be chosen. If ``num_dims < min(n_features, n_samples)``, we
-            use 'pca', as it projects data in meaningful directions (those
+            Depending on ``n_components``, the most reasonable initialization
+            will be chosen. If ``n_components < min(n_features, n_samples)``,
+            we use 'pca', as it projects data in meaningful directions (those
             of higher variance). Otherwise, we just use 'identity'.
 
         'pca'
-            ``num_dims`` principal components of the inputs passed
+            ``n_components`` principal components of the inputs passed
             to :meth:`fit` will be used to initialize the transformation.
             (See `sklearn.decomposition.PCA`)
 
         'identity'
-            If ``num_dims`` is strictly smaller than the
+            If ``n_components`` is strictly smaller than the
             dimensionality of the inputs passed to :meth:`fit`, the identity
-            matrix will be truncated to the first ``num_dims`` rows.
+            matrix will be truncated to the first ``n_components`` rows.
 
         'random'
             The initial transformation will be a random array of shape
-            `(num_dims, n_features)`. Each value is sampled from the
+            `(n_components, n_features)`. Each value is sampled from the
             standard normal distribution.
 
         numpy array
@@ -106,6 +114,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
         transformation. If ``init='pca'``, ``random_state`` is passed as an
         argument to PCA when initializing the transformation.
     """
+    self.n_components = n_components
     self.num_dims = num_dims
     self.init = init
     self.A0 = A0
@@ -130,6 +139,12 @@ class MLKR(MahalanobisMixin, TransformerMixin):
                       'removed in 0.6.0. Use "init" instead.',
                       DeprecationWarning)
 
+      if self.num_dims != 'deprecated':
+        warnings.warn('"num_dims" parameter is not used.'
+                      ' It has been deprecated in version 0.5.0 and will be'
+                      ' removed in 0.6.0. Use "n_components" instead',
+                      DeprecationWarning)
+
       X, y = self._prepare_inputs(X, y, y_numeric=True,
                                   ensure_min_samples=2)
       n, d = X.shape
@@ -137,7 +152,8 @@ class MLKR(MahalanobisMixin, TransformerMixin):
           raise ValueError('Data and label lengths mismatch: %d != %d'
                            % (n, y.shape[0]))
 
-      m = self.num_dims
+      m = _check_n_components(d, self.n_components)
+      m = self.n_components
       if m is None:
           m = d
       # if the init is the default (identity), we raise a warning just in case
