@@ -35,7 +35,7 @@ class _BaseMMC(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               init='identity', A0='deprecated', diagonal=False,
+               init=None, A0='deprecated', diagonal=False,
                diagonal_c=1.0, verbose=False, preprocessor=None,
                random_state=None):
     """Initialize MMC.
@@ -44,15 +44,17 @@ class _BaseMMC(MahalanobisMixin):
     max_iter : int, optional
     max_proj : int, optional
     convergence_threshold : float, optional
-    init : string or numpy array, optional (default='identity')
-         Initialization of the Mahalanobis matrix. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+    init : None, string or numpy array, optional (default=None)
+        Initialization of the Mahalanobis matrix. Possible options are
+        'identity', 'covariance', 'random', and a numpy array of
+        shape (n_features, n_features). If None, will be set
+        automatically to 'identity' (this is to raise a warning if
+        'init' is not set, and stays to its default value (None), in v0.5.0).
 
          'identity'
             An identity matrix of shape (n_features, n_features).
 
-        'covariance'
+         'covariance'
             The (pseudo-)inverse of the covariance matrix.
 
          'random'
@@ -111,15 +113,22 @@ class _BaseMMC(MahalanobisMixin):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
-    msg = ("Warning, as of version 0.5.0, the default init is now "
-           "'identity', instead of the identity divided by a scaling factor "
-           "of 10. If you still want to use the same init as in previous "
-           "versions, set 'init' == np.eye(d)/10, where d is the dimension "
-           "of your input space (d=pairs.shape[1]). "
-           "This warning will disappear in v0.6.0.")
-    warnings.warn(msg, ChangedBehaviorWarning)
+    if self.init is None:
+      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
+      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+             "the default init will now be set to 'identity', instead of the "
+             "identity divided by a scaling factor of 10. "
+             "If you still want to use the same init as in previous "
+             "versions, set `init`=np.eye(d)/10, where d is the dimension "
+             "of your input space (d=pairs.shape[1]). "
+             "This warning will disappear in v0.6.0, and `init` parameter's"
+             " default value will be set to 'auto'.")
+      warnings.warn(msg, ChangedBehaviorWarning)
+      init = 'identity'
+    else:
+      init = self.init
 
-    self.A_ = _initialize_metric_mahalanobis(pairs, self.init,
+    self.A_ = _initialize_metric_mahalanobis(pairs, init,
                                              random_state=self.random_state,
                                              matrix_name='init')
 
@@ -455,7 +464,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_labeled='deprecated', num_constraints=None, init='identity',
+               num_labeled='deprecated', num_constraints=None, init=None,
                A0='deprecated', diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None, random_state=None):
     """Initialize the supervised version of `MMC`.
@@ -475,10 +484,12 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
          be removed in 0.6.0.
     num_constraints: int, optional
         number of constraints to generate
-    init : string or numpy array, optional (default='identity')
-         Initialization of the Mahalanobis matrix. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+    init : None, string or numpy array, optional (default=None)
+        Initialization of the Mahalanobis matrix. Possible options are
+        'identity', 'covariance', 'random', and a numpy array of
+        shape (n_features, n_features). If None, will be set
+        automatically to 'identity' (this is to raise a warning if
+        'init' is not set, and stays to its default value (None), in v0.5.0).
 
          'identity'
              An identity matrix of shape (n_features, n_features).

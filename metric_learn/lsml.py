@@ -31,17 +31,19 @@ class _BaseLSML(MahalanobisMixin):
 
   _tuple_size = 4  # constraints are quadruplets
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
                verbose=False, preprocessor=None, random_state=None):
     """Initialize LSML.
 
     Parameters
     ----------
-    prior : string or numpy array, optional (default='identity')
+    prior : None, string or numpy array, optional (default=None)
          Prior to set for the metric. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For LSML, the prior should be strictly
-         positive definite (PD).
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). For LSML, the prior should be strictly
+         positive definite (PD). If `None`, will be set
+         automatically to 'identity' (this is to raise a warning if
+         `prior` is not set, and stays to its default value (None), in v0.5.0).
 
          'identity'
             An identity matrix of shape (n_features, n_features).
@@ -93,14 +95,19 @@ class _BaseLSML(MahalanobisMixin):
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
     # if the prior is the default (identity), we raise a warning just in case
-    if self.prior == 'identity':
-      msg = ("Warning, as of version 0.5.0, the default prior is now "
+    if self.prior is None:
+      msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
+             "the default prior will now be set to "
              "'identity', instead of 'covariance'. If you still want to use "
              "the inverse of the covariance matrix as a prior, "
              "set 'prior'=='covariance'. This warning will disappear in "
-             "v0.6.0.")
+             "v0.6.0, and `prior` parameter's default value will be set to "
+             "'identity'.")
       warnings.warn(msg, ChangedBehaviorWarning)
-    M, prior_inv = _initialize_metric_mahalanobis(quadruplets, self.prior,
+      prior = 'identity'
+    else:
+      prior = self.prior
+    M, prior_inv = _initialize_metric_mahalanobis(quadruplets, prior,
                                                   return_inverse=True,
                                                   strict_pd=True,
                                                   matrix_name='prior')
@@ -217,7 +224,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       metric (See function `transformer_from_metric`.)
   """
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
                num_labeled='deprecated', num_constraints=None, weights=None,
                verbose=False, preprocessor=None, random_state=None):
     """Initialize the supervised version of `LSML`.
@@ -231,11 +238,13 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     ----------
     tol : float, optional
     max_iter : int, optional
-    prior : string or numpy array, optional (default='identity')
+    prior : None, string or numpy array, optional (default=None)
          Prior to set for the metric. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For LSML, the prior should be strictly
-         positive definite (PD).
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). For LSML, the prior should be strictly
+         positive definite (PD). If `None`, will be set
+         automatically to 'identity' (this is to raise a warning if
+         `prior` is not set, and stays to its default value (None), in v0.5.0).
 
          'identity'
             An identity matrix of shape (n_features, n_features).

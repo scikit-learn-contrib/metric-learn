@@ -369,7 +369,7 @@ def _check_sdp_from_eigen(w, tol=None):
   if tol < 0:
     raise ValueError("tol should be positive.")
   if any(w < - tol):
-    raise NonPSDError
+    raise NonPSDError()
   if any(abs(w) < tol):
     return False
   return True
@@ -549,41 +549,48 @@ def _initialize_transformer(num_dims, input, y=None, init='auto',
   random_state = check_random_state(random_state)
   if isinstance(init, np.ndarray):
     return init
-  else:
-    n_samples = input.shape[0]
-    if init == 'auto':
-      if has_classes:
-        n_classes = len(np.unique(y))
-      if has_classes and num_dims <= min(n_features, n_classes - 1):
-        init = 'lda'
-      elif num_dims < min(n_features, n_samples):
-        init = 'pca'
-      else:
-        init = 'identity'
-    if init == 'identity':
-      return np.eye(num_dims, input.shape[-1])
-    elif init == 'random':
-      return random_state.randn(num_dims, input.shape[-1])
-    elif init in {'pca', 'lda'}:
-      init_time = time.time()
-      if init == 'pca':
-        pca = PCA(n_components=num_dims,
-                  random_state=random_state)
-        if verbose:
-          print('Finding principal components... ')
-          sys.stdout.flush()
-        pca.fit(input)
-        transformation = pca.components_
-      elif init == 'lda':
-        lda = LinearDiscriminantAnalysis(n_components=num_dims)
-        if verbose:
-          print('Finding most discriminative components... ')
-          sys.stdout.flush()
-        lda.fit(input, y)
-        transformation = lda.scalings_.T[:num_dims]
+  n_samples = input.shape[0]
+  if init == 'auto':
+    if has_classes:
+      n_classes = len(np.unique(y))
+    else:
+      n_classes = -1
+    init = _auto_select_init(has_classes, n_features, n_samples, num_dims,
+                             n_classes)
+  if init == 'identity':
+    return np.eye(num_dims, input.shape[-1])
+  elif init == 'random':
+    return random_state.randn(num_dims, input.shape[-1])
+  elif init in {'pca', 'lda'}:
+    init_time = time.time()
+    if init == 'pca':
+      pca = PCA(n_components=num_dims,
+                random_state=random_state)
       if verbose:
-        print('done in {:5.2f}s'.format(time.time() - init_time))
-      return transformation
+        print('Finding principal components... ')
+        sys.stdout.flush()
+      pca.fit(input)
+      transformation = pca.components_
+    elif init == 'lda':
+      lda = LinearDiscriminantAnalysis(n_components=num_dims)
+      if verbose:
+        print('Finding most discriminative components... ')
+        sys.stdout.flush()
+      lda.fit(input, y)
+      transformation = lda.scalings_.T[:num_dims]
+    if verbose:
+      print('done in {:5.2f}s'.format(time.time() - init_time))
+    return transformation
+
+
+def _auto_select_init(has_classes, n_features, n_samples, num_dims, n_classes):
+  if has_classes and num_dims <= min(n_features, n_classes - 1):
+    init = 'lda'
+  elif num_dims < min(n_features, n_samples):
+    init = 'pca'
+  else:
+    init = 'identity'
+  return init
 
 
 def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
@@ -684,44 +691,43 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       return M, M_inv
     else:
       return M
-  else:
-    if init == 'identity':
-      M = np.eye(n_features, n_features)
-      if return_inverse:
-        M_inv = M.copy()
-        return M, M_inv
-      else:
-        return M
-    if init == 'covariance':
-      if input.ndim == 3:
-        # if the input are tuples, we need to form an X by deduplication
-        X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
-      else:
-        X = input
-      # atleast2d is necessary to deal with scalar covariance matrices
-      M_inv = np.atleast_2d(np.cov(X, rowvar=False))
-      s, u = scipy.linalg.eigh(M_inv)
-      cov_is_definite = _check_sdp_from_eigen(s)
-      if strict_pd and not cov_is_definite:
-        raise LinAlgError("Unable to get a true inverse of the covariance "
-                          "matrix since it is not definite. Try another "
-                          "`{}`, or an algorithm that does not "
-                          "require the `{}` to be strictly positive definite."
-                          .format(*((matrix_name,) * 2)))
-      M = np.dot(u / s, u.T)
-      if return_inverse:
-        return M, M_inv
-      else:
-        return M
-    elif init == 'random':
-      # we need to create a random symmetric matrix
-      M = make_spd_matrix(n_features, random_state=random_state)
-      if return_inverse:
-        # we use pinvh even if we know the matrix is definite, just because
-        # we need the returned matrix to be symmetric (and sometimes
-        # np.linalg.inv returns not symmetric inverses of symmetric matrices)
-        # TODO: there might be a more efficient method to do so
-        M_inv = pinvh(M)
-        return M, M_inv
-      else:
-        return M
+  elif init == 'identity':
+    M = np.eye(n_features, n_features)
+    if return_inverse:
+      M_inv = M.copy()
+      return M, M_inv
+    else:
+      return M
+  elif init == 'covariance':
+    if input.ndim == 3:
+      # if the input are tuples, we need to form an X by deduplication
+      X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
+    else:
+      X = input
+    # atleast2d is necessary to deal with scalar covariance matrices
+    M_inv = np.atleast_2d(np.cov(X, rowvar=False))
+    s, u = scipy.linalg.eigh(M_inv)
+    cov_is_definite = _check_sdp_from_eigen(s)
+    if strict_pd and not cov_is_definite:
+      raise LinAlgError("Unable to get a true inverse of the covariance "
+                        "matrix since it is not definite. Try another "
+                        "`{}`, or an algorithm that does not "
+                        "require the `{}` to be strictly positive definite."
+                        .format(*((matrix_name,) * 2)))
+    M = np.dot(u / s, u.T)
+    if return_inverse:
+      return M, M_inv
+    else:
+      return M
+  elif init == 'random':
+    # we need to create a random symmetric matrix
+    M = make_spd_matrix(n_features, random_state=random_state)
+    if return_inverse:
+      # we use pinvh even if we know the matrix is definite, just because
+      # we need the returned matrix to be symmetric (and sometimes
+      # np.linalg.inv returns not symmetric inverses of symmetric matrices)
+      # TODO: there might be a more efficient method to do so
+      M_inv = pinvh(M)
+      return M, M_inv
+    else:
+      return M

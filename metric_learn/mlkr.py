@@ -21,7 +21,7 @@ from sklearn.base import TransformerMixin
 
 from sklearn.metrics import pairwise_distances
 from .base_metric import MahalanobisMixin
-from metric_learn._util import _initialize_transformer
+from ._util import _initialize_transformer
 
 EPS = np.finfo(float).eps
 
@@ -38,7 +38,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, init='auto', A0='deprecated',
+  def __init__(self, num_dims=None, init=None, A0='deprecated',
                tol=None, max_iter=1000, verbose=False, preprocessor=None,
                random_state=None):
     """
@@ -49,10 +49,12 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     num_dims : int, optional
         Dimensionality of reduced space (defaults to dimension of X)
 
-    init : string or numpy array, optional (default='auto')
+    init : None, string or numpy array, optional (default=None)
         Initialization of the linear transformation. Possible options are
         'auto', 'pca', 'identity', 'random', and a numpy array of shape
-        (n_features_a, n_features_b).
+        (n_features_a, n_features_b). If None, will be set automatically to
+        'auto' (this option is to raise a warning if 'init' is not set,
+        and stays to its default value None, in v0.5.0).
 
         'auto'
             Depending on ``num_dims``, the most reasonable initialization
@@ -89,7 +91,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
         Convergence tolerance for the optimization.
 
     max_iter: int, optional
-        Cap on number of congugate gradient iterations.
+        Cap on number of conjugate gradient iterations.
 
     verbose : bool, optional (default=False)
         Whether to print progress messages or not.
@@ -139,13 +141,19 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       if m is None:
           m = d
       # if the init is the default (identity), we raise a warning just in case
-      if self.init == 'auto':
-        msg = ("Warning, as of version 0.5.0, the default init is now "
-               "'auto', instead of 'pca'. If you still want to use "
-               "PCA as an init, set 'init'=='pca'. This warning will "
-               "disappear in v0.6.0.")
+      if self.init is None:
+        # TODO:
+        #  replace init=None by init='auto' in v0.6.0 and remove the warning
+        msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+               "the default init will now be set to 'auto', instead of 'pca'. "
+               "If you still want to use PCA as an init, set `init`='pca'. "
+               "This warning will disappear in v0.6.0, and `init` parameter's"
+               " default value will be set to 'auto'.")
         warnings.warn(msg, ChangedBehaviorWarning)
-      A = _initialize_transformer(m, X, y, init=self.init,
+        init = 'auto'
+      else:
+        init = self.init
+      A = _initialize_transformer(m, X, y, init=init,
                                   random_state=self.random_state,
                                   # MLKR works on regression targets:
                                   has_classes=False)

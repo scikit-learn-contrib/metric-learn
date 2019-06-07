@@ -29,7 +29,7 @@ class TestStringRepr(unittest.TestCase):
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
                      remove_spaces(
-        "NCA(init='auto', max_iter=100, num_dims=None, "
+        "NCA(init=None, max_iter=100, num_dims=None, "
         "preprocessor=None,\n  random_state=None, "
         "tol=None, verbose=False)"))
 
@@ -58,26 +58,26 @@ ITML_Supervised(A0='deprecated', bounds='deprecated',
   def test_lsml(self):
     self.assertEqual(remove_spaces(str(metric_learn.LSML())),
                      remove_spaces("""
-LSML(max_iter=1000, preprocessor=None, prior='identity',
+LSML(max_iter=1000, preprocessor=None, prior=None,
    random_state=None, tol=0.001, verbose=False)
 """))
     self.assertEqual(remove_spaces(str(metric_learn.LSML_Supervised())),
                      remove_spaces("""
 LSML_Supervised(max_iter=1000, num_constraints=None,
-        num_labeled='deprecated', preprocessor=None, prior='identity',
+        num_labeled='deprecated', preprocessor=None, prior=None,
         random_state=None, tol=0.001, verbose=False, weights=None)
 """))
 
   def test_sdml(self):
     self.assertEqual(remove_spaces(str(metric_learn.SDML())),
                      remove_spaces("""
-SDML(balance_param=0.5, preprocessor=None, prior='identity', random_state=None,
+SDML(balance_param=0.5, preprocessor=None, prior=None, random_state=None,
    sparsity_param=0.01, use_cov='deprecated', verbose=False)
 """))
     self.assertEqual(remove_spaces(str(metric_learn.SDML_Supervised())),
                      remove_spaces("""
 SDML_Supervised(balance_param=0.5, num_constraints=None,
-        num_labeled='deprecated', preprocessor=None, prior='identity',
+        num_labeled='deprecated', preprocessor=None, prior=None,
         random_state=None, sparsity_param=0.01, use_cov='deprecated',
         verbose=False)
 """))
@@ -95,7 +95,7 @@ SDML_Supervised(balance_param=0.5, num_constraints=None,
   def test_mlkr(self):
     self.assertEqual(remove_spaces(str(metric_learn.MLKR())),
                      remove_spaces("""
-MLKR(A0='deprecated', init='auto', max_iter=1000, num_dims=None,
+MLKR(A0='deprecated', init=None, max_iter=1000, num_dims=None,
    preprocessor=None, random_state=None, tol=None, verbose=False)
 """))
 
@@ -103,13 +103,13 @@ MLKR(A0='deprecated', init='auto', max_iter=1000, num_dims=None,
     self.assertEqual(remove_spaces(str(metric_learn.MMC())),
                      remove_spaces("""
 MMC(A0='deprecated', convergence_threshold=0.001, diagonal=False,
-  diagonal_c=1.0, init='identity', max_iter=100, max_proj=10000,
+  diagonal_c=1.0, init=None, max_iter=100, max_proj=10000,
   preprocessor=None, random_state=None, verbose=False)
 """))
     self.assertEqual(remove_spaces(str(metric_learn.MMC_Supervised())),
                      remove_spaces("""
 MMC_Supervised(A0='deprecated', convergence_threshold=1e-06, diagonal=False,
-        diagonal_c=1.0, init='identity', max_iter=100, max_proj=10000,
+        diagonal_c=1.0, init=None, max_iter=100, max_proj=10000,
         num_constraints=None, num_labeled='deprecated', preprocessor=None,
         random_state=None, verbose=False)
 """))

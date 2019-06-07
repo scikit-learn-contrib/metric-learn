@@ -35,7 +35,7 @@ class _BaseSDML(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior='identity',
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
                use_cov='deprecated', verbose=False, preprocessor=None,
                random_state=None):
     """
@@ -47,11 +47,13 @@ class _BaseSDML(MahalanobisMixin):
     sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
 
-    prior : string or numpy array, optional (default='identity')
+    prior : None, string or numpy array, optional (default=None)
          Prior to set for the metric. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For SDML, the prior should be strictly
-         positive definite (PD).
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). For SDML, the prior should be strictly
+         positive definite (PD). If `None`, will be set
+         automatically to 'identity' (this is to raise a warning if
+         `prior` is not set, and stays to its default value (None), in v0.5.0).
 
          'identity'
             An identity matrix of shape (n_features, n_features).
@@ -110,14 +112,22 @@ class _BaseSDML(MahalanobisMixin):
 
     # set up (the inverse of) the prior M
     # if the prior is the default (identity), we raise a warning just in case
-    if self.prior == 'identity':
-      msg = ("Warning, as of version 0.5.0, the default prior is now "
+    if self.prior is None:
+      # TODO:
+      #  replace prior=None by prior='identity' in v0.6.0 and remove the
+      #  warning
+      msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
+             "the default prior will now be set to "
              "'identity', instead of 'covariance'. If you still want to use "
              "the inverse of the covariance matrix as a prior, "
-             "set 'prior'=='covariance'. "
-             "This warning will disappear in v0.6.0.")
+             "set 'prior'=='covariance'. This warning will disappear in "
+             "v0.6.0, and `prior` parameter's default value will be set to "
+             "'identity'.")
       warnings.warn(msg, ChangedBehaviorWarning)
-    _, prior_inv = _initialize_metric_mahalanobis(pairs, self.prior,
+      prior = 'identity'
+    else:
+      prior = self.prior
+    _, prior_inv = _initialize_metric_mahalanobis(pairs, prior,
                                                   return_inverse=True,
                                                   strict_pd=True,
                                                   matrix_name='prior')
@@ -135,7 +145,7 @@ class _BaseSDML(MahalanobisMixin):
                     "positive semi-definite (PSD). The algorithm may diverge, "
                     "and lead to degenerate solutions. "
                     "To prevent that, try to decrease the balance parameter "
-                    "`balance_param` and/or to set prior='identity'.",
+                    "`balance_param` and/or to set `prior`='identity'.",
                     ConvergenceWarning)
       w -= min_eigval  # we translate the eigenvalues to make them all positive
     w += 1e-10  # we add a small offset to avoid definiteness problems
@@ -235,7 +245,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
       metric (See function `transformer_from_metric`.)
   """
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior='identity',
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
                use_cov='deprecated', num_labeled='deprecated',
                num_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
@@ -251,11 +261,13 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
         trade off between sparsity and M0 prior
     sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
-    prior : string or numpy array, optional (default='identity')
-          Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For SDML, the prior should be strictly
-         positive definite (PD).
+    prior : None, string or numpy array, optional (default=None)
+         Prior to set for the metric. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). For SDML, the prior should be strictly
+         positive definite (PD). If `None`, will be set
+         automatically to 'identity' (this is to raise a warning if
+         `prior` is not set, and stays to its default value (None), in v0.5.0).
 
          'identity'
             An identity matrix of shape (n_features, n_features).

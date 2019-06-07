@@ -11,7 +11,8 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
                                 check_collapsed_pairs, validate_vector,
                                 _check_sdp_from_eigen,
-                                check_y_valid_values_for_pairs)
+                                check_y_valid_values_for_pairs,
+                                _auto_select_init)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -1107,3 +1108,23 @@ def test_check_input_pairs_learners_invalid_y(estimator, build_dataset,
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, wrong_labels)
   assert str(raised_error.value) == expected_msg
+
+
+@pytest.mark.parametrize('has_classes, n_features, n_samples, num_dims, '
+                         'n_classes, result',
+                         [(False, 3, 20, 3, 0, 'identity'),
+                          (False, 3, 2, 3, 0, 'identity'),
+                          (False, 5, 3, 4, 0, 'identity'),
+                          (False, 4, 5, 3, 0, 'pca'),
+                          (True, 5, 6, 3, 4, 'lda'),
+                          (True, 6, 3, 3, 3, 'identity'),
+                          (True, 5, 6, 4, 2, 'pca'),
+                          (True, 2, 6, 2, 10, 'lda'),
+                          (True, 4, 6, 2, 3, 'lda')
+                          ])
+def test__auto_select_init(has_classes, n_features, n_samples, num_dims,
+                           n_classes,
+                           result):
+  """Checks that the auto selection of the init works as expected"""
+  assert (_auto_select_init(has_classes, n_features,
+                            n_samples, num_dims, n_classes) == result)

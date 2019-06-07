@@ -20,7 +20,7 @@ from six.moves import xrange
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
 
-from metric_learn._util import _initialize_transformer
+from ._util import _initialize_transformer
 from .base_metric import MahalanobisMixin
 
 

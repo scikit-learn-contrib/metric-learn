@@ -23,7 +23,7 @@ from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
-from metric_learn._util import _initialize_transformer
+from ._util import _initialize_transformer
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -41,16 +41,18 @@ class NCA(MahalanobisMixin, TransformerMixin):
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, init='auto', num_dims=None, max_iter=100, tol=None,
+  def __init__(self, init=None, num_dims=None, max_iter=100, tol=None,
                verbose=False, preprocessor=None, random_state=None):
     """Neighborhood Components Analysis
 
     Parameters
     ----------
-    init : string or numpy array, optional (default='auto')
-        Initialization of the Mahalanobis matrix. Possible options are
-        'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
-        (n_features_a, n_features_b).
+    init : None, string or numpy array, optional (default=None)
+        Initialization of the linear transformation. Possible options are
+        'auto', 'pca', 'identity', 'random', and a numpy array of shape
+        (n_features_a, n_features_b). If None, will be set automatically to
+        'auto' (this option is to raise a warning if 'init' is not set,
+        and stays to its default value None, in v0.5.0).
 
         'auto'
             Depending on ``num_dims``, the most reasonable initialization
@@ -130,14 +132,20 @@ class NCA(MahalanobisMixin, TransformerMixin):
 
     # Initialize A
     # if the init is the default (auto), we raise a warning just in case
-    if self.init == 'auto':
-      msg = ("Warning, as of version 0.5.0, the default init is now "
-             "'auto', instead of the previous scaling matrix. If you still "
-             "want to use the same scaling matrix as before as an init, "
-             "set 'init'==np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min("
-             "axis=0), EPS))). This warning will disappear in v0.6.0.")
+    if self.init is None:
+      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
+      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+             "the default init will now be set to 'auto', instead of the "
+             "previous scaling matrix. same scaling matrix as before as an "
+             "init, set `init`=np.eye(X.shape[1])/"
+             "(np.maximum(X.max(axis=0)-X.min(axis=0), EPS))). This warning "
+             "will disappear in v0.6.0, and `init` parameter's default value "
+             "will be set to 'auto'.")
       warnings.warn(msg, ChangedBehaviorWarning)
-    A = _initialize_transformer(num_dims, X, labels, self.init, self.verbose)
+      init = 'auto'
+    else:
+      init = self.init
+    A = _initialize_transformer(num_dims, X, labels, init, self.verbose)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]
