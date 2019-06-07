@@ -23,9 +23,9 @@ class TestStringRepr(unittest.TestCase):
       str(metric_learn.LMNN()),
         r"(python_)?LMNN\(convergence_tol=0.001, init='auto', k=3, "
         r"learn_rate=1e-07,\s+"
-        r"max_iter=1000, min_iter=50, n_components=None,\s+"
-        r"num_dims='deprecated', preprocessor=None, random_state=None,\s+"
-        r"regularization=0.5, use_pca=True, verbose=False\)")
+        r"max_iter=1000, min_iter=50, n_components=None, "
+        r"num_dims='deprecated',\s+preprocessor=None, random_state=None, "
+        r"regularization=0.5,\s+use_pca=True, verbose=False\)")
 
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
