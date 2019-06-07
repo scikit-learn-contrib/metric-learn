@@ -30,7 +30,16 @@ from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseMMC(MahalanobisMixin):
-  """Mahalanobis Metric for Clustering (MMC)"""
+  """Mahalanobis Metric for Clustering (MMC)
+
+  Attributes
+  ----------
+
+  classes_ : `list`
+      The possible labels of the pairs `MMC` can fit on. `classes_ = [-1, 1]`,
+      where -1 means points in a pair are dissimilar (negative label), and 1
+      means they are similar (positive label).
+  """
 
   _tuple_size = 2  # constraints are pairs
 

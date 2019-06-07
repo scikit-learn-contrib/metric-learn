@@ -190,6 +190,11 @@ class ITML(_BaseITML, _PairsClassifierMixin):
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
 
+  classes_ : `list`
+      The possible labels of the pairs `ITML` can fit on. `classes_ = [-1, 1]`,
+      where -1 means points in a pair are dissimilar (negative label), and 1
+      means they are similar (positive label).
+
   threshold_ : `float`
       If the distance metric between two points is lower than this threshold,
       points will be classified as similar, otherwise they will be
