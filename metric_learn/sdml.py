@@ -120,7 +120,7 @@ class _BaseSDML(MahalanobisMixin):
              "the default prior will now be set to "
              "'identity', instead of 'covariance'. If you still want to use "
              "the inverse of the covariance matrix as a prior, "
-             "set 'prior'=='covariance'. This warning will disappear in "
+             "set prior='covariance'. This warning will disappear in "
              "v0.6.0, and `prior` parameter's default value will be set to "
              "'identity'.")
       warnings.warn(msg, ChangedBehaviorWarning)
@@ -145,7 +145,7 @@ class _BaseSDML(MahalanobisMixin):
                     "positive semi-definite (PSD). The algorithm may diverge, "
                     "and lead to degenerate solutions. "
                     "To prevent that, try to decrease the balance parameter "
-                    "`balance_param` and/or to set `prior`='identity'.",
+                    "`balance_param` and/or to set prior='identity'.",
                     ConvergenceWarning)
       w -= min_eigval  # we translate the eigenvalues to make them all positive
     w += 1e-10  # we add a small offset to avoid definiteness problems

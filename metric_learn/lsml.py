@@ -100,7 +100,7 @@ class _BaseLSML(MahalanobisMixin):
              "the default prior will now be set to "
              "'identity', instead of 'covariance'. If you still want to use "
              "the inverse of the covariance matrix as a prior, "
-             "set 'prior'=='covariance'. This warning will disappear in "
+             "set prior='covariance'. This warning will disappear in "
              "v0.6.0, and `prior` parameter's default value will be set to "
              "'identity'.")
       warnings.warn(msg, ChangedBehaviorWarning)

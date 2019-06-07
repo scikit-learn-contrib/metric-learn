@@ -162,7 +162,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
         #  replace init=None by init='auto' in v0.6.0 and remove the warning
         msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
                "the default init will now be set to 'auto', instead of 'pca'. "
-               "If you still want to use PCA as an init, set `init`='pca'. "
+               "If you still want to use PCA as an init, set init='pca'. "
                "This warning will disappear in v0.6.0, and `init` parameter's"
                " default value will be set to 'auto'.")
         warnings.warn(msg, ChangedBehaviorWarning)

@@ -119,7 +119,7 @@ class _BaseMMC(MahalanobisMixin):
              "the default init will now be set to 'identity', instead of the "
              "identity divided by a scaling factor of 10. "
              "If you still want to use the same init as in previous "
-             "versions, set `init`=np.eye(d)/10, where d is the dimension "
+             "versions, set init=np.eye(d)/10, where d is the dimension "
              "of your input space (d=pairs.shape[1]). "
              "This warning will disappear in v0.6.0, and `init` parameter's"
              " default value will be set to 'auto'.")
