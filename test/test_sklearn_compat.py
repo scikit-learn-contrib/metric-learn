@@ -352,8 +352,8 @@ def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
    to_transform) = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
-  if hasattr(estimator, "num_dims"):
-    estimator.num_dims = 1
+  if hasattr(estimator, "n_components"):
+    estimator.n_components = 1
   estimator.fit(*remove_y_quadruplets(estimator, input_data, labels))
 
   def check_dict():
@@ -381,8 +381,8 @@ def test_dont_overwrite_parameters(estimator, build_dataset,
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
-  if hasattr(estimator, "num_dims"):
-    estimator.num_dims = 1
+  if hasattr(estimator, "n_components"):
+    estimator.n_components = 1
   dict_before_fit = estimator.__dict__.copy()
 
   estimator.fit(*remove_y_quadruplets(estimator, input_data, labels))

@@ -88,36 +88,34 @@ class TestFitTransform(unittest.TestCase):
     assert_array_almost_equal(res_1, res_2)
 
   def test_lfda(self):
-    lfda = LFDA(k=2, num_dims=2)
+    lfda = LFDA(k=2, n_components=2)
     lfda.fit(self.X, self.y)
     res_1 = lfda.transform(self.X)
 
-    lfda = LFDA(k=2, num_dims=2)
+    lfda = LFDA(k=2, n_components=2)
     res_2 = lfda.fit_transform(self.X, self.y)
 
     # signs may be flipped, that's okay
-    if np.sign(res_1[0,0]) != np.sign(res_2[0,0]):
-        res_2 *= -1
-    assert_array_almost_equal(res_1, res_2)
+    assert_array_almost_equal(abs(res_1), abs(res_2))
 
   def test_rca_supervised(self):
     seed = np.random.RandomState(1234)
-    rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
     rca.fit(self.X, self.y, random_state=seed)
     res_1 = rca.transform(self.X)
 
     seed = np.random.RandomState(1234)
-    rca = RCA_Supervised(num_dims=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
     res_2 = rca.fit_transform(self.X, self.y, random_state=seed)
 
     assert_array_almost_equal(res_1, res_2)
 
   def test_mlkr(self):
-    mlkr = MLKR(num_dims=2)
+    mlkr = MLKR(n_components=2)
     mlkr.fit(self.X, self.y)
     res_1 = mlkr.transform(self.X)
 
-    mlkr = MLKR(num_dims=2)
+    mlkr = MLKR(n_components=2)
     res_2 = mlkr.fit_transform(self.X, self.y)
 
     assert_array_almost_equal(res_1, res_2)

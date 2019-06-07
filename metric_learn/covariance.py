@@ -22,7 +22,7 @@ class Covariance(MahalanobisMixin, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """

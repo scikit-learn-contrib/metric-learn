@@ -10,7 +10,7 @@ from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
                                 check_collapsed_pairs, validate_vector,
-                                _check_sdp_from_eigen,
+                                _check_sdp_from_eigen, _check_n_components,
                                 check_y_valid_values_for_pairs)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
@@ -867,9 +867,9 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   formed_points_to_transform = dataset_formed.to_transform
   (indices_train, indices_test, y_train, y_test, formed_train,
    formed_test) = train_test_split(dataset_indices.data,
-                                          dataset_indices.target,
-                                          dataset_formed.data,
-                                          random_state=SEED)
+                                   dataset_indices.target,
+                                   dataset_formed.data,
+                                   random_state=SEED)
 
   def make_random_state(estimator):
     rs = {}
@@ -1006,6 +1006,24 @@ def test_check_sdp_from_eigen_positive_err_messages():
   _check_sdp_from_eigen(w, 1.)
   _check_sdp_from_eigen(w, 0.)
   _check_sdp_from_eigen(w, None)
+
+
+def test__check_n_components():
+  """Checks that n_components returns what is expected
+  (including the errors)"""
+  dim = _check_n_components(5, None)
+  assert dim == 5
+
+  dim = _check_n_components(5, 3)
+  assert dim == 3
+
+  with pytest.raises(ValueError) as expected_err:
+    _check_n_components(5, 10)
+  assert str(expected_err.value) == 'Invalid n_components, must be in [1, 5]'
+
+  with pytest.raises(ValueError) as expected_err:
+    _check_n_components(5, 0)
+  assert str(expected_err.value) == 'Invalid n_components, must be in [1, 5]'
 
 
 @pytest.mark.unit

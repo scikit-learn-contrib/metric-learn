@@ -411,3 +411,13 @@ def validate_vector(u, dtype=None):
   if u.ndim > 1:
     raise ValueError("Input vector should be 1-D.")
   return u
+
+
+def _check_n_components(n_features, n_components):
+  """Checks that n_components is less than n_features and deal with the None
+  case"""
+  if n_components is None:
+    return n_features
+  if 0 < n_components <= n_features:
+    return n_components
+  raise ValueError('Invalid n_components, must be in [1, %d]' % n_features)

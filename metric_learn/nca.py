@@ -23,6 +23,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
+from ._util import _check_n_components
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -36,19 +37,24 @@ class NCA(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, max_iter=100, tol=None, verbose=False,
-               preprocessor=None):
+  def __init__(self, n_components=None, num_dims='deprecated', max_iter=100,
+               tol=None, verbose=False, preprocessor=None):
     """Neighborhood Components Analysis
 
     Parameters
     ----------
-    num_dims : int, optional (default=None)
-      Embedding dimensionality. If None, will be set to ``n_features``
-      (``d``) at fit time.
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
 
     max_iter : int, optional (default=100)
       Maximum number of iterations done by the optimization algorithm.
@@ -59,6 +65,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     verbose : bool, optional (default=False)
       Whether to print progress messages or not.
     """
+    self.n_components = n_components
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.tol = tol
@@ -70,18 +77,21 @@ class NCA(MahalanobisMixin, TransformerMixin):
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
+    if self.num_dims != 'deprecated':
+      warnings.warn('"num_dims" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    ' removed in 0.6.0. Use "n_components" instead',
+                    DeprecationWarning)
     X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
-    num_dims = self.num_dims
-    if num_dims is None:
-        num_dims = d
+    n_components = _check_n_components(d, self.n_components)
 
     # Measure the total training time
     train_time = time.time()
 
     # Initialize A to a scaling matrix
-    A = np.zeros((num_dims, d))
-    np.fill_diagonal(A, 1./(np.maximum(X.max(axis=0)-X.min(axis=0), EPS)))
+    A = np.zeros((n_components, d))
+    np.fill_diagonal(A, 1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]
@@ -130,7 +140,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     start_time = time.time()
 
     A = A.reshape(-1, X.shape[1])
-    X_embedded = np.dot(X, A.T)  # (n_samples, num_dims)
+    X_embedded = np.dot(X, A.T)  # (n_samples, n_components)
     # Compute softmax distances
     p_ij = pairwise_distances(X_embedded, squared=True)
     np.fill_diagonal(p_ij, np.inf)

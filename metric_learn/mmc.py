@@ -356,7 +356,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
 
@@ -406,7 +406,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """
@@ -469,7 +469,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     if self.num_labeled != 'deprecated':
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0', DeprecationWarning)
+                    ' removed in 0.6.0', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
