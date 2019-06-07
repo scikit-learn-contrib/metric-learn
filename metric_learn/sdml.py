@@ -18,11 +18,11 @@ import numpy as np
 from sklearn.base import TransformerMixin
 from scipy.linalg import pinvh
 from sklearn.covariance import graphical_lasso
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import transformer_from_metric
+from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 try:
   from inverse_covariance import quic
 except ImportError:
@@ -35,8 +35,9 @@ class _BaseSDML(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               verbose=False, preprocessor=None):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
+               use_cov='deprecated', verbose=False, preprocessor=None,
+               random_state=None):
     """
     Parameters
     ----------
@@ -46,8 +47,34 @@ class _BaseSDML(MahalanobisMixin):
     sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
 
-    use_cov : bool, optional
-        controls prior matrix, will use the identity if use_cov=False
+    prior : None, string or numpy array, optional (default=None)
+         Prior to set for the metric. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). For SDML, the prior should be strictly
+         positive definite (PD). If `None`, will be set
+         automatically to 'identity' (this is to raise a warning if
+         `prior` is not set, and stays to its default value (None), in v0.5.0).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+         'covariance'
+            The inverse covariance matrix.
+
+         'random'
+            The prior will be a random positive definite (PD) matrix of shape
+            `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
+
+         numpy array
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
+
+    use_cov : Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'prior' instead.
 
     verbose : bool, optional
         if True, prints information while learning
@@ -55,14 +82,25 @@ class _BaseSDML(MahalanobisMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be gotten like this: X[indices].
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``prior='random'``, ``random_state`` is used to set the prior.
     """
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
+    self.prior = prior
     self.use_cov = use_cov
     self.verbose = verbose
+    self.random_state = random_state
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
+    if self.use_cov != 'deprecated':
+      warnings.warn('"use_cov" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "prior" instead.',
+                    DeprecationWarning)
     if not HAS_SKGGM:
       if self.verbose:
         print("SDML will use scikit-learn's graphical lasso solver.")
@@ -73,11 +111,26 @@ class _BaseSDML(MahalanobisMixin):
                                     type_of_inputs='tuples')
 
     # set up (the inverse of) the prior M
-    if self.use_cov:
-      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-      prior_inv = np.atleast_2d(np.cov(X, rowvar=False))
+    # if the prior is the default (identity), we raise a warning just in case
+    if self.prior is None:
+      # TODO:
+      #  replace prior=None by prior='identity' in v0.6.0 and remove the
+      #  warning
+      msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
+             "the default prior will now be set to "
+             "'identity', instead of 'covariance'. If you still want to use "
+             "the inverse of the covariance matrix as a prior, "
+             "set prior='covariance'. This warning will disappear in "
+             "v0.6.0, and `prior` parameter's default value will be set to "
+             "'identity'.")
+      warnings.warn(msg, ChangedBehaviorWarning)
+      prior = 'identity'
     else:
-      prior_inv = np.identity(pairs.shape[2])
+      prior = self.prior
+    _, prior_inv = _initialize_metric_mahalanobis(pairs, prior,
+                                                  return_inverse=True,
+                                                  strict_pd=True,
+                                                  matrix_name='prior')
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = prior_inv + self.balance_param * loss_matrix
@@ -92,7 +145,7 @@ class _BaseSDML(MahalanobisMixin):
                     "positive semi-definite (PSD). The algorithm may diverge, "
                     "and lead to degenerate solutions. "
                     "To prevent that, try to decrease the balance parameter "
-                    "`balance_param` and/or to set use_cov=False.",
+                    "`balance_param` and/or to set prior='identity'.",
                     ConvergenceWarning)
       w -= min_eigval  # we translate the eigenvalues to make them all positive
     w += 1e-10  # we add a small offset to avoid definiteness problems
@@ -139,7 +192,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
 
@@ -187,27 +240,56 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, use_cov=True,
-               num_labeled='deprecated', num_constraints=None, verbose=False,
-               preprocessor=None):
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
+               use_cov='deprecated', num_labeled='deprecated',
+               num_constraints=None, verbose=False, preprocessor=None,
+               random_state=None):
     """Initialize the supervised version of `SDML`.
 
     `SDML_Supervised` creates pairs of similar sample by taking same class
     samples, and pairs of dissimilar samples by taking different class
     samples. It then passes these pairs to `SDML` for training.
+
     Parameters
     ----------
     balance_param : float, optional
         trade off between sparsity and M0 prior
     sparsity_param : float, optional
         trade off between optimizer and sparseness (see graph_lasso)
-    use_cov : bool, optional
-        controls prior matrix, will use the identity if use_cov=False
+    prior : None, string or numpy array, optional (default=None)
+         Prior to set for the metric. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). For SDML, the prior should be strictly
+         positive definite (PD). If `None`, will be set
+         automatically to 'identity' (this is to raise a warning if
+         `prior` is not set, and stays to its default value (None), in v0.5.0).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+         'covariance'
+            The inverse covariance matrix.
+
+         'random'
+            The prior will be a random SPD matrix of shape
+            `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
+
+         numpy array
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
+
+    use_cov : Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'prior' instead.
+
     num_labeled : Not used
       .. deprecated:: 0.5.0
          `num_labeled` was deprecated in version 0.5.0 and will
@@ -219,10 +301,15 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to set the random
+        prior.
     """
     _BaseSDML.__init__(self, balance_param=balance_param,
-                       sparsity_param=sparsity_param, use_cov=use_cov,
-                       verbose=verbose, preprocessor=preprocessor)
+                       sparsity_param=sparsity_param, prior=prior,
+                       use_cov=use_cov, verbose=verbose,
+                       preprocessor=preprocessor, random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 

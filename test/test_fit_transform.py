@@ -65,13 +65,13 @@ class TestFitTransform(unittest.TestCase):
   def test_sdml_supervised(self):
     seed = np.random.RandomState(1234)
     sdml = SDML_Supervised(num_constraints=1500, balance_param=1e-5,
-                           use_cov=False)
+                           prior='identity')
     sdml.fit(self.X, self.y, random_state=seed)
     res_1 = sdml.transform(self.X)
 
     seed = np.random.RandomState(1234)
     sdml = SDML_Supervised(num_constraints=1500, balance_param=1e-5,
-                           use_cov=False)
+                           prior='identity')
     res_2 = sdml.fit_transform(self.X, self.y, random_state=seed)
 
     assert_array_almost_equal(res_1, res_2)

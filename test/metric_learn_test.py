@@ -5,11 +5,12 @@ import numpy as np
 from scipy.optimize import check_grad, approx_fprime
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
-from sklearn.datasets import load_iris, make_classification, make_regression
+from sklearn.datasets import (load_iris, make_classification, make_regression,
+                              make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
                            assert_allclose)
 from sklearn.utils.testing import assert_warns_message
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.validation import check_X_y
 try:
   from inverse_covariance import quic
@@ -19,7 +20,7 @@ else:
   HAS_SKGGM = True
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC, RCA,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
-                          RCA_Supervised, MMC_Supervised, SDML, ITML)
+                          RCA_Supervised, MMC_Supervised, SDML, ITML, LSML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
 from metric_learn.lmnn import python_LMNN, _sum_outer_products
@@ -92,6 +93,31 @@ class TestLSML(MetricTestCase):
            ' removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, lsml_supervised.fit, X, y)
 
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    lsml_supervised = LSML_Supervised()
+    msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
+           "the default prior will now be set to "
+           "'identity', instead of 'covariance'. If you still want to use "
+           "the inverse of the covariance matrix as a prior, "
+           "set prior='covariance'. This warning will disappear in "
+           "v0.6.0, and `prior` parameter's default value will be set to "
+           "'identity'.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      lsml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.], [-5., 3.], [5., 0.]],
+                      [[0., 50.], [0., -60], [-10., 0.], [10., 0.]]])
+    lsml = LSML()
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      lsml.fit(pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 class TestITML(MetricTestCase):
   def test_iris(self):
@@ -125,6 +151,27 @@ class TestITML(MetricTestCase):
            ' removed in 0.6.0. Use the "bounds" parameter of this '
            'fit method instead.')
     assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
+
+  def test_deprecation_A0(self):
+    # test that a deprecation message is thrown if A0 is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    itml_supervised = ITML_Supervised(A0=np.ones_like(X))
+    msg = ('"A0" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "prior" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      itml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    itml = ITML(A0=np.ones_like(X))
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      itml.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 @pytest.mark.parametrize('bounds', [None, (20., 100.), [20., 100.],
@@ -190,10 +237,10 @@ class TestLMNN(MetricTestCase):
 
     X, y = lmnn._prepare_inputs(X, y, dtype=float,
                                 ensure_min_samples=2)
-    num_pts, num_dims = X.shape
+    num_pts, n_components = X.shape
     unique_labels, label_inds = np.unique(y, return_inverse=True)
     lmnn.labels_ = np.arange(len(unique_labels))
-    lmnn.transformer_ = np.eye(num_dims)
+    lmnn.transformer_ = np.eye(n_components)
 
     target_neighbors = lmnn._select_targets(X, label_inds)
     impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds)
@@ -243,10 +290,10 @@ def test_toy_ex_lmnn(X, y, loss):
 
   X, y = lmnn._prepare_inputs(X, y, dtype=float,
                               ensure_min_samples=2)
-  num_pts, num_dims = X.shape
+  num_pts, n_components = X.shape
   unique_labels, label_inds = np.unique(y, return_inverse=True)
   lmnn.labels_ = np.arange(len(unique_labels))
-  lmnn.transformer_ = np.eye(num_dims)
+  lmnn.transformer_ = np.eye(n_components)
 
   target_neighbors = lmnn._select_targets(X, label_inds)
   impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds)
@@ -336,7 +383,7 @@ class TestSDML(MetricTestCase):
     # because it will return a non SPD matrix
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
     y_pairs = [1, -1]
-    sdml = SDML(use_cov=False, balance_param=100, verbose=True)
+    sdml = SDML(prior='identity', balance_param=100, verbose=True)
 
     msg = ("There was a problem in SDML when using scikit-learn's graphical "
            "lasso solver. skggm's graphical lasso can sometimes converge on "
@@ -352,14 +399,14 @@ class TestSDML(MetricTestCase):
                              "installed.")
   def test_sdml_raises_warning_msg_installed_skggm(self):
     """Tests that the right warning message is raised if someone tries to
-    use SDML but has not installed skggm, and that the algorithm fails to
+    use SDML and has installed skggm, and that the algorithm fails to
     converge"""
     # TODO: remove if we don't need skggm anymore
     # case on which we know that skggm's graphical lasso fails
     # because it will return non finite values
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
     y_pairs = [1, -1]
-    sdml = SDML(use_cov=False, balance_param=100, verbose=True)
+    sdml = SDML(prior='identity', balance_param=100, verbose=True)
 
     msg = ("There was a problem in SDML when using skggm's graphical "
            "lasso solver.")
@@ -382,7 +429,7 @@ class TestSDML(MetricTestCase):
     # pathological case)
     X = np.array([[-10., 0.], [10., 0.], [5., 0.], [3., 0.]])
     y = [0, 0, 1, 1]
-    sdml_supervised = SDML_Supervised(balance_param=0.5, use_cov=False,
+    sdml_supervised = SDML_Supervised(balance_param=0.5, prior='identity',
                                       sparsity_param=0.01)
     msg = ("There was a problem in SDML when using skggm's graphical "
            "lasso solver.")
@@ -395,25 +442,27 @@ class TestSDML(MetricTestCase):
                              "that no warning should be thrown.")
   def test_raises_no_warning_installed_skggm(self):
     # otherwise we should be able to instantiate and fit SDML and it
-    # should raise no warning
+    # should raise no error and no ConvergenceWarning
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
     y_pairs = [1, -1]
     X, y = make_classification(random_state=42)
-    with pytest.warns(None) as record:
-      sdml = SDML()
+    with pytest.warns(None) as records:
+      sdml = SDML(prior='covariance')
       sdml.fit(pairs, y_pairs)
-    assert len(record) == 0
-    with pytest.warns(None) as record:
-      sdml = SDML_Supervised(use_cov=False, balance_param=1e-5)
-      sdml.fit(X, y)
-    assert len(record) == 0
+    for record in records:
+      assert record.category is not ConvergenceWarning
+    with pytest.warns(None) as records:
+      sdml_supervised = SDML_Supervised(prior='identity', balance_param=1e-5)
+      sdml_supervised.fit(X, y)
+    for record in records:
+      assert record.category is not ConvergenceWarning
 
   def test_iris(self):
     # Note: this is a flaky test, which fails for certain seeds.
     # TODO: un-flake it!
     rs = np.random.RandomState(5555)
 
-    sdml = SDML_Supervised(num_constraints=1500, use_cov=False,
+    sdml = SDML_Supervised(num_constraints=1500, prior='identity',
                            balance_param=5e-5)
     sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
     csep = class_separation(sdml.transform(self.iris_points),
@@ -425,7 +474,7 @@ class TestSDML(MetricTestCase):
     # initialization
     # TODO: remove in v.0.6
     X, y = make_classification(random_state=42)
-    sdml_supervised = SDML_Supervised(num_labeled=np.inf, use_cov=False,
+    sdml_supervised = SDML_Supervised(num_labeled=np.inf, prior='identity',
                                       balance_param=5e-5)
     msg = ('"num_labeled" parameter is not used.'
            ' It has been deprecated in version 0.5.0 and will be'
@@ -437,12 +486,12 @@ class TestSDML(MetricTestCase):
     pseudo-covariance matrix is not PSD"""
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
     y = [1, -1]
-    sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
+    sdml = SDML(prior='covariance', sparsity_param=0.01, balance_param=0.5)
     msg = ("Warning, the input matrix of graphical lasso is not "
            "positive semi-definite (PSD). The algorithm may diverge, "
            "and lead to degenerate solutions. "
            "To prevent that, try to decrease the balance parameter "
-           "`balance_param` and/or to set use_cov=False.")
+           "`balance_param` and/or to set prior='identity'.")
     with pytest.warns(ConvergenceWarning) as raised_warning:
       try:
         sdml.fit(pairs, y)
@@ -457,7 +506,7 @@ class TestSDML(MetricTestCase):
     pseudo-covariance matrix is PSD"""
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
     y = [1, -1]
-    sdml = SDML(use_cov=True, sparsity_param=0.01, balance_param=0.5)
+    sdml = SDML(prior='covariance', sparsity_param=0.01, balance_param=0.5)
     sdml.fit(pairs, y)
     assert np.isfinite(sdml.get_mahalanobis_matrix()).all()
 
@@ -470,8 +519,56 @@ class TestSDML(MetricTestCase):
     it should work, but scikit-learn's graphical_lasso does not work"""
     X, y = load_iris(return_X_y=True)
     sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
-                           use_cov=True)
-    sdml.fit(X, y)
+                           prior='covariance')
+    sdml.fit(X, y, random_state=np.random.RandomState(42))
+
+  def test_deprecation_use_cov(self):
+    # test that a deprecation message is thrown if use_cov  is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    sdml_supervised = SDML_Supervised(use_cov=np.ones_like(X),
+                                      balance_param=1e-5)
+    msg = ('"use_cov" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "prior" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      sdml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    sdml = SDML(use_cov=np.ones_like(X), balance_param=1e-5)
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      sdml.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used (except for the balance_param that we need
+    # to set for the algorithm to not diverge)
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    sdml_supervised = SDML_Supervised(balance_param=1e-5)
+    msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
+           "the default prior will now be set to "
+           "'identity', instead of 'covariance'. If you still want to use "
+           "the inverse of the covariance matrix as a prior, "
+           "set prior='covariance'. This warning will disappear in "
+           "v0.6.0, and `prior` parameter's default value will be set to "
+           "'identity'.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      sdml_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    sdml = SDML(balance_param=1e-5)
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      sdml.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 @pytest.mark.skipif(not HAS_SKGGM,
@@ -483,7 +580,7 @@ def test_verbose_has_installed_skggm_sdml(capsys):
   # TODO: remove if we don't need skggm anymore
   pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
   y_pairs = [1, -1]
-  sdml = SDML(verbose=True)
+  sdml = SDML(verbose=True, prior='covariance')
   sdml.fit(pairs, y_pairs)
   out, _ = capsys.readouterr()
   assert "SDML will use skggm's graphical lasso solver." in out
@@ -496,8 +593,8 @@ def test_verbose_has_installed_skggm_sdml_supervised(capsys):
   # Test that if users have installed skggm, a message is printed telling them
   # skggm's solver is used (when they use SDML_Supervised)
   # TODO: remove if we don't need skggm anymore
-  X, y = make_classification(random_state=42)
-  sdml = SDML_Supervised(verbose=True)
+  X, y = load_iris(return_X_y=True)
+  sdml = SDML_Supervised(verbose=True, prior='identity', balance_param=1e-5)
   sdml.fit(X, y)
   out, _ = capsys.readouterr()
   assert "SDML will use skggm's graphical lasso solver." in out
@@ -512,7 +609,7 @@ def test_verbose_has_not_installed_skggm_sdml(capsys):
   # TODO: remove if we don't need skggm anymore
   pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
   y_pairs = [1, -1]
-  sdml = SDML(verbose=True)
+  sdml = SDML(verbose=True, prior='covariance')
   sdml.fit(pairs, y_pairs)
   out, _ = capsys.readouterr()
   assert "SDML will use scikit-learn's graphical lasso solver." in out
@@ -526,7 +623,7 @@ def test_verbose_has_not_installed_skggm_sdml_supervised(capsys):
   # skggm's solver is used (when they use SDML_Supervised)
   # TODO: remove if we don't need skggm anymore
   X, y = make_classification(random_state=42)
-  sdml = SDML_Supervised(verbose=True, balance_param=1e-5, use_cov=False)
+  sdml = SDML_Supervised(verbose=True, balance_param=1e-5, prior='identity')
   sdml.fit(X, y)
   out, _ = capsys.readouterr()
   assert "SDML will use scikit-learn's graphical lasso solver." in out
@@ -622,11 +719,8 @@ class TestNCA(MetricTestCase):
       X = X[[ind_0[0], ind_1[0], ind_2[0]]]
       y = y[[ind_0[0], ind_1[0], ind_2[0]]]
 
-      EPS = np.finfo(float).eps
-      A = np.zeros((X.shape[1], X.shape[1]))
-      np.fill_diagonal(A,
-                       1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
-      nca = NCA(max_iter=30, n_components=X.shape[1])
+      A = make_spd_matrix(X.shape[1], X.shape[1])
+      nca = NCA(init=A, max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
 
@@ -635,18 +729,34 @@ class TestNCA(MetricTestCase):
       #  must stay like the initialization
       X = self.iris_points[self.iris_labels == 0]
       y = self.iris_labels[self.iris_labels == 0]
-      EPS = np.finfo(float).eps
-      A = np.zeros((X.shape[1], X.shape[1]))
-      np.fill_diagonal(A,
-                       1. / (np.maximum(X.max(axis=0) - X.min(axis=0), EPS)))
-      nca = NCA(max_iter=30, n_components=X.shape[1])
+
+      A = make_spd_matrix(X.shape[1], X.shape[1])
+      nca = NCA(init=A, max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.transformer_, A)
+
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    nca = NCA()
+    msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+           "the default init will now be set to 'auto', instead of the "
+           "previous scaling matrix. same scaling matrix as before as an "
+           "init, set init=np.eye(X.shape[1])/"
+           "(np.maximum(X.max(axis=0)-X.min(axis=0), EPS))). This warning will"
+           " disappear in v0.6.0, and `init` parameter's default value will "
+           "be set to 'auto'.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      nca.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 @pytest.mark.parametrize('num_dims', [None, 2])
 def test_deprecation_num_dims_nca(num_dims):
-  # test that a deprecation message is thrown if num_labeled is set at
+  # test that a deprecation message is thrown if num_dims is set at
   # initialization
   # TODO: remove in v.0.6
   X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
@@ -674,7 +784,7 @@ class TestLFDA(MetricTestCase):
 
 @pytest.mark.parametrize('num_dims', [None, 2])
 def test_deprecation_num_dims_lfda(num_dims):
-  # test that a deprecation message is thrown if num_labeled is set at
+  # test that a deprecation message is thrown if num_dims is set at
   # initialization
   # TODO: remove in v.0.6
   X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
@@ -715,7 +825,7 @@ class TestRCA(MetricTestCase):
 
 @pytest.mark.parametrize('num_dims', [None, 2])
 def test_deprecation_num_dims_rca(num_dims):
-  # test that a deprecation message is thrown if num_labeled is set at
+  # test that a deprecation message is thrown if num_dims is set at
   # initialization
   # TODO: remove in v.0.6
   X, y = load_iris(return_X_y=True)
@@ -767,10 +877,40 @@ class TestMLKR(MetricTestCase):
     rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
     np.testing.assert_almost_equal(rel_diff, 0.)
 
+  def test_deprecation_A0(self):
+    # test that a deprecation message is thrown if A0 is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mlkr = MLKR(A0=np.ones_like(X))
+    msg = ('"A0" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "init" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      mlkr.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([0.1, 0.2, 0.3, 0.4])
+    mlkr = MLKR()
+    msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+           "the default init will now be set to 'auto', instead of 'pca'. "
+           "If you still want to use PCA as an init, set init='pca'. "
+           "This warning will disappear in v0.6.0, and `init` parameter's"
+           " default value will be set to 'auto'.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      mlkr.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 @pytest.mark.parametrize('num_dims', [None, 2])
 def test_deprecation_num_dims_mlkr(num_dims):
-  # test that a deprecation message is thrown if num_labeled is set at
+  # test that a deprecation message is thrown if num_dims is set at
   # initialization
   # TODO: remove in v.0.6
   X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
@@ -794,8 +934,9 @@ class TestMMC(MetricTestCase):
     c, d = np.nonzero(np.triu(~mask, k=1))
 
     # Full metric
-    mmc = MMC(convergence_threshold=0.01)
-    mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
+    n_features = self.iris_points.shape[1]
+    mmc = MMC(convergence_threshold=0.01, init=np.eye(n_features) / 10)
+    mmc.fit(*wrap_pairs(self.iris_points, [a, b, c, d]))
     expected = [[+0.000514, +0.000868, -0.001195, -0.001703],
                 [+0.000868, +0.001468, -0.002021, -0.002879],
                 [-0.001195, -0.002021, +0.002782, +0.003964],
@@ -833,6 +974,53 @@ class TestMMC(MetricTestCase):
            ' It has been deprecated in version 0.5.0 and will be'
            ' removed in 0.6.0')
     assert_warns_message(DeprecationWarning, msg, mmc_supervised.fit, X, y)
+
+  def test_deprecation_A0(self):
+    # test that a deprecation message is thrown if A0 is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mmc_supervised = MMC_Supervised(A0=np.ones_like(X))
+    msg = ('"A0" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. Use "init" instead.')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      mmc_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    mmc = MMC(A0=np.ones_like(X))
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      mmc.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+  def test_changed_behaviour_warning(self):
+    # test that a ChangedBehavior warning is thrown about the init, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mmc_supervised = MMC_Supervised()
+    msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+           "the default init will now be set to 'identity', instead of the "
+           "identity divided by a scaling factor of 10. "
+           "If you still want to use the same init as in previous "
+           "versions, set init=np.eye(d)/10, where d is the dimension "
+           "of your input space (d=pairs.shape[1]). "
+           "This warning will disappear in v0.6.0, and `init` parameter's"
+           " default value will be set to 'auto'.")
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      mmc_supervised.fit(X, y)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
+    y_pairs = [1, -1]
+    mmc = MMC()
+    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
+      mmc.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 @pytest.mark.parametrize(('algo_class', 'dataset'),

@@ -11,7 +11,8 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
                                 check_collapsed_pairs, validate_vector,
                                 _check_sdp_from_eigen, _check_n_components,
-                                check_y_valid_values_for_pairs)
+                                check_y_valid_values_for_pairs,
+                                _auto_select_init)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -19,7 +20,7 @@ from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
                                       _PairsClassifierMixin,
                                       _QuadrupletsClassifierMixin)
-from metric_learn.exceptions import PreprocessorError
+from metric_learn.exceptions import PreprocessorError, NonPSDError
 from sklearn.datasets import make_regression, make_blobs, load_iris
 
 
@@ -104,7 +105,7 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
 
 pairs_learners = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be faster
                   (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster
-                  (SDML(use_cov=False, balance_param=1e-5), build_pairs)]
+                  (SDML(prior='identity', balance_param=1e-5), build_pairs)]
 ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
                               [learner for (learner, _) in
                                pairs_learners]))
@@ -118,13 +119,13 @@ classifiers = [(Covariance(), build_classification),
                (LSML_Supervised(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
                (RCA_Supervised(num_chunks=10), build_classification),
-               (SDML_Supervised(use_cov=False, balance_param=1e-5),
+               (SDML_Supervised(prior='identity', balance_param=1e-5),
                build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
 
-regressors = [(MLKR(), build_regression)]
+regressors = [(MLKR(init='pca'), build_regression)]
 ids_regressors = list(map(lambda x: x.__class__.__name__,
                           [learner for (learner, _) in regressors]))
 
@@ -993,7 +994,7 @@ def test__validate_vector():
     validate_vector(x)
 
 
-def test_check_sdp_from_eigen_positive_err_messages():
+def test__check_sdp_from_eigen_positive_err_messages():
   """Tests that if _check_sdp_from_eigen is given a negative tol it returns
   an error, and if positive (or None) it does not"""
   w = np.abs(np.random.RandomState(42).randn(10)) + 1
@@ -1006,6 +1007,37 @@ def test_check_sdp_from_eigen_positive_err_messages():
   _check_sdp_from_eigen(w, 1.)
   _check_sdp_from_eigen(w, 0.)
   _check_sdp_from_eigen(w, None)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w', [np.array([-1.2, 5.5, 6.6]),
+                               np.array([-1.2, -5.6])])
+def test__check_sdp_from_eigen_positive_eigenvalues(w):
+  """Tests that _check_sdp_from_eigen, returns a NonPSDError when
+  the eigenvalues are negatives or null."""
+  with pytest.raises(NonPSDError):
+    _check_sdp_from_eigen(w)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w', [np.array([0., 2.3, 5.3]),
+                               np.array([1e-20, 3.5]),
+                               np.array([1.5, 2.4, 4.6])])
+def test__check_sdp_from_eigen_negative_eigenvalues(w):
+  """Tests that _check_sdp_from_eigen, returns no error when the
+  eigenvalues are positive."""
+  _check_sdp_from_eigen(w)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w, is_definite', [(np.array([1e-15, 5.6]), False),
+                                            (np.array([-1e-15, 5.6]), False),
+                                            (np.array([3.2, 5.6, 0.01]), True),
+                                            ])
+def test__check_sdp_from_eigen_returns_definiteness(w, is_definite):
+  """Tests that _check_sdp_from_eigen returns the definiteness of the
+  matrix (when it is PSD), based on the given eigenvalues"""
+  assert _check_sdp_from_eigen(w) == is_definite
 
 
 def test__check_n_components():
@@ -1094,3 +1126,23 @@ def test_check_input_pairs_learners_invalid_y(estimator, build_dataset,
     with pytest.raises(ValueError) as raised_error:
       model.fit(input_data, wrong_labels)
   assert str(raised_error.value) == expected_msg
+
+
+@pytest.mark.parametrize('has_classes, n_features, n_samples, n_components, '
+                         'n_classes, result',
+                         [(False, 3, 20, 3, 0, 'identity'),
+                          (False, 3, 2, 3, 0, 'identity'),
+                          (False, 5, 3, 4, 0, 'identity'),
+                          (False, 4, 5, 3, 0, 'pca'),
+                          (True, 5, 6, 3, 4, 'lda'),
+                          (True, 6, 3, 3, 3, 'identity'),
+                          (True, 5, 6, 4, 2, 'pca'),
+                          (True, 2, 6, 2, 10, 'lda'),
+                          (True, 4, 6, 2, 3, 'lda')
+                          ])
+def test__auto_select_init(has_classes, n_features, n_samples, n_components,
+                           n_classes,
+                           result):
+  """Checks that the auto selection of the init works as expected"""
+  assert (_auto_select_init(has_classes, n_features,
+                            n_samples, n_components, n_classes) == result)

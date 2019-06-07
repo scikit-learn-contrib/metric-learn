@@ -20,36 +20,64 @@ import numpy as np
 import scipy.linalg
 from six.moves import xrange
 from sklearn.base import TransformerMixin
+from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
-from ._util import transformer_from_metric
+from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseLSML(MahalanobisMixin):
 
   _tuple_size = 4  # constraints are quadruplets
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None, verbose=False,
-               preprocessor=None):
+  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize LSML.
 
     Parameters
     ----------
+    prior : None, string or numpy array, optional (default=None)
+         Prior to set for the metric. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). For LSML, the prior should be strictly
+         positive definite (PD). If `None`, will be set
+         automatically to 'identity' (this is to raise a warning if
+         `prior` is not set, and stays to its default value (None), in v0.5.0).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+         'covariance'
+            The inverse covariance matrix.
+
+         'random'
+            The initial Mahalanobis matrix will be a random positive definite
+            (PD) matrix of shape `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
+
+         numpy array
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
+
     tol : float, optional
     max_iter : int, optional
-    prior : (d x d) matrix, optional
-        guess at a metric [default: inv(covariance(X))]
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to set the random
+        prior.
     """
     self.prior = prior
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
+    self.random_state = random_state
     super(_BaseLSML, self).__init__(preprocessor)
 
   def _fit(self, quadruplets, weights=None):
@@ -66,14 +94,23 @@ class _BaseLSML(MahalanobisMixin):
     else:
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
+    # if the prior is the default (identity), we raise a warning just in case
     if self.prior is None:
-      X = np.vstack({tuple(row) for row in
-                     quadruplets.reshape(-1, quadruplets.shape[2])})
-      prior_inv = np.atleast_2d(np.cov(X, rowvar=False))
-      M = np.linalg.inv(prior_inv)
+      msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
+             "the default prior will now be set to "
+             "'identity', instead of 'covariance'. If you still want to use "
+             "the inverse of the covariance matrix as a prior, "
+             "set prior='covariance'. This warning will disappear in "
+             "v0.6.0, and `prior` parameter's default value will be set to "
+             "'identity'.")
+      warnings.warn(msg, ChangedBehaviorWarning)
+      prior = 'identity'
     else:
-      M = self.prior
-      prior_inv = np.linalg.inv(self.prior)
+      prior = self.prior
+    M, prior_inv = _initialize_metric_mahalanobis(quadruplets, prior,
+                                                  return_inverse=True,
+                                                  strict_pd=True,
+                                                  matrix_name='prior')
 
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -146,7 +183,7 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """
@@ -182,15 +219,14 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,
                num_labeled='deprecated', num_constraints=None, weights=None,
-               verbose=False,
-               preprocessor=None):
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize the supervised version of `LSML`.
 
     `LSML_Supervised` creates quadruplets from labeled samples by taking two
@@ -202,8 +238,29 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     ----------
     tol : float, optional
     max_iter : int, optional
-    prior : (d x d) matrix, optional
-        guess at a metric [default: covariance(X)]
+    prior : None, string or numpy array, optional (default=None)
+         Prior to set for the metric. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). For LSML, the prior should be strictly
+         positive definite (PD). If `None`, will be set
+         automatically to 'identity' (this is to raise a warning if
+         `prior` is not set, and stays to its default value (None), in v0.5.0).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+         'covariance'
+            The inverse covariance matrix.
+
+         'random'
+            The initial Mahalanobis matrix will be a random positive definite
+            (PD) matrix of shape `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
+
+         numpy array
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
     num_labeled : Not used
       .. deprecated:: 0.5.0
          `num_labeled` was deprecated in version 0.5.0 and will
@@ -217,9 +274,14 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to set the random
+        prior.
     """
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
-                       verbose=verbose, preprocessor=preprocessor)
+                       verbose=verbose, preprocessor=preprocessor,
+                       random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights

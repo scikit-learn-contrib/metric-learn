@@ -21,11 +21,12 @@ import warnings
 import numpy as np
 from six.moves import xrange
 from sklearn.base import TransformerMixin
-from sklearn.utils.validation import check_array, assert_all_finite
+from sklearn.utils.validation import assert_all_finite
+from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm, transformer_from_metric
+from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseMMC(MahalanobisMixin):
@@ -34,20 +35,51 @@ class _BaseMMC(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               A0=None, diagonal=False, diagonal_c=1.0, verbose=False,
-               preprocessor=None):
+               init=None, A0='deprecated', diagonal=False,
+               diagonal_c=1.0, verbose=False, preprocessor=None,
+               random_state=None):
     """Initialize MMC.
     Parameters
     ----------
     max_iter : int, optional
     max_proj : int, optional
     convergence_threshold : float, optional
-    A0 : (d x d) matrix, optional
-        initial metric, defaults to identity
-        only the main diagonal is taken if `diagonal == True`
+    init : None, string or numpy array, optional (default=None)
+        Initialization of the Mahalanobis matrix. Possible options are
+        'identity', 'covariance', 'random', and a numpy array of
+        shape (n_features, n_features). If None, will be set
+        automatically to 'identity' (this is to raise a warning if
+        'init' is not set, and stays to its default value (None), in v0.5.0).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+         'covariance'
+            The (pseudo-)inverse of the covariance matrix.
+
+         'random'
+            The initial Mahalanobis matrix will be a random SPD matrix of shape
+            `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
+
+         numpy array
+             An SPD matrix of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
+
+    verbose : bool, optional
+        if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
+    A0 : Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'init' instead.
     diagonal : bool, optional
         if True, a diagonal metric will be learned,
-        i.e., a simple scaling of dimensions
+        i.e., a simple scaling of dimensions. The initialization will then
+        be the diagonal coefficients of the matrix given as 'init'.
     diagonal_c : float, optional
         weight of the dissimilarity constraint for diagonal
         metric learning
@@ -56,29 +88,49 @@ class _BaseMMC(MahalanobisMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be gotten like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation.
     """
     self.max_iter = max_iter
     self.max_proj = max_proj
     self.convergence_threshold = convergence_threshold
+    self.init = init
     self.A0 = A0
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
     self.verbose = verbose
+    self.random_state = random_state
     super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
+    if self.A0 != 'deprecated':
+      warnings.warn('"A0" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "init" instead.',
+                    DeprecationWarning)
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
-    # init metric
-    if self.A0 is None:
-      self.A_ = np.identity(pairs.shape[2])
-      if not self.diagonal:
-        # Don't know why division by 10... it's in the original code
-        # and seems to affect the overall scale of the learned metric.
-        self.A_ /= 10.0
+    if self.init is None:
+      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
+      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+             "the default init will now be set to 'identity', instead of the "
+             "identity divided by a scaling factor of 10. "
+             "If you still want to use the same init as in previous "
+             "versions, set init=np.eye(d)/10, where d is the dimension "
+             "of your input space (d=pairs.shape[1]). "
+             "This warning will disappear in v0.6.0, and `init` parameter's"
+             " default value will be set to 'auto'.")
+      warnings.warn(msg, ChangedBehaviorWarning)
+      init = 'identity'
     else:
-      self.A_ = check_array(self.A0)
+      init = self.init
+
+    self.A_ = _initialize_metric_mahalanobis(pairs, init,
+                                             random_state=self.random_state,
+                                             matrix_name='init')
 
     if self.diagonal:
       return self._fit_diag(pairs, y)
@@ -356,7 +408,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
 
@@ -406,15 +458,15 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_labeled='deprecated', num_constraints=None, A0=None,
-               diagonal=False, diagonal_c=1.0, verbose=False,
-               preprocessor=None):
+               num_labeled='deprecated', num_constraints=None, init=None,
+               A0='deprecated', diagonal=False, diagonal_c=1.0, verbose=False,
+               preprocessor=None, random_state=None):
     """Initialize the supervised version of `MMC`.
 
     `MMC_Supervised` creates pairs of similar sample by taking same class
@@ -432,9 +484,38 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
          be removed in 0.6.0.
     num_constraints: int, optional
         number of constraints to generate
-    A0 : (d x d) matrix, optional
-        initial metric, defaults to identity
-        only the main diagonal is taken if `diagonal == True`
+    init : None, string or numpy array, optional (default=None)
+        Initialization of the Mahalanobis matrix. Possible options are
+        'identity', 'covariance', 'random', and a numpy array of
+        shape (n_features, n_features). If None, will be set
+        automatically to 'identity' (this is to raise a warning if
+        'init' is not set, and stays to its default value (None), in v0.5.0).
+
+         'identity'
+             An identity matrix of shape (n_features, n_features).
+
+         'covariance'
+             The (pseudo-)inverse of the covariance matrix.
+
+         'random'
+             The initial Mahalanobis matrix will be a random SPD matrix of
+             shape `(n_features, n_features)`, generated using
+             `sklearn.datasets.make_spd_matrix`.
+
+         numpy array
+             A numpy array of shape (n_features, n_features), that will
+             be used as such to initialize the metric.
+
+    verbose : bool, optional
+        if True, prints information while learning
+
+    preprocessor : array-like, shape=(n_samples, n_features) or callable
+        The preprocessor to call to get tuples from indices. If array-like,
+        tuples will be gotten like this: X[indices].
+    A0 : Not used.
+        .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'init' instead.
     diagonal : bool, optional
         if True, a diagonal metric will be learned,
         i.e., a simple scaling of dimensions
@@ -446,11 +527,16 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        Mahalanobis matrix.
     """
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,
-                      A0=A0, diagonal=diagonal, diagonal_c=diagonal_c,
-                      verbose=verbose, preprocessor=preprocessor)
+                      init=init, A0=A0, diagonal=diagonal,
+                      diagonal_c=diagonal_c, verbose=verbose,
+                      preprocessor=preprocessor, random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 

@@ -85,15 +85,15 @@ class TestSklearnCompat(unittest.TestCase):
                                num_constraints=num_constraints,
                                verbose=verbose,
                                preprocessor=preprocessor,
-                               balance_param=1e-5, use_cov=False)
+                               balance_param=1e-5, prior='identity')
     dSDML.__init__ = stable_init
     check_estimator(dSDML)
 
   def test_rca(self):
-    def stable_init(self, num_dims=None, pca_comps=None,
+    def stable_init(self, n_components=None, pca_comps=None,
                     chunk_size=2, preprocessor=None):
       # this init makes RCA stable for scikit-learn examples.
-      RCA_Supervised.__init__(self, num_chunks=2, num_dims=num_dims,
+      RCA_Supervised.__init__(self, num_chunks=2, n_components=n_components,
                               pca_comps=pca_comps, chunk_size=chunk_size,
                               preprocessor=preprocessor)
     dRCA.__init__ = stable_init

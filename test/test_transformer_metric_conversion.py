@@ -11,6 +11,7 @@ from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
 from metric_learn._util import transformer_from_metric
+from metric_learn.exceptions import NonPSDError
 
 
 class TestTransformerMetricConversion(unittest.TestCase):
@@ -49,7 +50,7 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
   def test_sdml_supervised(self):
     seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500, use_cov=False,
+    sdml = SDML_Supervised(num_constraints=1500, prior='identity',
                            balance_param=1e-5)
     sdml.fit(self.X, self.y, random_state=seed)
     L = sdml.transformer_
@@ -162,10 +163,10 @@ class TestTransformerMetricConversion(unittest.TestCase):
     P = ortho_group.rvs(7, random_state=rng)
     M = P.dot(D).dot(P.T)
     msg = ("Matrix is not positive semidefinite (PSD).")
-    with pytest.raises(ValueError) as raised_error:
+    with pytest.raises(NonPSDError) as raised_error:
       transformer_from_metric(M)
     assert str(raised_error.value) == msg
-    with pytest.raises(ValueError) as raised_error:
+    with pytest.raises(NonPSDError) as raised_error:
       transformer_from_metric(D)
     assert str(raised_error.value) == msg
 
