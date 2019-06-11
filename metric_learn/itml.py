@@ -1,17 +1,5 @@
-r"""
-Information Theoretic Metric Learning(ITML)
-
-`ITML` minimizes the (differential) relative entropy, aka Kullback-Leibler
-divergence, between two multivariate Gaussians subject to constraints on the
-associated Mahalanobis distance, which can be formulated into a Bregman
-optimization problem by minimizing the LogDet divergence subject to
-linear constraints. This algorithm can handle a wide variety of constraints
-and can optionally incorporate a prior on the distance function. Unlike some
-other methods, `ITML` does not rely on an eigenvalue computation or
-semi-definite programming.
-
-Read more in the :ref:`User Guide <itml>`.
-
+"""
+Information Theoretic Metric Learning (ITML)
 """
 
 from __future__ import print_function, absolute_import
@@ -34,55 +22,6 @@ class _BaseITML(MahalanobisMixin):
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                prior='identity', A0='deprecated', verbose=False,
                preprocessor=None, random_state=None):
-    """Initialize ITML.
-
-    Parameters
-    ----------
-    gamma : float, optional
-        value for slack variables
-
-    max_iter : int, optional
-
-    convergence_threshold : float, optional
-
-    prior : string or numpy array, optional (default='identity')
-         The Mahalanobis matrix to use as a prior. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For ITML, the prior should be strictly
-         positive definite (PD).
-
-         'identity'
-            An identity matrix of shape (n_features, n_features).
-
-         'covariance'
-            The inverse covariance matrix.
-
-         'random'
-            The prior will be a random SPD matrix of shape
-            `(n_features, n_features)`, generated using
-            `sklearn.datasets.make_spd_matrix`.
-
-         numpy array
-             A positive definite (PD) matrix of shape
-             (n_features, n_features), that will be used as such to set the
-             prior.
-
-    A0 : Not used
-      .. deprecated:: 0.5.0
-         `A0` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0. Use 'prior' instead.
-
-    verbose : bool, optional
-        if True, prints information while learning
-
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``prior='random'``, ``random_state`` is used to set the prior.
-    """
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
@@ -172,6 +111,64 @@ class _BaseITML(MahalanobisMixin):
 class ITML(_BaseITML, _PairsClassifierMixin):
   """Information Theoretic Metric Learning (ITML)
 
+  `ITML` minimizes the (differential) relative entropy, aka Kullback-Leibler
+  divergence, between two multivariate Gaussians subject to constraints on the
+  associated Mahalanobis distance, which can be formulated into a Bregman
+  optimization problem by minimizing the LogDet divergence subject to
+  linear constraints. This algorithm can handle a wide variety of constraints
+  and can optionally incorporate a prior on the distance function. Unlike some
+  other methods, `ITML` does not rely on an eigenvalue computation or
+  semi-definite programming.
+
+  Read more in the :ref:`User Guide <itml>`.
+
+  Parameters
+  ----------
+  gamma : float, optional
+      value for slack variables
+
+  max_iter : int, optional
+
+  convergence_threshold : float, optional
+
+  prior : string or numpy array, optional (default='identity')
+       The Mahalanobis matrix to use as a prior. Possible options are
+       'identity', 'covariance', 'random', and a numpy array of shape
+       (n_features, n_features). For ITML, the prior should be strictly
+       positive definite (PD).
+
+       'identity'
+          An identity matrix of shape (n_features, n_features).
+
+       'covariance'
+          The inverse covariance matrix.
+
+       'random'
+          The prior will be a random SPD matrix of shape
+          `(n_features, n_features)`, generated using
+          `sklearn.datasets.make_spd_matrix`.
+
+       numpy array
+           A positive definite (PD) matrix of shape
+           (n_features, n_features), that will be used as such to set the
+           prior.
+
+  A0 : Not used
+    .. deprecated:: 0.5.0
+       `A0` was deprecated in version 0.5.0 and will
+       be removed in 0.6.0. Use 'prior' instead.
+
+  verbose : bool, optional
+      if True, prints information while learning
+
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int. If
+      ``prior='random'``, ``random_state`` is used to set the prior.
+
   Attributes
   ----------
   bounds_ : `numpy.ndarray`, shape=(2,)
@@ -194,6 +191,22 @@ class ITML(_BaseITML, _PairsClassifierMixin):
       If the distance metric between two points is lower than this threshold,
       points will be classified as similar, otherwise they will be
       classified as dissimilar.
+
+  Examples
+  --------
+  >>> from metric_learn import ITML_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> itml = ITML_Supervised(num_constraints=200)
+  >>> itml.fit(X, Y)
+
+  References
+  ----------
+  .. [1] `Information-theoretic Metric Learning
+         <http://machinelearning.wustl.edu/mlpapers/paper_files\
+/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis, et al.
   """
 
   def fit(self, pairs, y, bounds=None, calibration_params=None):
@@ -204,7 +217,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs: array-like, shape=(n_constraints, 2, n_features) or
+    pairs: array-like, shape=(n_constraints, 2, n_features) or \
            (n_constraints, 2)
         3D Array of pairs with each row corresponding to two points,
         or 2D array of indices of pairs if the metric learner uses a
@@ -240,6 +253,64 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 class ITML_Supervised(_BaseITML, TransformerMixin):
   """Supervised version of Information Theoretic Metric Learning (ITML)
 
+  `ITML_Supervised` creates pairs of similar sample by taking same class
+  samples, and pairs of dissimilar samples by taking different class
+  samples. It then passes these pairs to `ITML` for training.
+
+  Parameters
+  ----------
+  gamma : float, optional
+      value for slack variables
+  max_iter : int, optional
+  convergence_threshold : float, optional
+  num_labeled : Not used
+        .. deprecated:: 0.5.0
+           `num_labeled` was deprecated in version 0.5.0 and will
+           be removed in 0.6.0.
+  num_constraints: int, optional
+      number of constraints to generate
+  bounds : Not used
+         .. deprecated:: 0.5.0
+        `bounds` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Set `bounds` at fit time instead :
+        `itml_supervised.fit(X, y, bounds=...)`
+
+  prior : string or numpy array, optional (default='identity')
+       Initialization of the Mahalanobis matrix. Possible options are
+       'identity', 'covariance', 'random', and a numpy array of shape
+       (n_features, n_features). For ITML, the prior should be strictly
+       positive definite (PD).
+
+       'identity'
+          An identity matrix of shape (n_features, n_features).
+
+       'covariance'
+          The inverse covariance matrix.
+
+       'random'
+          The prior will be a random SPD matrix of shape
+          `(n_features, n_features)`, generated using
+          `sklearn.datasets.make_spd_matrix`.
+
+       numpy array
+           A positive definite (PD) matrix of shape
+           (n_features, n_features), that will be used as such to set the
+           prior.
+
+  A0 : Not used
+    .. deprecated:: 0.5.0
+       `A0` was deprecated in version 0.5.0 and will
+       be removed in 0.6.0. Use 'prior' instead.
+  verbose : bool, optional
+      if True, prints information while learning
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int. If
+      ``prior='random'``, ``random_state`` is used to set the prior.
+
+
   Attributes
   ----------
   bounds_ : `numpy.ndarray`, shape=(2,)
@@ -257,71 +328,18 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  See Also
+  --------
+  metric_learn.ITML : The original weakly-supervised algorithm
+  :ref:`supervised_version` : The section of the project documentation
+    that describes the supervised version of weakly supervised estimators.
   """
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled='deprecated', num_constraints=None,
                bounds='deprecated', prior='identity', A0='deprecated',
                verbose=False, preprocessor=None, random_state=None):
-    """Initialize the supervised version of `ITML`.
-
-    `ITML_Supervised` creates pairs of similar sample by taking same class
-    samples, and pairs of dissimilar samples by taking different class
-    samples. It then passes these pairs to `ITML` for training.
-
-    Parameters
-    ----------
-    gamma : float, optional
-        value for slack variables
-    max_iter : int, optional
-    convergence_threshold : float, optional
-    num_labeled : Not used
-          .. deprecated:: 0.5.0
-             `num_labeled` was deprecated in version 0.5.0 and will
-             be removed in 0.6.0.
-    num_constraints: int, optional
-        number of constraints to generate
-    bounds : Not used
-           .. deprecated:: 0.5.0
-          `bounds` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Set `bounds` at fit time instead :
-          `itml_supervised.fit(X, y, bounds=...)`
-
-    prior : string or numpy array, optional (default='identity')
-         Initialization of the Mahalanobis matrix. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features). For ITML, the prior should be strictly
-         positive definite (PD).
-
-         'identity'
-            An identity matrix of shape (n_features, n_features).
-
-         'covariance'
-            The inverse covariance matrix.
-
-         'random'
-            The prior will be a random SPD matrix of shape
-            `(n_features, n_features)`, generated using
-            `sklearn.datasets.make_spd_matrix`.
-
-         numpy array
-             A positive definite (PD) matrix of shape
-             (n_features, n_features), that will be used as such to set the
-             prior.
-
-    A0 : Not used
-      .. deprecated:: 0.5.0
-         `A0` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0. Use 'prior' instead.
-    verbose : bool, optional
-        if True, prints information while learning
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``prior='random'``, ``random_state`` is used to set the prior.
-    """
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
                        A0=A0, prior=prior, verbose=verbose,

@@ -1,13 +1,5 @@
-r"""
-Local Fisher Discriminant Analysis(LFDA)
-
-LFDA is a linear supervised dimensionality reduction method. It is
-particularly useful when dealing with multimodality, where one ore more classes
-consist of separate clusters in input space. The core optimization problem of
-LFDA is solved as a generalized eigenvalue problem.
-
-Read more in the :ref:`User Guide <lfda>`.
-
+"""
+Local Fisher Discriminant Analysis (LFDA)
 """
 from __future__ import division, absolute_import
 import numpy as np
@@ -26,42 +18,68 @@ class LFDA(MahalanobisMixin, TransformerMixin):
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
   Sugiyama, ICML 2006
 
+  LFDA is a linear supervised dimensionality reduction method. It is
+  particularly useful when dealing with multimodality, where one ore more
+  classes consist of separate clusters in input space. The core optimization
+  problem of LFDA is solved as a generalized eigenvalue problem.
+
+  Read more in the :ref:`User Guide <lfda>`.
+
+  Parameters
+  ----------
+  n_components : int or None, optional (default=None)
+      Dimensionality of reduced space (if None, defaults to dimension of X).
+
+  num_dims : Not used
+
+      .. deprecated:: 0.5.0
+        `num_dims` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use `n_components` instead.
+
+  k : int, optional
+      Number of nearest neighbors used in local scaling method.
+      Defaults to min(7, n_components - 1).
+
+  embedding_type : str, optional
+      Type of metric in the embedding space (default: 'weighted')
+        'weighted'        - weighted eigenvectors
+        'orthonormalized' - orthonormalized
+        'plain'           - raw eigenvectors
+
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
+
+  Examples
+  --------
+
+  >>> import numpy as np
+  >>> from metric_learn import LFDA
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> lfda = LFDA(k=2, dim=2)
+  >>> lfda.fit(X, Y)
+
+  References
+  ------------------
+  .. [1] `Dimensionality Reduction of Multimodal Labeled Data by Local Fisher
+         Discriminant Analysis <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA.pdf>`_
+         Masashi Sugiyama.
+
+  .. [2] `Local Fisher Discriminant Analysis on Beer Style Clustering
+         <https://gastrograph.com/resources/whitepapers/local-fisher\
+-discriminant-analysis-on-beer-style-clustering.html#>`_ Yuan Tang.
   '''
 
   def __init__(self, n_components=None, num_dims='deprecated',
                k=None, embedding_type='weighted', preprocessor=None):
-    '''
-    Initialize LFDA.
-
-    Parameters
-    ----------
-    n_components : int or None, optional (default=None)
-        Dimensionality of reduced space (if None, defaults to dimension of X).
-
-    num_dims : Not used
-
-        .. deprecated:: 0.5.0
-          `num_dims` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use `n_components` instead.
-
-    k : int, optional
-        Number of nearest neighbors used in local scaling method.
-        Defaults to min(7, n_components - 1).
-
-    embedding_type : str, optional
-        Type of metric in the embedding space (default: 'weighted')
-          'weighted'        - weighted eigenvectors
-          'orthonormalized' - orthonormalized
-          'plain'           - raw eigenvectors
-
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-    '''
     if embedding_type not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid embedding_type: %r' % embedding_type)
     self.n_components = n_components

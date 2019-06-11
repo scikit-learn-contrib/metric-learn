@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -50,3 +51,16 @@ intersphinx_mapping = {
     'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
     'scikit-learn': ('https://scikit-learn.org/stable/', None)
 }
+
+
+# sphinx-gallery configuration
+sphinx_gallery_conf = {
+    # to generate mini-galleries at the end of each docstring in the API
+    # section: (see https://sphinx-gallery.github.io/configuration.html
+    # #references-to-examples)
+    'doc_module': 'metric_learn',
+    'backreferences_dir': os.path.join('generated'),
+}
+
+# generate autosummary even if no references
+autosummary_generate = True

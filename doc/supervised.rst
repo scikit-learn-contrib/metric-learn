@@ -43,11 +43,11 @@ the covariance matrix of the input data. This is a simple baseline method.
 
 .. _lmnn:
 
-:py:class:`LMNN <metric_learn.lmnn.LMNN>`
+:py:class:`LMNN <metric_learn.LMNN>`
 -----------------------------------------
 
 Large Margin Nearest Neighbor Metric Learning
-(:py:class:`LMNN <metric_learn.lmnn.LMNN>`)
+(:py:class:`LMNN <metric_learn.LMNN>`)
 
 `LMNN` learns a Mahalanobis distance metric in the kNN classification
 setting. The learned metric attempts to keep close k-nearest neighbors 
@@ -102,10 +102,10 @@ The two implementations differ slightly, and the C++ version is more complete.
 
 .. _nca:
 
-:py:class:`NCA <metric_learn.nca.NCA>`
+:py:class:`NCA <metric_learn.NCA>`
 --------------------------------------
 
-Neighborhood Components Analysis(:py:class:`NCA <metric_learn.nca.NCA>`)
+Neighborhood Components Analysis(:py:class:`NCA <metric_learn.NCA>`)
 
 `NCA` is a distance metric learning algorithm which aims to improve the 
 accuracy of nearest neighbors classification compared to the standard 
@@ -166,10 +166,10 @@ the sum of probability of being correctly classified:
 
 .. _lfda:
 
-:py:class:`LFDA <metric_learn.lfda.LFDA>`
+:py:class:`LFDA <metric_learn.LFDA>`
 -----------------------------------------
 
-Local Fisher Discriminant Analysis(:py:class:`LFDA <metric_learn.lfda.LFDA>`)
+Local Fisher Discriminant Analysis(:py:class:`LFDA <metric_learn.LFDA>`)
 
 `LFDA` is a linear supervised dimensionality reduction method. It is
 particularly useful when dealing with multi-modality, where one ore more classes
@@ -240,10 +240,10 @@ same class are not imposed to be close.
 
 .. _mlkr:
 
-:py:class:`MLKR <metric_learn.mlkr.MLKR>`
+:py:class:`MLKR <metric_learn.MLKR>`
 -----------------------------------------
 
-Metric Learning for Kernel Regression(:py:class:`MLKR <metric_learn.mlkr.MLKR>`)
+Metric Learning for Kernel Regression(:py:class:`MLKR <metric_learn.MLKR>`)
 
 `MLKR` is an algorithm for supervised metric learning, which learns a
 distance function by directly minimizing the leave-one-out regression error.
@@ -302,6 +302,8 @@ calculating a weighted average of all the training samples:
        press/v2/weinberger07a/weinberger07a.pdf>`_ Kilian Q. Weinberger,
        Gerald Tesauro
 
+
+.. _supervised_version:
 
 Supervised versions of weakly-supervised algorithms
 ---------------------------------------------------

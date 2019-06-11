@@ -1,15 +1,5 @@
-r"""
-Sparse High-Dimensional Metric Learning(SDML)
-
-SDML is an efficient sparse metric learning in high-dimensional space via
-double regularization: an L1-penalization on the off-diagonal elements of the
-Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between
-:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}`
-or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the
-covariance matrix).
-
-Read more in the :ref:`User Guide <sdml>`.
-
+"""
+Sparse High-Dimensional Metric Learning (SDML)
 """
 
 from __future__ import absolute_import
@@ -38,55 +28,6 @@ class _BaseSDML(MahalanobisMixin):
   def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
                use_cov='deprecated', verbose=False, preprocessor=None,
                random_state=None):
-    """
-    Parameters
-    ----------
-    balance_param : float, optional
-        trade off between sparsity and M0 prior
-
-    sparsity_param : float, optional
-        trade off between optimizer and sparseness (see graph_lasso)
-
-    prior : None, string or numpy array, optional (default=None)
-         Prior to set for the metric. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of
-         shape (n_features, n_features). For SDML, the prior should be strictly
-         positive definite (PD). If `None`, will be set
-         automatically to 'identity' (this is to raise a warning if
-         `prior` is not set, and stays to its default value (None), in v0.5.0).
-
-         'identity'
-            An identity matrix of shape (n_features, n_features).
-
-         'covariance'
-            The inverse covariance matrix.
-
-         'random'
-            The prior will be a random positive definite (PD) matrix of shape
-            `(n_features, n_features)`, generated using
-            `sklearn.datasets.make_spd_matrix`.
-
-         numpy array
-             A positive definite (PD) matrix of shape
-             (n_features, n_features), that will be used as such to set the
-             prior.
-
-    use_cov : Not used.
-        .. deprecated:: 0.5.0
-          `A0` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use 'prior' instead.
-
-    verbose : bool, optional
-        if True, prints information while learning
-
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be gotten like this: X[indices].
-
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``prior='random'``, ``random_state`` is used to set the prior.
-    """
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
     self.prior = prior
@@ -190,6 +131,63 @@ class _BaseSDML(MahalanobisMixin):
 class SDML(_BaseSDML, _PairsClassifierMixin):
   """Sparse Distance Metric Learning (SDML)
 
+  SDML is an efficient sparse metric learning in high-dimensional space via
+  double regularization: an L1-penalization on the off-diagonal elements of the
+  Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence
+  between :math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either
+  :math:`\mathbf{I}` or :math:`\mathbf{\Omega}^{-1}`, where
+  :math:`\mathbf{\Omega}` is the covariance matrix).
+
+  Read more in the :ref:`User Guide <sdml>`.
+
+  Parameters
+  ----------
+  balance_param : float, optional
+      trade off between sparsity and M0 prior
+
+  sparsity_param : float, optional
+      trade off between optimizer and sparseness (see graph_lasso)
+
+  prior : None, string or numpy array, optional (default=None)
+       Prior to set for the metric. Possible options are
+       'identity', 'covariance', 'random', and a numpy array of
+       shape (n_features, n_features). For SDML, the prior should be strictly
+       positive definite (PD). If `None`, will be set
+       automatically to 'identity' (this is to raise a warning if
+       `prior` is not set, and stays to its default value (None), in v0.5.0).
+
+       'identity'
+          An identity matrix of shape (n_features, n_features).
+
+       'covariance'
+          The inverse covariance matrix.
+
+       'random'
+          The prior will be a random positive definite (PD) matrix of shape
+          `(n_features, n_features)`, generated using
+          `sklearn.datasets.make_spd_matrix`.
+
+       numpy array
+           A positive definite (PD) matrix of shape
+           (n_features, n_features), that will be used as such to set the
+           prior.
+
+  use_cov : Not used.
+      .. deprecated:: 0.5.0
+        `A0` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use 'prior' instead.
+
+  verbose : bool, optional
+      if True, prints information while learning
+
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be gotten like this: X[indices].
+
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int. If
+      ``prior='random'``, ``random_state`` is used to set the prior.
+
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
@@ -200,6 +198,27 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
       If the distance metric between two points is lower than this threshold,
       points will be classified as similar, otherwise they will be
       classified as dissimilar.
+
+  Examples
+  --------
+  >>> from metric_learn import SDML_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> sdml = SDML_Supervised(num_constraints=200)
+  >>> sdml.fit(X, Y)
+
+  References
+  ----------
+
+  .. [1] Qi et al.
+         An efficient sparse metric learning in high-dimensional space via
+         L1-penalized log-determinant regularization. ICML 2009.
+         http://lms.comp.nus.edu.sg/sites/default/files/publication\
+-attachments/icml09-guojun.pdf
+
+  .. [2] Adapted from https://gist.github.com/kcarnold/5439945
   """
 
   def fit(self, pairs, y, calibration_params=None):
@@ -210,7 +229,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs : array-like, shape=(n_constraints, 2, n_features) or
+    pairs : array-like, shape=(n_constraints, 2, n_features) or \
            (n_constraints, 2)
         3D Array of pairs with each row corresponding to two points,
         or 2D array of indices of pairs if the metric learner uses a
@@ -238,74 +257,78 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 class SDML_Supervised(_BaseSDML, TransformerMixin):
   """Supervised version of Sparse Distance Metric Learning (SDML)
 
+  `SDML_Supervised` creates pairs of similar sample by taking same class
+  samples, and pairs of dissimilar samples by taking different class
+  samples. It then passes these pairs to `SDML` for training.
+
+  Parameters
+  ----------
+  balance_param : float, optional
+      trade off between sparsity and M0 prior
+  sparsity_param : float, optional
+      trade off between optimizer and sparseness (see graph_lasso)
+  prior : None, string or numpy array, optional (default=None)
+       Prior to set for the metric. Possible options are
+       'identity', 'covariance', 'random', and a numpy array of
+       shape (n_features, n_features). For SDML, the prior should be strictly
+       positive definite (PD). If `None`, will be set
+       automatically to 'identity' (this is to raise a warning if
+       `prior` is not set, and stays to its default value (None), in v0.5.0).
+
+       'identity'
+          An identity matrix of shape (n_features, n_features).
+
+       'covariance'
+          The inverse covariance matrix.
+
+       'random'
+          The prior will be a random SPD matrix of shape
+          `(n_features, n_features)`, generated using
+          `sklearn.datasets.make_spd_matrix`.
+
+       numpy array
+           A positive definite (PD) matrix of shape
+           (n_features, n_features), that will be used as such to set the
+           prior.
+
+  use_cov : Not used.
+      .. deprecated:: 0.5.0
+        `A0` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use 'prior' instead.
+
+  num_labeled : Not used
+    .. deprecated:: 0.5.0
+       `num_labeled` was deprecated in version 0.5.0 and will
+       be removed in 0.6.0.
+  num_constraints : int, optional
+      number of constraints to generate
+  verbose : bool, optional
+      if True, prints information while learning
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int. If
+      ``init='random'``, ``random_state`` is used to set the random
+      prior.
+
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  See Also
+  --------
+  metric_learn.SDML : The original weakly-supervised algorithm
+  :ref:`supervised_version` : The section of the project documentation
+    that describes the supervised version of weakly supervised estimators.
   """
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
                use_cov='deprecated', num_labeled='deprecated',
                num_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
-    """Initialize the supervised version of `SDML`.
-
-    `SDML_Supervised` creates pairs of similar sample by taking same class
-    samples, and pairs of dissimilar samples by taking different class
-    samples. It then passes these pairs to `SDML` for training.
-
-    Parameters
-    ----------
-    balance_param : float, optional
-        trade off between sparsity and M0 prior
-    sparsity_param : float, optional
-        trade off between optimizer and sparseness (see graph_lasso)
-    prior : None, string or numpy array, optional (default=None)
-         Prior to set for the metric. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of
-         shape (n_features, n_features). For SDML, the prior should be strictly
-         positive definite (PD). If `None`, will be set
-         automatically to 'identity' (this is to raise a warning if
-         `prior` is not set, and stays to its default value (None), in v0.5.0).
-
-         'identity'
-            An identity matrix of shape (n_features, n_features).
-
-         'covariance'
-            The inverse covariance matrix.
-
-         'random'
-            The prior will be a random SPD matrix of shape
-            `(n_features, n_features)`, generated using
-            `sklearn.datasets.make_spd_matrix`.
-
-         numpy array
-             A positive definite (PD) matrix of shape
-             (n_features, n_features), that will be used as such to set the
-             prior.
-
-    use_cov : Not used.
-        .. deprecated:: 0.5.0
-          `A0` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use 'prior' instead.
-
-    num_labeled : Not used
-      .. deprecated:: 0.5.0
-         `num_labeled` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0.
-    num_constraints : int, optional
-        number of constraints to generate
-    verbose : bool, optional
-        if True, prints information while learning
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to set the random
-        prior.
-    """
     _BaseSDML.__init__(self, balance_param=balance_param,
                        sparsity_param=sparsity_param, prior=prior,
                        use_cov=use_cov, verbose=verbose,

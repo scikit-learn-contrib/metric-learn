@@ -1,13 +1,5 @@
-r"""
-Metric Learning for Kernel Regression(MLKR)
-
-MLKR is an algorithm for supervised metric learning, which learns a
-distance function by directly minimizing the leave-one-out regression error.
-This algorithm can also be viewed as a supervised variation of PCA and can be
-used for dimensionality reduction and high dimensional data visualization.
-
-Read more in the :ref:`User Guide <mlkr>`.
-
+"""
+Metric Learning for Kernel Regression (MLKR)
 """
 from __future__ import division, print_function
 import time
@@ -31,6 +23,81 @@ EPS = np.finfo(float).eps
 class MLKR(MahalanobisMixin, TransformerMixin):
   """Metric Learning for Kernel Regression (MLKR)
 
+  MLKR is an algorithm for supervised metric learning, which learns a
+  distance function by directly minimizing the leave-one-out regression error.
+  This algorithm can also be viewed as a supervised variation of PCA and can be
+  used for dimensionality reduction and high dimensional data visualization.
+
+  Read more in the :ref:`User Guide <mlkr>`.
+
+  Parameters
+  ----------
+  n_components : int or None, optional (default=None)
+      Dimensionality of reduced space (if None, defaults to dimension of X).
+
+  num_dims : Not used
+
+      .. deprecated:: 0.5.0
+        `num_dims` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use `n_components` instead.
+
+  init : None, string or numpy array, optional (default=None)
+      Initialization of the linear transformation. Possible options are
+      'auto', 'pca', 'identity', 'random', and a numpy array of shape
+      (n_features_a, n_features_b). If None, will be set automatically to
+      'auto' (this option is to raise a warning if 'init' is not set,
+      and stays to its default value None, in v0.5.0).
+
+      'auto'
+          Depending on ``n_components``, the most reasonable initialization
+          will be chosen. If ``n_components < min(n_features, n_samples)``,
+          we use 'pca', as it projects data in meaningful directions (those
+          of higher variance). Otherwise, we just use 'identity'.
+
+      'pca'
+          ``n_components`` principal components of the inputs passed
+          to :meth:`fit` will be used to initialize the transformation.
+          (See `sklearn.decomposition.PCA`)
+
+      'identity'
+          If ``n_components`` is strictly smaller than the
+          dimensionality of the inputs passed to :meth:`fit`, the identity
+          matrix will be truncated to the first ``n_components`` rows.
+
+      'random'
+          The initial transformation will be a random array of shape
+          `(n_components, n_features)`. Each value is sampled from the
+          standard normal distribution.
+
+      numpy array
+          n_features_b must match the dimensionality of the inputs passed to
+          :meth:`fit` and n_features_a must be less than or equal to that.
+          If ``num_dims`` is not None, n_features_a must match it.
+
+  A0: Not used.
+      .. deprecated:: 0.5.0
+        `A0` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use 'init' instead.
+
+  tol: float, optional (default=None)
+      Convergence tolerance for the optimization.
+
+  max_iter: int, optional
+      Cap on number of conjugate gradient iterations.
+
+  verbose : bool, optional (default=False)
+      Whether to print progress messages or not.
+
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int. If
+      ``init='random'``, ``random_state`` is used to initialize the random
+      transformation. If ``init='pca'``, ``random_state`` is passed as an
+      argument to PCA when initializing the transformation.
+
   Attributes
   ----------
   n_iter_ : `int`
@@ -38,82 +105,28 @@ class MLKR(MahalanobisMixin, TransformerMixin):
 
   transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
+
+  Examples
+  --------
+
+  >>> from metric_learn import MLKR
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> mlkr = MLKR()
+  >>> mlkr.fit(X, Y)
+
+  References
+  ----------
+  .. [1] `Information-theoretic Metric Learning
+     <http://machinelearning.wustl.edu/\
+mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis, et al.
   """
 
   def __init__(self, n_components=None, num_dims='deprecated', init=None,
                A0='deprecated', tol=None, max_iter=1000, verbose=False,
                preprocessor=None, random_state=None):
-    """
-    Initialize MLKR.
-
-    Parameters
-    ----------
-    n_components : int or None, optional (default=None)
-        Dimensionality of reduced space (if None, defaults to dimension of X).
-
-    num_dims : Not used
-
-        .. deprecated:: 0.5.0
-          `num_dims` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use `n_components` instead.
-
-    init : None, string or numpy array, optional (default=None)
-        Initialization of the linear transformation. Possible options are
-        'auto', 'pca', 'identity', 'random', and a numpy array of shape
-        (n_features_a, n_features_b). If None, will be set automatically to
-        'auto' (this option is to raise a warning if 'init' is not set,
-        and stays to its default value None, in v0.5.0).
-
-        'auto'
-            Depending on ``n_components``, the most reasonable initialization
-            will be chosen. If ``n_components < min(n_features, n_samples)``,
-            we use 'pca', as it projects data in meaningful directions (those
-            of higher variance). Otherwise, we just use 'identity'.
-
-        'pca'
-            ``n_components`` principal components of the inputs passed
-            to :meth:`fit` will be used to initialize the transformation.
-            (See `sklearn.decomposition.PCA`)
-
-        'identity'
-            If ``n_components`` is strictly smaller than the
-            dimensionality of the inputs passed to :meth:`fit`, the identity
-            matrix will be truncated to the first ``n_components`` rows.
-
-        'random'
-            The initial transformation will be a random array of shape
-            `(n_components, n_features)`. Each value is sampled from the
-            standard normal distribution.
-
-        numpy array
-            n_features_b must match the dimensionality of the inputs passed to
-            :meth:`fit` and n_features_a must be less than or equal to that.
-            If ``num_dims`` is not None, n_features_a must match it.
-
-    A0: Not used.
-        .. deprecated:: 0.5.0
-          `A0` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use 'init' instead.
-
-    tol: float, optional (default=None)
-        Convergence tolerance for the optimization.
-
-    max_iter: int, optional
-        Cap on number of conjugate gradient iterations.
-
-    verbose : bool, optional (default=False)
-        Whether to print progress messages or not.
-
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        transformation. If ``init='pca'``, ``random_state`` is passed as an
-        argument to PCA when initializing the transformation.
-    """
     self.n_components = n_components
     self.num_dims = num_dims
     self.init = init

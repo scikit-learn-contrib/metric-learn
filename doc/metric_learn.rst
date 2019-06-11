@@ -7,30 +7,47 @@ Module Contents
 Base Classes
 ------------
 
-.. toctree::
+.. autosummary::
+    :toctree: generated/
+    :template: module.rst
 
-   metric_learn.constraints
-   metric_learn.base_metric
-
+    metric_learn.base_metric
+    metric_learn.constraints
 
 Supervised Learning Algorithms
 ------------------------------
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
 
-.. toctree::
-
-   metric_learn.lfda
-   metric_learn.lmnn
-   metric_learn.mlkr
-   metric_learn.nca
-   metric_learn.rca
-
+   metric_learn.LFDA
+   metric_learn.LMNN
+   metric_learn.MLKR
+   metric_learn.NCA
+   metric_learn.RCA
+   metric_learn.ITML_Supervised
+   metric_learn.LSML_Supervised
+   metric_learn.MMC_Supervised
+   metric_learn.SDML_Supervised
+   metric_learn.RCA_Supervised
 
 Weakly Supervised Learning Algorithms
 ------------------------------
 
-.. toctree::
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
 
-   metric_learn.itml
-   metric_learn.lsml
-   metric_learn.mmc
-   metric_learn.sdml
+   metric_learn.ITML
+   metric_learn.LSML
+   metric_learn.MMC
+   metric_learn.SDML
+
+Unsupervised Learning Algorithms
+--------------------------------
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   metric_learn.Covariance

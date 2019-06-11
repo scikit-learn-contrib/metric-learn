@@ -1,21 +1,4 @@
-r"""
-Metric Learning with Application for Clustering with Side Information(MMC)
-
-MMC minimizes the sum of squared distances between similar points, while
-enforcing the sum of distances between dissimilar ones to be greater than one.
-This leads to a convex and, thus, local-minima-free optimization problem that
-can be solved efficiently.
-However, the algorithm involves the computation of eigenvalues, which is the
-main speed-bottleneck. Since it has initially been designed for clustering
-applications, one of the implicit assumptions of MMC is that all classes form
-a compact set, i.e., follow a unimodal distribution, which restricts the
-possible use-cases of this method. However, it is one of the earliest and a
-still often cited technique.
-
-Read more in the :ref:`User Guide <mmc>`.
-
-"""
-
+"""Mahalanobis Metric for Clustering (MMC)"""
 from __future__ import print_function, absolute_import, division
 import warnings
 import numpy as np
@@ -30,7 +13,6 @@ from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseMMC(MahalanobisMixin):
-  """Mahalanobis Metric for Clustering (MMC)"""
 
   _tuple_size = 2  # constraints are pairs
 
@@ -38,61 +20,6 @@ class _BaseMMC(MahalanobisMixin):
                init=None, A0='deprecated', diagonal=False,
                diagonal_c=1.0, verbose=False, preprocessor=None,
                random_state=None):
-    """Initialize MMC.
-    Parameters
-    ----------
-    max_iter : int, optional
-    max_proj : int, optional
-    convergence_threshold : float, optional
-    init : None, string or numpy array, optional (default=None)
-        Initialization of the Mahalanobis matrix. Possible options are
-        'identity', 'covariance', 'random', and a numpy array of
-        shape (n_features, n_features). If None, will be set
-        automatically to 'identity' (this is to raise a warning if
-        'init' is not set, and stays to its default value (None), in v0.5.0).
-
-         'identity'
-            An identity matrix of shape (n_features, n_features).
-
-         'covariance'
-            The (pseudo-)inverse of the covariance matrix.
-
-         'random'
-            The initial Mahalanobis matrix will be a random SPD matrix of shape
-            `(n_features, n_features)`, generated using
-            `sklearn.datasets.make_spd_matrix`.
-
-         numpy array
-             An SPD matrix of shape (n_features, n_features), that will
-             be used as such to initialize the metric.
-
-    verbose : bool, optional
-        if True, prints information while learning
-
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be gotten like this: X[indices].
-    A0 : Not used.
-        .. deprecated:: 0.5.0
-          `A0` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use 'init' instead.
-    diagonal : bool, optional
-        if True, a diagonal metric will be learned,
-        i.e., a simple scaling of dimensions. The initialization will then
-        be the diagonal coefficients of the matrix given as 'init'.
-    diagonal_c : float, optional
-        weight of the dissimilarity constraint for diagonal
-        metric learning
-    verbose : bool, optional
-        if True, prints information while learning
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be gotten like this: X[indices].
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        transformation.
-    """
     self.max_iter = max_iter
     self.max_proj = max_proj
     self.convergence_threshold = convergence_threshold
@@ -403,6 +330,74 @@ class _BaseMMC(MahalanobisMixin):
 class MMC(_BaseMMC, _PairsClassifierMixin):
   """Mahalanobis Metric for Clustering (MMC)
 
+  MMC minimizes the sum of squared distances between similar points, while
+  enforcing the sum of distances between dissimilar ones to be greater than
+  one. This leads to a convex and, thus, local-minima-free optimization
+  problem that can be solved efficiently.
+  However, the algorithm involves the computation of eigenvalues, which is the
+  main speed-bottleneck. Since it has initially been designed for clustering
+  applications, one of the implicit assumptions of MMC is that all classes form
+  a compact set, i.e., follow a unimodal distribution, which restricts the
+  possible use-cases of this method. However, it is one of the earliest and a
+  still often cited technique.
+
+  Read more in the :ref:`User Guide <mmc>`.
+
+  Parameters
+     ----------
+     max_iter : int, optional
+     max_proj : int, optional
+     convergence_threshold : float, optional
+     init : None, string or numpy array, optional (default=None)
+         Initialization of the Mahalanobis matrix. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of
+         shape (n_features, n_features). If None, will be set
+         automatically to 'identity' (this is to raise a warning if
+         'init' is not set, and stays to its default value (None), in v0.5.0).
+
+          'identity'
+             An identity matrix of shape (n_features, n_features).
+
+          'covariance'
+             The (pseudo-)inverse of the covariance matrix.
+
+          'random'
+             The initial Mahalanobis matrix will be a random SPD matrix of
+             shape
+             `(n_features, n_features)`, generated using
+             `sklearn.datasets.make_spd_matrix`.
+
+          numpy array
+              An SPD matrix of shape (n_features, n_features), that will
+              be used as such to initialize the metric.
+
+     verbose : bool, optional
+         if True, prints information while learning
+
+     preprocessor : array-like, shape=(n_samples, n_features) or callable
+         The preprocessor to call to get tuples from indices. If array-like,
+         tuples will be gotten like this: X[indices].
+     A0 : Not used.
+         .. deprecated:: 0.5.0
+           `A0` was deprecated in version 0.5.0 and will
+           be removed in 0.6.0. Use 'init' instead.
+     diagonal : bool, optional
+         if True, a diagonal metric will be learned,
+         i.e., a simple scaling of dimensions. The initialization will then
+         be the diagonal coefficients of the matrix given as 'init'.
+     diagonal_c : float, optional
+         weight of the dissimilarity constraint for diagonal
+         metric learning
+     verbose : bool, optional
+         if True, prints information while learning
+     preprocessor : array-like, shape=(n_samples, n_features) or callable
+         The preprocessor to call to get tuples from indices. If array-like,
+         tuples will be gotten like this: X[indices].
+     random_state : int or numpy.RandomState or None, optional (default=None)
+         A pseudo random number generator object or a seed for it if int. If
+         ``init='random'``, ``random_state`` is used to initialize the random
+         transformation.
+
   Attributes
   ----------
   n_iter_ : `int`
@@ -416,6 +411,29 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
       If the distance metric between two points is lower than this threshold,
       points will be classified as similar, otherwise they will be
       classified as dissimilar.
+
+  Examples
+  --------
+  >>> from metric_learn import MMC_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> mmc = MMC_Supervised(num_constraints=200)
+  >>> mmc.fit(X, Y)
+
+  References
+  ----------
+  .. [1] `Distance metric learning with application to clustering with
+         side-information <http://papers.nips.cc/paper/2164-distance-metric-\
+learning-with-application-to-clustering-with-side-information.pdf>`_
+         Xing, Jordan, Russell, Ng.
+
+  See Also
+  --------
+  metric_learn.MMC : The original weakly-supervised algorithm
+  :ref:`supervised_version` : The section of the project documentation
+    that describes the supervised version of weakly supervised estimators.
   """
 
   def fit(self, pairs, y, calibration_params=None):
@@ -426,7 +444,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
 
     Parameters
     ----------
-    pairs : array-like, shape=(n_constraints, 2, n_features) or
+    pairs : array-like, shape=(n_constraints, 2, n_features) or \
            (n_constraints, 2)
         3D Array of pairs with each row corresponding to two points,
         or 2D array of indices of pairs if the metric learner uses a
@@ -453,6 +471,73 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
 class MMC_Supervised(_BaseMMC, TransformerMixin):
   """Supervised version of Mahalanobis Metric for Clustering (MMC)
 
+  `MMC_Supervised` creates pairs of similar sample by taking same class
+  samples, and pairs of dissimilar samples by taking different class
+  samples. It then passes these pairs to `MMC` for training.
+
+  Parameters
+  ----------
+  max_iter : int, optional
+  max_proj : int, optional
+  convergence_threshold : float, optional
+  num_labeled : Not used
+    .. deprecated:: 0.5.0
+       `num_labeled` was deprecated in version 0.5.0 and will
+       be removed in 0.6.0.
+  num_constraints: int, optional
+      number of constraints to generate
+  init : None, string or numpy array, optional (default=None)
+      Initialization of the Mahalanobis matrix. Possible options are
+      'identity', 'covariance', 'random', and a numpy array of
+      shape (n_features, n_features). If None, will be set
+      automatically to 'identity' (this is to raise a warning if
+      'init' is not set, and stays to its default value (None), in v0.5.0).
+
+       'identity'
+           An identity matrix of shape (n_features, n_features).
+
+       'covariance'
+           The (pseudo-)inverse of the covariance matrix.
+
+       'random'
+           The initial Mahalanobis matrix will be a random SPD matrix of
+           shape `(n_features, n_features)`, generated using
+           `sklearn.datasets.make_spd_matrix`.
+
+       numpy array
+           A numpy array of shape (n_features, n_features), that will
+           be used as such to initialize the metric.
+
+  verbose : bool, optional
+      if True, prints information while learning
+
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be gotten like this: X[indices].
+  A0 : Not used.
+      .. deprecated:: 0.5.0
+        `A0` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use 'init' instead.
+  diagonal : bool, optional
+      if True, a diagonal metric will be learned,
+      i.e., a simple scaling of dimensions
+  diagonal_c : float, optional
+      weight of the dissimilarity constraint for diagonal
+      metric learning
+  verbose : bool, optional
+      if True, prints information while learning
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int. If
+      ``init='random'``, ``random_state`` is used to initialize the random
+      Mahalanobis matrix.
+
+  `MMC_Supervised` creates pairs of similar sample by taking same class
+  samples, and pairs of dissimilar samples by taking different class
+  samples. It then passes these pairs to `MMC` for training.
+
   Attributes
   ----------
   n_iter_ : `int`
@@ -467,71 +552,6 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
                num_labeled='deprecated', num_constraints=None, init=None,
                A0='deprecated', diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None, random_state=None):
-    """Initialize the supervised version of `MMC`.
-
-    `MMC_Supervised` creates pairs of similar sample by taking same class
-    samples, and pairs of dissimilar samples by taking different class
-    samples. It then passes these pairs to `MMC` for training.
-
-    Parameters
-    ----------
-    max_iter : int, optional
-    max_proj : int, optional
-    convergence_threshold : float, optional
-    num_labeled : Not used
-      .. deprecated:: 0.5.0
-         `num_labeled` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0.
-    num_constraints: int, optional
-        number of constraints to generate
-    init : None, string or numpy array, optional (default=None)
-        Initialization of the Mahalanobis matrix. Possible options are
-        'identity', 'covariance', 'random', and a numpy array of
-        shape (n_features, n_features). If None, will be set
-        automatically to 'identity' (this is to raise a warning if
-        'init' is not set, and stays to its default value (None), in v0.5.0).
-
-         'identity'
-             An identity matrix of shape (n_features, n_features).
-
-         'covariance'
-             The (pseudo-)inverse of the covariance matrix.
-
-         'random'
-             The initial Mahalanobis matrix will be a random SPD matrix of
-             shape `(n_features, n_features)`, generated using
-             `sklearn.datasets.make_spd_matrix`.
-
-         numpy array
-             A numpy array of shape (n_features, n_features), that will
-             be used as such to initialize the metric.
-
-    verbose : bool, optional
-        if True, prints information while learning
-
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be gotten like this: X[indices].
-    A0 : Not used.
-        .. deprecated:: 0.5.0
-          `A0` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use 'init' instead.
-    diagonal : bool, optional
-        if True, a diagonal metric will be learned,
-        i.e., a simple scaling of dimensions
-    diagonal_c : float, optional
-        weight of the dissimilarity constraint for diagonal
-        metric learning
-    verbose : bool, optional
-        if True, prints information while learning
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to initialize the random
-        Mahalanobis matrix.
-    """
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,
                       init=init, A0=A0, diagonal=diagonal,

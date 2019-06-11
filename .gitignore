@@ -7,3 +7,4 @@ htmlcov/
 .cache/
 .pytest_cache/
 doc/auto_examples/*
+doc/generated/*

@@ -1,14 +1,5 @@
-r"""
-Relative Components Analysis(RCA)
-
-RCA learns a full rank Mahalanobis distance metric based on a weighted sum of
-in-chunklets covariance matrices. It applies a global linear transformation to
-assign large weights to relevant dimensions and low weights to irrelevant
-dimensions. Those relevant dimensions are estimated using "chunklets", subsets
-of points that are known to belong to the same class.
-
-Read more in the :ref:`User Guide <rca>`.
-
+"""
+Relative Components Analysis (RCA)
 """
 
 from __future__ import absolute_import
@@ -41,6 +32,54 @@ def _chunk_mean_centering(data, chunks):
 class RCA(MahalanobisMixin, TransformerMixin):
   """Relevant Components Analysis (RCA)
 
+  RCA learns a full rank Mahalanobis distance metric based on a weighted sum of
+  in-chunklets covariance matrices. It applies a global linear transformation
+  to assign large weights to relevant dimensions and low weights to irrelevant
+  dimensions. Those relevant dimensions are estimated using "chunklets",
+  subsets of points that are known to belong to the same class.
+
+  Read more in the :ref:`User Guide <rca>`.
+
+  Parameters
+  ----------
+  n_components : int or None, optional (default=None)
+      Dimensionality of reduced space (if None, defaults to dimension of X).
+
+  num_dims : Not used
+
+      .. deprecated:: 0.5.0
+        `num_dims` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use `n_components` instead.
+
+  pca_comps : int, float, None or string
+      Number of components to keep during PCA preprocessing.
+      If None (default), does not perform PCA.
+      If ``0 < pca_comps < 1``, it is used as
+      the minimum explained variance ratio.
+      See sklearn.decomposition.PCA for more details.
+
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+
+  Examples
+  --------
+  >>> from metric_learn import RCA_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> rca = RCA_Supervised(num_chunks=30, chunk_size=2)
+  >>> rca.fit(X, Y)
+
+  References
+  ------------------
+  .. [1] `Adjustment learning and relevant component analysis
+         <http://citeseerx.ist.\
+psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
+         Shental, et al.
+
+
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
@@ -49,30 +88,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
 
   def __init__(self, n_components=None, num_dims='deprecated',
                pca_comps=None, preprocessor=None):
-    """Initialize the learner.
-
-    Parameters
-    ----------
-    n_components : int or None, optional (default=None)
-        Dimensionality of reduced space (if None, defaults to dimension of X).
-
-    num_dims : Not used
-
-        .. deprecated:: 0.5.0
-          `num_dims` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use `n_components` instead.
-
-    pca_comps : int, float, None or string
-        Number of components to keep during PCA preprocessing.
-        If None (default), does not perform PCA.
-        If ``0 < pca_comps < 1``, it is used as
-        the minimum explained variance ratio.
-        See sklearn.decomposition.PCA for more details.
-
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-    """
     self.n_components = n_components
     self.num_dims = num_dims
     self.pca_comps = pca_comps
@@ -148,6 +163,27 @@ def _inv_sqrtm(x):
 class RCA_Supervised(RCA):
   """Supervised version of Relevant Components Analysis (RCA)
 
+  `RCA_Supervised` creates chunks of similar points by first sampling a
+  class, taking `chunk_size` elements in it, and repeating the process
+  `num_chunks` times.
+
+  Parameters
+  ----------
+  n_components : int or None, optional (default=None)
+      Dimensionality of reduced space (if None, defaults to dimension of X).
+
+  num_dims : Not used
+
+      .. deprecated:: 0.5.0
+        `num_dims` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use `n_components` instead.
+
+  num_chunks: int, optional
+  chunk_size: int, optional
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
@@ -157,29 +193,6 @@ class RCA_Supervised(RCA):
   def __init__(self, num_dims='deprecated', n_components=None,
                pca_comps=None, num_chunks=100, chunk_size=2,
                preprocessor=None):
-    """Initialize the supervised version of `RCA`.
-
-    `RCA_Supervised` creates chunks of similar points by first sampling a
-    class, taking `chunk_size` elements in it, and repeating the process
-    `num_chunks` times.
-
-    Parameters
-    ----------
-    n_components : int or None, optional (default=None)
-        Dimensionality of reduced space (if None, defaults to dimension of X).
-
-    num_dims : Not used
-
-        .. deprecated:: 0.5.0
-          `num_dims` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use `n_components` instead.
-
-    num_chunks: int, optional
-    chunk_size: int, optional
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-    """
     RCA.__init__(self, num_dims=num_dims, n_components=n_components,
                  pca_comps=pca_comps, preprocessor=preprocessor)
     self.num_chunks = num_chunks

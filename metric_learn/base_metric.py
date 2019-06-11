@@ -10,16 +10,16 @@ import warnings
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
+  """Base class for all metric-learners
+
+  Parameters
+  ----------
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be gotten like this: X[indices].
+  """
 
   def __init__(self, preprocessor=None):
-    """
-
-    Parameters
-    ----------
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be gotten like this: X[indices].
-    """
     self.preprocessor = preprocessor
 
   @abstractmethod
@@ -277,6 +277,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   get_metric.__doc__ = BaseMetricLearner.get_metric.__doc__
 
   def metric(self):
+    """Deprecated. Will be removed in v0.6.0. Use `get_mahalanobis_matrix`
+    instead"""
     # TODO: remove this method in version 0.6.0
     warnings.warn(("`metric` is deprecated since version 0.5.0 and will be "
                    "removed in 0.6.0. Use `get_mahalanobis_matrix` instead."),
@@ -578,7 +580,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or \
                   (n_quadruplets, 4)
       3D Array of quadruplets to predict, with each row corresponding to four
       points, or 2D array of indices of quadruplets if the metric learner
@@ -607,7 +609,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or \
                   (n_quadruplets, 4)
       3D Array of quadruplets to predict, with each row corresponding to four
       points, or 2D array of indices of quadruplets if the metric learner
@@ -630,7 +632,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or \
                   (n_quadruplets, 4)
       3D Array of quadruplets to score, with each row corresponding to four
       points, or 2D array of indices of quadruplets if the metric learner

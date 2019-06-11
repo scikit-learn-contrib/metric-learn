@@ -193,10 +193,10 @@ Algorithms
 
 .. _itml:
 
-:py:class:`ITML <metric_learn.itml.ITML>`
+:py:class:`ITML <metric_learn.ITML>`
 -----------------------------------------
 
-Information Theoretic Metric Learning(:py:class:`ITML <metric_learn.itml.ITML>`)
+Information Theoretic Metric Learning(:py:class:`ITML <metric_learn.ITML>`)
 
 `ITML` minimizes the (differential) relative entropy, aka Kullback–Leibler 
 divergence, between two multivariate Gaussians subject to constraints on the 
@@ -272,11 +272,11 @@ is the prior distance metric, set to identity matrix by default,
 
 .. _sdml:
 
-:py:class:`SDML <metric_learn.sdml.SDML>`
+:py:class:`SDML <metric_learn.SDML>`
 -----------------------------------------
 
 Sparse High-Dimensional Metric Learning
-(:py:class:`SDML <metric_learn.sdml.SDML>`)
+(:py:class:`SDML <metric_learn.SDML>`)
 
 `SDML` is an efficient sparse metric learning in high-dimensional space via 
 double regularization: an L1-penalization on the off-diagonal elements of the 
@@ -332,10 +332,10 @@ is the off-diagonal L1 norm.
 
 .. _rca:
 
-:py:class:`RCA <metric_learn.rca.RCA>`
+:py:class:`RCA <metric_learn.RCA>`
 --------------------------------------
 
-Relative Components Analysis (:py:class:`RCA <metric_learn.rca.RCA>`)
+Relative Components Analysis (:py:class:`RCA <metric_learn.RCA>`)
 
 `RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
 in-chunklets covariance matrices. It applies a global linear transformation to 
@@ -388,11 +388,11 @@ as the Mahalanobis matrix.
 
 .. _mmc:
 
-:py:class:`MMC <metric_learn.mmc.MMC>`
+:py:class:`MMC <metric_learn.MMC>`
 --------------------------------------
 
 Metric Learning with Application for Clustering with Side Information
-(:py:class:`MMC <metric_learn.mmc.MMC>`)
+(:py:class:`MMC <metric_learn.MMC>`)
 
 `MMC` minimizes the sum of squared distances between similar points, while
 enforcing the sum of distances between dissimilar ones to be greater than one. 
@@ -456,11 +456,11 @@ Algorithms
 
 .. _lsml:
 
-:py:class:`LSML <metric_learn.lsml.LSML>`
+:py:class:`LSML <metric_learn.LSML>`
 -----------------------------------------
 
 Metric Learning from Relative Comparisons by Minimizing Squared Residual
-(:py:class:`LSML <metric_learn.lsml.LSML>`)
+(:py:class:`LSML <metric_learn.LSML>`)
 
 `LSML` proposes a simple, yet effective, algorithm that minimizes a convex 
 objective function corresponding to the sum of squared residuals of 
