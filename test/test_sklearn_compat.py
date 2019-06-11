@@ -85,15 +85,15 @@ class TestSklearnCompat(unittest.TestCase):
                                num_constraints=num_constraints,
                                verbose=verbose,
                                preprocessor=preprocessor,
-                               balance_param=1e-5, use_cov=False)
+                               balance_param=1e-5, prior='identity')
     dSDML.__init__ = stable_init
     check_estimator(dSDML)
 
   def test_rca(self):
-    def stable_init(self, num_dims=None, pca_comps=None,
+    def stable_init(self, n_components=None, pca_comps=None,
                     chunk_size=2, preprocessor=None):
       # this init makes RCA stable for scikit-learn examples.
-      RCA_Supervised.__init__(self, num_chunks=2, num_dims=num_dims,
+      RCA_Supervised.__init__(self, num_chunks=2, n_components=n_components,
                               pca_comps=pca_comps, chunk_size=chunk_size,
                               preprocessor=preprocessor)
     dRCA.__init__ = stable_init
@@ -352,8 +352,8 @@ def test_dict_unchanged(estimator, build_dataset, with_preprocessor):
    to_transform) = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
-  if hasattr(estimator, "num_dims"):
-    estimator.num_dims = 1
+  if hasattr(estimator, "n_components"):
+    estimator.n_components = 1
   estimator.fit(*remove_y_quadruplets(estimator, input_data, labels))
 
   def check_dict():
@@ -381,8 +381,8 @@ def test_dont_overwrite_parameters(estimator, build_dataset,
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
-  if hasattr(estimator, "num_dims"):
-    estimator.num_dims = 1
+  if hasattr(estimator, "n_components"):
+    estimator.n_components = 1
   dict_before_fit = estimator.__dict__.copy()
 
   estimator.fit(*remove_y_quadruplets(estimator, input_data, labels))

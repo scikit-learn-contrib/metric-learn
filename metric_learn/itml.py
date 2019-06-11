@@ -23,7 +23,7 @@ from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import vector_norm, transformer_from_metric
+from ._util import transformer_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseITML(MahalanobisMixin):
@@ -32,7 +32,8 @@ class _BaseITML(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               A0=None, verbose=False, preprocessor=None):
+               prior='identity', A0='deprecated', verbose=False,
+               preprocessor=None, random_state=None):
     """Initialize ITML.
 
     Parameters
@@ -44,8 +45,32 @@ class _BaseITML(MahalanobisMixin):
 
     convergence_threshold : float, optional
 
-    A0 : (d x d) matrix, optional
-        initial regularization matrix, defaults to identity
+    prior : string or numpy array, optional (default='identity')
+         The Mahalanobis matrix to use as a prior. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features). For ITML, the prior should be strictly
+         positive definite (PD).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+         'covariance'
+            The inverse covariance matrix.
+
+         'random'
+            The prior will be a random SPD matrix of shape
+            `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
+
+         numpy array
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
+
+    A0 : Not used
+      .. deprecated:: 0.5.0
+         `A0` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0. Use 'prior' instead.
 
     verbose : bool, optional
         if True, prints information while learning
@@ -53,15 +78,26 @@ class _BaseITML(MahalanobisMixin):
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``prior='random'``, ``random_state`` is used to set the prior.
     """
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
+    self.prior = prior
     self.A0 = A0
     self.verbose = verbose
+    self.random_state = random_state
     super(_BaseITML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y, bounds=None):
+    if self.A0 != 'deprecated':
+      warnings.warn('"A0" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    'removed in 0.6.0. Use "prior" instead.',
+                    DeprecationWarning)
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
     # init bounds
@@ -76,11 +112,11 @@ class _BaseITML(MahalanobisMixin):
         raise ValueError("`bounds` should be an array-like of two elements.")
       self.bounds_ = bounds
     self.bounds_[self.bounds_ == 0] = 1e-9
-    # init metric
-    if self.A0 is None:
-      A = np.identity(pairs.shape[2])
-    else:
-      A = check_array(self.A0, copy=True)
+    # set the prior
+    # pairs will be deduplicated into X two times, TODO: avoid that
+    A = _initialize_metric_mahalanobis(pairs, self.prior, self.random_state,
+                                       strict_pd=True,
+                                       matrix_name='prior')
     gamma = self.gamma
     pos_pairs, neg_pairs = pairs[y == 1], pairs[y == -1]
     num_pos = len(pos_pairs)
@@ -150,7 +186,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
 
@@ -218,14 +254,15 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
                num_labeled='deprecated', num_constraints=None,
-               bounds='deprecated', A0=None, verbose=False, preprocessor=None):
+               bounds='deprecated', prior='identity', A0='deprecated',
+               verbose=False, preprocessor=None, random_state=None):
     """Initialize the supervised version of `ITML`.
 
     `ITML_Supervised` creates pairs of similar sample by taking same class
@@ -249,17 +286,46 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
           `bounds` was deprecated in version 0.5.0 and will
           be removed in 0.6.0. Set `bounds` at fit time instead :
           `itml_supervised.fit(X, y, bounds=...)`
-    A0 : (d x d) matrix, optional
-        initial regularization matrix, defaults to identity
+
+    prior : string or numpy array, optional (default='identity')
+         Initialization of the Mahalanobis matrix. Possible options are
+         'identity', 'covariance', 'random', and a numpy array of shape
+         (n_features, n_features). For ITML, the prior should be strictly
+         positive definite (PD).
+
+         'identity'
+            An identity matrix of shape (n_features, n_features).
+
+         'covariance'
+            The inverse covariance matrix.
+
+         'random'
+            The prior will be a random SPD matrix of shape
+            `(n_features, n_features)`, generated using
+            `sklearn.datasets.make_spd_matrix`.
+
+         numpy array
+             A positive definite (PD) matrix of shape
+             (n_features, n_features), that will be used as such to set the
+             prior.
+
+    A0 : Not used
+      .. deprecated:: 0.5.0
+         `A0` was deprecated in version 0.5.0 and will
+         be removed in 0.6.0. Use 'prior' instead.
     verbose : bool, optional
         if True, prints information while learning
     preprocessor : array-like, shape=(n_samples, n_features) or callable
         The preprocessor to call to get tuples from indices. If array-like,
         tuples will be formed like this: X[indices].
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``prior='random'``, ``random_state`` is used to set the prior.
     """
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
-                       A0=A0, verbose=verbose, preprocessor=preprocessor)
+                       A0=A0, prior=prior, verbose=verbose,
+                       preprocessor=preprocessor, random_state=random_state)
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.bounds = bounds
@@ -292,11 +358,11 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     if self.num_labeled != 'deprecated':
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0', DeprecationWarning)
+                    ' removed in 0.6.0', DeprecationWarning)
     if self.bounds != 'deprecated':
       warnings.warn('"bounds" parameter from initialization is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0. Use the "bounds" parameter of this '
+                    ' removed in 0.6.0. Use the "bounds" parameter of this '
                     'fit method instead.', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints

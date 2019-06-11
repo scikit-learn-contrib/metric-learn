@@ -118,6 +118,7 @@ through the argument `preprocessor`.
    paths in the filesystem, name of records in a database etc...) See section
    :ref:`preprocessor_section` for more details on how to use the preprocessor.
 
+.. _sklearn_compat_ws:
 
 Scikit-learn compatibility
 ==========================
