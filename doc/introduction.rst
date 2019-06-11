@@ -1,3 +1,5 @@
+.. _intro_metric_learning:
+
 ========================
 What is Metric Learning?
 ========================
@@ -76,6 +78,8 @@ necessarily the identity of indiscernibles.
   :math:`M=L^\top L` for some  :math:`L`, one can show that both
   parameterizations are equivalent. In practice, an algorithm may thus solve
   the metric learning problem with respect to either :math:`M` or :math:`L`.
+
+.. _use_cases:
 
 Use-cases
 =========

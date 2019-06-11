@@ -10,6 +10,7 @@ On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
 from __future__ import absolute_import
 import numpy as np
+import scipy
 from sklearn.base import TransformerMixin
 
 from .base_metric import MahalanobisMixin
@@ -21,7 +22,7 @@ class Covariance(MahalanobisMixin, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
   """
@@ -35,11 +36,11 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     y : unused
     """
     X = self._prepare_inputs(X, ensure_min_samples=2)
-    M = np.cov(X, rowvar = False)
-    if M.ndim == 0:
-      M = 1./M
+    M = np.atleast_2d(np.cov(X, rowvar=False))
+    if M.size == 1:
+      M = 1. / M
     else:
-      M = np.linalg.inv(M)
+      M = scipy.linalg.pinvh(M)
 
     self.transformer_ = transformer_from_metric(np.atleast_2d(M))
     return self

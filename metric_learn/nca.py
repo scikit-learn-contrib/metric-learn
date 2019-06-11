@@ -19,10 +19,11 @@ import sys
 import numpy as np
 from scipy.optimize import minimize
 from sklearn.metrics import pairwise_distances
-from sklearn.exceptions import ConvergenceWarning
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
+from ._util import _initialize_transformer, _check_n_components
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -36,19 +37,67 @@ class NCA(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims=None, max_iter=100, tol=None, verbose=False,
-               preprocessor=None):
+  def __init__(self, init=None, n_components=None, num_dims='deprecated',
+               max_iter=100, tol=None, verbose=False, preprocessor=None,
+               random_state=None):
     """Neighborhood Components Analysis
 
     Parameters
     ----------
-    num_dims : int, optional (default=None)
-      Embedding dimensionality. If None, will be set to ``n_features``
-      (``d``) at fit time.
+    init : None, string or numpy array, optional (default=None)
+        Initialization of the linear transformation. Possible options are
+        'auto', 'pca', 'identity', 'random', and a numpy array of shape
+        (n_features_a, n_features_b). If None, will be set automatically to
+        'auto' (this option is to raise a warning if 'init' is not set,
+        and stays to its default value None, in v0.5.0).
+
+        'auto'
+            Depending on ``n_components``, the most reasonable initialization
+            will be chosen. If ``n_components <= n_classes`` we use 'lda', as
+            it uses labels information. If not, but
+            ``n_components < min(n_features, n_samples)``, we use 'pca', as
+            it projects data in meaningful directions (those of higher
+            variance). Otherwise, we just use 'identity'.
+
+        'pca'
+            ``n_components`` principal components of the inputs passed
+            to :meth:`fit` will be used to initialize the transformation.
+            (See `sklearn.decomposition.PCA`)
+
+        'lda'
+            ``min(n_components, n_classes)`` most discriminative
+            components of the inputs passed to :meth:`fit` will be used to
+            initialize the transformation. (If ``n_components > n_classes``,
+            the rest of the components will be zero.) (See
+            `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)
+
+        'identity'
+            If ``n_components`` is strictly smaller than the
+            dimensionality of the inputs passed to :meth:`fit`, the identity
+            matrix will be truncated to the first ``n_components`` rows.
+
+        'random'
+            The initial transformation will be a random array of shape
+            `(n_components, n_features)`. Each value is sampled from the
+            standard normal distribution.
+
+        numpy array
+            n_features_b must match the dimensionality of the inputs passed to
+            :meth:`fit` and n_features_a must be less than or equal to that.
+            If ``n_components`` is not None, n_features_a must match it.
+
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
 
     max_iter : int, optional (default=100)
       Maximum number of iterations done by the optimization algorithm.
@@ -58,11 +107,20 @@ class NCA(MahalanobisMixin, TransformerMixin):
 
     verbose : bool, optional (default=False)
       Whether to print progress messages or not.
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int. If
+        ``init='random'``, ``random_state`` is used to initialize the random
+        transformation. If ``init='pca'``, ``random_state`` is passed as an
+        argument to PCA when initializing the transformation.
     """
+    self.n_components = n_components
+    self.init = init
     self.num_dims = num_dims
     self.max_iter = max_iter
     self.tol = tol
     self.verbose = verbose
+    self.random_state = random_state
     super(NCA, self).__init__(preprocessor)
 
   def fit(self, X, y):
@@ -70,18 +128,34 @@ class NCA(MahalanobisMixin, TransformerMixin):
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
+    if self.num_dims != 'deprecated':
+      warnings.warn('"num_dims" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    ' removed in 0.6.0. Use "n_components" instead',
+                    DeprecationWarning)
     X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
-    num_dims = self.num_dims
-    if num_dims is None:
-        num_dims = d
+    n_components = _check_n_components(d, self.n_components)
 
     # Measure the total training time
     train_time = time.time()
 
-    # Initialize A to a scaling matrix
-    A = np.zeros((num_dims, d))
-    np.fill_diagonal(A, 1./(np.maximum(X.max(axis=0)-X.min(axis=0), EPS)))
+    # Initialize A
+    # if the init is the default (auto), we raise a warning just in case
+    if self.init is None:
+      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
+      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+             "the default init will now be set to 'auto', instead of the "
+             "previous scaling matrix. same scaling matrix as before as an "
+             "init, set init=np.eye(X.shape[1])/"
+             "(np.maximum(X.max(axis=0)-X.min(axis=0), EPS))). This warning "
+             "will disappear in v0.6.0, and `init` parameter's default value "
+             "will be set to 'auto'.")
+      warnings.warn(msg, ChangedBehaviorWarning)
+      init = 'auto'
+    else:
+      init = self.init
+    A = _initialize_transformer(n_components, X, labels, init, self.verbose)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]
@@ -130,7 +204,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     start_time = time.time()
 
     A = A.reshape(-1, X.shape[1])
-    X_embedded = np.dot(X, A.T)  # (n_samples, num_dims)
+    X_embedded = np.dot(X, A.T)  # (n_samples, n_components)
     # Compute softmax distances
     p_ij = pairwise_distances(X_embedded, squared=True)
     np.fill_diagonal(p_ij, np.inf)

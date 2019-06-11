@@ -16,6 +16,8 @@ import warnings
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.base import TransformerMixin
+
+from ._util import _check_n_components
 from .base_metric import MahalanobisMixin
 
 
@@ -26,23 +28,29 @@ class LFDA(MahalanobisMixin, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(num_dims, n_features)
+  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   '''
 
-  def __init__(self, num_dims=None, k=None, embedding_type='weighted',
-               preprocessor=None):
+  def __init__(self, n_components=None, num_dims='deprecated',
+               k=None, embedding_type='weighted', preprocessor=None):
     '''
     Initialize LFDA.
 
     Parameters
     ----------
-    num_dims : int, optional
-        Dimensionality of reduced space (defaults to dimension of X)
+    n_components : int or None, optional (default=None)
+        Dimensionality of reduced space (if None, defaults to dimension of X).
+
+    num_dims : Not used
+
+        .. deprecated:: 0.5.0
+          `num_dims` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use `n_components` instead.
 
     k : int, optional
         Number of nearest neighbors used in local scaling method.
-        Defaults to min(7, num_dims - 1).
+        Defaults to min(7, n_components - 1).
 
     embedding_type : str, optional
         Type of metric in the embedding space (default: 'weighted')
@@ -56,6 +64,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     '''
     if embedding_type not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid embedding_type: %r' % embedding_type)
+    self.n_components = n_components
     self.num_dims = num_dims
     self.embedding_type = embedding_type
     self.k = k
@@ -72,17 +81,17 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     y : (n,) array-like
         Class labels, one per point of data.
     '''
+    if self.num_dims != 'deprecated':
+      warnings.warn('"num_dims" parameter is not used.'
+                    ' It has been deprecated in version 0.5.0 and will be'
+                    ' removed in 0.6.0. Use "n_components" instead',
+                    DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     unique_classes, y = np.unique(y, return_inverse=True)
     n, d = X.shape
     num_classes = len(unique_classes)
 
-    if self.num_dims is None:
-      dim = d
-    else:
-      if not 0 < self.num_dims <= d:
-        raise ValueError('Invalid num_dims, must be in [1,%d]' % d)
-      dim = self.num_dims
+    dim = _check_n_components(d, self.n_components)
 
     if self.k is None:
       k = min(7, d - 1)

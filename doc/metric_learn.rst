@@ -9,6 +9,7 @@ Base Classes
 
 .. toctree::
 
+   metric_learn.constraints
    metric_learn.base_metric
 
 
