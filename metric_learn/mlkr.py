@@ -72,7 +72,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       numpy array
           n_features_b must match the dimensionality of the inputs passed to
           :meth:`fit` and n_features_a must be less than or equal to that.
-          If ``num_dims`` is not None, n_features_a must match it.
+          If ``n_components`` is not None, n_features_a must match it.
 
   A0: Not used.
       .. deprecated:: 0.5.0
