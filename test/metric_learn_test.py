@@ -23,7 +23,7 @@ from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC, RCA,
                           RCA_Supervised, MMC_Supervised, SDML, ITML, LSML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
-from metric_learn.lmnn import python_LMNN, _sum_outer_products
+from metric_learn.lmnn import _sum_outer_products
 
 
 def class_separation(X, labels):
@@ -213,14 +213,12 @@ def test_bounds_parameters_invalid(bounds):
 
 class TestLMNN(MetricTestCase):
   def test_iris(self):
-    # Test both impls, if available.
-    for LMNN_cls in set((LMNN, python_LMNN)):
-      lmnn = LMNN_cls(k=5, learn_rate=1e-6, verbose=False)
-      lmnn.fit(self.iris_points, self.iris_labels)
+    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn.fit(self.iris_points, self.iris_labels)
 
-      csep = class_separation(lmnn.transform(self.iris_points),
-                              self.iris_labels)
-      self.assertLess(csep, 0.25)
+    csep = class_separation(lmnn.transform(self.iris_points),
+                            self.iris_labels)
+    self.assertLess(csep, 0.25)
 
   def test_loss_grad_lbfgs(self):
     """Test gradient of loss function
@@ -319,7 +317,7 @@ def test_convergence_simple_example(capsys):
   # LMNN should converge on this simple example, which it did not with
   # this issue: https://github.com/metric-learn/metric-learn/issues/88
   X, y = make_classification(random_state=0)
-  lmnn = python_LMNN(verbose=True)
+  lmnn = LMNN(verbose=True)
   lmnn.fit(X, y)
   out, _ = capsys.readouterr()
   assert "LMNN converged with objective" in out
@@ -329,7 +327,7 @@ def test_no_twice_same_objective(capsys):
   # test that the objective function never has twice the same value
   # see https://github.com/metric-learn/metric-learn/issues/88
   X, y = make_classification(random_state=0)
-  lmnn = python_LMNN(verbose=True)
+  lmnn = LMNN(verbose=True)
   lmnn.fit(X, y)
   out, _ = capsys.readouterr()
   lines = re.split("\n+", out)
