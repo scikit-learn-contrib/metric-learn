@@ -87,11 +87,6 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class,
     lmnn = LMNN(k=5, learn_rate=1e-6)
     lmnn.fit(X, Y, verbose=False)
 
-If a recent version of the Shogun Python modular (``modshogun``) library
-is available, the LMNN implementation will use the fast C++ version from
-there. Otherwise, the included pure-Python version will be used.
-The two implementations differ slightly, and the C++ version is more complete.
-
 .. topic:: References:
 
     .. [1] `Distance Metric Learning for Large Margin Nearest Neighbor
