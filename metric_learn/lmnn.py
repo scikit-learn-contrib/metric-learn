@@ -25,8 +25,7 @@ from ._util import _initialize_transformer, _check_n_components
 from .base_metric import MahalanobisMixin
 
 
-# commonality between LMNN implementations
-class _BaseLMNN(MahalanobisMixin, TransformerMixin):
+class LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, init=None, k=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
                use_pca=True, verbose=False, preprocessor=None,
@@ -114,11 +113,7 @@ class _BaseLMNN(MahalanobisMixin, TransformerMixin):
     self.n_components = n_components
     self.num_dims = num_dims
     self.random_state = random_state
-    super(_BaseLMNN, self).__init__(preprocessor)
-
-
-# slower Python version
-class LMNN(_BaseLMNN):
+    super(LMNN, self).__init__(preprocessor)
 
   def fit(self, X, y):
     if self.num_dims != 'deprecated':
