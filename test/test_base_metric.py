@@ -22,7 +22,7 @@ class TestStringRepr(unittest.TestCase):
     self.assertEqual(
         remove_spaces(str(metric_learn.LMNN())),
         remove_spaces(
-          "LMNN(convergence_tol=0.001, init='auto', k=3, "
+          "LMNN(convergence_tol=0.001, init=None, k=3, "
           "learn_rate=1e-07, "
           "max_iter=1000, min_iter=50, n_components=None, "
           "num_dims='deprecated', preprocessor=None, random_state=None, "

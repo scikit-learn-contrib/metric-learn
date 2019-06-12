@@ -111,7 +111,7 @@ class _BaseSDML(MahalanobisMixin):
                                     type_of_inputs='tuples')
 
     # set up (the inverse of) the prior M
-    # if the prior is the default (identity), we raise a warning just in case
+    # if the prior is the default (None), we raise a warning
     if self.prior is None:
       # TODO:
       #  replace prior=None by prior='identity' in v0.6.0 and remove the

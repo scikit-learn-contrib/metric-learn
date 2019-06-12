@@ -94,7 +94,7 @@ class _BaseLSML(MahalanobisMixin):
     else:
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
-    # if the prior is the default (identity), we raise a warning just in case
+    # if the prior is the default (None), we raise a warning
     if self.prior is None:
       msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
              "the default prior will now be set to "
