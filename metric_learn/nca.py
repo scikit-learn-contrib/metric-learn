@@ -147,7 +147,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
       msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
              "the default init will now be set to 'auto', instead of the "
              "previous scaling matrix. If you still want to use the same "
-             "scaling matrix as before as an init, set "
+             "scaling matrix as before, set "
              "init=np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min(axis=0)"
              ", EPS))). This warning will disappear in v0.6.0, and `init` "
              "parameter's default value will be set to 'auto'.")

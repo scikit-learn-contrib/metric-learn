@@ -145,7 +145,7 @@ class python_LMNN(_base_LMNN):
       msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
              "the default init will now be set to 'auto', instead of the "
              "previous identity matrix. If you still want to use the identity "
-             "matrix as before as an init, set init='identity'. This warning "
+             "matrix as before, set init='identity'. This warning "
              "will disappear in v0.6.0, and `init` parameter's default value "
              "will be set to 'auto'.")
       warnings.warn(msg, ChangedBehaviorWarning)
