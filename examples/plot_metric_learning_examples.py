@@ -202,10 +202,10 @@ plot_tsne(X_itml, y)
 # - See more in the documentation of the class :py:class:`MMC
 #   <metric_learn.mmc.MMC>`
 
-itml = metric_learn.ITML_Supervised()
-X_itml = itml.fit_transform(X, y)
+mmc = metric_learn.MMC_Supervised()
+X_mmc = mmc.fit_transform(X, y)
 
-plot_tsne(X_itml, y)
+plot_tsne(X_mmc, y)
 
 ######################################################################
 # Sparse Determinant Metric Learning
@@ -221,7 +221,8 @@ plot_tsne(X_itml, y)
 # - See more in the documentation of the class :py:class:`SDML
 #   <metric_learn.sdml.SDML>`
 
-sdml = metric_learn.SDML_Supervised(sparsity_param=0.1, balance_param=0.0015)
+sdml = metric_learn.SDML_Supervised(sparsity_param=0.1, balance_param=0.0015,
+                                    prior='covariance')
 X_sdml = sdml.fit_transform(X, y)
 
 plot_tsne(X_sdml, y)
@@ -240,7 +241,8 @@ plot_tsne(X_sdml, y)
 # - See more in the documentation of the class :py:class:`LSML
 #   <metric_learn.lsml.LSML>`
 
-lsml = metric_learn.LSML_Supervised(tol=0.0001, max_iter=10000)
+lsml = metric_learn.LSML_Supervised(tol=0.0001, max_iter=10000,
+                                    prior='covariance')
 X_lsml = lsml.fit_transform(X, y)
 
 plot_tsne(X_lsml, y)
