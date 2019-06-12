@@ -21,7 +21,7 @@ class TestStringRepr(unittest.TestCase):
   def test_lmnn(self):
     self.assertRegexpMatches(
       str(metric_learn.LMNN()),
-        r"(python_)?LMNN\(convergence_tol=0.001, init='auto', k=3, "
+        r"(python_)?LMNN\(convergence_tol=0.001, init=None, k=3, "
         r"learn_rate=1e-07,\s+"
         r"max_iter=1000, min_iter=50, n_components=None, "
         r"num_dims='deprecated',\s+preprocessor=None, random_state=None, "
