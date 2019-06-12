@@ -139,7 +139,7 @@ plot_tsne(X, y)
 # 
 
 # setting up LMNN
-lmnn = metric_learn.LMNN(k=5, learn_rate=1e-6)
+lmnn = metric_learn.LMNN(k=5, learn_rate=1e-6, init='random')
 
 # fit the data!
 lmnn.fit(X, y)
