@@ -89,13 +89,13 @@ SDML_Supervised(balance_param=0.5, num_constraints=None,
     self.assertEqual(remove_spaces(str(metric_learn.RCA())),
                      remove_spaces("RCA(n_components=None, "
                                    "num_dims='deprecated', "
-                                   "pca_comps=None, "
+                                   "pca_comps='deprecated', "
                                    "preprocessor=None)"))
     self.assertEqual(remove_spaces(str(metric_learn.RCA_Supervised())),
                      remove_spaces(
                        "RCA_Supervised(chunk_size=2, "
                        "n_components=None, num_chunks=100, "
-                       "num_dims='deprecated', pca_comps=None, "
+                       "num_dims='deprecated', pca_comps='deprecated', "
                        "preprocessor=None)"))
 
   def test_mlkr(self):
