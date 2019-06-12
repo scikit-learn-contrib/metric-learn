@@ -169,7 +169,7 @@ mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis, et al.
       m = self.n_components
       if m is None:
           m = d
-      # if the init is the default (identity), we raise a warning just in case
+      # if the init is the default (None), we raise a warning
       if self.init is None:
         # TODO:
         #  replace init=None by init='auto' in v0.6.0 and remove the warning

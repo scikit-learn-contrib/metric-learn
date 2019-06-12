@@ -160,16 +160,16 @@ class NCA(MahalanobisMixin, TransformerMixin):
     train_time = time.time()
 
     # Initialize A
-    # if the init is the default (auto), we raise a warning just in case
+    # if the init is the default (None), we raise a warning
     if self.init is None:
       # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
       msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
              "the default init will now be set to 'auto', instead of the "
-             "previous scaling matrix. same scaling matrix as before as an "
-             "init, set init=np.eye(X.shape[1])/"
-             "(np.maximum(X.max(axis=0)-X.min(axis=0), EPS))). This warning "
-             "will disappear in v0.6.0, and `init` parameter's default value "
-             "will be set to 'auto'.")
+             "previous scaling matrix. If you still want to use the same "
+             "scaling matrix as before, set "
+             "init=np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min(axis=0)"
+             ", EPS))). This warning will disappear in v0.6.0, and `init` "
+             "parameter's default value will be set to 'auto'.")
       warnings.warn(msg, ChangedBehaviorWarning)
       init = 'auto'
     else:

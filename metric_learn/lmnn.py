@@ -8,6 +8,7 @@ import numpy as np
 import warnings
 from collections import Counter
 from six.moves import xrange
+from sklearn.exceptions import ChangedBehaviorWarning
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
 
@@ -29,10 +30,12 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
 
   Parameters
   ----------
-  init : string or numpy array, optional (default='auto')
+  init : None, string or numpy array, optional (default=None)
       Initialization of the linear transformation. Possible options are
-      'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
-      (n_features_a, n_features_b).
+      'auto', 'pca', 'identity', 'random', and a numpy array of shape
+      (n_features_a, n_features_b). If None, will be set automatically to
+        'auto' (this option is to raise a warning if 'init' is not set,
+        and stays to its default value None, in v0.5.0).
 
       'auto'
           Depending on ``n_components``, the most reasonable initialization
@@ -171,7 +174,21 @@ class python_LMNN(_base_LMNN):
     if len(label_inds) != num_pts:
       raise ValueError('Must have one label per point.')
     self.labels_ = np.arange(len(unique_labels))
-    self.transformer_ = _initialize_transformer(output_dim, X, y, self.init,
+
+    # if the init is the default (None), we raise a warning
+    if self.init is None:
+      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
+      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
+             "the default init will now be set to 'auto', instead of the "
+             "previous identity matrix. If you still want to use the identity "
+             "matrix as before, set init='identity'. This warning "
+             "will disappear in v0.6.0, and `init` parameter's default value "
+             "will be set to 'auto'.")
+      warnings.warn(msg, ChangedBehaviorWarning)
+      init = 'auto'
+    else:
+      init = self.init
+    self.transformer_ = _initialize_transformer(output_dim, X, y, init,
                                                 self.verbose,
                                                 self.random_state)
     required_k = np.bincount(label_inds).min()
