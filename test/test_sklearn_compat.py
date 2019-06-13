@@ -105,6 +105,64 @@ RNG = check_random_state(0)
 
 # ---------------------- Test scikit-learn compatibility ----------------------
 
+def generate_array_like(input_data, labels=None):
+  """Helper function to generate array-like variants of numpy datasets,
+  for testing purposes."""
+  list_data = input_data.tolist()
+  input_data_changed = [input_data, list_data, tuple(list_data)]
+  if input_data.ndim >= 2:
+    input_data_changed.append(tuple(tuple(x) for x in list_data))
+  if input_data.ndim >= 3:
+    input_data_changed.append(tuple(tuple(tuple(x) for x in y) for y in
+                                    list_data))
+  if input_data.ndim == 2:
+    pd = pytest.importorskip('pandas')
+    input_data_changed.append(pd.DataFrame(input_data))
+  if labels is not None:
+    labels_changed = [labels, list(labels), tuple(labels)]
+  else:
+    labels_changed = [labels]
+  return input_data_changed, labels_changed
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize('with_preprocessor', [True, False])
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_array_like_inputs(estimator, build_dataset, with_preprocessor):
+  """Test that metric-learners can have as input (of all functions that are
+  applied on data) any array-like object."""
+  input_data, labels, preprocessor, X = build_dataset(with_preprocessor)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  input_variants, label_variants = generate_array_like(input_data, labels)
+  for input_variant in input_variants:
+    for label_variant in label_variants:
+      estimator.fit(*remove_y_quadruplets(estimator, input_variant,
+                                          label_variant))
+    if hasattr(estimator, "predict"):
+      estimator.predict(input_variant)
+    if hasattr(estimator, "predict_proba"):
+      estimator.predict_proba(input_variant)  # anticipation in case some
+      # time we have that, or if ppl want to contribute with new algorithms
+      # it will be checked automatically
+    if hasattr(estimator, "decision_function"):
+      estimator.decision_function(input_variant)
+    if hasattr(estimator, "score"):
+      for label_variant in label_variants:
+        estimator.score(*remove_y_quadruplets(estimator, input_variant,
+                                              label_variant))
+
+  X_variants, _ = generate_array_like(X)
+  for X_variant in X_variants:
+    estimator.transform(X_variant)
+
+  pairs = np.array([[X[0], X[1]], [X[0], X[2]]])
+  pairs_variants, _ = generate_array_like(pairs)
+  for pairs_variant in pairs_variants:
+    estimator.score_pairs(pairs_variant)
+
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
