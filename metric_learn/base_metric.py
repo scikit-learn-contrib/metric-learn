@@ -641,4 +641,4 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     score : float
       The quadruplets score.
     """
-    return - np.mean(self.predict(quadruplets))
+    return np.mean((self.predict(quadruplets) + 1) / 2)
