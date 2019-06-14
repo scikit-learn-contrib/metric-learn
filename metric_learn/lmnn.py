@@ -16,8 +16,7 @@ from ._util import _initialize_transformer, _check_n_components
 from .base_metric import MahalanobisMixin
 
 
-# commonality between LMNN implementations
-class _base_LMNN(MahalanobisMixin, TransformerMixin):
+class LMNN(MahalanobisMixin, TransformerMixin):
   """Large Margin Nearest Neighbor (LMNN)
 
   LMNN learns a Mahalanobis distance metric in the kNN classification
@@ -150,11 +149,7 @@ class _base_LMNN(MahalanobisMixin, TransformerMixin):
     self.n_components = n_components
     self.num_dims = num_dims
     self.random_state = random_state
-    super(_base_LMNN, self).__init__(preprocessor)
-
-
-# slower Python version
-class python_LMNN(_base_LMNN):
+    super(LMNN, self).__init__(preprocessor)
 
   def fit(self, X, y):
     if self.num_dims != 'deprecated':
@@ -380,32 +375,3 @@ def _sum_outer_products(data, a_inds, b_inds, weights=None):
   if weights is not None:
     return np.dot(Xab.T, Xab * weights[:,None])
   return np.dot(Xab.T, Xab)
-
-
-try:
-  # use the fast C++ version, if available
-  from modshogun import LMNN as shogun_LMNN
-  from modshogun import RealFeatures, MulticlassLabels
-
-  class LMNN(_base_LMNN):
-
-    def fit(self, X, y):
-      X, y = self._prepare_inputs(X, y, dtype=float,
-                                  ensure_min_samples=2)
-      labels = MulticlassLabels(y)
-      self._lmnn = shogun_LMNN(RealFeatures(X.T), labels, self.k)
-      self._lmnn.set_maxiter(self.max_iter)
-      self._lmnn.set_obj_threshold(self.convergence_tol)
-      self._lmnn.set_regularization(self.regularization)
-      self._lmnn.set_stepsize(self.learn_rate)
-      if self.use_pca:
-        self._lmnn.train()
-      else:
-        self._lmnn.train(np.eye(X.shape[1]))
-      self.transformer_ = self._lmnn.get_linear_transform(X)
-      return self
-
-except ImportError:
-  LMNN = python_LMNN
-
-LMNN.__doc__ == _base_LMNN.__doc__

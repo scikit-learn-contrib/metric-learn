@@ -13,15 +13,8 @@ CLASSES = {
     'NCA': metric_learn.NCA(max_iter=700, n_components=2),
     'RCA_Supervised': metric_learn.RCA_Supervised(dim=2, num_chunks=30,
                                                   chunk_size=2),
-    'SDML_Supervised': metric_learn.SDML_Supervised(num_constraints=1500),
+    'SDML_Supervised': metric_learn.SDML_Supervised(num_constraints=1500)
 }
-
-try:
-  from metric_learn.lmnn import python_LMNN
-  if python_LMNN is not metric_learn.LMNN:
-    CLASSES['python_LMNN'] = python_LMNN(k=5, learn_rate=1e-6, verbose=False)
-except ImportError:
-  pass
 
 
 class IrisDataset(object):

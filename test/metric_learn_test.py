@@ -18,12 +18,13 @@ except ImportError:
   HAS_SKGGM = False
 else:
   HAS_SKGGM = True
-from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC, RCA,
+from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
-                          RCA_Supervised, MMC_Supervised, SDML, ITML, LSML)
+                          RCA_Supervised, MMC_Supervised, SDML, RCA, ITML,
+                          LSML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs
-from metric_learn.lmnn import python_LMNN, _sum_outer_products
+from metric_learn.lmnn import _sum_outer_products
 
 
 def class_separation(X, labels):
@@ -213,14 +214,12 @@ def test_bounds_parameters_invalid(bounds):
 
 class TestLMNN(MetricTestCase):
   def test_iris(self):
-    # Test both impls, if available.
-    for LMNN_cls in set((LMNN, python_LMNN)):
-      lmnn = LMNN_cls(k=5, learn_rate=1e-6, verbose=False)
-      lmnn.fit(self.iris_points, self.iris_labels)
+    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn.fit(self.iris_points, self.iris_labels)
 
-      csep = class_separation(lmnn.transform(self.iris_points),
-                              self.iris_labels)
-      self.assertLess(csep, 0.25)
+    csep = class_separation(lmnn.transform(self.iris_points),
+                            self.iris_labels)
+    self.assertLess(csep, 0.25)
 
   def test_loss_grad_lbfgs(self):
     """Test gradient of loss function
@@ -336,7 +335,7 @@ def test_convergence_simple_example(capsys):
   # LMNN should converge on this simple example, which it did not with
   # this issue: https://github.com/metric-learn/metric-learn/issues/88
   X, y = make_classification(random_state=0)
-  lmnn = python_LMNN(verbose=True)
+  lmnn = LMNN(verbose=True)
   lmnn.fit(X, y)
   out, _ = capsys.readouterr()
   assert "LMNN converged with objective" in out
@@ -346,7 +345,7 @@ def test_no_twice_same_objective(capsys):
   # test that the objective function never has twice the same value
   # see https://github.com/metric-learn/metric-learn/issues/88
   X, y = make_classification(random_state=0)
-  lmnn = python_LMNN(verbose=True)
+  lmnn = LMNN(verbose=True)
   lmnn.fit(X, y)
   out, _ = capsys.readouterr()
   lines = re.split("\n+", out)
@@ -838,6 +837,63 @@ class TestRCA(MetricTestCase):
     rca.fit(X, self.iris_labels)
     csep = class_separation(rca.transform(X), self.iris_labels)
     self.assertLess(csep, 0.30)
+
+  def test_deprecation_pca_comps(self):
+    # test that a deprecation message is thrown if pca_comps is set at
+    # initialization
+    # TODO: remove in v.0.6
+    X, y = make_classification(random_state=42, n_samples=100)
+    rca_supervised = RCA_Supervised(pca_comps=X.shape[1], num_chunks=20)
+    msg = ('"pca_comps" parameter is not used. '
+           'It has been deprecated in version 0.5.0 and will be'
+           'removed in 0.6.0. RCA will not do PCA preprocessing anymore. If '
+           'you still want to do it, you could use '
+           '`sklearn.decomposition.PCA` and an `sklearn.pipeline.Pipeline`.')
+    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
+      rca_supervised.fit(X, y)
+    assert str(expected_msg[0].message) == msg
+
+    rca = RCA(pca_comps=X.shape[1])
+    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
+      rca.fit(X, y)
+    assert str(expected_msg[0].message) == msg
+
+  def test_changedbehaviorwarning_preprocessing(self):
+    # test that a ChangedBehaviorWarning is thrown when using RCA
+    # TODO: remove in v.0.6
+
+    msg = ("RCA will no longer center the data before training. If you want "
+           "to do some preprocessing, you should do it manually (you can also "
+           "use an `sklearn.pipeline.Pipeline` for instance). This warning "
+           "will disappear in version 0.6.0.")
+
+    X, y = make_classification(random_state=42, n_samples=100)
+    rca_supervised = RCA_Supervised(num_chunks=20)
+    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
+      rca_supervised.fit(X, y)
+    assert str(expected_msg[0].message) == msg
+
+    rca = RCA()
+    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
+      rca.fit(X, y)
+    assert str(expected_msg[0].message) == msg
+
+  def test_rank_deficient_returns_warning(self):
+    """Checks that if the covariance matrix is not invertible, we raise a
+    warning message advising to use PCA"""
+    X, y = load_iris(return_X_y=True)
+    # we make the fourth column a linear combination of the two first,
+    # so that the covariance matrix will not be invertible:
+    X[:, 3] = X[:, 0] + 3 * X[:, 1]
+    rca = RCA()
+    msg = ('The inner covariance matrix is not invertible, '
+           'so the transformation matrix may contain Nan values. '
+           'You should reduce the dimensionality of your input,'
+           'for instance using `sklearn.decomposition.PCA` as a '
+           'preprocessing step.')
+    with pytest.warns(None) as raised_warnings:
+      rca.fit(X, y)
+    assert any(str(w.message) == msg for w in raised_warnings)
 
 
 @pytest.mark.parametrize('num_dims', [None, 2])

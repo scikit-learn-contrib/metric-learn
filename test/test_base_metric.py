@@ -19,13 +19,14 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces("Covariance(preprocessor=None)"))
 
   def test_lmnn(self):
-    self.assertRegexpMatches(
-      str(metric_learn.LMNN()),
-        r"(python_)?LMNN\(convergence_tol=0.001, init=None, k=3, "
-        r"learn_rate=1e-07,\s+"
-        r"max_iter=1000, min_iter=50, n_components=None, "
-        r"num_dims='deprecated',\s+preprocessor=None, random_state=None, "
-        r"regularization=0.5,\s+use_pca=True, verbose=False\)")
+    self.assertEqual(
+        remove_spaces(str(metric_learn.LMNN())),
+        remove_spaces(
+          "LMNN(convergence_tol=0.001, init=None, k=3, "
+          "learn_rate=1e-07, "
+          "max_iter=1000, min_iter=50, n_components=None, "
+          "num_dims='deprecated', preprocessor=None, random_state=None, "
+          "regularization=0.5, use_pca=True, verbose=False)"))
 
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
@@ -88,13 +89,13 @@ SDML_Supervised(balance_param=0.5, num_constraints=None,
     self.assertEqual(remove_spaces(str(metric_learn.RCA())),
                      remove_spaces("RCA(n_components=None, "
                                    "num_dims='deprecated', "
-                                   "pca_comps=None, "
+                                   "pca_comps='deprecated', "
                                    "preprocessor=None)"))
     self.assertEqual(remove_spaces(str(metric_learn.RCA_Supervised())),
                      remove_spaces(
                        "RCA_Supervised(chunk_size=2, "
                        "n_components=None, num_chunks=100, "
-                       "num_dims='deprecated', pca_comps=None, "
+                       "num_dims='deprecated', pca_comps='deprecated', "
                        "preprocessor=None)"))
 
   def test_mlkr(self):

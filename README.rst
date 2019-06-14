@@ -41,13 +41,6 @@ package installed).
 
 See the `sphinx documentation`_ for full documentation about installation, API, usage, and examples.
 
-**Notes**
-
-If a recent version of the Shogun Python modular (``modshogun``) library
-is available, the LMNN implementation will use the fast C++ version from
-there. The two implementations differ slightly, and the C++ version is
-more complete.
-
 
 .. _sphinx documentation: http://metric-learn.github.io/metric-learn/
 

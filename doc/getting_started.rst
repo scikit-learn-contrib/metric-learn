@@ -23,14 +23,6 @@ Alternately, download the source repository and run:
   (install from commit `a0ed406 <https://github.com/skggm/skggm/commit/a0ed406586c4364ea3297a658f415e13b5cbdaf8>`_).
 -  For running the examples only: matplotlib
 
-**Notes**
-
-If a recent version of the Shogun Python modular (``modshogun``) library
-is available, the LMNN implementation will use the fast C++ version from
-there. The two implementations differ slightly, and the C++ version is
-more complete.
-
-
 Quick start
 ===========
 
