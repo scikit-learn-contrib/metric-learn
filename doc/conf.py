@@ -29,7 +29,6 @@ language = 'en'
 exclude_patterns = ['_build']
 pygments_style = 'sphinx'
 todo_include_todos = True
-numpydoc_show_class_members = False
 
 # Options for HTML output
 html_theme = 'sphinx_rtd_theme'
