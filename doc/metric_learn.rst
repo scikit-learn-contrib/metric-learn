@@ -32,7 +32,7 @@ Supervised Learning Algorithms
    metric_learn.RCA_Supervised
 
 Weakly Supervised Learning Algorithms
-------------------------------
+-------------------------------------
 
 .. autosummary::
    :toctree: generated/

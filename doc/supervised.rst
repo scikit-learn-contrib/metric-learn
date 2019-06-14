@@ -8,38 +8,100 @@ labels `y`, and learn a distance matrix that make points from the same class
 other, and points from different classes or with distant target values far away
 from each other.
 
-Scikit-learn compatibility
-==========================
+General API
+===========
 
-All supervised algorithms are scikit-learn `Estimators`, so they are
-compatible with Pipelining and scikit-learn model selection routines.
+Supervised Metric Learning Algorithms are the easiest metric-learn algorithms
+to use, since they use the same API as ``scikit-learn``.
+
+Input data
+----------
+In order to train a model, you need two `array-like <https://scikit-learn\
+.org/stable/glossary.html#term-array-like>`_ objects, `X` and `y`. `X`
+should be a 2D array-like of shape `(n_samples, n_features)`, where
+`n_samples` is the number of points of your dataset and `n_features` is the
+number of attributes of each of your points. `y` should be a 1D array-like
+of shape `(n_samples,)`, containing for each point in `X` the class it
+belongs to (or the value to regress for this sample, if you use `MLKR` for
+instance).
+
+Here is an example of a dataset of two dogs and one
+cat (the classes are 'dog' and 'cat') an animal being being represented by
+two numbers.
+
+>>> import numpy as np
+>>> X = np.array([[2.3, 3.6], [0.2, 0.5], [6.7, 2.1]])
+>>> y = np.array(['dog', 'cat', 'dog'])
+
+.. note::
+
+   You can also use a preprocessor instead of directly giving the inputs as
+   2D arrays. See the :ref:`preprocessor_section` section for more details.
+
+Fit, transform, and so on
+-------------------------
+The goal of supervised metric-learning algorithms is to transform
+points in a new space, in which the distance between two points from the
+same class will be small, and the distance between two points from different
+classes will be large. To do so, we fit the metric learner (example:
+`NCA`).
+
+>>> from metric_learn import NCA
+>>> nca = NCA(random_state=42)
+>>> nca.fit(X, y)
+NCA(init=None, max_iter=100, n_components=None, num_dims='deprecated',
+  preprocessor=None, random_state=42, tol=None, verbose=False)
+
+
+Now that the estimator is fitted, you can use it on new data for several
+purposes.
+
+First, you can transform the data in the learned space, using `transform`:
+Here we transform two points in the new embedding space.
+
+>>> X_new = np.array([[9.4, 4.1], [2.1, 4.4]])
+>>> nca.transform(X_new)
+array([[ 5.91884732, 10.25406973],
+       [ 3.1545886 ,  6.80350083]])
+
+Also, as explained before, our metric learners has learn a distance between
+points. You can use this distance in two main ways:
+
+- You can either return the distance between pairs of points using the
+  `score_pairs` function:
+
+>>> nca.score_pairs([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]]])
+array([0.49627072, 3.65287282])
+
+- Or you can return a function that will return the distance (in the new
+  space) between two 1D arrays (the coordinates of the points in the original
+  space), similarly to distance functions in `scipy.spatial.distance`.
+
+>>> metric_fun = nca.get_metric()
+>>> metric_fun([3.5, 3.6], [5.6, 2.4])
+0.4962707194621285
+
+.. note::
+
+    If the metric learner that you use learns a Mahalanobis Matrix (like it is
+    the case for all algorithms currently in metric-learn), you can get the
+    plain learned Mahalanobis matrix using `get_mahalanobis_matrix`.
+
+    >>> nca.get_mahalanobis_matrix()
+    array([[0.43680409, 0.89169412],
+           [0.89169412, 1.9542479 ]])
+
+.. TODO: remove the "like it is the case etc..." if it's not the case anymore
+
+Scikit-learn compatibility
+--------------------------
+
+All supervised algorithms are scikit-learn `sklearn.base.Estimators`, and
+`sklearn.base.TransformerMixin` so they are compatible with Pipelining and
+scikit-learn model selection routines.
 
 Algorithms
 ==========
-
-Covariance
-----------
-
-.. todo:: Covariance is unsupervised, so its doc should not be here.
-
-`Covariance` does not "learn" anything, rather it calculates
-the covariance matrix of the input data. This is a simple baseline method.
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import Covariance
-    from sklearn.datasets import load_iris
-
-    iris = load_iris()['data']
-
-    cov = Covariance().fit(iris)
-    x = cov.transform(iris)
-
-.. topic:: References:
-
-    .. [1] On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
 .. _lmnn:
 
@@ -86,11 +148,6 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class,
 
     lmnn = LMNN(k=5, learn_rate=1e-6)
     lmnn.fit(X, Y, verbose=False)
-
-If a recent version of the Shogun Python modular (``modshogun``) library
-is available, the LMNN implementation will use the fast C++ version from
-there. Otherwise, the included pure-Python version will be used.
-The two implementations differ slightly, and the C++ version is more complete.
 
 .. topic:: References:
 

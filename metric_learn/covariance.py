@@ -20,6 +20,8 @@ class Covariance(MahalanobisMixin, TransformerMixin):
   This is a simple baseline method first introduced in
   On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 
+  Read more in the :ref:`User Guide <covariance>`.
+
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
