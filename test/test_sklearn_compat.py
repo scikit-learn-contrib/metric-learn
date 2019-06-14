@@ -135,9 +135,9 @@ def test_array_like_inputs(estimator, build_dataset, with_preprocessor):
   input_data, labels, preprocessor, X = build_dataset(with_preprocessor)
 
   # we subsample the data for the test to be more efficient
-  input_data, labels = input_data[5:], labels[5:]
-  X = X[5:]
-  
+  input_data, labels = input_data[:30], labels[:30]
+  X = X[:10]
+
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
