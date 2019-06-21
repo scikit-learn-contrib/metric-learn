@@ -25,6 +25,13 @@ from ._util import _initialize_transformer, _check_n_components
 from .base_metric import MahalanobisMixin
 
 
+def re_order_target_neighbors(L_next, X, target_neighbors):
+  Xl = np.dot(X, L_next.T)
+  dd = np.sum((Xl[:, None, :] - Xl[target_neighbors])**2, axis=2)
+  sorted_neighbors = np.take_along_axis(target_neighbors, dd.argsort(axis=1), 1)
+  return sorted_neighbors
+
+
 class LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, init=None, k=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
@@ -155,8 +162,9 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       raise ValueError('not enough class labels for specified k'
                        ' (smallest class has %d)' % required_k)
 
-    target_neighbors = self._select_targets(X, label_inds)
-    impostors = self._find_impostors(target_neighbors[:, -1], X, label_inds)
+    target_neighbors = self._select_targets(self.transformer_, X, label_inds)
+    impostors = self._find_impostors(self.transformer_,
+                                     target_neighbors[:, -1], X, label_inds)
     if len(impostors) == 0:
         # L has already been initialized to an identity matrix
         return
@@ -194,10 +202,17 @@ class LMNN(MahalanobisMixin, TransformerMixin):
         # we compute the objective at next point
         # we copy variables that can be modified by _loss_grad, because if we
         # retry we don t want to modify them several times
+        # target_neighbors_next = self._select_targets(L_next, X, label_inds)
+        # TODO: I should just re-order the target neighbors
+        target_neighbors_next = re_order_target_neighbors(L_next, X,
+                                                          target_neighbors)
+        impostors_next = self._find_impostors(L_next,
+                                              target_neighbors_next[:, -1], X,
+                                              label_inds)
         (G_next, objective_next, total_active_next, df_next, a1_next,
          a2_next) = (
-            self._loss_grad(X, L_next, dfG, impostors, it, k, reg,
-                            target_neighbors, df.copy(), list(a1), list(a2)))
+            self._loss_grad(X, L_next, dfG, impostors_next, it, k, reg,
+                            target_neighbors_next, df.copy(), list(a1), list(a2)))
         assert not np.isnan(objective)
         delta_obj = objective_next - objective
         if delta_obj > 0:
@@ -212,6 +227,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       # old variables to these new ones before next iteration and we
       # slightly increase the learning rate
       L = L_next
+      target_neighbors = target_neighbors_next
+      impostors = impostors_next
       G, df, objective, total_active, a1, a2 = (
           G_next, df_next, objective_next, total_active_next, a1_next, a2_next)
       learn_rate *= 1.01
@@ -231,20 +248,25 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     # store the last L
     self.transformer_ = L
     self.n_iter_ = it
+    self.targets_ = target_neighbors
+    self.impostors_ = impostors
     return self
 
   def _loss_grad(self, X, L, dfG, impostors, it, k, reg, target_neighbors, df,
                  a1, a2):
     # Compute pairwise distances under current metric
     Lx = L.dot(X.T).T
+    n_samples = X.shape[0]
     g0 = _inplace_paired_L2(*Lx[impostors])
     Ni = 1 + _inplace_paired_L2(Lx[target_neighbors], Lx[:, None, :])
     g1, g2 = Ni[impostors]
     # compute the gradient
     total_active = 0
     for nn_idx in reversed(xrange(k)):
-      act1 = g0 < g1[:, nn_idx]
-      act2 = g0 < g2[:, nn_idx]
+      act1 = np.zeros(X.shape[0]**2, dtype=bool)
+      act2 = np.zeros(X.shape[0]**2, dtype=bool)
+      act1[impostors[0] * n_samples + impostors[1]] = g0 < g1[:, nn_idx]
+      act2[impostors[0] * n_samples + impostors[1]] = g0 < g2[:, nn_idx]
       total_active += act1.sum() + act2.sum()
 
       if it > 1:
@@ -259,17 +281,25 @@ class LMNN(MahalanobisMixin, TransformerMixin):
         minus2 = np.zeros(0, dtype=int)
 
       targets = target_neighbors[:, nn_idx]
-      PLUS, pweight = _count_edges(plus1, plus2, impostors, targets)
+      all_points = np.repeat(np.arange(X.shape[0])[None], 2, axis=0)
+
+      PLUS, pweight = _count_edges(np.where(plus1)[0] % n_samples,
+                                   np.where(plus2)[0] % n_samples,
+                                   all_points, targets)
       df += _sum_outer_products(X, PLUS[:, 0], PLUS[:, 1], pweight)
-      MINUS, mweight = _count_edges(minus1, minus2, impostors, targets)
+      MINUS, mweight = _count_edges(np.where(minus1)[0] % n_samples,
+                                   np.where(minus2)[0] % n_samples,
+                                   all_points, targets)
       df -= _sum_outer_products(X, MINUS[:, 0], MINUS[:, 1], mweight)
+      df += _sum_outer_products(X, np.where(minus1)[0] % n_samples,
+                                np.where(minus1)[0] // n_samples)
+      df += _sum_outer_products(X, np.where(minus2)[0] % n_samples,
+                                np.where(minus2)[0] // n_samples)
 
-      in_imp, out_imp = impostors
-      df += _sum_outer_products(X, in_imp[minus1], out_imp[minus1])
-      df += _sum_outer_products(X, in_imp[minus2], out_imp[minus2])
-
-      df -= _sum_outer_products(X, in_imp[plus1], out_imp[plus1])
-      df -= _sum_outer_products(X, in_imp[plus2], out_imp[plus2])
+      df -= _sum_outer_products(X, np.where(plus1)[0] % n_samples,
+                                np.where(plus1)[0] // n_samples)
+      df -= _sum_outer_products(X, np.where(plus2)[0] % n_samples,
+                                np.where(plus2)[0] // n_samples)
 
       a1[nn_idx] = act1
       a2[nn_idx] = act2
@@ -282,23 +312,24 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     objective += G.flatten().dot(L.flatten())
     return 2 * G, objective, total_active, df, a1, a2
 
-  def _select_targets(self, X, label_inds):
+  def _select_targets(self, L, X, label_inds):
     target_neighbors = np.empty((X.shape[0], self.k), dtype=int)
     for label in self.labels_:
       inds, = np.nonzero(label_inds == label)
-      dd = euclidean_distances(X[inds], squared=True)
+      dd = euclidean_distances(X.dot(L.T)[inds], squared=True)
       np.fill_diagonal(dd, np.inf)
       nn = np.argsort(dd)[..., :self.k]
       target_neighbors[inds] = inds[nn]
     return target_neighbors
 
-  def _find_impostors(self, furthest_neighbors, X, label_inds):
-    Lx = self.transform(X)
+  def _find_impostors(self, L, furthest_neighbors, X, label_inds):
+    Lx = X.dot(L.T)
     margin_radii = 1 + _inplace_paired_L2(Lx[furthest_neighbors], Lx)
     impostors = []
     for label in self.labels_[:-1]:
       in_inds, = np.nonzero(label_inds == label)
-      out_inds, = np.nonzero(label_inds > label)
+      out_inds, = np.nonzero(label_inds > label)  # TODO: not sure why >,
+      # sth like only one pass through labels and avoid symmetric ?
       dist = euclidean_distances(Lx[out_inds], Lx[in_inds], squared=True)
       i1,j1 = np.nonzero(dist < margin_radii[out_inds][:,None])
       i2,j2 = np.nonzero(dist < margin_radii[in_inds])
