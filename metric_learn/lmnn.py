@@ -133,7 +133,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
          Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul
   """
 
-  def __init__(self, init='auto', k=3, min_iter=50, max_iter=1000,
+  def __init__(self, init=None, k=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
                use_pca=True, verbose=False, preprocessor=None,
                n_components=None, num_dims='deprecated', random_state=None):
