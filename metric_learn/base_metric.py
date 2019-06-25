@@ -618,6 +618,9 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
+    quadruplets = check_input(quadruplets, type_of_inputs='tuples',
+                              preprocessor=self.preprocessor_,
+                              estimator=self, tuple_size=self._tuple_size)
     return (self.score_pairs(quadruplets[:, 2:]) -
             self.score_pairs(quadruplets[:, :2]))
 
