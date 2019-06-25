@@ -277,7 +277,8 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
         ``init='random'``, ``random_state`` is used to set the random
-        prior.
+        prior. In any case, `random_state` is also used to randomly sample
+        constraints from labels.
     """
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                        verbose=verbose, preprocessor=preprocessor,
@@ -286,7 +287,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     self.num_constraints = num_constraints
     self.weights = weights
 
-  def fit(self, X, y, random_state=np.random):
+  def fit(self, X, y, random_state='deprecated'):
     """Create constraints from labels and learn the LSML model.
 
     Parameters
@@ -297,13 +298,21 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     y : (n) array-like
         Data labels.
 
-    random_state : numpy.random.RandomState, optional
-        If provided, controls random number generation.
+    random_state : Not used
+      .. deprecated:: 0.5.0
+        `random_state` in the `fit` function was deprecated in version 0.5.0
+        and will be removed in 0.6.0. Set `random_state` at initialization
+        instead (when instantiating a new `LSML_Supervised` object).
     """
     if self.num_labeled != 'deprecated':
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
                     ' removed in 0.6.0', DeprecationWarning)
+    if random_state != 'deprecated':
+      warnings.warn('"random_state" parameter in the `fit` function is '
+                    'deprecated. Set `random_state` at initialization '
+                    'instead (when instantiating a new `LSML_Supervised` '
+                    'object).', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
@@ -312,6 +321,6 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
 
     c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints, same_length=True,
-                                        random_state=random_state)
+                                        random_state=self.random_state)
     return _BaseLSML._fit(self, X[np.column_stack(pos_neg)],
                           weights=self.weights)

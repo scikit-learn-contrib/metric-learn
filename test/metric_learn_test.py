@@ -119,6 +119,21 @@ class TestLSML(MetricTestCase):
       lsml.fit(pairs)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
+  def test_deprecation_random_state(self):
+    # test that a deprecation message is thrown if random_state is set at
+    # fit time
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    lsml_supervised = LSML_Supervised()
+    msg = ('"random_state" parameter in the `fit` function is '
+           'deprecated. Set `random_state` at initialization '
+           'instead (when instantiating a new `LSML_Supervised` '
+           'object).')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      lsml_supervised.fit(X, y, random_state=np.random)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 class TestITML(MetricTestCase):
   def test_iris(self):
@@ -172,6 +187,21 @@ class TestITML(MetricTestCase):
     itml = ITML(A0=np.ones_like(X))
     with pytest.warns(DeprecationWarning) as raised_warning:
       itml.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+  def test_deprecation_random_state(self):
+    # test that a deprecation message is thrown if random_state is set at
+    # fit time
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    itml_supervised = ITML_Supervised()
+    msg = ('"random_state" parameter in the `fit` function is '
+           'deprecated. Set `random_state` at initialization '
+           'instead (when instantiating a new `ITML_Supervised` '
+           'object).')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      itml_supervised.fit(X, y, random_state=np.random)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
@@ -586,6 +616,20 @@ class TestSDML(MetricTestCase):
       sdml.fit(pairs, y_pairs)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
+  def test_deprecation_random_state(self):
+    # test that a deprecation message is thrown if random_state is set at
+    # fit time
+    # TODO: remove in v.0.6
+    X, y = load_iris(return_X_y=True)
+    sdml_supervised = SDML_Supervised(balance_param=5e-5)
+    msg = ('"random_state" parameter in the `fit` function is '
+           'deprecated. Set `random_state` at initialization '
+           'instead (when instantiating a new `SDML_Supervised` '
+           'object).')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      sdml_supervised.fit(X, y, random_state=np.random)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 @pytest.mark.skipif(not HAS_SKGGM,
                     reason='The message should be printed only if skggm is '
@@ -895,6 +939,20 @@ class TestRCA(MetricTestCase):
       rca.fit(X, y)
     assert any(str(w.message) == msg for w in raised_warnings)
 
+  def test_deprecation_random_state(self):
+    # test that a deprecation message is thrown if random_state is set at
+    # fit time
+    # TODO: remove in v.0.6
+    X, y = make_classification(random_state=42, n_samples=100)
+    rca_supervised = RCA_Supervised(num_chunks=20)
+    msg = ('"random_state" parameter in the `fit` function is '
+           'deprecated. Set `random_state` at initialization '
+           'instead (when instantiating a new `RCA_Supervised` '
+           'object).')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      rca_supervised.fit(X, y, random_state=np.random)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
 
 @pytest.mark.parametrize('num_dims', [None, 2])
 def test_deprecation_num_dims_rca(num_dims):
@@ -1093,6 +1151,21 @@ class TestMMC(MetricTestCase):
     mmc = MMC()
     with pytest.warns(ChangedBehaviorWarning) as raised_warning:
       mmc.fit(pairs, y_pairs)
+    assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+  def test_deprecation_random_state(self):
+    # test that a deprecation message is thrown if random_state is set at
+    # fit time
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    mmc_supervised = MMC_Supervised()
+    msg = ('"random_state" parameter in the `fit` function is '
+           'deprecated. Set `random_state` at initialization '
+           'instead (when instantiating a new `MMC_Supervised` '
+           'object).')
+    with pytest.warns(DeprecationWarning) as raised_warning:
+      mmc_supervised.fit(X, y, random_state=np.random)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 

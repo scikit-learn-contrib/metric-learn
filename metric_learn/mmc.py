@@ -530,7 +530,8 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
         ``init='random'``, ``random_state`` is used to initialize the random
-        Mahalanobis matrix.
+        Mahalanobis matrix.  In any case, `random_state` is also used to
+        randomly sample constraints from labels.
     """
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,
@@ -540,7 +541,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
-  def fit(self, X, y, random_state=np.random):
+  def fit(self, X, y, random_state='deprecated'):
     """Create constraints from labels and learn the MMC model.
 
     Parameters
@@ -549,13 +550,21 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
         Input data, where each row corresponds to a single instance.
     y : (n) array-like
         Data labels.
-    random_state : numpy.random.RandomState, optional
-        If provided, controls random number generation.
+    random_state : Not used
+      .. deprecated:: 0.5.0
+        `random_state` in the `fit` function was deprecated in version 0.5.0
+        and will be removed in 0.6.0. Set `random_state` at initialization
+        instead (when instantiating a new `MMC_Supervised` object).
     """
     if self.num_labeled != 'deprecated':
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
                     ' removed in 0.6.0', DeprecationWarning)
+    if random_state != 'deprecated':
+      warnings.warn('"random_state" parameter in the `fit` function is '
+                    'deprecated. Set `random_state` at initialization '
+                    'instead (when instantiating a new `MMC_Supervised` '
+                    'object).', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
@@ -564,6 +573,6 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
 
     c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
-                                        random_state=random_state)
+                                        random_state=self.random_state)
     pairs, y = wrap_pairs(X, pos_neg)
     return _BaseMMC._fit(self, pairs, y)

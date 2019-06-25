@@ -320,7 +320,9 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
         tuples will be formed like this: X[indices].
     random_state : int or numpy.RandomState or None, optional (default=None)
         A pseudo random number generator object or a seed for it if int. If
-        ``prior='random'``, ``random_state`` is used to set the prior.
+        ``prior='random'``, ``random_state`` is used to set the prior. In any
+        case, `random_state` is also used to randomly sample constraints from
+        labels.
     """
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
@@ -330,7 +332,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     self.num_constraints = num_constraints
     self.bounds = bounds
 
-  def fit(self, X, y, random_state=np.random, bounds=None):
+  def fit(self, X, y, random_state='deprecated', bounds=None):
     """Create constraints from labels and learn the ITML model.
 
 
@@ -342,8 +344,11 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     y : (n) array-like
         Data labels.
 
-    random_state : numpy.random.RandomState, optional
-        If provided, controls random number generation.
+    random_state : Not used
+      .. deprecated:: 0.5.0
+        `random_state` in the `fit` function was deprecated in version 0.5.0
+        and will be removed in 0.6.0. Set `random_state` at initialization
+        instead (when instantiating a new `ITML_Supervised` object).
 
     bounds : array-like of two numbers
         Bounds on similarity, aside slack variables, s.t.
@@ -364,6 +369,11 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
                     ' It has been deprecated in version 0.5.0 and will be'
                     ' removed in 0.6.0. Use the "bounds" parameter of this '
                     'fit method instead.', DeprecationWarning)
+    if random_state != 'deprecated':
+      warnings.warn('"random_state" parameter in the `fit` function is '
+                    'deprecated. Set `random_state` at initialization '
+                    'instead (when instantiating a new `ITML_Supervised` '
+                    'object).', DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
@@ -372,6 +382,6 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
     c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
-                                        random_state=random_state)
+                                        random_state=self.random_state)
     pairs, y = wrap_pairs(X, pos_neg)
     return _BaseITML._fit(self, pairs, y, bounds=bounds)

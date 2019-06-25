@@ -6,6 +6,7 @@ import numpy as np
 import warnings
 from six.moves import xrange
 from scipy.sparse import coo_matrix
+from sklearn.utils import check_random_state
 
 __all__ = ['Constraints']
 
@@ -18,7 +19,8 @@ class Constraints(object):
     self.known_label_idx, = np.where(partial_labels >= 0)
     self.known_labels = partial_labels[self.known_label_idx]
 
-  def adjacency_matrix(self, num_constraints, random_state=np.random):
+  def adjacency_matrix(self, num_constraints, random_state=None):
+    random_state = check_random_state(random_state)
     a, b, c, d = self.positive_negative_pairs(num_constraints,
                                               random_state=random_state)
     row = np.concatenate((a, c))
@@ -30,7 +32,8 @@ class Constraints(object):
     return adj + adj.T
 
   def positive_negative_pairs(self, num_constraints, same_length=False,
-                              random_state=np.random):
+                              random_state=None):
+    random_state = check_random_state(random_state)
     a, b = self._pairs(num_constraints, same_label=True,
                        random_state=random_state)
     c, d = self._pairs(num_constraints, same_label=False,
@@ -41,7 +44,8 @@ class Constraints(object):
     return a, b, c, d
 
   def _pairs(self, num_constraints, same_label=True, max_iter=10,
-             random_state=np.random):
+             random_state=None):
+    random_state = check_random_state(random_state)
     num_labels = len(self.known_labels)
     ab = set()
     it = 0
@@ -63,13 +67,14 @@ class Constraints(object):
     ab = np.array(list(ab)[:num_constraints], dtype=int)
     return self.known_label_idx[ab.T]
 
-  def chunks(self, num_chunks=100, chunk_size=2, random_state=np.random):
+  def chunks(self, num_chunks=100, chunk_size=2, random_state=None):
     """
     the random state object to be passed must be a numpy random seed
     """
+    random_state = check_random_state(random_state)
     chunks = -np.ones_like(self.known_label_idx, dtype=int)
     uniq, lookup = np.unique(self.known_labels, return_inverse=True)
-    all_inds = [set(np.where(lookup==c)[0]) for c in xrange(len(uniq))]
+    all_inds = [set(np.where(lookup == c)[0]) for c in xrange(len(uniq))]
     idx = 0
     while idx < num_chunks and all_inds:
       if len(all_inds) == 1:
