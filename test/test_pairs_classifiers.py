@@ -4,6 +4,7 @@ from functools import partial
 
 import pytest
 from numpy.testing import assert_array_equal
+from scipy.spatial.distance import euclidean
 
 from metric_learn.base_metric import _PairsClassifierMixin, MahalanobisMixin
 from sklearn.exceptions import NotFittedError
@@ -489,3 +490,31 @@ def test_validate_calibration_params_invalid_parameters_error_before__fit(
   with pytest.raises(ValueError) as raised_error:
     estimator.fit(input_data, labels, calibration_params={'strategy': 'weird'})
   assert str(raised_error.value) == expected_msg
+
+
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
+                         ids=ids_pairs_learners)
+def test_accuracy_toy_example(estimator, build_dataset):
+  """Test that the accuracy works on some toy example (hence that the
+  prediction is OK)"""
+  input_data, labels, preprocessor, X = build_dataset(with_preprocessor=False)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  estimator.fit(input_data, labels)
+  # we force the transformation to be identity so that we control what it does
+  estimator.transformer_ = np.eye(X.shape[1])
+  # the threshold for similar or dissimilar pairs is half of the distance
+  # between X[0] and X[1]
+  estimator.set_threshold(euclidean(X[0], X[1]) / 2)
+  # We take the two first points and we build 4 regularly spaced points on the
+  # line they define, so that it's easy to build quadruplets of different
+  # similarities.
+  X_test = X[0] + np.arange(4)[:, np.newaxis] * (X[0] - X[1]) / 4
+  pairs_test = np.array(
+      [[X_test[0], X_test[1]],  # similar
+       [X_test[0], X_test[3]],  # dissimilar
+       [X_test[1], X_test[2]],  # similar
+       [X_test[2], X_test[3]]])  # similar
+  y = np.array([-1, 1, 1, -1])  # [F, F, T, F]
+  assert accuracy_score(estimator.predict(pairs_test), y) == 0.25

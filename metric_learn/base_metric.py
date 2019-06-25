@@ -643,4 +643,9 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     score : float
       The quadruplets score.
     """
-    return - np.mean(self.predict(quadruplets))
+    # Since the prediction is a vector of values in {-1, +1}, we need to
+    # rescale them to {0, 1} to compute the accuracy using the mean (because
+    # then 1 means a correctly classified result (pairs are in the right
+    # order), and a 0 an incorrectly classified result (pairs are in the
+    # wrong order).
+    return self.predict(quadruplets).mean() / 2 + 0.5

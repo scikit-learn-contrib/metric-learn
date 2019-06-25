@@ -40,3 +40,26 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
   with pytest.raises(NotFittedError):
     estimator.predict(input_data)
 
+
+@pytest.mark.parametrize('estimator, build_dataset', quadruplets_learners,
+                         ids=ids_quadruplets_learners)
+def test_accuracy_toy_example(estimator, build_dataset):
+  """Test that the default scoring for quadruplets (accuracy) works on some
+  toy example"""
+  input_data, labels, preprocessor, X = build_dataset(with_preprocessor=False)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  estimator.fit(input_data)
+  # We take the two first points and we build 4 regularly spaced points on the
+  # line they define, so that it's easy to build quadruplets of different
+  # similarities.
+  X_test = X[0] + np.arange(4)[:, np.newaxis] * (X[0] - X[1]) / 4
+  quadruplets_test = np.array(
+      [[X_test[0], X_test[2], X_test[0], X_test[1]],
+       [X_test[1], X_test[3], X_test[1], X_test[0]],
+       [X_test[1], X_test[2], X_test[0], X_test[3]],
+       [X_test[3], X_test[0], X_test[2], X_test[1]]])
+  # we force the transformation to be identity so that we control what it does
+  estimator.transformer_ = np.eye(X.shape[1])
+  assert estimator.score(quadruplets_test) == 0.25
