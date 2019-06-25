@@ -53,14 +53,16 @@ class TestSklearnCompat(unittest.TestCase):
     class Stable_SDML_Supervised(SDML_Supervised):
 
       def __init__(self, sparsity_param=0.01, num_labeled='deprecated',
-                   num_constraints=None, verbose=False, preprocessor=None):
+                   num_constraints=None, verbose=False, preprocessor=None,
+                   random_state=None):
         # this init makes SDML stable for scikit-learn examples.
         SDML_Supervised.__init__(self, sparsity_param=sparsity_param,
                                  num_labeled=num_labeled,
                                  num_constraints=num_constraints,
                                  verbose=verbose,
                                  preprocessor=preprocessor,
-                                 balance_param=1e-5, prior='identity')
+                                 balance_param=1e-5, prior='identity',
+                                 random_state=random_state)
     check_estimator(Stable_SDML_Supervised)
 
   def test_rca(self):
