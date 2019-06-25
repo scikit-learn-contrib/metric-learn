@@ -67,11 +67,12 @@ class TestSklearnCompat(unittest.TestCase):
     class Stable_RCA_Supervised(RCA_Supervised):
 
       def __init__(self, n_components=None, pca_comps=None,
-                   chunk_size=2, preprocessor=None):
+                   chunk_size=2, preprocessor=None, random_state=None):
         # this init makes RCA stable for scikit-learn examples.
         RCA_Supervised.__init__(self, num_chunks=2, n_components=n_components,
                                 pca_comps=pca_comps, chunk_size=chunk_size,
-                                preprocessor=preprocessor)
+                                preprocessor=preprocessor,
+                                random_state=random_state)
     check_estimator(Stable_RCA_Supervised)
 
 
