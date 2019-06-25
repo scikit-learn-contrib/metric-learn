@@ -214,6 +214,13 @@ class RCA_Supervised(RCA):
                     'deprecated. Set `random_state` at initialization '
                     'instead (when instantiating a new `RCA_Supervised` '
                     'object).', DeprecationWarning)
+    else:
+      warnings.warn('As of v0.5.0, `RCA_Supervised` now uses the '
+                    '`random_state` given at initialization to sample '
+                    'constraints, not the default `np.random` from the `fit` '
+                    'method, since this argument is now deprecated. '
+                    'This warning will disappear in v0.6.0.',
+                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     chunks = Constraints(y).chunks(num_chunks=self.num_chunks,
                                    chunk_size=self.chunk_size,

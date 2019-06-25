@@ -18,6 +18,7 @@ from __future__ import print_function, absolute_import
 import warnings
 import numpy as np
 from six.moves import xrange
+from sklearn.exceptions import ChangedBehaviorWarning
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
@@ -374,6 +375,13 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
                     'deprecated. Set `random_state` at initialization '
                     'instead (when instantiating a new `ITML_Supervised` '
                     'object).', DeprecationWarning)
+    else:
+      warnings.warn('As of v0.5.0, `ITML_Supervised` now uses the '
+                    '`random_state` given at initialization to sample '
+                    'constraints, not the default `np.random` from the `fit` '
+                    'method, since this argument is now deprecated. '
+                    'This warning will disappear in v0.6.0.',
+                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
