@@ -368,9 +368,27 @@ Supervised versions of weakly-supervised algorithms
 Note that each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
 has a supervised version of the form `*_Supervised` where similarity tuples are
 generated from the labels information and passed to the underlying algorithm.
+These constraints are sampled randomly under the hood.
 
-.. todo:: add more details about that (see issue `<https://github
-          .com/metric-learn/metric-learn/issues/135>`_)
+For pairs learners (see :ref:`learning_on_pairs`), pairs (tuple of two points
+from the dataset), and labels (`int` indicating whether the two points are
+similar (+1) or dissimilar (-1)), are sampled with the function
+`metric_learn.constraints.positive_negative_pairs`. To sample positive pairs
+(of label +1), this method will look at all the samples from the same label and
+sample randomly a pair among them. To sample negative pairs (of label -1), this
+method will look at all the samples from a different class and sample randomly
+a pair among them. The method will try to build `num_constraints` positive
+pairs and `num_constraints` negative pairs, but sometimes it cannot find enough
+of one of those, so forcing `same_length=True` will return both times the
+minimum of the two lenghts.
+
+For using quadruplets learners (see :ref:`learning_on_quadruplets`) in a
+supervised way, we will basically sample positive and negative pairs like
+before, but we'll just concatenate them, so that we have a 3D array of
+quadruplets, where for each quadruplet the two first points are in fact points
+from the same class, and the two last points are in fact points from a
+different class (so indeed the two last points should be less similar than the
+two first points).
 
 .. topic:: Example Code:
 
