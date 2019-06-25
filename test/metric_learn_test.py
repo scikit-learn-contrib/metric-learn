@@ -476,11 +476,11 @@ class TestSDML(MetricTestCase):
     X = np.array([[-10., 0.], [10., 0.], [5., 0.], [3., 0.]])
     y = [0, 0, 1, 1]
     sdml_supervised = SDML_Supervised(balance_param=0.5, prior='identity',
-                                      sparsity_param=0.01)
+                                      sparsity_param=0.01, random_state=rng)
     msg = ("There was a problem in SDML when using skggm's graphical "
            "lasso solver.")
     with pytest.raises(RuntimeError) as raised_error:
-      sdml_supervised.fit(X, y, random_state=rng)
+      sdml_supervised.fit(X, y)
     assert msg == str(raised_error.value)
 
   @pytest.mark.skipif(not HAS_SKGGM,
@@ -565,8 +565,9 @@ class TestSDML(MetricTestCase):
     it should work, but scikit-learn's graphical_lasso does not work"""
     X, y = load_iris(return_X_y=True)
     sdml = SDML_Supervised(balance_param=0.5, sparsity_param=0.01,
-                           prior='covariance')
-    sdml.fit(X, y, random_state=np.random.RandomState(42))
+                           prior='covariance',
+                           random_state=np.random.RandomState(42))
+    sdml.fit(X, y)
 
   def test_deprecation_use_cov(self):
     # test that a deprecation message is thrown if use_cov  is set at
@@ -869,15 +870,13 @@ class TestRCA(MetricTestCase):
     X = np.hstack((self.iris_points, np.eye(len(self.iris_points), M=1)))
 
     # Apply PCA with the number of components
-    rca = RCA_Supervised(n_components=2, pca_comps=3, num_chunks=30,
-                         chunk_size=2)
+    rca = RCA_Supervised(n_components=2, pca_comps=3, num_chunks=30)
     rca.fit(X, self.iris_labels)
     csep = class_separation(rca.transform(X), self.iris_labels)
     self.assertLess(csep, 0.30)
 
     # Apply PCA with the minimum variance ratio
-    rca = RCA_Supervised(n_components=2, pca_comps=0.95, num_chunks=30,
-                         chunk_size=2)
+    rca = RCA_Supervised(n_components=2, pca_comps=0.95, num_chunks=30)
     rca.fit(X, self.iris_labels)
     csep = class_separation(rca.transform(X), self.iris_labels)
     self.assertLess(csep, 0.30)

@@ -24,33 +24,6 @@ from test.test_utils import (metric_learners, ids_metric_learners,
                              quadruplets_learners)
 
 
-# Wrap the _Supervised methods with a deterministic wrapper for testing.
-class deterministic_mixin(object):
-  def fit(self, X, y):
-    rs = np.random.RandomState(1234)
-    return super(deterministic_mixin, self).fit(X, y, random_state=rs)
-
-
-class dLSML(deterministic_mixin, LSML_Supervised):
-  pass
-
-
-class dITML(deterministic_mixin, ITML_Supervised):
-  pass
-
-
-class dMMC(deterministic_mixin, MMC_Supervised):
-  pass
-
-
-class dSDML(deterministic_mixin, SDML_Supervised):
-  pass
-
-
-class dRCA(deterministic_mixin, RCA_Supervised):
-  pass
-
-
 class TestSklearnCompat(unittest.TestCase):
   def test_covariance(self):
     check_estimator(Covariance)
@@ -68,36 +41,38 @@ class TestSklearnCompat(unittest.TestCase):
     check_estimator(NCA)
 
   def test_lsml(self):
-    check_estimator(dLSML)
+    check_estimator(LSML_Supervised)
 
   def test_itml(self):
-    check_estimator(dITML)
+    check_estimator(ITML_Supervised)
 
   def test_mmc(self):
-    check_estimator(dMMC)
+    check_estimator(MMC_Supervised)
 
   def test_sdml(self):
-    def stable_init(self, sparsity_param=0.01, num_labeled='deprecated',
-                    num_constraints=None, verbose=False, preprocessor=None):
-      # this init makes SDML stable for scikit-learn examples.
-      SDML_Supervised.__init__(self, sparsity_param=sparsity_param,
-                               num_labeled=num_labeled,
-                               num_constraints=num_constraints,
-                               verbose=verbose,
-                               preprocessor=preprocessor,
-                               balance_param=1e-5, prior='identity')
-    dSDML.__init__ = stable_init
-    check_estimator(dSDML)
+    class Stable_SDML_Supervised(SDML_Supervised):
+
+      def __init__(self, sparsity_param=0.01, num_labeled='deprecated',
+                   num_constraints=None, verbose=False, preprocessor=None):
+        # this init makes SDML stable for scikit-learn examples.
+        SDML_Supervised.__init__(self, sparsity_param=sparsity_param,
+                                 num_labeled=num_labeled,
+                                 num_constraints=num_constraints,
+                                 verbose=verbose,
+                                 preprocessor=preprocessor,
+                                 balance_param=1e-5, prior='identity')
+    check_estimator(Stable_SDML_Supervised)
 
   def test_rca(self):
-    def stable_init(self, n_components=None, pca_comps=None,
-                    chunk_size=2, preprocessor=None):
-      # this init makes RCA stable for scikit-learn examples.
-      RCA_Supervised.__init__(self, num_chunks=2, n_components=n_components,
-                              pca_comps=pca_comps, chunk_size=chunk_size,
-                              preprocessor=preprocessor)
-    dRCA.__init__ = stable_init
-    check_estimator(dRCA)
+    class Stable_RCA_Supervised(RCA_Supervised):
+
+      def __init__(self, n_components=None, pca_comps=None,
+                   chunk_size=2, preprocessor=None):
+        # this init makes RCA stable for scikit-learn examples.
+        RCA_Supervised.__init__(self, num_chunks=2, n_components=n_components,
+                                pca_comps=pca_comps, chunk_size=chunk_size,
+                                preprocessor=preprocessor)
+    check_estimator(Stable_RCA_Supervised)
 
 
 RNG = check_random_state(0)
