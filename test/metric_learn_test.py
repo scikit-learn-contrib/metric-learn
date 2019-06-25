@@ -861,11 +861,10 @@ def test_deprecation_num_dims_lfda(num_dims):
 
 class TestRCA(MetricTestCase):
   def test_iris(self):
-    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2,
-                         random_state=42)
+    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(self.iris_points), self.iris_labels)
-    self.assertLess(csep, 0.25)
+    self.assertLess(csep, 0.26)
 
   def test_deprecation_pca_comps(self):
     # test that a deprecation message is thrown if pca_comps is set at
