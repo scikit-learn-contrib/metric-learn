@@ -124,42 +124,44 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
   Parameters
   ----------
-  gamma : float, optional
-      value for slack variables
+  gamma : float, optional (default=1.)
+      Value for slack variables
 
-  max_iter : int, optional
+  max_iter : int, optional (default=1000)
+      Maximum number of iteration of the optimization procedure.
 
-  convergence_threshold : float, optional
+  convergence_threshold : float, optional (default=1e-3)
+      Convergence tolerance.
 
   prior : string or numpy array, optional (default='identity')
-       The Mahalanobis matrix to use as a prior. Possible options are
-       'identity', 'covariance', 'random', and a numpy array of shape
-       (n_features, n_features). For ITML, the prior should be strictly
-       positive definite (PD).
+      The Mahalanobis matrix to use as a prior. Possible options are
+      'identity', 'covariance', 'random', and a numpy array of shape
+      (n_features, n_features). For ITML, the prior should be strictly
+      positive definite (PD).
 
-       'identity'
+      'identity'
           An identity matrix of shape (n_features, n_features).
 
-       'covariance'
+      'covariance'
           The inverse covariance matrix.
 
-       'random'
+      'random'
           The prior will be a random SPD matrix of shape
           `(n_features, n_features)`, generated using
           `sklearn.datasets.make_spd_matrix`.
 
-       numpy array
-           A positive definite (PD) matrix of shape
-           (n_features, n_features), that will be used as such to set the
-           prior.
+      numpy array
+          A positive definite (PD) matrix of shape
+          (n_features, n_features), that will be used as such to set the
+          prior.
 
   A0 : Not used
-    .. deprecated:: 0.5.0
-       `A0` was deprecated in version 0.5.0 and will
-       be removed in 0.6.0. Use 'prior' instead.
+      .. deprecated:: 0.5.0
+          `A0` was deprecated in version 0.5.0 and will
+          be removed in 0.6.0. Use 'prior' instead.
 
-  verbose : bool, optional
-      if True, prints information while learning
+  verbose : bool, optional (default=False)
+      If True, prints information while learning
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,

@@ -74,6 +74,22 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   k : int, optional
       Number of neighbors to consider, not including self-edges.
 
+  min_iter : int, optional (default=50)
+      Minimum number of iterations of the optimization procedure.
+
+  max_iter : int, optional (default=1000)
+      Maximum number of iterations of the optimization procedure.
+
+  learn_rate : float, optional (default=1e-7)
+      Learning rate of the optimization procedure
+
+  tol : float, optional (default=0.001)
+      Tolerance of the optimization procedure. If the objective value varies
+      less than `tol`, we consider the algorithm has converged and stop it.
+
+  verbose : bool, optional (default=False)
+      Whether to print the progress of the optimization procedure.
+
   regularization: float, optional
       Weighting of pull and push terms, with 0.5 meaning equal weight.
 

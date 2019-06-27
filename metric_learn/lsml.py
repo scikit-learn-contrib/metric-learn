@@ -243,31 +243,33 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
 
   Parameters
   ----------
-  tol : float, optional
-  max_iter : int, optional
+  tol : float, optional (default=1e-3)
+      Tolerance for the convergence procedure.
+  max_iter : int, optional (default=1000)
+      Number of maximum iterations of the convergence procedure.
   prior : None, string or numpy array, optional (default=None)
-       Prior to set for the metric. Possible options are
-       'identity', 'covariance', 'random', and a numpy array of
-       shape (n_features, n_features). For LSML, the prior should be strictly
-       positive definite (PD). If `None`, will be set
-       automatically to 'identity' (this is to raise a warning if
-       `prior` is not set, and stays to its default value (None), in v0.5.0).
+      Prior to set for the metric. Possible options are
+      'identity', 'covariance', 'random', and a numpy array of
+      shape (n_features, n_features). For LSML, the prior should be strictly
+      positive definite (PD). If `None`, will be set
+      automatically to 'identity' (this is to raise a warning if
+      `prior` is not set, and stays to its default value (None), in v0.5.0).
 
-       'identity'
+      'identity'
           An identity matrix of shape (n_features, n_features).
 
-       'covariance'
+      'covariance'
           The inverse covariance matrix.
 
-       'random'
+      'random'
           The initial Mahalanobis matrix will be a random positive definite
           (PD) matrix of shape `(n_features, n_features)`, generated using
           `sklearn.datasets.make_spd_matrix`.
 
-       numpy array
-           A positive definite (PD) matrix of shape
-           (n_features, n_features), that will be used as such to set the
-           prior.
+      numpy array
+          A positive definite (PD) matrix of shape
+          (n_features, n_features), that will be used as such to set the
+          prior.
   num_labeled : Not used
     .. deprecated:: 0.5.0
        `num_labeled` was deprecated in version 0.5.0 and will

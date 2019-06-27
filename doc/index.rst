@@ -25,7 +25,7 @@ Documentation outline
 .. toctree::
    :maxdepth: 2
 
-   Package Overview <metric_learn>
+   Package Contents <metric_learn>
 
 .. toctree::
    :maxdepth: 2

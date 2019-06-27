@@ -344,59 +344,65 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   Read more in the :ref:`User Guide <mmc>`.
 
   Parameters
-     ----------
-     max_iter : int, optional
-     max_proj : int, optional
-     convergence_threshold : float, optional
-     init : None, string or numpy array, optional (default=None)
-         Initialization of the Mahalanobis matrix. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of
-         shape (n_features, n_features). If None, will be set
-         automatically to 'identity' (this is to raise a warning if
-         'init' is not set, and stays to its default value (None), in v0.5.0).
+  ----------
+  max_iter : int, optional (default=100)
+      Maximum number of iterations of the convergence procedure.
 
-          'identity'
-             An identity matrix of shape (n_features, n_features).
+  max_proj : int, optional (default=10000)
+      Maximum number of projection steps.
 
-          'covariance'
-             The (pseudo-)inverse of the covariance matrix.
+  convergence_threshold : float, optional (default=1e-6)
+      Convergence threshold for the convergence procedure.
 
-          'random'
-             The initial Mahalanobis matrix will be a random SPD matrix of
-             shape
-             `(n_features, n_features)`, generated using
-             `sklearn.datasets.make_spd_matrix`.
+  init : None, string or numpy array, optional (default=None)
+     Initialization of the Mahalanobis matrix. Possible options are
+     'identity', 'covariance', 'random', and a numpy array of
+     shape (n_features, n_features). If None, will be set
+     automatically to 'identity' (this is to raise a warning if
+     'init' is not set, and stays to its default value (None), in v0.5.0).
 
-          numpy array
-              An SPD matrix of shape (n_features, n_features), that will
-              be used as such to initialize the metric.
+      'identity'
+         An identity matrix of shape (n_features, n_features).
 
-     verbose : bool, optional
-         if True, prints information while learning
+      'covariance'
+         The (pseudo-)inverse of the covariance matrix.
 
-     preprocessor : array-like, shape=(n_samples, n_features) or callable
-         The preprocessor to call to get tuples from indices. If array-like,
-         tuples will be gotten like this: X[indices].
-     A0 : Not used.
-         .. deprecated:: 0.5.0
-           `A0` was deprecated in version 0.5.0 and will
-           be removed in 0.6.0. Use 'init' instead.
-     diagonal : bool, optional
-         if True, a diagonal metric will be learned,
-         i.e., a simple scaling of dimensions. The initialization will then
-         be the diagonal coefficients of the matrix given as 'init'.
-     diagonal_c : float, optional
-         weight of the dissimilarity constraint for diagonal
-         metric learning
-     verbose : bool, optional
-         if True, prints information while learning
-     preprocessor : array-like, shape=(n_samples, n_features) or callable
-         The preprocessor to call to get tuples from indices. If array-like,
-         tuples will be gotten like this: X[indices].
-     random_state : int or numpy.RandomState or None, optional (default=None)
-         A pseudo random number generator object or a seed for it if int. If
-         ``init='random'``, ``random_state`` is used to initialize the random
-         transformation.
+      'random'
+         The initial Mahalanobis matrix will be a random SPD matrix of
+         shape
+         `(n_features, n_features)`, generated using
+         `sklearn.datasets.make_spd_matrix`.
+
+      numpy array
+          An SPD matrix of shape (n_features, n_features), that will
+          be used as such to initialize the metric.
+
+  verbose : bool, optional
+     if True, prints information while learning
+
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+     The preprocessor to call to get tuples from indices. If array-like,
+     tuples will be gotten like this: X[indices].
+  A0 : Not used.
+     .. deprecated:: 0.5.0
+       `A0` was deprecated in version 0.5.0 and will
+       be removed in 0.6.0. Use 'init' instead.
+  diagonal : bool, optional
+     if True, a diagonal metric will be learned,
+     i.e., a simple scaling of dimensions. The initialization will then
+     be the diagonal coefficients of the matrix given as 'init'.
+  diagonal_c : float, optional
+     weight of the dissimilarity constraint for diagonal
+     metric learning
+  verbose : bool, optional
+     if True, prints information while learning
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+     The preprocessor to call to get tuples from indices. If array-like,
+     tuples will be gotten like this: X[indices].
+  random_state : int or numpy.RandomState or None, optional (default=None)
+     A pseudo random number generator object or a seed for it if int. If
+     ``init='random'``, ``random_state`` is used to initialize the random
+     transformation.
 
   Attributes
   ----------

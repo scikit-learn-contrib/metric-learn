@@ -177,7 +177,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
         `A0` was deprecated in version 0.5.0 and will
         be removed in 0.6.0. Use 'prior' instead.
 
-  verbose : bool, optional
+  verbose : bool, optional (default=False)
       if True, prints information while learning
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
@@ -263,9 +263,9 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
 
   Parameters
   ----------
-  balance_param : float, optional
+  balance_param : float, optional (default=0.5)
       trade off between sparsity and M0 prior
-  sparsity_param : float, optional
+  sparsity_param : float, optional (default=0.01)
       trade off between optimizer and sparseness (see graph_lasso)
   prior : None, string or numpy array, optional (default=None)
        Prior to set for the metric. Possible options are
@@ -300,9 +300,9 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     .. deprecated:: 0.5.0
        `num_labeled` was deprecated in version 0.5.0 and will
        be removed in 0.6.0.
-  num_constraints : int, optional
+  num_constraints : int, optional (default=None)
       number of constraints to generate
-  verbose : bool, optional
+  verbose : bool, optional (default=False)
       if True, prints information while learning
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,
