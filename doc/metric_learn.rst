@@ -9,10 +9,12 @@ Base Classes
 
 .. autosummary::
     :toctree: generated/
-    :template: module.rst
+    :template: class.rst
 
-    metric_learn.base_metric
-    metric_learn.constraints
+    metric_learn.Constraints
+    metric_learn.base_metric.BaseMetricLearner
+    metric_learn.base_metric._PairsClassifierMixin
+    metric_learn.base_metric._QuadrupletsClassifierMixin
 
 Supervised Learning Algorithms
 ------------------------------
