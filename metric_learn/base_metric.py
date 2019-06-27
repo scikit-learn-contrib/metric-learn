@@ -1,3 +1,7 @@
+"""
+Base module.
+"""
+
 from sklearn.base import BaseEstimator
 from sklearn.utils.extmath import stable_cumsum
 from sklearn.utils.validation import _is_arraylike, check_is_fitted
