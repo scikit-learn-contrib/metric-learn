@@ -16,7 +16,6 @@ from .base_metric import MahalanobisMixin
 class LFDA(MahalanobisMixin, TransformerMixin):
   '''
   Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction
-  Sugiyama, ICML 2006
 
   LFDA is a linear supervised dimensionality reduction method. It is
   particularly useful when dealing with multimodality, where one ore more

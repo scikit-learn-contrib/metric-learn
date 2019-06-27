@@ -14,7 +14,8 @@ import warnings
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
-  """Base class for all metric-learners
+  """
+  Base class for all metric-learners.
 
   Parameters
   ----------
@@ -301,7 +302,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
 
 class _PairsClassifierMixin(BaseMetricLearner):
-  """
+  """Base class for pairs learners.
+
   Attributes
   ----------
   threshold_ : `float`
@@ -573,6 +575,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
+  """Base class for quadruplets learners.
+  """
 
   _tuple_size = 4  # number of points in a tuple, 4 for quadruplets
 
