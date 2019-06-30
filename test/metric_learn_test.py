@@ -6,7 +6,7 @@ from scipy.optimize import check_grad, approx_fprime
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.datasets import (load_iris, make_classification, make_regression,
-                              make_spd_matrix)
+                              make_spd_matrix, make_blobs)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
                            assert_allclose)
 from sklearn.utils.testing import assert_warns_message
@@ -290,6 +290,105 @@ class TestLMNN(MetricTestCase):
     with pytest.warns(ChangedBehaviorWarning) as raised_warning:
       lmnn.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+
+def test_loss_func(capsys):
+  """Test the loss function (and its gradient) on a simple example,
+  by comparing the results with the actual implementation of metric-learn,
+  with a very simple (but nonperformant) implementation"""
+  # TODO: we need to find an example where there are still some impostors at
+  #  the beginning and they decrease
+  # TODO: ideally we would like to do a test where the number of active
+  #  constraints decrease
+  def hinge(a):
+    if a > 0:
+      return a, 1
+    else:
+      return 0, 0
+
+  def loss_fn(L, X, y, target_neighbors, regularization):
+    L = L.reshape(-1, X.shape[1])
+    Lx = np.dot(X, L.T)
+    loss = 0
+    total_active = 0
+    for i in range(X.shape[0]):
+      for j in target_neighbors[i]:
+        loss += (1 - regularization) * np.sum((Lx[i] - Lx[j])**2)
+        for l in range(X.shape[0]):
+          y_il = int(y[i] == y[l])
+          hin, active = hinge(1 + np.sum((Lx[i] - Lx[j])**2) -
+                              np.sum((Lx[i] - Lx[l])**2))
+          total_active += active * (1 - y_il)  # an active constraint is
+          # active, and is a constraint
+          loss += regularization * ((1 - y_il) * hin)
+    return loss, total_active
+
+  def loss_fn_reduced(*args):
+    return loss_fn(*args)[0]
+
+  class LMNN_nonperformant(LMNN):
+
+    def fit(self, X, y):
+      self.y = y
+      return super(LMNN_nonperformant, self).fit(X, y)
+
+    def _loss_grad(self, X, L, dfG, impostors, it, k, reg, target_neighbors,
+                   df,a1, a2):
+      loss, total_active = loss_fn(L.ravel(), X, self.y, target_neighbors,
+                      self.regularization)
+      grad = approx_fprime(L.ravel(), loss_fn_reduced, 1e-3, X, self.y,
+                           target_neighbors, self.regularization)
+      grad = grad.reshape(-1, X.shape[1])
+      return grad, loss, total_active, [], [], []
+
+  # test that the objective function never has twice the same value
+  # see https://github.com/metric-learn/metric-learn/issues/88
+
+  X, y = make_classification(n_samples=10, n_classes=2,
+                             n_features=2,
+                             n_redundant=0, shuffle=True,
+                             scale=[1, 20], random_state=42)
+  lmnn_perf = LMNN(verbose=True, random_state=42, init='identity', max_iter=10)
+  lmnn_nonperf = LMNN_nonperformant(verbose=True, random_state=42,
+                                    init='identity', max_iter=10)
+  objectives, obj_diffs, grads, total_active = dict(), dict(), dict(), dict()
+  for algo, name in zip([lmnn_perf, lmnn_nonperf], ['perf', 'nonperf']):
+    algo.fit(X, y)
+    out, _ = capsys.readouterr()
+    lines = re.split("\n+", out)
+    # we get only objectives from each line:
+    # the regexp matches a float that follows an integer (the iteration
+    # number), and which is followed by a (signed) float (delta obj). It
+    # matches for instance:
+    # 3 **1113.7665747189938** -3.182774197440267 46431.0200999999999998e-06
+    # regex for a signed number allowing scientific expression
+    num = '(-?\d+.?\d*(e[+|-]\d+)?)'
+    strings = [re.search("\d+ (?:{}) (?:{}) (?:(\d+)) (?:{})".format(num, num,
+                                                                   num),
+                         s) for
+               s in
+                     lines]
+    objectives[name] = [float(match.group(1)) for match in strings if match is
+                        not
+                        None]
+    obj_diffs[name] = [float(match.group(3)) for match in strings if match is
+                             not
+                       None]
+    total_active[name] = [float(match.group(5)) for match in strings if
+                          match is not
+                          None]
+    grads[name] = [float(match.group(6)) for match in strings if match is not
+                   None]
+    assert len(strings) >= 10  # we ensure that we actually did more than 10
+    # iterations
+    assert total_active[name][0] >= 2  # we ensure that we have some active
+    # constraints (that's the case we want to test)
+    # we remove the last element because it can be equal to the penultimate
+    # if the last gradient update is null
+  np.testing.assert_allclose(objectives['perf'], objectives['nonperf'])
+  np.testing.assert_allclose(obj_diffs['perf'], obj_diffs['nonperf'])
+  np.testing.assert_allclose(total_active['perf'], total_active['nonperf'])
+  np.testing.assert_allclose(grads['perf'], grads['nonperf'])
 
 
 @pytest.mark.parametrize('X, y, loss', [(np.array([[0], [1], [2], [3]]),
