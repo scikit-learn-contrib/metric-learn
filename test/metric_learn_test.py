@@ -2,7 +2,7 @@ import unittest
 import re
 import pytest
 import numpy as np
-from pandas.tests.sparse.frame.test_to_from_scipy import scipy
+import scipy
 from scipy.optimize import check_grad, approx_fprime
 from six.moves import xrange
 from sklearn.metrics import pairwise_distances, euclidean_distances
