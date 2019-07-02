@@ -247,20 +247,11 @@ class TestLMNN(MetricTestCase):
     # sum outer products
     dfG = _sum_outer_products(X, target_neighbors.flatten(),
                               np.repeat(np.arange(X.shape[0]), k))
-    df = np.zeros_like(dfG)
-
-    # storage
-    a1 = [None]*k
-    a2 = [None]*k
-    for nn_idx in xrange(k):
-      a1[nn_idx] = np.array([])
-      a2[nn_idx] = np.array([])
 
     # initialize L
     def loss_grad(flat_L):
-      return lmnn._loss_grad(X, flat_L.reshape(-1, X.shape[1]), dfG, impostors,
-                             1, k, reg, target_neighbors, df.copy(),
-                             list(a1), list(a2))
+      return lmnn._loss_grad(X, flat_L.reshape(-1, X.shape[1]), dfG,
+                             1, k, reg, target_neighbors, label_inds)
 
     def fun(x):
       return loss_grad(x)[1]
