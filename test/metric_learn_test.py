@@ -307,6 +307,8 @@ def test_loss_func(capsys):
       return 0, 0
 
   def loss_fn(L, X, y, target_neighbors, regularization):
+    # warning to self: this is probably wrong, see test on the thing that was
+    # before
      L = L.reshape(-1, X.shape[1])
      Lx = np.dot(X, L.T)
      loss = 0
