@@ -182,9 +182,12 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     G, objective, total_active = self._loss_grad(X, L, y, dfG, 1,
                                                  k, reg, target_neighbors)
 
+
     # TODO: need to print here the log
     it = 1  # we already made one iteration
 
+    print(it, objective, 0, total_active, 1.05e-5)  # TODO: replace by a
+    # real learning rate here it's just to fix a bug when printing
     # main loop
     for it in xrange(2, self.max_iter):
       # then at each iteration, we try to find a value of L that has better
@@ -261,21 +264,23 @@ class LMNN(MahalanobisMixin, TransformerMixin):
         active = margins > 0
         # we mask the further impostors bc they don't need to be compared
         # anymore
-        actives = np.sum(active, axis=1)  # result: like a column (but
+        actives = np.ma.sum(active, axis=1)  # result: like a column (but
         # result is "list")
-        current_total_actives = np.sum(actives)
+        current_total_actives = np.ma.sum(actives)
         total_active += current_total_actives
         pos_margins = np.ma.masked_array(margins, ~active)
         imp_dist = np.ma.masked_array(imp_dist, ~active)
         push_loss += (1 - reg) * np.ma.sum(pos_margins)
 
-        weights[same_label, target_idx_sorted[same_label][:, nn_idx]] -= \
+        weights[same_label, target_idx_sorted[same_label][:, nn_idx].ravel()] \
+          -= \
           actives
-        weights[target_idx_sorted[same_label][:, nn_idx], same_label] -= \
+        weights[target_idx_sorted[same_label][:, nn_idx].ravel(), same_label] \
+          -= \
           actives
-        weights[target_idx_sorted[same_label][:, nn_idx],
-                target_idx_sorted[same_label][:, nn_idx]] += actives
-        weights[~same_label][:, ~same_label] -= np.ma.sum(active, axis=0)
+        weights[target_idx_sorted[same_label][:, nn_idx].ravel(),
+                target_idx_sorted[same_label][:, nn_idx].ravel()] += actives
+        weights[~same_label, ~same_label] -= np.ma.sum(active, axis=0)
         #
         # TODO: be
         # careful
