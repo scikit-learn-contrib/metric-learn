@@ -336,11 +336,10 @@ def test_loss_func(capsys):
       self.y = y
       return super(LMNN_nonperformant, self).fit(X, y)
 
-    def _loss_grad(self, X, L, dfG, impostors, it, k, reg, target_neighbors,
-                   df, a1, a2):
+    def _loss_grad(self, X, L, y, dfG, it, k, reg, target_neighbors):
       grad, loss, total_active = loss_fn(L.ravel(), X, self.y,
                                          target_neighbors, self.regularization)
-      return grad, loss, total_active, [], [], []
+      return grad, loss, total_active
 
   # test that the objective function never has twice the same value
   # see https://github.com/metric-learn/metric-learn/issues/88
