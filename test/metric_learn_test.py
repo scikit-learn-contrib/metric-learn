@@ -307,24 +307,28 @@ def test_loss_func(capsys):
       return 0, 0
 
   def loss_fn(L, X, y, target_neighbors, regularization):
-    L = L.reshape(-1, X.shape[1])
-    Lx = np.dot(X, L.T)
-    loss = 0
-    total_active = 0
-    for i in range(X.shape[0]):
-      for j in target_neighbors[i]:
-        loss += (1 - regularization) * np.sum((Lx[i] - Lx[j])**2)
-        for l in range(X.shape[0]):
-          y_il = int(y[i] == y[l])
-          hin, active = hinge(1 + np.sum((Lx[i] - Lx[j])**2) -
-                              np.sum((Lx[i] - Lx[l])**2))
-          total_active += active * (1 - y_il)  # an active constraint is
-          # active, and is a constraint
-          loss += regularization * ((1 - y_il) * hin)
-    return loss, total_active
-
-  def loss_fn_reduced(*args):
-    return loss_fn(*args)[0]
+     L = L.reshape(-1, X.shape[1])
+     Lx = np.dot(X, L.T)
+     loss = 0
+     total_active = 0
+     grad = np.zeros_like(L)
+     for i in range(X.shape[0]):
+       for j in target_neighbors[i]:
+         loss += (1 - regularization) * np.sum((Lx[i] - Lx[j])**2)
+         grad += (1 - regularization) * (Lx[i] - Lx[j]).T.dot(X[i] - X[j])
+         for l in range(X.shape[0]):
+           if y[i] != y[l]:
+             hin, active = hinge(1 + np.sum((Lx[i] - Lx[j])**2) -
+                                 np.sum((Lx[i] - Lx[l])**2))
+             total_active += active  # an active constraint is
+             # active, and is a constraint
+             if active:
+               loss += regularization * hin
+               grad += (regularization *
+                        ((Lx[i] - Lx[j]).T.dot(X[i] - X[j])
+                         - (Lx[i] - Lx[l]).T.dot(X[i] - X[l])))
+     grad *= 2
+     return grad, loss, total_active
 
   class LMNN_nonperformant(LMNN):
 
@@ -333,12 +337,9 @@ def test_loss_func(capsys):
       return super(LMNN_nonperformant, self).fit(X, y)
 
     def _loss_grad(self, X, L, dfG, impostors, it, k, reg, target_neighbors,
-                   df,a1, a2):
-      loss, total_active = loss_fn(L.ravel(), X, self.y, target_neighbors,
-                      self.regularization)
-      grad = approx_fprime(L.ravel(), loss_fn_reduced, 1e-3, X, self.y,
-                           target_neighbors, self.regularization)
-      grad = grad.reshape(-1, X.shape[1])
+                   df, a1, a2):
+      grad, loss, total_active = loss_fn(L.ravel(), X, self.y,
+                                         target_neighbors, self.regularization)
       return grad, loss, total_active, [], [], []
 
   # test that the objective function never has twice the same value
