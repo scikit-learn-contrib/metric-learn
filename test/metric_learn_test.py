@@ -2,9 +2,10 @@ import unittest
 import re
 import pytest
 import numpy as np
+from pandas.tests.sparse.frame.test_to_from_scipy import scipy
 from scipy.optimize import check_grad, approx_fprime
 from six.moves import xrange
-from sklearn.metrics import pairwise_distances
+from sklearn.metrics import pairwise_distances, euclidean_distances
 from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
@@ -281,6 +282,123 @@ class TestLMNN(MetricTestCase):
     with pytest.warns(ChangedBehaviorWarning) as raised_warning:
       lmnn.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+
+def test_loss_func(capsys):
+  """Test the loss function (and its gradient) on a simple example,
+  by comparing the results with the actual implementation of metric-learn,
+  with a very simple (but nonperformant) implementation"""
+  # TODO:
+  #  we need to find an example where there are still some impostors at
+  #  the beginning and they decrease
+
+  # toy dataset to use
+  X, y = make_classification(n_samples=10, n_classes=2,
+                             n_features=2,
+                             n_redundant=0, shuffle=True,
+                             scale=[1, 20], random_state=42)
+
+  def hinge(a):
+    if a > 0:
+      return a, 1
+    else:
+      return 0, 0
+
+  def loss_fn(L, X, y, target_neighbors, reg):
+    # warning to self: this is probably wrong, see test on the thing that was
+    # before
+     L = L.reshape(-1, X.shape[1])
+     Lx = np.dot(X, L.T)
+     loss = 0
+     total_active = 0
+     grad = np.zeros_like(L)
+     for i in range(X.shape[0]):
+       for j in target_neighbors[i]:
+         loss += (1 - reg) * np.sum((Lx[i] - Lx[j]) ** 2)
+         grad += (1 - reg) * np.outer(Lx[i] - Lx[j], X[i] - X[j])
+         for l in range(X.shape[0]):
+           if y[i] != y[l]:
+             hin, active = hinge(1 + np.sum((Lx[i] - Lx[j])**2) -
+                                 np.sum((Lx[i] - Lx[l])**2))
+             total_active += active
+             if active:
+               loss += reg * hin
+               grad += (reg * (np.outer(Lx[i] - Lx[j], X[i] - X[j]) -
+                               np.outer(Lx[i] - Lx[l], X[i] - X[l])))
+     grad = 2 * grad
+     return grad, loss, total_active
+
+  # we check that the gradient we have computed in the non-performant implem
+  # is indeed the true gradient on a toy example:
+
+  def _select_targets(X, y, k):
+    target_neighbors = np.empty((X.shape[0], k), dtype=int)
+    for label in np.unique(y):
+      inds, = np.nonzero(y == label)
+      dd = euclidean_distances(X[inds], squared=True)
+      np.fill_diagonal(dd, np.inf)
+      nn = np.argsort(dd)[..., :k]
+      target_neighbors[inds] = inds[nn]
+    return target_neighbors
+
+  target_neighbors = _select_targets(X, y, 2)
+  regularization = 0.5
+  x0 = np.random.randn(1, 2)
+
+  def loss(x0):
+    return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
+                   regularization)[1]
+
+  def grad(x0):
+    return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
+                   regularization)[0].ravel()
+
+  scipy.optimize.check_grad(loss, grad, x0.ravel())
+
+  class LMNN_nonperformant(LMNN):
+
+    def fit(self, X, y):
+      self.y = y
+      return super(LMNN_nonperformant, self).fit(X, y)
+
+    def _loss_grad(self, X, L, dfG, k, reg, target_neighbors, label_inds):
+      grad, loss, total_active = loss_fn(L.ravel(), X, self.y,
+                                         target_neighbors, self.regularization)
+      return grad, loss, total_active
+
+  lmnn_perf = LMNN(verbose=True, random_state=42, init='identity', max_iter=10)
+  lmnn_nonperf = LMNN_nonperformant(verbose=True, random_state=42,
+                                    init='identity', max_iter=10)
+  objectives, obj_diffs, grads, total_active = dict(), dict(), dict(), dict()
+  for algo, name in zip([lmnn_perf, lmnn_nonperf], ['perf', 'nonperf']):
+    algo.fit(X, y)
+    out, _ = capsys.readouterr()
+    lines = re.split("\n+", out)
+    # we get every variable that is printed from the algorithm in verbose
+    num = '(-?\d+.?\d*(e[+|-]\d+)?)'
+    strings = [re.search("\d+ (?:{}) (?:{}) (?:(\d+)) (?:{})"
+                         .format(num, num, num), s) for s in lines]
+    objectives[name] = [float(match.group(1)) for match in strings if match is
+                        not
+                        None]
+    obj_diffs[name] = [float(match.group(3)) for match in strings if match is
+                             not
+                       None]
+    total_active[name] = [float(match.group(5)) for match in strings if
+                          match is not
+                          None]
+    grads[name] = [float(match.group(6)) for match in strings if match is not
+                   None]
+    assert len(strings) >= 10  # we ensure that we actually did more than 10
+    # iterations
+    assert total_active[name][0] >= 2  # we ensure that we have some active
+    # constraints (that's the case we want to test)
+    # we remove the last element because it can be equal to the penultimate
+    # if the last gradient update is null
+  np.testing.assert_allclose(objectives['perf'], objectives['nonperf'])
+  np.testing.assert_allclose(obj_diffs['perf'], obj_diffs['nonperf'])
+  np.testing.assert_allclose(total_active['perf'], total_active['nonperf'])
+  np.testing.assert_allclose(grads['perf'], grads['nonperf'])
 
 
 @pytest.mark.parametrize('X, y, loss', [(np.array([[0], [1], [2], [3]]),

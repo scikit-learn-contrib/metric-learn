@@ -164,7 +164,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
     # first iteration: we compute variables (including objective and gradient)
     #  at initialization point
-    G, objective, total_active = self._loss_grad(X, L, dfG, 1, k,
+    G, objective, total_active = self._loss_grad(X, L, dfG, k,
                                                  reg, target_neighbors,
                                                  label_inds)
 
@@ -216,7 +216,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     self.n_iter_ = it
     return self
 
-  def _loss_grad(self, X, L, dfG, k, reg, df, target_neighbors, label_inds):
+  def _loss_grad(self, X, L, dfG, k, reg, target_neighbors, label_inds):
     # Compute pairwise distances under current metric
     Lx = L.dot(X.T).T
 
@@ -232,6 +232,10 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     g1, g2 = Ni[impostors]
     # compute the gradient
     total_active = 0
+    df = np.zeros((X.shape[1], X.shape[1]))  # TODO: could be put at the
+    # beginning
+    # like
+    # before
     for nn_idx in reversed(xrange(k)):  # TODO: reverse not used here
       act1 = g0 < g1[:, nn_idx]
       act2 = g0 < g2[:, nn_idx]
@@ -242,7 +246,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       df += _sum_outer_products(X, PLUS[:, 0], PLUS[:, 1], pweight)
 
       in_imp, out_imp = impostors
-      df -= _sum_outer_products(X, in_imp, out_imp)
+      df -= _sum_outer_products(X, in_imp[act1], out_imp[act1])
+      df -= _sum_outer_products(X, in_imp[act2], out_imp[act2])
 
     # do the gradient update
     assert not np.isnan(df).any()
