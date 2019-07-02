@@ -319,6 +319,7 @@ def test_loss_func(capsys):
      loss = 0
      total_active = 0
      grad = np.zeros_like(L)
+     outer = np.zeros((X.shape[0], X.shape[0]))
      for i in range(X.shape[0]):
        for j in target_neighbors[i]:
          loss += (1 - regularization) * np.sum((Lx[i] - Lx[j])**2)
@@ -334,36 +335,43 @@ def test_loss_func(capsys):
                grad += (regularization *
                         (np.outer(Lx[i] - Lx[j], X[i] - X[j])
                          - np.outer(Lx[i] - Lx[l], X[i] - X[l])))
+               outer[i, j] -= 1
+               outer[j, i] -= 1
+               outer[j, j] += 1
+               outer[l, l] -= 1
+               outer[l, i] += 1
+               outer[i, l] += 1
      grad = 2 * grad
      return grad, loss, total_active
 
-  # we check that the gradient we have computed in the test is indeed the
-  # true gradient on a toy example:
-  X, y = make_classification(random_state=42, class_sep=0.1, n_features=20)
-
-  def _select_targets(X, y, k):
-    target_neighbors = np.empty((X.shape[0], k), dtype=int)
-    for label in np.unique(y):
-      inds, = np.nonzero(y == label)
-      dd = euclidean_distances(X[inds], squared=True)
-      np.fill_diagonal(dd, np.inf)
-      nn = np.argsort(dd)[..., :k]
-      target_neighbors[inds] = inds[nn]
-    return target_neighbors
-
-  target_neighbors = _select_targets(X, y, 2)
-  regularization = 0.5
-  x0 = np.random.randn(5, 20)
-
-  def loss(x0):
-    return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
-                   regularization)[1]
-
-  def grad(x0):
-    return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
-                   regularization)[0].ravel()
-
-  scipy.optimize.check_grad(loss, grad, x0.ravel())
+  # TODO: keep this but make it lighter
+  # # we check that the gradient we have computed in the test is indeed the
+  # # true gradient on a toy example:
+  # X, y = make_classification(random_state=42, class_sep=0.1, n_features=20)
+  #
+  # def _select_targets(X, y, k):
+  #   target_neighbors = np.empty((X.shape[0], k), dtype=int)
+  #   for label in np.unique(y):
+  #     inds, = np.nonzero(y == label)
+  #     dd = euclidean_distances(X[inds], squared=True)
+  #     np.fill_diagonal(dd, np.inf)
+  #     nn = np.argsort(dd)[..., :k]
+  #     target_neighbors[inds] = inds[nn]
+  #   return target_neighbors
+  #
+  # target_neighbors = _select_targets(X, y, 2)
+  # regularization = 0.5
+  # x0 = np.random.randn(5, 20) # TODO: take smaller x0, X, y
+  #
+  # def loss(x0):
+  #   return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
+  #                  regularization)[1]
+  #
+  # def grad(x0):
+  #   return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
+  #                  regularization)[0].ravel()
+  #
+  # scipy.optimize.check_grad(loss, grad, x0.ravel())
 
   class LMNN_nonperformant(LMNN):
 

@@ -251,43 +251,44 @@ class LMNN(MahalanobisMixin, TransformerMixin):
                                            target_dist.argsort(axis=1), 1)
     target_dist = np.sort(target_dist, axis=1)
     total_active, push_loss = 0, 0
-    weights = scipy.sparse.csr_matrix((n_samples, n_samples))
+    weights = np.zeros((n_samples, n_samples))
     for c in np.unique(y):  # could maybe avoid this loop and vectorize
-      same_label = y == c  # TODO: I can have this pre-computed
-      imp_dist = pairwise_distances(Lx[same_label], Lx[~same_label],
+      same_label = np.where(y == c)[0]  # TODO: I can have this pre-computed
+      diff_label = np.where(y != c)[0]
+      imp_dist = pairwise_distances(Lx[same_label], Lx[diff_label],
                                     squared=True)
       # TODO: do some computations with a count kind of thing maybe
       for nn_idx in reversed(xrange(k)):  # could maybe avoid this loop and
         # vectorize
         # TODO: simplify indexing when possible
-        margins = target_dist[same_label, nn_idx][:, None] + 1 - imp_dist
+        margins = target_dist[same_label][:, nn_idx][:, None] + 1 - imp_dist
         active = margins > 0
         # we mask the further impostors bc they don't need to be compared
         # anymore
-        actives = np.ma.sum(active, axis=1)  # result: like a column (but
+        actives = np.sum(active, axis=1)  # result: like a column (but
         # result is "list")
-        current_total_actives = np.ma.sum(actives)
+        current_total_actives = np.sum(actives)
         total_active += current_total_actives
-        pos_margins = np.ma.masked_array(margins, ~active)
-        imp_dist = np.ma.masked_array(imp_dist, ~active)
-        push_loss += (1 - reg) * np.ma.sum(pos_margins)
+        pos_margins = margins[active]
+        push_loss += (1 - reg) * np.sum(pos_margins)
 
-        weights[same_label, target_idx_sorted[same_label][:, nn_idx].ravel()] \
+        weights[same_label,
+                (target_idx_sorted[same_label][:, nn_idx]).ravel()] \
+          -= actives
+        weights[(target_idx_sorted[same_label][:, nn_idx]).ravel(),
+                 same_label] \
           -= \
           actives
-        weights[target_idx_sorted[same_label][:, nn_idx].ravel(), same_label] \
-          -= \
-          actives
-        weights[target_idx_sorted[same_label][:, nn_idx].ravel(),
-                target_idx_sorted[same_label][:, nn_idx].ravel()] += actives
-        weights[~same_label, ~same_label] -= np.ma.sum(active, axis=0)
+        weights[(target_idx_sorted[same_label][:, nn_idx]).ravel(),
+                (target_idx_sorted[same_label][:, nn_idx]).ravel()] += actives
+        weights[diff_label, diff_label] -= np.sum(active, axis=0)
         #
         # TODO: be
         # careful
         # may be wrong here
-        weights[~same_label][:, same_label] += active.T
-        weights[same_label][:, ~same_label] += active
-
+        weights[diff_label[:, None], same_label[None]] += active.T
+        weights[same_label[:, None], diff_label[None]] += active
+  
         # TODO: maybe for some of the things we can multiply or add a total
         #  at the end of the loop on nn_idx ?
         # TODO:
