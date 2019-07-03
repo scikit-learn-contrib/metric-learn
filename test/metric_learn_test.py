@@ -243,7 +243,6 @@ class TestLMNN(MetricTestCase):
     lmnn.transformer_ = np.eye(n_components)
 
     target_neighbors = lmnn._select_targets(X, label_inds)
-    impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds)
 
     # sum outer products
     dfG = _sum_outer_products(X, target_neighbors.flatten(),
@@ -445,7 +444,7 @@ def test_toy_ex_lmnn(X, y, loss):
   lmnn.transformer_ = np.eye(n_components)
 
   target_neighbors = lmnn._select_targets(X, label_inds)
-  impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds)
+  impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds, L)
 
   # sum outer products
   dfG = _sum_outer_products(X, target_neighbors.flatten(),
