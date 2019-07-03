@@ -20,13 +20,14 @@ In order to train a model, you need two `array-like <https://scikit-learn\
 .org/stable/glossary.html#term-array-like>`_ objects, `X` and `y`. `X`
 should be a 2D array-like of shape `(n_samples, n_features)`, where
 `n_samples` is the number of points of your dataset and `n_features` is the
-number of attributes of each of your points. `y` should be a 1D array-like
+number of attributes describing each point. `y` should be a 1D
+array-like
 of shape `(n_samples,)`, containing for each point in `X` the class it
 belongs to (or the value to regress for this sample, if you use `MLKR` for
 instance).
 
 Here is an example of a dataset of two dogs and one
-cat (the classes are 'dog' and 'cat') an animal being being represented by
+cat (the classes are 'dog' and 'cat') an animal being represented by
 two numbers.
 
 >>> import numpy as np
@@ -83,9 +84,10 @@ array([0.49627072, 3.65287282])
 
 .. note::
 
-    If the metric learner that you use learns a Mahalanobis Matrix (like it is
-    the case for all algorithms currently in metric-learn), you can get the
-    plain learned Mahalanobis matrix using `get_mahalanobis_matrix`.
+    If the metric learner that you use learns a :ref:`Mahalanobis distance
+    <mahalanobis_distances>` (like it is the case for all algorithms
+    currently in metric-learn), you can get the plain learned Mahalanobis
+    matrix using `get_mahalanobis_matrix`.
 
     >>> nca.get_mahalanobis_matrix()
     array([[0.43680409, 0.89169412],
@@ -96,9 +98,13 @@ array([0.49627072, 3.65287282])
 Scikit-learn compatibility
 --------------------------
 
-All supervised algorithms are scikit-learn `sklearn.base.Estimators`, and
-`sklearn.base.TransformerMixin` so they are compatible with Pipelining and
-scikit-learn model selection routines.
+All supervised algorithms are scikit-learn estimators 
+(`sklearn.base.BaseEstimator`) and transformers 
+(`sklearn.base.TransformerMixin`) so they are compatible with pipelines 
+(`sklearn.pipeline.Pipeline`) and
+scikit-learn model selection routines 
+(`sklearn.model_selection.cross_val_score`,
+`sklearn.model_selection.GridSearchCV`, etc).
 
 Algorithms
 ==========
@@ -365,14 +371,14 @@ calculating a weighted average of all the training samples:
 Supervised versions of weakly-supervised algorithms
 ---------------------------------------------------
 
-Note that each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
+Each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
 has a supervised version of the form `*_Supervised` where similarity tuples are
-generated from the labels information and passed to the underlying algorithm.
-These constraints are sampled randomly under the hood.
+randomly generated from the labels information and passed to the underlying
+algorithm.
 
 For pairs learners (see :ref:`learning_on_pairs`), pairs (tuple of two points
-from the dataset), and labels (`int` indicating whether the two points are
-similar (+1) or dissimilar (-1)), are sampled with the function
+from the dataset), and pair labels (`int` indicating whether the two points
+are similar (+1) or dissimilar (-1)), are sampled with the function
 `metric_learn.constraints.positive_negative_pairs`. To sample positive pairs
 (of label +1), this method will look at all the samples from the same label and
 sample randomly a pair among them. To sample negative pairs (of label -1), this
@@ -383,12 +389,11 @@ of one of those, so forcing `same_length=True` will return both times the
 minimum of the two lenghts.
 
 For using quadruplets learners (see :ref:`learning_on_quadruplets`) in a
-supervised way, we will basically sample positive and negative pairs like
-before, but we'll just concatenate them, so that we have a 3D array of
-quadruplets, where for each quadruplet the two first points are in fact points
-from the same class, and the two last points are in fact points from a
-different class (so indeed the two last points should be less similar than the
-two first points).
+supervised way, positive and negative pairs are sampled as above and
+concatenated so that we have a 3D array of
+quadruplets, where for each quadruplet the two first points are from the same
+class, and the two last points are from a different class (so indeed the two
+last points should be less similar than the two first points).
 
 .. topic:: Example Code:
 
