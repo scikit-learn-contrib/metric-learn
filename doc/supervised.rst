@@ -11,8 +11,8 @@ from each other.
 General API
 ===========
 
-Supervised Metric Learning Algorithms are the easiest metric-learn algorithms
-to use, since they use the same API as ``scikit-learn``.
+Supervised metric learning algorithms essentially use the same API as
+``scikit-learn``.
 
 Input data
 ----------
