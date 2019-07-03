@@ -294,9 +294,9 @@ def test_loss_func(capsys):
 
   # toy dataset to use
   X, y = make_classification(n_samples=10, n_classes=2,
-                             n_features=2,
+                             n_features=6,
                              n_redundant=0, shuffle=True,
-                             scale=[1, 20], random_state=42)
+                             scale=[1, 1, 20, 20, 20, 20], random_state=42)
 
   def hinge(a):
     if a > 0:
@@ -343,7 +343,8 @@ def test_loss_func(capsys):
 
   target_neighbors = _select_targets(X, y, 2)
   regularization = 0.5
-  x0 = np.random.randn(1, 2)
+  n_features = X.shape[1]
+  x0 = np.random.randn(1, n_features)
 
   def loss(x0):
     return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
@@ -355,7 +356,22 @@ def test_loss_func(capsys):
 
   scipy.optimize.check_grad(loss, grad, x0.ravel())
 
-  class LMNN_nonperformant(LMNN):
+  class LMNN_with_callback(LMNN):
+
+    def __init__(self, *args, callback=None, **kwargs):
+      if callback is None:
+        self.callback = []
+      else:
+        self.callback = callback
+      super(LMNN_with_callback, self).__init__(*args, **kwargs)
+
+    def _loss_grad(self, *args, **kwargs):
+      grad, objective, total_active = (
+        super(LMNN_with_callback, self)._loss_grad(*args, **kwargs))
+      self.callback.append(grad)
+      return grad, objective, total_active
+
+  class LMNN_nonperformant(LMNN_with_callback):
 
     def fit(self, X, y):
       self.y = y
@@ -364,12 +380,17 @@ def test_loss_func(capsys):
     def _loss_grad(self, X, L, dfG, k, reg, target_neighbors, label_inds):
       grad, loss, total_active = loss_fn(L.ravel(), X, self.y,
                                          target_neighbors, self.regularization)
+      self.callback.append(grad)
       return grad, loss, total_active
 
-  lmnn_perf = LMNN(verbose=True, random_state=42, init='identity', max_iter=10)
+  mem1, mem2 = [], []
+  lmnn_perf = LMNN_with_callback(verbose=True, random_state=42,
+                                 init='identity', max_iter=30, callback=mem1)
   lmnn_nonperf = LMNN_nonperformant(verbose=True, random_state=42,
-                                    init='identity', max_iter=10)
-  objectives, obj_diffs, grads, total_active = dict(), dict(), dict(), dict()
+                                    init='identity', max_iter=30,
+                                    callback=mem2)
+  objectives, obj_diffs, learn_rate, total_active = (dict(), dict(), dict(),
+                                                     dict())
   for algo, name in zip([lmnn_perf, lmnn_nonperf], ['perf', 'nonperf']):
     algo.fit(X, y)
     out, _ = capsys.readouterr()
@@ -395,10 +416,15 @@ def test_loss_func(capsys):
     # constraints (that's the case we want to test)
     # we remove the last element because it can be equal to the penultimate
     # if the last gradient update is null
+  for i in range(len(mem1)):
+    np.testing.assert_allclose(lmnn_perf.callback[i],
+                               lmnn_nonperf.callback[i],
+                               err_msg='Gradient different at iteration '
+                                       '{}'.format(i))
   np.testing.assert_allclose(objectives['perf'], objectives['nonperf'])
   np.testing.assert_allclose(obj_diffs['perf'], obj_diffs['nonperf'])
   np.testing.assert_allclose(total_active['perf'], total_active['nonperf'])
-  np.testing.assert_allclose(grads['perf'], grads['nonperf'])
+  np.testing.assert_allclose(learn_rate['perf'], learn_rate['nonperf'])
 
 
 @pytest.mark.parametrize('X, y, loss', [(np.array([[0], [1], [2], [3]]),
