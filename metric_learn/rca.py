@@ -172,6 +172,29 @@ class RCA_Supervised(RCA):
   class, taking `chunk_size` elements in it, and repeating the process
   `num_chunks` times.
 
+  Parameters
+  ----------
+  n_components : int or None, optional (default=None)
+      Dimensionality of reduced space (if None, defaults to dimension of X).
+
+  num_dims : Not used
+
+      .. deprecated:: 0.5.0
+        `num_dims` was deprecated in version 0.5.0 and will
+        be removed in 0.6.0. Use `n_components` instead.
+
+  num_chunks: int, optional
+
+  chunk_size: int, optional
+
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int.
+      It is used to randomly sample constraints from labels.
+
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
@@ -181,44 +204,7 @@ class RCA_Supervised(RCA):
   def __init__(self, num_dims='deprecated', n_components=None,
                pca_comps='deprecated', num_chunks=100, chunk_size=2,
                preprocessor=None, random_state=None):
-    """Initialize the supervised version of `RCA`.
-
-    `RCA_Supervised` creates chunks of similar points by first sampling a
-    class, taking `chunk_size` elements in it, and repeating the process
-    `num_chunks` times.
-
-    Parameters
-    ----------
-    n_components : int or None, optional (default=None)
-        Dimensionality of reduced space (if None, defaults to dimension of X).
-
-    num_dims : Not used
-
-        .. deprecated:: 0.5.0
-          `num_dims` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use `n_components` instead.
-
-    num_chunks: int, optional
-
-    chunk_size: int, optional
-
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int.
-        It is used to randomly sample constraints from labels.
-
-    Attributes
-    ----------
-    transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
-        The learned linear transformation ``L``.
-  """
-
-  def __init__(self, num_dims='deprecated', n_components=None,
-               pca_comps='deprecated', num_chunks=100, chunk_size=2,
-               preprocessor=None):
+    """Initialize the supervised version of `RCA`."""
     RCA.__init__(self, num_dims=num_dims, n_components=n_components,
                  pca_comps=pca_comps, preprocessor=preprocessor)
     self.num_chunks = num_chunks

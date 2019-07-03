@@ -311,7 +311,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
       A pseudo random number generator object or a seed for it if int. If
       ``init='random'``, ``random_state`` is used to set the random
       prior. In any case, `random_state` is also used to randomly sample
-        constraints from labels.
+      constraints from labels.
 
   Attributes
   ----------

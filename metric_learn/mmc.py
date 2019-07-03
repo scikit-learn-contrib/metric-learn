@@ -539,7 +539,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
       A pseudo random number generator object or a seed for it if int. If
       ``init='random'``, ``random_state`` is used to initialize the random
       Mahalanobis matrix.  In any case, `random_state` is also used to
-        randomly sample constraints from labels.
+      randomly sample constraints from labels.
 
   `MMC_Supervised` creates pairs of similar sample by taking same class
   samples, and pairs of dissimilar samples by taking different class
