@@ -12,7 +12,7 @@ General API
 ===========
 
 Supervised metric learning algorithms essentially use the same API as
-``scikit-learn``.
+scikit-learn.
 
 Input data
 ----------
@@ -168,7 +168,7 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class,
 :py:class:`NCA <metric_learn.NCA>`
 --------------------------------------
 
-Neighborhood Components Analysis(:py:class:`NCA <metric_learn.NCA>`)
+Neighborhood Components Analysis (:py:class:`NCA <metric_learn.NCA>`)
 
 `NCA` is a distance metric learning algorithm which aims to improve the 
 accuracy of nearest neighbors classification compared to the standard 
@@ -232,7 +232,7 @@ the sum of probability of being correctly classified:
 :py:class:`LFDA <metric_learn.LFDA>`
 -----------------------------------------
 
-Local Fisher Discriminant Analysis(:py:class:`LFDA <metric_learn.LFDA>`)
+Local Fisher Discriminant Analysis (:py:class:`LFDA <metric_learn.LFDA>`)
 
 `LFDA` is a linear supervised dimensionality reduction method. It is
 particularly useful when dealing with multi-modality, where one ore more classes
@@ -306,7 +306,7 @@ same class are not imposed to be close.
 :py:class:`MLKR <metric_learn.MLKR>`
 -----------------------------------------
 
-Metric Learning for Kernel Regression(:py:class:`MLKR <metric_learn.MLKR>`)
+Metric Learning for Kernel Regression (:py:class:`MLKR <metric_learn.MLKR>`)
 
 `MLKR` is an algorithm for supervised metric learning, which learns a
 distance function by directly minimizing the leave-one-out regression error.

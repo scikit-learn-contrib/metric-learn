@@ -31,22 +31,21 @@ two points, three points, etc...). The label is some information we have
 about this set of points (e.g. "these two points are similar"). Note that
 some information can be contained in the ordering of these tuples (see for
 instance the section :ref:`learning_on_quadruplets`). For more details about
-the specific of each algorithms, refer to the appropriate section: either
-:ref:`learning_on_pairs` or :ref:`learning_on_quadruplets`)
+specific forms of tuples, refer to the appropriate sections 
+(:ref:`learning_on_pairs` or :ref:`learning_on_quadruplets`).
 
-
-The `tuples` argument is the first argument of every method (like the X
+The `tuples` argument is the first argument of every method (like the `X`
 argument for classical algorithms in scikit-learn). The second argument is the
 label of the tuple: its semantic depends on the algorithm used. For instance
-for pairs learners ``y`` is a label indicating whether the pair is of similar
+for pairs learners `y` is a label indicating whether the pair is of similar
 samples or dissimilar samples.
 
 Then one can fit a Weakly Supervised Metric Learner on this tuple, like this:
 
 >>> my_algo.fit(tuples, y)
 
-Like in a classical setting we split the points ``X`` between train and test,
-here we split the ``tuples`` between train and test.
+Like in a classical setting we split the points `X` between train and test,
+here we split the `tuples` between train and test.
 
 >>> from sklearn.model_selection import train_test_split
 >>> pairs_train, pairs_test, y_train, y_test = train_test_split(pairs, y)
@@ -58,9 +57,9 @@ learn:
 ^^^^^^^^^^^^^^^^^^
 
 The most intuitive way to represent tuples is to provide the algorithm with a
-3D array-like of tuples of shape ``(n_tuples, t, n_features)``, where
-``n_tuples`` is the number of tuples, ``tuple_size`` is the number of elements
-in a tuple (2 for pairs, 3 for triplets for instance), and ``n_features`` is
+3D array-like of tuples of shape `(n_tuples, t, n_features)`, where
+`n_tuples` is the number of tuples, `tuple_size` is the number of elements
+in a tuple (2 for pairs, 3 for triplets for instance), and `n_features` is
 the number of features of each point.
 
 .. topic:: Example:
@@ -91,8 +90,8 @@ the number of features of each point.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Instead of forming each point in each tuple, a more efficient representation
-would be to keep the dataset of points ``X`` aside, and just represent tuples
-as a collection of tuples of *indices* from the points in ``X``. Since we loose
+would be to keep the dataset of points `X` aside, and just represent tuples
+as a collection of tuples of *indices* from the points in `X`. Since we loose
 the feature dimension there, the resulting array is 2D.
 
 .. topic:: Example: An equivalent representation of the above pairs would be:
@@ -110,7 +109,7 @@ the feature dimension there, the resulting array is 2D.
 >>> y = np.array([-1, 1, 1, -1])
 
 In order to fit metric learning algorithms with this type of input, we need to
-give the original dataset of points ``X`` to the estimator so that it knows
+give the original dataset of points `X` to the estimator so that it knows
 the points the indices refer to. We do this when initializing the estimator,
 through the argument `preprocessor` (see below :ref:`fit_ws`)
 
@@ -118,7 +117,7 @@ through the argument `preprocessor` (see below :ref:`fit_ws`)
 .. note::
 
    Instead of an array-like, you can give a callable in the argument
-   ``preprocessor``, which will go fetch and form the tuples. This allows to
+   `preprocessor`, which will go fetch and form the tuples. This allows to
    give more general indicators than just indices from an array (for instance
    paths in the filesystem, name of records in a database etc...) See section
    :ref:`preprocessor_section` for more details on how to use the preprocessor.
@@ -157,7 +156,7 @@ Here we transform two points in the new embedding space.
 array([[-3.24667162e+01,  4.62622348e-07,  3.88325421e-08],
        [-3.61531114e+01,  4.86778289e-07,  2.12654397e-08]])
 
-Also, as explained before, our metric learners has learn a distance between
+Also, as explained before, our metric learner has learned a distance between
 points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
@@ -178,9 +177,10 @@ array([7.27607365, 0.88853014])
 
 .. note::
 
-    If the metric learner that you use learns a Mahalanobis Matrix (like it is
-    the case for all algorithms currently in metric-learn), you can get the
-    plain Mahalanobis matrix using `get_mahalanobis_matrix`.
+    If the metric learner that you use learns a :ref:`Mahalanobis distance
+    <mahalanobis_distances>` (like it is the case for all algorithms
+    currently in metric-learn), you can get the plain Mahalanobis matrix using
+    `get_mahalanobis_matrix`.
 
 >>> mmc.get_mahalanobis_matrix()
 array([[ 0.58603894, -5.69883982, -1.66614919],
@@ -190,29 +190,6 @@ array([[ 0.58603894, -5.69883982, -1.66614919],
 .. TODO: remove the "like it is the case etc..." if it's not the case anymore
 
 .. _sklearn_compat_ws:
-    
-Scikit-learn compatibility
---------------------------
-
-Weakly supervised estimators are compatible with scikit-learn routines for
-model selection (grid-search, cross-validation etc). See the scoring section
-of the appropriate algorithm (:ref:`pairs learners <learning_on_pairs>`
-or :ref:`quadruplets learners <learning_on_quadruplets>`)
-for more details on the scoring used in the case of Weakly Supervised Metric
-Learning.
-
-Example:
-
->>> from metric_learn import MMC
->>> from sklearn.datasets import load_iris
->>> from sklearn.model_selection import cross_val_score
->>> rng = np.random.RandomState(42)
->>> X, _ = load_iris(return_X_y=True)
->>> # let's sample 30 random pairs and labels of pairs
->>> pairs_indices = rng.randint(X.shape[0], size=(30, 2))
->>> y = rng.randint(2, size=30)
->>> mmc = MMC(preprocessor=X)
->>> cross_val_score(mmc, pairs_indices, y)
 
 Prediction and scoring
 ----------------------
@@ -229,14 +206,35 @@ the appropriate section for more details, either :ref:`this
 one <pairs_scoring>` for pairs, or :ref:`this one <learning_on_quadruplets>`
 for quadruplets.
 
+Scikit-learn compatibility
+--------------------------
+
+Weakly supervised estimators are compatible with scikit-learn routines for
+model selection (`sklearn.model_selection.cross_val_score`,
+`sklearn.model_selection.GridSearchCV`, etc).
+
+Example:
+
+>>> from metric_learn import MMC
+>>> import numpy as np
+>>> from sklearn.datasets import load_iris
+>>> from sklearn.model_selection import cross_val_score
+>>> rng = np.random.RandomState(42)
+>>> X, _ = load_iris(return_X_y=True)
+>>> # let's sample 30 random pairs and labels of pairs
+>>> pairs_indices = rng.randint(X.shape[0], size=(30, 2))
+>>> y = 2 * rng.randint(2, size=30) - 1
+>>> mmc = MMC(preprocessor=X)
+>>> cross_val_score(mmc, pairs_indices, y)
+
 .. _learning_on_pairs:
 
 Learning on pairs
 =================
 
 Some metric learning algorithms learn on pairs of samples. In this case, one
-should provide the algorithm with ``n_samples`` pairs of points, with a
-corresponding target containing ``n_samples`` values being either +1 or -1.
+should provide the algorithm with `n_samples` pairs of points, with a
+corresponding target containing `n_samples` values being either +1 or -1.
 These values indicate whether the given pairs are similar points or
 dissimilar points.
 
@@ -262,11 +260,11 @@ each other.
 
 .. _pairs_predicting:
 
-Predicting
+Prediction
 ----------
 
-When a pairs learner is fitted, it is also able to predict, for an
-upcoming pair, whether it is a pair of similar or dissimilar points.
+When a pairs learner is fitted, it is also able to predict, for an unseen
+pair, whether it is a pair of similar or dissimilar points.
 
 >>> mmc.predict([[[0.6, 1.6], [1.15, 2.75]],
 ...              [[3.2, 1.1], [5.4, 6.1]]])
@@ -274,34 +272,37 @@ array([1, -1])
 
 .. _calibration:
 
-Thresholding
-------------
-In order to predict whether a new pair represents similar or dissimilar
-samples, we in fact need to set a distance threshold, so that points closer (in
-the learned space) than this threshold are predicted as similar, and points
-further away are predicted as dissimilar. Several methods are possible for this
-thresholding.
+Prediction threshold
+^^^^^^^^^^^^^^^^^^^^
 
-- **At fit time**: The threshold is set with `calibrate_threshold` (see
-  below) on the trainset. You can specify the calibration parameters directly
+Predicting whether a new pair represents similar or dissimilar
+samples requires to set a threshold on the learned distance, so that points
+closer (in the learned space) than this threshold are predicted as similar,
+and points further away are predicted as dissimilar. Several methods are
+possible for this thresholding.
+
+- **Calibration at fit time**: The threshold is set with `calibrate_threshold`
+  (see below) on the training set. You can specify the calibration
+  parameters directly
   in the `fit` method with the `threshold_params` parameter (see the
   documentation of the `fit` method of any metric learner that learns on pairs
-  of points for more information). This method can cause a little bit of
-  overfitting. If you want to avoid that, calibrate the threshold after
-  fitting, on a validation set.
+  of points for more information). Note that calibrating on the training set
+  may cause some overfitting. If you want to avoid that, calibrate the
+  threshold after fitting, on a validation set.
 
   >>> mmc.fit(pairs, y) # will fit the threshold automatically after fitting
 
-- **Manual**: calling `set_threshold` will set the threshold to a
+- **Calibration on validation set**: calling `calibrate_threshold` will
+  calibrate the threshold to achieve a particular score on a validation set,
+  the score being among the classical scores for classification (accuracy, f1
+  score...).
+
+  >>> mmc.calibrate_threshold(pairs, y)
+
+- **Manual threshold**: calling `set_threshold` will set the threshold to a
   particular value.
 
   >>> mmc.set_threshold(0.4)
-
-- **Calibration**: calling `calibrate_threshold` will calibrate the
-  threshold to achieve a particular score on a validation set, the score
-  being among the classical scores for classification (accuracy, f1 score...).
-
-  >>> mmc.calibrate_threshold(pairs, y)
 
 See also: `sklearn.calibration`.
 
@@ -310,18 +311,17 @@ See also: `sklearn.calibration`.
 Scoring
 -------
 
-Not only are they able to predict the label of given pairs, they can also
-return a `decision_function` for a set of pairs. It is basically the "score"
-that will be thresholded to find the prediction for the pair. In fact this
-"score" is the opposite of the distance in the new space (higher score means
- points are similar, and lower score dissimilar).
+Pair metric learners can also return a `decision_function` for a set of pairs.
+It is basically the "score" that will be thresholded to find the prediction
+for the pair. This score corresponds to the opposite of the distance in the
+new space (higher score means points are similar, and lower score dissimilar).
 
 >>> mmc.decision_function([[[0.6, 1.6], [1.15, 2.75]],
 ...                        [[3.2, 1.1], [5.4, 6.1]]])
 array([-0.12811124, -0.74750256])
 
-This allows to return all kinds of estimator scoring usually used in classic
-classification tasks, like `sklearn.metrics.accuracy` for instance, which
+This allows to use common scoring functions for binary classification, like
+`sklearn.metrics.accuracy_score` for instance, which
 can be used inside cross-validation routines:
 
 >>> from sklearn.model_selection import cross_val_score
@@ -333,15 +333,14 @@ can be used inside cross-validation routines:
 array([1., 0., 1.])
 
 Pairs learners also have a default score, which basically
-returns the `sklearn.metrics.roc_auc_score` (therefore is not dependent on
-the threshold).
+returns the `sklearn.metrics.roc_auc_score` (which is threshold-independent).
 
 >>> pairs_test = np.array([[[0.6, 1.6], [1.15, 2.75]],
 ...                        [[3.2, 1.1], [5.4, 6.1]],
 ...                        [[7.7, 5.6], [1.23, 8.4]]])
->>> y_test = np.array([-1., 1., -1.])
+>>> y_test = np.array([1., -1., -1.])
 >>> mmc.score(pairs_test, y_test)
-0.5
+1.0
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
@@ -356,7 +355,7 @@ Algorithms
 :py:class:`ITML <metric_learn.ITML>`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Information Theoretic Metric Learning(:py:class:`ITML <metric_learn.ITML>`)
+Information Theoretic Metric Learning (:py:class:`ITML <metric_learn.ITML>`)
 
 `ITML` minimizes the (differential) relative entropy, aka Kullback–Leibler 
 divergence, between two multivariate Gaussians subject to constraints on the 
@@ -608,11 +607,10 @@ points, while constrains the sum of distances between dissimilar points:
 Learning on quadruplets
 =======================
 
-
-
-The goal of weakly-supervised metric-learning algorithms is to transform
-points in a new space, in which the tuple-wise constraints between points
-are respected.
+Some metric learning algorithms learn on quadruplets of samples. In this case,
+one should provide the algorithm with `n_samples` quadruplets of points. Th
+semantic of each quadruplet is that the first two points should be closer
+together than the last two points.
 
 Fitting
 -------
@@ -659,7 +657,7 @@ last points.
 
 .. _quadruplets_predicting:
 
-Predicting
+Prediction
 ----------
 
 When a quadruplets learner is fitted, it is also able to predict, for an
@@ -677,10 +675,10 @@ array([-1.,  1.])
 Scoring
 -------
 
-Not only are they able to predict the label of given pairs, they can also
-return a `decision_function` for a set of pairs. It is basically the "score"
-which sign will be taken to find the prediction for the pair. In fact this
-"score" is the difference between the distance between the two last points,
+Quadruplet metric learners can also
+return a `decision_function` for a set of pairs. This is basically the "score"
+which sign will be taken to find the prediction for the pair, which
+corresponds to the difference between the distance between the two last points,
 and the distance between the two last points of the quadruplet (higher
 score means the two last points are more likely to be more dissimilar than
 the two first points (i.e. more likely to have a +1 prediction since it's
