@@ -157,11 +157,13 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class,
 
 .. topic:: References:
 
-    .. [1] `Distance Metric Learning for Large Margin Nearest Neighbor
-       Classification
-       <http://papers.nips.cc/paper/2795-distance-metric-learning-for-large
-       -margin -nearest-neighbor-classification>`_ Kilian Q. Weinberger, John
-       Blitzer, Lawrence K. Saul
+    .. [1] Weinberger et al. `Distance Metric Learning for Large Margin
+       Nearest Neighbor Classification
+       <http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf>`_.
+       JMLR 2009
+
+    .. [2] `Wikipedia entry on Large Margin Nearest Neighbor <https://en.wikipedia.org/wiki/Large_margin_nearest_neighbor>`_
+       
 
 .. _nca:
 
@@ -219,13 +221,12 @@ the sum of probability of being correctly classified:
 
 .. topic:: References:
 
-    .. [1] J. Goldberger, G. Hinton, S. Roweis, R. Salakhutdinov.
-       "Neighbourhood Components Analysis". Advances in Neural Information
-       Processing Systems. 17, 513-520, 2005.
-       http://www.cs.nyu.edu/~roweis/papers/ncanips.pdf
+    .. [1] Goldberger et al.
+       `Neighbourhood Components Analysis <https://papers.nips.cc/paper/2566-neighbourhood-components-analysis.pdf>`_.
+       NIPS 2005
 
-    .. [2] Wikipedia entry on Neighborhood Components Analysis
-       https://en.wikipedia.org/wiki/Neighbourhood_components_analysis
+    .. [2] `Wikipedia entry on Neighborhood Components Analysis <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_
+       
 
 .. _lfda:
 
@@ -293,13 +294,13 @@ same class are not imposed to be close.
 
 .. topic:: References:
 
-    .. [1] `Dimensionality Reduction of Multimodal Labeled Data by Local
-       Fisher Discriminant Analysis <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA
-       .pdf>`_ Masashi Sugiyama.
+    .. [1] Sugiyama. `Dimensionality Reduction of Multimodal Labeled Data by Local
+       Fisher Discriminant Analysis <http://www.jmlr.org/papers/volume8/sugiyama07b/sugiyama07b.pdf>`_.
+       JMLR 2007
 
-    .. [2] `Local Fisher Discriminant Analysis on Beer Style Clustering
+    .. [2] Tang. `Local Fisher Discriminant Analysis on Beer Style Clustering
        <https://gastrograph.com/resources/whitepapers/local-fisher
-       -discriminant-analysis-on-beer-style-clustering.html#>`_ Yuan Tang.
+       -discriminant-analysis-on-beer-style-clustering.html#>`_.
 
 .. _mlkr:
 
@@ -361,9 +362,8 @@ calculating a weighted average of all the training samples:
 
 .. topic:: References:
 
-    .. [1] `Metric Learning for Kernel Regression <http://proceedings.mlr.
-       press/v2/weinberger07a/weinberger07a.pdf>`_ Kilian Q. Weinberger,
-       Gerald Tesauro
+    .. [1] Weinberger et al. `Metric Learning for Kernel Regression <http://proceedings.mlr.
+       press/v2/weinberger07a/weinberger07a.pdf>`_. AISTATS 2007
 
 
 .. _supervised_version:

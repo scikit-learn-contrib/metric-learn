@@ -421,12 +421,9 @@ is the prior distance metric, set to identity matrix by default,
 
 .. topic:: References:
 
-    .. [1] `Information-theoretic Metric Learning <http://machinelearning.wustl
-       .edu/mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis,
-       et al.
+    .. [1] Jason V. Davis, et al. `Information-theoretic Metric Learning <https://icml.cc/imls/conferences/2007/proceedings/papers/404.pdf>`_. ICML 2007
 
-    .. [2] Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/
-       itml/
+    .. [2] Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
 
 
 .. _sdml:
@@ -482,10 +479,9 @@ is the off-diagonal L1 norm.
 .. topic:: References:
 
     .. [1] Qi et al.
-       An efficient sparse metric learning in high-dimensional space via
-       L1-penalized log-determinant regularization. ICML 2009.
-       http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/
-       icml09-guojun.pdf
+       `An efficient sparse metric learning in high-dimensional space via
+       L1-penalized log-determinant regularization <https://icml.cc/Conferences/2009/papers/46.pdf>`_.
+       ICML 2009.
 
     .. [2] Adapted from https://gist.github.com/kcarnold/5439945
 
@@ -536,14 +532,13 @@ as the Mahalanobis matrix.
 
 .. topic:: References:
 
-    .. [1] `Adjustment learning and relevant component analysis
+    .. [1] Shental et al. `Adjustment learning and relevant component analysis
        <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871
-       &rep=rep1&type=pdf>`_ Noam Shental, et al.
+       &rep=rep1&type=pdf>`_. ECCV 2002
 
-    .. [2] 'Learning distance functions using equivalence relations', ICML 2003
+    .. [2] Bar-Hillel et al. `Learning distance functions using equivalence relations <https://aaai.org/Papers/ICML/2003/ICML03-005.pdf>`_. ICML 2003
 
-    .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
-       2005
+    .. [3] Bar-Hillel et al. `Learning a Mahalanobis metric from equivalence constraints <http://www.jmlr.org/papers/volume6/bar-hillel05a/bar-hillel05a.pdf>`_. JMLR 2005
 
 .. _mmc:
 
@@ -594,12 +589,11 @@ points, while constrains the sum of distances between dissimilar points:
 
 .. topic:: References:
 
-  .. [1] `Distance metric learning with application to clustering with
+  .. [1] Xing et al. `Distance metric learning with application to clustering with
         side-information <http://papers.nips
         .cc/paper/2164-distance-metric-learning-with-application-to-clustering
-        -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
-  .. [2] Adapted from Matlab code `here <http://www.cs.cmu
-     .edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz>`_.
+        -with-side-information.pdf>`_. NIPS 2002
+  .. [2] Adapted from Matlab code http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
 
 
 .. _learning_on_quadruplets:
@@ -800,8 +794,8 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
 .. topic:: References:
 
     .. [1] Liu et al.
-       "Metric Learning from Relative Comparisons by Minimizing Squared
-       Residual". ICDM 2012. http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
+       `Metric Learning from Relative Comparisons by Minimizing Squared
+       Residual <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012
 
     .. [2] Adapted from https://gist.github.com/kcarnold/5439917
 
