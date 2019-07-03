@@ -1,17 +1,5 @@
-r"""
-Metric Learning from Relative Comparisons by Minimizing Squared Residual(LSML)
-
-`LSML` proposes a simple, yet effective, algorithm that minimizes a convex
-objective function corresponding to the sum of squared residuals of
-constraints. This algorithm uses the constraints in the form of the
-relative distance comparisons, such method is especially useful where
-pairwise constraints are not natural to obtain, thus pairwise constraints
-based algorithms become infeasible to be deployed. Furthermore, its sparsity
-extension leads to more stable estimation when the dimension is high and
-only a small amount of constraints is given.
-
-Read more in the :ref:`User Guide <lsml>`.
-
+"""
+Metric Learning from Relative Comparisons by Minimizing Squared Residual (LSML)
 """
 
 from __future__ import print_function, absolute_import, division
@@ -33,46 +21,6 @@ class _BaseLSML(MahalanobisMixin):
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,
                verbose=False, preprocessor=None, random_state=None):
-    """Initialize LSML.
-
-    Parameters
-    ----------
-    prior : None, string or numpy array, optional (default=None)
-         Prior to set for the metric. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of
-         shape (n_features, n_features). For LSML, the prior should be strictly
-         positive definite (PD). If `None`, will be set
-         automatically to 'identity' (this is to raise a warning if
-         `prior` is not set, and stays to its default value (None), in v0.5.0).
-
-         'identity'
-            An identity matrix of shape (n_features, n_features).
-
-         'covariance'
-            The inverse covariance matrix.
-
-         'random'
-            The initial Mahalanobis matrix will be a random positive definite
-            (PD) matrix of shape `(n_features, n_features)`, generated using
-            `sklearn.datasets.make_spd_matrix`.
-
-         numpy array
-             A positive definite (PD) matrix of shape
-             (n_features, n_features), that will be used as such to set the
-             prior.
-
-    tol : float, optional
-    max_iter : int, optional
-    verbose : bool, optional
-        if True, prints information while learning
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to set the random
-        prior.
-    """
     self.prior = prior
     self.tol = tol
     self.max_iter = max_iter
@@ -178,6 +126,55 @@ class _BaseLSML(MahalanobisMixin):
 class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
   """Least Squared-residual Metric Learning (LSML)
 
+  `LSML` proposes a simple, yet effective, algorithm that minimizes a convex
+  objective function corresponding to the sum of squared residuals of
+  constraints. This algorithm uses the constraints in the form of the
+  relative distance comparisons, such method is especially useful where
+  pairwise constraints are not natural to obtain, thus pairwise constraints
+  based algorithms become infeasible to be deployed. Furthermore, its sparsity
+  extension leads to more stable estimation when the dimension is high and
+  only a small amount of constraints is given.
+
+  Read more in the :ref:`User Guide <lsml>`.
+
+  Parameters
+  ----------
+  prior : None, string or numpy array, optional (default=None)
+       Prior to set for the metric. Possible options are
+       'identity', 'covariance', 'random', and a numpy array of
+       shape (n_features, n_features). For LSML, the prior should be strictly
+       positive definite (PD). If `None`, will be set
+       automatically to 'identity' (this is to raise a warning if
+       `prior` is not set, and stays to its default value (None), in v0.5.0).
+
+       'identity'
+          An identity matrix of shape (n_features, n_features).
+
+       'covariance'
+          The inverse covariance matrix.
+
+       'random'
+          The initial Mahalanobis matrix will be a random positive definite
+          (PD) matrix of shape `(n_features, n_features)`, generated using
+          `sklearn.datasets.make_spd_matrix`.
+
+       numpy array
+           A positive definite (PD) matrix of shape
+           (n_features, n_features), that will be used as such to set the
+           prior.
+
+  tol : float, optional
+  max_iter : int, optional
+  verbose : bool, optional
+      if True, prints information while learning
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int. If
+      ``init='random'``, ``random_state`` is used to set the random
+      prior.
+
   Attributes
   ----------
   n_iter_ : `int`
@@ -186,6 +183,31 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
   transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  Examples
+  --------
+  >>> from metric_learn import LSML_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> lsml = LSML_Supervised(num_constraints=200)
+  >>> lsml.fit(X, Y)
+
+  References
+  ----------
+  .. [1] Liu et al. `Metric Learning from Relative Comparisons by Minimizing
+         Squared Residual
+         <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012.
+
+  .. [2] Adapted from https://gist.github.com/kcarnold/5439917
+
+  See Also
+  --------
+  metric_learn.LSML : The original weakly-supervised algorithm
+
+  :ref:`supervised_version` : The section of the project documentation
+    that describes the supervised version of weakly supervised estimators.
   """
 
   def fit(self, quadruplets, weights=None):
@@ -193,7 +215,7 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_constraints, 4, n_features) or
+    quadruplets : array-like, shape=(n_constraints, 4, n_features) or \
                   (n_constraints, 4)
         3D array-like of quadruplets of points or 2D array of quadruplets of
         indicators. In order to supervise the algorithm in the right way, we
@@ -214,6 +236,59 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 class LSML_Supervised(_BaseLSML, TransformerMixin):
   """Supervised version of Least Squared-residual Metric Learning (LSML)
 
+  `LSML_Supervised` creates quadruplets from labeled samples by taking two
+  samples from the same class, and two samples from different classes.
+  This way it builds quadruplets where the two first points must be more
+  similar than the two last points.
+
+  Parameters
+  ----------
+  tol : float, optional (default=1e-3)
+      Tolerance for the convergence procedure.
+  max_iter : int, optional (default=1000)
+      Number of maximum iterations of the convergence procedure.
+  prior : None, string or numpy array, optional (default=None)
+      Prior to set for the metric. Possible options are
+      'identity', 'covariance', 'random', and a numpy array of
+      shape (n_features, n_features). For LSML, the prior should be strictly
+      positive definite (PD). If `None`, will be set
+      automatically to 'identity' (this is to raise a warning if
+      `prior` is not set, and stays to its default value (None), in v0.5.0).
+
+      'identity'
+          An identity matrix of shape (n_features, n_features).
+
+      'covariance'
+          The inverse covariance matrix.
+
+      'random'
+          The initial Mahalanobis matrix will be a random positive definite
+          (PD) matrix of shape `(n_features, n_features)`, generated using
+          `sklearn.datasets.make_spd_matrix`.
+
+      numpy array
+          A positive definite (PD) matrix of shape
+          (n_features, n_features), that will be used as such to set the
+          prior.
+  num_labeled : Not used
+    .. deprecated:: 0.5.0
+       `num_labeled` was deprecated in version 0.5.0 and will
+       be removed in 0.6.0.
+  num_constraints: int, optional
+      number of constraints to generate
+  weights : (m,) array of floats, optional
+      scale factor for each constraint
+  verbose : bool, optional
+      if True, prints information while learning
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get tuples from indices. If array-like,
+      tuples will be formed like this: X[indices].
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int. If
+      ``init='random'``, ``random_state`` is used to set the random
+      prior. In any case, `random_state` is also used to randomly sample
+        constraints from labels.
+
   Attributes
   ----------
   n_iter_ : `int`
@@ -227,59 +302,6 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,
                num_labeled='deprecated', num_constraints=None, weights=None,
                verbose=False, preprocessor=None, random_state=None):
-    """Initialize the supervised version of `LSML`.
-
-    `LSML_Supervised` creates quadruplets from labeled samples by taking two
-    samples from the same class, and two samples from different classes.
-    This way it builds quadruplets where the two first points must be more
-    similar than the two last points.
-
-    Parameters
-    ----------
-    tol : float, optional
-    max_iter : int, optional
-    prior : None, string or numpy array, optional (default=None)
-         Prior to set for the metric. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of
-         shape (n_features, n_features). For LSML, the prior should be strictly
-         positive definite (PD). If `None`, will be set
-         automatically to 'identity' (this is to raise a warning if
-         `prior` is not set, and stays to its default value (None), in v0.5.0).
-
-         'identity'
-            An identity matrix of shape (n_features, n_features).
-
-         'covariance'
-            The inverse covariance matrix.
-
-         'random'
-            The initial Mahalanobis matrix will be a random positive definite
-            (PD) matrix of shape `(n_features, n_features)`, generated using
-            `sklearn.datasets.make_spd_matrix`.
-
-         numpy array
-             A positive definite (PD) matrix of shape
-             (n_features, n_features), that will be used as such to set the
-             prior.
-    num_labeled : Not used
-      .. deprecated:: 0.5.0
-         `num_labeled` was deprecated in version 0.5.0 and will
-         be removed in 0.6.0.
-    num_constraints: int, optional
-        number of constraints to generate
-    weights : (m,) array of floats, optional
-        scale factor for each constraint
-    verbose : bool, optional
-        if True, prints information while learning
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-        The preprocessor to call to get tuples from indices. If array-like,
-        tuples will be formed like this: X[indices].
-    random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int. If
-        ``init='random'``, ``random_state`` is used to set the random
-        prior. In any case, `random_state` is also used to randomly sample
-        constraints from labels.
-    """
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                        verbose=verbose, preprocessor=preprocessor,
                        random_state=random_state)

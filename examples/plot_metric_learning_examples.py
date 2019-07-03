@@ -130,7 +130,7 @@ plot_tsne(X, y)
 #
 # - See more in the :ref:`User Guide <lmnn>`
 # - See more in the documentation of the class :py:class:`LMNN
-#   <metric_learn.lmnn.LMNN>`
+#   <metric_learn.LMNN>`
 
 
 ######################################################################
@@ -139,7 +139,7 @@ plot_tsne(X, y)
 # 
 
 # setting up LMNN
-lmnn = metric_learn.LMNN(k=5, learn_rate=1e-6)
+lmnn = metric_learn.LMNN(k=5, learn_rate=1e-6, init='random')
 
 # fit the data!
 lmnn.fit(X, y)
@@ -181,7 +181,7 @@ plot_tsne(X_lmnn, y)
 #
 # - See more in the :ref:`User Guide <itml>`
 # - See more in the documentation of the class :py:class:`ITML
-#   <metric_learn.itml.ITML>`
+#   <metric_learn.ITML>`
 
 itml = metric_learn.ITML_Supervised()
 X_itml = itml.fit_transform(X, y)
@@ -200,12 +200,12 @@ plot_tsne(X_itml, y)
 #
 # - See more in the :ref:`User Guide <mmc>`
 # - See more in the documentation of the class :py:class:`MMC
-#   <metric_learn.mmc.MMC>`
+#   <metric_learn.MMC>`
 
-itml = metric_learn.ITML_Supervised()
-X_itml = itml.fit_transform(X, y)
+mmc = metric_learn.MMC_Supervised()
+X_mmc = mmc.fit_transform(X, y)
 
-plot_tsne(X_itml, y)
+plot_tsne(X_mmc, y)
 
 ######################################################################
 # Sparse Determinant Metric Learning
@@ -219,9 +219,10 @@ plot_tsne(X_itml, y)
 #
 # - See more in the :ref:`User Guide <sdml>`
 # - See more in the documentation of the class :py:class:`SDML
-#   <metric_learn.sdml.SDML>`
+#   <metric_learn.SDML>`
 
-sdml = metric_learn.SDML_Supervised(sparsity_param=0.1, balance_param=0.0015)
+sdml = metric_learn.SDML_Supervised(sparsity_param=0.1, balance_param=0.0015,
+                                    prior='covariance')
 X_sdml = sdml.fit_transform(X, y)
 
 plot_tsne(X_sdml, y)
@@ -238,9 +239,10 @@ plot_tsne(X_sdml, y)
 #
 # - See more in the :ref:`User Guide <lsml>`
 # - See more in the documentation of the class :py:class:`LSML
-#   <metric_learn.lsml.LSML>`
+#   <metric_learn.LSML>`
 
-lsml = metric_learn.LSML_Supervised(tol=0.0001, max_iter=10000)
+lsml = metric_learn.LSML_Supervised(tol=0.0001, max_iter=10000,
+                                    prior='covariance')
 X_lsml = lsml.fit_transform(X, y)
 
 plot_tsne(X_lsml, y)
@@ -265,7 +267,7 @@ plot_tsne(X_lsml, y)
 #
 # - See more in the :ref:`User Guide <nca>`
 # - See more in the documentation of the class :py:class:`NCA
-#   <metric_learn.nca.NCA>`
+#   <metric_learn.NCA>`
 
 nca = metric_learn.NCA(max_iter=1000)
 X_nca = nca.fit_transform(X, y)
@@ -285,7 +287,7 @@ plot_tsne(X_nca, y)
 #
 # - See more in the :ref:`User Guide <lfda>`
 # - See more in the documentation of the class :py:class:`LFDA
-#   <metric_learn.lfda.LFDA>`
+#   <metric_learn.LFDA>`
 
 lfda = metric_learn.LFDA(k=2, num_dims=2)
 X_lfda = lfda.fit_transform(X, y)
@@ -306,7 +308,7 @@ plot_tsne(X_lfda, y)
 #
 # - See more in the :ref:`User Guide <rca>`
 # - See more in the documentation of the class :py:class:`RCA
-#   <metric_learn.rca.RCA>`
+#   <metric_learn.RCA>`
 
 rca = metric_learn.RCA_Supervised(num_chunks=30, chunk_size=2)
 X_rca = rca.fit_transform(X, y)
@@ -326,7 +328,7 @@ plot_tsne(X_rca, y)
 #
 # - See more in the :ref:`User Guide <mlkr>`
 # - See more in the documentation of the class :py:class:`MLKR
-#   <metric_learn.mlkr.MLKR>`
+#   <metric_learn.MLKR>`
 #
 # To illustrate MLKR, let's use the dataset
 # `sklearn.datasets.make_regression` the same way as we did with the
@@ -445,8 +447,8 @@ print(pairs_labels)
 ######################################################################
 # Using our constraints, let's now train ITML again. Note that we are no
 # longer calling the supervised class :py:class:`ITML_Supervised
-# <metric_learn.itml.ITML_Supervised>` but the more generic
-# (weakly-supervised) :py:class:`ITML <metric_learn.itml.ITML>`, which
+# <metric_learn.ITML_Supervised>` but the more generic
+# (weakly-supervised) :py:class:`ITML <metric_learn.ITML>`, which
 # takes the dataset `X` through the `preprocessor` argument (see
 # :ref:`this section  <preprocessor_section>` of the documentation to learn
 # about more advanced uses of `preprocessor`) and the pair information `pairs`

@@ -12,6 +12,11 @@ __all__ = ['Constraints']
 
 
 class Constraints(object):
+  """
+  Class to build constraints from labels.
+
+  See more in the :ref:`User Guide <supervised_version>`
+  """
   def __init__(self, partial_labels):
     '''partial_labels : int arraylike, -1 indicating unknown label'''
     partial_labels = np.asanyarray(partial_labels, dtype=int)

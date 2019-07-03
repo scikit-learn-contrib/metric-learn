@@ -1,3 +1,7 @@
+"""
+Base module.
+"""
+
 from sklearn.base import BaseEstimator
 from sklearn.utils.extmath import stable_cumsum
 from sklearn.utils.validation import _is_arraylike, check_is_fitted
@@ -10,16 +14,17 @@ import warnings
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
+  """
+  Base class for all metric-learners.
+
+  Parameters
+  ----------
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be gotten like this: X[indices].
+  """
 
   def __init__(self, preprocessor=None):
-    """
-
-    Parameters
-    ----------
-    preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be gotten like this: X[indices].
-    """
     self.preprocessor = preprocessor
 
   @abstractmethod
@@ -277,6 +282,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   get_metric.__doc__ = BaseMetricLearner.get_metric.__doc__
 
   def metric(self):
+    """Deprecated. Will be removed in v0.6.0. Use `get_mahalanobis_matrix`
+    instead"""
     # TODO: remove this method in version 0.6.0
     warnings.warn(("`metric` is deprecated since version 0.5.0 and will be "
                    "removed in 0.6.0. Use `get_mahalanobis_matrix` instead."),
@@ -295,7 +302,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
 
 class _PairsClassifierMixin(BaseMetricLearner):
-  """
+  """Base class for pairs learners.
+
   Attributes
   ----------
   threshold_ : `float`
@@ -567,6 +575,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
 
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
+  """Base class for quadruplets learners.
+  """
 
   _tuple_size = 4  # number of points in a tuple, 4 for quadruplets
 
@@ -578,7 +588,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or \
                   (n_quadruplets, 4)
       3D Array of quadruplets to predict, with each row corresponding to four
       points, or 2D array of indices of quadruplets if the metric learner
@@ -607,7 +617,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or \
                   (n_quadruplets, 4)
       3D Array of quadruplets to predict, with each row corresponding to four
       points, or 2D array of indices of quadruplets if the metric learner
@@ -618,6 +628,9 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
+    quadruplets = check_input(quadruplets, type_of_inputs='tuples',
+                              preprocessor=self.preprocessor_,
+                              estimator=self, tuple_size=self._tuple_size)
     return (self.score_pairs(quadruplets[:, 2:]) -
             self.score_pairs(quadruplets[:, :2]))
 
@@ -630,7 +643,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
     Parameters
     ----------
-    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or
+    quadruplets : array-like, shape=(n_quadruplets, 4, n_features) or \
                   (n_quadruplets, 4)
       3D Array of quadruplets to score, with each row corresponding to four
       points, or 2D array of indices of quadruplets if the metric learner
