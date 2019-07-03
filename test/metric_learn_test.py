@@ -400,16 +400,14 @@ def test_loss_func(capsys):
     strings = [re.search("\d+ (?:{}) (?:{}) (?:(\d+)) (?:{})"
                          .format(num, num, num), s) for s in lines]
     objectives[name] = [float(match.group(1)) for match in strings if match is
-                        not
-                        None]
+                        not None]
     obj_diffs[name] = [float(match.group(3)) for match in strings if match is
-                             not
-                       None]
+                             not None]
     total_active[name] = [float(match.group(5)) for match in strings if
                           match is not
                           None]
-    grads[name] = [float(match.group(6)) for match in strings if match is not
-                   None]
+    learn_rate[name] = [float(match.group(6)) for match in strings if match is
+                      not None]
     assert len(strings) >= 10  # we ensure that we actually did more than 10
     # iterations
     assert total_active[name][0] >= 2  # we ensure that we have some active
