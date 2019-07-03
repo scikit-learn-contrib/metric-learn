@@ -8,46 +8,114 @@ labels `y`, and learn a distance matrix that make points from the same class
 other, and points from different classes or with distant target values far away
 from each other.
 
-Scikit-learn compatibility
-==========================
+General API
+===========
 
-All supervised algorithms are scikit-learn `Estimators`, so they are
-compatible with Pipelining and scikit-learn model selection routines.
+Supervised metric learning algorithms essentially use the same API as
+scikit-learn.
+
+Input data
+----------
+In order to train a model, you need two `array-like <https://scikit-learn\
+.org/stable/glossary.html#term-array-like>`_ objects, `X` and `y`. `X`
+should be a 2D array-like of shape `(n_samples, n_features)`, where
+`n_samples` is the number of points of your dataset and `n_features` is the
+number of attributes describing each point. `y` should be a 1D
+array-like
+of shape `(n_samples,)`, containing for each point in `X` the class it
+belongs to (or the value to regress for this sample, if you use `MLKR` for
+instance).
+
+Here is an example of a dataset of two dogs and one
+cat (the classes are 'dog' and 'cat') an animal being represented by
+two numbers.
+
+>>> import numpy as np
+>>> X = np.array([[2.3, 3.6], [0.2, 0.5], [6.7, 2.1]])
+>>> y = np.array(['dog', 'cat', 'dog'])
+
+.. note::
+
+   You can also use a preprocessor instead of directly giving the inputs as
+   2D arrays. See the :ref:`preprocessor_section` section for more details.
+
+Fit, transform, and so on
+-------------------------
+The goal of supervised metric-learning algorithms is to transform
+points in a new space, in which the distance between two points from the
+same class will be small, and the distance between two points from different
+classes will be large. To do so, we fit the metric learner (example:
+`NCA`).
+
+>>> from metric_learn import NCA
+>>> nca = NCA(random_state=42)
+>>> nca.fit(X, y)
+NCA(init=None, max_iter=100, n_components=None, num_dims='deprecated',
+  preprocessor=None, random_state=42, tol=None, verbose=False)
+
+
+Now that the estimator is fitted, you can use it on new data for several
+purposes.
+
+First, you can transform the data in the learned space, using `transform`:
+Here we transform two points in the new embedding space.
+
+>>> X_new = np.array([[9.4, 4.1], [2.1, 4.4]])
+>>> nca.transform(X_new)
+array([[ 5.91884732, 10.25406973],
+       [ 3.1545886 ,  6.80350083]])
+
+Also, as explained before, our metric learners has learn a distance between
+points. You can use this distance in two main ways:
+
+- You can either return the distance between pairs of points using the
+  `score_pairs` function:
+
+>>> nca.score_pairs([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]]])
+array([0.49627072, 3.65287282])
+
+- Or you can return a function that will return the distance (in the new
+  space) between two 1D arrays (the coordinates of the points in the original
+  space), similarly to distance functions in `scipy.spatial.distance`.
+
+>>> metric_fun = nca.get_metric()
+>>> metric_fun([3.5, 3.6], [5.6, 2.4])
+0.4962707194621285
+
+.. note::
+
+    If the metric learner that you use learns a :ref:`Mahalanobis distance
+    <mahalanobis_distances>` (like it is the case for all algorithms
+    currently in metric-learn), you can get the plain learned Mahalanobis
+    matrix using `get_mahalanobis_matrix`.
+
+    >>> nca.get_mahalanobis_matrix()
+    array([[0.43680409, 0.89169412],
+           [0.89169412, 1.9542479 ]])
+
+.. TODO: remove the "like it is the case etc..." if it's not the case anymore
+
+Scikit-learn compatibility
+--------------------------
+
+All supervised algorithms are scikit-learn estimators 
+(`sklearn.base.BaseEstimator`) and transformers 
+(`sklearn.base.TransformerMixin`) so they are compatible with pipelines 
+(`sklearn.pipeline.Pipeline`) and
+scikit-learn model selection routines 
+(`sklearn.model_selection.cross_val_score`,
+`sklearn.model_selection.GridSearchCV`, etc).
 
 Algorithms
 ==========
 
-Covariance
-----------
-
-.. todo:: Covariance is unsupervised, so its doc should not be here.
-
-`Covariance` does not "learn" anything, rather it calculates
-the covariance matrix of the input data. This is a simple baseline method.
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import Covariance
-    from sklearn.datasets import load_iris
-
-    iris = load_iris()['data']
-
-    cov = Covariance().fit(iris)
-    x = cov.transform(iris)
-
-.. topic:: References:
-
-    .. [1] On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
-
 .. _lmnn:
 
-LMNN
------
+:py:class:`LMNN <metric_learn.LMNN>`
+-----------------------------------------
 
 Large Margin Nearest Neighbor Metric Learning
-(:py:class:`LMNN <metric_learn.lmnn.LMNN>`)
+(:py:class:`LMNN <metric_learn.LMNN>`)
 
 `LMNN` learns a Mahalanobis distance metric in the kNN classification
 setting. The learned metric attempts to keep close k-nearest neighbors 
@@ -89,18 +157,20 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class,
 
 .. topic:: References:
 
-    .. [1] `Distance Metric Learning for Large Margin Nearest Neighbor
-       Classification
-       <http://papers.nips.cc/paper/2795-distance-metric-learning-for-large
-       -margin -nearest-neighbor-classification>`_ Kilian Q. Weinberger, John
-       Blitzer, Lawrence K. Saul
+    .. [1] Weinberger et al. `Distance Metric Learning for Large Margin
+       Nearest Neighbor Classification
+       <http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf>`_.
+       JMLR 2009
+
+    .. [2] `Wikipedia entry on Large Margin Nearest Neighbor <https://en.wikipedia.org/wiki/Large_margin_nearest_neighbor>`_
+       
 
 .. _nca:
 
-NCA
----
+:py:class:`NCA <metric_learn.NCA>`
+--------------------------------------
 
-Neighborhood Components Analysis(:py:class:`NCA <metric_learn.nca.NCA>`)
+Neighborhood Components Analysis (:py:class:`NCA <metric_learn.NCA>`)
 
 `NCA` is a distance metric learning algorithm which aims to improve the 
 accuracy of nearest neighbors classification compared to the standard 
@@ -151,20 +221,19 @@ the sum of probability of being correctly classified:
 
 .. topic:: References:
 
-    .. [1] J. Goldberger, G. Hinton, S. Roweis, R. Salakhutdinov.
-       "Neighbourhood Components Analysis". Advances in Neural Information
-       Processing Systems. 17, 513-520, 2005.
-       http://www.cs.nyu.edu/~roweis/papers/ncanips.pdf
+    .. [1] Goldberger et al.
+       `Neighbourhood Components Analysis <https://papers.nips.cc/paper/2566-neighbourhood-components-analysis.pdf>`_.
+       NIPS 2005
 
-    .. [2] Wikipedia entry on Neighborhood Components Analysis
-       https://en.wikipedia.org/wiki/Neighbourhood_components_analysis
+    .. [2] `Wikipedia entry on Neighborhood Components Analysis <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_
+       
 
 .. _lfda:
 
-LFDA
-----
+:py:class:`LFDA <metric_learn.LFDA>`
+-----------------------------------------
 
-Local Fisher Discriminant Analysis(:py:class:`LFDA <metric_learn.lfda.LFDA>`)
+Local Fisher Discriminant Analysis (:py:class:`LFDA <metric_learn.LFDA>`)
 
 `LFDA` is a linear supervised dimensionality reduction method. It is
 particularly useful when dealing with multi-modality, where one ore more classes
@@ -225,20 +294,20 @@ same class are not imposed to be close.
 
 .. topic:: References:
 
-    .. [1] `Dimensionality Reduction of Multimodal Labeled Data by Local
-       Fisher Discriminant Analysis <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA
-       .pdf>`_ Masashi Sugiyama.
+    .. [1] Sugiyama. `Dimensionality Reduction of Multimodal Labeled Data by Local
+       Fisher Discriminant Analysis <http://www.jmlr.org/papers/volume8/sugiyama07b/sugiyama07b.pdf>`_.
+       JMLR 2007
 
-    .. [2] `Local Fisher Discriminant Analysis on Beer Style Clustering
+    .. [2] Tang. `Local Fisher Discriminant Analysis on Beer Style Clustering
        <https://gastrograph.com/resources/whitepapers/local-fisher
-       -discriminant-analysis-on-beer-style-clustering.html#>`_ Yuan Tang.
+       -discriminant-analysis-on-beer-style-clustering.html#>`_.
 
 .. _mlkr:
 
-MLKR
-----
+:py:class:`MLKR <metric_learn.MLKR>`
+-----------------------------------------
 
-Metric Learning for Kernel Regression(:py:class:`MLKR <metric_learn.mlkr.MLKR>`)
+Metric Learning for Kernel Regression (:py:class:`MLKR <metric_learn.MLKR>`)
 
 `MLKR` is an algorithm for supervised metric learning, which learns a
 distance function by directly minimizing the leave-one-out regression error.
@@ -293,20 +362,38 @@ calculating a weighted average of all the training samples:
 
 .. topic:: References:
 
-    .. [1] `Metric Learning for Kernel Regression <http://proceedings.mlr.
-       press/v2/weinberger07a/weinberger07a.pdf>`_ Kilian Q. Weinberger,
-       Gerald Tesauro
+    .. [1] Weinberger et al. `Metric Learning for Kernel Regression <http://proceedings.mlr.
+       press/v2/weinberger07a/weinberger07a.pdf>`_. AISTATS 2007
 
+
+.. _supervised_version:
 
 Supervised versions of weakly-supervised algorithms
 ---------------------------------------------------
 
-Note that each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
+Each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
 has a supervised version of the form `*_Supervised` where similarity tuples are
-generated from the labels information and passed to the underlying algorithm.
+randomly generated from the labels information and passed to the underlying
+algorithm.
 
-.. todo:: add more details about that (see issue `<https://github
-          .com/metric-learn/metric-learn/issues/135>`_)
+For pairs learners (see :ref:`learning_on_pairs`), pairs (tuple of two points
+from the dataset), and pair labels (`int` indicating whether the two points
+are similar (+1) or dissimilar (-1)), are sampled with the function
+`metric_learn.constraints.positive_negative_pairs`. To sample positive pairs
+(of label +1), this method will look at all the samples from the same label and
+sample randomly a pair among them. To sample negative pairs (of label -1), this
+method will look at all the samples from a different class and sample randomly
+a pair among them. The method will try to build `num_constraints` positive
+pairs and `num_constraints` negative pairs, but sometimes it cannot find enough
+of one of those, so forcing `same_length=True` will return both times the
+minimum of the two lenghts.
+
+For using quadruplets learners (see :ref:`learning_on_quadruplets`) in a
+supervised way, positive and negative pairs are sampled as above and
+concatenated so that we have a 3D array of
+quadruplets, where for each quadruplet the two first points are from the same
+class, and the two last points are from a different class (so indeed the two
+last points should be less similar than the two first points).
 
 .. topic:: Example Code:
 
