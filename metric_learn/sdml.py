@@ -310,7 +310,8 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int. If
       ``init='random'``, ``random_state`` is used to set the random
-      prior.
+      prior. In any case, `random_state` is also used to randomly sample
+      constraints from labels.
 
   Attributes
   ----------
@@ -336,7 +337,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
-  def fit(self, X, y, random_state=np.random):
+  def fit(self, X, y, random_state='deprecated'):
     """Create constraints from labels and learn the SDML model.
 
     Parameters
@@ -345,9 +346,11 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
         data matrix, where each row corresponds to a single instance
     y : array-like, shape (n,)
         data labels, one for each instance
-    random_state : {numpy.random.RandomState, int}, optional
-        Random number generator or random seed. If not given, the singleton
-        numpy.random will be used.
+    random_state : Not used
+      .. deprecated:: 0.5.0
+        `random_state` in the `fit` function was deprecated in version 0.5.0
+        and will be removed in 0.6.0. Set `random_state` at initialization
+        instead (when instantiating a new `SDML_Supervised` object).
 
     Returns
     -------
@@ -358,6 +361,18 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
       warnings.warn('"num_labeled" parameter is not used.'
                     ' It has been deprecated in version 0.5.0 and will be'
                     ' removed in 0.6.0', DeprecationWarning)
+    if random_state != 'deprecated':
+      warnings.warn('"random_state" parameter in the `fit` function is '
+                    'deprecated. Set `random_state` at initialization '
+                    'instead (when instantiating a new `SDML_Supervised` '
+                    'object).', DeprecationWarning)
+    else:
+      warnings.warn('As of v0.5.0, `SDML_Supervised` now uses the '
+                    '`random_state` given at initialization to sample '
+                    'constraints, not the default `np.random` from the `fit` '
+                    'method, since this argument is now deprecated. '
+                    'This warning will disappear in v0.6.0.',
+                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:
@@ -366,6 +381,6 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
 
     c = Constraints(y)
     pos_neg = c.positive_negative_pairs(num_constraints,
-                                        random_state=random_state)
+                                        random_state=self.random_state)
     pairs, y = wrap_pairs(X, pos_neg)
     return _BaseSDML._fit(self, pairs, y)
