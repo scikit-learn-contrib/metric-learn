@@ -181,7 +181,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
         # we copy variables that can be modified by _loss_grad, because if we
         # retry we don t want to modify them several times
         (G_next, objective_next, total_active_next) = (
-          self._loss_grad(X, L, dfG, k, reg, target_neighbors, label_inds))
+          self._loss_grad(X, L_next, dfG, k, reg, target_neighbors,
+                          label_inds))
         assert not np.isnan(objective)
         delta_obj = objective_next - objective
         if delta_obj > 0:
