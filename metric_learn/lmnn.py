@@ -225,7 +225,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     Ni = 1 + _inplace_paired_L2(Lx[target_neighbors], Lx[:, None, :])
     furthest_neighbors = np.take_along_axis(target_neighbors,
                                             Ni.argmax(axis=1)[:, None], 1)
-    impostors = self._find_impostors(furthest_neighbors.ravel(), X, label_inds)
+    impostors = self._find_impostors(furthest_neighbors.ravel(), X,
+                                     label_inds, L)
 
     g0 = _inplace_paired_L2(*Lx[impostors])  # maybe this can become big ?
 
