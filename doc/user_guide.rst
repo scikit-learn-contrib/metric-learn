@@ -12,4 +12,5 @@ User Guide
    introduction.rst
    supervised.rst
    weakly_supervised.rst
+   unsupervised.rst
    preprocessor.rst

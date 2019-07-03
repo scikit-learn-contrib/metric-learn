@@ -11,8 +11,8 @@ from each other.
 General API
 ===========
 
-Supervised Metric Learning Algorithms are the easiest metric-learn algorithms
-to use, since they use the same API as ``scikit-learn``.
+Supervised metric learning algorithms essentially use the same API as
+scikit-learn.
 
 Input data
 ----------
@@ -20,13 +20,14 @@ In order to train a model, you need two `array-like <https://scikit-learn\
 .org/stable/glossary.html#term-array-like>`_ objects, `X` and `y`. `X`
 should be a 2D array-like of shape `(n_samples, n_features)`, where
 `n_samples` is the number of points of your dataset and `n_features` is the
-number of attributes of each of your points. `y` should be a 1D array-like
+number of attributes describing each point. `y` should be a 1D
+array-like
 of shape `(n_samples,)`, containing for each point in `X` the class it
 belongs to (or the value to regress for this sample, if you use `MLKR` for
 instance).
 
 Here is an example of a dataset of two dogs and one
-cat (the classes are 'dog' and 'cat') an animal being being represented by
+cat (the classes are 'dog' and 'cat') an animal being represented by
 two numbers.
 
 >>> import numpy as np
@@ -83,9 +84,10 @@ array([0.49627072, 3.65287282])
 
 .. note::
 
-    If the metric learner that you use learns a Mahalanobis Matrix (like it is
-    the case for all algorithms currently in metric-learn), you can get the
-    plain learned Mahalanobis matrix using `get_mahalanobis_matrix`.
+    If the metric learner that you use learns a :ref:`Mahalanobis distance
+    <mahalanobis_distances>` (like it is the case for all algorithms
+    currently in metric-learn), you can get the plain learned Mahalanobis
+    matrix using `get_mahalanobis_matrix`.
 
     >>> nca.get_mahalanobis_matrix()
     array([[0.43680409, 0.89169412],
@@ -96,9 +98,13 @@ array([0.49627072, 3.65287282])
 Scikit-learn compatibility
 --------------------------
 
-All supervised algorithms are scikit-learn `sklearn.base.Estimators`, and
-`sklearn.base.TransformerMixin` so they are compatible with Pipelining and
-scikit-learn model selection routines.
+All supervised algorithms are scikit-learn estimators 
+(`sklearn.base.BaseEstimator`) and transformers 
+(`sklearn.base.TransformerMixin`) so they are compatible with pipelines 
+(`sklearn.pipeline.Pipeline`) and
+scikit-learn model selection routines 
+(`sklearn.model_selection.cross_val_score`,
+`sklearn.model_selection.GridSearchCV`, etc).
 
 Algorithms
 ==========
@@ -151,18 +157,20 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class,
 
 .. topic:: References:
 
-    .. [1] `Distance Metric Learning for Large Margin Nearest Neighbor
-       Classification
-       <http://papers.nips.cc/paper/2795-distance-metric-learning-for-large
-       -margin -nearest-neighbor-classification>`_ Kilian Q. Weinberger, John
-       Blitzer, Lawrence K. Saul
+    .. [1] Weinberger et al. `Distance Metric Learning for Large Margin
+       Nearest Neighbor Classification
+       <http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf>`_.
+       JMLR 2009
+
+    .. [2] `Wikipedia entry on Large Margin Nearest Neighbor <https://en.wikipedia.org/wiki/Large_margin_nearest_neighbor>`_
+       
 
 .. _nca:
 
 :py:class:`NCA <metric_learn.NCA>`
 --------------------------------------
 
-Neighborhood Components Analysis(:py:class:`NCA <metric_learn.NCA>`)
+Neighborhood Components Analysis (:py:class:`NCA <metric_learn.NCA>`)
 
 `NCA` is a distance metric learning algorithm which aims to improve the 
 accuracy of nearest neighbors classification compared to the standard 
@@ -213,20 +221,19 @@ the sum of probability of being correctly classified:
 
 .. topic:: References:
 
-    .. [1] J. Goldberger, G. Hinton, S. Roweis, R. Salakhutdinov.
-       "Neighbourhood Components Analysis". Advances in Neural Information
-       Processing Systems. 17, 513-520, 2005.
-       http://www.cs.nyu.edu/~roweis/papers/ncanips.pdf
+    .. [1] Goldberger et al.
+       `Neighbourhood Components Analysis <https://papers.nips.cc/paper/2566-neighbourhood-components-analysis.pdf>`_.
+       NIPS 2005
 
-    .. [2] Wikipedia entry on Neighborhood Components Analysis
-       https://en.wikipedia.org/wiki/Neighbourhood_components_analysis
+    .. [2] `Wikipedia entry on Neighborhood Components Analysis <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_
+       
 
 .. _lfda:
 
 :py:class:`LFDA <metric_learn.LFDA>`
 -----------------------------------------
 
-Local Fisher Discriminant Analysis(:py:class:`LFDA <metric_learn.LFDA>`)
+Local Fisher Discriminant Analysis (:py:class:`LFDA <metric_learn.LFDA>`)
 
 `LFDA` is a linear supervised dimensionality reduction method. It is
 particularly useful when dealing with multi-modality, where one ore more classes
@@ -287,20 +294,20 @@ same class are not imposed to be close.
 
 .. topic:: References:
 
-    .. [1] `Dimensionality Reduction of Multimodal Labeled Data by Local
-       Fisher Discriminant Analysis <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA
-       .pdf>`_ Masashi Sugiyama.
+    .. [1] Sugiyama. `Dimensionality Reduction of Multimodal Labeled Data by Local
+       Fisher Discriminant Analysis <http://www.jmlr.org/papers/volume8/sugiyama07b/sugiyama07b.pdf>`_.
+       JMLR 2007
 
-    .. [2] `Local Fisher Discriminant Analysis on Beer Style Clustering
+    .. [2] Tang. `Local Fisher Discriminant Analysis on Beer Style Clustering
        <https://gastrograph.com/resources/whitepapers/local-fisher
-       -discriminant-analysis-on-beer-style-clustering.html#>`_ Yuan Tang.
+       -discriminant-analysis-on-beer-style-clustering.html#>`_.
 
 .. _mlkr:
 
 :py:class:`MLKR <metric_learn.MLKR>`
 -----------------------------------------
 
-Metric Learning for Kernel Regression(:py:class:`MLKR <metric_learn.MLKR>`)
+Metric Learning for Kernel Regression (:py:class:`MLKR <metric_learn.MLKR>`)
 
 `MLKR` is an algorithm for supervised metric learning, which learns a
 distance function by directly minimizing the leave-one-out regression error.
@@ -355,9 +362,8 @@ calculating a weighted average of all the training samples:
 
 .. topic:: References:
 
-    .. [1] `Metric Learning for Kernel Regression <http://proceedings.mlr.
-       press/v2/weinberger07a/weinberger07a.pdf>`_ Kilian Q. Weinberger,
-       Gerald Tesauro
+    .. [1] Weinberger et al. `Metric Learning for Kernel Regression <http://proceedings.mlr.
+       press/v2/weinberger07a/weinberger07a.pdf>`_. AISTATS 2007
 
 
 .. _supervised_version:
@@ -365,14 +371,14 @@ calculating a weighted average of all the training samples:
 Supervised versions of weakly-supervised algorithms
 ---------------------------------------------------
 
-Note that each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
+Each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
 has a supervised version of the form `*_Supervised` where similarity tuples are
-generated from the labels information and passed to the underlying algorithm.
-These constraints are sampled randomly under the hood.
+randomly generated from the labels information and passed to the underlying
+algorithm.
 
 For pairs learners (see :ref:`learning_on_pairs`), pairs (tuple of two points
-from the dataset), and labels (`int` indicating whether the two points are
-similar (+1) or dissimilar (-1)), are sampled with the function
+from the dataset), and pair labels (`int` indicating whether the two points
+are similar (+1) or dissimilar (-1)), are sampled with the function
 `metric_learn.constraints.positive_negative_pairs`. To sample positive pairs
 (of label +1), this method will look at all the samples from the same label and
 sample randomly a pair among them. To sample negative pairs (of label -1), this
@@ -383,12 +389,11 @@ of one of those, so forcing `same_length=True` will return both times the
 minimum of the two lenghts.
 
 For using quadruplets learners (see :ref:`learning_on_quadruplets`) in a
-supervised way, we will basically sample positive and negative pairs like
-before, but we'll just concatenate them, so that we have a 3D array of
-quadruplets, where for each quadruplet the two first points are in fact points
-from the same class, and the two last points are in fact points from a
-different class (so indeed the two last points should be less similar than the
-two first points).
+supervised way, positive and negative pairs are sampled as above and
+concatenated so that we have a 3D array of
+quadruplets, where for each quadruplet the two first points are from the same
+class, and the two last points are from a different class (so indeed the two
+last points should be less similar than the two first points).
 
 .. topic:: Example Code:
 
