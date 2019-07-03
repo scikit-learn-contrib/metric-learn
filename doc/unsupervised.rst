@@ -2,9 +2,9 @@
 Unsupervised Metric Learning
 ============================
 
-Unsupervised metric learning algorithms just take as input points `X`. For
-now, in metric-learn, there only is `Covariance`, which is a simple
-baseline algorithm (see below).
+Unsupervised metric learning algorithms only take as input an (unlabeled)
+dataset `X`. For now, in metric-learn, there only is `Covariance`, which is a
+simple baseline algorithm (see below).
 
 
 Algorithms
