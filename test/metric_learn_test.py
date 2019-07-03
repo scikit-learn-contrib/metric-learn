@@ -251,7 +251,7 @@ class TestLMNN(MetricTestCase):
     # initialize L
     def loss_grad(flat_L):
       return lmnn._loss_grad(X, flat_L.reshape(-1, X.shape[1]), dfG,
-                             1, k, reg, target_neighbors, label_inds)
+                             k, reg, target_neighbors, label_inds)
 
     def fun(x):
       return loss_grad(x)[1]
