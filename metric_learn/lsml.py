@@ -12,7 +12,7 @@ from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
-from ._util import transformer_from_metric, _initialize_metric_mahalanobis
+from ._util import components_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseLSML(MahalanobisMixin):
@@ -94,7 +94,7 @@ class _BaseLSML(MahalanobisMixin):
         print("Didn't converge after", it, "iterations. Final loss:", s_best)
     self.n_iter_ = it
 
-    self.transformer_ = transformer_from_metric(M)
+    self.components_ = components_from_metric(M)
     return self
 
   def _comparison_loss(self, metric, vab, vcd):
@@ -180,9 +180,9 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
 
   Examples
   --------
@@ -293,9 +293,9 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
   """
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,

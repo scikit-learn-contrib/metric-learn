@@ -12,7 +12,7 @@ from sklearn.exceptions import ChangedBehaviorWarning
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
 
-from ._util import _initialize_transformer, _check_n_components
+from ._util import _initialize_components, _check_n_components
 from .base_metric import MahalanobisMixin
 
 
@@ -117,7 +117,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  components_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
 
   Examples
@@ -199,9 +199,9 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       init = 'auto'
     else:
       init = self.init
-    self.transformer_ = _initialize_transformer(output_dim, X, y, init,
-                                                self.verbose,
-                                                self.random_state)
+    self.components_ = _initialize_components(output_dim, X, y, init,
+                                              self.verbose,
+                                              self.random_state)
     required_k = np.bincount(label_inds).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'
@@ -226,7 +226,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       a2[nn_idx] = np.array([])
 
     # initialize L
-    L = self.transformer_
+    L = self.components_
 
     # first iteration: we compute variables (including objective and gradient)
     #  at initialization point
@@ -281,7 +281,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
         print("LMNN didn't converge in %d steps." % self.max_iter)
 
     # store the last L
-    self.transformer_ = L
+    self.components_ = L
     self.n_iter_ = it
     return self
 

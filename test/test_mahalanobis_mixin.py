@@ -59,7 +59,7 @@ def test_score_pairs_toy_example(estimator, build_dataset):
     set_random_state(model)
     model.fit(*remove_y_quadruplets(estimator, input_data, labels))
     pairs = np.stack([X[:10], X[10:20]], axis=1)
-    embedded_pairs = pairs.dot(model.transformer_.T)
+    embedded_pairs = pairs.dot(model.components_.T)
     distances = np.sqrt(np.sum((embedded_pairs[:, 1] -
                                 embedded_pairs[:, 0])**2,
                                axis=-1))
@@ -119,7 +119,7 @@ def test_embed_toy_example(estimator, build_dataset):
     model = clone(estimator)
     set_random_state(model)
     model.fit(*remove_y_quadruplets(estimator, input_data, labels))
-    embedded_points = X.dot(model.transformer_.T)
+    embedded_points = X.dot(model.components_.T)
     assert_array_almost_equal(model.transform(X), embedded_points)
 
 
@@ -278,14 +278,14 @@ def test_get_squared_metric(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
-def test_transformer_is_2D(estimator, build_dataset):
-  """Tests that the transformer of metric learners is 2D"""
+def test_components_is_2D(estimator, build_dataset):
+  """Tests that the transformation matrix of metric learners is 2D"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
   # test that it works for X.shape[1] features
   model.fit(*remove_y_quadruplets(estimator, input_data, labels))
-  assert model.transformer_.shape == (X.shape[1], X.shape[1])
+  assert model.components_.shape == (X.shape[1], X.shape[1])
 
   # test that it works for 1 feature
   trunc_data = input_data[..., :1]
@@ -304,7 +304,7 @@ def test_transformer_is_2D(estimator, build_dataset):
     trunc_data = trunc_data[to_keep]
     labels = labels[to_keep]
   model.fit(*remove_y_quadruplets(estimator, trunc_data, labels))
-  assert model.transformer_.shape == (1, 1)  # the transformer must be 2D
+  assert model.components_.shape == (1, 1)  # the components must be 2D
 
 
 @pytest.mark.parametrize('estimator, build_dataset',
@@ -466,8 +466,8 @@ def test_auto_init_transformation(n_samples, n_features, n_classes,
       else:
         model_other = clone(model_base).set_params(init='identity')
       model_other.fit(input_data, labels)
-      assert_array_almost_equal(model.transformer_,
-                                model_other.transformer_)
+      assert_array_almost_equal(model.components_,
+                                model_other.components_)
 
 
 @pytest.mark.parametrize('estimator, build_dataset',
@@ -483,7 +483,8 @@ def test_auto_init_transformation(n_samples, n_features, n_classes,
                               hasattr(ml, 'init')])
 def test_init_mahalanobis(estimator, build_dataset):
     """Tests that for estimators that learn a mahalanobis matrix
-    instead of a transformer, i.e. those that are mahalanobis metric learners
+    instead of a linear transformation, i.e. those that are mahalanobis metric
+    learners
     where we can change the init, but not choose the n_components,
     (TODO: be more explicit on this characterization, for instance with
     safe_flags like in scikit-learn) that the init has an expected behaviour.

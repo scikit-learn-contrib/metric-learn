@@ -126,13 +126,13 @@ def test_threshold_different_scores_is_finite(estimator, build_dataset,
 
 class IdentityPairsClassifier(MahalanobisMixin, _PairsClassifierMixin):
   """A simple pairs classifier for testing purposes, that will just have
-  identity as transformer_, and a string threshold so that it returns an
+  identity as components_, and a string threshold so that it returns an
   error if not explicitely set.
   """
   def fit(self, pairs, y):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
-    self.transformer_ = np.atleast_2d(np.identity(pairs.shape[2]))
+    self.components_ = np.atleast_2d(np.identity(pairs.shape[2]))
     self.threshold_ = 'I am not set.'
     return self
 
@@ -347,7 +347,7 @@ def test_calibrate_threshold_extreme():
     """
 
     def fit(self, pairs, y, calibration_params=None):
-      self.transformer_ = 'not used'
+      self.components_ = 'not used'
       self.calibrate_threshold(pairs, y, **(calibration_params if
                                             calibration_params is not None else
                                             dict()))
@@ -503,7 +503,7 @@ def test_accuracy_toy_example(estimator, build_dataset):
   set_random_state(estimator)
   estimator.fit(input_data, labels)
   # we force the transformation to be identity so that we control what it does
-  estimator.transformer_ = np.eye(X.shape[1])
+  estimator.components_ = np.eye(X.shape[1])
   # the threshold for similar or dissimilar pairs is half of the distance
   # between X[0] and X[1]
   estimator.set_threshold(euclidean(X[0], X[1]) / 2)

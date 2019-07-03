@@ -13,7 +13,7 @@ from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.fixes import logsumexp
 from sklearn.base import TransformerMixin
 
-from ._util import _initialize_transformer, _check_n_components
+from ._util import _initialize_components, _check_n_components
 from .base_metric import MahalanobisMixin
 
 EPS = np.finfo(float).eps
@@ -116,7 +116,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  components_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
 
   References
@@ -174,7 +174,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
       init = 'auto'
     else:
       init = self.init
-    A = _initialize_transformer(n_components, X, labels, init, self.verbose)
+    A = _initialize_components(n_components, X, labels, init, self.verbose)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]
@@ -191,7 +191,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
     self.n_iter_ = 0
     opt_result = minimize(**optimizer_params)
 
-    self.transformer_ = opt_result.x.reshape(-1, X.shape[1])
+    self.components_ = opt_result.x.reshape(-1, X.shape[1])
     self.n_iter_ = opt_result.nit
 
     # Stop timer

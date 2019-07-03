@@ -15,7 +15,7 @@ from sklearn.metrics import pairwise_distances
 
 from metric_learn._util import _check_n_components
 from .base_metric import MahalanobisMixin
-from ._util import _initialize_transformer
+from ._util import _initialize_components
 
 EPS = np.finfo(float).eps
 
@@ -103,7 +103,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  components_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
 
   Examples
@@ -182,10 +182,10 @@ mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis, et al.
         init = 'auto'
       else:
         init = self.init
-      A = _initialize_transformer(m, X, y, init=init,
-                                  random_state=self.random_state,
-                                  # MLKR works on regression targets:
-                                  has_classes=False)
+      A = _initialize_components(m, X, y, init=init,
+                                 random_state=self.random_state,
+                                 # MLKR works on regression targets:
+                                 has_classes=False)
 
       # Measure the total training time
       train_time = time.time()
@@ -194,7 +194,7 @@ mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis, et al.
       res = minimize(self._loss, A.ravel(), (X, y), method='L-BFGS-B',
                      jac=True, tol=self.tol,
                      options=dict(maxiter=self.max_iter))
-      self.transformer_ = res.x.reshape(A.shape)
+      self.components_ = res.x.reshape(A.shape)
 
       # Stop timer
       train_time = time.time() - train_time

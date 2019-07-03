@@ -135,7 +135,7 @@ to the following resources:
       arrays and outputs the learned metric score on these two points
 ..    :math:`M = L^{\top}L` such that distance between vectors ``x`` and
 ..    ``y`` can be computed as :math:`\sqrt{\left(x-y\right)M\left(x-y\right)}`.
-.. -  ``transformer_from_metric(metric)``, which returns a transformation matrix
+.. -  ``components_from_metric(metric)``, which returns a transformation matrix
 ..    :math:`L \in \mathbb{R}^{D \times d}`, which can be used to convert a
 ..    data matrix :math:`X \in \mathbb{R}^{n \times d}` to the
 ..    :math:`D`-dimensional learned metric space :math:`X L^{\top}`,

@@ -9,7 +9,7 @@ from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import transformer_from_metric, _initialize_metric_mahalanobis
+from ._util import components_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseMMC(MahalanobisMixin):
@@ -185,7 +185,7 @@ class _BaseMMC(MahalanobisMixin):
     self.A_[:] = A_old
     self.n_iter_ = cycle
 
-    self.transformer_ = transformer_from_metric(self.A_)
+    self.components_ = components_from_metric(self.A_)
     return self
 
   def _fit_diag(self, pairs, y):
@@ -246,7 +246,7 @@ class _BaseMMC(MahalanobisMixin):
 
     self.A_ = np.diag(w)
 
-    self.transformer_ = transformer_from_metric(self.A_)
+    self.components_ = components_from_metric(self.A_)
     return self
 
   def _fD(self, neg_pairs, A):
@@ -409,9 +409,9 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
 
   threshold_ : `float`
       If the distance metric between two points is lower than this threshold,
@@ -549,9 +549,9 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,

@@ -12,7 +12,7 @@ from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import transformer_from_metric, _initialize_metric_mahalanobis
+from ._util import components_from_metric, _initialize_metric_mahalanobis
 try:
   from inverse_covariance import quic
 except ImportError:
@@ -124,7 +124,7 @@ class _BaseSDML(MahalanobisMixin):
             raised_error)
       raise RuntimeError(msg)
 
-    self.transformer_ = transformer_from_metric(np.atleast_2d(M))
+    self.components_ = components_from_metric(np.atleast_2d(M))
     return self
 
 
@@ -190,9 +190,9 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
 
   threshold_ : `float`
       If the distance metric between two points is lower than this threshold,
@@ -314,9 +314,9 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
 
   See Also
   --------

@@ -191,7 +191,7 @@ def test_get_metric_works_does_not_raise(estimator, build_dataset):
     assert len(record) == 0
 
   # Test that the scalar case works
-  model.transformer_ = np.array([3.1])
+  model.components_ = np.array([3.1])
   metric = model.get_metric()
   for u, v in [(5, 6.7), ([5], [6.7]), ([[5]], [[6.7]])]:
     with pytest.warns(None) as record:
@@ -211,13 +211,13 @@ def test_n_components(estimator, build_dataset):
     set_random_state(model)
     model.set_params(n_components=None)
     model.fit(input_data, labels)
-    assert model.transformer_.shape == (X.shape[1], X.shape[1])
+    assert model.components_.shape == (X.shape[1], X.shape[1])
 
     model = clone(estimator)
     set_random_state(model)
     model.set_params(n_components=X.shape[1] - 1)
     model.fit(input_data, labels)
-    assert model.transformer_.shape == (X.shape[1] - 1, X.shape[1])
+    assert model.components_.shape == (X.shape[1] - 1, X.shape[1])
 
     model = clone(estimator)
     set_random_state(model)

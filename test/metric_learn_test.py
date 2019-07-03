@@ -239,7 +239,7 @@ class TestLMNN(MetricTestCase):
     num_pts, n_components = X.shape
     unique_labels, label_inds = np.unique(y, return_inverse=True)
     lmnn.labels_ = np.arange(len(unique_labels))
-    lmnn.transformer_ = np.eye(n_components)
+    lmnn.components_ = np.eye(n_components)
 
     target_neighbors = lmnn._select_targets(X, label_inds)
     impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds)
@@ -309,7 +309,7 @@ def test_toy_ex_lmnn(X, y, loss):
   num_pts, n_components = X.shape
   unique_labels, label_inds = np.unique(y, return_inverse=True)
   lmnn.labels_ = np.arange(len(unique_labels))
-  lmnn.transformer_ = np.eye(n_components)
+  lmnn.components_ = np.eye(n_components)
 
   target_neighbors = lmnn._select_targets(X, label_inds)
   impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds)
@@ -738,7 +738,7 @@ class TestNCA(MetricTestCase):
       A = make_spd_matrix(X.shape[1], X.shape[1])
       nca = NCA(init=A, max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
-      assert_array_equal(nca.transformer_, A)
+      assert_array_equal(nca.components_, A)
 
   def test_one_class(self):
       # if there is only one class the gradient is null, so the final matrix
@@ -749,7 +749,7 @@ class TestNCA(MetricTestCase):
       A = make_spd_matrix(X.shape[1], X.shape[1])
       nca = NCA(init=A, max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
-      assert_array_equal(nca.transformer_, A)
+      assert_array_equal(nca.components_, A)
 
   def test_changed_behaviour_warning(self):
     # test that a ChangedBehavior warning is thrown about the init, if the
@@ -795,7 +795,7 @@ class TestLFDA(MetricTestCase):
 
     # Sanity checks for learned matrices.
     self.assertEqual(lfda.get_mahalanobis_matrix().shape, (4, 4))
-    self.assertEqual(lfda.transformer_.shape, (2, 4))
+    self.assertEqual(lfda.components_.shape, (2, 4))
 
 
 @pytest.mark.parametrize('num_dims', [None, 2])

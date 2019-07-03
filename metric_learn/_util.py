@@ -375,7 +375,7 @@ def _check_sdp_from_eigen(w, tol=None):
   return True
 
 
-def transformer_from_metric(metric, tol=None):
+def components_from_metric(metric, tol=None):
   """Returns the transformation matrix from the Mahalanobis matrix.
 
   Returns the transformation matrix from the Mahalanobis matrix, i.e. the
@@ -429,10 +429,10 @@ def validate_vector(u, dtype=None):
   return u
 
 
-def _initialize_transformer(n_components, input, y=None, init='auto',
-                            verbose=False, random_state=None,
-                            has_classes=True):
-  """Returns the initial transformer to be used depending on the arguments.
+def _initialize_components(n_components, input, y=None, init='auto',
+                           verbose=False, random_state=None,
+                           has_classes=True):
+  """Returns the initial transformation to be used depending on the arguments.
 
   Parameters
   ----------
@@ -503,8 +503,8 @@ def _initialize_transformer(n_components, input, y=None, init='auto',
 
   Returns
   -------
-  init_transformer : `numpy.ndarray`
-    The initial transformer to use.
+  init_components : `numpy.ndarray`
+    The initial transformation to use.
   """
   # if we are doing a regression we cannot use lda:
   n_features = input.shape[-1]

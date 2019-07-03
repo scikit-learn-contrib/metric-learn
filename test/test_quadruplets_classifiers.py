@@ -61,5 +61,5 @@ def test_accuracy_toy_example(estimator, build_dataset):
        [X_test[1], X_test[2], X_test[0], X_test[3]],
        [X_test[3], X_test[0], X_test[2], X_test[1]]])
   # we force the transformation to be identity so that we control what it does
-  estimator.transformer_ = np.eye(X.shape[1])
+  estimator.components_ = np.eye(X.shape[1])
   assert estimator.score(quadruplets_test) == 0.25
