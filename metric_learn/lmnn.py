@@ -269,8 +269,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       target_neighbors[inds] = inds[nn]
     return target_neighbors
 
-  def _find_impostors(self, furthest_neighbors, X, label_inds):
-    Lx = self.transform(X)
+  def _find_impostors(self, furthest_neighbors, X, label_inds, L):
+    Lx = X.dot(L.T)
     margin_radii = 1 + _inplace_paired_L2(Lx[furthest_neighbors], Lx)
     impostors = []
     for label in self.labels_[:-1]:

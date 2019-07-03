@@ -417,7 +417,7 @@ def test_loss_func(capsys):
   for i in range(len(mem1)):
     np.testing.assert_allclose(lmnn_perf.callback[i],
                                lmnn_nonperf.callback[i],
-                               err_msg='Gradient different at iteration '
+                               err_msg='Gradient different at position '
                                        '{}'.format(i))
   np.testing.assert_allclose(objectives['perf'], objectives['nonperf'])
   np.testing.assert_allclose(obj_diffs['perf'], obj_diffs['nonperf'])
