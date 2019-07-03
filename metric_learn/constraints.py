@@ -49,8 +49,7 @@ class Constraints(object):
     return a, b, c, d
 
   def _pairs(self, num_constraints, same_label=True, max_iter=10,
-             random_state=None):
-    random_state = check_random_state(random_state)
+             random_state=np.random):
     num_labels = len(self.known_labels)
     ab = set()
     it = 0
