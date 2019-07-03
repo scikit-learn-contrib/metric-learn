@@ -354,11 +354,8 @@ def test_loss_func(capsys):
     """ We will use a callback to get the gradient (see later)
     """
 
-    def __init__(self, *args, callback=None, **kwargs):
-      if callback is None:
-        self.callback = []
-      else:
-        self.callback = callback
+    def __init__(self, callback, *args, **kwargs):
+      self.callback = callback
       super(LMNN_with_callback, self).__init__(*args, **kwargs)
 
     def _loss_grad(self, *args, **kwargs):
