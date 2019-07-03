@@ -459,9 +459,8 @@ def test_toy_ex_lmnn(X, y, loss):
     a2[nn_idx] = np.array([])
 
   #  assert that the loss equals the one computed by hand
-  assert lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, impostors, 1, k,
-                         reg, target_neighbors, df, a1, a2)[1] == loss
-
+  assert lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, k,
+                         reg, target_neighbors, label_inds)[1] == loss
 
 def test_convergence_simple_example(capsys):
   # LMNN should converge on this simple example, which it did not with
