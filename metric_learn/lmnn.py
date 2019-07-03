@@ -280,17 +280,14 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     impostors = self._find_impostors(furthest_neighbors.ravel(), X,
                                      label_inds, L)
 
-    g0 = _inplace_paired_L2(*Lx[impostors])  # maybe this can become big ?
+    g0 = _inplace_paired_L2(*Lx[impostors])
 
     # we reorder the target neighbors
     g1, g2 = Ni[impostors]
     # compute the gradient
     total_active = 0
-    df = np.zeros((X.shape[1], X.shape[1]))  # TODO: could be put at the
-    # beginning
-    # like
-    # before
-    for nn_idx in reversed(xrange(k)):  # TODO: reverse not used here
+    df = np.zeros((X.shape[1], X.shape[1]))
+    for nn_idx in reversed(xrange(k)):  # note: reverse not useful here
       act1 = g0 < g1[:, nn_idx]
       act2 = g0 < g2[:, nn_idx]
       total_active += act1.sum() + act2.sum()

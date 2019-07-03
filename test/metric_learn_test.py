@@ -287,9 +287,6 @@ def test_loss_func(capsys):
   """Test the loss function (and its gradient) on a simple example,
   by comparing the results with the actual implementation of metric-learn,
   with a very simple (but nonperformant) implementation"""
-  # TODO:
-  #  we need to find an example where there are still some impostors at
-  #  the beginning and they decrease
 
   # toy dataset to use
   X, y = make_classification(n_samples=10, n_classes=2,
@@ -304,8 +301,6 @@ def test_loss_func(capsys):
       return 0, 0
 
   def loss_fn(L, X, y, target_neighbors, reg):
-    # warning to self: this is probably wrong, see test on the thing that was
-    # before
      L = L.reshape(-1, X.shape[1])
      Lx = np.dot(X, L.T)
      loss = 0
@@ -356,6 +351,8 @@ def test_loss_func(capsys):
   scipy.optimize.check_grad(loss, grad, x0.ravel())
 
   class LMNN_with_callback(LMNN):
+    """ We will use a callback to get the gradient (see later)
+    """
 
     def __init__(self, *args, callback=None, **kwargs):
       if callback is None:
