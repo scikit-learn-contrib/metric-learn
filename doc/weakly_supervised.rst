@@ -11,17 +11,28 @@ and dissimilar points. Refer to the documentation of each algorithm for its
 particular form of input data.
 
 
+General API
+===========
+
 Input data
-==========
+----------
 
 In the following paragraph we talk about tuples for sake of generality. These
 can be pairs, triplets, quadruplets etc, depending on the particular metric
 learning algorithm we use.
 
 Basic form
-----------
-Every weakly supervised algorithm will take as input tuples of points, and if
-needed labels for theses tuples.
+^^^^^^^^^^
+
+Every weakly supervised algorithm will take as input tuples of
+points, and if needed labels for theses tuples. The tuples of points can
+also be called "constraints". They are a set of points that we consider (ex:
+two points, three points, etc...). The label is some information we have
+about this set of points (e.g. "these two points are similar"). Note that
+some information can be contained in the ordering of these tuples (see for
+instance the section :ref:`learning_on_quadruplets`). For more details about
+the specific of each algorithms, refer to the appropriate section: either
+:ref:`learning_on_pairs` or :ref:`learning_on_quadruplets`)
 
 
 The `tuples` argument is the first argument of every method (like the X
@@ -44,7 +55,7 @@ These are two data structures that can be used to represent tuple in metric
 learn:
 
 3D array of tuples
-------------------
+^^^^^^^^^^^^^^^^^^
 
 The most intuitive way to represent tuples is to provide the algorithm with a
 3D array-like of tuples of shape ``(n_tuples, t, n_features)``, where
@@ -62,10 +73,10 @@ the number of features of each point.
 >>>                    [[-2.16, +0.11, -0.02],
 >>>                     [+1.58, +0.16, +0.93]],
 >>>
->>>                    [[+1.58, +0.16, +0.93 ],  # same as tuples[1, 1, :]
+>>>                    [[+1.58, +0.16, +0.93],  # same as tuples[1, 1, :]
 >>>                     [+0.89, -0.34, +2.41]],
 >>>
->>>                    [[-0.12, -1.21, -0.20 ],  # same as tuples[0, 0, :]
+>>>                    [[-0.12, -1.21, -0.20],  # same as tuples[0, 0, :]
 >>>                     [-2.16, +0.11, -0.02]]])  # same as tuples[1, 0, :]
 >>> y = np.array([-1, 1, 1, -1])
 
@@ -77,7 +88,7 @@ the number of features of each point.
 
 
 2D array of indicators + preprocessor
--------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Instead of forming each point in each tuple, a more efficient representation
 would be to keep the dataset of points ``X`` aside, and just represent tuples
@@ -101,13 +112,7 @@ the feature dimension there, the resulting array is 2D.
 In order to fit metric learning algorithms with this type of input, we need to
 give the original dataset of points ``X`` to the estimator so that it knows
 the points the indices refer to. We do this when initializing the estimator,
-through the argument `preprocessor`.
-
-.. topic:: Example:
-
->>> from metric_learn import MMC
->>> mmc = MMC(preprocessor=X)
->>> mmc.fit(pairs_indice, y)
+through the argument `preprocessor` (see below :ref:`fit_ws`)
 
 
 .. note::
@@ -118,17 +123,85 @@ through the argument `preprocessor`.
    paths in the filesystem, name of records in a database etc...) See section
    :ref:`preprocessor_section` for more details on how to use the preprocessor.
 
-.. _sklearn_compat_ws:
+.. _fit_ws:
 
+Fit, transform, and so on
+-------------------------
+
+The goal of weakly-supervised metric-learning algorithms is to transform
+points in a new space, in which the tuple-wise constraints between points
+are respected.
+
+>>> from metric_learn import MMC
+>>> mmc = MMC(random_state=42)
+>>> mmc.fit(tuples, y)
+MMC(A0='deprecated', convergence_threshold=0.001, diagonal=False,
+  diagonal_c=1.0, init=None, max_iter=100, max_proj=10000,
+  preprocessor=None, random_state=42, verbose=False)
+
+Or alternatively (using a preprocessor):
+
+>>> from metric_learn import MMC
+>>> mmc = MMC(preprocessor=X, random_state=42)
+>>> mmc.fit(pairs_indice, y)
+
+
+Now that the estimator is fitted, you can use it on new data for several
+purposes.
+
+First, you can transform the data in the learned space, using `transform`:
+Here we transform two points in the new embedding space.
+
+>>> X_new = np.array([[9.4, 4.1, 4.2], [2.1, 4.4, 2.3]])
+>>> mmc.transform(X_new)
+array([[-3.24667162e+01,  4.62622348e-07,  3.88325421e-08],
+       [-3.61531114e+01,  4.86778289e-07,  2.12654397e-08]])
+
+Also, as explained before, our metric learners has learn a distance between
+points. You can use this distance in two main ways:
+
+- You can either return the distance between pairs of points using the
+  `score_pairs` function:
+
+>>> mmc.score_pairs([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
+...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
+array([7.27607365, 0.88853014])
+
+- Or you can return a function that will return the distance
+  (in the new space) between two 1D arrays (the coordinates of the points in
+  the original space), similarly to distance functions in
+  `scipy.spatial.distance`. To do that, use the `get_metric` method.
+
+>>> metric_fun = mmc.get_metric()
+>>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
+7.276073646278203
+
+.. note::
+
+    If the metric learner that you use learns a Mahalanobis Matrix (like it is
+    the case for all algorithms currently in metric-learn), you can get the
+    plain Mahalanobis matrix using `get_mahalanobis_matrix`.
+
+>>> mmc.get_mahalanobis_matrix()
+array([[ 0.58603894, -5.69883982, -1.66614919],
+       [-5.69883982, 55.41743549, 16.20219519],
+       [-1.66614919, 16.20219519,  4.73697721]])
+
+.. TODO: remove the "like it is the case etc..." if it's not the case anymore
+
+.. _sklearn_compat_ws:
+    
 Scikit-learn compatibility
-==========================
+--------------------------
 
 Weakly supervised estimators are compatible with scikit-learn routines for
 model selection (grid-search, cross-validation etc). See the scoring section
-for more details on the scoring used in the case of Weakly Supervised
-Metric Learning.
+of the appropriate algorithm (:ref:`pairs learners <learning_on_pairs>`
+or :ref:`quadruplets learners <learning_on_quadruplets>`)
+for more details on the scoring used in the case of Weakly Supervised Metric
+Learning.
 
-.. topic:: Example
+Example:
 
 >>> from metric_learn import MMC
 >>> from sklearn.datasets import load_iris
@@ -141,13 +214,22 @@ Metric Learning.
 >>> mmc = MMC(preprocessor=X)
 >>> cross_val_score(mmc, pairs_indices, y)
 
-Scoring
-=======
+Prediction and scoring
+----------------------
 
-Some default scoring are implemented in metric-learn, depending on the kind of
-tuples you're working with (pairs, triplets...). See the docstring of the
-`score` method of the estimator you use.
+Since weakly supervised are also able, after being fitted, to predict for a
+given tuple what is its label (for pairs) or ordering (for quadruplets). See
+the appropriate section for more details, either :ref:`this
+one <pairs_predicting>` for pairs, or :ref:`this one
+<quadruplets_predicting>` for quadruplets.
 
+They also implement a default scoring method, `score`, that can be
+used to evaluate the performance of a metric-learner on a test dataset. See
+the appropriate section for more details, either :ref:`this
+one <pairs_scoring>` for pairs, or :ref:`this one <learning_on_quadruplets>`
+for quadruplets.
+
+.. _learning_on_pairs:
 
 Learning on pairs
 =================
@@ -158,15 +240,46 @@ corresponding target containing ``n_samples`` values being either +1 or -1.
 These values indicate whether the given pairs are similar points or
 dissimilar points.
 
+Fitting
+-------
+Here is an example for fitting on pairs (see :ref:`fit_ws` for more details on
+the input data format and how to fit, in the general case of learning on
+tuples).
+
+>>> from metric_learn import MMC
+>>> pairs = np.array([[[1.2, 3.2], [2.3, 5.5]],
+>>>                   [[4.5, 2.3], [2.1, 2.3]]])
+>>> y_pairs = np.array([1, -1])
+>>> mmc = MMC(random_state=42)
+>>> mmc.fit(pairs, y_pairs)
+MMC(A0='deprecated', convergence_threshold=0.001, diagonal=False,
+    diagonal_c=1.0, init=None, max_iter=100, max_proj=10000, preprocessor=None,
+    random_state=42, verbose=False)
+
+Here, we learned a metric that puts the two first points closer
+together in the transformed space, and the two next points further away from
+each other.
+
+.. _pairs_predicting:
+
+Predicting
+----------
+
+When a pairs learner is fitted, it is also able to predict, for an
+upcoming pair, whether it is a pair of similar or dissimilar points.
+
+>>> mmc.predict([[[0.6, 1.6], [1.15, 2.75]],
+...              [[3.2, 1.1], [5.4, 6.1]]])
+array([1, -1])
 
 .. _calibration:
 
 Thresholding
 ------------
 In order to predict whether a new pair represents similar or dissimilar
-samples, we need to set a distance threshold, so that points closer (in the
-learned space) than this threshold are predicted as similar, and points further
-away are predicted as dissimilar. Several methods are possible for this
+samples, we in fact need to set a distance threshold, so that points closer (in
+the learned space) than this threshold are predicted as similar, and points
+further away are predicted as dissimilar. Several methods are possible for this
 thresholding.
 
 - **At fit time**: The threshold is set with `calibrate_threshold` (see
@@ -177,26 +290,73 @@ thresholding.
   overfitting. If you want to avoid that, calibrate the threshold after
   fitting, on a validation set.
 
+  >>> mmc.fit(pairs, y) # will fit the threshold automatically after fitting
+
 - **Manual**: calling `set_threshold` will set the threshold to a
   particular value.
+
+  >>> mmc.set_threshold(0.4)
 
 - **Calibration**: calling `calibrate_threshold` will calibrate the
   threshold to achieve a particular score on a validation set, the score
   being among the classical scores for classification (accuracy, f1 score...).
 
+  >>> mmc.calibrate_threshold(pairs, y)
 
 See also: `sklearn.calibration`.
 
+.. _pairs_scoring:
+
+Scoring
+-------
+
+Not only are they able to predict the label of given pairs, they can also
+return a `decision_function` for a set of pairs. It is basically the "score"
+that will be thresholded to find the prediction for the pair. In fact this
+"score" is the opposite of the distance in the new space (higher score means
+ points are similar, and lower score dissimilar).
+
+>>> mmc.decision_function([[[0.6, 1.6], [1.15, 2.75]],
+...                        [[3.2, 1.1], [5.4, 6.1]]])
+array([-0.12811124, -0.74750256])
+
+This allows to return all kinds of estimator scoring usually used in classic
+classification tasks, like `sklearn.metrics.accuracy` for instance, which
+can be used inside cross-validation routines:
+
+>>> from sklearn.model_selection import cross_val_score
+>>> pairs_test = np.array([[[0.6, 1.6], [1.15, 2.75]],
+...                        [[3.2, 1.1], [5.4, 6.1]],
+...                        [[7.7, 5.6], [1.23, 8.4]]])
+>>> y_test = np.array([-1., 1., -1.])
+>>> cross_val_score(mmc, pairs_test, y_test, scoring='accuracy')
+array([1., 0., 1.])
+
+Pairs learners also have a default score, which basically
+returns the `sklearn.metrics.roc_auc_score` (therefore is not dependent on
+the threshold).
+
+>>> pairs_test = np.array([[[0.6, 1.6], [1.15, 2.75]],
+...                        [[3.2, 1.1], [5.4, 6.1]],
+...                        [[7.7, 5.6], [1.23, 8.4]]])
+>>> y_test = np.array([-1., 1., -1.])
+>>> mmc.score(pairs_test, y_test)
+0.5
+
+.. note::
+   See :ref:`fit_ws` for more details on metric learners functions that are
+   not specific to learning on pairs, like `transform`, `score_pairs`,
+   `get_metric` and `get_mahalanobis_matrix`.
 
 Algorithms
-==========
+----------
 
 .. _itml:
 
-ITML
-----
+:py:class:`ITML <metric_learn.ITML>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Information Theoretic Metric Learning(:py:class:`ITML <metric_learn.itml.ITML>`)
+Information Theoretic Metric Learning(:py:class:`ITML <metric_learn.ITML>`)
 
 `ITML` minimizes the (differential) relative entropy, aka Kullback–Leibler 
 divergence, between two multivariate Gaussians subject to constraints on the 
@@ -270,13 +430,306 @@ is the prior distance metric, set to identity matrix by default,
        itml/
 
 
+.. _sdml:
+
+:py:class:`SDML <metric_learn.SDML>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Sparse High-Dimensional Metric Learning
+(:py:class:`SDML <metric_learn.SDML>`)
+
+`SDML` is an efficient sparse metric learning in high-dimensional space via 
+double regularization: an L1-penalization on the off-diagonal elements of the 
+Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between 
+:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}` 
+or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
+covariance matrix).
+
+The formulated optimization on the semidefinite matrix :math:`\mathbf{M}` 
+is convex:
+
+.. math::
+
+    \min_{\mathbf{M}} = \text{tr}((\mathbf{M}_0 + \eta \mathbf{XLX}^{T})
+    \cdot \mathbf{M}) - \log\det \mathbf{M} + \lambda ||\mathbf{M}||_{1, off}
+
+where :math:`\mathbf{X}=[\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_n]` is 
+the training data, the incidence matrix :math:`\mathbf{K}_{ij} = 1` if 
+:math:`(\mathbf{x}_i, \mathbf{x}_j)` is a similar pair, otherwise -1. The 
+Laplacian matrix :math:`\mathbf{L}=\mathbf{D}-\mathbf{K}` is calculated from 
+:math:`\mathbf{K}` and :math:`\mathbf{D}`, a diagonal matrix whose entries are 
+the sums of the row elements of :math:`\mathbf{K}`., :math:`||\cdot||_{1, off}` 
+is the off-diagonal L1 norm.
+
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import SDML
+
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
+    y = [1, 1, -1, -1]
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
+
+    sdml = SDML()
+    sdml.fit(pairs, y)
+
+.. topic:: References:
+
+    .. [1] Qi et al.
+       An efficient sparse metric learning in high-dimensional space via
+       L1-penalized log-determinant regularization. ICML 2009.
+       http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/
+       icml09-guojun.pdf
+
+    .. [2] Adapted from https://gist.github.com/kcarnold/5439945
+
+.. _rca:
+
+:py:class:`RCA <metric_learn.RCA>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Relative Components Analysis (:py:class:`RCA <metric_learn.RCA>`)
+
+`RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
+in-chunklets covariance matrices. It applies a global linear transformation to 
+assign large weights to relevant dimensions and low weights to irrelevant 
+dimensions. Those relevant dimensions are estimated using "chunklets", subsets 
+of points that are known to belong to the same class.
+
+For a training set with :math:`n` training points in :math:`k` chunklets, the 
+algorithm is efficient since it simply amounts to computing
+
+.. math::
+
+      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}
+      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)
+      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)^T
+
+
+where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}` 
+with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used 
+as the Mahalanobis matrix.
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import RCA
+
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
+    y = [1, 1, -1, -1]
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
+
+    rca = RCA()
+    rca.fit(pairs, y)
+
+.. topic:: References:
+
+    .. [1] `Adjustment learning and relevant component analysis
+       <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871
+       &rep=rep1&type=pdf>`_ Noam Shental, et al.
+
+    .. [2] 'Learning distance functions using equivalence relations', ICML 2003
+
+    .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
+       2005
+
+.. _mmc:
+
+:py:class:`MMC <metric_learn.MMC>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Metric Learning with Application for Clustering with Side Information
+(:py:class:`MMC <metric_learn.MMC>`)
+
+`MMC` minimizes the sum of squared distances between similar points, while
+enforcing the sum of distances between dissimilar ones to be greater than one. 
+This leads to a convex and, thus, local-minima-free optimization problem that 
+can be solved efficiently. 
+However, the algorithm involves the computation of eigenvalues, which is the 
+main speed-bottleneck. Since it has initially been designed for clustering 
+applications, one of the implicit assumptions of MMC is that all classes form 
+a compact set, i.e., follow a unimodal distribution, which restricts the 
+possible use-cases of this method. However, it is one of the earliest and a 
+still often cited technique.
+
+The algorithm aims at minimizing the sum of distances between all the similar 
+points, while constrains the sum of distances between dissimilar points:
+
+.. math::
+
+      \min_{\mathbf{M}\in\mathbb{S}_+^d}\sum_{(\mathbf{x}_i, 
+      \mathbf{x}_j)\in S} d_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j)
+      \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}_i, \mathbf{x}_j)
+      \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import MMC
+
+    pairs = [[[1.2, 7.5], [1.3, 1.5]],
+             [[6.4, 2.6], [6.2, 9.7]],
+             [[1.3, 4.5], [3.2, 4.6]],
+             [[6.2, 5.5], [5.4, 5.4]]]
+    y = [1, 1, -1, -1]
+
+    # in this task we want points where the first feature is close to be closer
+    # to each other, no matter how close the second feature is
+
+    mmc = MMC()
+    mmc.fit(pairs, y)
+
+.. topic:: References:
+
+  .. [1] `Distance metric learning with application to clustering with
+        side-information <http://papers.nips
+        .cc/paper/2164-distance-metric-learning-with-application-to-clustering
+        -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
+  .. [2] Adapted from Matlab code `here <http://www.cs.cmu
+     .edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz>`_.
+
+
+.. _learning_on_quadruplets:
+
+Learning on quadruplets
+=======================
+
+
+
+The goal of weakly-supervised metric-learning algorithms is to transform
+points in a new space, in which the tuple-wise constraints between points
+are respected.
+
+Fitting
+-------
+Here is an example for fitting on quadruplets (see :ref:`fit_ws` for more
+details on the input data format and how to fit, in the general case of
+learning on tuples).
+
+>>> from metric_learn import LSML
+>>> quadruplets = np.array([[[1.2, 3.2], [2.3, 5.5], [2.4, 6.7], [2.1, 0.6]],
+>>>                         [[4.5, 2.3], [2.1, 2.3], [0.6, 1.2], [7.3, 3.4]]])
+>>> lsml = LSML(random_state=42)
+>>> lsml.fit(quadruplets)
+LSML(max_iter=1000, preprocessor=None, prior=None, random_state=42, tol=0.001,
+   verbose=False)
+
+Or alternatively (using a preprocessor):
+
+>>> X = np.array([[1.2, 3.2],
+>>>               [2.3, 5.5],
+>>>               [2.4, 6.7],
+>>>               [2.1, 0.6],
+>>>               [4.5, 2.3],
+>>>               [2.1, 2.3],
+>>>               [0.6, 1.2],
+>>>               [7.3, 3.4]])
+>>> quadruplets_indices = np.array([[0, 1, 2, 3], [4, 5, 6, 7]])
+>>> lsml = LSML(preprocessor=X, random_state=42)
+>>> lsml.fit(quadruplets_indices)
+LSML(max_iter=1000,
+   preprocessor=array([[1.2, 3.2],
+       [2.3, 5.5],
+       [2.4, 6.7],
+       [2.1, 0.6],
+       [4.5, 2.3],
+       [2.1, 2.3],
+       [0.6, 1.2],
+       [7.3, 3.4]]),
+   prior=None, random_state=42, tol=0.001, verbose=False)
+
+
+Here, we want to learn a metric that, for each of the two
+`quadruplets`, will put the two first points closer together than the two
+last points.
+
+.. _quadruplets_predicting:
+
+Predicting
+----------
+
+When a quadruplets learner is fitted, it is also able to predict, for an
+upcoming quadruplet, whether the two first points are more similar than the
+two last points (+1), or not (-1).
+
+>>> quadruplets_test = np.array(
+... [[[5.6, 5.3], [2.2, 2.1], [0.4, 0.6], [1.2, 3.4]],
+...  [[6.0, 4.2], [4.3, 1.2], [4.5, 0.6], [0.1, 7.8]]])
+>>> lsml.predict(quadruplets_test)
+array([-1.,  1.])
+
+.. _quadruplets_scoring:
+
+Scoring
+-------
+
+Not only are they able to predict the label of given pairs, they can also
+return a `decision_function` for a set of pairs. It is basically the "score"
+which sign will be taken to find the prediction for the pair. In fact this
+"score" is the difference between the distance between the two last points,
+and the distance between the two last points of the quadruplet (higher
+score means the two last points are more likely to be more dissimilar than
+the two first points (i.e. more likely to have a +1 prediction since it's
+the right ordering)).
+
+>>> lsml.decision_function(quadruplets_test)
+array([-1.75700306,  4.98982131])
+
+In the above example, for the first quadruplet in `quadruplets_test`, the
+two first points are predicted less similar than the two last points (they
+are further away in the transformed space).
+
+Unlike for pairs learners, quadruplets learners don't allow to give a `y`
+when fitting, which does not allow to use scikit-learn scoring functions
+like:
+
+>>> from sklearn.model_selection import cross_val_score
+>>> cross_val_score(lsml, quadruplets, scoring='f1_score')  # this won't work
+
+(This is actually intentional, for more details
+about that, see
+`this comment <https://github.com/metric-learn/metric-learn/pull/168#pullrequestreview-203730742>`_
+on github.)
+
+However, quadruplets learners do have a default scoring function, which will
+basically return the accuracy score on a given test set, i.e. the proportion
+of quadruplets have the right predicted ordering.
+
+>>> lsml.score(quadruplets_test)
+0.5
+
+.. note::
+   See :ref:`fit_ws` for more details on metric learners functions that are
+   not specific to learning on pairs, like `transform`, `score_pairs`,
+   `get_metric` and `get_mahalanobis_matrix`.
+
+
+
+
+Algorithms
+----------
+
 .. _lsml:
 
-LSML
-----
+:py:class:`LSML <metric_learn.LSML>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Metric Learning from Relative Comparisons by Minimizing Squared Residual
-(:py:class:`LSML <metric_learn.lsml.LSML>`)
+(:py:class:`LSML <metric_learn.LSML>`)
 
 `LSML` proposes a simple, yet effective, algorithm that minimizes a convex 
 objective function corresponding to the sum of squared residuals of 
@@ -354,219 +807,4 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
 
     .. [2] Adapted from https://gist.github.com/kcarnold/5439917
 
-.. _sdml:
 
-=======
-
-SDML
-----
-
-Sparse High-Dimensional Metric Learning
-(:py:class:`SDML <metric_learn.sdml.SDML>`)
-
-`SDML` is an efficient sparse metric learning in high-dimensional space via 
-double regularization: an L1-penalization on the off-diagonal elements of the 
-Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between 
-:math:`\mathbf{M}` and :math:`\mathbf{M_0}` (set as either :math:`\mathbf{I}` 
-or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
-covariance matrix).
-
-The formulated optimization on the semidefinite matrix :math:`\mathbf{M}` 
-is convex:
-
-.. math::
-
-    \min_{\mathbf{M}} = \text{tr}((\mathbf{M}_0 + \eta \mathbf{XLX}^{T})
-    \cdot \mathbf{M}) - \log\det \mathbf{M} + \lambda ||\mathbf{M}||_{1, off}
-
-where :math:`\mathbf{X}=[\mathbf{x}_1, \mathbf{x}_2, ..., \mathbf{x}_n]` is 
-the training data, the incidence matrix :math:`\mathbf{K}_{ij} = 1` if 
-:math:`(\mathbf{x}_i, \mathbf{x}_j)` is a similar pair, otherwise -1. The 
-Laplacian matrix :math:`\mathbf{L}=\mathbf{D}-\mathbf{K}` is calculated from 
-:math:`\mathbf{K}` and :math:`\mathbf{D}`, a diagonal matrix whose entries are 
-the sums of the row elements of :math:`\mathbf{K}`., :math:`||\cdot||_{1, off}` 
-is the off-diagonal L1 norm.
-
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import SDML
-
-    pairs = [[[1.2, 7.5], [1.3, 1.5]],
-             [[6.4, 2.6], [6.2, 9.7]],
-             [[1.3, 4.5], [3.2, 4.6]],
-             [[6.2, 5.5], [5.4, 5.4]]]
-    y = [1, 1, -1, -1]
-
-    # in this task we want points where the first feature is close to be closer
-    # to each other, no matter how close the second feature is
-
-    sdml = SDML()
-    sdml.fit(pairs, y)
-
-.. topic:: References:
-
-    .. [1] Qi et al.
-       An efficient sparse metric learning in high-dimensional space via
-       L1-penalized log-determinant regularization. ICML 2009.
-       http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/
-       icml09-guojun.pdf
-
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439945
-
-.. _rca:
-
-RCA
----
-
-Relative Components Analysis (:py:class:`RCA <metric_learn.rca.RCA>`)
-
-`RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
-in-chunklets covariance matrices. It applies a global linear transformation to 
-assign large weights to relevant dimensions and low weights to irrelevant 
-dimensions. Those relevant dimensions are estimated using "chunklets", subsets 
-of points that are known to belong to the same class.
-
-For a training set with :math:`n` training points in :math:`k` chunklets, the 
-algorithm is efficient since it simply amounts to computing
-
-.. math::
-
-      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}
-      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)
-      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)^T
-
-
-where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}` 
-with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used 
-as the Mahalanobis matrix.
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import RCA
-
-    pairs = [[[1.2, 7.5], [1.3, 1.5]],
-             [[6.4, 2.6], [6.2, 9.7]],
-             [[1.3, 4.5], [3.2, 4.6]],
-             [[6.2, 5.5], [5.4, 5.4]]]
-    y = [1, 1, -1, -1]
-
-    # in this task we want points where the first feature is close to be closer
-    # to each other, no matter how close the second feature is
-
-    rca = RCA()
-    rca.fit(pairs, y)
-
-.. topic:: References:
-
-    .. [1] `Adjustment learning and relevant component analysis
-       <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871
-       &rep=rep1&type=pdf>`_ Noam Shental, et al.
-
-    .. [2] 'Learning distance functions using equivalence relations', ICML 2003
-
-    .. [3]'Learning a Mahalanobis metric from equivalence constraints', JMLR
-       2005
-
-.. _mmc:
-
-MMC
----
-
-Metric Learning with Application for Clustering with Side Information
-(:py:class:`MMC <metric_learn.mmc.MMC>`)
-
-`MMC` minimizes the sum of squared distances between similar points, while
-enforcing the sum of distances between dissimilar ones to be greater than one. 
-This leads to a convex and, thus, local-minima-free optimization problem that 
-can be solved efficiently. 
-However, the algorithm involves the computation of eigenvalues, which is the 
-main speed-bottleneck. Since it has initially been designed for clustering 
-applications, one of the implicit assumptions of MMC is that all classes form 
-a compact set, i.e., follow a unimodal distribution, which restricts the 
-possible use-cases of this method. However, it is one of the earliest and a 
-still often cited technique.
-
-The algorithm aims at minimizing the sum of distances between all the similar 
-points, while constrains the sum of distances between dissimilar points:
-
-.. math::
-
-      \min_{\mathbf{M}\in\mathbb{S}_+^d}\sum_{(\mathbf{x}_i, 
-      \mathbf{x}_j)\in S} d_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j)
-      \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}_i, \mathbf{x}_j)
-      \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import MMC
-
-    pairs = [[[1.2, 7.5], [1.3, 1.5]],
-             [[6.4, 2.6], [6.2, 9.7]],
-             [[1.3, 4.5], [3.2, 4.6]],
-             [[6.2, 5.5], [5.4, 5.4]]]
-    y = [1, 1, -1, -1]
-
-    # in this task we want points where the first feature is close to be closer
-    # to each other, no matter how close the second feature is
-
-    mmc = MMC()
-    mmc.fit(pairs, y)
-
-.. topic:: References:
-
-  .. [1] `Distance metric learning with application to clustering with
-        side-information <http://papers.nips
-        .cc/paper/2164-distance-metric-learning-with-application-to-clustering
-        -with-side-information.pdf>`_ Xing, Jordan, Russell, Ng.
-  .. [2] Adapted from Matlab code `here <http://www.cs.cmu
-     .edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz>`_.
-
-Learning on quadruplets
-=======================
-
-A type of information even weaker than pairs is information about relative
-comparisons between pairs. The user should provide the algorithm with a
-quadruplet of points, where the two first points are closer than the two
-last points. No target vector (``y``) is needed, since the supervision is
-already in the order that points are given in the quadruplet.
-
-Algorithms
-==========
-
-LSML
-----
-
-`LSML`: Metric Learning from Relative Comparisons by Minimizing Squared
-Residual
-
-.. topic:: Example Code:
-
-::
-
-    from metric_learn import LSML
-
-    quadruplets = [[[1.2, 7.5], [1.3, 1.5], [6.4, 2.6], [6.2, 9.7]],
-                   [[1.3, 4.5], [3.2, 4.6], [6.2, 5.5], [5.4, 5.4]],
-                   [[3.2, 7.5], [3.3, 1.5], [8.4, 2.6], [8.2, 9.7]],
-                   [[3.3, 4.5], [5.2, 4.6], [8.2, 5.5], [7.4, 5.4]]]
-
-    # we want to make closer points where the first feature is close, and
-    # further if the second feature is close
-
-    lsml = LSML()
-    lsml.fit(quadruplets)
-
-.. topic:: References:
-
-    .. [1] Liu et al.
-       "Metric Learning from Relative Comparisons by Minimizing Squared
-       Residual". ICDM 2012. http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf
-
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439917

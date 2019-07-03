@@ -1,11 +1,5 @@
 """
 Covariance metric (baseline method)
-
-This method does not "learn" anything, rather it calculates
-the covariance matrix of the input data.
-
-This is a simple baseline method first introduced in
-On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
 """
 
 from __future__ import absolute_import
@@ -20,11 +14,28 @@ from ._util import transformer_from_metric
 class Covariance(MahalanobisMixin, TransformerMixin):
   """Covariance metric (baseline method)
 
+  This method does not "learn" anything, rather it calculates
+  the covariance matrix of the input data.
+
+  This is a simple baseline method first introduced in
+  On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
+
+  Read more in the :ref:`User Guide <covariance>`.
+
   Attributes
   ----------
   transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `transformer_from_metric`.)
+
+  Examples
+  --------
+  >>> from metric_learn import Covariance
+  >>> from sklearn.datasets import load_iris
+  >>> iris = load_iris()['data']
+  >>> cov = Covariance().fit(iris)
+  >>> x = cov.transform(iris)
+
   """
 
   def __init__(self, preprocessor=None):
