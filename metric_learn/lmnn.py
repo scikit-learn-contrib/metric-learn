@@ -1,8 +1,6 @@
 """
 Large Margin Nearest Neighbor Metric learning (LMNN)
 """
-# TODO: periodic recalculation of impostors, PCA initialization
-
 from __future__ import print_function, absolute_import
 import numpy as np
 import warnings
@@ -219,31 +217,19 @@ class LMNN(MahalanobisMixin, TransformerMixin):
                        ' (smallest class has %d)' % required_k)
 
     target_neighbors = self._select_targets(X, label_inds)
-    impostors = self._find_impostors(target_neighbors[:, -1], X, label_inds)
-    if len(impostors) == 0:
-        # L has already been initialized to an identity matrix
-        return
 
     # sum outer products
     dfG = _sum_outer_products(X, target_neighbors.flatten(),
                               np.repeat(np.arange(X.shape[0]), k))
-    df = np.zeros_like(dfG)
-
-    # storage
-    a1 = [None]*k
-    a2 = [None]*k
-    for nn_idx in xrange(k):
-      a1[nn_idx] = np.array([])
-      a2[nn_idx] = np.array([])
 
     # initialize L
     L = self.components_
 
     # first iteration: we compute variables (including objective and gradient)
     #  at initialization point
-    G, objective, total_active, df, a1, a2 = (
-        self._loss_grad(X, L, dfG, impostors, 1, k, reg, target_neighbors, df,
-                        a1, a2))
+    G, objective, total_active = self._loss_grad(X, L, dfG, k,
+                                                 reg, target_neighbors,
+                                                 label_inds)
 
     it = 1  # we already made one iteration
 
@@ -257,10 +243,9 @@ class LMNN(MahalanobisMixin, TransformerMixin):
         # we compute the objective at next point
         # we copy variables that can be modified by _loss_grad, because if we
         # retry we don t want to modify them several times
-        (G_next, objective_next, total_active_next, df_next, a1_next,
-         a2_next) = (
-            self._loss_grad(X, L_next, dfG, impostors, it, k, reg,
-                            target_neighbors, df.copy(), list(a1), list(a2)))
+        (G_next, objective_next, total_active_next) = (
+          self._loss_grad(X, L_next, dfG, k, reg, target_neighbors,
+                          label_inds))
         assert not np.isnan(objective)
         delta_obj = objective_next - objective
         if delta_obj > 0:
@@ -275,8 +260,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       # old variables to these new ones before next iteration and we
       # slightly increase the learning rate
       L = L_next
-      G, df, objective, total_active, a1, a2 = (
-          G_next, df_next, objective_next, total_active_next, a1_next, a2_next)
+      G, objective, total_active = G_next, objective_next, total_active_next
       learn_rate *= 1.01
 
       if self.verbose:
@@ -296,46 +280,37 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     self.n_iter_ = it
     return self
 
-  def _loss_grad(self, X, L, dfG, impostors, it, k, reg, target_neighbors, df,
-                 a1, a2):
+  def _loss_grad(self, X, L, dfG, k, reg, target_neighbors, label_inds):
     # Compute pairwise distances under current metric
     Lx = L.dot(X.T).T
-    g0 = _inplace_paired_L2(*Lx[impostors])
+
+    # we need to find the furthest neighbor:
     Ni = 1 + _inplace_paired_L2(Lx[target_neighbors], Lx[:, None, :])
+    furthest_neighbors = np.take_along_axis(target_neighbors,
+                                            Ni.argmax(axis=1)[:, None], 1)
+    impostors = self._find_impostors(furthest_neighbors.ravel(), X,
+                                     label_inds, L)
+
+    g0 = _inplace_paired_L2(*Lx[impostors])
+
+    # we reorder the target neighbors
     g1, g2 = Ni[impostors]
     # compute the gradient
     total_active = 0
-    for nn_idx in reversed(xrange(k)):
+    df = np.zeros((X.shape[1], X.shape[1]))
+    for nn_idx in reversed(xrange(k)):  # note: reverse not useful here
       act1 = g0 < g1[:, nn_idx]
       act2 = g0 < g2[:, nn_idx]
       total_active += act1.sum() + act2.sum()
 
-      if it > 1:
-        plus1 = act1 & ~a1[nn_idx]
-        minus1 = a1[nn_idx] & ~act1
-        plus2 = act2 & ~a2[nn_idx]
-        minus2 = a2[nn_idx] & ~act2
-      else:
-        plus1 = act1
-        plus2 = act2
-        minus1 = np.zeros(0, dtype=int)
-        minus2 = np.zeros(0, dtype=int)
-
       targets = target_neighbors[:, nn_idx]
-      PLUS, pweight = _count_edges(plus1, plus2, impostors, targets)
+      PLUS, pweight = _count_edges(act1, act2, impostors, targets)
       df += _sum_outer_products(X, PLUS[:, 0], PLUS[:, 1], pweight)
-      MINUS, mweight = _count_edges(minus1, minus2, impostors, targets)
-      df -= _sum_outer_products(X, MINUS[:, 0], MINUS[:, 1], mweight)
 
       in_imp, out_imp = impostors
-      df += _sum_outer_products(X, in_imp[minus1], out_imp[minus1])
-      df += _sum_outer_products(X, in_imp[minus2], out_imp[minus2])
+      df -= _sum_outer_products(X, in_imp[act1], out_imp[act1])
+      df -= _sum_outer_products(X, in_imp[act2], out_imp[act2])
 
-      df -= _sum_outer_products(X, in_imp[plus1], out_imp[plus1])
-      df -= _sum_outer_products(X, in_imp[plus2], out_imp[plus2])
-
-      a1[nn_idx] = act1
-      a2[nn_idx] = act2
     # do the gradient update
     assert not np.isnan(df).any()
     G = dfG * reg + df * (1 - reg)
@@ -343,7 +318,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     # compute the objective function
     objective = total_active * (1 - reg)
     objective += G.flatten().dot(L.flatten())
-    return 2 * G, objective, total_active, df, a1, a2
+    return 2 * G, objective, total_active
 
   def _select_targets(self, X, label_inds):
     target_neighbors = np.empty((X.shape[0], self.k), dtype=int)
@@ -355,8 +330,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       target_neighbors[inds] = inds[nn]
     return target_neighbors
 
-  def _find_impostors(self, furthest_neighbors, X, label_inds):
-    Lx = self.transform(X)
+  def _find_impostors(self, furthest_neighbors, X, label_inds, L):
+    Lx = X.dot(L.T)
     margin_radii = 1 + _inplace_paired_L2(Lx[furthest_neighbors], Lx)
     impostors = []
     for label in self.labels_[:-1]:
