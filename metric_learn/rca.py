@@ -81,7 +81,7 @@ psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  components_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 
@@ -152,9 +152,9 @@ psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
       inds = np.argsort(vals)[:dim]
       A = vecs[:, inds]
       inner_cov = np.atleast_2d(A.T.dot(inner_cov).dot(A))
-      self.transformer_ = _inv_sqrtm(inner_cov).dot(A.T)
+      self.components_ = _inv_sqrtm(inner_cov).dot(A.T)
     else:
-      self.transformer_ = _inv_sqrtm(inner_cov).T
+      self.components_ = _inv_sqrtm(inner_cov).T
 
     return self
 
@@ -197,7 +197,7 @@ class RCA_Supervised(RCA):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  components_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
   """
 

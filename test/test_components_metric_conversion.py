@@ -10,7 +10,7 @@ from sklearn.utils.testing import ignore_warnings
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,
     LSML_Supervised, ITML_Supervised, SDML_Supervised, RCA_Supervised)
-from metric_learn._util import transformer_from_metric
+from metric_learn._util import components_from_metric
 from metric_learn.exceptions import NonPSDError
 
 
@@ -25,27 +25,27 @@ class TestTransformerMetricConversion(unittest.TestCase):
   def test_cov(self):
     cov = Covariance()
     cov.fit(self.X)
-    L = cov.transformer_
+    L = cov.components_
     assert_array_almost_equal(L.T.dot(L), cov.get_mahalanobis_matrix())
 
   def test_lsml_supervised(self):
     seed = np.random.RandomState(1234)
     lsml = LSML_Supervised(num_constraints=200, random_state=seed)
     lsml.fit(self.X, self.y)
-    L = lsml.transformer_
+    L = lsml.components_
     assert_array_almost_equal(L.T.dot(L), lsml.get_mahalanobis_matrix())
 
   def test_itml_supervised(self):
     seed = np.random.RandomState(1234)
     itml = ITML_Supervised(num_constraints=200)
     itml.fit(self.X, self.y, random_state=seed)
-    L = itml.transformer_
+    L = itml.components_
     assert_array_almost_equal(L.T.dot(L), itml.get_mahalanobis_matrix())
 
   def test_lmnn(self):
     lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
     lmnn.fit(self.X, self.y)
-    L = lmnn.transformer_
+    L = lmnn.components_
     assert_array_almost_equal(L.T.dot(L), lmnn.get_mahalanobis_matrix())
 
   def test_sdml_supervised(self):
@@ -53,38 +53,38 @@ class TestTransformerMetricConversion(unittest.TestCase):
     sdml = SDML_Supervised(num_constraints=1500, prior='identity',
                            balance_param=1e-5, random_state=seed)
     sdml.fit(self.X, self.y)
-    L = sdml.transformer_
+    L = sdml.components_
     assert_array_almost_equal(L.T.dot(L), sdml.get_mahalanobis_matrix())
 
   def test_nca(self):
     n = self.X.shape[0]
     nca = NCA(max_iter=(100000//n))
     nca.fit(self.X, self.y)
-    L = nca.transformer_
+    L = nca.components_
     assert_array_almost_equal(L.T.dot(L), nca.get_mahalanobis_matrix())
 
   def test_lfda(self):
     lfda = LFDA(k=2, n_components=2)
     lfda.fit(self.X, self.y)
-    L = lfda.transformer_
+    L = lfda.components_
     assert_array_almost_equal(L.T.dot(L), lfda.get_mahalanobis_matrix())
 
   def test_rca_supervised(self):
     seed = np.random.RandomState(1234)
     rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
     rca.fit(self.X, self.y, random_state=seed)
-    L = rca.transformer_
+    L = rca.components_
     assert_array_almost_equal(L.T.dot(L), rca.get_mahalanobis_matrix())
 
   def test_mlkr(self):
     mlkr = MLKR(n_components=2)
     mlkr.fit(self.X, self.y)
-    L = mlkr.transformer_
+    L = mlkr.components_
     assert_array_almost_equal(L.T.dot(L), mlkr.get_mahalanobis_matrix())
 
   @ignore_warnings
-  def test_transformer_from_metric_edge_cases(self):
-    """Test that transformer_from_metric returns the right result in various
+  def test_components_from_metric_edge_cases(self):
+    """Test that components_from_metric returns the right result in various
     edge cases"""
     rng = np.random.RandomState(42)
 
@@ -97,25 +97,25 @@ class TestTransformerMetricConversion(unittest.TestCase):
     # https://github.com/metric-learn/metric-learn/issues/175)
     M = np.diag([1e-15, 2e-16, 3e-15, 4e-16, 5e-15, 6e-16, 7e-15])
     M = P.dot(M).dot(P.T)
-    L = transformer_from_metric(M)
+    L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
     # diagonal matrix
     M = np.diag(np.abs(rng.randn(5)))
-    L = transformer_from_metric(M)
+    L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
     # low-rank matrix (with zeros)
     M = np.zeros((7, 7))
     small_random = rng.randn(3, 3)
     M[:3, :3] = small_random.T.dot(small_random)
-    L = transformer_from_metric(M)
+    L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
     # low-rank matrix (without necessarily zeros)
     R = np.abs(rng.randn(7, 7))
     M = R.dot(np.diag([1, 5, 3, 2, 0, 0, 0])).dot(R.T)
-    L = transformer_from_metric(M)
+    L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
     # matrix with a determinant still high but which should be considered as a
@@ -131,54 +131,54 @@ class TestTransformerMetricConversion(unittest.TestCase):
     assert str(err_msg.value) == 'Matrix is not positive definite'
     # (just to show that this case is indeed considered by numpy as an
     # indefinite case)
-    L = transformer_from_metric(M)
+    L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
     # matrix with lots of small nonzeros that make a big zero when multiplied
     M = np.diag([1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3, 1e-3])
-    L = transformer_from_metric(M)
+    L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
     # full rank matrix
     M = rng.randn(10, 10)
     M = M.T.dot(M)
     assert np.linalg.matrix_rank(M) == 10
-    L = transformer_from_metric(M)
+    L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
   def test_non_symmetric_matrix_raises(self):
     """Checks that if a non symmetric matrix is given to
-    transformer_from_metric, an error is thrown"""
+    components_from_metric, an error is thrown"""
     rng = np.random.RandomState(42)
     M = rng.randn(10, 10)
     with pytest.raises(ValueError) as raised_error:
-      transformer_from_metric(M)
+      components_from_metric(M)
     assert str(raised_error.value) == "The input metric should be symmetric."
 
   def test_non_psd_raises(self):
     """Checks that a non PSD matrix (i.e. with negative eigenvalues) will
-    raise an error when passed to transformer_from_metric"""
+    raise an error when passed to components_from_metric"""
     rng = np.random.RandomState(42)
     D = np.diag([1, 5, 3, 4.2, -4, -2, 1])
     P = ortho_group.rvs(7, random_state=rng)
     M = P.dot(D).dot(P.T)
     msg = ("Matrix is not positive semidefinite (PSD).")
     with pytest.raises(NonPSDError) as raised_error:
-      transformer_from_metric(M)
+      components_from_metric(M)
     assert str(raised_error.value) == msg
     with pytest.raises(NonPSDError) as raised_error:
-      transformer_from_metric(D)
+      components_from_metric(D)
     assert str(raised_error.value) == msg
 
   def test_almost_psd_dont_raise(self):
     """Checks that if the metric is almost PSD (i.e. it has some negative
-    eigenvalues very close to zero), then transformer_from_metric will still
+    eigenvalues very close to zero), then components_from_metric will still
     work"""
     rng = np.random.RandomState(42)
     D = np.diag([1, 5, 3, 4.2, -1e-20, -2e-20, -1e-20])
     P = ortho_group.rvs(7, random_state=rng)
     M = P.dot(D).dot(P.T)
-    L = transformer_from_metric(M)
+    L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
 

@@ -8,7 +8,7 @@ import scipy
 from sklearn.base import TransformerMixin
 
 from .base_metric import MahalanobisMixin
-from ._util import transformer_from_metric
+from ._util import components_from_metric
 
 
 class Covariance(MahalanobisMixin, TransformerMixin):
@@ -24,9 +24,9 @@ class Covariance(MahalanobisMixin, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
 
   Examples
   --------
@@ -53,5 +53,5 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     else:
       M = scipy.linalg.pinvh(M)
 
-    self.transformer_ = transformer_from_metric(np.atleast_2d(M))
+    self.components_ = components_from_metric(np.atleast_2d(M))
     return self

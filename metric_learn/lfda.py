@@ -51,7 +51,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
 
   Attributes
   ----------
-  transformer_ : `numpy.ndarray`, shape=(n_components, n_features)
+  components_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
 
   Examples
@@ -155,7 +155,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     elif self.embedding_type == 'orthonormalized':
        vecs, _ = np.linalg.qr(vecs)
 
-    self.transformer_ = vecs.T
+    self.components_ = vecs.T
     return self
 
 

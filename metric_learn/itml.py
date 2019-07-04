@@ -12,7 +12,7 @@ from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
-from ._util import transformer_from_metric, _initialize_metric_mahalanobis
+from ._util import components_from_metric, _initialize_metric_mahalanobis
 
 
 class _BaseITML(MahalanobisMixin):
@@ -105,7 +105,7 @@ class _BaseITML(MahalanobisMixin):
       print('itml converged at iter: %d, conv = %f' % (it, conv))
     self.n_iter_ = it
 
-    self.transformer_ = transformer_from_metric(A)
+    self.components_ = components_from_metric(A)
     return self
 
 
@@ -186,9 +186,9 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
 
   threshold_ : `float`
       If the distance metric between two points is lower than this threshold,
@@ -329,9 +329,9 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   n_iter_ : `int`
       The number of iterations the solver has run.
 
-  transformer_ : `numpy.ndarray`, shape=(n_features, n_features)
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
       The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `transformer_from_metric`.)
+      metric (See function `components_from_metric`.)
 
   See Also
   --------
