@@ -353,6 +353,18 @@ class TestLMNN(MetricTestCase):
       lmnn.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
+  def test_deprecation_use_pca(self):
+    # test that a DeprecationWarning is thrown about use_pca, if the
+    # default parameters are used.
+    # TODO: remove in v.0.6
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+    lmnn = LMNN(k=2, use_pca=True)
+    msg = ('"use_pca" parameter is not used.'
+           ' It has been deprecated in version 0.5.0 and will be'
+           ' removed in 0.6.0.')
+    assert_warns_message(DeprecationWarning, msg, lmnn.fit, X, y)
+
 
 @pytest.mark.parametrize('X, y, loss', [(np.array([[0], [1], [2], [3]]),
                                          [1, 1, 0, 0], 3.0),

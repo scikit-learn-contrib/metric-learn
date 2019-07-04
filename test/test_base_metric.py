@@ -26,7 +26,7 @@ class TestStringRepr(unittest.TestCase):
           "learn_rate=1e-07, "
           "max_iter=1000, min_iter=50, n_components=None, "
           "num_dims='deprecated', preprocessor=None, random_state=None, "
-          "regularization=0.5, use_pca=True, verbose=False)"))
+          "regularization=0.5, use_pca='deprecated', verbose=False)"))
 
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
