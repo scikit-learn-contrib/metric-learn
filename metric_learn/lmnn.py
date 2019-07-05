@@ -210,7 +210,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       init = self.init
     self.components_ = _initialize_components(output_dim, X, y, init,
                                               self.verbose,
-                                              self.random_state)
+                                              random_state=self.random_state)
     required_k = np.bincount(label_inds).min()
     if self.k > required_k:
       raise ValueError('not enough class labels for specified k'

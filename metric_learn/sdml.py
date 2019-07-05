@@ -69,9 +69,8 @@ class _BaseSDML(MahalanobisMixin):
     else:
       prior = self.prior
     _, prior_inv = _initialize_metric_mahalanobis(pairs, prior,
-                                                  return_inverse=True,
-                                                  strict_pd=True,
-                                                  matrix_name='prior')
+       return_inverse=True, strict_pd=True, matrix_name='prior',
+       random_state=self.random_state)
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = prior_inv + self.balance_param * loss_matrix

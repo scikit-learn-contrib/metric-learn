@@ -174,7 +174,8 @@ class NCA(MahalanobisMixin, TransformerMixin):
       init = 'auto'
     else:
       init = self.init
-    A = _initialize_components(n_components, X, labels, init, self.verbose)
+    A = _initialize_components(n_components, X, labels, init, self.verbose,
+                               self.random_state)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]

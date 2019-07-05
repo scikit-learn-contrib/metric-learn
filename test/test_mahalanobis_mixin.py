@@ -652,3 +652,25 @@ def test_singular_array_init_or_prior(estimator, build_dataset, w0):
       with pytest.raises(LinAlgError) as raised_err:
         model.fit(input_data, labels)
       assert str(raised_err.value) == msg
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_deterministic_initialization(estimator, build_dataset):
+  """Test that estimators that have a prior or an init are deterministic
+  when it is set to to random and when the random_state is fixed."""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  if hasattr(estimator, 'init'):
+    model.set_params(init='random')
+  if hasattr(estimator, 'prior'):
+    model.set_params(prior='random')
+  model1 = clone(model)
+  set_random_state(model1, 42)
+  model1 = model1.fit(input_data, labels)
+  model2 = clone(model)
+  set_random_state(model2, 42)
+  model2 = model2.fit(input_data, labels)
+  np.testing.assert_allclose(model1.get_mahalanobis_matrix(),
+                             model2.get_mahalanobis_matrix())
