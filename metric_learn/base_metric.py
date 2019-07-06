@@ -51,7 +51,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
       learner is.
     """
 
-  def check_preprocessor(self):
+  def _check_preprocessor(self):
     """Initializes the preprocessor"""
     if _is_arraylike(self.preprocessor):
       self.preprocessor_ = ArrayIndexer(self.preprocessor)
@@ -92,7 +92,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     y: `numpy.ndarray` (optional)
       The checked input labels array.
     """
-    self.check_preprocessor()
+    self._check_preprocessor()
     return check_input(X, y,
                        type_of_inputs=type_of_inputs,
                        preprocessor=self.preprocessor_,

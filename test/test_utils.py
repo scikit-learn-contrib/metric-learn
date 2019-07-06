@@ -779,7 +779,7 @@ def test_error_message_check_preprocessor(preprocessor):
 
   mock_algo = MockMetricLearner(preprocessor=preprocessor)
   with pytest.raises(ValueError) as e:
-    mock_algo.check_preprocessor()
+    mock_algo._check_preprocessor()
   assert str(e.value) == ("Invalid type for the preprocessor: {}. You should "
                           "provide either None, an array-like object, "
                           "or a callable.".format(type(preprocessor)))
@@ -812,7 +812,7 @@ def test_error_message_t_score_pairs(estimator, _):
   """
   estimator = clone(estimator)
   set_random_state(estimator)
-  estimator.check_preprocessor()
+  estimator._check_preprocessor()
   triplets = np.array([[[1.3, 6.3], [3., 6.8], [6.5, 4.4]],
                        [[1.9, 5.3], [1., 7.8], [3.2, 1.2]]])
   with pytest.raises(ValueError) as raised_err:
