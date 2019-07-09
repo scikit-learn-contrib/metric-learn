@@ -56,9 +56,8 @@ class _BaseLSML(MahalanobisMixin):
     else:
       prior = self.prior
     M, prior_inv = _initialize_metric_mahalanobis(quadruplets, prior,
-                                                  return_inverse=True,
-                                                  strict_pd=True,
-                                                  matrix_name='prior')
+       return_inverse=True, strict_pd=True, matrix_name='prior',
+       random_state=self.random_state)
 
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
