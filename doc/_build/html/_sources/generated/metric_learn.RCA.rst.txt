@@ -1,0 +1,16 @@
+:mod:`metric_learn`.RCA
+==============================
+
+.. currentmodule:: metric_learn
+
+.. autoclass:: RCA
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :special-members: __init__
+
+.. include:: metric_learn.RCA.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

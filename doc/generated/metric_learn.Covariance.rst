@@ -1,0 +1,16 @@
+:mod:`metric_learn`.Covariance
+=====================================
+
+.. currentmodule:: metric_learn
+
+.. autoclass:: Covariance
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :special-members: __init__
+
+.. include:: metric_learn.Covariance.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

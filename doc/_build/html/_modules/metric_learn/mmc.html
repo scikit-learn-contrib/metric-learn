@@ -1,0 +1,820 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>metric_learn.mmc &mdash; metric-learn 0.5.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> metric-learn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Contents</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">metric-learn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>metric_learn.mmc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for metric_learn.mmc</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Mahalanobis Metric for Clustering (MMC)&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">assert_all_finite</span>
+<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="k">import</span> <span class="n">ChangedBehaviorWarning</span>
+
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">_PairsClassifierMixin</span><span class="p">,</span> <span class="n">MahalanobisMixin</span>
+<span class="kn">from</span> <span class="nn">.constraints</span> <span class="k">import</span> <span class="n">Constraints</span><span class="p">,</span> <span class="n">wrap_pairs</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">components_from_metric</span><span class="p">,</span> <span class="n">_initialize_metric_mahalanobis</span>
+
+
+<span class="k">class</span> <span class="nc">_BaseMMC</span><span class="p">(</span><span class="n">MahalanobisMixin</span><span class="p">):</span>
+
+  <span class="n">_tuple_size</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># constraints are pairs</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">A0</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">diagonal_c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_proj</span> <span class="o">=</span> <span class="n">max_proj</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span> <span class="o">=</span> <span class="n">convergence_threshold</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">init</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">A0</span> <span class="o">=</span> <span class="n">A0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span> <span class="o">=</span> <span class="n">diagonal</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">=</span> <span class="n">diagonal_c</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">_BaseMMC</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">A0</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;A0&quot; parameter is not used.&#39;</span>
+                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
+                    <span class="s1">&#39;removed in 0.6.0. Use &quot;init&quot; instead.&#39;</span><span class="p">,</span>
+                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+                                    <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;tuples&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="c1"># TODO: replace init=None by init=&#39;auto&#39; in v0.6.0 and remove the warning</span>
+      <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Warning, no init was set (`init=None`). As of version 0.5.0, &quot;</span>
+             <span class="s2">&quot;the default init will now be set to &#39;identity&#39;, instead of the &quot;</span>
+             <span class="s2">&quot;identity divided by a scaling factor of 10. &quot;</span>
+             <span class="s2">&quot;If you still want to use the same init as in previous &quot;</span>
+             <span class="s2">&quot;versions, set init=np.eye(d)/10, where d is the dimension &quot;</span>
+             <span class="s2">&quot;of your input space (d=pairs.shape[1]). &quot;</span>
+             <span class="s2">&quot;This warning will disappear in v0.6.0, and `init` parameter&#39;s&quot;</span>
+             <span class="s2">&quot; default value will be set to &#39;auto&#39;.&quot;</span><span class="p">)</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
+      <span class="n">init</span> <span class="o">=</span> <span class="s1">&#39;identity&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">_initialize_metric_mahalanobis</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span>
+                                             <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
+                                             <span class="n">matrix_name</span><span class="o">=</span><span class="s1">&#39;init&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_diag</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fit_full</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_fit_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Learn full metric using MMC.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) data matrix</span>
+<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">    constraints : 4-tuple of arrays</span>
+<span class="sd">        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
+<span class="sd">        dissimilar pairs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_dim</span> <span class="o">=</span> <span class="n">pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">error1</span> <span class="o">=</span> <span class="n">error2</span> <span class="o">=</span> <span class="mf">1e10</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.01</span>        <span class="c1"># error-bound of iterative projection on C1 and C2</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_</span>
+
+    <span class="n">pos_pairs</span><span class="p">,</span> <span class="n">neg_pairs</span> <span class="o">=</span> <span class="n">pairs</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pairs</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Create weight vector from similar samples</span>
+    <span class="n">pos_diff</span> <span class="o">=</span> <span class="n">pos_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pos_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span> <span class="n">pos_diff</span><span class="p">,</span> <span class="n">pos_diff</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="c1"># `w` is the sum of all outer products of the rows in `pos_diff`.</span>
+    <span class="c1"># The above `einsum` is equivalent to the much more inefficient:</span>
+    <span class="c1"># w = np.apply_along_axis(</span>
+    <span class="c1">#         lambda x: np.outer(x,x).ravel(),</span>
+    <span class="c1">#         1,</span>
+    <span class="c1">#         X[a] - X[b]</span>
+    <span class="c1">#     ).sum(axis = 0)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span> <span class="o">/</span> <span class="mf">100.0</span>
+
+    <span class="n">w_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">w1</span> <span class="o">=</span> <span class="n">w</span> <span class="o">/</span> <span class="n">w_norm</span>  <span class="c1"># make `w` a unit vector</span>
+    <span class="n">t1</span> <span class="o">=</span> <span class="n">t</span> <span class="o">/</span> <span class="n">w_norm</span>  <span class="c1"># distance from origin to `w^T*x=t` plane</span>
+
+    <span class="n">cycle</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># initial step size along gradient</span>
+    <span class="n">grad1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fS1</span><span class="p">(</span><span class="n">pos_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>            <span class="c1"># gradient of similarity</span>
+    <span class="c1"># constraint function</span>
+    <span class="n">grad2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD1</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>            <span class="c1"># gradient of dissimilarity</span>
+    <span class="c1"># constraint function</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad_projection</span><span class="p">(</span><span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">)</span>  <span class="c1"># gradient of fD1 orthogonal to fS1</span>
+
+    <span class="n">A_old</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">):</span>
+
+      <span class="c1"># projection of constraints C1 and C2</span>
+      <span class="n">satisfy</span> <span class="o">=</span> <span class="kc">False</span>
+
+      <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_proj</span><span class="p">):</span>
+
+        <span class="c1"># First constraint:</span>
+        <span class="c1"># f(A) = \sum_{i,j \in S} d_ij&#39; A d_ij &lt;= t              (1)</span>
+        <span class="c1"># (1) can be rewritten as a linear constraint: w^T x = t,</span>
+        <span class="c1"># where x is the unrolled matrix of A,</span>
+        <span class="c1"># w is also an unrolled matrix of W where</span>
+        <span class="c1"># W_{kl}= \sum_{i,j \in S}d_ij^k * d_ij^l</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">:</span>
+          <span class="n">x</span> <span class="o">=</span> <span class="n">x0</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">x</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="p">(</span><span class="n">t1</span> <span class="o">-</span> <span class="n">w1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span> <span class="o">*</span> <span class="n">w1</span>
+          <span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_dim</span><span class="p">,</span> <span class="n">num_dim</span><span class="p">)</span>
+
+        <span class="c1"># Second constraint:</span>
+        <span class="c1"># PSD constraint A &gt;= 0</span>
+        <span class="c1"># project A onto domain A&gt;0</span>
+        <span class="n">l</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">((</span><span class="n">A</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]),</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+        <span class="n">fDC2</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+        <span class="n">error2</span> <span class="o">=</span> <span class="p">(</span><span class="n">fDC2</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span>
+        <span class="k">if</span> <span class="n">error2</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span>
+          <span class="n">satisfy</span> <span class="o">=</span> <span class="kc">True</span>
+          <span class="k">break</span>
+
+      <span class="c1"># third constraint: gradient ascent</span>
+      <span class="c1"># max: g(A) &gt;= 1</span>
+      <span class="c1"># here we suppose g(A) = fD(A) = \sum_{I,J \in D} sqrt(d_ij&#39; A d_ij)</span>
+
+      <span class="n">obj_previous</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A_old</span><span class="p">)</span>  <span class="c1"># g(A_old)</span>
+      <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>               <span class="c1"># g(A)</span>
+
+      <span class="k">if</span> <span class="n">satisfy</span> <span class="ow">and</span> <span class="p">(</span><span class="n">obj</span> <span class="o">&gt;</span> <span class="n">obj_previous</span> <span class="ow">or</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="c1"># If projection of 1 and 2 is successful, and such projection</span>
+        <span class="c1"># improves objective function, slightly increase learning rate</span>
+        <span class="c1"># and update from the current A.</span>
+        <span class="n">alpha</span> <span class="o">*=</span> <span class="mf">1.05</span>
+        <span class="n">A_old</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="n">grad2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fS1</span><span class="p">(</span><span class="n">pos_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+        <span class="n">grad1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD1</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad_projection</span><span class="p">(</span><span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">+=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">M</span>
+
+      <span class="k">else</span><span class="p">:</span>
+
+        <span class="c1"># If projection of 1 and 2 failed, or obj &lt;= obj_previous due</span>
+        <span class="c1"># to projection of 1 and 2, shrink learning rate and re-update</span>
+        <span class="c1"># from the previous A.</span>
+        <span class="n">alpha</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A_old</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">M</span>
+
+      <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A_old</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span><span class="p">:</span>
+        <span class="k">break</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc iter: </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">, projections = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">it</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">converged_</span> <span class="o">=</span> <span class="kc">False</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc did not converge, conv = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">delta</span><span class="p">,))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">converged_</span> <span class="o">=</span> <span class="kc">True</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc converged at iter </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="n">delta</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">A_old</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_iter_</span> <span class="o">=</span> <span class="n">cycle</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">components_</span> <span class="o">=</span> <span class="n">components_from_metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span>
+
+  <span class="k">def</span> <span class="nf">_fit_diag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Learn diagonal metric using MMC.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) data matrix</span>
+<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">    constraints : 4-tuple of arrays</span>
+<span class="sd">        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
+<span class="sd">        dissimilar pairs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_dim</span> <span class="o">=</span> <span class="n">pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">pos_pairs</span><span class="p">,</span> <span class="n">neg_pairs</span> <span class="o">=</span> <span class="n">pairs</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pairs</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">s_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">pos_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pos_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-6</span>
+    <span class="n">reduction</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="n">error</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span> <span class="ow">and</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">:</span>
+
+      <span class="n">fD0</span><span class="p">,</span> <span class="n">fD_1st_d</span><span class="p">,</span> <span class="n">fD_2nd_d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_D_constraint</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+      <span class="n">obj_initial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s_sum</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD0</span>
+      <span class="n">fS_1st_d</span> <span class="o">=</span> <span class="n">s_sum</span>  <span class="c1"># first derivative of the similarity constraints</span>
+
+      <span class="n">gradient</span> <span class="o">=</span> <span class="n">fS_1st_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD_1st_d</span>               <span class="c1"># gradient of the objective</span>
+      <span class="n">hessian</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD_2nd_d</span> <span class="o">+</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_dim</span><span class="p">)</span>  <span class="c1"># Hessian of the objective</span>
+      <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">hessian</span><span class="p">),</span> <span class="n">gradient</span><span class="p">)</span>
+
+      <span class="c1"># Newton-Rapshon update</span>
+      <span class="c1"># search over optimal lambda</span>
+      <span class="n">lambd</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># initial step-size</span>
+      <span class="n">w_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">lambd</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span>
+      <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s_sum</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">_D_objective</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">))</span>
+      <span class="n">assert_all_finite</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+      <span class="n">obj_previous</span> <span class="o">=</span> <span class="n">obj</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># just to get the while-loop started</span>
+
+      <span class="n">inner_it</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="k">while</span> <span class="n">obj</span> <span class="o">&lt;</span> <span class="n">obj_previous</span><span class="p">:</span>
+        <span class="n">obj_previous</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="n">w_previous</span> <span class="o">=</span> <span class="n">w_tmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">lambd</span> <span class="o">/=</span> <span class="n">reduction</span>
+        <span class="n">w_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">w</span> <span class="o">-</span> <span class="n">lambd</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s_sum</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">_D_objective</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">))</span>
+        <span class="n">inner_it</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">assert_all_finite</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+      <span class="n">w</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">w_previous</span>
+      <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">obj_previous</span> <span class="o">-</span> <span class="n">obj_initial</span><span class="p">)</span> <span class="o">/</span> <span class="n">obj_previous</span><span class="p">)</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc iter: </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">error</span><span class="p">))</span>
+      <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">components_</span> <span class="o">=</span> <span class="n">components_from_metric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span>
+
+  <span class="k">def</span> <span class="nf">_fD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The value of the dissimilarity constraint function.</span>
+
+<span class="sd">    f = f(\sum_{ij \in D} distance(x_i, x_j))</span>
+<span class="sd">    i.e. distance can be L1:  \sqrt{(x_i-x_j)A(x_i-x_j)&#39;}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">diff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_fD1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The gradient of the dissimilarity constraint function w.r.t. A.</span>
+
+<span class="sd">    For example, let distance by L1 norm:</span>
+<span class="sd">    f = f(\sum_{ij \in D} \sqrt{(x_i-x_j)A(x_i-x_j)&#39;})</span>
+<span class="sd">    df/dA_{kl} = f&#39;* d(\sum_{ij \in D} \sqrt{(x_i-x_j)^k*(x_i-x_j)^l})/dA_{kl}</span>
+
+<span class="sd">    Note that d_ij*A*d_ij&#39; = tr(d_ij*A*d_ij&#39;) = tr(d_ij&#39;*d_ij*A)</span>
+<span class="sd">    so, d(d_ij*A*d_ij&#39;)/dA = d_ij&#39;*d_ij</span>
+<span class="sd">        df/dA = f&#39;(\sum_{ij \in D} \sqrt{tr(d_ij&#39;*d_ij*A)})</span>
+<span class="sd">                * 0.5*(\sum_{ij \in D} (1/sqrt{tr(d_ij&#39;*d_ij*A)})*(d_ij&#39;*d_ij))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">neg_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="c1"># outer products of all rows in `diff`</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;ijk&#39;</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+    <span class="c1"># faster version of: dist = np.sqrt(np.sum(M * A[None,:,:], axis=(1,2)))</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,jk&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+    <span class="c1"># faster version of: sum_deri = np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis=0)</span>
+    <span class="n">sum_deri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,i-&gt;jk&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="p">(</span><span class="n">dist</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">))</span>
+    <span class="n">sum_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sum_deri</span> <span class="o">/</span> <span class="p">(</span><span class="n">sum_dist</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">_fS1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The gradient of the similarity constraint function w.r.t. A.</span>
+
+<span class="sd">    f = \sum_{ij}(x_i-x_j)A(x_i-x_j)&#39; = \sum_{ij}d_ij*A*d_ij&#39;</span>
+<span class="sd">    df/dA = d(d_ij*A*d_ij&#39;)/dA</span>
+
+<span class="sd">    Note that d_ij*A*d_ij&#39; = tr(d_ij*A*d_ij&#39;) = tr(d_ij&#39;*d_ij*A)</span>
+<span class="sd">    so, d(d_ij*A*d_ij&#39;)/dA = d_ij&#39;*d_ij</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">pos_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">pos_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pos_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>  <span class="c1"># sum of outer products of all rows in `diff`</span>
+
+  <span class="k">def</span> <span class="nf">_grad_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">):</span>
+    <span class="n">grad2</span> <span class="o">=</span> <span class="n">grad2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">grad2</span><span class="p">)</span>
+    <span class="n">gtemp</span> <span class="o">=</span> <span class="n">grad1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad1</span> <span class="o">*</span> <span class="n">grad2</span><span class="p">)</span> <span class="o">*</span> <span class="n">grad2</span>
+    <span class="n">gtemp</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">gtemp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gtemp</span>
+
+  <span class="k">def</span> <span class="nf">_D_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neg_pairs</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(((</span><span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span>
+                                          <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
+                                        <span class="n">w</span><span class="p">[</span><span class="kc">None</span><span class="p">,:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)))</span>
+
+  <span class="k">def</span> <span class="nf">_D_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neg_pairs</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the value, 1st derivative, second derivative (Hessian) of</span>
+<span class="sd">    a dissimilarity constraint function gF(sum_ij distance(d_ij A d_ij))</span>
+<span class="sd">    where A is a diagonal matrix (in the form of a column vector &#39;w&#39;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">diff_sq</span> <span class="o">=</span> <span class="n">diff</span> <span class="o">*</span> <span class="n">diff</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">diff_sq</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
+    <span class="n">sum_deri1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,i&#39;</span><span class="p">,</span> <span class="n">diff_sq</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">))</span>
+    <span class="n">sum_deri2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+        <span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span>
+        <span class="n">diff_sq</span><span class="p">,</span>
+        <span class="n">diff_sq</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">dist</span><span class="o">**</span><span class="mi">3</span><span class="p">))[:,</span><span class="kc">None</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">sum_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sum_dist</span><span class="p">),</span>
+      <span class="n">sum_deri1</span> <span class="o">/</span> <span class="n">sum_dist</span><span class="p">,</span>
+      <span class="n">sum_deri2</span> <span class="o">/</span> <span class="n">sum_dist</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">sum_deri1</span><span class="p">,</span> <span class="n">sum_deri1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sum_dist</span> <span class="o">*</span> <span class="n">sum_dist</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="MMC"><a class="viewcode-back" href="../../generated/metric_learn.MMC.html#metric_learn.MMC">[docs]</a><span class="k">class</span> <span class="nc">MMC</span><span class="p">(</span><span class="n">_BaseMMC</span><span class="p">,</span> <span class="n">_PairsClassifierMixin</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Mahalanobis Metric for Clustering (MMC)</span>
+
+<span class="sd">  MMC minimizes the sum of squared distances between similar points, while</span>
+<span class="sd">  enforcing the sum of distances between dissimilar ones to be greater than</span>
+<span class="sd">  one. This leads to a convex and, thus, local-minima-free optimization</span>
+<span class="sd">  problem that can be solved efficiently.</span>
+<span class="sd">  However, the algorithm involves the computation of eigenvalues, which is the</span>
+<span class="sd">  main speed-bottleneck. Since it has initially been designed for clustering</span>
+<span class="sd">  applications, one of the implicit assumptions of MMC is that all classes form</span>
+<span class="sd">  a compact set, i.e., follow a unimodal distribution, which restricts the</span>
+<span class="sd">  possible use-cases of this method. However, it is one of the earliest and a</span>
+<span class="sd">  still often cited technique.</span>
+
+<span class="sd">  Read more in the :ref:`User Guide &lt;mmc&gt;`.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  max_iter : int, optional (default=100)</span>
+<span class="sd">      Maximum number of iterations of the convergence procedure.</span>
+
+<span class="sd">  max_proj : int, optional (default=10000)</span>
+<span class="sd">      Maximum number of projection steps.</span>
+
+<span class="sd">  convergence_threshold : float, optional (default=1e-6)</span>
+<span class="sd">      Convergence threshold for the convergence procedure.</span>
+
+<span class="sd">  init : None, string or numpy array, optional (default=None)</span>
+<span class="sd">     Initialization of the Mahalanobis matrix. Possible options are</span>
+<span class="sd">     &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
+<span class="sd">     shape (n_features, n_features). If None, will be set</span>
+<span class="sd">     automatically to &#39;identity&#39; (this is to raise a warning if</span>
+<span class="sd">     &#39;init&#39; is not set, and stays to its default value (None), in v0.5.0).</span>
+
+<span class="sd">      &#39;identity&#39;</span>
+<span class="sd">         An identity matrix of shape (n_features, n_features).</span>
+
+<span class="sd">      &#39;covariance&#39;</span>
+<span class="sd">         The (pseudo-)inverse of the covariance matrix.</span>
+
+<span class="sd">      &#39;random&#39;</span>
+<span class="sd">         The initial Mahalanobis matrix will be a random SPD matrix of</span>
+<span class="sd">         shape</span>
+<span class="sd">         `(n_features, n_features)`, generated using</span>
+<span class="sd">         `sklearn.datasets.make_spd_matrix`.</span>
+
+<span class="sd">      numpy array</span>
+<span class="sd">          An SPD matrix of shape (n_features, n_features), that will</span>
+<span class="sd">          be used as such to initialize the metric.</span>
+
+<span class="sd">  verbose : bool, optional</span>
+<span class="sd">     if True, prints information while learning</span>
+
+<span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
+<span class="sd">     The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">     tuples will be gotten like this: X[indices].</span>
+<span class="sd">  A0 : Not used.</span>
+<span class="sd">     .. deprecated:: 0.5.0</span>
+<span class="sd">       `A0` was deprecated in version 0.5.0 and will</span>
+<span class="sd">       be removed in 0.6.0. Use &#39;init&#39; instead.</span>
+<span class="sd">  diagonal : bool, optional</span>
+<span class="sd">     if True, a diagonal metric will be learned,</span>
+<span class="sd">     i.e., a simple scaling of dimensions. The initialization will then</span>
+<span class="sd">     be the diagonal coefficients of the matrix given as &#39;init&#39;.</span>
+<span class="sd">  diagonal_c : float, optional</span>
+<span class="sd">     weight of the dissimilarity constraint for diagonal</span>
+<span class="sd">     metric learning</span>
+<span class="sd">  verbose : bool, optional</span>
+<span class="sd">     if True, prints information while learning</span>
+<span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
+<span class="sd">     The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">     tuples will be gotten like this: X[indices].</span>
+<span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
+<span class="sd">     A pseudo random number generator object or a seed for it if int. If</span>
+<span class="sd">     ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
+<span class="sd">     transformation.</span>
+
+<span class="sd">  Attributes</span>
+<span class="sd">  ----------</span>
+<span class="sd">  n_iter_ : `int`</span>
+<span class="sd">      The number of iterations the solver has run.</span>
+
+<span class="sd">  components_ : `numpy.ndarray`, shape=(n_features, n_features)</span>
+<span class="sd">      The linear transformation ``L`` deduced from the learned Mahalanobis</span>
+<span class="sd">      metric (See function `components_from_metric`.)</span>
+
+<span class="sd">  threshold_ : `float`</span>
+<span class="sd">      If the distance metric between two points is lower than this threshold,</span>
+<span class="sd">      points will be classified as similar, otherwise they will be</span>
+<span class="sd">      classified as dissimilar.</span>
+
+<span class="sd">  Examples</span>
+<span class="sd">  --------</span>
+<span class="sd">  &gt;&gt;&gt; from metric_learn import MMC_Supervised</span>
+<span class="sd">  &gt;&gt;&gt; from sklearn.datasets import load_iris</span>
+<span class="sd">  &gt;&gt;&gt; iris_data = load_iris()</span>
+<span class="sd">  &gt;&gt;&gt; X = iris_data[&#39;data&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; Y = iris_data[&#39;target&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; mmc = MMC_Supervised(num_constraints=200)</span>
+<span class="sd">  &gt;&gt;&gt; mmc.fit(X, Y)</span>
+
+<span class="sd">  References</span>
+<span class="sd">  ----------</span>
+<span class="sd">  .. [1] `Distance metric learning with application to clustering with</span>
+<span class="sd">         side-information &lt;http://papers.nips.cc/paper/2164-distance-metric-\</span>
+<span class="sd">learning-with-application-to-clustering-with-side-information.pdf&gt;`_</span>
+<span class="sd">         Xing, Jordan, Russell, Ng.</span>
+
+<span class="sd">  See Also</span>
+<span class="sd">  --------</span>
+<span class="sd">  metric_learn.MMC : The original weakly-supervised algorithm</span>
+<span class="sd">  :ref:`supervised_version` : The section of the project documentation</span>
+<span class="sd">    that describes the supervised version of weakly supervised estimators.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MMC.fit"><a class="viewcode-back" href="../../generated/metric_learn.MMC.html#metric_learn.MMC.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">calibration_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Learn the MMC model.</span>
+
+<span class="sd">    The threshold will be calibrated on the trainset using the parameters</span>
+<span class="sd">    `calibration_params`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pairs : array-like, shape=(n_constraints, 2, n_features) or \</span>
+<span class="sd">           (n_constraints, 2)</span>
+<span class="sd">        3D Array of pairs with each row corresponding to two points,</span>
+<span class="sd">        or 2D array of indices of pairs if the metric learner uses a</span>
+<span class="sd">        preprocessor.</span>
+<span class="sd">    y : array-like, of shape (n_constraints,)</span>
+<span class="sd">        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.</span>
+<span class="sd">    calibration_params : `dict` or `None`</span>
+<span class="sd">        Dictionary of parameters to give to `calibrate_threshold` for the</span>
+<span class="sd">        threshold calibration step done at the end of `fit`. If `None` is</span>
+<span class="sd">        given, `calibrate_threshold` will use the default parameters.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    self : object</span>
+<span class="sd">        Returns the instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">calibration_params</span> <span class="o">=</span> <span class="p">(</span><span class="n">calibration_params</span> <span class="k">if</span> <span class="n">calibration_params</span> <span class="ow">is</span> <span class="ow">not</span>
+                          <span class="kc">None</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_calibration_params</span><span class="p">(</span><span class="o">**</span><span class="n">calibration_params</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">calibrate_threshold</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">calibration_params</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span></div></div>
+
+
+<div class="viewcode-block" id="MMC_Supervised"><a class="viewcode-back" href="../../generated/metric_learn.MMC_Supervised.html#metric_learn.MMC_Supervised">[docs]</a><span class="k">class</span> <span class="nc">MMC_Supervised</span><span class="p">(</span><span class="n">_BaseMMC</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Supervised version of Mahalanobis Metric for Clustering (MMC)</span>
+
+<span class="sd">  `MMC_Supervised` creates pairs of similar sample by taking same class</span>
+<span class="sd">  samples, and pairs of dissimilar samples by taking different class</span>
+<span class="sd">  samples. It then passes these pairs to `MMC` for training.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  max_iter : int, optional</span>
+<span class="sd">  max_proj : int, optional</span>
+<span class="sd">  convergence_threshold : float, optional</span>
+<span class="sd">  num_labeled : Not used</span>
+<span class="sd">    .. deprecated:: 0.5.0</span>
+<span class="sd">       `num_labeled` was deprecated in version 0.5.0 and will</span>
+<span class="sd">       be removed in 0.6.0.</span>
+<span class="sd">  num_constraints: int, optional</span>
+<span class="sd">      number of constraints to generate</span>
+<span class="sd">  init : None, string or numpy array, optional (default=None)</span>
+<span class="sd">      Initialization of the Mahalanobis matrix. Possible options are</span>
+<span class="sd">      &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
+<span class="sd">      shape (n_features, n_features). If None, will be set</span>
+<span class="sd">      automatically to &#39;identity&#39; (this is to raise a warning if</span>
+<span class="sd">      &#39;init&#39; is not set, and stays to its default value (None), in v0.5.0).</span>
+
+<span class="sd">       &#39;identity&#39;</span>
+<span class="sd">           An identity matrix of shape (n_features, n_features).</span>
+
+<span class="sd">       &#39;covariance&#39;</span>
+<span class="sd">           The (pseudo-)inverse of the covariance matrix.</span>
+
+<span class="sd">       &#39;random&#39;</span>
+<span class="sd">           The initial Mahalanobis matrix will be a random SPD matrix of</span>
+<span class="sd">           shape `(n_features, n_features)`, generated using</span>
+<span class="sd">           `sklearn.datasets.make_spd_matrix`.</span>
+
+<span class="sd">       numpy array</span>
+<span class="sd">           A numpy array of shape (n_features, n_features), that will</span>
+<span class="sd">           be used as such to initialize the metric.</span>
+
+<span class="sd">  verbose : bool, optional</span>
+<span class="sd">      if True, prints information while learning</span>
+
+<span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
+<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">      tuples will be gotten like this: X[indices].</span>
+<span class="sd">  A0 : Not used.</span>
+<span class="sd">      .. deprecated:: 0.5.0</span>
+<span class="sd">        `A0` was deprecated in version 0.5.0 and will</span>
+<span class="sd">        be removed in 0.6.0. Use &#39;init&#39; instead.</span>
+<span class="sd">  diagonal : bool, optional</span>
+<span class="sd">      if True, a diagonal metric will be learned,</span>
+<span class="sd">      i.e., a simple scaling of dimensions</span>
+<span class="sd">  diagonal_c : float, optional</span>
+<span class="sd">      weight of the dissimilarity constraint for diagonal</span>
+<span class="sd">      metric learning</span>
+<span class="sd">  verbose : bool, optional</span>
+<span class="sd">      if True, prints information while learning</span>
+<span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
+<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">      tuples will be formed like this: X[indices].</span>
+<span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
+<span class="sd">      A pseudo random number generator object or a seed for it if int. If</span>
+<span class="sd">      ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
+<span class="sd">      Mahalanobis matrix.  In any case, `random_state` is also used to</span>
+<span class="sd">      randomly sample constraints from labels.</span>
+
+<span class="sd">  `MMC_Supervised` creates pairs of similar sample by taking same class</span>
+<span class="sd">  samples, and pairs of dissimilar samples by taking different class</span>
+<span class="sd">  samples. It then passes these pairs to `MMC` for training.</span>
+
+<span class="sd">  Attributes</span>
+<span class="sd">  ----------</span>
+<span class="sd">  n_iter_ : `int`</span>
+<span class="sd">      The number of iterations the solver has run.</span>
+
+<span class="sd">  components_ : `numpy.ndarray`, shape=(n_features, n_features)</span>
+<span class="sd">      The linear transformation ``L`` deduced from the learned Mahalanobis</span>
+<span class="sd">      metric (See function `components_from_metric`.)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MMC_Supervised.__init__"><a class="viewcode-back" href="../../generated/metric_learn.MMC_Supervised.html#metric_learn.MMC_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+               <span class="n">num_labeled</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">num_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">A0</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diagonal_c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">_BaseMMC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="n">max_proj</span><span class="p">,</span>
+                      <span class="n">convergence_threshold</span><span class="o">=</span><span class="n">convergence_threshold</span><span class="p">,</span>
+                      <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span> <span class="n">A0</span><span class="o">=</span><span class="n">A0</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="n">diagonal</span><span class="p">,</span>
+                      <span class="n">diagonal_c</span><span class="o">=</span><span class="n">diagonal_c</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                      <span class="n">preprocessor</span><span class="o">=</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_labeled</span> <span class="o">=</span> <span class="n">num_labeled</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_constraints</span> <span class="o">=</span> <span class="n">num_constraints</span></div>
+
+<div class="viewcode-block" id="MMC_Supervised.fit"><a class="viewcode-back" href="../../generated/metric_learn.MMC_Supervised.html#metric_learn.MMC_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create constraints from labels and learn the MMC model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : (n x d) matrix</span>
+<span class="sd">        Input data, where each row corresponds to a single instance.</span>
+<span class="sd">    y : (n) array-like</span>
+<span class="sd">        Data labels.</span>
+<span class="sd">    random_state : Not used</span>
+<span class="sd">      .. deprecated:: 0.5.0</span>
+<span class="sd">        `random_state` in the `fit` function was deprecated in version 0.5.0</span>
+<span class="sd">        and will be removed in 0.6.0. Set `random_state` at initialization</span>
+<span class="sd">        instead (when instantiating a new `MMC_Supervised` object).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_labeled</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_labeled&quot; parameter is not used.&#39;</span>
+                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
+                    <span class="s1">&#39; removed in 0.6.0&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">random_state</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;random_state&quot; parameter in the `fit` function is &#39;</span>
+                    <span class="s1">&#39;deprecated. Set `random_state` at initialization &#39;</span>
+                    <span class="s1">&#39;instead (when instantiating a new `MMC_Supervised` &#39;</span>
+                    <span class="s1">&#39;object).&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;As of v0.5.0, `MMC_Supervised` now uses the &#39;</span>
+                    <span class="s1">&#39;`random_state` given at initialization to sample &#39;</span>
+                    <span class="s1">&#39;constraints, not the default `np.random` from the `fit` &#39;</span>
+                    <span class="s1">&#39;method, since this argument is now deprecated. &#39;</span>
+                    <span class="s1">&#39;This warning will disappear in v0.6.0.&#39;</span><span class="p">,</span>
+                    <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_constraints</span>
+    <span class="k">if</span> <span class="n">num_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+      <span class="n">num_constraints</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">num_classes</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Constraints</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">pos_neg</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">positive_negative_pairs</span><span class="p">(</span><span class="n">num_constraints</span><span class="p">,</span>
+                                        <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">wrap_pairs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">pos_neg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_BaseMMC</span><span class="o">.</span><span class="n">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,16 @@
+:mod:`metric_learn`.LSML
+===============================
+
+.. currentmodule:: metric_learn
+
+.. autoclass:: LSML
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :special-members: __init__
+
+.. include:: metric_learn.LSML.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

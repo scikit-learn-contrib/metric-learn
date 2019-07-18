@@ -1,0 +1,16 @@
+:mod:`metric_learn`.LFDA
+===============================
+
+.. currentmodule:: metric_learn
+
+.. autoclass:: LFDA
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :special-members: __init__
+
+.. include:: metric_learn.LFDA.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

@@ -1,0 +1,16 @@
+:mod:`metric_learn.base_metric`._PairsClassifierMixin
+============================================================
+
+.. currentmodule:: metric_learn.base_metric
+
+.. autoclass:: _PairsClassifierMixin
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :special-members: __init__
+
+.. include:: metric_learn.base_metric._PairsClassifierMixin.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>
