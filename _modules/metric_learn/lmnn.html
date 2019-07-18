@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.lmnn &mdash; metric-learn 0.4.0 documentation</title>
+  <title>metric_learn.lmnn &mdash; metric-learn 0.5.0 documentation</title>
   
 
   
@@ -24,26 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="metric-learn 0.4.0 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -65,7 +57,7 @@
             
             
               <div class="version">
-                0.4.0
+                0.5.0
               </div>
             
           
@@ -90,21 +82,16 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Contents</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
 </ul>
 
             
@@ -116,7 +103,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">metric-learn</a>
@@ -124,9 +111,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -156,8 +144,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -170,42 +156,165 @@
             
   <h1>Source code for metric_learn.lmnn</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Large-margin nearest neighbor metric learning. (Weinberger 2005)</span>
-
-<span class="sd">LMNN learns a Mahanalobis distance metric in the kNN classification setting</span>
-<span class="sd">using semidefinite programming.</span>
-<span class="sd">The learned metric attempts to keep k-nearest neighbors in the same class,</span>
-<span class="sd">while keeping examples from different classes separated by a large margin.</span>
-<span class="sd">This algorithm makes no assumptions about the distribution of the data.</span>
+<span class="sd">Large Margin Nearest Neighbor Metric learning (LMNN)</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c1">#TODO: periodic recalculation of impostors, PCA initialization</span>
-
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">check_X_y</span><span class="p">,</span> <span class="n">check_array</span>
+<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="k">import</span> <span class="n">ChangedBehaviorWarning</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">euclidean_distances</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
 
-<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">BaseMetricLearner</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">_initialize_components</span><span class="p">,</span> <span class="n">_check_n_components</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">MahalanobisMixin</span>
 
 
-<span class="c1"># commonality between LMNN implementations</span>
-<span class="k">class</span> <span class="nc">_base_LMNN</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span>
-               <span class="n">regularization</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">use_pca</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-               <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Initialize the LMNN object.</span>
+<div class="viewcode-block" id="LMNN"><a class="viewcode-back" href="../../generated/metric_learn.LMNN.html#metric_learn.LMNN">[docs]</a><span class="k">class</span> <span class="nc">LMNN</span><span class="p">(</span><span class="n">MahalanobisMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Large Margin Nearest Neighbor (LMNN)</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    k : int, optional</span>
-<span class="sd">        Number of neighbors to consider, not including self-edges.</span>
+<span class="sd">  LMNN learns a Mahalanobis distance metric in the kNN classification</span>
+<span class="sd">  setting. The learned metric attempts to keep close k-nearest neighbors</span>
+<span class="sd">  from the same class, while keeping examples from different classes</span>
+<span class="sd">  separated by a large margin. This algorithm makes no assumptions about</span>
+<span class="sd">  the distribution of the data.</span>
 
-<span class="sd">    regularization: float, optional</span>
-<span class="sd">        Weighting of pull and push terms, with 0.5 meaning equal weight.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">  Read more in the :ref:`User Guide &lt;lmnn&gt;`.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  init : None, string or numpy array, optional (default=None)</span>
+<span class="sd">      Initialization of the linear transformation. Possible options are</span>
+<span class="sd">      &#39;auto&#39;, &#39;pca&#39;, &#39;identity&#39;, &#39;random&#39;, and a numpy array of shape</span>
+<span class="sd">      (n_features_a, n_features_b). If None, will be set automatically to</span>
+<span class="sd">        &#39;auto&#39; (this option is to raise a warning if &#39;init&#39; is not set,</span>
+<span class="sd">        and stays to its default value None, in v0.5.0).</span>
+
+<span class="sd">      &#39;auto&#39;</span>
+<span class="sd">          Depending on ``n_components``, the most reasonable initialization</span>
+<span class="sd">          will be chosen. If ``n_components &lt;= n_classes`` we use &#39;lda&#39;, as</span>
+<span class="sd">          it uses labels information. If not, but</span>
+<span class="sd">          ``n_components &lt; min(n_features, n_samples)``, we use &#39;pca&#39;, as</span>
+<span class="sd">          it projects data in meaningful directions (those of higher</span>
+<span class="sd">          variance). Otherwise, we just use &#39;identity&#39;.</span>
+
+<span class="sd">      &#39;pca&#39;</span>
+<span class="sd">          ``n_components`` principal components of the inputs passed</span>
+<span class="sd">          to :meth:`fit` will be used to initialize the transformation.</span>
+<span class="sd">          (See `sklearn.decomposition.PCA`)</span>
+
+<span class="sd">      &#39;lda&#39;</span>
+<span class="sd">          ``min(n_components, n_classes)`` most discriminative</span>
+<span class="sd">          components of the inputs passed to :meth:`fit` will be used to</span>
+<span class="sd">          initialize the transformation. (If ``n_components &gt; n_classes``,</span>
+<span class="sd">          the rest of the components will be zero.) (See</span>
+<span class="sd">          `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)</span>
+
+<span class="sd">      &#39;identity&#39;</span>
+<span class="sd">          If ``n_components`` is strictly smaller than the</span>
+<span class="sd">          dimensionality of the inputs passed to :meth:`fit`, the identity</span>
+<span class="sd">          matrix will be truncated to the first ``n_components`` rows.</span>
+
+<span class="sd">      &#39;random&#39;</span>
+<span class="sd">          The initial transformation will be a random array of shape</span>
+<span class="sd">          `(n_components, n_features)`. Each value is sampled from the</span>
+<span class="sd">          standard normal distribution.</span>
+
+<span class="sd">      numpy array</span>
+<span class="sd">          n_features_b must match the dimensionality of the inputs passed to</span>
+<span class="sd">          :meth:`fit` and n_features_a must be less than or equal to that.</span>
+<span class="sd">          If ``n_components`` is not None, n_features_a must match it.</span>
+
+<span class="sd">  k : int, optional</span>
+<span class="sd">      Number of neighbors to consider, not including self-edges.</span>
+
+<span class="sd">  min_iter : int, optional (default=50)</span>
+<span class="sd">      Minimum number of iterations of the optimization procedure.</span>
+
+<span class="sd">  max_iter : int, optional (default=1000)</span>
+<span class="sd">      Maximum number of iterations of the optimization procedure.</span>
+
+<span class="sd">  learn_rate : float, optional (default=1e-7)</span>
+<span class="sd">      Learning rate of the optimization procedure</span>
+
+<span class="sd">  tol : float, optional (default=0.001)</span>
+<span class="sd">      Tolerance of the optimization procedure. If the objective value varies</span>
+<span class="sd">      less than `tol`, we consider the algorithm has converged and stop it.</span>
+
+<span class="sd">  use_pca : Not used</span>
+
+<span class="sd">      .. deprecated:: 0.5.0</span>
+<span class="sd">        `use_pca` was deprecated in version 0.5.0 and will</span>
+<span class="sd">        be removed in 0.6.0.</span>
+
+<span class="sd">  verbose : bool, optional (default=False)</span>
+<span class="sd">      Whether to print the progress of the optimization procedure.</span>
+
+<span class="sd">  regularization: float, optional</span>
+<span class="sd">      Weighting of pull and push terms, with 0.5 meaning equal weight.</span>
+
+<span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
+<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">      tuples will be formed like this: X[indices].</span>
+
+<span class="sd">  n_components : int or None, optional (default=None)</span>
+<span class="sd">      Dimensionality of reduced space (if None, defaults to dimension of X).</span>
+
+<span class="sd">  num_dims : Not used</span>
+
+<span class="sd">      .. deprecated:: 0.5.0</span>
+<span class="sd">        `num_dims` was deprecated in version 0.5.0 and will</span>
+<span class="sd">        be removed in 0.6.0. Use `n_components` instead.</span>
+
+<span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
+<span class="sd">      A pseudo random number generator object or a seed for it if int. If</span>
+<span class="sd">      ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
+<span class="sd">      transformation. If ``init=&#39;pca&#39;``, ``random_state`` is passed as an</span>
+<span class="sd">      argument to PCA when initializing the transformation.</span>
+
+<span class="sd">  Attributes</span>
+<span class="sd">  ----------</span>
+<span class="sd">  n_iter_ : `int`</span>
+<span class="sd">      The number of iterations the solver has run.</span>
+
+<span class="sd">  components_ : `numpy.ndarray`, shape=(n_components, n_features)</span>
+<span class="sd">      The learned linear transformation ``L``.</span>
+
+<span class="sd">  Examples</span>
+<span class="sd">  --------</span>
+
+<span class="sd">  &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">  &gt;&gt;&gt; from metric_learn import LMNN</span>
+<span class="sd">  &gt;&gt;&gt; from sklearn.datasets import load_iris</span>
+<span class="sd">  &gt;&gt;&gt; iris_data = load_iris()</span>
+<span class="sd">  &gt;&gt;&gt; X = iris_data[&#39;data&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; Y = iris_data[&#39;target&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; lmnn = LMNN(k=5, learn_rate=1e-6)</span>
+<span class="sd">  &gt;&gt;&gt; lmnn.fit(X, Y, verbose=False)</span>
+
+<span class="sd">  Notes</span>
+<span class="sd">  -----</span>
+
+<span class="sd">  If a recent version of the Shogun Python modular (``modshogun``) library</span>
+<span class="sd">  is available, the LMNN implementation will use the fast C++ version from</span>
+<span class="sd">  there. Otherwise, the included pure-Python version will be used.</span>
+<span class="sd">  The two implementations differ slightly, and the C++ version is more</span>
+<span class="sd">  complete.</span>
+
+<span class="sd">  References</span>
+<span class="sd">  ----------</span>
+<span class="sd">  .. [1] `Distance Metric Learning for Large Margin Nearest Neighbor</span>
+<span class="sd">         Classification &lt;http://papers.nips.cc/paper/2795-distance-metric\</span>
+<span class="sd">-learning-for-large-margin-nearest-neighbor-classification&gt;`_</span>
+<span class="sd">         Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LMNN.__init__"><a class="viewcode-back" href="../../generated/metric_learn.LMNN.html#metric_learn.LMNN.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">min_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+               <span class="n">learn_rate</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">regularization</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">convergence_tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+               <span class="n">use_pca</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">init</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">min_iter</span> <span class="o">=</span> <span class="n">min_iter</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
@@ -214,75 +323,86 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">convergence_tol</span> <span class="o">=</span> <span class="n">convergence_tol</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">use_pca</span> <span class="o">=</span> <span class="n">use_pca</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">=</span> <span class="n">num_dims</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">LMNN</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span></div>
 
-  <span class="k">def</span> <span class="nf">transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">L_</span>
+<div class="viewcode-block" id="LMNN.fit"><a class="viewcode-back" href="../../generated/metric_learn.LMNN.html#metric_learn.LMNN.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_dims&quot; parameter is not used.&#39;</span>
+                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
+                    <span class="s1">&#39; removed in 0.6.0. Use &quot;n_components&quot; instead&#39;</span><span class="p">,</span>
+                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_pca</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;use_pca&quot; parameter is not used.&#39;</span>
+                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
+                    <span class="s1">&#39; removed in 0.6.0.&#39;</span><span class="p">,</span>
+                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
+    <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularization</span>
+    <span class="n">learn_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learn_rate</span>
 
-
-<span class="c1"># slower Python version</span>
-<div class="viewcode-block" id="python_LMNN"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.python_LMNN">[docs]</a><span class="k">class</span> <span class="nc">python_LMNN</span><span class="p">(</span><span class="n">_base_LMNN</span><span class="p">):</span>
-
-  <span class="k">def</span> <span class="nf">_process_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">num_pts</span><span class="p">,</span> <span class="n">num_dims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">unique_labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_inds_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds_</span><span class="p">)</span> <span class="o">!=</span> <span class="n">num_pts</span><span class="p">:</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+                                <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">num_pts</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">output_dim</span> <span class="o">=</span> <span class="n">_check_n_components</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)</span>
+    <span class="n">unique_labels</span><span class="p">,</span> <span class="n">label_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">label_inds</span><span class="p">)</span> <span class="o">!=</span> <span class="n">num_pts</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Must have one label per point.&#39;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_labels</span><span class="p">))</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_pca</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;use_pca does nothing for the python_LMNN implementation&#39;</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">L_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_dims</span><span class="p">)</span>
-    <span class="n">required_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds_</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+
+    <span class="c1"># if the init is the default (None), we raise a warning</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="c1"># TODO: replace init=None by init=&#39;auto&#39; in v0.6.0 and remove the warning</span>
+      <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Warning, no init was set (`init=None`). As of version 0.5.0, &quot;</span>
+             <span class="s2">&quot;the default init will now be set to &#39;auto&#39;, instead of the &quot;</span>
+             <span class="s2">&quot;previous identity matrix. If you still want to use the identity &quot;</span>
+             <span class="s2">&quot;matrix as before, set init=&#39;identity&#39;. This warning &quot;</span>
+             <span class="s2">&quot;will disappear in v0.6.0, and `init` parameter&#39;s default value &quot;</span>
+             <span class="s2">&quot;will be set to &#39;auto&#39;.&quot;</span><span class="p">)</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
+      <span class="n">init</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">components_</span> <span class="o">=</span> <span class="n">_initialize_components</span><span class="p">(</span><span class="n">output_dim</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">required_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">label_inds</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">&gt;</span> <span class="n">required_k</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;not enough class labels for specified k&#39;</span>
                        <span class="s1">&#39; (smallest class has </span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">required_k</span><span class="p">)</span>
 
-<div class="viewcode-block" id="python_LMNN.fit"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.python_LMNN.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
-    <span class="n">reg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regularization</span>
-    <span class="n">learn_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learn_rate</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_process_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-
-    <span class="n">target_neighbors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_targets</span><span class="p">()</span>
-    <span class="n">impostors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_impostors</span><span class="p">(</span><span class="n">target_neighbors</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">impostors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># L has already been initialized to an identity matrix</span>
-        <span class="k">return</span>
+    <span class="n">target_neighbors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_targets</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">label_inds</span><span class="p">)</span>
 
     <span class="c1"># sum outer products</span>
-    <span class="n">dfG</span> <span class="o">=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">target_neighbors</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
-                              <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">k</span><span class="p">))</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dfG</span><span class="p">)</span>
-
-    <span class="c1"># storage</span>
-    <span class="n">a1</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">k</span>
-    <span class="n">a2</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="n">k</span>
-    <span class="k">for</span> <span class="n">nn_idx</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-      <span class="n">a1</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
-      <span class="n">a2</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">dfG</span> <span class="o">=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">target_neighbors</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                              <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">k</span><span class="p">))</span>
 
     <span class="c1"># initialize L</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">L_</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components_</span>
 
     <span class="c1"># first iteration: we compute variables (including objective and gradient)</span>
     <span class="c1">#  at initialization point</span>
-    <span class="n">G</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">total_active</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_loss_grad</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">dfG</span><span class="p">,</span> <span class="n">impostors</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">target_neighbors</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span>
-                        <span class="n">a2</span><span class="p">))</span>
+    <span class="n">G</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">total_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loss_grad</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">dfG</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span>
+                                                 <span class="n">reg</span><span class="p">,</span> <span class="n">target_neighbors</span><span class="p">,</span>
+                                                 <span class="n">label_inds</span><span class="p">)</span>
 
+    <span class="n">it</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># we already made one iteration</span>
+
+    <span class="c1"># main loop</span>
     <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">):</span>
       <span class="c1"># then at each iteration, we try to find a value of L that has better</span>
       <span class="c1"># objective than the previous L, following the gradient:</span>
       <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># the next point next_L to try out is found by a gradient step</span>
-        <span class="n">L_next</span> <span class="o">=</span> <span class="n">L</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">learn_rate</span> <span class="o">*</span> <span class="n">G</span>
+        <span class="n">L_next</span> <span class="o">=</span> <span class="n">L</span> <span class="o">-</span> <span class="n">learn_rate</span> <span class="o">*</span> <span class="n">G</span>
         <span class="c1"># we compute the objective at next point</span>
         <span class="c1"># we copy variables that can be modified by _loss_grad, because if we</span>
         <span class="c1"># retry we don t want to modify them several times</span>
-        <span class="p">(</span><span class="n">G_next</span><span class="p">,</span> <span class="n">objective_next</span><span class="p">,</span> <span class="n">total_active_next</span><span class="p">,</span> <span class="n">df_next</span><span class="p">,</span> <span class="n">a1_next</span><span class="p">,</span>
-         <span class="n">a2_next</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_loss_grad</span><span class="p">(</span><span class="n">L_next</span><span class="p">,</span> <span class="n">dfG</span><span class="p">,</span> <span class="n">impostors</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span>
-                            <span class="n">target_neighbors</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="nb">list</span><span class="p">(</span><span class="n">a1</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">a2</span><span class="p">)))</span>
+        <span class="p">(</span><span class="n">G_next</span><span class="p">,</span> <span class="n">objective_next</span><span class="p">,</span> <span class="n">total_active_next</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_loss_grad</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">L_next</span><span class="p">,</span> <span class="n">dfG</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">target_neighbors</span><span class="p">,</span>
+                          <span class="n">label_inds</span><span class="p">))</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">objective</span><span class="p">)</span>
         <span class="n">delta_obj</span> <span class="o">=</span> <span class="n">objective_next</span> <span class="o">-</span> <span class="n">objective</span>
         <span class="k">if</span> <span class="n">delta_obj</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -297,8 +417,7 @@
       <span class="c1"># old variables to these new ones before next iteration and we</span>
       <span class="c1"># slightly increase the learning rate</span>
       <span class="n">L</span> <span class="o">=</span> <span class="n">L_next</span>
-      <span class="n">G</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">total_active</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="p">(</span>
-          <span class="n">G_next</span><span class="p">,</span> <span class="n">df_next</span><span class="p">,</span> <span class="n">objective_next</span><span class="p">,</span> <span class="n">total_active_next</span><span class="p">,</span> <span class="n">a1_next</span><span class="p">,</span> <span class="n">a2_next</span><span class="p">)</span>
+      <span class="n">G</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">total_active</span> <span class="o">=</span> <span class="n">G_next</span><span class="p">,</span> <span class="n">objective_next</span><span class="p">,</span> <span class="n">total_active_next</span>
       <span class="n">learn_rate</span> <span class="o">*=</span> <span class="mf">1.01</span>
 
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
@@ -314,75 +433,67 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LMNN didn&#39;t converge in </span><span class="si">%d</span><span class="s2"> steps.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">)</span>
 
     <span class="c1"># store the last L</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">L_</span> <span class="o">=</span> <span class="n">L</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">components_</span> <span class="o">=</span> <span class="n">L</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">n_iter_</span> <span class="o">=</span> <span class="n">it</span>
     <span class="k">return</span> <span class="bp">self</span></div>
 
-  <span class="k">def</span> <span class="nf">_loss_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">dfG</span><span class="p">,</span> <span class="n">impostors</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">target_neighbors</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span>
-                 <span class="n">a2</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">_loss_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">dfG</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">reg</span><span class="p">,</span> <span class="n">target_neighbors</span><span class="p">,</span> <span class="n">label_inds</span><span class="p">):</span>
     <span class="c1"># Compute pairwise distances under current metric</span>
-    <span class="n">Lx</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">g0</span> <span class="o">=</span> <span class="n">_inplace_paired_L2</span><span class="p">(</span><span class="o">*</span><span class="n">Lx</span><span class="p">[</span><span class="n">impostors</span><span class="p">])</span>
+    <span class="n">Lx</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># we need to find the furthest neighbor:</span>
     <span class="n">Ni</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">_inplace_paired_L2</span><span class="p">(</span><span class="n">Lx</span><span class="p">[</span><span class="n">target_neighbors</span><span class="p">],</span> <span class="n">Lx</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">furthest_neighbors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take_along_axis</span><span class="p">(</span><span class="n">target_neighbors</span><span class="p">,</span>
+                                            <span class="n">Ni</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">impostors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_impostors</span><span class="p">(</span><span class="n">furthest_neighbors</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">X</span><span class="p">,</span>
+                                     <span class="n">label_inds</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+
+    <span class="n">g0</span> <span class="o">=</span> <span class="n">_inplace_paired_L2</span><span class="p">(</span><span class="o">*</span><span class="n">Lx</span><span class="p">[</span><span class="n">impostors</span><span class="p">])</span>
+
+    <span class="c1"># we reorder the target neighbors</span>
     <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">Ni</span><span class="p">[</span><span class="n">impostors</span><span class="p">]</span>
     <span class="c1"># compute the gradient</span>
     <span class="n">total_active</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">nn_idx</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">xrange</span><span class="p">(</span><span class="n">k</span><span class="p">)):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">nn_idx</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">xrange</span><span class="p">(</span><span class="n">k</span><span class="p">)):</span>  <span class="c1"># note: reverse not useful here</span>
       <span class="n">act1</span> <span class="o">=</span> <span class="n">g0</span> <span class="o">&lt;</span> <span class="n">g1</span><span class="p">[:,</span> <span class="n">nn_idx</span><span class="p">]</span>
       <span class="n">act2</span> <span class="o">=</span> <span class="n">g0</span> <span class="o">&lt;</span> <span class="n">g2</span><span class="p">[:,</span> <span class="n">nn_idx</span><span class="p">]</span>
       <span class="n">total_active</span> <span class="o">+=</span> <span class="n">act1</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">act2</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
-      <span class="k">if</span> <span class="n">it</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">plus1</span> <span class="o">=</span> <span class="n">act1</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">a1</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span>
-        <span class="n">minus1</span> <span class="o">=</span> <span class="n">a1</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">act1</span>
-        <span class="n">plus2</span> <span class="o">=</span> <span class="n">act2</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">a2</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span>
-        <span class="n">minus2</span> <span class="o">=</span> <span class="n">a2</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">act2</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="n">plus1</span> <span class="o">=</span> <span class="n">act1</span>
-        <span class="n">plus2</span> <span class="o">=</span> <span class="n">act2</span>
-        <span class="n">minus1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">minus2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-
       <span class="n">targets</span> <span class="o">=</span> <span class="n">target_neighbors</span><span class="p">[:,</span> <span class="n">nn_idx</span><span class="p">]</span>
-      <span class="n">PLUS</span><span class="p">,</span> <span class="n">pweight</span> <span class="o">=</span> <span class="n">_count_edges</span><span class="p">(</span><span class="n">plus1</span><span class="p">,</span> <span class="n">plus2</span><span class="p">,</span> <span class="n">impostors</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-      <span class="n">df</span> <span class="o">+=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">PLUS</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">PLUS</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pweight</span><span class="p">)</span>
-      <span class="n">MINUS</span><span class="p">,</span> <span class="n">mweight</span> <span class="o">=</span> <span class="n">_count_edges</span><span class="p">(</span><span class="n">minus1</span><span class="p">,</span> <span class="n">minus2</span><span class="p">,</span> <span class="n">impostors</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-      <span class="n">df</span> <span class="o">-=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">MINUS</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">MINUS</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">mweight</span><span class="p">)</span>
+      <span class="n">PLUS</span><span class="p">,</span> <span class="n">pweight</span> <span class="o">=</span> <span class="n">_count_edges</span><span class="p">(</span><span class="n">act1</span><span class="p">,</span> <span class="n">act2</span><span class="p">,</span> <span class="n">impostors</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+      <span class="n">df</span> <span class="o">+=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">PLUS</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">PLUS</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pweight</span><span class="p">)</span>
 
       <span class="n">in_imp</span><span class="p">,</span> <span class="n">out_imp</span> <span class="o">=</span> <span class="n">impostors</span>
-      <span class="n">df</span> <span class="o">+=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">in_imp</span><span class="p">[</span><span class="n">minus1</span><span class="p">],</span> <span class="n">out_imp</span><span class="p">[</span><span class="n">minus1</span><span class="p">])</span>
-      <span class="n">df</span> <span class="o">+=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">in_imp</span><span class="p">[</span><span class="n">minus2</span><span class="p">],</span> <span class="n">out_imp</span><span class="p">[</span><span class="n">minus2</span><span class="p">])</span>
+      <span class="n">df</span> <span class="o">-=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">in_imp</span><span class="p">[</span><span class="n">act1</span><span class="p">],</span> <span class="n">out_imp</span><span class="p">[</span><span class="n">act1</span><span class="p">])</span>
+      <span class="n">df</span> <span class="o">-=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">in_imp</span><span class="p">[</span><span class="n">act2</span><span class="p">],</span> <span class="n">out_imp</span><span class="p">[</span><span class="n">act2</span><span class="p">])</span>
 
-      <span class="n">df</span> <span class="o">-=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">in_imp</span><span class="p">[</span><span class="n">plus1</span><span class="p">],</span> <span class="n">out_imp</span><span class="p">[</span><span class="n">plus1</span><span class="p">])</span>
-      <span class="n">df</span> <span class="o">-=</span> <span class="n">_sum_outer_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">in_imp</span><span class="p">[</span><span class="n">plus2</span><span class="p">],</span> <span class="n">out_imp</span><span class="p">[</span><span class="n">plus2</span><span class="p">])</span>
-
-      <span class="n">a1</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">act1</span>
-      <span class="n">a2</span><span class="p">[</span><span class="n">nn_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">act2</span>
     <span class="c1"># do the gradient update</span>
     <span class="k">assert</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">dfG</span> <span class="o">*</span> <span class="n">reg</span> <span class="o">+</span> <span class="n">df</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">reg</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
     <span class="c1"># compute the objective function</span>
     <span class="n">objective</span> <span class="o">=</span> <span class="n">total_active</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">reg</span><span class="p">)</span>
-    <span class="n">objective</span> <span class="o">+=</span> <span class="n">G</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">G</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">total_active</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span>
+    <span class="n">objective</span> <span class="o">+=</span> <span class="n">G</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">G</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">total_active</span>
 
-  <span class="k">def</span> <span class="nf">_select_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="n">target_neighbors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">_select_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">label_inds</span><span class="p">):</span>
+    <span class="n">target_neighbors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span><span class="p">:</span>
-      <span class="n">inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds_</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span>
-      <span class="n">dd</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">[</span><span class="n">inds</span><span class="p">],</span> <span class="n">squared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="n">inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">label_inds</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span>
+      <span class="n">dd</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">inds</span><span class="p">],</span> <span class="n">squared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
       <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">dd</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
       <span class="n">nn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">dd</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">]</span>
       <span class="n">target_neighbors</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span> <span class="o">=</span> <span class="n">inds</span><span class="p">[</span><span class="n">nn</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">target_neighbors</span>
 
-  <span class="k">def</span> <span class="nf">_find_impostors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">furthest_neighbors</span><span class="p">):</span>
-    <span class="n">Lx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">()</span>
+  <span class="k">def</span> <span class="nf">_find_impostors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">furthest_neighbors</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">label_inds</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+    <span class="n">Lx</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="n">margin_radii</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">_inplace_paired_L2</span><span class="p">(</span><span class="n">Lx</span><span class="p">[</span><span class="n">furthest_neighbors</span><span class="p">],</span> <span class="n">Lx</span><span class="p">)</span>
     <span class="n">impostors</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels_</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-      <span class="n">in_inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds_</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span>
-      <span class="n">out_inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_inds_</span> <span class="o">&gt;</span> <span class="n">label</span><span class="p">)</span>
+      <span class="n">in_inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">label_inds</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span>
+      <span class="n">out_inds</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">label_inds</span> <span class="o">&gt;</span> <span class="n">label</span><span class="p">)</span>
       <span class="n">dist</span> <span class="o">=</span> <span class="n">euclidean_distances</span><span class="p">(</span><span class="n">Lx</span><span class="p">[</span><span class="n">out_inds</span><span class="p">],</span> <span class="n">Lx</span><span class="p">[</span><span class="n">in_inds</span><span class="p">],</span> <span class="n">squared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
       <span class="n">i1</span><span class="p">,</span><span class="n">j1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">dist</span> <span class="o">&lt;</span> <span class="n">margin_radii</span><span class="p">[</span><span class="n">out_inds</span><span class="p">][:,</span><span class="kc">None</span><span class="p">])</span>
       <span class="n">i2</span><span class="p">,</span><span class="n">j2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">dist</span> <span class="o">&lt;</span> <span class="n">margin_radii</span><span class="p">[</span><span class="n">in_inds</span><span class="p">])</span>
@@ -423,38 +534,10 @@
   <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xab</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Xab</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[:,</span><span class="kc">None</span><span class="p">])</span>
   <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Xab</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">Xab</span><span class="p">)</span>
-
-
-<span class="k">try</span><span class="p">:</span>
-  <span class="c1"># use the fast C++ version, if available</span>
-  <span class="kn">from</span> <span class="nn">modshogun</span> <span class="k">import</span> <span class="n">LMNN</span> <span class="k">as</span> <span class="n">shogun_LMNN</span>
-  <span class="kn">from</span> <span class="nn">modshogun</span> <span class="k">import</span> <span class="n">RealFeatures</span><span class="p">,</span> <span class="n">MulticlassLabels</span>
-
-<div class="viewcode-block" id="LMNN"><a class="viewcode-back" href="../../metric_learn.lmnn.html#metric_learn.lmnn.LMNN">[docs]</a>  <span class="k">class</span> <span class="nc">LMNN</span><span class="p">(</span><span class="n">_base_LMNN</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-      <span class="n">labels</span> <span class="o">=</span> <span class="n">MulticlassLabels</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span> <span class="o">=</span> <span class="n">shogun_LMNN</span><span class="p">(</span><span class="n">RealFeatures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_maxiter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_obj_threshold</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convergence_tol</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_regularization</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regularization</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">set_stepsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learn_rate</span><span class="p">)</span>
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_pca</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">L_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmnn</span><span class="o">.</span><span class="n">get_linear_transform</span><span class="p">()</span>
-      <span class="k">return</span> <span class="bp">self</span></div>
-
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-  <span class="n">LMNN</span> <span class="o">=</span> <span class="n">python_LMNN</span>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -463,11 +546,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -482,36 +565,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.4.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

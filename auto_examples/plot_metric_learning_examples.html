@@ -1,0 +1,700 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Algorithms walkthrough &mdash; metric-learn 0.5.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Sandwich demo" href="plot_sandwich.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> metric-learn
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../metric_learn.html">Package Contents</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="plot_sandwich.html">Sandwich demo</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Algorithms walkthrough</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-our-dataset-and-setting-up-plotting">Loading our dataset and setting up plotting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metric-learning">Metric Learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#large-margin-nearest-neighbour">Large Margin Nearest Neighbour</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fit-and-then-transform">Fit and then transform!</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#information-theoretic-metric-learning">Information Theoretic Metric Learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mahalanobis-metric-for-clustering">Mahalanobis Metric for Clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sparse-determinant-metric-learning">Sparse Determinant Metric Learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#least-squares-metric-learning">Least Squares Metric Learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#neighborhood-components-analysis">Neighborhood Components Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#local-fisher-discriminant-analysis">Local Fisher Discriminant Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#relative-components-analysis">Relative Components Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#regression-example-metric-learning-for-kernel-regression">Regression example: Metric Learning for Kernel Regression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metric-learning-from-weaker-supervision">Metric Learning from Weaker Supervision</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">metric-learn</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Examples</a> &raquo;</li>
+        
+      <li>Algorithms walkthrough</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/auto_examples/plot_metric_learning_examples.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-metric-learning-examples-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="algorithms-walkthrough">
+<span id="sphx-glr-auto-examples-plot-metric-learning-examples-py"></span><h1>Algorithms walkthrough<a class="headerlink" href="#algorithms-walkthrough" title="Permalink to this headline">¶</a></h1>
+<p>This is a small walkthrough which illustrates most of the Metric Learning
+algorithms implemented in metric-learn by using them on synthetic data,
+with some visualizations to provide intuitions into what they are designed
+to achieve.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># License: BSD 3 clause</span>
+<span class="c1"># Authors: Bhargav Srinivasa Desikan &lt;bhargavvader@gmail.com&gt;</span>
+<span class="c1">#          William de Vazelhes &lt;wdevazelhes@gmail.com&gt;</span>
+</pre></div>
+</div>
+<div class="section" id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+<span class="kn">import</span> <span class="nn">metric_learn</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span><span class="p">,</span> <span class="n">make_regression</span>
+
+<span class="c1"># visualisation imports</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.random.seed.html#numpy.random.seed" title="View documentation for numpy.random.seed"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="loading-our-dataset-and-setting-up-plotting">
+<h2>Loading our dataset and setting up plotting<a class="headerlink" href="#loading-our-dataset-and-setting-up-plotting" title="Permalink to this headline">¶</a></h2>
+<p>We will be using a synthetic dataset to illustrate the plotting,
+using the function <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html#sklearn.datasets.make_classification" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_classification</span></code></a> from
+scikit-learn. The dataset will contain:</p>
+<blockquote>
+<div><ul class="simple">
+<li>100 points in 3 classes with 2 clusters per class</li>
+<li>5 features, among which 3 are informative (correlated with the class
+labels) and two are random noise with large magnitude</li>
+</ul>
+</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_classification</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_classes</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_clusters_per_class</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                           <span class="n">n_informative</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">class_sep</span><span class="o">=</span><span class="mf">4.</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                           <span class="n">n_redundant</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                           <span class="n">scale</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Note that the dimensionality of the data is 5, so to plot the
+transformed data in 2D, we will use the t-sne algorithm. (See
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html#sklearn.manifold.TSNE" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.manifold.TSNE</span></code></a>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_tsne</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Paired</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+    <span class="c1"># clean the figure</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+
+    <span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">()</span>
+    <span class="n">X_embedded</span> <span class="o">=</span> <span class="n">tsne</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_embedded</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_embedded</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">colormap</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(())</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(())</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Let’s now plot the dataset as is.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_tsne</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_001.png" />
+<p>We can see that the classes appear mixed up: this is because t-sne
+is based on preserving the original neighborhood of points in the embedding
+space, but this original neighborhood is based on the euclidean
+distance in the input space, in which the contribution of the noisy
+features is high. So even if points from the same class are close to each
+other in some subspace of the input space, this is not the case when
+considering all dimensions of the input space.</p>
+</div>
+<div class="section" id="metric-learning">
+<h2>Metric Learning<a class="headerlink" href="#metric-learning" title="Permalink to this headline">¶</a></h2>
+<p>Why is Metric Learning useful? We can, with prior knowledge of which
+points are supposed to be closer, figure out a better way to compute
+distances between points for the task at hand. Especially in higher
+dimensions when Euclidean distances are a poor way to measure distance, this
+becomes very useful.</p>
+<p>Basically, we learn this distance:
+<span class="math notranslate nohighlight">\(D(x, x') = \sqrt{(x-x')^\top M(x-x')}\)</span>. And we learn the parameters
+<span class="math notranslate nohighlight">\(M\)</span> of this distance to satisfy certain constraints on the distance
+between points, for example requiring that points of the same class are
+close together and points of different class are far away.</p>
+<p>For more information, check the <a class="reference internal" href="../introduction.html#intro-metric-learning"><span class="std std-ref">What is Metric Learning?</span></a> section
+from the documentation. Some good reading material can also be found
+<a class="reference external" href="https://arxiv.org/pdf/1306.6709.pdf">here</a>. It serves as a
+good literature review of Metric Learning.</p>
+<p>We will briefly explain the metric learning algorithms implemented by
+metric-learn, before providing some examples for its usage, and also
+discuss how to perform metric learning with weaker supervision than class
+labels.</p>
+<p>Metric-learn can be easily integrated with your other machine learning
+pipelines, and follows scikit-learn conventions.</p>
+</div>
+<div class="section" id="large-margin-nearest-neighbour">
+<h2>Large Margin Nearest Neighbour<a class="headerlink" href="#large-margin-nearest-neighbour" title="Permalink to this headline">¶</a></h2>
+<p>LMNN is a metric learning algorithm primarily designed for k-nearest
+neighbor classification. The algorithm is based on semidefinite
+programming, a sub-class of convex programming (as most Metric Learning
+algorithms are).</p>
+<p>The main intuition behind LMNN is to learn a pseudometric under which
+all data instances in the training set are surrounded by at least k
+instances that share the same class label. If this is achieved, the
+leave-one-out error (a special case of cross validation) is minimized.
+You’ll notice that the points from the same labels are closer together,
+but they are not necessary in a same cluster. This is particular to LMNN
+and we’ll see that some other algorithms implicitly enforce points from
+the same class to cluster together.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../supervised.html#lmnn"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.LMNN.html#metric_learn.LMNN" title="metric_learn.LMNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">LMNN</span></code></a></li>
+</ul>
+<div class="section" id="fit-and-then-transform">
+<h3>Fit and then transform!<a class="headerlink" href="#fit-and-then-transform" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># setting up LMNN</span>
+<span class="n">lmnn</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">LMNN</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">learn_rate</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+
+<span class="c1"># fit the data!</span>
+<span class="n">lmnn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># transform our input space</span>
+<span class="n">X_lmnn</span> <span class="o">=</span> <span class="n">lmnn</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>So what have we learned? The matrix <span class="math notranslate nohighlight">\(M\)</span> we talked about before.</p>
+<p>Now let us plot the transformed space - this tells us what the original
+space looks like after being transformed with the new learned metric.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_lmnn</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_002.png" />
+<p>Pretty neat, huh?</p>
+<p>The rest of this notebook will briefly explain the other Metric Learning
+algorithms before plotting them. Also, while we have first run <code class="docutils literal notranslate"><span class="pre">fit</span></code>
+and then <code class="docutils literal notranslate"><span class="pre">transform</span></code> to see our data transformed, we can also use
+<code class="docutils literal notranslate"><span class="pre">fit_transform</span></code>. The rest of the examples and illustrations will use
+<code class="docutils literal notranslate"><span class="pre">fit_transform</span></code>.</p>
+</div>
+</div>
+<div class="section" id="information-theoretic-metric-learning">
+<h2>Information Theoretic Metric Learning<a class="headerlink" href="#information-theoretic-metric-learning" title="Permalink to this headline">¶</a></h2>
+<p>ITML uses a regularizer that automatically enforces a Semi-Definite
+Positive Matrix condition - the LogDet divergence. It uses soft
+must-link or cannot like constraints, and a simple algorithm based on
+Bregman projections. Unlike LMNN, ITML will implicitly enforce points from
+the same class to belong to the same cluster, as you can see below.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../weakly_supervised.html#itml"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.ITML.html#metric_learn.ITML" title="metric_learn.ITML"><code class="xref py py-class docutils literal notranslate"><span class="pre">ITML</span></code></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">itml</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">ITML_Supervised</span><span class="p">()</span>
+<span class="n">X_itml</span> <span class="o">=</span> <span class="n">itml</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_itml</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_003.png" />
+</div>
+<div class="section" id="mahalanobis-metric-for-clustering">
+<h2>Mahalanobis Metric for Clustering<a class="headerlink" href="#mahalanobis-metric-for-clustering" title="Permalink to this headline">¶</a></h2>
+<p>MMC is an algorithm that will try to minimize the distance between similar
+points, while ensuring that the sum of distances between dissimilar points is
+higher than a threshold. This is done by optimizing a cost function
+subject to an inequality constraint.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../weakly_supervised.html#mmc"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.MMC.html#metric_learn.MMC" title="metric_learn.MMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">MMC</span></code></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mmc</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">MMC_Supervised</span><span class="p">()</span>
+<span class="n">X_mmc</span> <span class="o">=</span> <span class="n">mmc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_mmc</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_004.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_004.png" />
+</div>
+<div class="section" id="sparse-determinant-metric-learning">
+<h2>Sparse Determinant Metric Learning<a class="headerlink" href="#sparse-determinant-metric-learning" title="Permalink to this headline">¶</a></h2>
+<p>Implements an efficient sparse metric learning algorithm in high
+dimensional space via an <span class="math notranslate nohighlight">\(l_1\)</span>-penalized log-determinant
+regularization. Compared to the most existing distance metric learning
+algorithms, the algorithm exploits the sparsity nature underlying the
+intrinsic high dimensional feature space.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../weakly_supervised.html#sdml"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.SDML.html#metric_learn.SDML" title="metric_learn.SDML"><code class="xref py py-class docutils literal notranslate"><span class="pre">SDML</span></code></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sdml</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">SDML_Supervised</span><span class="p">(</span><span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.0015</span><span class="p">,</span>
+                                    <span class="n">prior</span><span class="o">=</span><span class="s1">&#39;covariance&#39;</span><span class="p">)</span>
+<span class="n">X_sdml</span> <span class="o">=</span> <span class="n">sdml</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_sdml</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_005.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_005.png" />
+</div>
+<div class="section" id="least-squares-metric-learning">
+<h2>Least Squares Metric Learning<a class="headerlink" href="#least-squares-metric-learning" title="Permalink to this headline">¶</a></h2>
+<p>LSML is a simple, yet effective, algorithm that learns a Mahalanobis
+metric from a given set of relative comparisons. This is done by
+formulating and minimizing a convex loss function that corresponds to
+the sum of squared hinge loss of violated constraints.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../weakly_supervised.html#lsml"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.LSML.html#metric_learn.LSML" title="metric_learn.LSML"><code class="xref py py-class docutils literal notranslate"><span class="pre">LSML</span></code></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lsml</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">LSML_Supervised</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
+                                    <span class="n">prior</span><span class="o">=</span><span class="s1">&#39;covariance&#39;</span><span class="p">)</span>
+<span class="n">X_lsml</span> <span class="o">=</span> <span class="n">lsml</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_lsml</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_006.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_006.png" />
+</div>
+<div class="section" id="neighborhood-components-analysis">
+<h2>Neighborhood Components Analysis<a class="headerlink" href="#neighborhood-components-analysis" title="Permalink to this headline">¶</a></h2>
+<p>NCA is an extremly popular metric learning algorithm.</p>
+<p>Neighborhood components analysis aims at “learning” a distance metric
+by finding a linear transformation of input data such that the average
+leave-one-out (LOO) classification performance of a soft-nearest
+neighbors rule is maximized in the transformed space. The key insight to
+the algorithm is that a matrix <span class="math notranslate nohighlight">\(A\)</span> corresponding to the
+transformation can be found by defining a differentiable objective function
+for <span class="math notranslate nohighlight">\(A\)</span>, followed by use of an iterative solver such as
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html#scipy.optimize.fmin_l_bfgs_b" title="(in SciPy v1.3.0)"><code class="xref any docutils literal notranslate"><span class="pre">scipy.optimize.fmin_l_bfgs_b</span></code></a>. Like LMNN, this algorithm does not try to
+cluster points from the same class in a unique cluster, because it
+enforces conditions at a local neighborhood scale.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../supervised.html#nca"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.NCA.html#metric_learn.NCA" title="metric_learn.NCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">NCA</span></code></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nca</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">NCA</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">X_nca</span> <span class="o">=</span> <span class="n">nca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_nca</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_007.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_007.png" />
+</div>
+<div class="section" id="local-fisher-discriminant-analysis">
+<h2>Local Fisher Discriminant Analysis<a class="headerlink" href="#local-fisher-discriminant-analysis" title="Permalink to this headline">¶</a></h2>
+<p>LFDA is a linear supervised dimensionality reduction method. It is
+particularly useful when dealing with multimodality, where one ore more
+classes consist of separate clusters in input space. The core
+optimization problem of LFDA is solved as a generalized eigenvalue
+problem. Like LMNN, and NCA, this algorithm does not try to cluster points
+from the same class in a unique cluster.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../supervised.html#lfda"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.LFDA.html#metric_learn.LFDA" title="metric_learn.LFDA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LFDA</span></code></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lfda</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">LFDA</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X_lfda</span> <span class="o">=</span> <span class="n">lfda</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_lfda</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_008.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_008.png" />
+</div>
+<div class="section" id="relative-components-analysis">
+<h2>Relative Components Analysis<a class="headerlink" href="#relative-components-analysis" title="Permalink to this headline">¶</a></h2>
+<p>RCA is another one of the older algorithms. It learns a full rank
+Mahalanobis distance metric based on a weighted sum of in-class
+covariance matrices. It applies a global linear transformation to assign
+large weights to relevant dimensions and low weights to irrelevant
+dimensions. Those relevant dimensions are estimated using “chunklets”,
+subsets of points that are known to belong to the same class.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../weakly_supervised.html#rca"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.RCA.html#metric_learn.RCA" title="metric_learn.RCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCA</span></code></a></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rca</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">RCA_Supervised</span><span class="p">(</span><span class="n">num_chunks</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X_rca</span> <span class="o">=</span> <span class="n">rca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_rca</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_009.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_009.png" />
+</div>
+<div class="section" id="regression-example-metric-learning-for-kernel-regression">
+<h2>Regression example: Metric Learning for Kernel Regression<a class="headerlink" href="#regression-example-metric-learning-for-kernel-regression" title="Permalink to this headline">¶</a></h2>
+<p>The previous algorithms took as input a dataset with class labels. Metric
+learning can also be useful for regression, when the labels are real numbers.
+An algorithm very similar to NCA but for regression is Metric
+Learning for Kernel Regression (MLKR). It will optimize for the average
+leave-one-out <em>regression</em> performance from a soft-nearest neighbors
+regression.</p>
+<ul class="simple">
+<li>See more in the <a class="reference internal" href="../supervised.html#mlkr"><span class="std std-ref">User Guide</span></a></li>
+<li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.MLKR.html#metric_learn.MLKR" title="metric_learn.MLKR"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKR</span></code></a></li>
+</ul>
+<p>To illustrate MLKR, let’s use the dataset
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_regression.html#sklearn.datasets.make_regression" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_regression</span></code></a> the same way as we did with the
+classification  before. The dataset will contain: 100 points of 5 features
+each, among which 3 are informative (i.e., used to generate the
+regression target from a linear model), and two are random noise with the
+same magnitude.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X_reg</span><span class="p">,</span> <span class="n">y_reg</span> <span class="o">=</span> <span class="n">make_regression</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_informative</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                               <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s plot the dataset as is</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_reg</span><span class="p">,</span> <span class="n">y_reg</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Oranges</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_010.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_010.png" />
+<p>And let’s plot the dataset after transformation by MLKR:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mlkr</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">MLKR</span><span class="p">()</span>
+<span class="n">X_mlkr</span> <span class="o">=</span> <span class="n">mlkr</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_reg</span><span class="p">,</span> <span class="n">y_reg</span><span class="p">)</span>
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_mlkr</span><span class="p">,</span> <span class="n">y_reg</span><span class="p">,</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Oranges</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_011.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_011.png" />
+<p>Points that have the same value to regress are now closer to each
+other ! This would improve the performance of
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html#sklearn.neighbors.KNeighborsRegressor" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.neighbors.KNeighborsRegressor</span></code></a> for instance.</p>
+</div>
+<div class="section" id="metric-learning-from-weaker-supervision">
+<h2>Metric Learning from Weaker Supervision<a class="headerlink" href="#metric-learning-from-weaker-supervision" title="Permalink to this headline">¶</a></h2>
+<p>To learn the metric, so far we have always given the labels of the
+data to supervise the algorithms. However, in many applications,
+it is easier to obtain information about whether two samples are
+similar or dissimilar. For instance, when annotating a dataset of face
+images, it is easier for an annotator to tell if two faces belong to the same
+person or not, rather than finding the ID of the face among a huge database
+of every person’s faces.
+Note that for some problems (e.g., in information
+retrieval where the goal is to rank documents by similarity to a query
+document), there is no notion of individual label but one can gather
+information on which pairs of points are similar or dissimilar.
+Fortunately, one of the strength of metric learning is the ability to
+learn from such weaker supervision. Indeed, some of the algorithms we’ve
+used above have alternate ways to pass some supervision about the metric
+we want to learn. The way to go is to pass a 2D array <code class="xref any docutils literal notranslate"><span class="pre">pairs</span></code> of pairs,
+as well as an array of labels <code class="xref any docutils literal notranslate"><span class="pre">pairs_labels</span></code> such that for each <code class="xref any docutils literal notranslate"><span class="pre">i</span></code> between
+<code class="xref any docutils literal notranslate"><span class="pre">0</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">n_pairs</span></code> we want <code class="xref any docutils literal notranslate"><span class="pre">X[pairs[i,</span> <span class="pre">0],</span> <span class="pre">:]</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">X[pairs[i,</span> <span class="pre">1],</span> <span class="pre">:]</span></code> to be
+similar if <code class="xref any docutils literal notranslate"><span class="pre">pairs_labels[i]</span> <span class="pre">==</span> <span class="pre">1</span></code>, and we want them to be dissimilar if
+<code class="xref any docutils literal notranslate"><span class="pre">pairs_labels[i]</span> <span class="pre">==</span> <span class="pre">-1</span></code>. In other words, we
+want to enforce a metric that projects similar points closer together and
+dissimilar points further away from each other. This kind of input is
+possible for ITML, SDML, and MMC. See <a class="reference internal" href="../weakly_supervised.html#weakly-supervised-section"><span class="std std-ref">Weakly Supervised Metric Learning</span></a> for
+details on other kinds of weak supervision that some algorithms can work
+with.</p>
+<p>For the purpose of this example, we’re going to explicitly create these
+pairwise constraints through the labels we have, i.e. <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>.
+Do keep in mind that we are doing this method because we know the labels
+- we can actually create the constraints any way we want to depending on
+the data!</p>
+<p>Note that this is what metric-learn did under the hood in the previous
+examples (do check out the
+<code class="xref any docutils literal notranslate"><span class="pre">constraints</span></code> module!) - but we’ll try our own version of this. We’re
+going to go ahead and assume that two points labeled the same will be
+closer than two points in different labels.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_constraints</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">itertools</span>
+    <span class="kn">import</span> <span class="nn">random</span>
+
+    <span class="c1"># aggregate indices of same class</span>
+    <span class="n">zeros</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.where.html#numpy.where" title="View documentation for numpy.where"><span class="n">np</span><span class="o">.</span><span class="n">where</span></a><span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ones</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.where.html#numpy.where" title="View documentation for numpy.where"><span class="n">np</span><span class="o">.</span><span class="n">where</span></a><span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">twos</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.where.html#numpy.where" title="View documentation for numpy.where"><span class="n">np</span><span class="o">.</span><span class="n">where</span></a><span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># make permutations of all those points in the same class</span>
+    <span class="n">zeros_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">zeros</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">ones_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">ones</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">twos_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">twos</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># put them together!</span>
+    <span class="n">sim</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html#numpy.array" title="View documentation for numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">zeros_</span> <span class="o">+</span> <span class="n">ones_</span> <span class="o">+</span> <span class="n">twos_</span><span class="p">)</span>
+
+    <span class="c1"># similarily, put together indices in different classes</span>
+    <span class="n">dis</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">zero</span> <span class="ow">in</span> <span class="n">zeros</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">one</span> <span class="ow">in</span> <span class="n">ones</span><span class="p">:</span>
+            <span class="n">dis</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">zero</span><span class="p">,</span> <span class="n">one</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">two</span> <span class="ow">in</span> <span class="n">twos</span><span class="p">:</span>
+            <span class="n">dis</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">zero</span><span class="p">,</span> <span class="n">two</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">one</span> <span class="ow">in</span> <span class="n">ones</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">two</span> <span class="ow">in</span> <span class="n">twos</span><span class="p">:</span>
+            <span class="n">dis</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">one</span><span class="p">,</span> <span class="n">two</span><span class="p">))</span>
+
+    <span class="c1"># pick up just enough dissimilar examples as we have similar examples</span>
+    <span class="n">dis</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html#numpy.array" title="View documentation for numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">dis</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">)))</span>
+
+    <span class="c1"># return an array of pairs of indices of shape=(2*len(sim), 2), and the corresponding labels, array of shape=(2*len(sim))</span>
+    <span class="c1"># Each pair of similar points have a label of +1 and each pair of dissimilar points have a label of -1</span>
+    <span class="k">return</span> <span class="p">(</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.vstack.html#numpy.vstack" title="View documentation for numpy.vstack"><span class="n">np</span><span class="o">.</span><span class="n">vstack</span></a><span class="p">([</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.column_stack.html#numpy.column_stack" title="View documentation for numpy.column_stack"><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span></a><span class="p">([</span><span class="n">sim</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sim</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]),</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.column_stack.html#numpy.column_stack" title="View documentation for numpy.column_stack"><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span></a><span class="p">([</span><span class="n">dis</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dis</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]])]),</span>
+            <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.concatenate.html#numpy.concatenate" title="View documentation for numpy.concatenate"><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span></a><span class="p">([</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ones.html#numpy.ones" title="View documentation for numpy.ones"><span class="n">np</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">)),</span> <span class="o">-</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ones.html#numpy.ones" title="View documentation for numpy.ones"><span class="n">np</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">))]))</span>
+
+<span class="n">pairs</span><span class="p">,</span> <span class="n">pairs_labels</span> <span class="o">=</span> <span class="n">create_constraints</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now that we’ve created our constraints, let’s see what it looks like!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pairs_labels</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[ 0  6]
+ [ 0  9]
+ [ 0 10]
+ ...
+ [47 63]
+ [22 92]
+ [65 64]]
+[ 1.  1.  1. ... -1. -1. -1.]
+</pre></div>
+</div>
+<p>Using our constraints, let’s now train ITML again. Note that we are no
+longer calling the supervised class <a class="reference internal" href="../generated/metric_learn.ITML_Supervised.html#metric_learn.ITML_Supervised" title="metric_learn.ITML_Supervised"><code class="xref py py-class docutils literal notranslate"><span class="pre">ITML_Supervised</span></code></a> but the more generic
+(weakly-supervised) <a class="reference internal" href="../generated/metric_learn.ITML.html#metric_learn.ITML" title="metric_learn.ITML"><code class="xref py py-class docutils literal notranslate"><span class="pre">ITML</span></code></a>, which
+takes the dataset <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> through the <code class="xref any docutils literal notranslate"><span class="pre">preprocessor</span></code> argument (see
+<a class="reference internal" href="../preprocessor.html#preprocessor-section"><span class="std std-ref">this section</span></a> of the documentation to learn
+about more advanced uses of <code class="xref any docutils literal notranslate"><span class="pre">preprocessor</span></code>) and the pair information <code class="xref any docutils literal notranslate"><span class="pre">pairs</span></code>
+and <code class="xref any docutils literal notranslate"><span class="pre">pairs_labels</span></code> in the fit method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">itml</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">ITML</span><span class="p">(</span><span class="n">preprocessor</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
+<span class="n">itml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">pairs_labels</span><span class="p">)</span>
+
+<span class="n">X_itml</span> <span class="o">=</span> <span class="n">itml</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">plot_tsne</span><span class="p">(</span><span class="n">X_itml</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_plot_metric_learning_examples_012.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_012.png" />
+<p>And that’s the result of ITML after being trained on our manually
+constructed constraints! A bit different from our old result, but not too
+different.</p>
+<p>RCA and LSML also have their own specific ways of taking in inputs -
+it’s worth one’s while to poke around in the constraints.py file to see
+how exactly this is going on.</p>
+<p>Finally, one of the main advantages of metric-learn is its out-of-the box
+compatibility with scikit-learn, for doing <a class="reference external" href="https://scikit-learn.org/stable/model_selection.html">model selection</a>,
+cross-validation, and scoring for instance. Indeed, supervised algorithms are
+regular <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></a> that can be plugged into any
+pipeline or cross-validation procedure. And weakly-supervised estimators are
+also compatible with scikit-learn, since their input dataset format described
+above allows to be sliced along the first dimension when doing
+cross-validations (see also this <a class="reference internal" href="../weakly_supervised.html#sklearn-compat-ws"><span class="std std-ref">section</span></a>). You
+can also look at some <a class="reference internal" href="../introduction.html#use-cases"><span class="std std-ref">use cases</span></a> where you could combine
+metric-learn with scikit-learn estimators.</p>
+<p>This brings us to the end of this tutorial! Have fun Metric Learning :)</p>
+<p><strong>Total running time of the script:</strong> ( 1 minutes  5.133 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-metric-learning-examples-py">
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/47d7e96fc5ed57a08669b70c0daf7f4f/plot_metric_learning_examples.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_metric_learning_examples.py</span></code></a></div>
+<div class="sphx-glr-download docutils container">
+<a class="reference download internal" download="" href="../_downloads/c3c89065d16de63f152d556f31fd7ee6/plot_metric_learning_examples.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_metric_learning_examples.ipynb</span></code></a></div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="plot_sandwich.html" class="btn btn-neutral" title="Sandwich demo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

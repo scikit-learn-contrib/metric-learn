@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn package &mdash; metric-learn 0.4.0 documentation</title>
+  <title>metric_learn package &mdash; metric-learn 0.5.0 documentation</title>
   
 
   
@@ -24,27 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="metric-learn 0.4.0 documentation" href="index.html"/>
-        <link rel="next" title="metric_learn.base_metric module" href="metric_learn.base_metric.html"/>
-        <link rel="prev" title="Mahalanobis Metric Learning for Clustering (MMC)" href="metric_learn.mmc.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="metric_learn.Constraints" href="generated/metric_learn.Constraints.html" />
+    <link rel="prev" title="5. Preprocessor" href="preprocessor.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -66,7 +59,7 @@
             
             
               <div class="version">
-                0.4.0
+                0.5.0
               </div>
             
           
@@ -91,37 +84,50 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Package Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.html">metric_learn.base_metric module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Package Contents</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#base-classes">Base Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.Constraints.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.base_metric.BaseMetricLearner.html"><code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.base_metric._PairsClassifierMixin.html"><code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.base_metric._QuadrupletsClassifierMixin.html"><code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._QuadrupletsClassifierMixin</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-metric_learn">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supervised-learning-algorithms">Supervised Learning Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.LFDA.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.LFDA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.LMNN.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.LMNN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.MLKR.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.MLKR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.NCA.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.NCA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.RCA.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.RCA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.ITML_Supervised.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.ITML_Supervised</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.LSML_Supervised.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.LSML_Supervised</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.MMC_Supervised.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.MMC_Supervised</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.SDML_Supervised.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.SDML_Supervised</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.RCA_Supervised.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.RCA_Supervised</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#weakly-supervised-learning-algorithms">Weakly Supervised Learning Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.ITML.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.ITML</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.LSML.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.LSML</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.MMC.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.MMC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.SDML.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.SDML</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#unsupervised-learning-algorithms">Unsupervised Learning Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/metric_learn.Covariance.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.Covariance</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
 </ul>
 
             
@@ -133,7 +139,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">metric-learn</a>
@@ -141,9 +147,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -187,78 +194,124 @@
             
   <div class="section" id="metric-learn-package">
 <h1>metric_learn package<a class="headerlink" href="#metric-learn-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.base_metric.html">metric_learn.base_metric module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.itml.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.itml.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.lfda.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.lfda.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.lmnn.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.lmnn.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.lsml.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.lsml.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.mlkr.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.mlkr.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.mmc.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.mmc.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.nca.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.nca.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.rca.html">Relative Components Analysis (RCA)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.rca.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.rca.html#references">References</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.sdml.html#example-code">Example Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metric_learn.sdml.html#references">References</a></li>
-</ul>
-</li>
-</ul>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="base-classes">
+<h2>Base Classes<a class="headerlink" href="#base-classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.Constraints.html#metric_learn.Constraints" title="metric_learn.Constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.Constraints</span></code></a>(partial_labels)</td>
+<td>Class to build constraints from labels.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.base_metric.BaseMetricLearner.html#metric_learn.base_metric.BaseMetricLearner" title="metric_learn.base_metric.BaseMetricLearner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a>([…])</td>
+<td>Base class for all metric-learners.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.base_metric._PairsClassifierMixin.html#metric_learn.base_metric._PairsClassifierMixin" title="metric_learn.base_metric._PairsClassifierMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.base_metric._PairsClassifierMixin</span></code></a>([…])</td>
+<td>Base class for pairs learners.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.base_metric._QuadrupletsClassifierMixin.html#metric_learn.base_metric._QuadrupletsClassifierMixin" title="metric_learn.base_metric._QuadrupletsClassifierMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.base_metric._QuadrupletsClassifierMixin</span></code></a>([…])</td>
+<td>Base class for quadruplets learners.</td>
+</tr>
+</tbody>
+</table>
 </div>
-<div class="section" id="module-metric_learn">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-metric_learn" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="supervised-learning-algorithms">
+<h2>Supervised Learning Algorithms<a class="headerlink" href="#supervised-learning-algorithms" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.LFDA.html#metric_learn.LFDA" title="metric_learn.LFDA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.LFDA</span></code></a>([n_components,&nbsp;num_dims,&nbsp;…])</td>
+<td>Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.LMNN.html#metric_learn.LMNN" title="metric_learn.LMNN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.LMNN</span></code></a>([init,&nbsp;k,&nbsp;min_iter,&nbsp;…])</td>
+<td>Large Margin Nearest Neighbor (LMNN)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.MLKR.html#metric_learn.MLKR" title="metric_learn.MLKR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.MLKR</span></code></a>([n_components,&nbsp;num_dims,&nbsp;…])</td>
+<td>Metric Learning for Kernel Regression (MLKR)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.NCA.html#metric_learn.NCA" title="metric_learn.NCA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.NCA</span></code></a>([init,&nbsp;n_components,&nbsp;…])</td>
+<td>Neighborhood Components Analysis (NCA)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.RCA.html#metric_learn.RCA" title="metric_learn.RCA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.RCA</span></code></a>([n_components,&nbsp;num_dims,&nbsp;…])</td>
+<td>Relevant Components Analysis (RCA)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.ITML_Supervised.html#metric_learn.ITML_Supervised" title="metric_learn.ITML_Supervised"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.ITML_Supervised</span></code></a>([gamma,&nbsp;…])</td>
+<td>Supervised version of Information Theoretic Metric Learning (ITML)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.LSML_Supervised.html#metric_learn.LSML_Supervised" title="metric_learn.LSML_Supervised"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.LSML_Supervised</span></code></a>([tol,&nbsp;…])</td>
+<td>Supervised version of Least Squared-residual Metric Learning (LSML)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.MMC_Supervised.html#metric_learn.MMC_Supervised" title="metric_learn.MMC_Supervised"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.MMC_Supervised</span></code></a>([max_iter,&nbsp;…])</td>
+<td>Supervised version of Mahalanobis Metric for Clustering (MMC)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.SDML_Supervised.html#metric_learn.SDML_Supervised" title="metric_learn.SDML_Supervised"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.SDML_Supervised</span></code></a>([…])</td>
+<td>Supervised version of Sparse Distance Metric Learning (SDML)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.RCA_Supervised.html#metric_learn.RCA_Supervised" title="metric_learn.RCA_Supervised"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.RCA_Supervised</span></code></a>([num_dims,&nbsp;…])</td>
+<td>Supervised version of Relevant Components Analysis (RCA)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="weakly-supervised-learning-algorithms">
+<h2>Weakly Supervised Learning Algorithms<a class="headerlink" href="#weakly-supervised-learning-algorithms" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML" title="metric_learn.ITML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.ITML</span></code></a>([gamma,&nbsp;max_iter,&nbsp;…])</td>
+<td>Information Theoretic Metric Learning (ITML)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.LSML.html#metric_learn.LSML" title="metric_learn.LSML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.LSML</span></code></a>([tol,&nbsp;max_iter,&nbsp;prior,&nbsp;…])</td>
+<td>Least Squared-residual Metric Learning (LSML)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.MMC.html#metric_learn.MMC" title="metric_learn.MMC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.MMC</span></code></a>([max_iter,&nbsp;max_proj,&nbsp;…])</td>
+<td>Mahalanobis Metric for Clustering (MMC)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/metric_learn.SDML.html#metric_learn.SDML" title="metric_learn.SDML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.SDML</span></code></a>([balance_param,&nbsp;…])</td>
+<td>Sparse Distance Metric Learning (SDML)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="unsupervised-learning-algorithms">
+<h2>Unsupervised Learning Algorithms<a class="headerlink" href="#unsupervised-learning-algorithms" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance" title="metric_learn.Covariance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.Covariance</span></code></a>([preprocessor])</td>
+<td>Covariance metric (baseline method)</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metric_learn.base_metric.html" class="btn btn-neutral float-right" title="metric_learn.base_metric module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="generated/metric_learn.Constraints.html" class="btn btn-neutral float-right" title="metric_learn.Constraints" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="metric_learn.mmc.html" class="btn btn-neutral" title="Mahalanobis Metric Learning for Clustering (MMC)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="preprocessor.html" class="btn btn-neutral" title="5. Preprocessor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -267,11 +320,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -286,36 +339,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.4.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

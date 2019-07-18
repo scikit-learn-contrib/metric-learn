@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.lfda &mdash; metric-learn 0.4.0 documentation</title>
+  <title>metric_learn.lfda &mdash; metric-learn 0.5.0 documentation</title>
   
 
   
@@ -24,26 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="metric-learn 0.4.0 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -65,7 +57,7 @@
             
             
               <div class="version">
-                0.4.0
+                0.5.0
               </div>
             
           
@@ -90,21 +82,16 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Contents</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
 </ul>
 
             
@@ -116,7 +103,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">metric-learn</a>
@@ -124,9 +111,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -156,8 +144,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -171,15 +157,6 @@
   <h1>Source code for metric_learn.lfda</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Local Fisher Discriminant Analysis (LFDA)</span>
-
-<span class="sd">Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction</span>
-<span class="sd">Sugiyama, ICML 2006</span>
-
-<span class="sd">LFDA is a linear supervised dimensionality reduction method.</span>
-<span class="sd">It is particularly useful when dealing with multimodality,</span>
-<span class="sd">where one ore more classes consist of separate clusters in input space.</span>
-<span class="sd">The core optimization problem of LFDA is solved as a generalized</span>
-<span class="sd">eigenvalue problem.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -187,68 +164,87 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">pairwise_distances</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">check_X_y</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
 
-<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">BaseMetricLearner</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">_check_n_components</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">MahalanobisMixin</span>
 
 
-<div class="viewcode-block" id="LFDA"><a class="viewcode-back" href="../../metric_learn.lfda.html#metric_learn.lfda.LFDA">[docs]</a><span class="k">class</span> <span class="nc">LFDA</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
+<div class="viewcode-block" id="LFDA"><a class="viewcode-back" href="../../generated/metric_learn.LFDA.html#metric_learn.LFDA">[docs]</a><span class="k">class</span> <span class="nc">LFDA</span><span class="p">(</span><span class="n">MahalanobisMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
   <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">  Local Fisher Discriminant Analysis for Supervised Dimensionality Reduction</span>
-<span class="sd">  Sugiyama, ICML 2006</span>
+
+<span class="sd">  LFDA is a linear supervised dimensionality reduction method. It is</span>
+<span class="sd">  particularly useful when dealing with multimodality, where one ore more</span>
+<span class="sd">  classes consist of separate clusters in input space. The core optimization</span>
+<span class="sd">  problem of LFDA is solved as a generalized eigenvalue problem.</span>
+
+<span class="sd">  Read more in the :ref:`User Guide &lt;lfda&gt;`.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  n_components : int or None, optional (default=None)</span>
+<span class="sd">      Dimensionality of reduced space (if None, defaults to dimension of X).</span>
+
+<span class="sd">  num_dims : Not used</span>
+
+<span class="sd">      .. deprecated:: 0.5.0</span>
+<span class="sd">        `num_dims` was deprecated in version 0.5.0 and will</span>
+<span class="sd">        be removed in 0.6.0. Use `n_components` instead.</span>
+
+<span class="sd">  k : int, optional</span>
+<span class="sd">      Number of nearest neighbors used in local scaling method.</span>
+<span class="sd">      Defaults to min(7, n_components - 1).</span>
+
+<span class="sd">  embedding_type : str, optional</span>
+<span class="sd">      Type of metric in the embedding space (default: &#39;weighted&#39;)</span>
+<span class="sd">        &#39;weighted&#39;        - weighted eigenvectors</span>
+<span class="sd">        &#39;orthonormalized&#39; - orthonormalized</span>
+<span class="sd">        &#39;plain&#39;           - raw eigenvectors</span>
+
+<span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
+<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">      tuples will be formed like this: X[indices].</span>
+
+<span class="sd">  Attributes</span>
+<span class="sd">  ----------</span>
+<span class="sd">  components_ : `numpy.ndarray`, shape=(n_components, n_features)</span>
+<span class="sd">      The learned linear transformation ``L``.</span>
+
+<span class="sd">  Examples</span>
+<span class="sd">  --------</span>
+
+<span class="sd">  &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">  &gt;&gt;&gt; from metric_learn import LFDA</span>
+<span class="sd">  &gt;&gt;&gt; from sklearn.datasets import load_iris</span>
+<span class="sd">  &gt;&gt;&gt; iris_data = load_iris()</span>
+<span class="sd">  &gt;&gt;&gt; X = iris_data[&#39;data&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; Y = iris_data[&#39;target&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; lfda = LFDA(k=2, dim=2)</span>
+<span class="sd">  &gt;&gt;&gt; lfda.fit(X, Y)</span>
+
+<span class="sd">  References</span>
+<span class="sd">  ------------------</span>
+<span class="sd">  .. [1] `Dimensionality Reduction of Multimodal Labeled Data by Local Fisher</span>
+<span class="sd">         Discriminant Analysis &lt;http://www.ms.k.u-tokyo.ac.jp/2007/LFDA.pdf&gt;`_</span>
+<span class="sd">         Masashi Sugiyama.</span>
+
+<span class="sd">  .. [2] `Local Fisher Discriminant Analysis on Beer Style Clustering</span>
+<span class="sd">         &lt;https://gastrograph.com/resources/whitepapers/local-fisher\</span>
+<span class="sd">-discriminant-analysis-on-beer-style-clustering.html#&gt;`_ Yuan Tang.</span>
 <span class="sd">  &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="LFDA.__init__"><a class="viewcode-back" href="../../metric_learn.lfda.html#metric_learn.lfda.LFDA.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">embedding_type</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Initialize LFDA.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    num_dims : int, optional</span>
-<span class="sd">        Dimensionality of reduced space (defaults to dimension of X)</span>
-
-<span class="sd">    k : int, optional</span>
-<span class="sd">        Number of nearest neighbors used in local scaling method.</span>
-<span class="sd">        Defaults to min(7, num_dims - 1).</span>
-
-<span class="sd">    embedding_type : str, optional</span>
-<span class="sd">        Type of metric in the embedding space (default: &#39;weighted&#39;)</span>
-<span class="sd">          &#39;weighted&#39;        - weighted eigenvectors</span>
-<span class="sd">          &#39;orthonormalized&#39; - orthonormalized</span>
-<span class="sd">          &#39;plain&#39;           - raw eigenvectors</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="LFDA.__init__"><a class="viewcode-back" href="../../generated/metric_learn.LFDA.html#metric_learn.LFDA.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span>
+               <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">embedding_type</span><span class="o">=</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">embedding_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;weighted&#39;</span><span class="p">,</span> <span class="s1">&#39;orthonormalized&#39;</span><span class="p">,</span> <span class="s1">&#39;plain&#39;</span><span class="p">):</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid embedding_type: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">embedding_type</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">=</span> <span class="n">num_dims</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">embedding_type</span> <span class="o">=</span> <span class="n">embedding_type</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">LFDA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LFDA.transformer"><a class="viewcode-back" href="../../metric_learn.lfda.html#metric_learn.lfda.LFDA.transformer">[docs]</a>  <span class="k">def</span> <span class="nf">transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer_</span></div>
-
-  <span class="k">def</span> <span class="nf">_process_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="n">unique_classes</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">check_X_y</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_classes</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="n">dim</span> <span class="o">=</span> <span class="n">d</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&lt;=</span> <span class="n">d</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Invalid num_dims, must be in [1,</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">d</span><span class="p">)</span>
-      <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span>
-
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">d</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">&gt;=</span> <span class="n">d</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Chosen k (</span><span class="si">%d</span><span class="s1">) too large, using </span><span class="si">%d</span><span class="s1"> instead.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-      <span class="n">k</span> <span class="o">=</span> <span class="n">d</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">k</span>
-
-<div class="viewcode-block" id="LFDA.fit"><a class="viewcode-back" href="../../metric_learn.lfda.html#metric_learn.lfda.LFDA.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="viewcode-block" id="LFDA.fit"><a class="viewcode-back" href="../../generated/metric_learn.LFDA.html#metric_learn.LFDA.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Fit the LFDA model.</span>
 
 <span class="sd">    Parameters</span>
@@ -259,7 +255,25 @@
 <span class="sd">    y : (n,) array-like</span>
 <span class="sd">        Class labels, one per point of data.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">k_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_dims&quot; parameter is not used.&#39;</span>
+                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
+                    <span class="s1">&#39; removed in 0.6.0. Use &quot;n_components&quot; instead&#39;</span><span class="p">,</span>
+                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">unique_classes</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_classes</span><span class="p">)</span>
+
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">_check_n_components</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">d</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">&gt;=</span> <span class="n">d</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Chosen k (</span><span class="si">%d</span><span class="s1">) too large, using </span><span class="si">%d</span><span class="s1"> instead.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+      <span class="n">k</span> <span class="o">=</span> <span class="n">d</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
     <span class="n">tSb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="n">d</span><span class="p">))</span>
     <span class="n">tSw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="n">d</span><span class="p">))</span>
 
@@ -270,8 +284,8 @@
       <span class="c1"># classwise affinity matrix</span>
       <span class="n">dist</span> <span class="o">=</span> <span class="n">pairwise_distances</span><span class="p">(</span><span class="n">Xc</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;l2&#39;</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
       <span class="c1"># distances to k-th nearest neighbor</span>
-      <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k_</span><span class="p">,</span> <span class="n">nc</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-      <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span><span class="n">k</span><span class="p">])</span>
+      <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">nc</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)[:,</span> <span class="n">k</span><span class="p">])</span>
 
       <span class="n">local_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
       <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
@@ -298,7 +312,7 @@
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding_type</span> <span class="o">==</span> <span class="s1">&#39;orthonormalized&#39;</span><span class="p">:</span>
        <span class="n">vecs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">vecs</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">transformer_</span> <span class="o">=</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">components_</span> <span class="o">=</span> <span class="n">vecs</span><span class="o">.</span><span class="n">T</span>
     <span class="k">return</span> <span class="bp">self</span></div></div>
 
 
@@ -321,9 +335,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -332,11 +344,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -351,36 +363,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.4.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

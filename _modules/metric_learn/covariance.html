@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.covariance &mdash; metric-learn 0.4.0 documentation</title>
+  <title>metric_learn.covariance &mdash; metric-learn 0.5.0 documentation</title>
   
 
   
@@ -24,26 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="metric-learn 0.4.0 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -65,7 +57,7 @@
             
             
               <div class="version">
-                0.4.0
+                0.5.0
               </div>
             
           
@@ -90,21 +82,16 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.covariance.html">Covariance metric (baseline method)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lmnn.html">Large Margin Nearest Neighbor (LMNN)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.nca.html">Neighborhood Components Analysis (NCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lfda.html">Local Fisher Discriminant Analysis (LFDA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mlkr.html">Metric Learning for Kernel Regression (MLKR)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.itml.html">Information Theoretic Metric Learning (ITML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.lsml.html">Least Squares Metric Learning (LSML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.sdml.html">Sparse Determinant Metric Learning (SDML)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.rca.html">Relative Components Analysis (RCA)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.mmc.html">Mahalanobis Metric Learning for Clustering (MMC)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide.html">User Guide</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metric_learn.html">Package Contents</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
 </ul>
 
             
@@ -116,7 +103,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">metric-learn</a>
@@ -124,9 +111,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -156,8 +144,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -171,46 +157,65 @@
   <h1>Source code for metric_learn.covariance</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Covariance metric (baseline method)</span>
-
-<span class="sd">This method does not &quot;learn&quot; anything, rather it calculates</span>
-<span class="sd">the covariance matrix of the input data.</span>
-
-<span class="sd">This is a simple baseline method first introduced in</span>
-<span class="sd">On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">check_array</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
 
-<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">BaseMetricLearner</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">MahalanobisMixin</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">components_from_metric</span>
 
 
-<div class="viewcode-block" id="Covariance"><a class="viewcode-back" href="../../metric_learn.covariance.html#metric_learn.covariance.Covariance">[docs]</a><span class="k">class</span> <span class="nc">Covariance</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
-<div class="viewcode-block" id="Covariance.__init__"><a class="viewcode-back" href="../../metric_learn.covariance.html#metric_learn.covariance.Covariance.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">pass</span></div>
+<div class="viewcode-block" id="Covariance"><a class="viewcode-back" href="../../generated/metric_learn.Covariance.html#metric_learn.Covariance">[docs]</a><span class="k">class</span> <span class="nc">Covariance</span><span class="p">(</span><span class="n">MahalanobisMixin</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Covariance metric (baseline method)</span>
 
-<div class="viewcode-block" id="Covariance.metric"><a class="viewcode-back" href="../../metric_learn.covariance.html#metric_learn.covariance.Covariance.metric">[docs]</a>  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">M_</span></div>
+<span class="sd">  This method does not &quot;learn&quot; anything, rather it calculates</span>
+<span class="sd">  the covariance matrix of the input data.</span>
 
-<div class="viewcode-block" id="Covariance.fit"><a class="viewcode-back" href="../../metric_learn.covariance.html#metric_learn.covariance.Covariance.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="sd">  This is a simple baseline method first introduced in</span>
+<span class="sd">  On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936</span>
+
+<span class="sd">  Read more in the :ref:`User Guide &lt;covariance&gt;`.</span>
+
+<span class="sd">  Attributes</span>
+<span class="sd">  ----------</span>
+<span class="sd">  components_ : `numpy.ndarray`, shape=(n_features, n_features)</span>
+<span class="sd">      The linear transformation ``L`` deduced from the learned Mahalanobis</span>
+<span class="sd">      metric (See function `components_from_metric`.)</span>
+
+<span class="sd">  Examples</span>
+<span class="sd">  --------</span>
+<span class="sd">  &gt;&gt;&gt; from metric_learn import Covariance</span>
+<span class="sd">  &gt;&gt;&gt; from sklearn.datasets import load_iris</span>
+<span class="sd">  &gt;&gt;&gt; iris = load_iris()[&#39;data&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; cov = Covariance().fit(iris)</span>
+<span class="sd">  &gt;&gt;&gt; x = cov.transform(iris)</span>
+
+<span class="sd">  &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Covariance.__init__"><a class="viewcode-back" href="../../generated/metric_learn.Covariance.html#metric_learn.Covariance.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">Covariance</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Covariance.fit"><a class="viewcode-back" href="../../generated/metric_learn.Covariance.html#metric_learn.Covariance.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    X : data matrix, (n x d)</span>
 <span class="sd">    y : unused</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="n">check_array</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">M_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">rowvar</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">M_</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">M_</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">M_</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">rowvar</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">M</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="n">M</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">M</span>
     <span class="k">else</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">M_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">M_</span><span class="p">)</span>
+      <span class="n">M</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinvh</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">components_</span> <span class="o">=</span> <span class="n">components_from_metric</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">M</span><span class="p">))</span>
     <span class="k">return</span> <span class="bp">self</span></div></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -219,11 +224,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2018, CJ Carey and Yuan Tang.
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -238,36 +243,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.4.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
