@@ -136,15 +136,6 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   >>> lmnn = LMNN(k=5, learn_rate=1e-6)
   >>> lmnn.fit(X, Y, verbose=False)
 
-  Notes
-  -----
-
-  If a recent version of the Shogun Python modular (``modshogun``) library
-  is available, the LMNN implementation will use the fast C++ version from
-  there. Otherwise, the included pure-Python version will be used.
-  The two implementations differ slightly, and the C++ version is more
-  complete.
-
   References
   ----------
   .. [1] `Distance Metric Learning for Large Margin Nearest Neighbor
