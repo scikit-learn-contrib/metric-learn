@@ -32,7 +32,7 @@ class Constraints(object):
     col = np.concatenate((b, d))
     data = np.ones_like(row, dtype=int)
     data[len(a):] = -1
-    adj = coo_matrix((data, (row, col)), shape=(self.num_points,)*2)
+    adj = coo_matrix((data, (row, col)), shape=(self.num_points,) * 2)
     # symmetrize
     return adj + adj.T
 
@@ -84,7 +84,7 @@ class Constraints(object):
       if len(all_inds) == 1:
         c = 0
       else:
-        c = random_state.randint(0, high=len(all_inds)-1)
+        c = random_state.randint(0, high=len(all_inds) - 1)
       inds = all_inds[c]
       if len(inds) < chunk_size:
         del all_inds[c]

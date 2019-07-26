@@ -22,11 +22,11 @@ class TestStringRepr(unittest.TestCase):
     self.assertEqual(
         remove_spaces(str(metric_learn.LMNN())),
         remove_spaces(
-          "LMNN(convergence_tol=0.001, init=None, k=3, "
-          "learn_rate=1e-07, "
-          "max_iter=1000, min_iter=50, n_components=None, "
-          "num_dims='deprecated', preprocessor=None, random_state=None, "
-          "regularization=0.5, use_pca='deprecated', verbose=False)"))
+            "LMNN(convergence_tol=0.001, init=None, k=3, "
+            "learn_rate=1e-07, "
+            "max_iter=1000, min_iter=50, n_components=None, "
+            "num_dims='deprecated', preprocessor=None, random_state=None, "
+            "regularization=0.5, use_pca='deprecated', verbose=False)"))
 
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA())),
@@ -47,7 +47,7 @@ class TestStringRepr(unittest.TestCase):
     self.assertEqual(remove_spaces(str(metric_learn.ITML())),
                      remove_spaces("""
 ITML(A0='deprecated', convergence_threshold=0.001, gamma=1.0,
-   max_iter=1000, preprocessor=None, prior='identity', random_state=None, 
+   max_iter=1000, preprocessor=None, prior='identity', random_state=None,
    verbose=False)
 """))
     self.assertEqual(remove_spaces(str(metric_learn.ITML_Supervised())),
@@ -93,10 +93,10 @@ SDML_Supervised(balance_param=0.5, num_constraints=None,
                                    "preprocessor=None)"))
     self.assertEqual(remove_spaces(str(metric_learn.RCA_Supervised())),
                      remove_spaces(
-                       "RCA_Supervised(chunk_size=2, "
-                       "n_components=None, num_chunks=100, "
-                       "num_dims='deprecated', pca_comps='deprecated', "
-                       "preprocessor=None, random_state=None)"))
+                         "RCA_Supervised(chunk_size=2, "
+                         "n_components=None, num_chunks=100, "
+                         "num_dims='deprecated', pca_comps='deprecated', "
+                         "preprocessor=None, random_state=None)"))
 
   def test_mlkr(self):
     self.assertEqual(remove_spaces(str(metric_learn.MLKR())),

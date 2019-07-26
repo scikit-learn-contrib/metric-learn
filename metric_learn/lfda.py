@@ -113,15 +113,16 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     if self.k is None:
       k = min(7, d - 1)
     elif self.k >= d:
-      warnings.warn('Chosen k (%d) too large, using %d instead.' % (self.k,d-1))
+      warnings.warn('Chosen k (%d) too large, using %d instead.'
+                    % (self.k, d - 1))
       k = d - 1
     else:
       k = int(self.k)
-    tSb = np.zeros((d,d))
-    tSw = np.zeros((d,d))
+    tSb = np.zeros((d, d))
+    tSw = np.zeros((d, d))
 
     for c in xrange(num_classes):
-      Xc = X[y==c]
+      Xc = X[y == c]
       nc = Xc.shape[0]
 
       # classwise affinity matrix
@@ -132,14 +133,14 @@ class LFDA(MahalanobisMixin, TransformerMixin):
 
       local_scale = np.outer(sigma, sigma)
       with np.errstate(divide='ignore', invalid='ignore'):
-        A = np.exp(-dist/local_scale)
-        A[local_scale==0] = 0
+        A = np.exp(-dist / local_scale)
+        A[local_scale == 0] = 0
 
-      G = Xc.T.dot(A.sum(axis=0)[:,None] * Xc) - Xc.T.dot(A).dot(Xc)
-      tSb += G/n + (1-nc/n)*Xc.T.dot(Xc) + _sum_outer(Xc)/n
-      tSw += G/nc
+      G = Xc.T.dot(A.sum(axis=0)[:, None] * Xc) - Xc.T.dot(A).dot(Xc)
+      tSb += G / n + (1 - nc / n) * Xc.T.dot(Xc) + _sum_outer(Xc) / n
+      tSw += G / nc
 
-    tSb -= _sum_outer(X)/n - tSw
+    tSb -= _sum_outer(X) / n - tSw
 
     # symmetrize
     tSb = (tSb + tSb.T) / 2
@@ -148,7 +149,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     vals, vecs = _eigh(tSb, tSw, dim)
     order = np.argsort(-vals)[:dim]
     vals = vals[order].real
-    vecs = vecs[:,order]
+    vecs = vecs[:, order]
 
     if self.embedding_type == 'weighted':
        vecs *= np.sqrt(vals)

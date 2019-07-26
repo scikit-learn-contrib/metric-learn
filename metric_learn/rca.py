@@ -6,7 +6,6 @@ from __future__ import absolute_import
 import numpy as np
 import warnings
 from six.moves import xrange
-from sklearn import decomposition
 from sklearn.base import TransformerMixin
 from sklearn.exceptions import ChangedBehaviorWarning
 
@@ -123,20 +122,20 @@ psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
 
     if self.pca_comps != 'deprecated':
       warnings.warn(
-        '"pca_comps" parameter is not used. '
-        'It has been deprecated in version 0.5.0 and will be'
-        'removed in 0.6.0. RCA will not do PCA preprocessing anymore. If '
-        'you still want to do it, you could use '
-        '`sklearn.decomposition.PCA` and an `sklearn.pipeline.Pipeline`.',
-        DeprecationWarning)
+          '"pca_comps" parameter is not used. '
+          'It has been deprecated in version 0.5.0 and will be'
+          'removed in 0.6.0. RCA will not do PCA preprocessing anymore. If '
+          'you still want to do it, you could use '
+          '`sklearn.decomposition.PCA` and an `sklearn.pipeline.Pipeline`.',
+          DeprecationWarning)
 
     X, chunks = self._prepare_inputs(X, chunks, ensure_min_samples=2)
 
     warnings.warn(
-      "RCA will no longer center the data before training. If you want "
-      "to do some preprocessing, you should do it manually (you can also "
-      "use an `sklearn.pipeline.Pipeline` for instance). This warning "
-      "will disappear in version 0.6.0.", ChangedBehaviorWarning)
+        "RCA will no longer center the data before training. If you want "
+        "to do some preprocessing, you should do it manually (you can also "
+        "use an `sklearn.pipeline.Pipeline` for instance). This warning "
+        "will disappear in version 0.6.0.", ChangedBehaviorWarning)
 
     chunks = np.asanyarray(chunks, dtype=int)
     chunk_mask, chunked_data = _chunk_mean_centering(X, chunks)

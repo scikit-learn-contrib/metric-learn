@@ -58,7 +58,7 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
   def test_nca(self):
     n = self.X.shape[0]
-    nca = NCA(max_iter=(100000//n))
+    nca = NCA(max_iter=(100000 // n))
     nca.fit(self.X, self.y)
     L = nca.components_
     assert_array_almost_equal(L.T.dot(L), nca.get_mahalanobis_matrix())

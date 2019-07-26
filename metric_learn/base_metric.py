@@ -241,8 +241,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       The embedded data points.
     """
     X_checked = check_input(X, type_of_inputs='classic', estimator=self,
-                             preprocessor=self.preprocessor_,
-                             accept_sparse=True)
+                            preprocessor=self.preprocessor_,
+                            accept_sparse=True)
     return X_checked.dot(self.components_.T)
 
   def get_metric(self):
