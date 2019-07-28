@@ -15,6 +15,7 @@ from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.validation import check_X_y
 try:
   from inverse_covariance import quic
+  assert(quic)
 except ImportError:
   HAS_SKGGM = False
 else:
