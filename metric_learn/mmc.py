@@ -31,6 +31,7 @@ class _BaseMMC(MahalanobisMixin):
     self.random_state = random_state
     super(_BaseMMC, self).__init__(preprocessor)
 
+
   def _fit(self, pairs, y):
     if self.A0 != 'deprecated':
       warnings.warn('"A0" parameter is not used.'
