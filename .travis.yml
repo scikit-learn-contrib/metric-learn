@@ -17,7 +17,8 @@ before_install:
     fi
 script:
   # we run flake8 to ensure syntax (no need to run it on every version)
-  - if [[ $TRAVIS_PYTHON_VERSION == "3.7" ]]; then flake8 --ignore=E111,E114;
+  - if [[ $TRAVIS_PYTHON_VERSION == "3.7" ]];
+      then flake8 --ignore=E111,E114,W504;
     fi
   # we do coverage for all versions so that codecov will merge them: this
   # way we will see that both paths (with or without skggm) are tested

@@ -129,7 +129,7 @@ class _BaseSDML(MahalanobisMixin):
 
 
 class SDML(_BaseSDML, _PairsClassifierMixin):
-  """Sparse Distance Metric Learning (SDML)
+  r"""Sparse Distance Metric Learning (SDML)
 
   SDML is an efficient sparse metric learning in high-dimensional space via
   double regularization: an L1-penalization on the off-diagonal elements of the

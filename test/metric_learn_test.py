@@ -464,8 +464,8 @@ def test_loss_func(capsys):
     out, _ = capsys.readouterr()
     lines = re.split("\n+", out)
     # we get every variable that is printed from the algorithm in verbose
-    num = '(-?\d+.?\d*(e[+|-]\d+)?)'
-    strings = [re.search("\d+ (?:{}) (?:{}) (?:(\d+)) (?:{})"
+    num = r'(-?\d+.?\d*(e[+|-]\d+)?)'
+    strings = [re.search(r"\d+ (?:{}) (?:{}) (?:(\d+)) (?:{})"
                          .format(num, num, num), s) for s in lines]
     objectives[name] = [float(match.group(1)) for match in strings if match is
                         not None]
@@ -553,7 +553,7 @@ def test_no_twice_same_objective(capsys):
   # number), and which is followed by a (signed) float (delta obj). It
   # matches for instance:
   # 3 **1113.7665747189938** -3.182774197440267 46431.0200999999999998e-06
-  objectives = [re.search("\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
+  objectives = [re.search(r"\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
                 for s in lines]
   objectives = [match.group(1) for match in objectives if match is not None]
   # we remove the last element because it can be equal to the penultimate
@@ -1388,10 +1388,10 @@ def test_verbose(algo_class, dataset, capsys):
   for line in lines[3:-2]:
     # The following regex will match for instance:
     # '[NCA]          0         6.988936e+01       0.01'
-    assert re.match("\[" + algo_class.__name__ + "\]\ *\d+\ *\d\.\d{6}e[+|-]"
-                    "\d+\ *\d+\.\d{2}", line)
-  assert re.match("\[" + algo_class.__name__ + "\] Training took\ *"
-                  "\d+\.\d{2}s\.", lines[-2])
+    assert re.match(r"\[" + algo_class.__name__ + r"\]\ *\d+\ *\d\.\d{6}e[+|-]"
+                    r"\d+\ *\d+\.\d{2}", line)
+  assert re.match(r"\[" + algo_class.__name__ + r"\] Training took\ *"
+                  r"\d+\.\d{2}s\.", lines[-2])
   assert lines[-1] == ''
 
 

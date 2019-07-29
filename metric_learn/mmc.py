@@ -254,7 +254,7 @@ class _BaseMMC(MahalanobisMixin):
     return self
 
   def _fD(self, neg_pairs, A):
-    """The value of the dissimilarity constraint function.
+    r"""The value of the dissimilarity constraint function.
 
     f = f(\sum_{ij \in D} distance(x_i, x_j))
     i.e. distance can be L1:  \sqrt{(x_i-x_j)A(x_i-x_j)'}
@@ -264,7 +264,7 @@ class _BaseMMC(MahalanobisMixin):
                   1e-6)
 
   def _fD1(self, neg_pairs, A):
-    """The gradient of the dissimilarity constraint function w.r.t. A.
+    r"""The gradient of the dissimilarity constraint function w.r.t. A.
 
     For example, let distance by L1 norm:
     f = f(\sum_{ij \in D} \sqrt{(x_i-x_j)A(x_i-x_j)'})
@@ -287,7 +287,7 @@ class _BaseMMC(MahalanobisMixin):
     return sum_deri / (sum_dist + 1e-6)
 
   def _fS1(self, pos_pairs, A):
-    """The gradient of the similarity constraint function w.r.t. A.
+    r"""The gradient of the similarity constraint function w.r.t. A.
 
     f = \sum_{ij}(x_i-x_j)A(x_i-x_j)' = \sum_{ij}d_ij*A*d_ij'
     df/dA = d(d_ij*A*d_ij')/dA

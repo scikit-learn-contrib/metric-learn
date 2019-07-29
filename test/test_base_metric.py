@@ -9,7 +9,7 @@ from test.test_utils import ids_metric_learners, metric_learners
 
 
 def remove_spaces(s):
-  return re.sub('\s+', '', s)
+  return re.sub(r'\s+', '', s)
 
 
 class TestStringRepr(unittest.TestCase):
