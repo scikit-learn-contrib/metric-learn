@@ -122,5 +122,7 @@ check_files() {
     git diff --unified=0 $COMMIT_RANGE | flake8 --diff --show-source --extend-ignore=E111,E114
 }
 
+check_files
+
 echo -e "No problem detected by flake8\n"
 
