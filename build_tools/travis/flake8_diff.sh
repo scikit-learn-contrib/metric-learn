@@ -1,3 +1,6 @@
+# This file is not used yet but we keep it in case we need to check the pep8 difference
+# on the diff (see .travis.yml)
+#
 #!/bin/bash
 # copied-pasted and adapted from http://github.com/sklearn-contrib/imbalanced-learn
 # (more precisely: https://raw.githubusercontent.com/glemaitre/imbalanced-learn
@@ -116,6 +119,9 @@ echo -e '\nRunning flake8 on the diff in the range' "$COMMIT_RANGE" \
      "($(git rev-list $COMMIT_RANGE | wc -l) commit(s)):"
 echo '--------------------------------------------------------------------------------'
 
+# to not include the context (some lines before and after the modified lines), add the
+# flag --unified=0 (warning: it will not include some errors like for instance adding too
+# much blank lines
 check_files() {
     git diff $COMMIT_RANGE | flake8 --diff --show-source --extend-ignore=E111,E114
 }
