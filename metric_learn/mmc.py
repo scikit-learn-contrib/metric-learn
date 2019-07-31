@@ -20,7 +20,7 @@ class _BaseMMC(MahalanobisMixin):
                init=None, A0='deprecated', diagonal=False,
                diagonal_c=1.0, verbose=False, preprocessor=None,
                random_state=None):
-    self.max_iter  = max_iter
+    self.max_iter = max_iter
     self.max_proj = max_proj
     self.convergence_threshold = convergence_threshold
     self.init = init
@@ -30,7 +30,6 @@ class _BaseMMC(MahalanobisMixin):
     self.verbose = verbose
     self.random_state = random_state
     super(_BaseMMC, self).__init__(preprocessor)
-
 
   def _fit(self, pairs, y):
     if self.A0 != 'deprecated':
