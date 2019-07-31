@@ -14,6 +14,7 @@ matrix:
     script:
       - pytest test --cov;
     after_success:
+      - bash <(curl -s https://codecov.io/bash)
   - name: "Pytest python 3.4 without skggm"
     python: "3.4"
     before_install:
