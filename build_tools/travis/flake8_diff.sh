@@ -117,9 +117,7 @@ echo -e '\nRunning flake8 on the diff in the range' "$COMMIT_RANGE" \
 echo '--------------------------------------------------------------------------------'
 
 check_files() {
-    # Conservative approach: diff without context (--unified=0) so that code
-    # that was not changed does not create failures
-    git diff --unified=0 $COMMIT_RANGE | flake8 --diff --show-source --extend-ignore=E111,E114
+    git diff $COMMIT_RANGE | flake8 --diff --show-source --extend-ignore=E111,E114
 }
 
 check_files
