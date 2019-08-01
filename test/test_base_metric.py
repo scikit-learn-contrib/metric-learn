@@ -16,7 +16,7 @@ class TestStringRepr(unittest.TestCase):
 
   def test_covariance(self):
     self.assertEqual(remove_spaces(str(metric_learn.Covariance())),
-                     remove_spaces("XXXCovariance(preprocessor=None)"))
+                     remove_spaces("Covariance(preprocessor=None)"))
 
   def test_lmnn(self):
     self.assertEqual(

@@ -94,7 +94,7 @@ class _BaseSDML(MahalanobisMixin):
     try:
       if HAS_SKGGM:
         theta0 = pinvh(sigma0)
-        M, _, _, _, _, _ = quic(emp_cov, lam=self.sparsity_param,
+        M, _, _, _, _, _ = quic(emp_cov, nothing=self.sparsity_param,
                                 msg=self.verbose,
                                 Theta0=theta0, Sigma0=sigma0)
       else:
