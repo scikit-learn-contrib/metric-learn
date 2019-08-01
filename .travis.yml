@@ -9,7 +9,7 @@ matrix:
     before_install:
       - sudo apt-get install liblapack-dev
       - pip install --upgrade pip pytest
-      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn flake8
+      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
       - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
     script:
       - pytest test --cov;
@@ -19,7 +19,7 @@ matrix:
     before_install:
       - sudo apt-get install liblapack-dev
       - pip install --upgrade pip pytest
-      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn flake8
+      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
     script:
       - pytest test --cov;
       - bash <(curl -s https://codecov.io/bash)
@@ -28,7 +28,7 @@ matrix:
     before_install:
       - sudo apt-get install liblapack-dev
       - pip install --upgrade pip pytest
-      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn flake8
+      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
       - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
     script:
       - pytest test --cov;
@@ -38,12 +38,12 @@ matrix:
     before_install:
       - sudo apt-get install liblapack-dev
       - pip install --upgrade pip pytest
-      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn flake8
+      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
       - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
     script:
       - pytest test --cov;
       - bash <(curl -s https://codecov.io/bash)
-  - name: "Syntax checking"
+  - name: "Syntax checking with flake8"
     python: "3.7"
     before_install:
       - pip install flake8
