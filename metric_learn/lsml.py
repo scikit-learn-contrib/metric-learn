@@ -55,9 +55,10 @@ class _BaseLSML(MahalanobisMixin):
       prior = 'identity'
     else:
       prior = self.prior
-    M, prior_inv = _initialize_metric_mahalanobis(quadruplets, prior,
-       return_inverse=True, strict_pd=True, matrix_name='prior',
-       random_state=self.random_state)
+    M, prior_inv = _initialize_metric_mahalanobis(
+        quadruplets, prior,
+        return_inverse=True, strict_pd=True, matrix_name='prior',
+        random_state=self.random_state)
 
     step_sizes = np.logspace(-10, 0, 10)
     # Keep track of the best step size and the loss at that step.
@@ -65,7 +66,7 @@ class _BaseLSML(MahalanobisMixin):
     s_best = self._total_loss(M, vab, vcd, prior_inv)
     if self.verbose:
       print('initial loss', s_best)
-    for it in xrange(1, self.max_iter+1):
+    for it in xrange(1, self.max_iter + 1):
       grad = self._gradient(M, vab, vcd, prior_inv)
       grad_norm = scipy.linalg.norm(grad)
       if grad_norm < self.tol:
@@ -117,8 +118,8 @@ class _BaseLSML(MahalanobisMixin):
     # TODO: vectorize
     for vab, dab, vcd, dcd in zip(vab[violations], dabs[violations],
                                   vcd[violations], dcds[violations]):
-      dMetric += ((1-np.sqrt(dcd/dab))*np.outer(vab, vab) +
-                  (1-np.sqrt(dab/dcd))*np.outer(vcd, vcd))
+      dMetric += ((1 - np.sqrt(dcd / dab)) * np.outer(vab, vab) +
+                  (1 - np.sqrt(dab / dcd)) * np.outer(vcd, vcd))
     return dMetric
 
 

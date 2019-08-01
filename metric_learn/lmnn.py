@@ -235,8 +235,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
         # we copy variables that can be modified by _loss_grad, because if we
         # retry we don t want to modify them several times
         (G_next, objective_next, total_active_next) = (
-          self._loss_grad(X, L_next, dfG, k, reg, target_neighbors,
-                          label_inds))
+            self._loss_grad(X, L_next, dfG, k, reg, target_neighbors,
+                            label_inds))
         assert not np.isnan(objective)
         delta_obj = objective_next - objective
         if delta_obj > 0:
@@ -329,15 +329,15 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       in_inds, = np.nonzero(label_inds == label)
       out_inds, = np.nonzero(label_inds > label)
       dist = euclidean_distances(Lx[out_inds], Lx[in_inds], squared=True)
-      i1,j1 = np.nonzero(dist < margin_radii[out_inds][:,None])
-      i2,j2 = np.nonzero(dist < margin_radii[in_inds])
-      i = np.hstack((i1,i2))
-      j = np.hstack((j1,j2))
+      i1, j1 = np.nonzero(dist < margin_radii[out_inds][:, None])
+      i2, j2 = np.nonzero(dist < margin_radii[in_inds])
+      i = np.hstack((i1, i2))
+      j = np.hstack((j1, j2))
       if i.size > 0:
         # get unique (i,j) pairs using index trickery
-        shape = (i.max()+1, j.max()+1)
-        tmp = np.ravel_multi_index((i,j), shape)
-        i,j = np.unravel_index(np.unique(tmp), shape)
+        shape = (i.max() + 1, j.max() + 1)
+        tmp = np.ravel_multi_index((i, j), shape)
+        i, j = np.unravel_index(np.unique(tmp), shape)
       impostors.append(np.vstack((in_inds[j], out_inds[i])))
     if len(impostors) == 0:
         # No impostors detected
@@ -352,19 +352,19 @@ def _inplace_paired_L2(A, B):
 
 
 def _count_edges(act1, act2, impostors, targets):
-  imp = impostors[0,act1]
+  imp = impostors[0, act1]
   c = Counter(zip(imp, targets[imp]))
-  imp = impostors[1,act2]
+  imp = impostors[1, act2]
   c.update(zip(imp, targets[imp]))
   if c:
     active_pairs = np.array(list(c.keys()))
   else:
-    active_pairs = np.empty((0,2), dtype=int)
+    active_pairs = np.empty((0, 2), dtype=int)
   return active_pairs, np.array(list(c.values()))
 
 
 def _sum_outer_products(data, a_inds, b_inds, weights=None):
   Xab = data[a_inds] - data[b_inds]
   if weights is not None:
-    return np.dot(Xab.T, Xab * weights[:,None])
+    return np.dot(Xab.T, Xab * weights[:, None])
   return np.dot(Xab.T, Xab)

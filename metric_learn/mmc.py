@@ -77,7 +77,7 @@ class _BaseMMC(MahalanobisMixin):
     """
     num_dim = pairs.shape[2]
 
-    error1 = error2 = 1e10
+    error2 = 1e10
     eps = 0.01        # error-bound of iterative projection on C1 and C2
     A = self.A_
 
@@ -105,7 +105,8 @@ class _BaseMMC(MahalanobisMixin):
     # constraint function
     grad2 = self._fD1(neg_pairs, A)            # gradient of dissimilarity
     # constraint function
-    M = self._grad_projection(grad1, grad2)  # gradient of fD1 orthogonal to fS1
+    # gradient of fD1 orthogonal to fS1:
+    M = self._grad_projection(grad1, grad2)
 
     A_old = A.copy()
 
@@ -133,7 +134,7 @@ class _BaseMMC(MahalanobisMixin):
         # PSD constraint A >= 0
         # project A onto domain A>0
         l, V = np.linalg.eigh((A + A.T) / 2)
-        A[:] = np.dot(V * np.maximum(0, l[None,:]), V.T)
+        A[:] = np.dot(V * np.maximum(0, l[None, :]), V.T)
 
         fDC2 = w.dot(A.ravel())
         error2 = (fDC2 - t) / t
@@ -172,7 +173,8 @@ class _BaseMMC(MahalanobisMixin):
       if delta < self.convergence_threshold:
         break
       if self.verbose:
-        print('mmc iter: %d, conv = %f, projections = %d' % (cycle, delta, it+1))
+        print('mmc iter: %d, conv = %f, projections = %d' %
+              (cycle, delta, it + 1))
 
     if delta > self.convergence_threshold:
       self.converged_ = False
@@ -214,8 +216,10 @@ class _BaseMMC(MahalanobisMixin):
       obj_initial = np.dot(s_sum, w) + self.diagonal_c * fD0
       fS_1st_d = s_sum  # first derivative of the similarity constraints
 
-      gradient = fS_1st_d - self.diagonal_c * fD_1st_d               # gradient of the objective
-      hessian = -self.diagonal_c * fD_2nd_d + eps * np.eye(num_dim)  # Hessian of the objective
+      # gradient of the objective:
+      gradient = fS_1st_d - self.diagonal_c * fD_1st_d
+      # Hessian of the objective:
+      hessian = -self.diagonal_c * fD_2nd_d + eps * np.eye(num_dim)
       step = np.dot(np.linalg.inv(hessian), gradient)
 
       # Newton-Rapshon update
@@ -250,16 +254,17 @@ class _BaseMMC(MahalanobisMixin):
     return self
 
   def _fD(self, neg_pairs, A):
-    """The value of the dissimilarity constraint function.
+    r"""The value of the dissimilarity constraint function.
 
     f = f(\sum_{ij \in D} distance(x_i, x_j))
     i.e. distance can be L1:  \sqrt{(x_i-x_j)A(x_i-x_j)'}
     """
     diff = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
-    return np.log(np.sum(np.sqrt(np.sum(np.dot(diff, A) * diff, axis=1))) + 1e-6)
+    return np.log(np.sum(np.sqrt(np.sum(np.dot(diff, A) * diff, axis=1))) +
+                  1e-6)
 
   def _fD1(self, neg_pairs, A):
-    """The gradient of the dissimilarity constraint function w.r.t. A.
+    r"""The gradient of the dissimilarity constraint function w.r.t. A.
 
     For example, let distance by L1 norm:
     f = f(\sum_{ij \in D} \sqrt{(x_i-x_j)A(x_i-x_j)'})
@@ -270,19 +275,19 @@ class _BaseMMC(MahalanobisMixin):
         df/dA = f'(\sum_{ij \in D} \sqrt{tr(d_ij'*d_ij*A)})
                 * 0.5*(\sum_{ij \in D} (1/sqrt{tr(d_ij'*d_ij*A)})*(d_ij'*d_ij))
     """
-    dim = neg_pairs.shape[2]
     diff = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
     # outer products of all rows in `diff`
     M = np.einsum('ij,ik->ijk', diff, diff)
     # faster version of: dist = np.sqrt(np.sum(M * A[None,:,:], axis=(1,2)))
     dist = np.sqrt(np.einsum('ijk,jk', M, A))
-    # faster version of: sum_deri = np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis=0)
+    # faster version of: sum_deri = np.sum(M /
+    # (2 * (dist[:,None,None] + 1e-6)), axis=0)
     sum_deri = np.einsum('ijk,i->jk', M, 0.5 / (dist + 1e-6))
     sum_dist = dist.sum()
     return sum_deri / (sum_dist + 1e-6)
 
   def _fS1(self, pos_pairs, A):
-    """The gradient of the similarity constraint function w.r.t. A.
+    r"""The gradient of the similarity constraint function w.r.t. A.
 
     f = \sum_{ij}(x_i-x_j)A(x_i-x_j)' = \sum_{ij}d_ij*A*d_ij'
     df/dA = d(d_ij*A*d_ij')/dA
@@ -290,9 +295,9 @@ class _BaseMMC(MahalanobisMixin):
     Note that d_ij*A*d_ij' = tr(d_ij*A*d_ij') = tr(d_ij'*d_ij*A)
     so, d(d_ij*A*d_ij')/dA = d_ij'*d_ij
     """
-    dim = pos_pairs.shape[2]
     diff = pos_pairs[:, 0, :] - pos_pairs[:, 1, :]
-    return np.einsum('ij,ik->jk', diff, diff)  # sum of outer products of all rows in `diff`
+    # sum of outer products of all rows in `diff`:
+    return np.einsum('ij,ik->jk', diff, diff)
 
   def _grad_projection(self, grad1, grad2):
     grad2 = grad2 / np.linalg.norm(grad2)
@@ -303,7 +308,7 @@ class _BaseMMC(MahalanobisMixin):
   def _D_objective(self, neg_pairs, w):
     return np.log(np.sum(np.sqrt(np.sum(((neg_pairs[:, 0, :] -
                                           neg_pairs[:, 1, :]) ** 2) *
-                                        w[None,:], axis=1) + 1e-6)))
+                                        w[None, :], axis=1) + 1e-6)))
 
   def _D_constraint(self, neg_pairs, w):
     """Compute the value, 1st derivative, second derivative (Hessian) of
@@ -317,13 +322,14 @@ class _BaseMMC(MahalanobisMixin):
     sum_deri2 = np.einsum(
         'ij,ik->jk',
         diff_sq,
-        diff_sq / (-4 * np.maximum(1e-6, dist**3))[:,None]
+        diff_sq / (-4 * np.maximum(1e-6, dist**3))[:, None]
     )
     sum_dist = dist.sum()
     return (
-      np.log(sum_dist),
-      sum_deri1 / sum_dist,
-      sum_deri2 / sum_dist - np.outer(sum_deri1, sum_deri1) / (sum_dist * sum_dist)
+        np.log(sum_dist),
+        sum_deri1 / sum_dist,
+        sum_deri2 / sum_dist -
+        np.outer(sum_deri1, sum_deri1) / (sum_dist * sum_dist)
     )
 
 

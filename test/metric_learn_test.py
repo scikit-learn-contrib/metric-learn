@@ -15,6 +15,7 @@ from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.validation import check_X_y
 try:
   from inverse_covariance import quic
+  assert(quic)
 except ImportError:
   HAS_SKGGM = False
 else:
@@ -32,9 +33,9 @@ def class_separation(X, labels):
   unique_labels, label_inds = np.unique(labels, return_inverse=True)
   ratio = 0
   for li in xrange(len(unique_labels)):
-    Xc = X[label_inds==li]
-    Xnc = X[label_inds!=li]
-    ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc,Xnc).mean()
+    Xc = X[label_inds == li]
+    Xnc = X[label_inds != li]
+    ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc, Xnc).mean()
   return ratio / len(unique_labels)
 
 
@@ -434,7 +435,7 @@ def test_loss_func(capsys):
 
     def _loss_grad(self, *args, **kwargs):
       grad, objective, total_active = (
-        super(LMNN_with_callback, self)._loss_grad(*args, **kwargs))
+          super(LMNN_with_callback, self)._loss_grad(*args, **kwargs))
       self.callback.append(grad)
       return grad, objective, total_active
 
@@ -463,18 +464,18 @@ def test_loss_func(capsys):
     out, _ = capsys.readouterr()
     lines = re.split("\n+", out)
     # we get every variable that is printed from the algorithm in verbose
-    num = '(-?\d+.?\d*(e[+|-]\d+)?)'
-    strings = [re.search("\d+ (?:{}) (?:{}) (?:(\d+)) (?:{})"
+    num = r'(-?\d+.?\d*(e[+|-]\d+)?)'
+    strings = [re.search(r"\d+ (?:{}) (?:{}) (?:(\d+)) (?:{})"
                          .format(num, num, num), s) for s in lines]
     objectives[name] = [float(match.group(1)) for match in strings if match is
                         not None]
     obj_diffs[name] = [float(match.group(3)) for match in strings if match is
-                             not None]
+                       not None]
     total_active[name] = [float(match.group(5)) for match in strings if
                           match is not
                           None]
     learn_rate[name] = [float(match.group(6)) for match in strings if match is
-                      not None]
+                        not None]
     assert len(strings) >= 10  # we ensure that we actually did more than 10
     # iterations
     assert total_active[name][0] >= 2  # we ensure that we have some active
@@ -512,16 +513,14 @@ def test_toy_ex_lmnn(X, y, loss):
   lmnn.components_ = np.eye(n_components)
 
   target_neighbors = lmnn._select_targets(X, label_inds)
-  impostors = lmnn._find_impostors(target_neighbors[:, -1], X, label_inds, L)
 
   # sum outer products
   dfG = _sum_outer_products(X, target_neighbors.flatten(),
                             np.repeat(np.arange(X.shape[0]), k))
-  df = np.zeros_like(dfG)
 
   # storage
-  a1 = [None]*k
-  a2 = [None]*k
+  a1 = [None] * k
+  a2 = [None] * k
   for nn_idx in xrange(k):
     a1[nn_idx] = np.array([])
     a2[nn_idx] = np.array([])
@@ -529,6 +528,7 @@ def test_toy_ex_lmnn(X, y, loss):
   #  assert that the loss equals the one computed by hand
   assert lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, k,
                          reg, target_neighbors, label_inds)[1] == loss
+
 
 def test_convergence_simple_example(capsys):
   # LMNN should converge on this simple example, which it did not with
@@ -553,7 +553,7 @@ def test_no_twice_same_objective(capsys):
   # number), and which is followed by a (signed) float (delta obj). It
   # matches for instance:
   # 3 **1113.7665747189938** -3.182774197440267 46431.0200999999999998e-06
-  objectives = [re.search("\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
+  objectives = [re.search(r"\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
                 for s in lines]
   objectives = [match.group(1) for match in objectives if match is not None]
   # we remove the last element because it can be equal to the penultimate
@@ -1241,9 +1241,9 @@ def test_deprecation_num_dims_mlkr(num_dims):
 class TestMMC(MetricTestCase):
   def test_iris(self):
 
-    # Generate full set of constraints for comparison with reference implementation
-    n = self.iris_points.shape[0]
-    mask = (self.iris_labels[None] == self.iris_labels[:,None])
+    # Generate full set of constraints for comparison with reference
+    # implementation
+    mask = self.iris_labels[None] == self.iris_labels[:, None]
     a, b = np.nonzero(np.triu(mask, k=1))
     c, d = np.nonzero(np.triu(~mask, k=1))
 
@@ -1260,7 +1260,7 @@ class TestMMC(MetricTestCase):
 
     # Diagonal metric
     mmc = MMC(diagonal=True)
-    mmc.fit(*wrap_pairs(self.iris_points, [a,b,c,d]))
+    mmc.fit(*wrap_pairs(self.iris_points, [a, b, c, d]))
     expected = [0, 0, 1.210220, 1.228596]
     assert_array_almost_equal(np.diag(expected), mmc.get_mahalanobis_matrix(),
                               decimal=6)
@@ -1270,7 +1270,7 @@ class TestMMC(MetricTestCase):
     mmc.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mmc.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.15)
-    
+
     # Supervised Diagonal
     mmc = MMC_Supervised(diagonal=True)
     mmc.fit(self.iris_points, self.iris_labels)
@@ -1388,10 +1388,10 @@ def test_verbose(algo_class, dataset, capsys):
   for line in lines[3:-2]:
     # The following regex will match for instance:
     # '[NCA]          0         6.988936e+01       0.01'
-    assert re.match("\[" + algo_class.__name__ + "\]\ *\d+\ *\d\.\d{6}e[+|-]"
-                    "\d+\ *\d+\.\d{2}", line)
-  assert re.match("\[" + algo_class.__name__ + "\] Training took\ *"
-                  "\d+\.\d{2}s\.", lines[-2])
+    assert re.match(r"\[" + algo_class.__name__ + r"\]\ *\d+\ *\d\.\d{6}e[+|-]"
+                    r"\d+\ *\d+\.\d{2}", line)
+  assert re.match(r"\[" + algo_class.__name__ + r"\] Training took\ *"
+                  r"\d+\.\d{2}s\.", lines[-2])
   assert lines[-1] == ''
 
 

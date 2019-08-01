@@ -68,9 +68,10 @@ class _BaseSDML(MahalanobisMixin):
       prior = 'identity'
     else:
       prior = self.prior
-    _, prior_inv = _initialize_metric_mahalanobis(pairs, prior,
-       return_inverse=True, strict_pd=True, matrix_name='prior',
-       random_state=self.random_state)
+    _, prior_inv = _initialize_metric_mahalanobis(
+        pairs, prior,
+        return_inverse=True, strict_pd=True, matrix_name='prior',
+        random_state=self.random_state)
     diff = pairs[:, 0] - pairs[:, 1]
     loss_matrix = (diff.T * y).dot(diff)
     emp_cov = prior_inv + self.balance_param * loss_matrix
@@ -128,7 +129,7 @@ class _BaseSDML(MahalanobisMixin):
 
 
 class SDML(_BaseSDML, _PairsClassifierMixin):
-  """Sparse Distance Metric Learning (SDML)
+  r"""Sparse Distance Metric Learning (SDML)
 
   SDML is an efficient sparse metric learning in high-dimensional space via
   double regularization: an L1-penalization on the off-diagonal elements of the

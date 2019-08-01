@@ -63,7 +63,7 @@ class _BaseITML(MahalanobisMixin):
     num_neg = len(neg_pairs)
     _lambda = np.zeros(num_pos + num_neg)
     lambdaold = np.zeros_like(_lambda)
-    gamma_proj = 1. if gamma is np.inf else gamma/(gamma+1.)
+    gamma_proj = 1. if gamma is np.inf else gamma / (gamma + 1.)
     pos_bhat = np.zeros(num_pos) + self.bounds_[0]
     neg_bhat = np.zeros(num_neg) + self.bounds_[1]
     pos_vv = pos_pairs[:, 0, :] - pos_pairs[:, 1, :]
@@ -71,22 +71,23 @@ class _BaseITML(MahalanobisMixin):
 
     for it in xrange(self.max_iter):
       # update positives
-      for i,v in enumerate(pos_vv):
+      for i, v in enumerate(pos_vv):
         wtw = v.dot(A).dot(v)  # scalar
-        alpha = min(_lambda[i], gamma_proj*(1./wtw - 1./pos_bhat[i]))
+        alpha = min(_lambda[i], gamma_proj * (1. / wtw - 1. / pos_bhat[i]))
         _lambda[i] -= alpha
-        beta = alpha/(1 - alpha*wtw)
-        pos_bhat[i] = 1./((1 / pos_bhat[i]) + (alpha / gamma))
+        beta = alpha / (1 - alpha * wtw)
+        pos_bhat[i] = 1. / ((1 / pos_bhat[i]) + (alpha / gamma))
         Av = A.dot(v)
         A += np.outer(Av, Av * beta)
 
       # update negatives
-      for i,v in enumerate(neg_vv):
+      for i, v in enumerate(neg_vv):
         wtw = v.dot(A).dot(v)  # scalar
-        alpha = min(_lambda[i+num_pos], gamma_proj*(1./neg_bhat[i] - 1./wtw))
-        _lambda[i+num_pos] -= alpha
-        beta = -alpha/(1 + alpha*wtw)
-        neg_bhat[i] = 1./((1 / neg_bhat[i]) - (alpha / gamma))
+        alpha = min(_lambda[i + num_pos],
+                    gamma_proj * (1. / neg_bhat[i] - 1. / wtw))
+        _lambda[i + num_pos] -= alpha
+        beta = -alpha / (1 + alpha * wtw)
+        neg_bhat[i] = 1. / ((1 / neg_bhat[i]) - (alpha / gamma))
         Av = A.dot(v)
         A += np.outer(Av, Av * beta)
 

@@ -163,7 +163,7 @@ class MetricTransformer(six.with_metaclass(ABCMeta)):
 
 class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
                                           MetricTransformer)):
-  """Mahalanobis metric learning algorithms.
+  r"""Mahalanobis metric learning algorithms.
 
   Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x')`,
   defined between two column vectors :math:`x` and :math:`x'` by: :math:`d_M(x,
@@ -182,7 +182,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   """
 
   def score_pairs(self, pairs):
-    """Returns the learned Mahalanobis distance between pairs.
+    r"""Returns the learned Mahalanobis distance between pairs.
 
     This distance is defined as: :math:`d_M(x, x') = \sqrt{(x-x')^T M (x-x')}`
     where ``M`` is the learned Mahalanobis matrix, for every pair of points
@@ -241,8 +241,8 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       The embedded data points.
     """
     X_checked = check_input(X, type_of_inputs='classic', estimator=self,
-                             preprocessor=self.preprocessor_,
-                             accept_sparse=True)
+                            preprocessor=self.preprocessor_,
+                            accept_sparse=True)
     return X_checked.dot(self.components_.T)
 
   def get_metric(self):

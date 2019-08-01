@@ -3,7 +3,6 @@ from collections import namedtuple
 import numpy as np
 from numpy.testing import assert_array_equal, assert_equal
 from sklearn.model_selection import train_test_split
-from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_random_state, shuffle
 from sklearn.utils.testing import set_random_state
 from sklearn.base import clone
@@ -963,6 +962,7 @@ def test_check_collapsed_pairs_raises_error():
   assert str(e.value) == ("2 collapsed pairs found (where the left element is "
                           "the same as the right element), out of 3 pairs in"
                           " total.")
+
 
 def test__validate_vector():
   """Replica of scipy.spatial.tests.test_distance.test__validate_vector"""

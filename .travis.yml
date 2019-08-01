@@ -1,27 +1,57 @@
 language: python
 sudo: false
 cache: pip
-python:
-  - "2.7"
-  - "3.4"
-  - "3.6"
-before_install:
-  - sudo apt-get install liblapack-dev
-  - pip install --upgrade pip pytest
-  - pip install wheel cython numpy scipy codecov pytest-cov
-  - if $TRAVIS_PYTHON_VERSION == "3.6"; then
-        pip install scikit-learn;
-    else
-        pip install scikit-learn==0.20.3;
-    fi
-  - if [[ ($TRAVIS_PYTHON_VERSION == "3.6") ||
-          ($TRAVIS_PYTHON_VERSION == "2.7")]]; then
-              pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
-    fi
-script:
-  # we do coverage for all versions so that codecov will merge them: this
-  # way we will see that both paths (with or without skggm) are tested
-  - pytest test --cov;
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
-
+language: python
+matrix:
+  include:
+  - name: "Pytest python 2.7 with skggm"
+    python: "2.7"
+    before_install:
+      - sudo apt-get install liblapack-dev
+      - pip install --upgrade pip pytest
+      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
+      - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
+    script:
+      - pytest test --cov;
+    after_success:
+      - bash <(curl -s https://codecov.io/bash)
+  - name: "Pytest python 3.4 without skggm"
+    python: "3.4"
+    before_install:
+      - sudo apt-get install liblapack-dev
+      - pip install --upgrade pip pytest
+      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
+    script:
+      - pytest test --cov;
+    after_success:
+      - bash <(curl -s https://codecov.io/bash)
+  - name: "Pytest python 3.6 with skggm"
+    python: "3.6"
+    before_install:
+      - sudo apt-get install liblapack-dev
+      - pip install --upgrade pip pytest
+      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
+      - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
+    script:
+      - pytest test --cov;
+    after_success:
+      - bash <(curl -s https://codecov.io/bash)
+  - name: "Pytest python 3.7 with skggm"
+    python: "3.7"
+    before_install:
+      - sudo apt-get install liblapack-dev
+      - pip install --upgrade pip pytest
+      - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
+      - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
+    script:
+      - pytest test --cov;
+    after_success:
+      - bash <(curl -s https://codecov.io/bash)
+  - name: "Syntax checking with flake8"
+    python: "3.7"
+    before_install:
+      - pip install flake8
+    script:
+      - flake8 --extend-ignore=E111,E114 --show-source;
+      # Use this instead to have a syntax check only on the diff:
+      # - source ./build_tools/travis/flake8_diff.sh;
