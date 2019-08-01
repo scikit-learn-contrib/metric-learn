@@ -13,6 +13,7 @@ matrix:
       - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
     script:
       - pytest test --cov;
+    after_success:
       - bash <(curl -s https://codecov.io/bash)
   - name: "Pytest python 3.4 without skggm"
     python: "3.4"
@@ -22,6 +23,7 @@ matrix:
       - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
     script:
       - pytest test --cov;
+    after_success:
       - bash <(curl -s https://codecov.io/bash)
   - name: "Pytest python 3.6 with skggm"
     python: "3.6"
@@ -32,6 +34,7 @@ matrix:
       - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
     script:
       - pytest test --cov;
+    after_success:
       - bash <(curl -s https://codecov.io/bash)
   - name: "Pytest python 3.7 with skggm"
     python: "3.7"
@@ -42,6 +45,7 @@ matrix:
       - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
     script:
       - pytest test --cov;
+    after_success:
       - bash <(curl -s https://codecov.io/bash)
   - name: "Syntax checking with flake8"
     python: "3.7"
