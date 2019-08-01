@@ -1,3 +1,0 @@
-import nimp
-
-nimp.test()
