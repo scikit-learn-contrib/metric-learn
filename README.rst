@@ -3,7 +3,9 @@
 metric-learn
 =============
 
-Metric Learning algorithms in Python.
+Metric Learning algorithms in Python. 
+
+As part of `scikit-learn-contrib <https://github.com/scikit-learn-contrib>`_, the API of metric-learn is compatible with `scikit-learn <http://scikit-learn.org/stable/>`_, the leading library for machine learning in Python. This allows to use of all the scikit-learn routines (for pipelining, model selection, etc) with metric learning algorithms.
 
 **Algorithms**
 
@@ -42,13 +44,13 @@ package installed).
 See the `sphinx documentation`_ for full documentation about installation, API, usage, and examples.
 
 
-.. _sphinx documentation: http://metric-learn.github.io/metric-learn/
+.. _sphinx documentation: http://contrib.scikit-learn.org/metric-learn/
 
-.. |Travis-CI Build Status| image:: https://api.travis-ci.org/metric-learn/metric-learn.svg?branch=master
-   :target: https://travis-ci.org/metric-learn/metric-learn
+.. |Travis-CI Build Status| image:: https://api.travis-ci.org/scikit-learn-contrib/metric-learn.svg?branch=master
+   :target: https://travis-ci.org/scikit-learn-contrib/metric-learn
 .. |License| image:: http://img.shields.io/:license-mit-blue.svg?style=flat
    :target: http://badges.mit-license.org
 .. |PyPI version| image:: https://badge.fury.io/py/metric-learn.svg
    :target: http://badge.fury.io/py/metric-learn
-.. |Code coverage| image:: https://codecov.io/gh/metric-learn/metric-learn/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/metric-learn/metric-learn
+.. |Code coverage| image:: https://codecov.io/gh/scikit-learn-contrib/metric-learn/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/scikit-learn-contrib/metric-learn
