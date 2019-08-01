@@ -2,6 +2,9 @@ language: python
 sudo: false
 cache: pip
 language: python
+env:
+  global:
+    - SKGGM_VERSION=a0ed406586c4364ea3297a658f415e13b5cbdaf8
 matrix:
   include:
   - name: "Pytest python 2.7 with skggm"
@@ -10,7 +13,7 @@ matrix:
       - sudo apt-get install liblapack-dev
       - pip install --upgrade pip pytest
       - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
-      - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
+      - pip install git+https://github.com/skggm/skggm.git@${SKGGM_VERSION};
     script:
       - pytest test --cov;
     after_success:
@@ -31,7 +34,7 @@ matrix:
       - sudo apt-get install liblapack-dev
       - pip install --upgrade pip pytest
       - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
-      - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
+      - pip install git+https://github.com/skggm/skggm.git@${SKGGM_VERSION};
     script:
       - pytest test --cov;
     after_success:
@@ -42,7 +45,7 @@ matrix:
       - sudo apt-get install liblapack-dev
       - pip install --upgrade pip pytest
       - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
-      - pip install git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8;
+      - pip install git+https://github.com/skggm/skggm.git@${SKGGM_VERSION};
     script:
       - pytest test --cov;
     after_success:
