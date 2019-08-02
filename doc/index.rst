@@ -2,7 +2,7 @@ metric-learn: Metric Learning in Python
 =======================================
 |Travis-CI Build Status| |License| |PyPI version| |Code coverage|
 
-`Metric-learn <https://github.com/scikit-learn-contrib/metric-learn>`_
+`metric-learn <https://github.com/scikit-learn-contrib/metric-learn>`_
 contains efficient Python implementations of several popular supervised and
 weakly-supervised metric learning algorithms. As part of `scikit-learn-contrib
 <https://github.com/scikit-learn-contrib>`_, the API of metric-learn is compatible with `scikit-learn
