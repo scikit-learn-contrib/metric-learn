@@ -55,3 +55,6 @@ matrix:
       - flake8 --extend-ignore=E111,E114 --show-source;
       # Use this instead to have a syntax check only on the diff:
       # - source ./build_tools/travis/flake8_diff.sh;
+branches:
+  only:
+  - master
