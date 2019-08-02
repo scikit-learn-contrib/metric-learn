@@ -532,7 +532,7 @@ def test_toy_ex_lmnn(X, y, loss):
 
 def test_convergence_simple_example(capsys):
   # LMNN should converge on this simple example, which it did not with
-  # this issue: https://github.com/metric-learn/metric-learn/issues/88
+  # this issue: https://github.com/scikit-learn-contrib/metric-learn/issues/88
   X, y = make_classification(random_state=0)
   lmnn = LMNN(verbose=True)
   lmnn.fit(X, y)
@@ -542,7 +542,7 @@ def test_convergence_simple_example(capsys):
 
 def test_no_twice_same_objective(capsys):
   # test that the objective function never has twice the same value
-  # see https://github.com/metric-learn/metric-learn/issues/88
+  # see https://github.com/scikit-learn-contrib/metric-learn/issues/88
   X, y = make_classification(random_state=0)
   lmnn = LMNN(verbose=True)
   lmnn.fit(X, y)

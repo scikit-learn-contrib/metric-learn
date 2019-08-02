@@ -694,7 +694,7 @@ like:
 
 (This is actually intentional, for more details
 about that, see
-`this comment <https://github.com/metric-learn/metric-learn/pull/168#pullrequestreview-203730742>`_
+`this comment <https://github.com/scikit-learn-contrib/metric-learn/pull/168#pullrequestreview-203730742>`_
 on github.)
 
 However, quadruplets learners do have a default scoring function, which will

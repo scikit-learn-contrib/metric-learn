@@ -94,7 +94,7 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
     # matrix with all its coefficients very low (to check that the algorithm
     # does not consider it as a diagonal matrix)(non regression test for
-    # https://github.com/metric-learn/metric-learn/issues/175)
+    # https://github.com/scikit-learn-contrib/metric-learn/issues/175)
     M = np.diag([1e-15, 2e-16, 3e-15, 4e-16, 5e-15, 6e-16, 7e-15])
     M = P.dot(M).dot(P.T)
     L = components_from_metric(M)
