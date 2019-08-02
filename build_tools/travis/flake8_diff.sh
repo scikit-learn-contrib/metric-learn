@@ -23,7 +23,7 @@ set -e
 # pipefail is necessary to propagate exit codes
 set -o pipefail
 
-PROJECT=metric-learn/metric-learn
+PROJECT=scikit-learn-contrib/metric-learn
 PROJECT_URL=https://github.com/$PROJECT.git
 
 # Find the remote with the project name (upstream in most cases)

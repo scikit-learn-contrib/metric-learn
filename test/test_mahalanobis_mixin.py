@@ -573,8 +573,8 @@ def test_singular_covariance_init_or_prior(estimator, build_dataset):
     """Tests that when using the 'covariance' init or prior, it returns the
     appropriate error if the covariance matrix is singular, for algorithms
     that need a strictly PD prior or init (see
-    https://github.com/metric-learn/metric-learn/issues/202 and
-    https://github.com/metric-learn/metric-learn/pull/195#issuecomment
+    https://github.com/scikit-learn-contrib/metric-learn/issues/202 and
+    https://github.com/scikit-learn-contrib/metric-learn/pull/195#issuecomment
     -492332451)
     """
     matrices_to_set = []
@@ -618,8 +618,8 @@ def test_singular_array_init_or_prior(estimator, build_dataset, w0):
     """Tests that when using a custom array init (or prior), it returns the
     appropriate error if it is singular, for algorithms
     that need a strictly PD prior or init (see
-    https://github.com/metric-learn/metric-learn/issues/202 and
-    https://github.com/metric-learn/metric-learn/pull/195#issuecomment
+    https://github.com/scikit-learn-contrib/metric-learn/issues/202 and
+    https://github.com/scikit-learn-contrib/metric-learn/pull/195#issuecomment
     -492332451)
     """
     matrices_to_set = []

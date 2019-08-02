@@ -24,7 +24,7 @@ setup(name='metric-learn',
           'Nathalie Vauquier'
       ],
       author_email='ccarey@cs.umass.edu',
-      url='http://github.com/metric-learn/metric-learn',
+      url='http://github.com/scikit-learn-contrib/metric-learn',
       license='MIT',
       classifiers=[
           'Development Status :: 4 - Beta',
