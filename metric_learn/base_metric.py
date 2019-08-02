@@ -661,6 +661,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     # wrong order).
     return self.predict(quadruplets).mean() / 2 + 0.5
 
+
 def does_nothing():
     # this function does nothing
     pass
