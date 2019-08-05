@@ -222,7 +222,7 @@ automatically to ‘identity’ (this is to raise a warning if
 <dd><p class="first last">The initial Mahalanobis matrix will be a random SPD matrix of
 shape
 <code class="xref any docutils literal notranslate"><span class="pre">(n_features,</span> <span class="pre">n_features)</span></code>, generated using
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_spd_matrix.html#sklearn.datasets.make_spd_matrix" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_spd_matrix</span></code></a>.</p>
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_spd_matrix.html#sklearn.datasets.make_spd_matrix" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_spd_matrix</span></code></a>.</p>
 </dd>
 <dt>numpy array</dt>
 <dd><p class="first last">An SPD matrix of shape (n_features, n_features), that will
@@ -306,7 +306,7 @@ Xing, Jordan, Russell, Ng.</td></tr>
 <dt><strong>n_iter_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a></span></dt>
 <dd><p class="first last">The number of iterations the solver has run.</p>
 </dd>
-<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
 <dd><p class="first last">The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
 metric (See function <code class="xref any docutils literal notranslate"><span class="pre">components_from_metric</span></code>.)</p>
 </dd>
@@ -330,43 +330,40 @@ classified as dissimilar.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.calibrate_threshold" title="metric_learn.MMC.calibrate_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a>(pairs_valid,&nbsp;y_valid[,&nbsp;…])</td>
 <td>Decision threshold calibration for pairwise binary classification</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.check_preprocessor" title="metric_learn.MMC.check_preprocessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_preprocessor</span></code></a>()</td>
-<td>Initializes the preprocessor</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.decision_function" title="metric_learn.MMC.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.decision_function" title="metric_learn.MMC.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(pairs)</td>
 <td>Returns the decision function used to classify the pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.fit" title="metric_learn.MMC.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(pairs,&nbsp;y[,&nbsp;calibration_params])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.fit" title="metric_learn.MMC.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(pairs,&nbsp;y[,&nbsp;calibration_params])</td>
 <td>Learn the MMC model.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.get_mahalanobis_matrix" title="metric_learn.MMC.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.get_mahalanobis_matrix" title="metric_learn.MMC.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
 <td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.get_metric" title="metric_learn.MMC.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.get_metric" title="metric_learn.MMC.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
 <td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.get_params" title="metric_learn.MMC.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.get_params" title="metric_learn.MMC.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
 <td>Get parameters for this estimator.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.metric" title="metric_learn.MMC.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.metric" title="metric_learn.MMC.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
 <td>Deprecated.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.predict" title="metric_learn.MMC.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.predict" title="metric_learn.MMC.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(pairs)</td>
 <td>Predicts the learned metric between input pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.score" title="metric_learn.MMC.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(pairs,&nbsp;y)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.score" title="metric_learn.MMC.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(pairs,&nbsp;y)</td>
 <td>Computes score of pairs similarity prediction.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.score_pairs" title="metric_learn.MMC.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.score_pairs" title="metric_learn.MMC.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
 <td>Returns the learned Mahalanobis distance between pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.set_params" title="metric_learn.MMC.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.set_params" title="metric_learn.MMC.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
 <td>Set the parameters of this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.set_threshold" title="metric_learn.MMC.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(threshold)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.set_threshold" title="metric_learn.MMC.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(threshold)</td>
 <td>Sets the threshold of the metric learner to the given value <code class="xref any docutils literal notranslate"><span class="pre">threshold</span></code>.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.MMC.transform" title="metric_learn.MMC.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.MMC.transform" title="metric_learn.MMC.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
 <td>Embeds data points in the learned linear embedding space.</td>
 </tr>
 </tbody>
@@ -438,7 +435,7 @@ threshold. They must be +1 for positive pairs and -1 for negative pairs.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.21.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a></dt>
+<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.21.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a></dt>
 <dd>scikit-learn’s module for calibrating classifiers</dd>
 </dl>
 </div>
@@ -457,12 +454,6 @@ Clinical chemistry, 1993</td></tr>
 <tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>most of the code of this function is from scikit-learn’s PR #10117</td></tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="metric_learn.MMC.check_preprocessor">
-<code class="descname">check_preprocessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.MMC.check_preprocessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes the preprocessor</p>
 </dd></dl>
 
 <dl class="method">
@@ -488,7 +479,7 @@ preprocessor.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
+<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
 <dd><p class="first last">The predicted decision function value for each pair.</p>
 </dd>
 </dl>
@@ -545,7 +536,7 @@ given, <a class="reference internal" href="#metric_learn.MMC.calibrate_threshold
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
 <dd><p class="first last">The copy of the learned Mahalanobis matrix.</p>
 </dd>
 </dl>
@@ -657,7 +648,7 @@ preprocessor.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
+<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
 <dd><p class="first last">The predicted learned metric value between samples in every pair.</p>
 </dd>
 </dl>
@@ -812,14 +803,14 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
+<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
 <dd><p class="first last">The data points to embed.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
+<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
 <dd><p class="first last">The embedded data points.</p>
 </dd>
 </dl>
@@ -844,7 +835,7 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

@@ -186,7 +186,7 @@
   <div class="section" id="supervised-metric-learning">
 <h1>2. Supervised Metric Learning<a class="headerlink" href="#supervised-metric-learning" title="Permalink to this headline">¶</a></h1>
 <p>Supervised metric learning algorithms take as inputs points <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> and target
-labels <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>, and learn a distance matrix that make points from the same class
+labels <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>, and learn a distance matrix that make points from the same class
 (for classification) or with close target value (for regression) close to each
 other, and points from different classes or with distant target values far away
 from each other.</p>
@@ -196,10 +196,10 @@ from each other.</p>
 scikit-learn.</p>
 <div class="section" id="input-data">
 <h3>2.1.1. Input data<a class="headerlink" href="#input-data" title="Permalink to this headline">¶</a></h3>
-<p>In order to train a model, you need two <a class="reference external" href="https://scikit-learn .org/stable/glossary.html#term-array-like">array-like</a> objects, <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>. <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>
+<p>In order to train a model, you need two <a class="reference external" href="https://scikit-learn .org/stable/glossary.html#term-array-like">array-like</a> objects, <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>. <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>
 should be a 2D array-like of shape <code class="xref any docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_features)</span></code>, where
-<a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> is the number of points of your dataset and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-features" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">n_features</span></code></a> is the
-number of attributes describing each point. <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> should be a 1D
+<a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> is the number of points of your dataset and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-features" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_features</span></code></a> is the
+number of attributes describing each point. <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> should be a 1D
 array-like
 of shape <code class="xref any docutils literal notranslate"><span class="pre">(n_samples,)</span></code>, containing for each point in <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> the class it
 belongs to (or the value to regress for this sample, if you use <a class="reference internal" href="#mlkr"><span class="std std-ref">MLKR</span></a> for
@@ -277,12 +277,12 @@ matrix using <a class="reference internal" href="generated/metric_learn.Covarian
 <div class="section" id="scikit-learn-compatibility">
 <h3>2.1.3. Scikit-learn compatibility<a class="headerlink" href="#scikit-learn-compatibility" title="Permalink to this headline">¶</a></h3>
 <p>All supervised algorithms are scikit-learn estimators
-(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></a>) and transformers
-(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></a>) so they are compatible with pipelines
-(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code></a>) and
+(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></a>) and transformers
+(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></a>) so they are compatible with pipelines
+(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code></a>) and
 scikit-learn model selection routines
-(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html#sklearn.model_selection.cross_val_score" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.cross_val_score</span></code></a>,
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a>, etc).</p>
+(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html#sklearn.model_selection.cross_val_score" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.cross_val_score</span></code></a>,
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a>, etc).</p>
 </div>
 </div>
 <div class="section" id="algorithms">
@@ -564,7 +564,7 @@ last points should be less similar than the two first points).</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

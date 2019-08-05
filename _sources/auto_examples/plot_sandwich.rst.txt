@@ -30,7 +30,8 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
     from sklearn.metrics import pairwise_distances
     from sklearn.neighbors import NearestNeighbors
 
-    from metric_learn import LMNN, ITML_Supervised, LSML_Supervised, SDML_Supervised
+    from metric_learn import (LMNN, ITML_Supervised, LSML_Supervised,
+                              SDML_Supervised)
 
 
     def sandwich_demo():
@@ -66,10 +67,10 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 
     # TODO: use this somewhere
     def visualize_class_separation(X, labels):
-      _, (ax1,ax2) = plt.subplots(ncols=2)
+      _, (ax1, ax2) = plt.subplots(ncols=2)
       label_order = np.argsort(labels)
       ax1.imshow(pairwise_distances(X[label_order]), interpolation='nearest')
-      ax2.imshow(pairwise_distances(labels[label_order,None]),
+      ax2.imshow(pairwise_distances(labels[label_order, None]),
                  interpolation='nearest')
 
 
@@ -96,26 +97,26 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
         for k, xc in enumerate(x_centers):
           data[i, k, 0] = np.random.normal(xc, 0.1)
           data[i, k, 1] = np.random.normal(yc, 0.1)
-        labels[i,:] = i
+        labels[i, :] = i
       return data.reshape((-1, 2)), labels.ravel()
 
 
     def plot_sandwich_data(x, y, axis=plt, colors='rbgmky'):
       for idx, val in enumerate(np.unique(y)):
-        xi = x[y==val]
+        xi = x[y == val]
         axis.scatter(*xi.T, s=50, facecolors='none', edgecolors=colors[idx])
 
 
     def plot_neighborhood_graph(x, nn, y, axis=plt, colors='rbgmky'):
       for i, a in enumerate(x):
-        b = x[nn[i,1]]
+        b = x[nn[i, 1]]
         axis.plot((a[0], b[0]), (a[1], b[1]), colors[y[i]])
 
 
     if __name__ == '__main__':
       sandwich_demo()
 
-**Total running time of the script:** ( 0 minutes  4.484 seconds)
+**Total running time of the script:** ( 0 minutes  4.620 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sandwich.py:

@@ -218,7 +218,7 @@ automatically to ‘identity’ (this is to raise a warning if
 <dt>‘random’</dt>
 <dd><p class="first last">The initial Mahalanobis matrix will be a random positive definite
 (PD) matrix of shape <code class="xref any docutils literal notranslate"><span class="pre">(n_features,</span> <span class="pre">n_features)</span></code>, generated using
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_spd_matrix.html#sklearn.datasets.make_spd_matrix" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_spd_matrix</span></code></a>.</p>
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_spd_matrix.html#sklearn.datasets.make_spd_matrix" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_spd_matrix</span></code></a>.</p>
 </dd>
 <dt>numpy array</dt>
 <dd><p class="first last">A positive definite (PD) matrix of shape
@@ -249,7 +249,7 @@ tuples will be formed like this: X[indices].</p>
 <dt><strong>random_state</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or numpy.RandomState or None, optional (default=None)</span></dt>
 <dd><p class="first last">A pseudo random number generator object or a seed for it if int. If
 <code class="docutils literal notranslate"><span class="pre">init='random'</span></code>, <code class="docutils literal notranslate"><span class="pre">random_state</span></code> is used to set the random
-prior. In any case, <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-random-state" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">random_state</span></code></a> is also used to randomly sample
+prior. In any case, <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-random-state" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">random_state</span></code></a> is also used to randomly sample
 constraints from labels.</p>
 </dd>
 </dl>
@@ -259,7 +259,7 @@ constraints from labels.</p>
 <dt><strong>n_iter_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a></span></dt>
 <dd><p class="first last">The number of iterations the solver has run.</p>
 </dd>
-<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
 <dd><p class="first last">The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
 metric (See function <code class="xref any docutils literal notranslate"><span class="pre">components_from_metric</span></code>.)</p>
 </dd>
@@ -275,34 +275,31 @@ metric (See function <code class="xref any docutils literal notranslate"><span c
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.check_preprocessor" title="metric_learn.LSML_Supervised.check_preprocessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_preprocessor</span></code></a>()</td>
-<td>Initializes the preprocessor</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.fit" title="metric_learn.LSML_Supervised.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X,&nbsp;y[,&nbsp;random_state])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.fit" title="metric_learn.LSML_Supervised.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X,&nbsp;y[,&nbsp;random_state])</td>
 <td>Create constraints from labels and learn the LSML model.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.fit_transform" title="metric_learn.LSML_Supervised.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[,&nbsp;y])</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.fit_transform" title="metric_learn.LSML_Supervised.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[,&nbsp;y])</td>
 <td>Fit to data, then transform it.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.get_mahalanobis_matrix" title="metric_learn.LSML_Supervised.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.get_mahalanobis_matrix" title="metric_learn.LSML_Supervised.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
 <td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.get_metric" title="metric_learn.LSML_Supervised.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.get_metric" title="metric_learn.LSML_Supervised.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
 <td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.get_params" title="metric_learn.LSML_Supervised.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.get_params" title="metric_learn.LSML_Supervised.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
 <td>Get parameters for this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.metric" title="metric_learn.LSML_Supervised.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.metric" title="metric_learn.LSML_Supervised.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
 <td>Deprecated.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.score_pairs" title="metric_learn.LSML_Supervised.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.score_pairs" title="metric_learn.LSML_Supervised.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
 <td>Returns the learned Mahalanobis distance between pairs.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.set_params" title="metric_learn.LSML_Supervised.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.set_params" title="metric_learn.LSML_Supervised.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
 <td>Set the parameters of this estimator.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.transform" title="metric_learn.LSML_Supervised.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LSML_Supervised.transform" title="metric_learn.LSML_Supervised.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
 <td>Embeds data points in the learned linear embedding space.</td>
 </tr>
 </tbody>
@@ -311,12 +308,6 @@ metric (See function <code class="xref any docutils literal notranslate"><span c
 <dt id="metric_learn.LSML_Supervised.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>tol=0.001</em>, <em>max_iter=1000</em>, <em>prior=None</em>, <em>num_labeled='deprecated'</em>, <em>num_constraints=None</em>, <em>weights=None</em>, <em>verbose=False</em>, <em>preprocessor=None</em>, <em>random_state=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/lsml.html#LSML_Supervised.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.LSML_Supervised.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="metric_learn.LSML_Supervised.check_preprocessor">
-<code class="descname">check_preprocessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LSML_Supervised.check_preprocessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes the preprocessor</p>
 </dd></dl>
 
 <dl class="method">
@@ -336,8 +327,8 @@ metric (See function <code class="xref any docutils literal notranslate"><span c
 </dd>
 <dt><strong>random_state</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Not used</span></dt>
 <dd><div class="first last deprecated">
-<p><span class="versionmodified">Deprecated since version 0.5.0: </span><a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-random-state" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">random_state</span></code></a> in the <a class="reference internal" href="#metric_learn.LSML_Supervised.fit" title="metric_learn.LSML_Supervised.fit"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">fit</span></code></a> function was deprecated in version 0.5.0
-and will be removed in 0.6.0. Set <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-random-state" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">random_state</span></code></a> at initialization
+<p><span class="versionmodified">Deprecated since version 0.5.0: </span><a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-random-state" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">random_state</span></code></a> in the <a class="reference internal" href="#metric_learn.LSML_Supervised.fit" title="metric_learn.LSML_Supervised.fit"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">fit</span></code></a> function was deprecated in version 0.5.0
+and will be removed in 0.6.0. Set <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-random-state" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">random_state</span></code></a> at initialization
 instead (when instantiating a new <a class="reference internal" href="#metric_learn.LSML_Supervised" title="metric_learn.LSML_Supervised"><code class="xref any py py-class docutils literal notranslate"><span class="pre">LSML_Supervised</span></code></a> object).</p>
 </div>
 </dd>
@@ -388,7 +379,7 @@ and returns a transformed version of X.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
 <dd><p class="first last">The copy of the learned Mahalanobis matrix.</p>
 </dd>
 </dl>
@@ -557,14 +548,14 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
+<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
 <dd><p class="first last">The data points to embed.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
+<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
 <dd><p class="first last">The embedded data points.</p>
 </dd>
 </dl>
@@ -600,7 +591,7 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

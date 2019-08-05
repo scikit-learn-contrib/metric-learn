@@ -217,14 +217,14 @@ variance). Otherwise, we just use ‘identity’.</p>
 <dt>‘pca’</dt>
 <dd><p class="first last"><code class="docutils literal notranslate"><span class="pre">n_components</span></code> principal components of the inputs passed
 to <a class="reference internal" href="#metric_learn.LMNN.fit" title="metric_learn.LMNN.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> will be used to initialize the transformation.
-(See <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.decomposition.PCA</span></code></a>)</p>
+(See <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html#sklearn.decomposition.PCA" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.decomposition.PCA</span></code></a>)</p>
 </dd>
 <dt>‘lda’</dt>
 <dd><p class="first last"><code class="docutils literal notranslate"><span class="pre">min(n_components,</span> <span class="pre">n_classes)</span></code> most discriminative
 components of the inputs passed to <a class="reference internal" href="#metric_learn.LMNN.fit" title="metric_learn.LMNN.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> will be used to
 initialize the transformation. (If <code class="docutils literal notranslate"><span class="pre">n_components</span> <span class="pre">&gt;</span> <span class="pre">n_classes</span></code>,
 the rest of the components will be zero.) (See
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.discriminant_analysis.LinearDiscriminantAnalysis.html#sklearn.discriminant_analysis.LinearDiscriminantAnalysis" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.discriminant_analysis.LinearDiscriminantAnalysis</span></code></a>)</p>
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.discriminant_analysis.LinearDiscriminantAnalysis.html#sklearn.discriminant_analysis.LinearDiscriminantAnalysis" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.discriminant_analysis.LinearDiscriminantAnalysis</span></code></a>)</p>
 </dd>
 <dt>‘identity’</dt>
 <dd><p class="first last">If <code class="docutils literal notranslate"><span class="pre">n_components</span></code> is strictly smaller than the
@@ -281,7 +281,7 @@ tuples will be formed like this: X[indices].</p>
 <dt><strong>num_dims</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Not used</span></dt>
 <dd><div class="first last deprecated">
 <p><span class="versionmodified">Deprecated since version 0.5.0: </span><code class="xref any docutils literal notranslate"><span class="pre">num_dims</span></code> was deprecated in version 0.5.0 and will
-be removed in 0.6.0. Use <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-components" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">n_components</span></code></a> instead.</p>
+be removed in 0.6.0. Use <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-components" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_components</span></code></a> instead.</p>
 </div>
 </dd>
 <dt><strong>random_state</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or numpy.RandomState or None, optional (default=None)</span></dt>
@@ -295,12 +295,6 @@ argument to PCA when initializing the transformation.</p>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Notes</p>
-<p>If a recent version of the Shogun Python modular (<code class="docutils literal notranslate"><span class="pre">modshogun</span></code>) library
-is available, the LMNN implementation will use the fast C++ version from
-there. Otherwise, the included pure-Python version will be used.
-The two implementations differ slightly, and the C++ version is more
-complete.</p>
 <p class="rubric">References</p>
 <table class="docutils citation" frame="void" id="r56d00e05cd6d-1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
@@ -329,7 +323,7 @@ Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul</td></tr>
 <dt><strong>n_iter_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a></span></dt>
 <dd><p class="first last">The number of iterations the solver has run.</p>
 </dd>
-<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_components, n_features)</span></dt>
+<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_components, n_features)</span></dt>
 <dd><p class="first last">The learned linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code>.</p>
 </dd>
 </dl>
@@ -344,31 +338,28 @@ Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul</td></tr>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.check_preprocessor" title="metric_learn.LMNN.check_preprocessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_preprocessor</span></code></a>()</td>
-<td>Initializes the preprocessor</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.fit_transform" title="metric_learn.LMNN.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[,&nbsp;y])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.fit_transform" title="metric_learn.LMNN.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[,&nbsp;y])</td>
 <td>Fit to data, then transform it.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.get_mahalanobis_matrix" title="metric_learn.LMNN.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.get_mahalanobis_matrix" title="metric_learn.LMNN.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
 <td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.get_metric" title="metric_learn.LMNN.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.get_metric" title="metric_learn.LMNN.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
 <td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.get_params" title="metric_learn.LMNN.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.get_params" title="metric_learn.LMNN.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
 <td>Get parameters for this estimator.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.metric" title="metric_learn.LMNN.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.metric" title="metric_learn.LMNN.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
 <td>Deprecated.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.score_pairs" title="metric_learn.LMNN.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.score_pairs" title="metric_learn.LMNN.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
 <td>Returns the learned Mahalanobis distance between pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.set_params" title="metric_learn.LMNN.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.set_params" title="metric_learn.LMNN.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
 <td>Set the parameters of this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.transform" title="metric_learn.LMNN.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.transform" title="metric_learn.LMNN.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
 <td>Embeds data points in the learned linear embedding space.</td>
 </tr>
 </tbody>
@@ -388,12 +379,6 @@ Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul</td></tr>
 <dt id="metric_learn.LMNN.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>init=None</em>, <em>k=3</em>, <em>min_iter=50</em>, <em>max_iter=1000</em>, <em>learn_rate=1e-07</em>, <em>regularization=0.5</em>, <em>convergence_tol=0.001</em>, <em>use_pca='deprecated'</em>, <em>verbose=False</em>, <em>preprocessor=None</em>, <em>n_components=None</em>, <em>num_dims='deprecated'</em>, <em>random_state=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/lmnn.html#LMNN.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.LMNN.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="metric_learn.LMNN.check_preprocessor">
-<code class="descname">check_preprocessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.check_preprocessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes the preprocessor</p>
 </dd></dl>
 
 <dl class="method">
@@ -441,7 +426,7 @@ and returns a transformed version of X.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
 <dd><p class="first last">The copy of the learned Mahalanobis matrix.</p>
 </dd>
 </dl>
@@ -610,14 +595,14 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
+<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
 <dd><p class="first last">The data points to embed.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
+<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
 <dd><p class="first last">The embedded data points.</p>
 </dd>
 </dl>
@@ -653,7 +638,7 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

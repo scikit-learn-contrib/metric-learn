@@ -194,7 +194,7 @@ On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
 <dd><p class="first last">The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
 metric (See function <code class="xref any docutils literal notranslate"><span class="pre">components_from_metric</span></code>.)</p>
 </dd>
@@ -210,34 +210,31 @@ metric (See function <code class="xref any docutils literal notranslate"><span c
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.check_preprocessor" title="metric_learn.Covariance.check_preprocessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_preprocessor</span></code></a>()</td>
-<td>Initializes the preprocessor</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.fit" title="metric_learn.Covariance.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X[,&nbsp;y])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.fit" title="metric_learn.Covariance.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X[,&nbsp;y])</td>
 <td>X : data matrix, (n x d) y : unused</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.fit_transform" title="metric_learn.Covariance.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[,&nbsp;y])</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.fit_transform" title="metric_learn.Covariance.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[,&nbsp;y])</td>
 <td>Fit to data, then transform it.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.get_mahalanobis_matrix" title="metric_learn.Covariance.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.get_mahalanobis_matrix" title="metric_learn.Covariance.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
 <td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.get_metric" title="metric_learn.Covariance.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.get_metric" title="metric_learn.Covariance.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
 <td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.get_params" title="metric_learn.Covariance.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.get_params" title="metric_learn.Covariance.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
 <td>Get parameters for this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.metric" title="metric_learn.Covariance.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.metric" title="metric_learn.Covariance.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
 <td>Deprecated.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.score_pairs" title="metric_learn.Covariance.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.score_pairs" title="metric_learn.Covariance.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
 <td>Returns the learned Mahalanobis distance between pairs.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.set_params" title="metric_learn.Covariance.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.set_params" title="metric_learn.Covariance.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
 <td>Set the parameters of this estimator.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Covariance.transform" title="metric_learn.Covariance.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Covariance.transform" title="metric_learn.Covariance.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
 <td>Embeds data points in the learned linear embedding space.</td>
 </tr>
 </tbody>
@@ -246,12 +243,6 @@ metric (See function <code class="xref any docutils literal notranslate"><span c
 <dt id="metric_learn.Covariance.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>preprocessor=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/covariance.html#Covariance.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Covariance.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="metric_learn.Covariance.check_preprocessor">
-<code class="descname">check_preprocessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.Covariance.check_preprocessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes the preprocessor</p>
 </dd></dl>
 
 <dl class="method">
@@ -301,7 +292,7 @@ and returns a transformed version of X.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
 <dd><p class="first last">The copy of the learned Mahalanobis matrix.</p>
 </dd>
 </dl>
@@ -470,14 +461,14 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
+<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
 <dd><p class="first last">The data points to embed.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
+<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
 <dd><p class="first last">The embedded data points.</p>
 </dd>
 </dl>
@@ -502,7 +493,7 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

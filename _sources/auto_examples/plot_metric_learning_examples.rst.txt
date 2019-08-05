@@ -613,7 +613,7 @@ closer than two points in different labels.
     def create_constraints(labels):
         import itertools
         import random
-    
+
         # aggregate indices of same class
         zeros = np.where(y == 0)[0]
         ones = np.where(y == 1)[0]
@@ -624,7 +624,7 @@ closer than two points in different labels.
         twos_ = list(itertools.combinations(twos, 2))
         # put them together!
         sim = np.array(zeros_ + ones_ + twos_)
-    
+
         # similarily, put together indices in different classes
         dis = []
         for zero in zeros:
@@ -635,14 +635,18 @@ closer than two points in different labels.
         for one in ones:
             for two in twos:
                 dis.append((one, two))
-            
+
         # pick up just enough dissimilar examples as we have similar examples
         dis = np.array(random.sample(dis, len(sim)))
-    
-        # return an array of pairs of indices of shape=(2*len(sim), 2), and the corresponding labels, array of shape=(2*len(sim))
-        # Each pair of similar points have a label of +1 and each pair of dissimilar points have a label of -1
-        return (np.vstack([np.column_stack([sim[:, 0], sim[:, 1]]), np.column_stack([dis[:, 0], dis[:, 1]])]),
+
+        # return an array of pairs of indices of shape=(2*len(sim), 2), and the
+        # corresponding labels, array of shape=(2*len(sim))
+        # Each pair of similar points have a label of +1 and each pair of
+        # dissimilar points have a label of -1
+        return (np.vstack([np.column_stack([sim[:, 0], sim[:, 1]]),
+                           np.column_stack([dis[:, 0], dis[:, 1]])]),
                 np.concatenate([np.ones(len(sim)), -np.ones(len(sim))]))
+
 
     pairs, pairs_labels = create_constraints(y)
 
@@ -679,9 +683,9 @@ Now that we've created our constraints, let's see what it looks like!
      [ 0  9]
      [ 0 10]
      ...
-     [47 63]
-     [22 92]
-     [65 64]]
+     [19  2]
+     [42 40]
+     [82 41]]
     [ 1.  1.  1. ... -1. -1. -1.]
 
 
@@ -740,7 +744,7 @@ metric-learn with scikit-learn estimators.
 This brings us to the end of this tutorial! Have fun Metric Learning :)
 
 
-**Total running time of the script:** ( 1 minutes  5.133 seconds)
+**Total running time of the script:** ( 1 minutes  19.674 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_metric_learning_examples.py:

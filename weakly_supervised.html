@@ -218,7 +218,7 @@ specific forms of tuples, refer to the appropriate sections
 <p>The <code class="xref any docutils literal notranslate"><span class="pre">tuples</span></code> argument is the first argument of every method (like the <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>
 argument for classical algorithms in scikit-learn). The second argument is the
 label of the tuple: its semantic depends on the algorithm used. For instance
-for pairs learners <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> is a label indicating whether the pair is of similar
+for pairs learners <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> is a label indicating whether the pair is of similar
 samples or dissimilar samples.</p>
 <p>Then one can fit a Weakly Supervised Metric Learner on this tuple, like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_algo</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tuples</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -238,7 +238,7 @@ learn:</p>
 <p>The most intuitive way to represent tuples is to provide the algorithm with a
 3D array-like of tuples of shape <code class="xref any docutils literal notranslate"><span class="pre">(n_tuples,</span> <span class="pre">t,</span> <span class="pre">n_features)</span></code>, where
 <code class="xref any docutils literal notranslate"><span class="pre">n_tuples</span></code> is the number of tuples, <code class="xref any docutils literal notranslate"><span class="pre">tuple_size</span></code> is the number of elements
-in a tuple (2 for pairs, 3 for triplets for instance), and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-features" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">n_features</span></code></a> is
+in a tuple (2 for pairs, 3 for triplets for instance), and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-features" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_features</span></code></a> is
 the number of features of each point.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tuples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="o">-</span><span class="mf">0.12</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.21</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.20</span><span class="p">],</span>
@@ -376,8 +376,8 @@ for quadruplets.</p>
 <div class="section" id="scikit-learn-compatibility">
 <h3>3.1.4. Scikit-learn compatibility<a class="headerlink" href="#scikit-learn-compatibility" title="Permalink to this headline">¶</a></h3>
 <p>Weakly supervised estimators are compatible with scikit-learn routines for
-model selection (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html#sklearn.model_selection.cross_val_score" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.cross_val_score</span></code></a>,
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a>, etc).</p>
+model selection (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html#sklearn.model_selection.cross_val_score" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.cross_val_score</span></code></a>,
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a>, etc).</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MMC</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -397,8 +397,8 @@ model selection (<a class="reference external" href="https://scikit-learn.org/st
 <div class="section" id="learning-on-pairs">
 <span id="id1"></span><h2>3.2. Learning on pairs<a class="headerlink" href="#learning-on-pairs" title="Permalink to this headline">¶</a></h2>
 <p>Some metric learning algorithms learn on pairs of samples. In this case, one
-should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> pairs of points, with a
-corresponding target containing <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> values being either +1 or -1.
+should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> pairs of points, with a
+corresponding target containing <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> values being either +1 or -1.
 These values indicate whether the given pairs are similar points or
 dissimilar points.</p>
 <div class="section" id="fitting">
@@ -465,7 +465,7 @@ particular value.</p>
 </div>
 </li>
 </ul>
-<p>See also: <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a>.</p>
+<p>See also: <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a>.</p>
 </div>
 </div>
 <div class="section" id="scoring">
@@ -480,7 +480,7 @@ new space (higher score means points are similar, and lower score dissimilar).</
 </pre></div>
 </div>
 <p>This allows to use common scoring functions for binary classification, like
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.metrics.accuracy_score</span></code></a> for instance, which
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.metrics.accuracy_score</span></code></a> for instance, which
 can be used inside cross-validation routines:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">cross_val_score</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pairs_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
@@ -492,7 +492,7 @@ can be used inside cross-validation routines:</p>
 </pre></div>
 </div>
 <p>Pairs learners also have a default score, which basically
-returns the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.metrics.roc_auc_score</span></code></a> (which is threshold-independent).</p>
+returns the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.metrics.roc_auc_score</span></code></a> (which is threshold-independent).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pairs_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
 <span class="gp">... </span>                       <span class="p">[[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.4</span><span class="p">,</span> <span class="mf">6.1</span><span class="p">]],</span>
 <span class="gp">... </span>                       <span class="p">[[</span><span class="mf">7.7</span><span class="p">,</span> <span class="mf">5.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.23</span><span class="p">,</span> <span class="mf">8.4</span><span class="p">]]])</span>
@@ -746,7 +746,7 @@ side-information</a>. NIPS 2002</td></tr>
 <div class="section" id="learning-on-quadruplets">
 <span id="id15"></span><h2>3.3. Learning on quadruplets<a class="headerlink" href="#learning-on-quadruplets" title="Permalink to this headline">¶</a></h2>
 <p>Some metric learning algorithms learn on quadruplets of samples. In this case,
-one should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> quadruplets of points. Th
+one should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> quadruplets of points. Th
 semantic of each quadruplet is that the first two points should be closer
 together than the last two points.</p>
 <div class="section" id="id16">
@@ -821,7 +821,7 @@ the right ordering)).</p>
 <p>In the above example, for the first quadruplet in <code class="xref any docutils literal notranslate"><span class="pre">quadruplets_test</span></code>, the
 two first points are predicted less similar than the two last points (they
 are further away in the transformed space).</p>
-<p>Unlike for pairs learners, quadruplets learners don’t allow to give a <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>
+<p>Unlike for pairs learners, quadruplets learners don’t allow to give a <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>
 when fitting, which does not allow to use scikit-learn scoring functions
 like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">cross_val_score</span>
@@ -830,7 +830,7 @@ like:</p>
 </div>
 <p>(This is actually intentional, for more details
 about that, see
-<a class="reference external" href="https://github.com/metric-learn/metric-learn/pull/168#pullrequestreview-203730742">this comment</a>
+<a class="reference external" href="https://github.com/scikit-learn-contrib/metric-learn/pull/168#pullrequestreview-203730742">this comment</a>
 on github.)</p>
 <p>However, quadruplets learners do have a default scoring function, which will
 basically return the accuracy score on a given test set, i.e. the proportion
@@ -945,7 +945,7 @@ Residual</a>. ICDM 2012</td></tr>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

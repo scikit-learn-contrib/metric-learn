@@ -163,7 +163,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">decomposition</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
 <span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="k">import</span> <span class="n">ChangedBehaviorWarning</span>
 
@@ -280,20 +279,20 @@
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca_comps</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
       <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-        <span class="s1">&#39;&quot;pca_comps&quot; parameter is not used. &#39;</span>
-        <span class="s1">&#39;It has been deprecated in version 0.5.0 and will be&#39;</span>
-        <span class="s1">&#39;removed in 0.6.0. RCA will not do PCA preprocessing anymore. If &#39;</span>
-        <span class="s1">&#39;you still want to do it, you could use &#39;</span>
-        <span class="s1">&#39;`sklearn.decomposition.PCA` and an `sklearn.pipeline.Pipeline`.&#39;</span><span class="p">,</span>
-        <span class="ne">DeprecationWarning</span><span class="p">)</span>
+          <span class="s1">&#39;&quot;pca_comps&quot; parameter is not used. &#39;</span>
+          <span class="s1">&#39;It has been deprecated in version 0.5.0 and will be&#39;</span>
+          <span class="s1">&#39;removed in 0.6.0. RCA will not do PCA preprocessing anymore. If &#39;</span>
+          <span class="s1">&#39;you still want to do it, you could use &#39;</span>
+          <span class="s1">&#39;`sklearn.decomposition.PCA` and an `sklearn.pipeline.Pipeline`.&#39;</span><span class="p">,</span>
+          <span class="ne">DeprecationWarning</span><span class="p">)</span>
 
     <span class="n">X</span><span class="p">,</span> <span class="n">chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-      <span class="s2">&quot;RCA will no longer center the data before training. If you want &quot;</span>
-      <span class="s2">&quot;to do some preprocessing, you should do it manually (you can also &quot;</span>
-      <span class="s2">&quot;use an `sklearn.pipeline.Pipeline` for instance). This warning &quot;</span>
-      <span class="s2">&quot;will disappear in version 0.6.0.&quot;</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
+        <span class="s2">&quot;RCA will no longer center the data before training. If you want &quot;</span>
+        <span class="s2">&quot;to do some preprocessing, you should do it manually (you can also &quot;</span>
+        <span class="s2">&quot;use an `sklearn.pipeline.Pipeline` for instance). This warning &quot;</span>
+        <span class="s2">&quot;will disappear in version 0.6.0.&quot;</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
 
     <span class="n">chunks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">chunk_mask</span><span class="p">,</span> <span class="n">chunked_data</span> <span class="o">=</span> <span class="n">_chunk_mean_centering</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span>
@@ -412,7 +411,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

@@ -179,25 +179,29 @@
 <dt id="metric_learn.SDML">
 <em class="property">class </em><code class="descclassname">metric_learn.</code><code class="descname">SDML</code><span class="sig-paren">(</span><em>balance_param=0.5</em>, <em>sparsity_param=0.01</em>, <em>prior=None</em>, <em>use_cov='deprecated'</em>, <em>verbose=False</em>, <em>preprocessor=None</em>, <em>random_state=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/sdml.html#SDML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.SDML" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sparse Distance Metric Learning (SDML)</p>
-<p>SDML is an efficient sparse metric learning in high-dimensional space via
+<blockquote>
+<div><p>SDML is an efficient sparse metric learning in high-dimensional space via
 double regularization: an L1-penalization on the off-diagonal elements of the
 Mahalanobis matrix <span class="math notranslate nohighlight">\(\mathbf{M}\)</span>, and a log-determinant divergence
 between <span class="math notranslate nohighlight">\(\mathbf{M}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{M_0}\)</span> (set as either
 <span class="math notranslate nohighlight">\(\mathbf{I}\)</span> or <span class="math notranslate nohighlight">\(\mathbf{\Omega}^{-1}\)</span>, where
 <span class="math notranslate nohighlight">\(\mathbf{\Omega}\)</span> is the covariance matrix).</p>
 <p>Read more in the <a class="reference internal" href="../weakly_supervised.html#sdml"><span class="std std-ref">User Guide</span></a>.</p>
+</div></blockquote>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>balance_param</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
-<dd><p class="first last">trade off between sparsity and M0 prior</p>
-</dd>
-<dt><strong>sparsity_param</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
+<dd><blockquote class="first">
+<div><p>trade off between sparsity and M0 prior</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>sparsity_param <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
 <dd><p class="first last">trade off between optimizer and sparseness (see graph_lasso)</p>
 </dd>
-<dt><strong>prior</strong> <span class="classifier-delimiter">:</span> <span class="classifier">None, string or numpy array, optional (default=None)</span></dt>
+<dt>prior <span class="classifier-delimiter">:</span> <span class="classifier">None, string or numpy array, optional (default=None)</span></dt>
 <dd><p class="first">Prior to set for the metric. Possible options are
 ‘identity’, ‘covariance’, ‘random’, and a numpy array of
 shape (n_features, n_features). For SDML, the prior should be strictly
@@ -214,7 +218,7 @@ automatically to ‘identity’ (this is to raise a warning if
 <dt>‘random’</dt>
 <dd><p class="first last">The prior will be a random positive definite (PD) matrix of shape
 <code class="xref any docutils literal notranslate"><span class="pre">(n_features,</span> <span class="pre">n_features)</span></code>, generated using
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_spd_matrix.html#sklearn.datasets.make_spd_matrix" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_spd_matrix</span></code></a>.</p>
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_spd_matrix.html#sklearn.datasets.make_spd_matrix" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_spd_matrix</span></code></a>.</p>
 </dd>
 <dt>numpy array</dt>
 <dd><p class="first last">A positive definite (PD) matrix of shape
@@ -223,44 +227,39 @@ prior.</p>
 </dd>
 </dl>
 </dd>
-<dt><strong>use_cov</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Not used.</span></dt>
+<dt>use_cov <span class="classifier-delimiter">:</span> <span class="classifier">Not used.</span></dt>
 <dd><div class="first last deprecated">
 <p><span class="versionmodified">Deprecated since version 0.5.0: </span><code class="xref any docutils literal notranslate"><span class="pre">A0</span></code> was deprecated in version 0.5.0 and will
 be removed in 0.6.0. Use ‘prior’ instead.</p>
 </div>
 </dd>
-<dt><strong>verbose</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
+<dt>verbose <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional (default=False)</span></dt>
 <dd><p class="first last">if True, prints information while learning</p>
 </dd>
-<dt><strong>preprocessor</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape=(n_samples, n_features) or callable</span></dt>
+<dt>preprocessor <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape=(n_samples, n_features) or callable</span></dt>
 <dd><p class="first last">The preprocessor to call to get tuples from indices. If array-like,
 tuples will be gotten like this: X[indices].</p>
 </dd>
-<dt><strong>random_state</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or numpy.RandomState or None, optional (default=None)</span></dt>
+<dt>random_state <span class="classifier-delimiter">:</span> <span class="classifier">int or numpy.RandomState or None, optional (default=None)</span></dt>
 <dd><p class="first last">A pseudo random number generator object or a seed for it if int. If
 <code class="docutils literal notranslate"><span class="pre">prior='random'</span></code>, <code class="docutils literal notranslate"><span class="pre">random_state</span></code> is used to set the prior.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </td>
 </tr>
 </tbody>
 </table>
-<p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="rf8f41cf07229-1" rules="none">
+<p>-attachments/icml09-guojun.pdf</p>
+<blockquote>
+<div><table class="docutils citation" frame="void" id="rf8f41cf07229-2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Qi et al.
-An efficient sparse metric learning in high-dimensional space via
-L1-penalized log-determinant regularization. ICML 2009.
-<a class="reference external" href="http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf">http://lms.comp.nus.edu.sg/sites/default/files/publication-attachments/icml09-guojun.pdf</a></td></tr>
+<tr><td class="label">[2]</td><td>Adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439945">https://gist.github.com/kcarnold/5439945</a></td></tr>
 </tbody>
 </table>
-<table class="docutils citation" frame="void" id="rf8f41cf07229-2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439945">https://gist.github.com/kcarnold/5439945</a></td></tr>
-</tbody>
-</table>
+</div></blockquote>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">SDML_Supervised</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
@@ -276,14 +275,18 @@ L1-penalized log-determinant regularization. ICML 2009.
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
-<dd><p class="first last">The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
+<dt><strong>components_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dd><blockquote class="first">
+<div><p>The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
 metric (See function <code class="xref any docutils literal notranslate"><span class="pre">components_from_metric</span></code>.)</p>
-</dd>
-<dt><strong>threshold_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">float</span></code></a></span></dt>
+</div></blockquote>
+<dl class="last docutils">
+<dt><a href="#id3"><span class="problematic" id="id4">threshold_</span></a> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">float</span></code></a></span></dt>
 <dd><p class="first last">If the distance metric between two points is lower than this threshold,
 points will be classified as similar, otherwise they will be
 classified as dissimilar.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </td>
@@ -300,43 +303,40 @@ classified as dissimilar.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.calibrate_threshold" title="metric_learn.SDML.calibrate_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a>(pairs_valid,&nbsp;y_valid[,&nbsp;…])</td>
 <td>Decision threshold calibration for pairwise binary classification</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.check_preprocessor" title="metric_learn.SDML.check_preprocessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_preprocessor</span></code></a>()</td>
-<td>Initializes the preprocessor</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.decision_function" title="metric_learn.SDML.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.decision_function" title="metric_learn.SDML.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(pairs)</td>
 <td>Returns the decision function used to classify the pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.fit" title="metric_learn.SDML.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(pairs,&nbsp;y[,&nbsp;calibration_params])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.fit" title="metric_learn.SDML.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(pairs,&nbsp;y[,&nbsp;calibration_params])</td>
 <td>Learn the SDML model.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.get_mahalanobis_matrix" title="metric_learn.SDML.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_mahalanobis_matrix" title="metric_learn.SDML.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
 <td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
 <td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.get_params" title="metric_learn.SDML.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_params" title="metric_learn.SDML.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
 <td>Get parameters for this estimator.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.metric" title="metric_learn.SDML.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.metric" title="metric_learn.SDML.metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric</span></code></a>()</td>
 <td>Deprecated.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.predict" title="metric_learn.SDML.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.predict" title="metric_learn.SDML.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(pairs)</td>
 <td>Predicts the learned metric between input pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.score" title="metric_learn.SDML.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(pairs,&nbsp;y)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.score" title="metric_learn.SDML.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(pairs,&nbsp;y)</td>
 <td>Computes score of pairs similarity prediction.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.score_pairs" title="metric_learn.SDML.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.score_pairs" title="metric_learn.SDML.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
 <td>Returns the learned Mahalanobis distance between pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.set_params" title="metric_learn.SDML.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.set_params" title="metric_learn.SDML.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
 <td>Set the parameters of this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.set_threshold" title="metric_learn.SDML.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(threshold)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.set_threshold" title="metric_learn.SDML.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(threshold)</td>
 <td>Sets the threshold of the metric learner to the given value <code class="xref any docutils literal notranslate"><span class="pre">threshold</span></code>.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.transform" title="metric_learn.SDML.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.transform" title="metric_learn.SDML.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
 <td>Embeds data points in the learned linear embedding space.</td>
 </tr>
 </tbody>
@@ -408,7 +408,7 @@ threshold. They must be +1 for positive pairs and -1 for negative pairs.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.21.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a></dt>
+<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.21.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a></dt>
 <dd>scikit-learn’s module for calibrating classifiers</dd>
 </dl>
 </div>
@@ -416,7 +416,7 @@ threshold. They must be +1 for positive pairs and -1 for negative pairs.</p>
 <table class="docutils citation" frame="void" id="r640b5f1b19c6-1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[1]</a></td><td>Receiver-operating characteristic (ROC) plots: a fundamental
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Receiver-operating characteristic (ROC) plots: a fundamental
 evaluation tool in clinical medicine, MH Zweig, G Campbell -
 Clinical chemistry, 1993</td></tr>
 </tbody>
@@ -424,15 +424,9 @@ Clinical chemistry, 1993</td></tr>
 <table class="docutils citation" frame="void" id="r640b5f1b19c6-2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[2]</a></td><td>most of the code of this function is from scikit-learn’s PR #10117</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>most of the code of this function is from scikit-learn’s PR #10117</td></tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="metric_learn.SDML.check_preprocessor">
-<code class="descname">check_preprocessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.check_preprocessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes the preprocessor</p>
 </dd></dl>
 
 <dl class="method">
@@ -458,7 +452,7 @@ preprocessor.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
+<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
 <dd><p class="first last">The predicted decision function value for each pair.</p>
 </dd>
 </dl>
@@ -515,7 +509,7 @@ given, <a class="reference internal" href="#metric_learn.SDML.calibrate_threshol
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
+<dt><strong>M</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt>
 <dd><p class="first last">The copy of the learned Mahalanobis matrix.</p>
 </dd>
 </dl>
@@ -627,7 +621,7 @@ preprocessor.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
+<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
 <dd><p class="first last">The predicted learned metric value between samples in every pair.</p>
 </dd>
 </dl>
@@ -782,14 +776,14 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
+<dt><strong>X</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt>
 <dd><p class="first last">The data points to embed.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
+<dt><strong>X_embedded</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt>
 <dd><p class="first last">The embedded data points.</p>
 </dd>
 </dl>
@@ -814,7 +808,7 @@ the learned linear transformation (See <code class="xref py py-class docutils li
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

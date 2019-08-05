@@ -206,14 +206,14 @@ to achieve.</p>
 
 <span class="c1"># visualisation imports</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.random.seed.html#numpy.random.seed" title="View documentation for numpy.random.seed"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="loading-our-dataset-and-setting-up-plotting">
 <h2>Loading our dataset and setting up plotting<a class="headerlink" href="#loading-our-dataset-and-setting-up-plotting" title="Permalink to this headline">¶</a></h2>
 <p>We will be using a synthetic dataset to illustrate the plotting,
-using the function <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html#sklearn.datasets.make_classification" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_classification</span></code></a> from
+using the function <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html#sklearn.datasets.make_classification" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_classification</span></code></a> from
 scikit-learn. The dataset will contain:</p>
 <blockquote>
 <div><ul class="simple">
@@ -230,7 +230,7 @@ labels) and two are random noise with large magnitude</li>
 </div>
 <p>Note that the dimensionality of the data is 5, so to plot the
 transformed data in 2D, we will use the t-sne algorithm. (See
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html#sklearn.manifold.TSNE" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.manifold.TSNE</span></code></a>).</p>
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html#sklearn.manifold.TSNE" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.manifold.TSNE</span></code></a>).</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plot_tsne</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Paired</span><span class="p">):</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
@@ -482,7 +482,7 @@ regression.</p>
 <li>See more in the documentation of the class <a class="reference internal" href="../generated/metric_learn.MLKR.html#metric_learn.MLKR" title="metric_learn.MLKR"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKR</span></code></a></li>
 </ul>
 <p>To illustrate MLKR, let’s use the dataset
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_regression.html#sklearn.datasets.make_regression" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_regression</span></code></a> the same way as we did with the
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_regression.html#sklearn.datasets.make_regression" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_regression</span></code></a> the same way as we did with the
 classification  before. The dataset will contain: 100 points of 5 features
 each, among which 3 are informative (i.e., used to generate the
 regression target from a linear model), and two are random noise with the
@@ -505,7 +505,7 @@ same magnitude.</p>
 <img alt="../_images/sphx_glr_plot_metric_learning_examples_011.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_011.png" />
 <p>Points that have the same value to regress are now closer to each
 other ! This would improve the performance of
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html#sklearn.neighbors.KNeighborsRegressor" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.neighbors.KNeighborsRegressor</span></code></a> for instance.</p>
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html#sklearn.neighbors.KNeighborsRegressor" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.neighbors.KNeighborsRegressor</span></code></a> for instance.</p>
 </div>
 <div class="section" id="metric-learning-from-weaker-supervision">
 <h2>Metric Learning from Weaker Supervision<a class="headerlink" href="#metric-learning-from-weaker-supervision" title="Permalink to this headline">¶</a></h2>
@@ -534,7 +534,7 @@ possible for ITML, SDML, and MMC. See <a class="reference internal" href="../wea
 details on other kinds of weak supervision that some algorithms can work
 with.</p>
 <p>For the purpose of this example, we’re going to explicitly create these
-pairwise constraints through the labels we have, i.e. <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>.
+pairwise constraints through the labels we have, i.e. <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>.
 Do keep in mind that we are doing this method because we know the labels
 - we can actually create the constraints any way we want to depending on
 the data!</p>
@@ -572,10 +572,14 @@ closer than two points in different labels.</p>
     <span class="c1"># pick up just enough dissimilar examples as we have similar examples</span>
     <span class="n">dis</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.array.html#numpy.array" title="View documentation for numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">dis</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">)))</span>
 
-    <span class="c1"># return an array of pairs of indices of shape=(2*len(sim), 2), and the corresponding labels, array of shape=(2*len(sim))</span>
-    <span class="c1"># Each pair of similar points have a label of +1 and each pair of dissimilar points have a label of -1</span>
-    <span class="k">return</span> <span class="p">(</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.vstack.html#numpy.vstack" title="View documentation for numpy.vstack"><span class="n">np</span><span class="o">.</span><span class="n">vstack</span></a><span class="p">([</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.column_stack.html#numpy.column_stack" title="View documentation for numpy.column_stack"><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span></a><span class="p">([</span><span class="n">sim</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sim</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]),</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.column_stack.html#numpy.column_stack" title="View documentation for numpy.column_stack"><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span></a><span class="p">([</span><span class="n">dis</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dis</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]])]),</span>
+    <span class="c1"># return an array of pairs of indices of shape=(2*len(sim), 2), and the</span>
+    <span class="c1"># corresponding labels, array of shape=(2*len(sim))</span>
+    <span class="c1"># Each pair of similar points have a label of +1 and each pair of</span>
+    <span class="c1"># dissimilar points have a label of -1</span>
+    <span class="k">return</span> <span class="p">(</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.vstack.html#numpy.vstack" title="View documentation for numpy.vstack"><span class="n">np</span><span class="o">.</span><span class="n">vstack</span></a><span class="p">([</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.column_stack.html#numpy.column_stack" title="View documentation for numpy.column_stack"><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span></a><span class="p">([</span><span class="n">sim</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sim</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]),</span>
+                       <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.column_stack.html#numpy.column_stack" title="View documentation for numpy.column_stack"><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span></a><span class="p">([</span><span class="n">dis</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dis</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]])]),</span>
             <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.concatenate.html#numpy.concatenate" title="View documentation for numpy.concatenate"><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span></a><span class="p">([</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ones.html#numpy.ones" title="View documentation for numpy.ones"><span class="n">np</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">)),</span> <span class="o">-</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ones.html#numpy.ones" title="View documentation for numpy.ones"><span class="n">np</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="p">))]))</span>
+
 
 <span class="n">pairs</span><span class="p">,</span> <span class="n">pairs_labels</span> <span class="o">=</span> <span class="n">create_constraints</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 </pre></div>
@@ -590,9 +594,9 @@ closer than two points in different labels.</p>
  [ 0  9]
  [ 0 10]
  ...
- [47 63]
- [22 92]
- [65 64]]
+ [19  2]
+ [42 40]
+ [82 41]]
 [ 1.  1.  1. ... -1. -1. -1.]
 </pre></div>
 </div>
@@ -621,7 +625,7 @@ how exactly this is going on.</p>
 <p>Finally, one of the main advantages of metric-learn is its out-of-the box
 compatibility with scikit-learn, for doing <a class="reference external" href="https://scikit-learn.org/stable/model_selection.html">model selection</a>,
 cross-validation, and scoring for instance. Indeed, supervised algorithms are
-regular <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v0.21.2)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></a> that can be plugged into any
+regular <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></a> that can be plugged into any
 pipeline or cross-validation procedure. And weakly-supervised estimators are
 also compatible with scikit-learn, since their input dataset format described
 above allows to be sliced along the first dimension when doing
@@ -629,12 +633,12 @@ cross-validations (see also this <a class="reference internal" href="../weakly_s
 can also look at some <a class="reference internal" href="../introduction.html#use-cases"><span class="std std-ref">use cases</span></a> where you could combine
 metric-learn with scikit-learn estimators.</p>
 <p>This brings us to the end of this tutorial! Have fun Metric Learning :)</p>
-<p><strong>Total running time of the script:</strong> ( 1 minutes  5.133 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 1 minutes  19.674 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-metric-learning-examples-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/47d7e96fc5ed57a08669b70c0daf7f4f/plot_metric_learning_examples.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_metric_learning_examples.py</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/1701602fecf66f059913dd6559226da0/plot_metric_learning_examples.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_metric_learning_examples.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/c3c89065d16de63f152d556f31fd7ee6/plot_metric_learning_examples.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_metric_learning_examples.ipynb</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/434a24c66bbfd5f8398470a8c859e27b/plot_metric_learning_examples.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_metric_learning_examples.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
@@ -658,7 +662,7 @@ metric-learn with scikit-learn estimators.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

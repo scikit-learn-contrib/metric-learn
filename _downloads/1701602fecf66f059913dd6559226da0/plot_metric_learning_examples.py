@@ -88,7 +88,7 @@ plot_tsne(X, y)
 # distances between points for the task at hand. Especially in higher
 # dimensions when Euclidean distances are a poor way to measure distance, this
 # becomes very useful.
-# 
+#
 # Basically, we learn this distance:
 # :math:`D(x, x') = \sqrt{(x-x')^\top M(x-x')}`. And we learn the parameters
 # :math:`M` of this distance to satisfy certain constraints on the distance
@@ -113,12 +113,12 @@ plot_tsne(X, y)
 ######################################################################
 # Large Margin Nearest Neighbour
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
+#
 # LMNN is a metric learning algorithm primarily designed for k-nearest
 # neighbor classification. The algorithm is based on semidefinite
 # programming, a sub-class of convex programming (as most Metric Learning
 # algorithms are).
-# 
+#
 # The main intuition behind LMNN is to learn a pseudometric under which
 # all data instances in the training set are surrounded by at least k
 # instances that share the same class label. If this is achieved, the
@@ -136,7 +136,7 @@ plot_tsne(X, y)
 ######################################################################
 # Fit and then transform!
 # -----------------------
-# 
+#
 
 # setting up LMNN
 lmnn = metric_learn.LMNN(k=5, learn_rate=1e-6)
@@ -162,7 +162,7 @@ plot_tsne(X_lmnn, y)
 
 ######################################################################
 # Pretty neat, huh?
-# 
+#
 # The rest of this notebook will briefly explain the other Metric Learning
 # algorithms before plotting them. Also, while we have first run ``fit``
 # and then ``transform`` to see our data transformed, we can also use
@@ -172,7 +172,7 @@ plot_tsne(X_lmnn, y)
 ######################################################################
 # Information Theoretic Metric Learning
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
+#
 # ITML uses a regularizer that automatically enforces a Semi-Definite
 # Positive Matrix condition - the LogDet divergence. It uses soft
 # must-link or cannot like constraints, and a simple algorithm based on
@@ -231,7 +231,7 @@ plot_tsne(X_sdml, y)
 ######################################################################
 # Least Squares Metric Learning
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
+#
 # LSML is a simple, yet effective, algorithm that learns a Mahalanobis
 # metric from a given set of relative comparisons. This is done by
 # formulating and minimizing a convex loss function that corresponds to
@@ -277,7 +277,7 @@ plot_tsne(X_nca, y)
 ######################################################################
 # Local Fisher Discriminant Analysis
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
+#
 # LFDA is a linear supervised dimensionality reduction method. It is
 # particularly useful when dealing with multimodality, where one ore more
 # classes consist of separate clusters in input space. The core
@@ -298,7 +298,7 @@ plot_tsne(X_lfda, y)
 ######################################################################
 # Relative Components Analysis
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# 
+#
 # RCA is another one of the older algorithms. It learns a full rank
 # Mahalanobis distance metric based on a weighted sum of in-class
 # covariance matrices. It applies a global linear transformation to assign
@@ -402,7 +402,7 @@ plot_tsne(X_mlkr, y_reg, plt.cm.Oranges)
 def create_constraints(labels):
     import itertools
     import random
-    
+
     # aggregate indices of same class
     zeros = np.where(y == 0)[0]
     ones = np.where(y == 1)[0]
@@ -413,7 +413,7 @@ def create_constraints(labels):
     twos_ = list(itertools.combinations(twos, 2))
     # put them together!
     sim = np.array(zeros_ + ones_ + twos_)
-    
+
     # similarily, put together indices in different classes
     dis = []
     for zero in zeros:
@@ -424,21 +424,25 @@ def create_constraints(labels):
     for one in ones:
         for two in twos:
             dis.append((one, two))
-            
+
     # pick up just enough dissimilar examples as we have similar examples
     dis = np.array(random.sample(dis, len(sim)))
-    
-    # return an array of pairs of indices of shape=(2*len(sim), 2), and the corresponding labels, array of shape=(2*len(sim))
-    # Each pair of similar points have a label of +1 and each pair of dissimilar points have a label of -1
-    return (np.vstack([np.column_stack([sim[:, 0], sim[:, 1]]), np.column_stack([dis[:, 0], dis[:, 1]])]),
+
+    # return an array of pairs of indices of shape=(2*len(sim), 2), and the
+    # corresponding labels, array of shape=(2*len(sim))
+    # Each pair of similar points have a label of +1 and each pair of
+    # dissimilar points have a label of -1
+    return (np.vstack([np.column_stack([sim[:, 0], sim[:, 1]]),
+                       np.column_stack([dis[:, 0], dis[:, 1]])]),
             np.concatenate([np.ones(len(sim)), -np.ones(len(sim))]))
+
 
 pairs, pairs_labels = create_constraints(y)
 
 
 ######################################################################
 # Now that we've created our constraints, let's see what it looks like!
-# 
+#
 
 print(pairs)
 print(pairs_labels)

@@ -234,7 +234,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">num_dim</span> <span class="o">=</span> <span class="n">pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
-    <span class="n">error1</span> <span class="o">=</span> <span class="n">error2</span> <span class="o">=</span> <span class="mf">1e10</span>
+    <span class="n">error2</span> <span class="o">=</span> <span class="mf">1e10</span>
     <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.01</span>        <span class="c1"># error-bound of iterative projection on C1 and C2</span>
     <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A_</span>
 
@@ -262,7 +262,8 @@
     <span class="c1"># constraint function</span>
     <span class="n">grad2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fD1</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>            <span class="c1"># gradient of dissimilarity</span>
     <span class="c1"># constraint function</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad_projection</span><span class="p">(</span><span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">)</span>  <span class="c1"># gradient of fD1 orthogonal to fS1</span>
+    <span class="c1"># gradient of fD1 orthogonal to fS1:</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grad_projection</span><span class="p">(</span><span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">)</span>
 
     <span class="n">A_old</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -290,7 +291,7 @@
         <span class="c1"># PSD constraint A &gt;= 0</span>
         <span class="c1"># project A onto domain A&gt;0</span>
         <span class="n">l</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">((</span><span class="n">A</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]),</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]),</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
         <span class="n">fDC2</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
         <span class="n">error2</span> <span class="o">=</span> <span class="p">(</span><span class="n">fDC2</span> <span class="o">-</span> <span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">t</span>
@@ -329,7 +330,8 @@
       <span class="k">if</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span><span class="p">:</span>
         <span class="k">break</span>
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc iter: </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">, projections = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">it</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mmc iter: </span><span class="si">%d</span><span class="s1">, conv = </span><span class="si">%f</span><span class="s1">, projections = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="n">cycle</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">it</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">converged_</span> <span class="o">=</span> <span class="kc">False</span>
@@ -371,8 +373,10 @@
       <span class="n">obj_initial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s_sum</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD0</span>
       <span class="n">fS_1st_d</span> <span class="o">=</span> <span class="n">s_sum</span>  <span class="c1"># first derivative of the similarity constraints</span>
 
-      <span class="n">gradient</span> <span class="o">=</span> <span class="n">fS_1st_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD_1st_d</span>               <span class="c1"># gradient of the objective</span>
-      <span class="n">hessian</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD_2nd_d</span> <span class="o">+</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_dim</span><span class="p">)</span>  <span class="c1"># Hessian of the objective</span>
+      <span class="c1"># gradient of the objective:</span>
+      <span class="n">gradient</span> <span class="o">=</span> <span class="n">fS_1st_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD_1st_d</span>
+      <span class="c1"># Hessian of the objective:</span>
+      <span class="n">hessian</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span> <span class="n">fD_2nd_d</span> <span class="o">+</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_dim</span><span class="p">)</span>
       <span class="n">step</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">hessian</span><span class="p">),</span> <span class="n">gradient</span><span class="p">)</span>
 
       <span class="c1"># Newton-Rapshon update</span>
@@ -407,16 +411,17 @@
     <span class="k">return</span> <span class="bp">self</span>
 
   <span class="k">def</span> <span class="nf">_fD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;The value of the dissimilarity constraint function.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;The value of the dissimilarity constraint function.</span>
 
 <span class="sd">    f = f(\sum_{ij \in D} distance(x_i, x_j))</span>
 <span class="sd">    i.e. distance can be L1:  \sqrt{(x_i-x_j)A(x_i-x_j)&#39;}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">diff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">diff</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span> <span class="o">+</span>
+                  <span class="mf">1e-6</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">_fD1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neg_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;The gradient of the dissimilarity constraint function w.r.t. A.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;The gradient of the dissimilarity constraint function w.r.t. A.</span>
 
 <span class="sd">    For example, let distance by L1 norm:</span>
 <span class="sd">    f = f(\sum_{ij \in D} \sqrt{(x_i-x_j)A(x_i-x_j)&#39;})</span>
@@ -427,19 +432,19 @@
 <span class="sd">        df/dA = f&#39;(\sum_{ij \in D} \sqrt{tr(d_ij&#39;*d_ij*A)})</span>
 <span class="sd">                * 0.5*(\sum_{ij \in D} (1/sqrt{tr(d_ij&#39;*d_ij*A)})*(d_ij&#39;*d_ij))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">neg_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
     <span class="c1"># outer products of all rows in `diff`</span>
     <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;ijk&#39;</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
     <span class="c1"># faster version of: dist = np.sqrt(np.sum(M * A[None,:,:], axis=(1,2)))</span>
     <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,jk&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
-    <span class="c1"># faster version of: sum_deri = np.sum(M / (2 * (dist[:,None,None] + 1e-6)), axis=0)</span>
+    <span class="c1"># faster version of: sum_deri = np.sum(M /</span>
+    <span class="c1"># (2 * (dist[:,None,None] + 1e-6)), axis=0)</span>
     <span class="n">sum_deri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,i-&gt;jk&#39;</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="p">(</span><span class="n">dist</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">))</span>
     <span class="n">sum_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">sum_deri</span> <span class="o">/</span> <span class="p">(</span><span class="n">sum_dist</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">_fS1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos_pairs</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;The gradient of the similarity constraint function w.r.t. A.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;The gradient of the similarity constraint function w.r.t. A.</span>
 
 <span class="sd">    f = \sum_{ij}(x_i-x_j)A(x_i-x_j)&#39; = \sum_{ij}d_ij*A*d_ij&#39;</span>
 <span class="sd">    df/dA = d(d_ij*A*d_ij&#39;)/dA</span>
@@ -447,9 +452,9 @@
 <span class="sd">    Note that d_ij*A*d_ij&#39; = tr(d_ij*A*d_ij&#39;) = tr(d_ij&#39;*d_ij*A)</span>
 <span class="sd">    so, d(d_ij*A*d_ij&#39;)/dA = d_ij&#39;*d_ij</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dim</span> <span class="o">=</span> <span class="n">pos_pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">pos_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pos_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>  <span class="c1"># sum of outer products of all rows in `diff`</span>
+    <span class="c1"># sum of outer products of all rows in `diff`:</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">_grad_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grad1</span><span class="p">,</span> <span class="n">grad2</span><span class="p">):</span>
     <span class="n">grad2</span> <span class="o">=</span> <span class="n">grad2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">grad2</span><span class="p">)</span>
@@ -460,7 +465,7 @@
   <span class="k">def</span> <span class="nf">_D_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neg_pairs</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(((</span><span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span>
                                           <span class="n">neg_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span>
-                                        <span class="n">w</span><span class="p">[</span><span class="kc">None</span><span class="p">,:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)))</span>
+                                        <span class="n">w</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-6</span><span class="p">)))</span>
 
   <span class="k">def</span> <span class="nf">_D_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neg_pairs</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute the value, 1st derivative, second derivative (Hessian) of</span>
@@ -474,13 +479,14 @@
     <span class="n">sum_deri2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
         <span class="s1">&#39;ij,ik-&gt;jk&#39;</span><span class="p">,</span>
         <span class="n">diff_sq</span><span class="p">,</span>
-        <span class="n">diff_sq</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">dist</span><span class="o">**</span><span class="mi">3</span><span class="p">))[:,</span><span class="kc">None</span><span class="p">]</span>
+        <span class="n">diff_sq</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">dist</span><span class="o">**</span><span class="mi">3</span><span class="p">))[:,</span> <span class="kc">None</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="n">sum_dist</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">(</span>
-      <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sum_dist</span><span class="p">),</span>
-      <span class="n">sum_deri1</span> <span class="o">/</span> <span class="n">sum_dist</span><span class="p">,</span>
-      <span class="n">sum_deri2</span> <span class="o">/</span> <span class="n">sum_dist</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">sum_deri1</span><span class="p">,</span> <span class="n">sum_deri1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sum_dist</span> <span class="o">*</span> <span class="n">sum_dist</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sum_dist</span><span class="p">),</span>
+        <span class="n">sum_deri1</span> <span class="o">/</span> <span class="n">sum_dist</span><span class="p">,</span>
+        <span class="n">sum_deri2</span> <span class="o">/</span> <span class="n">sum_dist</span> <span class="o">-</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">sum_deri1</span><span class="p">,</span> <span class="n">sum_deri1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sum_dist</span> <span class="o">*</span> <span class="n">sum_dist</span><span class="p">)</span>
     <span class="p">)</span>
 
 
@@ -778,7 +784,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>

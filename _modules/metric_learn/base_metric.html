@@ -208,7 +208,7 @@
 <span class="sd">      learner is.</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="BaseMetricLearner.check_preprocessor"><a class="viewcode-back" href="../../generated/metric_learn.base_metric.BaseMetricLearner.html#metric_learn.BaseMetricLearner.check_preprocessor">[docs]</a>  <span class="k">def</span> <span class="nf">check_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">_check_preprocessor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initializes the preprocessor&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">_is_arraylike</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="p">):</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span> <span class="o">=</span> <span class="n">ArrayIndexer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="p">)</span>
@@ -217,7 +217,7 @@
     <span class="k">else</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid type for the preprocessor: </span><span class="si">{}</span><span class="s2">. You should &quot;</span>
                        <span class="s2">&quot;provide either None, an array-like object, &quot;</span>
-                       <span class="s2">&quot;or a callable.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="p">)))</span></div>
+                       <span class="s2">&quot;or a callable.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span><span class="p">)))</span>
 
   <span class="k">def</span> <span class="nf">_prepare_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;classic&#39;</span><span class="p">,</span>
                       <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -249,7 +249,7 @@
 <span class="sd">    y: `numpy.ndarray` (optional)</span>
 <span class="sd">      The checked input labels array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">check_preprocessor</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_check_preprocessor</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">check_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
                        <span class="n">type_of_inputs</span><span class="o">=</span><span class="n">type_of_inputs</span><span class="p">,</span>
                        <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
@@ -320,7 +320,7 @@
 
 <span class="k">class</span> <span class="nc">MahalanobisMixin</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="n">BaseMetricLearner</span><span class="p">,</span>
                                           <span class="n">MetricTransformer</span><span class="p">)):</span>
-  <span class="sd">&quot;&quot;&quot;Mahalanobis metric learning algorithms.</span>
+  <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mahalanobis metric learning algorithms.</span>
 
 <span class="sd">  Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x&#39;)`,</span>
 <span class="sd">  defined between two column vectors :math:`x` and :math:`x&#39;` by: :math:`d_M(x,</span>
@@ -339,7 +339,7 @@
 <span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">score_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the learned Mahalanobis distance between pairs.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the learned Mahalanobis distance between pairs.</span>
 
 <span class="sd">    This distance is defined as: :math:`d_M(x, x&#39;) = \sqrt{(x-x&#39;)^T M (x-x&#39;)}`</span>
 <span class="sd">    where ``M`` is the learned Mahalanobis matrix, for every pair of points</span>
@@ -398,8 +398,8 @@
 <span class="sd">      The embedded data points.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">X_checked</span> <span class="o">=</span> <span class="n">check_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;classic&#39;</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-                             <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
-                             <span class="n">accept_sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                            <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
+                            <span class="n">accept_sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">X_checked</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">get_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -829,7 +829,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet, and Nathalie Vauquier
+        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
