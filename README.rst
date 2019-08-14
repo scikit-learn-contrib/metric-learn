@@ -3,7 +3,7 @@
 metric-learn: Metric Learning in Python
 =======================================
 
-metric-learn contains efficient Python implementations of several popular supervised and weakly-supervised metric learning algorithms. As part of `scikit-learn-contrib <https://github.com/scikit-learn-contrib>`_, the API of metric-learn is compatible with `scikit-learn <http://scikit-learn.org/stable/>`_, the leading library for machine learning in Python. This allows to use of all the scikit-learn routines (for pipelining, model selection, etc) with metric learning algorithms through a unified interface.
+metric-learn contains efficient Python implementations of several popular supervised and weakly-supervised metric learning algorithms. As part of `scikit-learn-contrib <https://github.com/scikit-learn-contrib>`_, the API of metric-learn is compatible with `scikit-learn <http://scikit-learn.org/stable/>`_, the leading library for machine learning in Python. This allows to use all the scikit-learn routines (for pipelining, model selection, etc) with metric learning algorithms through a unified interface.
 
 **Algorithms**
 
