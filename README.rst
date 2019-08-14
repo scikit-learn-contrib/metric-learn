@@ -50,6 +50,15 @@ citations to the following paper:
     <https://arxiv.org/abs/1908.04710>`_, de Vazelhes
     *et al.*, arXiv:1908.04710, 2019.
 
+    Bibtex entry::
+
+    @techreport{metric-learn,
+      title = {metric-learn: {M}etric {L}earning {A}lgorithms in {P}ython},
+      author = {{de Vazelhes}, William and {Carey}, CJ and {Tang}, Yuan and
+               {Vauquier}, Nathalie and {Bellet}, Aur{\'e}lien},
+      institution = {arXiv:1908.04710},
+      year = {2019}
+    }
 
 .. _sphinx documentation: http://contrib.scikit-learn.org/metric-learn/
 
