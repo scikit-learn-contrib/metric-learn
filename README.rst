@@ -41,6 +41,15 @@ package installed).
 
 See the `sphinx documentation`_ for full documentation about installation, API, usage, and examples.
 
+**Citation**
+
+If you use metric-learn in a scientific publication, we would appreciate
+citations to the following paper:
+
+    `metric-learn: Metric Learning Algorithms in Python
+    <https://arxiv.org/abs/1908.04710>`_, de Vazelhes
+    *et al.*, arXiv:1908.04710, 2019.
+
 
 .. _sphinx documentation: http://contrib.scikit-learn.org/metric-learn/
 
