@@ -55,7 +55,7 @@ citations to the following paper:
   @techreport{metric-learn,
     title = {metric-learn: {M}etric {L}earning {A}lgorithms in {P}ython},
     author = {{de Vazelhes}, William and {Carey}, CJ and {Tang}, Yuan and
-             {Vauquier}, Nathalie and {Bellet}, Aur{\'e}lien},
+              {Vauquier}, Nathalie and {Bellet}, Aur{\'e}lien},
     institution = {arXiv:1908.04710},
     year = {2019}
   }
