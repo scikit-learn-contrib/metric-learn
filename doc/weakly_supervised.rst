@@ -57,7 +57,7 @@ learn:
 ^^^^^^^^^^^^^^^^^^
 
 The most intuitive way to represent tuples is to provide the algorithm with a
-3D array-like of tuples of shape `(n_tuples, t, n_features)`, where
+3D array-like of tuples of shape `(n_tuples, tuple_size, n_features)`, where
 `n_tuples` is the number of tuples, `tuple_size` is the number of elements
 in a tuple (2 for pairs, 3 for triplets for instance), and `n_features` is
 the number of features of each point.
