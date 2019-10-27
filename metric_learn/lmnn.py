@@ -224,6 +224,9 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
     it = 1  # we already made one iteration
 
+    if self.verbose:
+      print("it | objective | delta_obj | total_active | learn_rate")
+
     # main loop
     for it in xrange(2, self.max_iter):
       # then at each iteration, we try to find a value of L that has better
