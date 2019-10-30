@@ -13,7 +13,7 @@ def gen_labels_for_chunks(num_chunks, chunk_size,
   assert min(num_chunks, chunk_size) > 0
   classes = shuffle(np.arange(n_classes), random_state=SEED)
   n_per_class = chunk_size * (num_chunks // n_classes)
-  n_maj_class = chunk_size * num_chunks - n_per_class * n_classes
+  n_maj_class = n_per_class + chunk_size * num_chunks - n_per_class * n_classes
 
   first_labels = classes[0] * np.ones(n_maj_class, dtype=int)
   remaining_labels = np.concatenate([k * np.ones(n_per_class, dtype=int)
