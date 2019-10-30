@@ -79,10 +79,11 @@ class Constraints(object):
     chunks = -np.ones_like(self.known_label_idx, dtype=int)
     uniq, lookup = np.unique(self.known_labels, return_inverse=True)
     all_inds = [set(np.where(lookup == c)[0]) for c in xrange(len(uniq))]
-    max_chunks = np.sum([len(s) // chunk_size for s in all_inds])
+    max_chunks = int(np.sum([len(s) // chunk_size for s in all_inds]))
     if max_chunks < num_chunks:
-      raise ValueError(('Not enough examples in each class to form '
-                        '%d chunks of %d examples') % (num_chunks, chunk_size))
+      raise ValueError(('Not enough examples in each class to form %d chunks '
+                        'of %d examples - maximum number of chunks is %d'
+                        ) % (num_chunks, chunk_size, max_chunks))
     idx = 0
     while idx < num_chunks and all_inds:
       if len(all_inds) == 1:
