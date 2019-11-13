@@ -34,7 +34,7 @@ def test_exact_num_points_for_chunks(num_chunks, chunk_size):
   chunks = constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
                               random_state=SEED)
 
-  chunk_no, size_each_chunk = np.unique(chunks, return_counts=True)
+  chunk_no, size_each_chunk = np.unique(chunks[chunks > 0], return_counts=True)
 
   np.testing.assert_array_equal(size_each_chunk, chunk_size)
   assert chunk_no.shape[0] == num_chunks
@@ -60,4 +60,4 @@ def test_chunk_case_one_miss_point(num_chunks, chunk_size):
 
 
 if __name__ == '__main__':
-  unittest.main()
+  test_exact_num_points_for_chunks(5, 10)
