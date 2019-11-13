@@ -25,38 +25,38 @@ def gen_labels_for_chunks(num_chunks, chunk_size,
   return shuffle(labels, random_state=SEED)
 
 
-class TestConstraints(unittest.TestCase):
-  def test_exact_num_points_for_chunks(self):
-    """Checks that the chunk generation works well with just enough points."""
-    for num_chunks, chunk_size in [(5, 10), (10, 50)]:
-      labels = gen_labels_for_chunks(num_chunks, chunk_size)
+@pytest.mark.parametrize("num_chunks, chunk_size", [(5, 10), (10, 50)])
+def test_exact_num_points_for_chunks(num_chunks, chunk_size):
+  """Checks that the chunk generation works well with just enough points."""
+  labels = gen_labels_for_chunks(num_chunks, chunk_size)
 
-      constraints = Constraints(labels)
-      chunks = constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
-                                  random_state=SEED)
+  constraints = Constraints(labels)
+  chunks = constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
+                              random_state=SEED)
 
-      chunk_no, size_each_chunk = np.unique(chunks, return_counts=True)
+  chunk_no, size_each_chunk = np.unique(chunks, return_counts=True)
 
-      self.assertTrue(np.all(size_each_chunk == chunk_size))
-      self.assertEqual(chunk_no.shape[0], num_chunks)
+  np.testing.assert_array_equal(size_each_chunk, chunk_size)
+  assert chunk_no.shape[0] == num_chunks
 
-  def test_chunk_case_one_miss_point(self):
-    """Checks that the chunk generation breaks when one point is missing."""
-    for num_chunks, chunk_size in [(5, 10), (10, 50)]:
-      labels = gen_labels_for_chunks(num_chunks, chunk_size)
 
-      assert len(labels) >= 1
-      constraints = Constraints(labels[1:])
-      with pytest.raises(ValueError) as e:
-        constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
-                           random_state=SEED)
+@pytest.mark.parametrize("num_chunks, chunk_size", [(5, 10), (10, 50)])
+def test_chunk_case_one_miss_point(num_chunks, chunk_size):
+  """Checks that the chunk generation breaks when one point is missing."""
+  labels = gen_labels_for_chunks(num_chunks, chunk_size)
 
-      expected_message = (('Not enough possible chunks of %d elements in each'
-                           ' class to form expected %d chunks - maximum number'
-                           ' of chunks is %d'
-                           ) % (chunk_size, num_chunks, num_chunks - 1))
+  assert len(labels) >= 1
+  constraints = Constraints(labels[1:])
+  with pytest.raises(ValueError) as e:
+    constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
+                       random_state=SEED)
 
-      self.assertEqual(str(e.value), expected_message)
+  expected_message = (('Not enough possible chunks of %d elements in each'
+                       ' class to form expected %d chunks - maximum number'
+                       ' of chunks is %d'
+                       ) % (chunk_size, num_chunks, num_chunks - 1))
+
+  assert str(e.value) == expected_message
 
 
 if __name__ == '__main__':
