@@ -79,12 +79,10 @@ class Constraints(object):
     random_state = check_random_state(random_state)
     chunks = -np.ones_like(self.partial_labels, dtype=int)
     uniq, lookup = np.unique(self.partial_labels, return_inverse=True)
-    if self.num_points != len(self.known_labels):
-      unknown_uniq = np.where(uniq < 0)[0]
+    unknown_uniq = np.where(uniq < 0)[0]
     all_inds = [set(np.where(lookup == c)[0]) for c in xrange(len(uniq))
                 if c not in unknown_uniq]
     max_chunks = int(np.sum([len(s) // chunk_size for s in all_inds]))
-    print(max_chunks)
     if max_chunks < num_chunks:
       raise ValueError(('Not enough possible chunks of %d elements in each'
                         ' class to form expected %d chunks - maximum number'
