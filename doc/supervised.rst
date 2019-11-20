@@ -374,7 +374,12 @@ Supervised versions of weakly-supervised algorithms
 Each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
 has a supervised version of the form `*_Supervised` where similarity tuples are
 randomly generated from the labels information and passed to the underlying
-algorithm.
+algorithm. 
+
+.. warning::
+    Supervised versions of weakly-supervised algortihms interpret label -1
+    (or any negative label) as a point with unknown label.
+    Those points are discarded in the learning process.
 
 For pairs learners (see :ref:`learning_on_pairs`), pairs (tuple of two points
 from the dataset), and pair labels (`int` indicating whether the two points
