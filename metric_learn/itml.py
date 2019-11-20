@@ -273,6 +273,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
            be removed in 0.6.0.
   num_constraints: int, optional
       number of constraints to generate
+      (`20 * num_classes**2` constraints if not specified)
   bounds : Not used
          .. deprecated:: 0.5.0
         `bounds` was deprecated in version 0.5.0 and will
