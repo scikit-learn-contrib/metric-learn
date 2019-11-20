@@ -498,7 +498,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
        be removed in 0.6.0.
   num_constraints: int, optional
       number of constraints to generate
-      (`20 * num_classes**2` constraints if not specified)
+      (`20 * num_classes**2` constraints by default)
   init : None, string or numpy array, optional (default=None)
       Initialization of the Mahalanobis matrix. Possible options are
       'identity', 'covariance', 'random', and a numpy array of
