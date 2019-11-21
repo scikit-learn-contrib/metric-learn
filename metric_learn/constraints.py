@@ -70,7 +70,7 @@ class Constraints(object):
       warnings.warn("Only generated %d %s constraints (requested %d)" % (
           len(ab), 'positive' if same_label else 'negative', num_constraints))
     ab = np.array(list(ab)[:num_constraints], dtype=int)
-    return self.known_label_idx[ab.T]
+    return known_label_idx[ab.T]
 
   def chunks(self, num_chunks=100, chunk_size=2, random_state=None):
     """
