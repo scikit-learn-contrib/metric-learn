@@ -21,7 +21,6 @@ class Constraints(object):
     '''partial_labels : int arraylike, -1 indicating unknown label'''
     partial_labels = np.asanyarray(partial_labels, dtype=int)
     self.partial_labels = partial_labels
-    self.num_points, = partial_labels.shape
 
   def adjacency_matrix(self, num_constraints, random_state=None):
     random_state = check_random_state(random_state)
@@ -31,7 +30,8 @@ class Constraints(object):
     col = np.concatenate((b, d))
     data = np.ones_like(row, dtype=int)
     data[len(a):] = -1
-    adj = coo_matrix((data, (row, col)), shape=(self.num_points,) * 2)
+    num_points = self.partial_labels.shape[0]
+    adj = coo_matrix((data, (row, col)), shape=(num_points,) * 2)
     # symmetrize
     return adj + adj.T
 
