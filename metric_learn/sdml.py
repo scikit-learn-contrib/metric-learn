@@ -302,6 +302,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
        be removed in 0.6.0.
   num_constraints : int, optional (default=None)
       number of constraints to generate
+      (`20 * num_classes**2` constraints by default)
   verbose : bool, optional (default=False)
       if True, prints information while learning
   preprocessor : array-like, shape=(n_samples, n_features) or callable
