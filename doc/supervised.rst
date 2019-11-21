@@ -377,7 +377,7 @@ randomly generated from the labels information and passed to the underlying
 algorithm. 
 
 .. warning::
-    Supervised versions of weakly-supervised algortihms interpret label -1
+    Supervised versions of weakly-supervised algorithms interpret label -1
     (or any negative label) as a point with unknown label.
     Those points are discarded in the learning process.
 
