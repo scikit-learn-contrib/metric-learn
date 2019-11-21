@@ -20,10 +20,8 @@ class Constraints(object):
   def __init__(self, partial_labels):
     '''partial_labels : int arraylike, -1 indicating unknown label'''
     partial_labels = np.asanyarray(partial_labels, dtype=int)
-    self.num_points, = partial_labels.shape
-    self.known_label_idx, = np.where(partial_labels >= 0)
-    self.known_labels = partial_labels[self.known_label_idx]
     self.partial_labels = partial_labels
+    self.num_points, = partial_labels.shape
 
   def adjacency_matrix(self, num_constraints, random_state=None):
     random_state = check_random_state(random_state)
@@ -51,17 +49,19 @@ class Constraints(object):
 
   def _pairs(self, num_constraints, same_label=True, max_iter=10,
              random_state=np.random):
-    num_labels = len(self.known_labels)
+    known_label_idx, = np.where(self.partial_labels >= 0)
+    known_labels = self.partial_labels[known_label_idx]
+    num_labels = len(known_labels)
     ab = set()
     it = 0
     while it < max_iter and len(ab) < num_constraints:
       nc = num_constraints - len(ab)
       for aidx in random_state.randint(num_labels, size=nc):
         if same_label:
-          mask = self.known_labels[aidx] == self.known_labels
+          mask = known_labels[aidx] == known_labels
           mask[aidx] = False  # avoid identity pairs
         else:
-          mask = self.known_labels[aidx] != self.known_labels
+          mask = known_labels[aidx] != known_labels
         b_choices, = np.where(mask)
         if len(b_choices) > 0:
           ab.add((aidx, random_state.choice(b_choices)))
