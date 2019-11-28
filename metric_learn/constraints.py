@@ -5,7 +5,6 @@ from supervised data labels.
 import numpy as np
 import warnings
 from six.moves import xrange
-from scipy.sparse import coo_matrix
 from sklearn.utils import check_random_state
 
 __all__ = ['Constraints']
