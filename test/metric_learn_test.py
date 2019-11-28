@@ -23,9 +23,9 @@ else:
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           LSML_Supervised, ITML_Supervised, SDML_Supervised,
                           RCA_Supervised, MMC_Supervised, SDML, RCA, ITML,
-                          LSML)
+                          LSML, RCA_SemiSupervised)
 # Import this specially for testing.
-from metric_learn.constraints import wrap_pairs
+from metric_learn.constraints import wrap_pairs, Constraints
 from metric_learn.lmnn import _sum_outer_products
 
 
@@ -1135,6 +1135,15 @@ class TestRCA(MetricTestCase):
     with pytest.warns(ChangedBehaviorWarning) as raised_warning:
       rca_supervised.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+  def test_semi_supervised(self):
+    n = 100
+    X, y = make_classification(random_state=42, n_samples=2 * n)
+    rca_semisupervised = RCA_SemiSupervised(num_chunks=20)
+    cons = Constraints(y[n:])
+    chunks = cons.chunks(num_chunks=20)
+    rca_semisupervised.fit(X[:n], y[:n],
+                           X[n:], chunks)
 
 
 @pytest.mark.parametrize('num_dims', [None, 2])
