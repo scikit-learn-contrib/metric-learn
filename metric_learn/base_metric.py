@@ -242,7 +242,6 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
       The embedded data points.
     """
     check_is_fitted(self, 'components_')
-
     X_checked = check_input(X, type_of_inputs='classic', estimator=self,
                             preprocessor=self.preprocessor_,
                             accept_sparse=True)
