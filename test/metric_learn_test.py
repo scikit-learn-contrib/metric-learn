@@ -1136,6 +1136,19 @@ class TestRCA(MetricTestCase):
       rca_supervised.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
+  def test_unknown_labels(self):
+    n = 100
+    X, y = make_classification(random_state=42, n_samples=2 * n)
+    y2 = np.concatenate((y[:n], np.ones(n)))
+
+    rca = RCA_Supervised(num_chunks=2)
+    rca.fit(X[:n], y[:n])
+
+    rca2 = RCA_Supervised(num_chunks=2)
+    rca2.fit(X, y2)
+
+    np.testing.assert_array_equal(rca.components_, rca2.components_)
+
 
 @pytest.mark.parametrize('num_dims', [None, 2])
 def test_deprecation_num_dims_rca(num_dims):

@@ -22,19 +22,6 @@ class Constraints(object):
     partial_labels = np.asanyarray(partial_labels, dtype=int)
     self.partial_labels = partial_labels
 
-  def adjacency_matrix(self, num_constraints, random_state=None):
-    random_state = check_random_state(random_state)
-    a, b, c, d = self.positive_negative_pairs(num_constraints,
-                                              random_state=random_state)
-    row = np.concatenate((a, c))
-    col = np.concatenate((b, d))
-    data = np.ones_like(row, dtype=int)
-    data[len(a):] = -1
-    num_points = self.partial_labels.shape[0]
-    adj = coo_matrix((data, (row, col)), shape=(num_points,) * 2)
-    # symmetrize
-    return adj + adj.T
-
   def positive_negative_pairs(self, num_constraints, same_length=False,
                               random_state=None):
     random_state = check_random_state(random_state)

@@ -57,3 +57,15 @@ def test_chunk_case_one_miss_point(num_chunks, chunk_size):
                        ) % (chunk_size, num_chunks, num_chunks - 1))
 
   assert str(e.value) == expected_message
+
+
+@pytest.mark.parametrize("num_chunks, chunk_size", [(5, 10), (10, 50)])
+def test_unknown_labels_not_in_chunks(num_chunks, chunk_size):
+  """Checks that unknown labels are not assigned to any chunk."""
+  labels = gen_labels_for_chunks(num_chunks, chunk_size)
+
+  constraints = Constraints(labels)
+  chunks = constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
+                              random_state=SEED)
+
+  assert np.all(chunks[labels < 0] < 0)
