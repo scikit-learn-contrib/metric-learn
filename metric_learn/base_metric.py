@@ -215,10 +215,10 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     :ref:`mahalanobis_distances` : The section of the project documentation
       that describes Mahalanobis Distances.
     """
-    check_is_fitted(self, 'components_')
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=2)
+    check_is_fitted(self, 'components_')
     pairwise_diffs = self.transform(pairs[:, 1, :] - pairs[:, 0, :])
     # (for MahalanobisMixin, the embedding is linear so we can just embed the
     # difference)
