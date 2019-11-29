@@ -336,6 +336,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
+    if "threshold_" not in vars(self):
+      msg = ("A threshold for this estimator has not been set,"
+             "call the set_threshold or calibrate_threshold method.")
+      raise AttributeError(msg)
     return 2 * (- self.decision_function(pairs) <= self.threshold_) - 1
 
   def decision_function(self, pairs):
