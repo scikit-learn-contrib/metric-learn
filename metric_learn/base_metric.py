@@ -338,7 +338,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     """
     if "threshold_" not in vars(self):
       msg = ("A threshold for this estimator has not been set,"
-             "call the set_threshold or calibrate_threshold method.")
+             "call its set_threshold or calibrate_threshold method.")
       raise AttributeError(msg)
     return 2 * (- self.decision_function(pairs) <= self.threshold_) - 1
 
