@@ -1144,6 +1144,8 @@ class TestRCA(MetricTestCase):
     chunks = cons.chunks(num_chunks=20)
     rca_semisupervised.fit(X[:n], y[:n],
                            X[n:], chunks)
+    rca_semisupervised.fit(X[:n], y[:n],
+                           X[n:], chunks, random_state=42)
 
 
 @pytest.mark.parametrize('num_dims', [None, 2])
