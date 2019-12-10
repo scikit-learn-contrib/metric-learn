@@ -96,7 +96,8 @@ psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
     if rank < d:
       warnings.warn('The inner covariance matrix is not invertible, '
                     'so the transformation matrix may contain Nan values. '
-                    'You should reduce the dimensionality of your input,'
+                    'You should remove any linearly dependent features and/or'
+                    'reduce the dimensionality of your input,'
                     'for instance using `sklearn.decomposition.PCA` as a '
                     'preprocessing step.')
 
