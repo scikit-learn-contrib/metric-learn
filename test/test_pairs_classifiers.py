@@ -66,14 +66,24 @@ def test_predict_monotonous(estimator, build_dataset,
                          ids=ids_pairs_learners)
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
-  """Test that a NotFittedError is raised if someone tries to predict and
-  the metric learner has not been fitted."""
+  """Test that a NotFittedError is raised if someone tries to use 
+  score_pairs, decision_function, get_metric, transform or
+  get_mahalanobis_matrix on input data and the metric learner
+  has not been fitted."""
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   with pytest.raises(NotFittedError):
+    estimator.score_pairs(input_data)
+  with pytest.raises(NotFittedError):
     estimator.decision_function(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.get_metric()
+  with pytest.raises(NotFittedError):
+    estimator.transform(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.get_mahalanobis_matrix()
 
 
 @pytest.mark.parametrize('calibration_params',
@@ -138,7 +148,8 @@ class IdentityPairsClassifier(MahalanobisMixin, _PairsClassifierMixin):
 
 
 def test_unset_threshold():
-  # test that set_threshold indeed sets the threshold
+  """Tests that the "threshold is unset" error is raised when using predict
+  (performs binary classification on pairs) with an unset threshold."""
   identity_pairs_classifier = IdentityPairsClassifier()
   pairs = np.array([[[0.], [1.]], [[1.], [3.]], [[2.], [5.]], [[3.], [7.]]])
   y = np.array([1, 1, -1, -1])
