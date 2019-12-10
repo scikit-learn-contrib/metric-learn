@@ -66,7 +66,7 @@ def test_predict_monotonous(estimator, build_dataset,
                          ids=ids_pairs_learners)
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
-  """Test that a NotFittedError is raised if someone tries to use 
+  """Test that a NotFittedError is raised if someone tries to use
   score_pairs, decision_function, get_metric, transform or
   get_mahalanobis_matrix on input data and the metric learner
   has not been fitted."""
