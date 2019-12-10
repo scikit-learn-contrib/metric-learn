@@ -240,12 +240,14 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     X_embedded : `numpy.ndarray`, shape=(n_samples, n_components)
       The embedded data points.
     """
+    check_is_fitted(self, ['preprocessor_', 'components_'])
     X_checked = check_input(X, type_of_inputs='classic', estimator=self,
                             preprocessor=self.preprocessor_,
                             accept_sparse=True)
     return X_checked.dot(self.components_.T)
 
   def get_metric(self):
+    check_is_fitted(self, 'components_')
     components_T = self.components_.T.copy()
 
     def metric_fun(u, v, squared=False):
@@ -298,6 +300,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     M : `numpy.ndarray`, shape=(n_features, n_features)
       The copy of the learned Mahalanobis matrix.
     """
+    check_is_fitted(self, 'components_')
     return self.components_.T.dot(self.components_)
 
 
@@ -333,7 +336,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    check_is_fitted(self, ['threshold_', 'components_'])
+    if "threshold_" not in vars(self):
+      msg = ("A threshold for this estimator has not been set,"
+             "call its set_threshold or calibrate_threshold method.")
+      raise AttributeError(msg)
     return 2 * (- self.decision_function(pairs) <= self.threshold_) - 1
 
   def decision_function(self, pairs):
@@ -357,6 +363,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted decision function value for each pair.
     """
+    check_is_fitted(self, 'preprocessor_')
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=self._tuple_size)
@@ -599,7 +606,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
-    check_is_fitted(self, 'components_')
+    check_is_fitted(self, 'preprocessor_')
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)
@@ -628,6 +635,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
+    check_is_fitted(self, 'preprocessor_')
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)

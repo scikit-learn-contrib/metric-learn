@@ -73,7 +73,7 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   with pytest.raises(NotFittedError):
-    estimator.predict(input_data)
+    estimator.decision_function(input_data)
 
 
 @pytest.mark.parametrize('calibration_params',
@@ -133,8 +133,23 @@ class IdentityPairsClassifier(MahalanobisMixin, _PairsClassifierMixin):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
     self.components_ = np.atleast_2d(np.identity(pairs.shape[2]))
-    self.threshold_ = 'I am not set.'
+    # self.threshold_ is not set.
     return self
+
+
+def test_unset_threshold():
+  # test that set_threshold indeed sets the threshold
+  identity_pairs_classifier = IdentityPairsClassifier()
+  pairs = np.array([[[0.], [1.]], [[1.], [3.]], [[2.], [5.]], [[3.], [7.]]])
+  y = np.array([1, 1, -1, -1])
+  identity_pairs_classifier.fit(pairs, y)
+  with pytest.raises(AttributeError) as e:
+    identity_pairs_classifier.predict(pairs)
+
+  expected_msg = ("A threshold for this estimator has not been set,"
+                  "call its set_threshold or calibrate_threshold method.")
+
+  assert str(e.value) == expected_msg
 
 
 def test_set_threshold():

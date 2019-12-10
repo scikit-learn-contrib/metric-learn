@@ -65,3 +65,7 @@ sphinx_gallery_conf = {
 
 # generate autosummary even if no references
 autosummary_generate = True
+
+# Switch to old behavior with html4, for a good display of references,
+# as described in https://github.com/sphinx-doc/sphinx/issues/6705
+html4_writer = True
