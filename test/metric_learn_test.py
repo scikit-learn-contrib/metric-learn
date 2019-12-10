@@ -1137,16 +1137,16 @@ class TestRCA(MetricTestCase):
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
   def test_unknown_labels(self):
-    n = 100
+    n = 200
+    num_chunks = 50
     X, y = make_classification(random_state=42, n_samples=2 * n,
-                               n_features=3, n_redundant=0,
-                               n_informative=3)
+                               n_features=6, n_informative=6, n_redundant=0)
     y2 = np.concatenate((y[:n], -np.ones(n)))
 
-    rca = RCA_Supervised(num_chunks=2)
+    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
     rca.fit(X[:n], y[:n])
 
-    rca2 = RCA_Supervised(num_chunks=2)
+    rca2 = RCA_Supervised(num_chunks=num_chunks, random_state=42)
     rca2.fit(X, y2)
 
     assert not np.any(np.isnan(rca.components_))
