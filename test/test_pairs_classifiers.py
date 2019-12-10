@@ -84,6 +84,12 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
     estimator.transform(input_data)
   with pytest.raises(NotFittedError):
     estimator.get_mahalanobis_matrix()
+  with pytest.raises(NotFittedError):
+    estimator.calibrate_threshold(input_data, labels)
+
+  estimator.set_threshold(0.5)
+  with pytest.raises(NotFittedError):
+    estimator.predict(input_data)
 
 
 @pytest.mark.parametrize('calibration_params',
