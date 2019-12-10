@@ -1138,14 +1138,19 @@ class TestRCA(MetricTestCase):
 
   def test_unknown_labels(self):
     n = 100
-    X, y = make_classification(random_state=42, n_samples=2 * n)
-    y2 = np.concatenate((y[:n], np.ones(n)))
+    X, y = make_classification(random_state=42, n_samples=2 * n,
+                               n_features=3, n_redundant=0,
+                               n_informative=3)
+    y2 = np.concatenate((y[:n], -np.ones(n)))
 
     rca = RCA_Supervised(num_chunks=2)
     rca.fit(X[:n], y[:n])
 
     rca2 = RCA_Supervised(num_chunks=2)
     rca2.fit(X, y2)
+
+    assert not np.any(np.isnan(rca.components_))
+    assert not np.any(np.isnan(rca2.components_))
 
     np.testing.assert_array_equal(rca.components_, rca2.components_)
 
