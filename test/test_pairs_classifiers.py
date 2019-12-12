@@ -121,8 +121,7 @@ def test_threshold_different_scores_is_finite(estimator, build_dataset,
   estimator.fit(input_data, labels)
   with pytest.warns(None) as record:
     estimator.calibrate_threshold(input_data, labels, **kwargs)
-  for w in record:
-    print(record[w])
+  print(record)
   assert len(record) == 0
 
 
