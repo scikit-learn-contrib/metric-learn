@@ -252,6 +252,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     return X_checked.dot(self.components_.T)
 
   def get_metric(self):
+    # TODO: remove when we stop supporting Python < 3.5
     if sys.version_info.major < 3 or sys.version_info.minor < 5:
       check_is_fitted(self, 'components_')
     else:
@@ -308,6 +309,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     M : `numpy.ndarray`, shape=(n_features, n_features)
       The copy of the learned Mahalanobis matrix.
     """
+    # TODO: remove when we stop supporting Python < 3.5
     if sys.version_info.major < 3 or sys.version_info.minor < 5:
       check_is_fitted(self, 'components_')
     else:
@@ -374,6 +376,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted decision function value for each pair.
     """
+    # TODO: remove when we stop supporting Python < 3.5
     if sys.version_info.major < 3 or sys.version_info.minor < 5:
       check_is_fitted(self, 'preprocessor_')
     else:
@@ -620,6 +623,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
+    # TODO: remove when we stop supporting Python < 3.5
     if sys.version_info.major < 3 or sys.version_info.minor < 5:
       check_is_fitted(self, 'preprocessor_')
     else:
@@ -652,6 +656,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
+    # TODO: remove when we stop supporting Python < 3.5
     if sys.version_info.major < 3 or sys.version_info.minor < 5:
       check_is_fitted(self, 'preprocessor_')
     else:
