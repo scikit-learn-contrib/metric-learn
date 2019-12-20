@@ -276,6 +276,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
        be removed in 0.6.0.
   num_constraints: int, optional
       number of constraints to generate
+      (`20 * num_classes**2` constraints by default)
   weights : (m,) array of floats, optional
       scale factor for each constraint
   verbose : bool, optional

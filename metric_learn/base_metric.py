@@ -11,6 +11,7 @@ from abc import ABCMeta, abstractmethod
 import six
 from ._util import ArrayIndexer, check_input, validate_vector
 import warnings
+import sys
 
 
 class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
@@ -240,12 +241,22 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     X_embedded : `numpy.ndarray`, shape=(n_samples, n_components)
       The embedded data points.
     """
+    # TODO: remove when we stop supporting Python < 3.5
+    if sys.version_info.major < 3 or sys.version_info.minor < 5:
+      check_is_fitted(self, ['preprocessor_', 'components_'])
+    else:
+      check_is_fitted(self)
     X_checked = check_input(X, type_of_inputs='classic', estimator=self,
                             preprocessor=self.preprocessor_,
                             accept_sparse=True)
     return X_checked.dot(self.components_.T)
 
   def get_metric(self):
+    # TODO: remove when we stop supporting Python < 3.5
+    if sys.version_info.major < 3 or sys.version_info.minor < 5:
+      check_is_fitted(self, 'components_')
+    else:
+      check_is_fitted(self)
     components_T = self.components_.T.copy()
 
     def metric_fun(u, v, squared=False):
@@ -298,6 +309,11 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     M : `numpy.ndarray`, shape=(n_features, n_features)
       The copy of the learned Mahalanobis matrix.
     """
+    # TODO: remove when we stop supporting Python < 3.5
+    if sys.version_info.major < 3 or sys.version_info.minor < 5:
+      check_is_fitted(self, 'components_')
+    else:
+      check_is_fitted(self)
     return self.components_.T.dot(self.components_)
 
 
@@ -333,7 +349,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    check_is_fitted(self, ['threshold_', 'components_'])
+    if "threshold_" not in vars(self):
+      msg = ("A threshold for this estimator has not been set,"
+             "call its set_threshold or calibrate_threshold method.")
+      raise AttributeError(msg)
     return 2 * (- self.decision_function(pairs) <= self.threshold_) - 1
 
   def decision_function(self, pairs):
@@ -357,6 +376,11 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted decision function value for each pair.
     """
+    # TODO: remove when we stop supporting Python < 3.5
+    if sys.version_info.major < 3 or sys.version_info.minor < 5:
+      check_is_fitted(self, 'preprocessor_')
+    else:
+      check_is_fitted(self)
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=self._tuple_size)
@@ -599,7 +623,11 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
-    check_is_fitted(self, 'components_')
+    # TODO: remove when we stop supporting Python < 3.5
+    if sys.version_info.major < 3 or sys.version_info.minor < 5:
+      check_is_fitted(self, 'preprocessor_')
+    else:
+      check_is_fitted(self)
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)
@@ -628,6 +656,11 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
       Metric differences.
     """
+    # TODO: remove when we stop supporting Python < 3.5
+    if sys.version_info.major < 3 or sys.version_info.minor < 5:
+      check_is_fitted(self, 'preprocessor_')
+    else:
+      check_is_fitted(self)
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)
