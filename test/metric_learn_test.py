@@ -1100,9 +1100,11 @@ class TestRCA(MetricTestCase):
     rca = RCA()
     msg = ('The inner covariance matrix is not invertible, '
            'so the transformation matrix may contain Nan values. '
-           'You should reduce the dimensionality of your input,'
+           'You should remove any linearly dependent features and/or '
+           'reduce the dimensionality of your input, '
            'for instance using `sklearn.decomposition.PCA` as a '
            'preprocessing step.')
+
     with pytest.warns(None) as raised_warnings:
       rca.fit(X, y)
     assert any(str(w.message) == msg for w in raised_warnings)
