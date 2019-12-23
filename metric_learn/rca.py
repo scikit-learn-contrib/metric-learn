@@ -93,6 +93,7 @@ psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
 
   def _check_dimension(self, rank, X):
     d = X.shape[1]
+
     if rank < d:
       warnings.warn('The inner covariance matrix is not invertible, '
                     'so the transformation matrix may contain Nan values. '
@@ -242,4 +243,13 @@ class RCA_Supervised(RCA):
     chunks = Constraints(y).chunks(num_chunks=self.num_chunks,
                                    chunk_size=self.chunk_size,
                                    random_state=self.random_state)
+
+    if self.num_chunks * (self.chunk_size - 1) < X.shape[1]:
+      warnings.warn('Due to the parameters of RCA_Supervised, '
+                    'the inner covariance matrix is not invertible, '
+                    'so the transformation matrix will contain Nan values. '
+                    'Increase the number or size of the chunks to correct '
+                    'this problem.'
+                    )
+
     return RCA.fit(self, X, chunks)

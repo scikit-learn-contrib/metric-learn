@@ -1156,6 +1156,23 @@ class TestRCA(MetricTestCase):
 
     np.testing.assert_array_equal(rca.components_, rca2.components_)
 
+  def test_bad_parameters(self):
+    n = 200
+    num_chunks = 3
+    X, y = make_classification(random_state=42, n_samples=n,
+                               n_features=6, n_informative=6, n_redundant=0)
+
+    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    msg = ('Due to the parameters of RCA_Supervised, '
+           'the inner covariance matrix is not invertible, '
+           'so the transformation matrix will contain Nan values. '
+           'Increase the number or size of the chunks to correct '
+           'this problem.'
+           )
+    with pytest.warns(None) as raised_warning:
+      rca.fit(X, y)
+    assert any(str(w.message) == msg for w in raised_warning)
+
 
 @pytest.mark.parametrize('num_dims', [None, 2])
 def test_deprecation_num_dims_rca(num_dims):
