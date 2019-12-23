@@ -87,7 +87,8 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
   with pytest.raises(NotFittedError):
     estimator.calibrate_threshold(input_data, labels)
 
-  estimator.set_threshold(0.5)
+  with pytest.raises(NotFittedError):
+    estimator.set_threshold(0.5)
   with pytest.raises(NotFittedError):
     estimator.predict(input_data)
 
@@ -163,7 +164,7 @@ def test_unset_threshold():
   with pytest.raises(AttributeError) as e:
     identity_pairs_classifier.predict(pairs)
 
-  expected_msg = ("A threshold for this estimator has not been set,"
+  expected_msg = ("A threshold for this estimator has not been set, "
                   "call its set_threshold or calibrate_threshold method.")
 
   assert str(e.value) == expected_msg
