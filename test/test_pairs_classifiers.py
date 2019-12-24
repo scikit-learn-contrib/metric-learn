@@ -380,6 +380,7 @@ def test_calibrate_threshold_extreme():
     """
 
     def fit(self, pairs, y, calibration_params=None):
+      self.preprocessor_ = 'not used'
       self.components_ = 'not used'
       self.calibrate_threshold(pairs, y, **(calibration_params if
                                             calibration_params is not None else
