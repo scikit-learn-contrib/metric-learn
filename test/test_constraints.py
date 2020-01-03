@@ -1,4 +1,3 @@
-import unittest
 import pytest
 import numpy as np
 from sklearn.utils import shuffle
@@ -34,7 +33,8 @@ def test_exact_num_points_for_chunks(num_chunks, chunk_size):
   chunks = constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
                               random_state=SEED)
 
-  chunk_no, size_each_chunk = np.unique(chunks, return_counts=True)
+  chunk_no, size_each_chunk = np.unique(chunks[chunks >= 0],
+                                        return_counts=True)
 
   np.testing.assert_array_equal(size_each_chunk, chunk_size)
   assert chunk_no.shape[0] == num_chunks
@@ -59,5 +59,13 @@ def test_chunk_case_one_miss_point(num_chunks, chunk_size):
   assert str(e.value) == expected_message
 
 
-if __name__ == '__main__':
-  unittest.main()
+@pytest.mark.parametrize("num_chunks, chunk_size", [(5, 10), (10, 50)])
+def test_unknown_labels_not_in_chunks(num_chunks, chunk_size):
+  """Checks that unknown labels are not assigned to any chunk."""
+  labels = gen_labels_for_chunks(num_chunks, chunk_size)
+
+  constraints = Constraints(labels)
+  chunks = constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
+                              random_state=SEED)
+
+  assert np.all(chunks[labels < 0] < 0)
