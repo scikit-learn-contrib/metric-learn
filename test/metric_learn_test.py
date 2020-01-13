@@ -1100,9 +1100,11 @@ class TestRCA(MetricTestCase):
     rca = RCA()
     msg = ('The inner covariance matrix is not invertible, '
            'so the transformation matrix may contain Nan values. '
-           'You should reduce the dimensionality of your input,'
+           'You should remove any linearly dependent features and/or '
+           'reduce the dimensionality of your input, '
            'for instance using `sklearn.decomposition.PCA` as a '
            'preprocessing step.')
+
     with pytest.warns(None) as raised_warnings:
       rca.fit(X, y)
     assert any(str(w.message) == msg for w in raised_warnings)
@@ -1135,6 +1137,41 @@ class TestRCA(MetricTestCase):
     with pytest.warns(ChangedBehaviorWarning) as raised_warning:
       rca_supervised.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
+
+  def test_unknown_labels(self):
+    n = 200
+    num_chunks = 50
+    X, y = make_classification(random_state=42, n_samples=2 * n,
+                               n_features=6, n_informative=6, n_redundant=0)
+    y2 = np.concatenate((y[:n], -np.ones(n)))
+
+    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca.fit(X[:n], y[:n])
+
+    rca2 = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca2.fit(X, y2)
+
+    assert not np.any(np.isnan(rca.components_))
+    assert not np.any(np.isnan(rca2.components_))
+
+    np.testing.assert_array_equal(rca.components_, rca2.components_)
+
+  def test_bad_parameters(self):
+    n = 200
+    num_chunks = 3
+    X, y = make_classification(random_state=42, n_samples=n,
+                               n_features=6, n_informative=6, n_redundant=0)
+
+    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    msg = ('Due to the parameters of RCA_Supervised, '
+           'the inner covariance matrix is not invertible, '
+           'so the transformation matrix will contain Nan values. '
+           'Increase the number or size of the chunks to correct '
+           'this problem.'
+           )
+    with pytest.warns(None) as raised_warning:
+      rca.fit(X, y)
+    assert any(str(w.message) == msg for w in raised_warning)
 
 
 @pytest.mark.parametrize('num_dims', [None, 2])

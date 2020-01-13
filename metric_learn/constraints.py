@@ -5,7 +5,6 @@ from supervised data labels.
 import numpy as np
 import warnings
 from six.moves import xrange
-from scipy.sparse import coo_matrix
 from sklearn.utils import check_random_state
 
 __all__ = ['Constraints']
@@ -20,21 +19,7 @@ class Constraints(object):
   def __init__(self, partial_labels):
     '''partial_labels : int arraylike, -1 indicating unknown label'''
     partial_labels = np.asanyarray(partial_labels, dtype=int)
-    self.num_points, = partial_labels.shape
-    self.known_label_idx, = np.where(partial_labels >= 0)
-    self.known_labels = partial_labels[self.known_label_idx]
-
-  def adjacency_matrix(self, num_constraints, random_state=None):
-    random_state = check_random_state(random_state)
-    a, b, c, d = self.positive_negative_pairs(num_constraints,
-                                              random_state=random_state)
-    row = np.concatenate((a, c))
-    col = np.concatenate((b, d))
-    data = np.ones_like(row, dtype=int)
-    data[len(a):] = -1
-    adj = coo_matrix((data, (row, col)), shape=(self.num_points,) * 2)
-    # symmetrize
-    return adj + adj.T
+    self.partial_labels = partial_labels
 
   def positive_negative_pairs(self, num_constraints, same_length=False,
                               random_state=None):
@@ -50,17 +35,19 @@ class Constraints(object):
 
   def _pairs(self, num_constraints, same_label=True, max_iter=10,
              random_state=np.random):
-    num_labels = len(self.known_labels)
+    known_label_idx, = np.where(self.partial_labels >= 0)
+    known_labels = self.partial_labels[known_label_idx]
+    num_labels = len(known_labels)
     ab = set()
     it = 0
     while it < max_iter and len(ab) < num_constraints:
       nc = num_constraints - len(ab)
       for aidx in random_state.randint(num_labels, size=nc):
         if same_label:
-          mask = self.known_labels[aidx] == self.known_labels
+          mask = known_labels[aidx] == known_labels
           mask[aidx] = False  # avoid identity pairs
         else:
-          mask = self.known_labels[aidx] != self.known_labels
+          mask = known_labels[aidx] != known_labels
         b_choices, = np.where(mask)
         if len(b_choices) > 0:
           ab.add((aidx, random_state.choice(b_choices)))
@@ -69,16 +56,18 @@ class Constraints(object):
       warnings.warn("Only generated %d %s constraints (requested %d)" % (
           len(ab), 'positive' if same_label else 'negative', num_constraints))
     ab = np.array(list(ab)[:num_constraints], dtype=int)
-    return self.known_label_idx[ab.T]
+    return known_label_idx[ab.T]
 
   def chunks(self, num_chunks=100, chunk_size=2, random_state=None):
     """
     the random state object to be passed must be a numpy random seed
     """
     random_state = check_random_state(random_state)
-    chunks = -np.ones_like(self.known_label_idx, dtype=int)
-    uniq, lookup = np.unique(self.known_labels, return_inverse=True)
-    all_inds = [set(np.where(lookup == c)[0]) for c in xrange(len(uniq))]
+    chunks = -np.ones_like(self.partial_labels, dtype=int)
+    uniq, lookup = np.unique(self.partial_labels, return_inverse=True)
+    unknown_uniq = np.where(uniq < 0)[0]
+    all_inds = [set(np.where(lookup == c)[0]) for c in xrange(len(uniq))
+                if c not in unknown_uniq]
     max_chunks = int(np.sum([len(s) // chunk_size for s in all_inds]))
     if max_chunks < num_chunks:
       raise ValueError(('Not enough possible chunks of %d elements in each'
