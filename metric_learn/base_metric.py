@@ -215,10 +215,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     :ref:`mahalanobis_distances` : The section of the project documentation
       that describes Mahalanobis Distances.
     """
-    if sys.version_info.major < 3 or sys.version_info.minor < 5:
-        check_is_fitted(self, ['preprocessor_'])
-    else:
-        check_is_fitted(self)
+    check_is_fitted(self, ['preprocessor_'])
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=2)
