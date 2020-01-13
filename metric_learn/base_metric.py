@@ -340,11 +340,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
-    # TODO: remove when we stop supporting Python < 3.5
-    if sys.version_info.major < 3 or sys.version_info.minor < 5:
-      check_is_fitted(self, 'preprocessor_')
-    else:
-      check_is_fitted(self)
+    check_is_fitted(self, 'preprocessor_')
 
     if "threshold_" not in vars(self):
       msg = ("A threshold for this estimator has not been set, "
@@ -424,11 +420,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     self : `_PairsClassifier`
       The pairs classifier with the new threshold set.
     """
-    # TODO: remove when we stop supporting Python < 3.5
-    if sys.version_info.major < 3 or sys.version_info.minor < 5:
-      check_is_fitted(self, 'preprocessor_')
-    else:
-      check_is_fitted(self)
+    check_is_fitted(self, 'preprocessor_')
 
     self.threshold_ = threshold
     return self
@@ -492,11 +484,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     --------
     sklearn.calibration : scikit-learn's module for calibrating classifiers
     """
-    # TODO: remove when we stop supporting Python < 3.5
-    if sys.version_info.major < 3 or sys.version_info.minor < 5:
-      check_is_fitted(self, 'preprocessor_')
-    else:
-      check_is_fitted(self)
+    check_is_fitted(self, 'preprocessor_')
 
     self._validate_calibration_params(strategy, min_rate, beta)
 
