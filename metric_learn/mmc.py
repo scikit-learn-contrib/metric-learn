@@ -426,13 +426,16 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
 
   Examples
   --------
-  >>> from metric_learn import MMC_Supervised
-  >>> from sklearn.datasets import load_iris
-  >>> iris_data = load_iris()
-  >>> X = iris_data['data']
-  >>> Y = iris_data['target']
-  >>> mmc = MMC_Supervised(num_constraints=200)
-  >>> mmc.fit(X, Y)
+  >>> from metric_learn import MMC
+  >>> pairs = [[[1.2, 7.5], [1.3, 1.5]],
+  >>>          [[6.4, 2.6], [6.2, 9.7]],
+  >>>          [[1.3, 4.5], [3.2, 4.6]],
+  >>>          [[6.2, 5.5], [5.4, 5.4]]]
+  >>> y = [1, 1, -1, -1]
+  >>> # in this task we want points where the first feature is close to be closer
+  >>> # to each other, no matter how close the second feature is
+  >>> mmc = MMC()
+  >>> mmc.fit(pairs, y)
 
   References
   ----------
@@ -551,6 +554,16 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   `MMC_Supervised` creates pairs of similar sample by taking same class
   samples, and pairs of dissimilar samples by taking different class
   samples. It then passes these pairs to `MMC` for training.
+
+  Examples
+  --------
+  >>> from metric_learn import MMC_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> mmc = MMC_Supervised(num_constraints=200)
+  >>> mmc.fit(X, Y)
 
   Attributes
   ----------

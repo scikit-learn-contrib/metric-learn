@@ -62,13 +62,16 @@ class RCA(MahalanobisMixin, TransformerMixin):
 
   Examples
   --------
-  >>> from metric_learn import RCA_Supervised
-  >>> from sklearn.datasets import load_iris
-  >>> iris_data = load_iris()
-  >>> X = iris_data['data']
-  >>> Y = iris_data['target']
-  >>> rca = RCA_Supervised(num_chunks=30, chunk_size=2)
-  >>> rca.fit(X, Y)
+  >>> from metric_learn import RCA
+  >>> pairs = [[[1.2, 7.5], [1.3, 1.5]],
+  >>>         [[6.4, 2.6], [6.2, 9.7]],
+  >>>         [[1.3, 4.5], [3.2, 4.6]],
+  >>>         [[6.2, 5.5], [5.4, 5.4]]]
+  >>> y = [1, 1, -1, -1]
+  >>> # in this task we want points where the first feature is close to be closer
+  >>> # to each other, no matter how close the second feature is
+  >>> rca = RCA()
+  >>> rca.fit(pairs, y)
 
   References
   ------------------
@@ -195,6 +198,16 @@ class RCA_Supervised(RCA):
   random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int.
       It is used to randomly sample constraints from labels.
+
+  Examples
+  --------
+  >>> from metric_learn import RCA_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> rca = RCA_Supervised(num_chunks=30, chunk_size=2)
+  >>> rca.fit(X, Y)
 
   Attributes
   ----------

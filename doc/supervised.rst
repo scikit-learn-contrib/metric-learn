@@ -131,13 +131,13 @@ The distance is learned by solving the following optimization problem:
       c\sum_{i, j, l}\eta_{ij}(1-y_{ij})[1+||\mathbf{L(x_i-x_j)}||^2-||
       \mathbf{L(x_i-x_l)}||^2]_+)
 
-where :math:`\mathbf{x}_i` is an data point, :math:`\mathbf{x}_j` is one 
-of its k nearest neighbors sharing the same label, and :math:`\mathbf{x}_l` 
+where :math:`\mathbf{x}_i` is a data point, :math:`\mathbf{x}_j` is one 
+of its k-nearest neighbors sharing the same label, and :math:`\mathbf{x}_l` 
 are all the other instances within that region with different labels, 
 :math:`\eta_{ij}, y_{ij} \in \{0, 1\}` are both the indicators, 
-:math:`\eta_{ij}` represents :math:`\mathbf{x}_{j}` is the k nearest 
-neighbors(with same labels) of :math:`\mathbf{x}_{i}`, :math:`y_{ij}=0` 
-indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different class, 
+:math:`\eta_{ij}` represents :math:`\mathbf{x}_{j}` is the k-nearest 
+neighbors (with same labels) of :math:`\mathbf{x}_{i}`, :math:`y_{ij}=0` 
+indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different classes, 
 :math:`[\cdot]_+=\max(0, \cdot)` is the Hinge loss.
 
 .. topic:: Example Code:
@@ -235,7 +235,7 @@ the sum of probability of being correctly classified:
 
 Local Fisher Discriminant Analysis (:py:class:`LFDA <metric_learn.LFDA>`)
 
-`LFDA` is a linear supervised dimensionality reduction method. It is
+`LFDA` is a linear supervised dimensionality reduction method witch effectively combines the ideas of `Linear Discriminant Analysis <https://en.wikipedia.org/wiki/Linear_discriminant_analysis>` and Locality-Preserving Projection . It is
 particularly useful when dealing with multi-modality, where one ore more classes
 consist of separate clusters in input space. The core optimization problem of
 LFDA is solved as a generalized eigenvalue problem.
@@ -261,18 +261,18 @@ where
     \,\,\mathbf{A}_{i,j}(1/n-1/n_l) \qquad y_i = y_j\end{aligned}\right.\\
 
 here :math:`\mathbf{A}_{i,j}` is the :math:`(i,j)`-th entry of the affinity
-matrix :math:`\mathbf{A}`:, which can be calculated with local scaling methods.
+matrix :math:`\mathbf{A}`:, which can be calculated with local scaling methods, `n` and `n_l` are the total number of points and the number of points per cluster `l`.
 
 Then the learning problem becomes derive the LFDA transformation matrix 
-:math:`\mathbf{T}_{LFDA}`:
+:math:`\mathbf{L}_{LFDA}`:
 
 .. math::
 
-    \mathbf{T}_{LFDA} = \arg\max_\mathbf{T}
-    [\text{tr}((\mathbf{T}^T\mathbf{S}^{(w)}
-    \mathbf{T})^{-1}\mathbf{T}^T\mathbf{S}^{(b)}\mathbf{T})]
+    \mathbf{L}_{LFDA} = \arg\max_\mathbf{L}
+    [\text{tr}((\mathbf{L}^T\mathbf{S}^{(w)}
+    \mathbf{L})^{-1}\mathbf{L}^T\mathbf{S}^{(b)}\mathbf{L})]
 
-That is, it is looking for a transformation matrix :math:`\mathbf{T}` such that 
+That is, it is looking for a transformation matrix :math:`\mathbf{L}` such that 
 nearby data pairs in the same class are made close and the data pairs in 
 different classes are separated from each other; far apart data pairs in the 
 same class are not imposed to be close.
@@ -327,8 +327,8 @@ empirical development. The Gaussian kernel is denoted as:
 where :math:`d(\cdot, \cdot)` is the squared distance under some metrics, 
 here in the fashion of Mahalanobis, it should be :math:`d(\mathbf{x}_i, 
 \mathbf{x}_j) = ||\mathbf{A}(\mathbf{x}_i - \mathbf{x}_j)||`, the transition 
-matrix :math:`\mathbf{A}` is derived from the decomposition of Mahalanobis 
-matrix :math:`\mathbf{M=A^TA}`.
+matrix :math:`\mathbf{L}` is derived from the decomposition of Mahalanobis 
+matrix :math:`\mathbf{M=L^TL}`.
 
 Since :math:`\sigma^2` can be integrated into :math:`d(\cdot)`, we can set 
 :math:`\sigma^2=1` for the sake of simplicity. Here we use the cumulative 

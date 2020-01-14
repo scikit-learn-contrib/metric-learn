@@ -367,36 +367,36 @@ other methods, `ITML` does not rely on an eigenvalue computation or
 semi-definite programming.
 
 
-Given a Mahalanobis distance parameterized by :math:`A`, its corresponding 
+Given a Mahalanobis distance parameterized by :math:`M`, its corresponding 
 multivariate Gaussian is denoted as:
 
 .. math::
-    p(\mathbf{x}; \mathbf{A}) = \frac{1}{Z}\exp(-\frac{1}{2}d_\mathbf{A}
+    p(\mathbf{x}; \mathbf{M}) = \frac{1}{Z}\exp(-\frac{1}{2}d_\mathbf{M}
     (\mathbf{x}, \mu)) 
-    =  \frac{1}{Z}\exp(-\frac{1}{2}((\mathbf{x} - \mu)^T\mathbf{A}
+    =  \frac{1}{Z}\exp(-\frac{1}{2}((\mathbf{x} - \mu)^T\mathbf{M}
     (\mathbf{x} - \mu)) 
 
 where :math:`Z` is the normalization constant, the inverse of Mahalanobis 
-matrix :math:`\mathbf{A}^{-1}` is the covariance of the Gaussian.
+matrix :math:`\mathbf{M}^{-1}` is the covariance of the Gaussian.
 
 Given pairs of similar points :math:`S` and pairs of dissimilar points 
 :math:`D`, the distance metric learning problem is to minimize the LogDet
 divergence, which is equivalent as minimizing :math:`\textbf{KL}(p(\mathbf{x}; 
-\mathbf{A}_0) || p(\mathbf{x}; \mathbf{A}))`:
+\mathbf{M}_0) || p(\mathbf{x}; \mathbf{M}))`:
 
 .. math::
 
-    \min_\mathbf{A} D_{\ell \mathrm{d}}\left(A, A_{0}\right) = 
-    \operatorname{tr}\left(A A_{0}^{-1}\right)-\log \operatorname{det}
-    \left(A A_{0}^{-1}\right)-n\\
-    \text{subject to } \quad d_\mathbf{A}(\mathbf{x}_i, \mathbf{x}_j) 
+    \min_\mathbf{A} D_{\ell \mathrm{d}}\left(M, M_{0}\right) = 
+    \operatorname{tr}\left(M M_{0}^{-1}\right)-\log \operatorname{det}
+    \left(M M_{0}^{-1}\right)-n\\
+    \text{subject to } \quad d_\mathbf{M}(\mathbf{x}_i, \mathbf{x}_j) 
     \leq u \qquad (\mathbf{x}_i, \mathbf{x}_j)\in S \\
-    d_\mathbf{A}(\mathbf{x}_i, \mathbf{x}_j) \geq l \qquad (\mathbf{x}_i, 
+    d_\mathbf{M}(\mathbf{x}_i, \mathbf{x}_j) \geq l \qquad (\mathbf{x}_i, 
     \mathbf{x}_j)\in D
 
 
 where :math:`u` and :math:`l` is the upper and the lower bound of distance
-for similar and dissimilar pairs respectively, and :math:`\mathbf{A}_0` 
+for similar and dissimilar pairs respectively, and :math:`\mathbf{M}_0` 
 is the prior distance metric, set to identity matrix by default, 
 :math:`D_{\ell \mathrm{d}}(\cdot)` is the log determinant.
 
