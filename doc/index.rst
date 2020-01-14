@@ -52,7 +52,7 @@ Documentation outline
 
    auto_examples/index
 
-:ref:`genindex` | :ref:`modindex` | :ref:`search`
+:ref:`genindex` | :doc:`Modules <./metric_learn>` | :ref:`search`
 
 .. |Travis-CI Build Status| image:: https://api.travis-ci.org/scikit-learn-contrib/metric-learn.svg?branch=master
    :target: https://travis-ci.org/scikit-learn-contrib/metric-learn
