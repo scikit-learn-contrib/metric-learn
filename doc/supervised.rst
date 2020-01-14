@@ -326,7 +326,7 @@ empirical development. The Gaussian kernel is denoted as:
 
 where :math:`d(\cdot, \cdot)` is the squared distance under some metrics, 
 here in the fashion of Mahalanobis, it should be :math:`d(\mathbf{x}_i, 
-\mathbf{x}_j) = ||\mathbf{A}(\mathbf{x}_i - \mathbf{x}_j)||`, the transition 
+\mathbf{x}_j) = ||\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)||`, the transition 
 matrix :math:`\mathbf{L}` is derived from the decomposition of Mahalanobis 
 matrix :math:`\mathbf{M=L^TL}`.
 
