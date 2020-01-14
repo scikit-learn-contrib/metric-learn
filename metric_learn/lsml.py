@@ -291,7 +291,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       ``init='random'``, ``random_state`` is used to set the random
       prior. In any case, `random_state` is also used to randomly sample
       constraints from labels.
-  
+
   Examples
   --------
   >>> from metric_learn import ITML_Supervised
