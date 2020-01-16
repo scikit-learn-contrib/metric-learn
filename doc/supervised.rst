@@ -235,7 +235,7 @@ the sum of probability of being correctly classified:
 
 Local Fisher Discriminant Analysis (:py:class:`LFDA <metric_learn.LFDA>`)
 
-`LFDA` is a linear supervised dimensionality reduction method witch effectively combines the ideas of `Linear Discriminant Analysis <https://en.wikipedia.org/wiki/Linear_discriminant_analysis>` and Locality-Preserving Projection . It is
+`LFDA` is a linear supervised dimensionality reduction method which effectively combines the ideas of `Linear Discriminant Analysis <https://en.wikipedia.org/wiki/Linear_discriminant_analysis>` and Locality-Preserving Projection . It is
 particularly useful when dealing with multi-modality, where one ore more classes
 consist of separate clusters in input space. The core optimization problem of
 LFDA is solved as a generalized eigenvalue problem.
