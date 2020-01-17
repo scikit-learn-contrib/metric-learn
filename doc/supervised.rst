@@ -261,7 +261,7 @@ where
     \,\,\mathbf{A}_{i,j}(1/n-1/n_l) \qquad y_i = y_j\end{aligned}\right.\\
 
 here :math:`\mathbf{A}_{i,j}` is the :math:`(i,j)`-th entry of the affinity
-matrix :math:`\mathbf{A}`:, which can be calculated with local scaling methods, `n` and `n_l` are the total number of points and the number of points per cluster `l`.
+matrix :math:`\mathbf{A}`:, which can be calculated with local scaling methods, `n` and `n_l` are the total number of points and the number of points per cluster `l` respectively.
 
 Then the learning problem becomes derive the LFDA transformation matrix 
 :math:`\mathbf{L}_{LFDA}`:
