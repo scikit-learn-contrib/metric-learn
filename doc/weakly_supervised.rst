@@ -518,17 +518,17 @@ as the Mahalanobis matrix.
 
     from metric_learn import RCA
 
-    pairs = [[[1.2, 7.5], [1.3, 1.5]],
-             [[6.4, 2.6], [6.2, 9.7]],
-             [[1.3, 4.5], [3.2, 4.6]],
-             [[6.2, 5.5], [5.4, 5.4]]]
-    y = [1, 1, -1, -1]
+    X = [[1.2, 7.5], [1.3, 1.5],
+        [6.4, 2.6], [6.2, 9.7],
+        [1.3, 4.5], [3.2, 4.6],
+        [6.2, 5.5], [5.4, 5.4]]
+    chunks = [1, 1, 2, 2, 1, 1, 2, 2]
 
-    # in this task we want points where the first feature is close to be closer
-    # to each other, no matter how close the second feature is
+    # in this task we want points that belong to the same class as indicated
+    # by chunks but not necesarily assest which chunks belong to wich class
 
     rca = RCA()
-    rca.fit(pairs, y)
+    rca.fit(X, chunks)
 
 .. topic:: References:
 
