@@ -518,14 +518,11 @@ as the Mahalanobis matrix.
 
     from metric_learn import RCA
 
-    X = [[1.2, 7.5], [1.3, 1.5],
-        [6.4, 2.6], [6.2, 9.7],
-        [1.3, 4.5], [3.2, 4.6],
-        [6.2, 5.5], [5.4, 5.4]]
-    chunks = [1, 1, 2, 2, 1, 1, 2, 2]
-
-    # in this task we want points that belong to the same class as indicated
-    # by chunks but not necesarily assest which chunks belong to wich class
+    X = [[-0.05,  3.0],[0.05, -3.0],
+        [0.1, -3.55],[-0.1, 3.55],
+        [-0.95, -0.05],[0.95, 0.05],
+        [0.4,  0.05],[-0.4, -0.05]]
+    chunks = [0, 0, 1, 1, 2, 2, 3, 3]
 
     rca = RCA()
     rca.fit(X, chunks)
