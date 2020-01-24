@@ -93,6 +93,8 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
       The checked input labels array.
     """
     self._check_preprocessor()
+
+    check_is_fitted(self, ['preprocessor_'])
     return check_input(X, y,
                        type_of_inputs=type_of_inputs,
                        preprocessor=self.preprocessor_,
