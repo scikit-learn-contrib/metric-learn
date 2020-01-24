@@ -1,5 +1,4 @@
 import numpy as np
-import scipy
 import six
 from numpy.linalg import LinAlgError
 from sklearn.datasets import make_spd_matrix
@@ -8,7 +7,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y, check_random_state
 from .exceptions import PreprocessorError, NonPSDError
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from scipy.linalg import pinvh
+from scipy.linalg import pinvh, eigh
 import sys
 import time
 
@@ -679,7 +678,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
   random_state = check_random_state(random_state)
   M = init
   if isinstance(init, np.ndarray):
-    s, u = scipy.linalg.eigh(init)
+    s, u = eigh(init)
     init_is_definite = _check_sdp_from_eigen(s)
     if strict_pd and not init_is_definite:
       raise LinAlgError("You should provide a strictly positive definite "
@@ -708,7 +707,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
     # atleast2d is necessary to deal with scalar covariance matrices
     M_inv = np.atleast_2d(np.cov(X, rowvar=False))
     if strict_pd:
-      s, u = scipy.linalg.eigh(M_inv)
+      s, u = eigh(M_inv)
       cov_is_definite = _check_sdp_from_eigen(s)
       if not cov_is_definite:
         raise LinAlgError("Unable to get a true inverse of the covariance "
