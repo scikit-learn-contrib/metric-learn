@@ -93,6 +93,8 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
       The checked input labels array.
     """
     self._check_preprocessor()
+
+    check_is_fitted(self, ['preprocessor_'])
     return check_input(X, y,
                        type_of_inputs=type_of_inputs,
                        preprocessor=self.preprocessor_,
@@ -215,6 +217,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
     :ref:`mahalanobis_distances` : The section of the project documentation
       that describes Mahalanobis Distances.
     """
+    check_is_fitted(self, ['preprocessor_'])
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=2)
@@ -336,8 +339,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
     y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)
       The predicted learned metric value between samples in every pair.
     """
+    check_is_fitted(self, 'preprocessor_')
+
     if "threshold_" not in vars(self):
-      msg = ("A threshold for this estimator has not been set,"
+      msg = ("A threshold for this estimator has not been set, "
              "call its set_threshold or calibrate_threshold method.")
       raise AttributeError(msg)
     return 2 * (- self.decision_function(pairs) <= self.threshold_) - 1
@@ -414,6 +419,8 @@ class _PairsClassifierMixin(BaseMetricLearner):
     self : `_PairsClassifier`
       The pairs classifier with the new threshold set.
     """
+    check_is_fitted(self, 'preprocessor_')
+
     self.threshold_ = threshold
     return self
 
@@ -476,6 +483,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     --------
     sklearn.calibration : scikit-learn's module for calibrating classifiers
     """
+    check_is_fitted(self, 'preprocessor_')
 
     self._validate_calibration_params(strategy, min_rate, beta)
 

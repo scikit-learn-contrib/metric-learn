@@ -749,6 +749,8 @@ def test_array_like_indexer_array_like_valid_classic(input_data, indices):
   """Checks that any array-like is valid in the 'preprocessor' argument,
   and in the indices, for a classic input"""
   class MockMetricLearner(MahalanobisMixin):
+    def fit(self):
+      pass
     pass
 
   mock_algo = MockMetricLearner(preprocessor=input_data)
@@ -763,6 +765,8 @@ def test_array_like_indexer_array_like_valid_tuples(input_data, indices):
   """Checks that any array-like is valid in the 'preprocessor' argument,
   and in the indices, for a classic input"""
   class MockMetricLearner(MahalanobisMixin):
+    def fit(self):
+      pass
     pass
 
   mock_algo = MockMetricLearner(preprocessor=input_data)
