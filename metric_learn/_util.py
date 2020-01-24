@@ -707,15 +707,19 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       X = input
     # atleast2d is necessary to deal with scalar covariance matrices
     M_inv = np.atleast_2d(np.cov(X, rowvar=False))
-    s, u = scipy.linalg.eigh(M_inv)
-    cov_is_definite = _check_sdp_from_eigen(s)
-    if strict_pd and not cov_is_definite:
-      raise LinAlgError("Unable to get a true inverse of the covariance "
-                        "matrix since it is not definite. Try another "
-                        "`{}`, or an algorithm that does not "
-                        "require the `{}` to be strictly positive definite."
-                        .format(*((matrix_name,) * 2)))
-    M = np.dot(u / s, u.T)
+    if strict_pd:
+      s, u = scipy.linalg.eigh(M_inv)
+      cov_is_definite = _check_sdp_from_eigen(s)
+      if not cov_is_definite:
+        raise LinAlgError("Unable to get a true inverse of the covariance "
+                          "matrix since it is not definite. Try another "
+                          "`{}`, or an algorithm that does not "
+                          "require the `{}` to be strictly positive definite."
+                          .format(*((matrix_name,) * 2)))
+      else:
+        M = np.dot(u / s, u.T)
+    else:
+      M = pinvh(M_inv)
     if return_inverse:
       return M, M_inv
     else:
