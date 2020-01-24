@@ -175,7 +175,7 @@ plot_tsne(X_lmnn, y)
 #
 # ITML uses a regularizer that automatically enforces a Semi-Definite
 # Positive Matrix condition - the LogDet divergence. It uses soft
-# must-link or cannot like constraints, and a simple algorithm based on
+# must-link or cannot-link constraints, and a simple algorithm based on
 # Bregman projections. Unlike LMNN, ITML will implicitly enforce points from
 # the same class to belong to the same cluster, as you can see below.
 #

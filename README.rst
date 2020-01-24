@@ -26,6 +26,7 @@ metric-learn contains efficient Python implementations of several popular superv
 
 - For SDML, using skggm will allow the algorithm to solve problematic cases
   (install from commit `a0ed406 <https://github.com/skggm/skggm/commit/a0ed406586c4364ea3297a658f415e13b5cbdaf8>`_).
+  ``pip install 'git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8'`` to install the required version of skggm from GitHub.
 -  For running the examples only: matplotlib
 
 **Installation/Setup**

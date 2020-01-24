@@ -186,13 +186,15 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
   Examples
   --------
-  >>> from metric_learn import LSML_Supervised
-  >>> from sklearn.datasets import load_iris
-  >>> iris_data = load_iris()
-  >>> X = iris_data['data']
-  >>> Y = iris_data['target']
-  >>> lsml = LSML_Supervised(num_constraints=200)
-  >>> lsml.fit(X, Y)
+  >>> from metric_learn import LSML
+  >>> quadruplets = [[[1.2, 7.5], [1.3, 1.5], [6.4, 2.6], [6.2, 9.7]],
+  >>>                [[1.3, 4.5], [3.2, 4.6], [6.2, 5.5], [5.4, 5.4]],
+  >>>                [[3.2, 7.5], [3.3, 1.5], [8.4, 2.6], [8.2, 9.7]],
+  >>>                [[3.3, 4.5], [5.2, 4.6], [8.2, 5.5], [7.4, 5.4]]]
+  >>> # we want to make closer points where the first feature is close, and
+  >>> # further if the second feature is close
+  >>> lsml = LSML()
+  >>> lsml.fit(quadruplets)
 
   References
   ----------
@@ -289,6 +291,16 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       ``init='random'``, ``random_state`` is used to set the random
       prior. In any case, `random_state` is also used to randomly sample
       constraints from labels.
+
+  Examples
+  --------
+  >>> from metric_learn import LSML_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> lsml = LSML_Supervised(num_constraints=200)
+  >>> lsml.fit(X, Y)
 
   Attributes
   ----------
