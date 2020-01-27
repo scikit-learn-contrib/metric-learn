@@ -7,9 +7,10 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y, check_random_state
 from .exceptions import PreprocessorError, NonPSDError
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from scipy.linalg import pinvh, eigh
+from scipy.linalg import pinvh
 import sys
 import time
+import warnings
 
 # hack around lack of axis kwarg in older numpy versions
 try:
@@ -678,7 +679,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
   random_state = check_random_state(random_state)
   M = init
   if isinstance(M, np.ndarray):
-    s, u = eigh(M)
+    U, s, Vh = np.linalg.svd(M, full_matrices=False, hermitian=True)
     init_is_definite = _check_sdp_from_eigen(s)
     if strict_pd and not init_is_definite:
       raise LinAlgError("You should provide a strictly positive definite "
@@ -686,8 +687,11 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                         " {}, or an algorithm that does not "
                         "require the {} to be strictly positive definite."
                         .format(*((matrix_name,) * 3)))
+    elif return_inverse and not init_is_definite:
+      warnings.warn('The initialization matrix is not invertible, '
+                    'but this isn"t an issue as the pseudo-inverse is used.')
     if return_inverse:
-      M_inv = pinvh(M)
+      M_inv = _pseudo_inverse_from_svd(U, s, Vh)
       return M, M_inv
     else:
       return M
@@ -706,19 +710,22 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       X = input
     # atleast2d is necessary to deal with scalar covariance matrices
     M_inv = np.atleast_2d(np.cov(X, rowvar=False))
-    if strict_pd:
-      s, u = eigh(M_inv)
-      cov_is_definite = _check_sdp_from_eigen(s)
-      if not cov_is_definite:
-        raise LinAlgError("Unable to get a true inverse of the covariance "
-                          "matrix since it is not definite. Try another "
-                          "`{}`, or an algorithm that does not "
-                          "require the `{}` to be strictly positive definite."
-                          .format(*((matrix_name,) * 2)))
-      else:
-        M = np.dot(u / s, u.T)
-    else:
-      M = pinvh(M_inv)
+    U, s, Vh = np.linalg.svd(M_inv, full_matrices=False, hermitian=True)
+    cov_is_definite = _check_sdp_from_eigen(s)
+    if strict_pd and not cov_is_definite:
+      raise LinAlgError("Unable to get a true inverse of the covariance "
+                        "matrix since it is not definite. Try another "
+                        "`{}`, or an algorithm that does not "
+                        "require the `{}` to be strictly positive definite."
+                        .format(*((matrix_name,) * 2)))
+    elif not cov_is_definite:
+      warnings.warn('The inverse covariance matrix is not invertible, '
+                    'but this isn"t an issue as the pseudo-inverse is used. '
+                    'You can remove any linearly dependent features and/or '
+                    'reduce the dimensionality of your input, '
+                    'for instance using `sklearn.decomposition.PCA` as a '
+                    'preprocessing step.')
+    M = _pseudo_inverse_from_svd(U, s, Vh)
     if return_inverse:
       return M, M_inv
     else:
@@ -745,3 +752,39 @@ def _check_n_components(n_features, n_components):
   if 0 < n_components <= n_features:
     return n_components
   raise ValueError('Invalid n_components, must be in [1, %d]' % n_features)
+
+
+def _pseudo_inverse_from_svd(u, s, vt, tol=1e-15):
+    """Compute the (Moore-Penrose) pseudo-inverse of the SVD of a matrix.
+
+  Parameters
+  ----------
+  u : { (..., M, M), (..., M, K) } array
+    Unitary array(s). 
+
+  s : (..., K) array
+      Vector(s) with the singular values, within each vector sorted in
+      descending order.
+
+  vh : { (..., N, N), (..., K, N) } array
+      Unitary array(s). 
+
+  tol : positive `float`, optional
+    Absolute eigenvalues below tol are considered zero.
+
+  Returns
+  -------
+  output : (…, M, N) array_like
+    The pseudo-inverse give by the SVD.
+  """
+    # discard small singular values
+    tol = np.asarray(tol)
+    cutoff = tol[..., np.core.newaxis]*np.core.amax(s, axis=-1,
+                                                    keepdims=True)
+    large = s > cutoff
+    s = np.core.divide(1, s, where=large, out=s)
+    s[~large] = 0
+    # output = vt.T * s^+ * U.T
+    return np.core.matmul(np.core.swapaxes(vt, -1, -2),
+                          np.core.multiply(s[..., np.core.newaxis],
+                                           np.core.swapaxes(u, -1, -2)))
