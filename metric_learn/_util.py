@@ -677,8 +677,8 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
 
   random_state = check_random_state(random_state)
   M = init
-  if isinstance(init, np.ndarray):
-    s, u = eigh(init)
+  if isinstance(M, np.ndarray):
+    s, u = eigh(M)
     init_is_definite = _check_sdp_from_eigen(s)
     if strict_pd and not init_is_definite:
       raise LinAlgError("You should provide a strictly positive definite "
@@ -687,7 +687,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                         "require the {} to be strictly positive definite."
                         .format(*((matrix_name,) * 3)))
     if return_inverse:
-      M_inv = np.dot(u / s, u.T)
+      M_inv = pinvh(M)
       return M, M_inv
     else:
       return M
