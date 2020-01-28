@@ -7,7 +7,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y, check_random_state
 from .exceptions import PreprocessorError, NonPSDError
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from scipy.linalg import pinvh
+from scipy.linalg import pinvh, eigh
 import sys
 import time
 import warnings
@@ -679,8 +679,8 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
   random_state = check_random_state(random_state)
   M = init
   if isinstance(M, np.ndarray):
-    U, s, Vh = np.linalg.svd(M, full_matrices=False, hermitian=True)
-    init_is_definite = _check_sdp_from_eigen(s)
+    w, V = eigh(M, check_finite=False)
+    init_is_definite = _check_sdp_from_eigen(w)
     if strict_pd and not init_is_definite:
       raise LinAlgError("You should provide a strictly positive definite "
                         "matrix as `{}`. This one is not definite. Try another"
@@ -691,7 +691,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       warnings.warn('The initialization matrix is not invertible, '
                     'but this isn"t an issue as the pseudo-inverse is used.')
     if return_inverse:
-      M_inv = _pseudo_inverse_from_svd(U, s, Vh)
+      M_inv = _pseudo_inverse_from_eig(w, V)
       return M, M_inv
     else:
       return M
@@ -710,8 +710,8 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       X = input
     # atleast2d is necessary to deal with scalar covariance matrices
     M_inv = np.atleast_2d(np.cov(X, rowvar=False))
-    U, s, Vh = np.linalg.svd(M_inv, full_matrices=False, hermitian=True)
-    cov_is_definite = _check_sdp_from_eigen(s)
+    w, V = eigh(M_inv, check_finite=False)
+    cov_is_definite = _check_sdp_from_eigen(w)
     if strict_pd and not cov_is_definite:
       raise LinAlgError("Unable to get a true inverse of the covariance "
                         "matrix since it is not definite. Try another "
@@ -725,7 +725,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                     'reduce the dimensionality of your input, '
                     'for instance using `sklearn.decomposition.PCA` as a '
                     'preprocessing step.')
-    M = _pseudo_inverse_from_svd(U, s, Vh)
+    M = _pseudo_inverse_from_eig(w, V)
     if return_inverse:
       return M, M_inv
     else:
@@ -754,20 +754,20 @@ def _check_n_components(n_features, n_components):
   raise ValueError('Invalid n_components, must be in [1, %d]' % n_features)
 
 
-def _pseudo_inverse_from_svd(u, s, vt, tol=1e-15):
-    """Compute the (Moore-Penrose) pseudo-inverse of the SVD of a matrix.
+def _pseudo_inverse_from_eig(w, V, tol=None):
+  """Compute the (Moore-Penrose) pseudo-inverse of the EVD of a symetric
+  matrix.
 
   Parameters
   ----------
-  u : { (..., M, M), (..., M, K) } array
-    Unitary array(s). 
+  w : (..., M) ndarray
+    The eigenvalues in ascending order, each repeated according to
+    its multiplicity.
 
-  s : (..., K) array
-      Vector(s) with the singular values, within each vector sorted in
-      descending order.
-
-  vh : { (..., N, N), (..., K, N) } array
-      Unitary array(s). 
+  v : {(..., M, M) ndarray, (..., M, M) matrix}
+    The column ``v[:, i]`` is the normalized eigenvector corresponding
+    to the eigenvalue ``w[i]``.  Will return a matrix object if `a` is
+    a matrix object.
 
   tol : positive `float`, optional
     Absolute eigenvalues below tol are considered zero.
@@ -775,16 +775,13 @@ def _pseudo_inverse_from_svd(u, s, vt, tol=1e-15):
   Returns
   -------
   output : (…, M, N) array_like
-    The pseudo-inverse give by the SVD.
+    The pseudo-inverse given by the EVD.
   """
-    # discard small singular values
-    tol = np.asarray(tol)
-    cutoff = tol[..., np.core.newaxis]*np.core.amax(s, axis=-1,
-                                                    keepdims=True)
-    large = s > cutoff
-    s = np.core.divide(1, s, where=large, out=s)
-    s[~large] = 0
-    # output = vt.T * s^+ * U.T
-    return np.core.matmul(np.core.swapaxes(vt, -1, -2),
-                          np.core.multiply(s[..., np.core.newaxis],
-                                           np.core.swapaxes(u, -1, -2)))
+  if tol is None:
+    tol = np.amax(w) * np.max(w.shape) * np.finfo(w.dtype).eps
+  # discard small eigenvalues and invert the rest
+  large = np.abs(w) > tol
+  w = np.divide(1, w, where=large, out=w)
+  w[~large] = 0
+
+  return np.dot(V * w, np.conjugate(V).T)
