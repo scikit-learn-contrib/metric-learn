@@ -774,7 +774,7 @@ def _pseudo_inverse_from_eig(w, V, tol=None):
 
   Returns
   -------
-  output : (…, M, N) array_like
+  output : (..., M, N) array_like
     The pseudo-inverse given by the EVD.
   """
   if tol is None:
