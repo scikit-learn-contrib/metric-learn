@@ -688,8 +688,8 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                         "require the {} to be strictly positive definite."
                         .format(*((matrix_name,) * 3)))
     elif return_inverse and not init_is_definite:
-      warnings.warn('The initialization matrix is not invertible, '
-                    'but this isn"t an issue as the pseudo-inverse is used.')
+      warnings.warn('The initialization matrix is not invertible: '
+                    'using the pseudo-inverse instead.')
     if return_inverse:
       M_inv = _pseudo_inverse_from_eig(w, V)
       return M, M_inv
@@ -719,9 +719,10 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                         "require the `{}` to be strictly positive definite."
                         .format(*((matrix_name,) * 2)))
     elif not cov_is_definite:
-      warnings.warn('The inverse covariance matrix is not invertible, '
-                    'but this isn"t an issue as the pseudo-inverse is used. '
-                    'You can remove any linearly dependent features and/or '
+      warnings.warn('The initialization matrix is not invertible: '
+                    'using the pseudo-inverse instead.'
+                    'To make the inverse covariance matrix invertible'
+                    ' you can remove any linearly dependent features and/or '
                     'reduce the dimensionality of your input, '
                     'for instance using `sklearn.decomposition.PCA` as a '
                     'preprocessing step.')
