@@ -8,12 +8,12 @@ from scipy.spatial.distance import pdist, squareform, mahalanobis
 from scipy.stats import ortho_group
 from sklearn import clone
 from sklearn.cluster import DBSCAN
-from sklearn.datasets import make_spd_matrix
-from sklearn.utils import check_random_state
+from sklearn.datasets import make_spd_matrix, make_blobs
+from sklearn.utils import check_random_state, shuffle
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.testing import set_random_state
 
-from metric_learn._util import make_context
+from metric_learn._util import make_context, _initialize_metric_mahalanobis
 from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
                                       _PairsClassifierMixin)
 from metric_learn.exceptions import NonPSDError
@@ -569,7 +569,7 @@ def test_init_mahalanobis(estimator, build_dataset):
                               in zip(ids_metric_learners,
                                      metric_learners)
                               if idml[:4] in ['ITML', 'SDML', 'LSML']])
-def test_singular_covariance_init_or_prior(estimator, build_dataset):
+def test_singular_covariance_init_or_prior_strictpd(estimator, build_dataset):
     """Tests that when using the 'covariance' init or prior, it returns the
     appropriate error if the covariance matrix is singular, for algorithms
     that need a strictly PD prior or init (see
@@ -608,13 +608,52 @@ def test_singular_covariance_init_or_prior(estimator, build_dataset):
                          [(ml, bd) for idml, (ml, bd)
                           in zip(ids_metric_learners,
                                  metric_learners)
+                          if idml[:3] in ['MMC']],
+                         ids=[idml for idml, (ml, _)
+                              in zip(ids_metric_learners,
+                                     metric_learners)
+                              if idml[:3] in ['MMC']])
+def test_singular_covariance_init_of_non_strict_pd(estimator, build_dataset):
+    """Tests that when using the 'covariance' init or prior, it returns the
+    appropriate warning if the covariance matrix is singular, for algorithms
+    that don't need a strictly PD init. Also checks that the returned
+    inverse matrix has finite values
+    """
+    input_data, labels, _, X = build_dataset()
+    model = clone(estimator)
+    set_random_state(model)
+    # We create a feature that is a linear combination of the first two
+    # features:
+    input_data = np.concatenate([input_data, input_data[:, ..., :2].dot([[2],
+                                                                        [3]])],
+                                axis=-1)
+    model.set_params(init='covariance')
+    msg = ('The initialization matrix is not invertible: '
+           'using the pseudo-inverse instead.'
+           'To make the inverse covariance matrix invertible'
+           ' you can remove any linearly dependent features and/or '
+           'reduce the dimensionality of your input, '
+           'for instance using `sklearn.decomposition.PCA` as a '
+           'preprocessing step.')
+    with pytest.warns(UserWarning) as raised_warning:
+      model.fit(input_data, labels)
+    assert np.any([str(warning.message) == msg for warning in raised_warning])
+    M = model.get_mahalanobis_matrix()
+    assert np.isfinite(M).all()
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize('estimator, build_dataset',
+                         [(ml, bd) for idml, (ml, bd)
+                          in zip(ids_metric_learners,
+                                 metric_learners)
                           if idml[:4] in ['ITML', 'SDML', 'LSML']],
                          ids=[idml for idml, (ml, _)
                               in zip(ids_metric_learners,
                                      metric_learners)
                               if idml[:4] in ['ITML', 'SDML', 'LSML']])
 @pytest.mark.parametrize('w0', [1e-20, 0., -1e-20])
-def test_singular_array_init_or_prior(estimator, build_dataset, w0):
+def test_singular_array_init_or_prior_strictpd(estimator, build_dataset, w0):
     """Tests that when using a custom array init (or prior), it returns the
     appropriate error if it is singular, for algorithms
     that need a strictly PD prior or init (see
@@ -652,6 +691,31 @@ def test_singular_array_init_or_prior(estimator, build_dataset, w0):
       with pytest.raises(LinAlgError) as raised_err:
         model.fit(input_data, labels)
       assert str(raised_err.value) == msg
+
+
+@pytest.mark.parametrize('w0', [1e-20, 0., -1e-20])
+def test_singular_array_init_of_non_strict_pd(w0):
+    """Tests that when using a custom array init, it returns the
+    appropriate warning if it is singular. Also checks if the returned
+    inverse matrix is finite. This isn't checked for model fitting as no
+    model curently uses this setting.
+    """
+    rng = np.random.RandomState(42)
+    X, y = shuffle(*make_blobs(random_state=rng),
+                   random_state=rng)
+    P = ortho_group.rvs(X.shape[1], random_state=rng)
+    w = np.abs(rng.randn(X.shape[1]))
+    w[0] = w0
+    M = P.dot(np.diag(w)).dot(P.T)
+    msg = ('The initialization matrix is not invertible: '
+           'using the pseudo-inverse instead.')
+    with pytest.warns(UserWarning) as raised_warning:
+      _, M_inv = _initialize_metric_mahalanobis(X, init=M,
+                                                random_state=rng,
+                                                return_inverse=True,
+                                                strict_pd=False)
+    assert str(raised_warning[0].message) == msg
+    assert np.isfinite(M_inv).all()
 
 
 @pytest.mark.integration
