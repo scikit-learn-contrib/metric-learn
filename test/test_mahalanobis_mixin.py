@@ -628,9 +628,9 @@ def test_singular_covariance_init_of_non_strict_pd(estimator, build_dataset):
                                                                         [3]])],
                                 axis=-1)
     model.set_params(init='covariance')
-    msg = ('The initialization matrix is not invertible: '
+    msg = ('The covariance matrix is not invertible: '
            'using the pseudo-inverse instead.'
-           'To make the inverse covariance matrix invertible'
+           'To make the covariance matrix invertible'
            ' you can remove any linearly dependent features and/or '
            'reduce the dimensionality of your input, '
            'for instance using `sklearn.decomposition.PCA` as a '

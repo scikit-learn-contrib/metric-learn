@@ -719,9 +719,9 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
                         "require the `{}` to be strictly positive definite."
                         .format(*((matrix_name,) * 2)))
     elif not cov_is_definite:
-      warnings.warn('The initialization matrix is not invertible: '
+      warnings.warn('The covariance matrix is not invertible: '
                     'using the pseudo-inverse instead.'
-                    'To make the inverse covariance matrix invertible'
+                    'To make the covariance matrix invertible'
                     ' you can remove any linearly dependent features and/or '
                     'reduce the dimensionality of your input, '
                     'for instance using `sklearn.decomposition.PCA` as a '
