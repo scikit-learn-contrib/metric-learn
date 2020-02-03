@@ -1167,4 +1167,5 @@ def test_pseudo_inverse_from_eig_and_pinvh_nonsingular():
   A = np.random.rand(100, 100)
   A = A + A.T
   w, V = eigh(A, check_finite=False)
-  np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A))
+  np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A),
+                             rtol=1e-09)
