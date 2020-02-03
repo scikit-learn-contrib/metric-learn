@@ -1159,7 +1159,7 @@ def test_pseudo_inverse_from_eig_and_pinvh_singular(w0):
   w[0] = w0
   A = V.dot(np.diag(w)).dot(V.T)
   np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A),
-                             rtol=1e-06)
+                             rtol=1e-05)
 
 
 def test_pseudo_inverse_from_eig_and_pinvh_nonsingular():
