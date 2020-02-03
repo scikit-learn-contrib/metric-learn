@@ -1149,9 +1149,22 @@ def test__auto_select_init(has_classes, n_features, n_samples, n_components,
                             n_samples, n_components, n_classes) == result)
 
 
-def test_pseudo_inverse_from_eig_and_pinvh():
+@pytest.mark.parametrize('w0', [1e-20, 0., -1e-20])
+def test_pseudo_inverse_from_eig_and_pinvh_singular(w0):
   """Checks that _pseudo_inverse_from_eig return the same result as
-  scipy.linalg.pinvh"""
+  scipy.linalg.pinvh for a singular matrix"""
   A = np.random.rand(100, 100)
+  A = A + A.T
+  w, V = eigh(A)
+  w[0] = w0
+  A = V.dot(np.diag(w)).dot(V.T)
+  np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A))
+
+
+def test_pseudo_inverse_from_eig_and_pinvh_nonsingular():
+  """Checks that _pseudo_inverse_from_eig return the same result as
+  scipy.linalg.pinvh for a non singular matrix"""
+  A = np.random.rand(100, 100)
+  A = A + A.T
   w, V = eigh(A, check_finite=False)
-  assert np.array_equal(_pseudo_inverse_from_eig(w, V), pinvh(A))
+  np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A))
