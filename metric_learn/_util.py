@@ -1,5 +1,4 @@
 import numpy as np
-import scipy
 import six
 from numpy.linalg import LinAlgError
 from sklearn.datasets import make_spd_matrix
@@ -8,9 +7,10 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_X_y, check_random_state
 from .exceptions import PreprocessorError, NonPSDError
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from scipy.linalg import pinvh
+from scipy.linalg import pinvh, eigh
 import sys
 import time
+import warnings
 
 # hack around lack of axis kwarg in older numpy versions
 try:
@@ -678,17 +678,20 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
 
   random_state = check_random_state(random_state)
   M = init
-  if isinstance(init, np.ndarray):
-    s, u = scipy.linalg.eigh(init)
-    init_is_definite = _check_sdp_from_eigen(s)
+  if isinstance(M, np.ndarray):
+    w, V = eigh(M, check_finite=False)
+    init_is_definite = _check_sdp_from_eigen(w)
     if strict_pd and not init_is_definite:
       raise LinAlgError("You should provide a strictly positive definite "
                         "matrix as `{}`. This one is not definite. Try another"
                         " {}, or an algorithm that does not "
                         "require the {} to be strictly positive definite."
                         .format(*((matrix_name,) * 3)))
+    elif return_inverse and not init_is_definite:
+      warnings.warn('The initialization matrix is not invertible: '
+                    'using the pseudo-inverse instead.')
     if return_inverse:
-      M_inv = np.dot(u / s, u.T)
+      M_inv = _pseudo_inverse_from_eig(w, V)
       return M, M_inv
     else:
       return M
@@ -707,15 +710,23 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
       X = input
     # atleast2d is necessary to deal with scalar covariance matrices
     M_inv = np.atleast_2d(np.cov(X, rowvar=False))
-    s, u = scipy.linalg.eigh(M_inv)
-    cov_is_definite = _check_sdp_from_eigen(s)
+    w, V = eigh(M_inv, check_finite=False)
+    cov_is_definite = _check_sdp_from_eigen(w)
     if strict_pd and not cov_is_definite:
       raise LinAlgError("Unable to get a true inverse of the covariance "
                         "matrix since it is not definite. Try another "
                         "`{}`, or an algorithm that does not "
                         "require the `{}` to be strictly positive definite."
                         .format(*((matrix_name,) * 2)))
-    M = np.dot(u / s, u.T)
+    elif not cov_is_definite:
+      warnings.warn('The covariance matrix is not invertible: '
+                    'using the pseudo-inverse instead.'
+                    'To make the covariance matrix invertible'
+                    ' you can remove any linearly dependent features and/or '
+                    'reduce the dimensionality of your input, '
+                    'for instance using `sklearn.decomposition.PCA` as a '
+                    'preprocessing step.')
+    M = _pseudo_inverse_from_eig(w, V)
     if return_inverse:
       return M, M_inv
     else:
@@ -742,3 +753,36 @@ def _check_n_components(n_features, n_components):
   if 0 < n_components <= n_features:
     return n_components
   raise ValueError('Invalid n_components, must be in [1, %d]' % n_features)
+
+
+def _pseudo_inverse_from_eig(w, V, tol=None):
+  """Compute the (Moore-Penrose) pseudo-inverse of the EVD of a symetric
+  matrix.
+
+  Parameters
+  ----------
+  w : (..., M) ndarray
+    The eigenvalues in ascending order, each repeated according to
+    its multiplicity.
+
+  v : {(..., M, M) ndarray, (..., M, M) matrix}
+    The column ``v[:, i]`` is the normalized eigenvector corresponding
+    to the eigenvalue ``w[i]``.  Will return a matrix object if `a` is
+    a matrix object.
+
+  tol : positive `float`, optional
+    Absolute eigenvalues below tol are considered zero.
+
+  Returns
+  -------
+  output : (..., M, N) array_like
+    The pseudo-inverse given by the EVD.
+  """
+  if tol is None:
+    tol = np.amax(w) * np.max(w.shape) * np.finfo(w.dtype).eps
+  # discard small eigenvalues and invert the rest
+  large = np.abs(w) > tol
+  w = np.divide(1, w, where=large, out=w)
+  w[~large] = 0
+
+  return np.dot(V * w, np.conjugate(V).T)

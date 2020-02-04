@@ -1,4 +1,5 @@
 import pytest
+from scipy.linalg import eigh, pinvh
 from collections import namedtuple
 import numpy as np
 from numpy.testing import assert_array_equal, assert_equal
@@ -11,7 +12,7 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 check_collapsed_pairs, validate_vector,
                                 _check_sdp_from_eigen, _check_n_components,
                                 check_y_valid_values_for_pairs,
-                                _auto_select_init)
+                                _auto_select_init, _pseudo_inverse_from_eig)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -1150,3 +1151,27 @@ def test__auto_select_init(has_classes, n_features, n_samples, n_components,
   """Checks that the auto selection of the init works as expected"""
   assert (_auto_select_init(has_classes, n_features,
                             n_samples, n_components, n_classes) == result)
+
+
+@pytest.mark.parametrize('w0', [1e-20, 0., -1e-20])
+def test_pseudo_inverse_from_eig_and_pinvh_singular(w0):
+  """Checks that _pseudo_inverse_from_eig returns the same result as
+  scipy.linalg.pinvh for a singular matrix"""
+  rng = np.random.RandomState(SEED)
+  A = rng.rand(100, 100)
+  A = A + A.T
+  w, V = eigh(A)
+  w[0] = w0
+  A = V.dot(np.diag(w)).dot(V.T)
+  np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A),
+                             rtol=1e-05)
+
+
+def test_pseudo_inverse_from_eig_and_pinvh_nonsingular():
+  """Checks that _pseudo_inverse_from_eig returns the same result as
+  scipy.linalg.pinvh for a non singular matrix"""
+  rng = np.random.RandomState(SEED)
+  A = rng.rand(100, 100)
+  A = A + A.T
+  w, V = eigh(A, check_finite=False)
+  np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A))
