@@ -150,7 +150,7 @@ class _BaseSCML_global(MahalanobisMixin):
       return B*np.sqrt(w)[..., None]
 
     else:   # if metric is full rank
-      return np.dot(B.T * np.sqrt(w), B)
+      return np.linalg.cholesky(np.dot(B.T * w, B)).T
 
   def _to_index_points(self, triplets):
     shape = triplets.shape
