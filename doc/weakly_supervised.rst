@@ -592,6 +592,119 @@ points, while constrains the sum of distances between dissimilar points:
         -with-side-information.pdf>`_. NIPS 2002
   .. [2] Adapted from Matlab code http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
 
+.. _learning_on_triplets:
+
+Learning on Triplets
+====================
+
+Some metric learning algorithms learn on triplets of samples. In this case,
+one should provide the algorithm with `n_samples` triplets of points. The
+semantic of each triplet is that the first two points should be closer
+together than the first and the last.
+
+Fitting
+-------
+Here is an example for fitting on triplets (see :ref:`fit_ws` for more
+details on the input data format and how to fit, in the general case of
+learning on tuples).
+
+>>> from metric_learn import SCML
+>>> triplets = np.array([[[1.2, 3.2], [2.3, 5.5], [2.1, 0.6]],
+>>>                      [[4.5, 2.3], [2.1, 2.3], [7.3, 3.4]]])
+>>> scml = SCML(random_state=42)
+>>> scml.fit(triplets)
+SCML(beta=1e-5, B=None, max_iter=100000, verbose=False,
+    preprocessor=None, random_state=None)
+
+Or alternatively (using a preprocessor):
+
+>>> X = np.array([[[1.2, 3.2], 
+>>>                [2.3, 5.5],
+>>>                [2.1, 0.6],
+>>>                [4.5, 2.3],
+>>>                [2.1, 2.3],
+>>>                [7.3, 3.4]])
+>>> triplets_indices = np.array([[0, 1, 2], [3, 4, 5]])
+>>> scml = SCML(preprocessor=X, random_state=42)
+>>> scml.fit(triplets_indices)
+SCML(beta=1e-5, B=None, max_iter=100000, verbose=False,
+   preprocessor=array([[1.2, 3.2],
+       [2.3, 5.5],
+       [2.4, 6.7],
+       [2.1, 0.6],
+       [4.5, 2.3],
+       [2.1, 2.3],
+       [0.6, 1.2],
+       [7.3, 3.4]]),
+    random_state=None)
+
+
+Here, we want to learn a metric that, for each of the two
+`triplets`, will put the two first points closer together than the first and the last.
+
+.. _triplets_predicting:
+
+Prediction
+----------
+
+When a triplets learner is fitted, it is also able to predict, for an
+upcoming triplet, whether the two first points are more similar than the
+first and the last (+1), or not (-1).
+
+>>> triplets_test = np.array(
+... [[[5.6, 5.3], [2.2, 2.1], [1.2, 3.4]],
+...  [[6.0, 4.2], [4.3, 1.2], [0.1, 7.8]]])
+>>> scml.predict(triplets_test)
+array([-1.,  1.])
+
+.. _triplets_scoring:
+
+Scoring
+-------
+
+Triplet metric learners can also
+return a `decision_function` for a set of pairs. This is basically the "score"
+which sign will be taken to find the prediction for the pair, which
+corresponds to the difference between the distance between the first two points,
+and the distance between the first and last points of the triplet (higher
+score means the first and last points are more likely to be more dissimilar than
+the two first points (i.e. more likely to have a +1 prediction since it's
+the right ordering)).
+
+>>> scml.decision_function(triplets_test)
+array([-1.75700306,  4.98982131])
+
+In the above example, for the first triplet in `triplets_test`, the
+two first points are predicted less similar than the first and last points (they
+are further away in the transformed space).
+
+Unlike for pairs learners, triplets learners don't allow to give a `y`
+when fitting, which does not allow to use scikit-learn scoring functions
+like:
+
+>>> from sklearn.model_selection import cross_val_score
+>>> cross_val_score(scml, triplets, scoring='f1_score')  # this won't work
+
+(This is actually intentional)
+
+However, triplets learners do have a default scoring function, which will
+basically return the accuracy score on a given test set, i.e. the proportion
+of triplets have the right predicted ordering.
+
+>>> scml.score(triplets_test)
+0.5
+
+.. note::
+   See :ref:`fit_ws` for more details on metric learners functions that are
+   not specific to learning on pairs, like `transform`, `score_pairs`,
+   `get_metric` and `get_mahalanobis_matrix`.
+
+
+
+
+Algorithms
+----------
+
 
 .. _learning_on_quadruplets:
 
