@@ -613,13 +613,6 @@ class _TripletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each triplet.
     """
-
-    # Aren't the following lines redundant as they are called on
-    # decision_function (as in quadruplets predict) ???
-    # check_is_fitted(self, 'preprocessor_')
-    # triplets = check_input(triplets, type_of_inputs='tuples',
-    #                       preprocessor=self.preprocessor_,
-    #                       estimator=self, tuple_size=self._tuple_size)
     return np.sign(self.decision_function(triplets))
 
   def decision_function(self, triplets):
@@ -705,10 +698,6 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
-    check_is_fitted(self, 'preprocessor_')
-    quadruplets = check_input(quadruplets, type_of_inputs='tuples',
-                              preprocessor=self.preprocessor_,
-                              estimator=self, tuple_size=self._tuple_size)
     return np.sign(self.decision_function(quadruplets))
 
   def decision_function(self, quadruplets):
