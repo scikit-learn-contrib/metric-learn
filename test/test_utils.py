@@ -19,9 +19,11 @@ from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           Constraints)
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
                                       _PairsClassifierMixin,
+                                      _TripletsClassifierMixin,
                                       _QuadrupletsClassifierMixin)
 from metric_learn.exceptions import PreprocessorError, NonPSDError
 from sklearn.datasets import make_regression, make_blobs, load_iris
+from metric_learn.lsml import _BaseLSML
 
 
 SEED = 42
@@ -83,6 +85,34 @@ def build_pairs(with_preprocessor=False):
     return Dataset(X[c], target, None, X[c[:, 0]])
 
 
+def build_triplets(with_preprocessor=False):
+  input_data, labels = load_iris(return_X_y=True)
+  X, y = shuffle(input_data, labels, random_state=SEED)
+  constraints = Constraints(y)
+  triplets = constraints.generate_knntriplets(X, 3, 10)
+  if with_preprocessor:
+    # if preprocessor, we build a 2D array of triplets of indices
+    return triplets, X
+  else:
+    # if not, we build a 3D array of triplets of samples
+    return X[triplets], None
+
+
+class mock_triplet_LSML(_BaseLSML, _TripletsClassifierMixin):
+  # Mock Triplet learner from LSML which is a quadruplets learner
+  # in order to test TripletClassifierMixin basic methods
+
+  _tuple_size = 4
+
+  def fit(self, triplets, weights=None):
+    quadruplets = triplets[:, [0, 1, 0, 2]]
+    return self._fit(quadruplets, weights=weights)
+
+  def decision_function(self, triplets):
+    self._tuple_size = 3
+    return _TripletsClassifierMixin.decision_function(self, triplets)
+
+
 def build_quadruplets(with_preprocessor=False):
   # builds a toy quadruplets problem
   X, indices = build_data()
@@ -102,6 +132,11 @@ quadruplets_learners = [(LSML(), build_quadruplets)]
 ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
                                  quadruplets_learners]))
+
+triplets_learners = [(mock_triplet_LSML(), build_triplets)]
+ids_triplets_learners = list(map(lambda x: x.__class__.__name__,
+                             [learner for (learner, _) in
+                              triplets_learners]))
 
 pairs_learners = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be faster
                   (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster

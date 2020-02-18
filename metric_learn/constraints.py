@@ -6,6 +6,8 @@ import numpy as np
 import warnings
 from six.moves import xrange
 from sklearn.utils import check_random_state
+from sklearn.neighbors import NearestNeighbors
+from numpy.matlib import repmat
 
 __all__ = ['Constraints']
 
@@ -32,6 +34,56 @@ class Constraints(object):
       n = min(len(a), len(c))
       return a[:n], b[:n], c[:n], d[:n]
     return a, b, c, d
+
+  def generate_knntriplets(self, X, k_genuine, k_impostor):
+
+    labels = np.unique(self.partial_labels)
+    L = len(labels)
+    len_input = np.size(self.partial_labels, 0)
+    triplets = np.empty((len_input*k_genuine*k_impostor, 3), dtype=np.intp)
+
+    start = 0
+    finish = 0
+    neigh = NearestNeighbors()
+
+    for i in range(L):
+
+        # generate mask for current label
+        gen_mask = self.partial_labels == labels[i]
+        gen_indx = np.where(gen_mask)
+
+        # get k_genuine genuine neighbours
+        neigh.fit(X=X[gen_indx])
+        gen_neigh = np.take(gen_indx, neigh.kneighbors(n_neighbors=k_genuine,
+                            return_distance=False))
+
+        # generate mask for impostors of current label
+        imp_indx = np.where(np.invert(gen_mask))
+
+        # get k_impostor impostor neighbours
+        neigh.fit(X=X[imp_indx])
+        imp_neigh = np.take(imp_indx, neigh.kneighbors(
+                            n_neighbors=k_impostor,
+                            X=X[gen_mask],
+                            return_distance=False))
+
+        # lenght = len_label*k_genuine*k_impostor
+        finish += np.sum(gen_mask)*k_genuine*k_impostor
+
+        triplets[start:finish, :] = self._comb(gen_indx, gen_neigh, imp_neigh,
+                                               k_genuine, k_impostor)
+        start = finish
+
+        # TODO: deal with too litle elements for k neighbors to be yielded
+
+    return triplets
+
+  def _comb(self, A, B, C, sizeB, sizeC):
+    # generate an array will all combinations of choosing
+    # an element from A, B and C
+    return np.vstack((repmat(A, sizeB*sizeC, 1).ravel(order='F'),
+                      repmat(np.hstack(B), sizeC, 1).ravel(order='F'),
+                      repmat(C, 1, sizeB).ravel())).T
 
   def _pairs(self, num_constraints, same_label=True, max_iter=10,
              random_state=np.random):
