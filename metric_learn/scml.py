@@ -6,7 +6,7 @@ from __future__ import print_function, absolute_import, division
 import numpy as np
 from .base_metric import _TripletsClassifierMixin, MahalanobisMixin
 from sklearn.base import TransformerMixin
-from .constraints import generate_knntriplets
+from .constraints import Constraints
 from sklearn.preprocessing import normalize
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import KMeans
@@ -31,6 +31,11 @@ class _BaseSCML_global(MahalanobisMixin):
     super(_BaseSCML_global, self).__init__(preprocessor)
 
   def _fit(self, triplets):
+    """
+    Optimization procedure to find a sparse vector of weights to
+    construct the metric from the basis set. This is based on the
+    dual averaging method.
+    """
 
     if self.preprocessor is not None:
       n_features = self.preprocessor.shape[1]
@@ -63,7 +68,7 @@ class _BaseSCML_global(MahalanobisMixin):
 
     for iter in range(self.max_iter):
       if (iter % output_iter == 0):
-
+        # regularization part of obj function
         obj1 = np.sum(w)*self.beta
 
       # Every triplet distance difference in the space given by L
@@ -72,7 +77,9 @@ class _BaseSCML_global(MahalanobisMixin):
       # Mask of places with positive slack
         slack_mask = slack_val > 0
 
+        # loss function of learning task part of obj function
         obj2 = np.sum(slack_val[slack_mask])/sizeT
+
         obj = obj1 + obj2
         if(self.verbose):
           count = np.sum(slack_mask)
@@ -98,26 +105,31 @@ class _BaseSCML_global(MahalanobisMixin):
 
       scale_f = -np.sqrt(iter+1) / gamma
 
-      # proximal operator and negative trimming equivalent
+      # proximal operator with negative trimming equivalent
       w = scale_f * np.minimum(avg_grad_w + self.beta, 0)
 
     if(self.verbose):
       print("max iteration reached.")
 
+    # return L matrix yielded from best weights
     self.components_ = self._get_components(best_w)
 
     return self
 
-# should this go to utils?
   def _compute_dist_diff(self, T, X):
+    """
+    Helper function to compute the distance difference of every triplet in the
+    space yielded by the basis set.
+    """
+    # Transformation of data by the basis set
     XB = np.matmul(X, self.basis.T)
-    T = np.vstack(T)
+
     lenT = len(T)
-    # all positive and negative pairs with lowest index first
+    # get all positive and negative pairs with lowest index first
     # np.array (2*lenT,2)
     T_pairs_sorted = np.sort(np.vstack((T[:, [0, 1]], T[:, [0, 2]])),
                              kind='stable')
-    # calculate all unique pairs
+    # calculate all unique pairs and their indeces
     uniqPairs, indeces = np.unique(T_pairs_sorted, return_inverse=True,
                                    axis=0)
     # calculate L2 distance acording to bases only for unique pairs
@@ -174,6 +186,65 @@ class _BaseSCML_global(MahalanobisMixin):
 
 
 class SCML_global(_BaseSCML_global, _TripletsClassifierMixin):
+  """Sparse Compositional Metric Learning (SCML)
+
+  `SCML` builds a metric as the sparse positive combination of a set of locally
+  discriminative rank-one PSD basis. This allows an optimization scheme with
+  only `K` parameters, that can be yielded with an efficient stochastic
+  composite optimization over a set of triplets constraints. Each triplet is
+  constructed as a relative distance comparison with respect to the first
+  element so that the second element is closer than the last.
+  Read more in the :ref:`User Guide <scml>`.
+  Parameters
+  ----------
+  basis : None, string or numpy array, optional (default=None)
+       Prior to set for the metric. Possible options are
+       '', and a numpy array of shape (n_basis, n_features). If
+        None an error will be raised as the basis set is esential
+        to SCML.
+       numpy array
+           A matrix of shape (n_basis, n_features), that will be used as
+           the basis set for the metric construction.
+  n_basis : int, optional
+      Number of basis to be yielded. In case it is not set it will be set based
+      on the basis numpy array. If an string option is pased to basis an error
+      wild be raised as this value will be needed.
+  max_iter : int, optional
+  verbose : bool, optional
+      if True, prints information while learning
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get triplets from indices. If array-like,
+      triplets will be formed like this: X[indices].
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int.
+  Attributes
+  ----------
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See function `components_from_metric`.)
+  Examples
+  --------
+  >>> from metric_learn import SCLM_global_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> scml = SCML_global_Supervised(basis='LDA', n_basis=400)
+  >>> scml.fit(X, Y)
+  References
+  ----------
+  .. [1] Y. Shi, A. Bellet and F. Sha. `Sparse Compositional Metric Learning.
+         <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
+         (AAAI), 2014.
+  .. [2] Adapted from original \
+         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+  See Also
+  --------
+  metric_learn.SCML_global : The original weakly-supervised algorithm.
+
+  :ref:`supervised_version` : The section of the project documentation
+    that describes the supervised version of weakly supervised estimators.
+  """
 
   def fit(self, triplets):
     """Learn the SCML model.
@@ -197,6 +268,67 @@ class SCML_global(_BaseSCML_global, _TripletsClassifierMixin):
 
 
 class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
+  """Supervised version of Sparse Compositional Metric Learning (SCML)
+
+  `SCML_global_Supervised` creates triplets by taking `k_genuine` neighbours
+  of the same class and `k_impostor` neighbours from diferent classes for each
+  point and then runs the SCML algorithm on these triplets.
+  Read more in the :ref:`User Guide <scml>`.
+  Parameters
+  ----------
+  basis : None, string or numpy array, optional (default=None)
+      Prior to set for the metric. Possible options are
+      'LDA', and a numpy array of shape (n_basis, n_features). If
+      None an error will be raised as the basis set is esential
+      to SCML.
+      'LDA'
+          The `n_basis` basis set is constructed from the LDA of significant
+          local regions in the feature space via clustering, for each region
+          center k-nearest neighbors are used to obtain the LDA scalings,
+          which correspond to the locally discriminative basis.
+       numpy array
+           A matrix of shape (n_basis, n_features), that will be used as
+           the basis set for the metric construction.
+  n_basis : int, optional
+      Number of basis to be yielded. In case it is not set it will be set based
+      on the basis numpy array. If an string option is pased to basis an error
+      wild be raised as this value will be needed.
+  max_iter : int, optional
+  verbose : bool, optional
+      if True, prints information while learning
+  preprocessor : array-like, shape=(n_samples, n_features) or callable
+      The preprocessor to call to get triplets from indices. If array-like,
+      triplets will be formed like this: X[indices].
+  random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int.
+  Attributes
+  ----------
+  components_ : `numpy.ndarray`, shape=(n_features, n_features)
+      The linear transformation ``L`` deduced from the learned Mahalanobis
+      metric (See function `components_from_metric`.)
+  Examples
+  --------
+  >>> from metric_learn import SCML
+  >>> triplets = np.array([[[1.2, 3.2], [2.3, 5.5], [2.1, 0.6]],
+  >>>                      [[4.5, 2.3], [2.1, 2.3], [7.3, 3.4]]])
+  >>> scml = SCML(random_state=42)
+  >>> scml.fit(triplets)
+  SCML(beta=1e-5, B=None, max_iter=100000, verbose=False,
+      preprocessor=None, random_state=None)
+  References
+  ----------
+  .. [1] Y. Shi, A. Bellet and F. Sha. `Sparse Compositional Metric Learning.
+         <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
+         (AAAI), 2014.
+  .. [2] Adapted from original \
+         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+  See Also
+  --------
+  metric_learn.SCML_global_Supervised : The supervised version of this
+    algorithm, which construct the triplets from the labels.
+  :ref:`supervised_version` : The section of the project documentation
+    that describes the supervised version of weakly supervised estimators.
+  """
 
   def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis=None,
                n_basis=None, max_iter=100000, verbose=False,
@@ -208,7 +340,7 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
                               preprocessor=preprocessor,
                               random_state=random_state)
 
-  def fit(self, X, y, random_state=None):
+  def fit(self, X, y):
     """Create constraints from labels and learn the SCML model.
 
     Parameters
@@ -232,14 +364,22 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     # should that case be handled?
 
     if(self.basis == "LDA"):
-      self._generate_bases_LDA(X, y, random_state)
+      self._generate_bases_LDA(X, y)
 
-    triplets = generate_knntriplets(X, y, self.k_genuine,
-                                    self.k_impostor)
+    constraints = Constraints(y)
+    triplets = constraints.generate_knntriplets(X, y, self.k_genuine,
+                                                self.k_impostor)
 
     return self._fit(triplets)
 
-  def _generate_bases_LDA(self, X, y, random_state=None):
+  def _generate_bases_LDA(self, X, y):
+    """
+    Helper function that computes the n_basis basis set constructed from the
+    LDA of significant local regions in the feature space via clustering, for
+    each region center k-nearest neighbors are used to obtain the LDA scalings,
+    which correspond to the locally discriminative basis. Currently this is
+    done at two scales `k={10,20}` if `n_feature < 50` or else `k={20,50}`.
+    """
 
     labels, class_count = np.unique(y, return_counts=True)
     n_class = len(labels)
@@ -253,24 +393,30 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
         ValueError("The number of basis should be greater than the number of "
                    "classes")
 
-    dim = np.size(X, 1)
-    num_eig = min(n_class-1, dim)
+    n_features = np.size(X, 1)
+    # Number of basis yielded from each LDA
+    num_eig = min(n_class-1, n_features)
+    # Number of clusters needed for 2 scales given the number of basis
+    # yielded by every LDA
     n_clusters = int(np.ceil(self.n_basis/(2 * num_eig)))
 
     # TODO: maybe give acces to Kmeans jobs for faster computation?
-    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state,
+    kmeans = KMeans(n_clusters=n_clusters, random_state=self.random_state,
                     algorithm='elkan').fit(X)
     cX = kmeans.cluster_centers_
 
     # TODO: find a better way to choose neighbourhood size
-    if dim > 50:
-        nK = 50
+    if n_features > 50:
+        k = 50
     else:
-        nK = 10
+        k = 10
 
-    nK_class = np.minimum(class_count, nK)
+    # In case some class has less elements than k
+    k_class = np.minimum(class_count, k)
 
-    idx_set = np.zeros((n_clusters, sum(nK_class)), dtype=np.int)
+    # Construct index set with neighbors of every element of every class
+
+    idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
 
     start = 0
     finish = 0
@@ -278,49 +424,56 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
 
     for c in range(n_class):
         sel_c = np.where(y == labels[c])
-        nk = nK_class[c]
-        # get nK_class same class neighbours
+        kc = k_class[c]
+        # get k_class same class neighbours
         neigh.fit(X=X[sel_c])
 
-        finish += nk
+        finish += kc
         idx_set[:, start:finish] = np.take(sel_c, neigh.kneighbors(X=cX,
-                                           n_neighbors=nk,
+                                           n_neighbors=kc,
                                            return_distance=False))
         start = finish
 
-    self.basis = np.zeros((self.n_basis, dim))
+    # Compute basis for every cluster in first scale
+    self.basis = np.zeros((self.n_basis, n_features))
     for i in range(n_clusters):
         lda = LinearDiscriminantAnalysis()
         lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
         self.basis[num_eig*i: num_eig*(i+1), :] = normalize(lda.scalings_.T)
 
-    nK = 20
+    # second scale
+    k = 20
 
-    nK_class = np.minimum(class_count, nK)
+    # In case some class has less elements than k
+    k_class = np.minimum(class_count, k)
 
-    idx_set = np.zeros((n_clusters, sum(nK_class)), dtype=np.int)
+    # Construct index set with neighbors of every element of every class
+
+    idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
 
     start = 0
     finish = 0
 
     for c in range(n_class):
         sel_c = np.where(y == labels[c])
-        nk = nK_class[c]
-        # get nK_class genuine neighbours
-        neigh.fit(X=X[sel_c])
+        kc = k_class[c]
 
-        finish += nk
+        # get k_class genuine neighbours
+        neigh.fit(X=X[sel_c])
+        finish += kc
         idx_set[:, start:finish] = np.take(sel_c, neigh.kneighbors(X=cX,
-                                           n_neighbors=nk,
+                                           n_neighbors=kc,
                                            return_distance=False))
         start = finish
 
+    # Compute basis for every cluster in first scale
     finish = num_eig * n_clusters
     n_components = None
 
     for i in range(n_clusters):
         start = finish
         finish += num_eig
+
         # handle tail, as n_basis != n_clusters*2*n_eig
         if (finish > self.n_basis):
           finish = self.n_basis
