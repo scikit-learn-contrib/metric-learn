@@ -18,13 +18,15 @@ class _BaseSCML_global(MahalanobisMixin):
 
   _tuple_size = 3   # constraints are triplets
 
-  def __init__(self, beta=1e-5, basis=None, n_basis=None,
-               max_iter=100000, verbose=False,  preprocessor=None,
-               random_state=None):
+  def __init__(self, beta=1e-5, basis=None, n_basis=None, gamma=5e-3,
+               max_iter=100000, output_iter=5000, verbose=False,
+               preprocessor=None, random_state=None):
     self.beta = beta
     self.basis = basis
     self.n_basis = n_basis
+    self.gamma = gamma
     self.max_iter = max_iter
+    self.output_iter = output_iter
     self.verbose = verbose
     self.preprocessor = preprocessor
     self.random_state = random_state
@@ -47,14 +49,12 @@ class _BaseSCML_global(MahalanobisMixin):
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
 
     # TODO:
-    # This algorithm is build to work with indeces, but in order to be
+    # This algorithm is built to work with indices, but in order to be
     # compliant with the current handling of inputs it is converted
     # back to indices by the following function. This should be improved
     # in the future.
     triplets, X = self._to_index_points(triplets)
 
-    # TODO: should be given access to gamma?
-    gamma = 5e-3
     dist_diff = self._compute_dist_diff(triplets, X)
 
     sizeT = triplets.shape[0]
@@ -62,12 +62,10 @@ class _BaseSCML_global(MahalanobisMixin):
     w = np.zeros((1, self.n_basis))
     avg_grad_w = np.zeros((1, self.n_basis))
 
-    output_iter = 5000     # output every output_iter iterations
-
     best_obj = np.inf
 
     for iter in range(self.max_iter):
-      if (iter % output_iter == 0):
+      if (iter % self.output_iter == 0):
         # regularization part of obj function
         obj1 = np.sum(w)*self.beta
 
@@ -103,7 +101,7 @@ class _BaseSCML_global(MahalanobisMixin):
       else:
         avg_grad_w = iter * avg_grad_w / (iter+1)
 
-      scale_f = -np.sqrt(iter+1) / gamma
+      scale_f = -np.sqrt(iter+1) / self.gamma
 
       # proximal operator with negative trimming equivalent
       w = scale_f * np.minimum(avg_grad_w + self.beta, 0)
@@ -129,15 +127,15 @@ class _BaseSCML_global(MahalanobisMixin):
     # np.array (2*lenT,2)
     T_pairs_sorted = np.sort(np.vstack((T[:, [0, 1]], T[:, [0, 2]])),
                              kind='stable')
-    # calculate all unique pairs and their indeces
-    uniqPairs, indeces = np.unique(T_pairs_sorted, return_inverse=True,
+    # calculate all unique pairs and their indices
+    uniqPairs, indices = np.unique(T_pairs_sorted, return_inverse=True,
                                    axis=0)
     # calculate L2 distance acording to bases only for unique pairs
     dist = np.square(XB[uniqPairs[:, 0], :]-XB[uniqPairs[:, 1], :])
 
     # return the diference of distances between all positive and negative
     # pairs
-    return dist[indeces[:lenT]]-dist[indeces[lenT:]]
+    return dist[indices[:lenT]]-dist[indices[lenT:]]
 
   def _get_components(self, w):
     """
@@ -197,6 +195,8 @@ class SCML_global(_BaseSCML_global, _TripletsClassifierMixin):
   Read more in the :ref:`User Guide <scml>`.
   Parameters
   ----------
+  beta: float (default=1e-5)
+      L1 regularization parameter.
   basis : None, string or numpy array, optional (default=None)
        Prior to set for the metric. Possible options are
        '', and a numpy array of shape (n_basis, n_features). If
@@ -209,7 +209,13 @@ class SCML_global(_BaseSCML_global, _TripletsClassifierMixin):
       Number of basis to be yielded. In case it is not set it will be set based
       on the basis numpy array. If an string option is pased to basis an error
       wild be raised as this value will be needed.
-  max_iter : int, optional
+  gamma: float (default = 5e-3)
+      Learning rate
+  max_iter : int (default = 100000)
+      Number of iterations for the algorithm
+  output_iter : int (default = 5000)
+      Number of iterations to check current weights performance and output this
+      information in case verbose is True.
   verbose : bool, optional
       if True, prints information while learning
   preprocessor : array-like, shape=(n_samples, n_features) or callable
@@ -276,6 +282,8 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
   Read more in the :ref:`User Guide <scml>`.
   Parameters
   ----------
+  beta: float (default=1e-5)
+      L1 regularization parameter.
   basis : None, string or numpy array, optional (default=None)
       Prior to set for the metric. Possible options are
       'LDA', and a numpy array of shape (n_basis, n_features). If
@@ -293,7 +301,13 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
       Number of basis to be yielded. In case it is not set it will be set based
       on the basis numpy array. If an string option is pased to basis an error
       wild be raised as this value will be needed.
-  max_iter : int, optional
+  gamma: float (default = 5e-3)
+      Learning rate
+  max_iter : int (default = 100000)
+      Number of iterations for the algorithm
+  output_iter : int (default = 5000)
+      Number of iterations to check current weights performance and output this
+      information in case verbose is True.
   verbose : bool, optional
       if True, prints information while learning
   preprocessor : array-like, shape=(n_samples, n_features) or callable
@@ -331,8 +345,8 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
   """
 
   def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis=None,
-               n_basis=None, max_iter=100000, verbose=False,
-               preprocessor=None, random_state=None):
+               n_basis=None, gamma=5e-3, max_iter=100000, output_iter=5000,
+               verbose=False, preprocessor=None, random_state=None):
     self.k_genuine = k_genuine
     self.k_impostor = k_impostor
     _BaseSCML_global.__init__(self, beta=beta, basis=basis, n_basis=n_basis,
