@@ -64,6 +64,7 @@ class _BaseSCML_global(MahalanobisMixin):
 
     best_obj = np.inf
 
+    rand_int = np.random.randint(low=0, high=sizeT, size=self.max_iter)
     for iter in range(self.max_iter):
       if (iter % self.output_iter == 0):
         # regularization part of obj function
@@ -92,9 +93,9 @@ class _BaseSCML_global(MahalanobisMixin):
       # TODO:
       # Maybe allow the usage of mini-batch opt?
 
-      idx = np.random.randint(low=0, high=sizeT)
+      idx = rand_int[iter]
 
-      slack_val = 1 + dist_diff[idx, :].dot(w.T)
+      slack_val = 1 + np.matmul(dist_diff[idx, :], w.T)
 
       if (slack_val > 0):
         avg_grad_w = (iter * avg_grad_w + dist_diff[idx, :]) / (iter+1)
