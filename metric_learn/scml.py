@@ -76,7 +76,7 @@ class _BaseSCML_global(MahalanobisMixin):
         slack_mask = slack_val > 0
 
         # loss function of learning task part of obj function
-        obj2 = np.sum(slack_val[slack_mask])/sizeT
+        obj2 = np.sum(slack_val, where=slack_mask)/sizeT
 
         obj = obj1 + obj2
         if(self.verbose):
@@ -162,6 +162,8 @@ class _BaseSCML_global(MahalanobisMixin):
     return triplets, X
 
   def _initialize_basis(self, n_features):
+    # TODO:
+    # Add other options passed as string
     authorized_basis = []
     if isinstance(self.basis, np.ndarray):
       self.basis = check_array(self.basis)
@@ -176,11 +178,6 @@ class _BaseSCML_global(MahalanobisMixin):
           "`basis` must be '{}' "
           "or a numpy array of shape (n_basis, n_features)."
           .format("', '".join(authorized_basis)))
-
-    # TODO:
-    # Add other options passed as string
-    elif type(self.basis) is str:
-      ValueError("No option for basis currently supported")
 
 
 class SCML_global(_BaseSCML_global, _TripletsClassifierMixin):
@@ -381,7 +378,7 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
       self._generate_bases_LDA(X, y)
 
     constraints = Constraints(y)
-    triplets = constraints.generate_knntriplets(X, y, self.k_genuine,
+    triplets = constraints.generate_knntriplets(X, self.k_genuine,
                                                 self.k_impostor)
 
     return self._fit(triplets)
@@ -419,7 +416,7 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
                     algorithm='elkan').fit(X)
     cX = kmeans.cluster_centers_
 
-    # TODO: find a better way to choose neighbourhood size
+    # TODO: find a better way to choose neighborhood size
     if n_features > 50:
         k = 50
     else:
@@ -428,7 +425,7 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     # In case some class has less elements than k
     k_class = np.minimum(class_count, k)
 
-    # Construct index set with neighbors of every element of every class
+    # Construct index set with neighbors for every element of every class
 
     idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
 
@@ -450,8 +447,8 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
 
     # Compute basis for every cluster in first scale
     self.basis = np.zeros((self.n_basis, n_features))
+    lda = LinearDiscriminantAnalysis()
     for i in range(n_clusters):
-        lda = LinearDiscriminantAnalysis()
         lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
         self.basis[num_eig*i: num_eig*(i+1), :] = normalize(lda.scalings_.T)
 
@@ -461,7 +458,7 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     # In case some class has less elements than k
     k_class = np.minimum(class_count, k)
 
-    # Construct index set with neighbors of every element of every class
+    # Construct index set with neighbors for every element of every class
 
     idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
 
@@ -480,10 +477,10 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
                                            return_distance=False))
         start = finish
 
-    # Compute basis for every cluster in first scale
+    # Compute basis for every cluster in second scale
     finish = num_eig * n_clusters
     n_components = None
-
+    lda = LinearDiscriminantAnalysis()
     for i in range(n_clusters):
         start = finish
         finish += num_eig
@@ -493,7 +490,6 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
           finish = self.n_basis
           n_components = finish-start
 
-        lda = LinearDiscriminantAnalysis()
         lda.fit(X[idx_set[i, :]], y[idx_set[i, :]], n_components=n_components)
 
         self.basis[start:finish, :] = normalize(lda.scalings_.T)
