@@ -479,7 +479,6 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
 
     # Compute basis for every cluster in second scale
     finish = num_eig * n_clusters
-    n_components = None
     lda = LinearDiscriminantAnalysis()
     for i in range(n_clusters):
         start = finish
@@ -488,10 +487,9 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
         # handle tail, as n_basis != n_clusters*2*n_eig
         if (finish > self.n_basis):
           finish = self.n_basis
-          n_components = finish-start
 
-        lda.fit(X[idx_set[i, :]], y[idx_set[i, :]], n_components=n_components)
+        lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
 
-        self.basis[start:finish, :] = normalize(lda.scalings_.T)
+        self.basis[start:finish, :] = normalize(lda.scalings_.T[:finish-start])
 
     return
