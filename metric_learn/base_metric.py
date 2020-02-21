@@ -598,8 +598,8 @@ class _TripletsClassifierMixin(BaseMetricLearner):
   def predict(self, triplets):
     """Predicts the ordering between sample distances in input triplets.
 
-    For each triplets, returns 1 if the first two elements are closer than the
-    first and last and -1 if not.
+    For each triplets, returns 1 if the first element is closer to the second than to the
+    last and -1 if not.
 
     Parameters
     ----------
