@@ -604,7 +604,7 @@ class _TripletsClassifierMixin(BaseMetricLearner):
     Parameters
     ----------
     triplets : array-like, shape=(n_triplets, 3, n_features) or (n_triplets, 3)
-      3D Array of triplets to predict, with each row corresponding to three
+      3D array of triplets to predict, with each row corresponding to three
       points, or 2D array of indices of triplets if the metric learner
       uses a preprocessor.
 
@@ -618,18 +618,18 @@ class _TripletsClassifierMixin(BaseMetricLearner):
   def decision_function(self, triplets):
     """Predicts differences between sample distances in input triplets.
 
-    For each triplets in the samples, computes the difference between the
-    learned metric of the second pair minus the learned metric of the first
-    pair. The higher it is, the more probable it is that the pairs in the
-    triplets are presented in the right order, i.e. that the label of the
-    triplet is 1. The lower it is, the more probable it is that the label of
-    the triplet is -1.
+    For each triplet (X_a, X_b, X_c) in the samples, computes the difference
+    between the learned metric of the second pair (X_a, X_c) minus the learned
+    metric of the first pair (X_a, X_b). The higher it is, the more probable it
+    is that the pairs in the triplets are presented in the right order, i.e.
+    that the label of the triplet is 1. The lower it is, the more probable it
+    is that the label of the triplet is -1.
 
     Parameters
     ----------
-    triplet : array-like, shape=(n_triplets, 4, n_features) or \
-                  (n_triplets, 4)
-      3D Array of triplets to predict, with each row corresponding to four
+    triplet : array-like, shape=(n_triplets, 3, n_features) or \
+                  (n_triplets, 3)
+      3D array of triplets to predict, with each row corresponding to three
       points, or 2D array of indices of triplets if the metric learner
       uses a preprocessor.
 
@@ -646,17 +646,17 @@ class _TripletsClassifierMixin(BaseMetricLearner):
             self.score_pairs(triplets[:, :2]))
 
   def score(self, triplets):
-    """Computes score on input triplets
+    """Computes score on input triplets.
 
-    Returns the accuracy score of the following classification task: a record
-    is correctly classified if the predicted similarity between the first two
-    samples is higher than that of the first and last element.
+    Returns the accuracy score of the following classification task: a triplet
+    (X_a, X_b, X_c) is correctly classified if the predicted similarity between
+    the first pair (X_a, X_b) is higher than that of the second pair (X_a, X_c)
 
     Parameters
     ----------
-    triplets : array-like, shape=(n_triplets, 4, n_features) or \
-                  (n_triplets, 4)
-      3D Array of triplets to score, with each row corresponding to four
+    triplets : array-like, shape=(n_triplets, 3, n_features) or \
+                  (n_triplets, 3)
+      3D array of triplets to score, with each row corresponding to three
       points, or 2D array of indices of triplets if the metric learner
       uses a preprocessor.
 

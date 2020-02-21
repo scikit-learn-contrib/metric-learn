@@ -57,7 +57,7 @@ def test_accuracy_toy_example(estimator, build_dataset):
   set_random_state(estimator)
   estimator.fit(triplets)
   # We take the two first points and we build 4 regularly spaced points on the
-  # line they define, so that it's easy to build quadruplets of different
+  # line they define, so that it's easy to build triplets of different
   # similarities.
   X_test = X[0] + np.arange(4)[:, np.newaxis] * (X[0] - X[1]) / 4
 

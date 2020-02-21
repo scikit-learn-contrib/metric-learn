@@ -36,9 +36,31 @@ class Constraints(object):
     return a, b, c, d
 
   def generate_knntriplets(self, X, k_genuine, k_impostor):
+    """
+    Generates triplets for every point to `k_genuine` neighbors of the same
+    class and `k_impostor` neighbors of other classes.
+
+    For every point (X_a) the triplets (X_a, X_b, X_c) are constructed from all
+    the combinations of taking `k_genuine` neighbors (X_b) of the same class
+    and `k_impostor` neighbors (X_c) of other classes.
+
+    Parameters
+    ----------
+      X : (n x d) matrix
+        Input data, where each row corresponds to a single instance.
+      k_genuine : int
+        Number of neighbors of the same class to be taken into account.
+      k_impostor : int
+        Number of neighbors of different classes to be taken into account.
+
+    Returns
+    -------
+    triplets : array-like, shape=(n_constraints, 3)
+      2D array of triplets of indicators.
+    """
 
     labels = np.unique(self.partial_labels)
-    L = len(labels)
+    n_labels = len(labels)
     len_input = np.size(self.partial_labels, 0)
     triplets = np.empty((len_input*k_genuine*k_impostor, 3), dtype=np.intp)
 
@@ -46,7 +68,7 @@ class Constraints(object):
     finish = 0
     neigh = NearestNeighbors()
 
-    for i in range(L):
+    for i in range(n_labels):
 
         # generate mask for current label
         gen_mask = self.partial_labels == labels[i]
@@ -67,7 +89,7 @@ class Constraints(object):
                             X=X[gen_mask],
                             return_distance=False))
 
-        # lenght = len_label*k_genuine*k_impostor
+        # length = len_label*k_genuine*k_impostor
         finish += np.sum(gen_mask)*k_genuine*k_impostor
 
         triplets[start:finish, :] = self._comb(gen_indx, gen_neigh, imp_neigh,
@@ -79,6 +101,7 @@ class Constraints(object):
     return triplets
 
   def _comb(self, A, B, C, sizeB, sizeC):
+    # generate_knntripelts helper function
     # generate an array will all combinations of choosing
     # an element from A, B and C
     return np.vstack((repmat(A, sizeB*sizeC, 1).ravel(order='F'),

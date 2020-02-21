@@ -89,7 +89,7 @@ def build_triplets(with_preprocessor=False):
   input_data, labels = load_iris(return_X_y=True)
   X, y = shuffle(input_data, labels, random_state=SEED)
   constraints = Constraints(y)
-  triplets = constraints.generate_knntriplets(X, 3, 10)
+  triplets = constraints.generate_knntriplets(X, 3, 4)
   if with_preprocessor:
     # if preprocessor, we build a 2D array of triplets of indices
     return triplets, X
