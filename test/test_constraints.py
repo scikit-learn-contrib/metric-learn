@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 from sklearn.utils import shuffle
 from metric_learn.constraints import Constraints
+from sklearn.datasets import make_blobs
 
 SEED = 42
 
@@ -69,3 +70,78 @@ def test_unknown_labels_not_in_chunks(num_chunks, chunk_size):
                               random_state=SEED)
 
   assert np.all(chunks[labels < 0] < 0)
+
+
+def test_generate_knntriplets():
+  k = 1
+  X = np.array([[0, 0],
+               [1, 1],
+               [2, 2],
+               [3, 3],
+               [4, 4],
+               [5, 5],
+               [6, 6],
+               [7, 7],
+               [8, 8]])
+  y = np.array([1, 1, 1, 2, 2, 2, 3, 3, 3])
+  T_test = np.array([[0, 1, 3],
+                    [1, 0, 3],
+                    [2, 1, 3],
+                    [3, 4, 2],
+                    [4, 3, 2],
+                    [5, 4, 6],
+                    [6, 7, 5],
+                    [7, 6, 5],
+                    [8, 7, 5]])
+  T = Constraints(y).generate_knntriplets(X, k, k)
+
+  assert np.array_equal(T, T_test)
+
+
+def test_generate_knntriplets_k_genuine():
+  """Checks the correct error raised when k_genuine is too big """
+  X, y = shuffle(*make_blobs(random_state=SEED),
+                 random_state=SEED)
+
+  label, labels_count = np.unique(y, return_counts=True)
+  labels_count_min = np.min(labels_count)
+  idx_smallest_label = np.where(labels_count == labels_count_min)
+
+  warn_msgs = []
+  for idx in idx_smallest_label[0]:
+    k_genuine = labels_count[idx]
+    warn_msgs.append("The class {} has {} elements but a minimum of {},"
+                     " which corresponds to k_genuine+1, is expected. "
+                     "A lower number of k_genuine will be used for this"
+                     "class.\n"
+                     .format(label[idx], k_genuine, k_genuine+1))
+
+  with pytest.warns(UserWarning) as raised_warning:
+    Constraints(y).generate_knntriplets(X, k_genuine, 1)
+  for warn in raised_warning:
+    assert str(warn.message) in warn_msgs
+
+
+def test_generate_knntriplets_k_impostor():
+  """Checks the correct error raised when k_impostor is too big """
+  X, y = shuffle(*make_blobs(random_state=SEED),
+                 random_state=SEED)
+
+  length = len(y)
+  label, labels_count = np.unique(y, return_counts=True)
+  labels_count_max = np.max(labels_count)
+  idx_smallest_label = np.where(labels_count == labels_count_max)
+  k_impostor = length - labels_count_max + 1
+
+  warn_msgs = []
+  for idx in idx_smallest_label[0]:
+    warn_msgs.append("The class {} has {} elements of other classes but a "
+                     "minimum of {}, which corresponds to k_impostor, is"
+                     " expected. A lower number of k_impostor will be used"
+                     " for this class.\n"
+                     .format(label[idx], k_impostor-1, k_impostor))
+
+  with pytest.warns(UserWarning) as raised_warning:
+    Constraints(y).generate_knntriplets(X, 1, k_impostor)
+  for warn in raised_warning:
+    assert str(warn.message) in warn_msgs
