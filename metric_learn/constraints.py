@@ -59,10 +59,35 @@ class Constraints(object):
       2D array of triplets of indicators.
     """
 
-    labels = np.unique(self.partial_labels)
+    labels, labels_count = np.unique(self.partial_labels, return_counts=True)
     n_labels = len(labels)
     len_input = np.size(self.partial_labels, 0)
-    triplets = np.empty((len_input*k_genuine*k_impostor, 3), dtype=np.intp)
+
+    # Handle the case where there are too few elements to yield k_genuine or
+    # k_impostor neighbors for every class.
+
+    k_genuine_vec = np.ones(n_labels, dtype=np.intp)*k_genuine
+    k_impostor_vec = np.ones(n_labels, dtype=np.intp)*k_impostor
+
+    for i in range(n_labels):
+      if (k_genuine + 1 > labels_count[i]):
+        k_genuine_vec[i] = labels_count[i]-1
+        warnings.warn("The class {} has {} elements but a minimum of {},"
+                      " which corresponds to k_genuine+1, is expected. "
+                      "A lower number of k_genuine will be used for this"
+                      "class.\n"
+                      .format(labels[i], labels_count[i], k_genuine+1))
+      if (k_impostor > len_input - labels_count[i]):
+        k_impostor_vec[i] = len_input - labels_count[i]
+        warnings.warn("The class {} has {} elements of other classes but a "
+                      "minimum of {}, which corresponds to k_impostor, is"
+                      " expected. A lower number of k_impostor will be used"
+                      " for this class.\n"
+                      .format(labels[i], len_input - labels_count[i],
+                              k_impostor))
+
+    triplets = np.empty((np.dot(k_genuine_vec*k_impostor_vec, labels_count),
+                         3), dtype=np.intp)
 
     start = 0
     finish = 0
@@ -76,7 +101,8 @@ class Constraints(object):
 
         # get k_genuine genuine neighbours
         neigh.fit(X=X[gen_indx])
-        gen_neigh = np.take(gen_indx, neigh.kneighbors(n_neighbors=k_genuine,
+        gen_neigh = np.take(gen_indx, neigh.kneighbors(
+                            n_neighbors=k_genuine_vec[i],
                             return_distance=False))
 
         # generate mask for impostors of current label
@@ -85,18 +111,17 @@ class Constraints(object):
         # get k_impostor impostor neighbours
         neigh.fit(X=X[imp_indx])
         imp_neigh = np.take(imp_indx, neigh.kneighbors(
-                            n_neighbors=k_impostor,
+                            n_neighbors=k_impostor_vec[i],
                             X=X[gen_mask],
                             return_distance=False))
 
         # length = len_label*k_genuine*k_impostor
-        finish += np.sum(gen_mask)*k_genuine*k_impostor
+        finish += labels_count[i]*k_genuine_vec[i]*k_impostor_vec[i]
 
         triplets[start:finish, :] = self._comb(gen_indx, gen_neigh, imp_neigh,
-                                               k_genuine, k_impostor)
+                                               k_genuine_vec[i],
+                                               k_impostor_vec[i])
         start = finish
-
-        # TODO: deal with too litle elements for k neighbors to be yielded
 
     return triplets
 
