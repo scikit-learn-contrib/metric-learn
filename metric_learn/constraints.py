@@ -37,12 +37,17 @@ class Constraints(object):
 
   def generate_knntriplets(self, X, k_genuine, k_impostor):
     """
-    Generates triplets for every point to `k_genuine` neighbors of the same
-    class and `k_impostor` neighbors of other classes.
+    Generates triplets from labeled data.
 
     For every point (X_a) the triplets (X_a, X_b, X_c) are constructed from all
-    the combinations of taking `k_genuine` neighbors (X_b) of the same class
-    and `k_impostor` neighbors (X_c) of other classes.
+    the combinations of taking one of its `k_genuine`-nearest neighbors of the
+    same class (X_b) and taking one of its `k_impostor`-nearest neighbors of
+    other classes (X_c).
+
+    In the case a class doesn't have enough points in the same class (other
+    classes) to yield `k_genuine` (`k_impostor`) neighbors a warning will be
+    raised and the maximum value of genuine (impostor) neighbors will be used
+    for that class.
 
     Parameters
     ----------
@@ -72,19 +77,20 @@ class Constraints(object):
     for i in range(n_labels):
       if (k_genuine + 1 > labels_count[i]):
         k_genuine_vec[i] = labels_count[i]-1
-        warnings.warn("The class {} has {} elements but a minimum of {},"
-                      " which corresponds to k_genuine+1, is expected. "
-                      "A lower number of k_genuine will be used for this"
-                      "class.\n"
-                      .format(labels[i], labels_count[i], k_genuine+1))
+        warnings.warn("The class {} has {} elements, which is not sufficient "
+                      "to generate {} genuine neighbors as specified by "
+                      "k_genuine. Will generate {} genuine neighbors instead."
+                      "\n"
+                      .format(labels[i], labels_count[i], k_genuine+1,
+                              k_genuine_vec[i]))
       if (k_impostor > len_input - labels_count[i]):
         k_impostor_vec[i] = len_input - labels_count[i]
-        warnings.warn("The class {} has {} elements of other classes but a "
-                      "minimum of {}, which corresponds to k_impostor, is"
-                      " expected. A lower number of k_impostor will be used"
-                      " for this class.\n"
-                      .format(labels[i], len_input - labels_count[i],
-                              k_impostor))
+        warnings.warn("The class {} has {} elements of other classes, which is"
+                      " not sufficient to generate {} impostor neighbors as "
+                      "specified by k_impostor. Will generate {} impostor "
+                      "neighbors instead.\n"
+                      .format(labels[i], k_impostor_vec[i], k_impostor,
+                              k_impostor_vec[i]))
 
     triplets = np.empty((np.dot(k_genuine_vec*k_impostor_vec, labels_count),
                          3), dtype=np.intp)
@@ -126,7 +132,7 @@ class Constraints(object):
     return triplets
 
   def _comb(self, A, B, C, sizeB, sizeC):
-    # generate_knntripelts helper function
+    # generate_knntriplets helper function
     # generate an array will all combinations of choosing
     # an element from A, B and C
     return np.vstack((repmat(A, sizeB*sizeC, 1).ravel(order='F'),

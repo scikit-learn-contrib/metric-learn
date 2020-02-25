@@ -619,11 +619,11 @@ class _TripletsClassifierMixin(BaseMetricLearner):
     """Predicts differences between sample distances in input triplets.
 
     For each triplet (X_a, X_b, X_c) in the samples, computes the difference
-    between the learned metric of the second pair (X_a, X_c) minus the learned
-    metric of the first pair (X_a, X_b). The higher it is, the more probable it
-    is that the pairs in the triplets are presented in the right order, i.e.
-    that the label of the triplet is 1. The lower it is, the more probable it
-    is that the label of the triplet is -1.
+    between the learned distance of the second pair (X_a, X_c) minus the
+    learned distance of the first pair (X_a, X_b). The higher it is, the more
+    probable it is that the pairs in the triplets are presented in the right
+    order, i.e. that the label of the triplet is 1. The lower it is, the more
+    probable it is that the label of the triplet is -1.
 
     Parameters
     ----------

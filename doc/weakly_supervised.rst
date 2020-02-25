@@ -594,7 +594,7 @@ points, while constrains the sum of distances between dissimilar points:
 
 .. _learning_on_triplets:
 
-Learning on Triplets
+Learning on triplets
 ====================
 
 Some metric learning algorithms learn on triplets of samples. In this case,
@@ -650,7 +650,7 @@ Prediction
 
 When a triplets learner is fitted, it is also able to predict, for an
 upcoming triplet, whether the first point is closer to the second point 
-than to the third one. (+1), or not (-1).
+than to the third one (+1), or not (-1).
 
 >>> triplets_test = np.array(
 ... [[[5.6, 5.3], [2.2, 2.1], [1.2, 3.4]],
@@ -664,7 +664,7 @@ Scoring
 -------
 
 Triplet metric learners can also return a `decision_function` for a set of triplets,
-which correspond to the distance between the first two points minus the distance
+which corresponds to the distance between the first two points minus the distance
 between the first and last points of the triplet (the higher the value, the more
 similar the first point to the second point compared to the last one). This "score"
 can be interpreted as a measure of likeliness of having a +1 prediction for this 
@@ -707,7 +707,7 @@ Learning on quadruplets
 =======================
 
 Some metric learning algorithms learn on quadruplets of samples. In this case,
-one should provide the algorithm with `n_samples` quadruplets of points. Th
+one should provide the algorithm with `n_samples` quadruplets of points. The
 semantic of each quadruplet is that the first two points should be closer
 together than the last two points.
 
@@ -772,10 +772,10 @@ array([-1.,  1.])
 .. _quadruplets_scoring:
 
 Scoring
--------W
+-------
 
 Quadruplet metric learners can also return a `decision_function` for a set of
-quadruplets, which correspond to the distance between the first pair of points minus 
+quadruplets, which corresponds to the distance between the first pair of points minus 
 the distance between the second pair of points of the triplet (the higher the value,
 the more similar the first pair is than the last pair). 
 This "score" can be interpreted as a measure of likeliness of having a +1 prediction 

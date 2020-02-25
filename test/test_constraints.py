@@ -74,25 +74,11 @@ def test_unknown_labels_not_in_chunks(num_chunks, chunk_size):
 
 def test_generate_knntriplets():
   k = 1
-  X = np.array([[0, 0],
-               [1, 1],
-               [2, 2],
-               [3, 3],
-               [4, 4],
-               [5, 5],
-               [6, 6],
-               [7, 7],
+  X = np.array([[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7],
                [8, 8]])
   y = np.array([1, 1, 1, 2, 2, 2, 3, 3, 3])
-  T_test = np.array([[0, 1, 3],
-                    [1, 0, 3],
-                    [2, 1, 3],
-                    [3, 4, 2],
-                    [4, 3, 2],
-                    [5, 4, 6],
-                    [6, 7, 5],
-                    [7, 6, 5],
-                    [8, 7, 5]])
+  T_test = np.array([[0, 1, 3], [1, 0, 3], [2, 1, 3], [3, 4, 2], [4, 3, 2],
+                     [5, 4, 6], [6, 7, 5], [7, 6, 5], [8, 7, 5]])
   T = Constraints(y).generate_knntriplets(X, k, k)
 
   assert np.array_equal(T, T_test)
@@ -110,11 +96,11 @@ def test_generate_knntriplets_k_genuine():
   warn_msgs = []
   for idx in idx_smallest_label[0]:
     k_genuine = labels_count[idx]
-    warn_msgs.append("The class {} has {} elements but a minimum of {},"
-                     " which corresponds to k_genuine+1, is expected. "
-                     "A lower number of k_genuine will be used for this"
-                     "class.\n"
-                     .format(label[idx], k_genuine, k_genuine+1))
+    warn_msgs.append("The class {} has {} elements, which is not sufficient "
+                     "to generate {} genuine neighbors as specified by "
+                     "k_genuine. Will generate {} genuine neighbors instead."
+                     "\n"
+                     .format(label[idx], k_genuine, k_genuine+1, k_genuine-1))
 
   with pytest.warns(UserWarning) as raised_warning:
     Constraints(y).generate_knntriplets(X, k_genuine, 1)
@@ -135,11 +121,12 @@ def test_generate_knntriplets_k_impostor():
 
   warn_msgs = []
   for idx in idx_smallest_label[0]:
-    warn_msgs.append("The class {} has {} elements of other classes but a "
-                     "minimum of {}, which corresponds to k_impostor, is"
-                     " expected. A lower number of k_impostor will be used"
-                     " for this class.\n"
-                     .format(label[idx], k_impostor-1, k_impostor))
+    warn_msgs.append("The class {} has {} elements of other classes, which is"
+                     " not sufficient to generate {} impostor neighbors as "
+                     "specified by k_impostor. Will generate {} impostor "
+                     "neighbors instead.\n"
+                     .format(label[idx], k_impostor-1, k_impostor,
+                             k_impostor-1))
 
   with pytest.warns(UserWarning) as raised_warning:
     Constraints(y).generate_knntriplets(X, 1, k_impostor)
