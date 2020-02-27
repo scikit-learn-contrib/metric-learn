@@ -130,11 +130,11 @@ def test_generate_knntriplets_k_genuine():
 
   label, labels_count = np.unique(y, return_counts=True)
   labels_count_min = np.min(labels_count)
-  idx_smallest_label = np.where(labels_count == labels_count_min)
+  idx_smallest_label, = np.where(labels_count == labels_count_min)
   k_genuine = labels_count_min
 
   warn_msgs = []
-  for idx in idx_smallest_label[0]:
+  for idx in idx_smallest_label:
     warn_msgs.append("The class {} has {} elements, which is not sufficient "
                      "to generate {} genuine neighbors as specified by "
                      "k_genuine. Will generate {} genuine neighbors instead."
@@ -155,11 +155,11 @@ def test_generate_knntriplets_k_impostor():
   length = len(y)
   label, labels_count = np.unique(y, return_counts=True)
   labels_count_max = np.max(labels_count)
-  idx_biggest_label = np.where(labels_count == labels_count_max)
+  idx_biggest_label, = np.where(labels_count == labels_count_max)
   k_impostor = length - labels_count_max + 1
 
   warn_msgs = []
-  for idx in idx_biggest_label[0]:
+  for idx in idx_biggest_label:
     warn_msgs.append("The class {} has {} elements of other classes, which is"
                      " not sufficient to generate {} impostor neighbors as "
                      "specified by k_impostor. Will generate {} impostor "

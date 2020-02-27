@@ -66,25 +66,25 @@ class Constraints(object):
 
     labels, labels_count = np.unique(self.partial_labels, return_counts=True)
     n_labels = len(labels)
-    len_input = np.size(self.partial_labels, 0)
+    len_input = self.partial_labels.shape[0]
 
     # Handle the case where there are too few elements to yield k_genuine or
     # k_impostor neighbors for every class.
 
-    k_genuine_vec = np.ones(n_labels, dtype=np.intp)*k_genuine
-    k_impostor_vec = np.ones(n_labels, dtype=np.intp)*k_impostor
+    k_genuine_vec = np.full(n_labels, k_genuine)
+    k_impostor_vec = np.full(n_labels, k_impostor)
 
-    for i in range(n_labels):
-      if (k_genuine + 1 > labels_count[i]):
-        k_genuine_vec[i] = labels_count[i]-1
+    for i, count in enumerate(labels_count):
+      if k_genuine + 1 > count:
+        k_genuine_vec[i] = count-1
         warnings.warn("The class {} has {} elements, which is not sufficient "
                       "to generate {} genuine neighbors as specified by "
                       "k_genuine. Will generate {} genuine neighbors instead."
                       "\n"
-                      .format(labels[i], labels_count[i], k_genuine+1,
+                      .format(labels[i], count, k_genuine+1,
                               k_genuine_vec[i]))
-      if (k_impostor > len_input - labels_count[i]):
-        k_impostor_vec[i] = len_input - labels_count[i]
+      if k_impostor > len_input - count:
+        k_impostor_vec[i] = len_input - count
         warnings.warn("The class {} has {} elements of other classes, which is"
                       " not sufficient to generate {} impostor neighbors as "
                       "specified by k_impostor. Will generate {} impostor "
@@ -92,17 +92,26 @@ class Constraints(object):
                       .format(labels[i], k_impostor_vec[i], k_impostor,
                               k_impostor_vec[i]))
 
-    triplets = np.empty((np.dot(k_genuine_vec*k_impostor_vec, labels_count),
-                         3), dtype=np.intp)
+    # The total number of possible triplets combinations comes from taking one
+    # of the k_genuine_vec[i] genuine neighbors and one of the
+    # k_impostor_vec[i] impostor neighbors for the labels_count[i] elements in
+    # every class
+    comb_per_label = labels_count * k_genuine_vec * k_impostor_vec
+    num_triplets = np.sum(comb_per_label)
+    triplets = np.empty((num_triplets, 3), dtype=np.intp)
 
-    start = 0
-    finish = 0
     neigh = NearestNeighbors()
 
-    for i in range(n_labels):
+    # Get start and finish for later triplet assiging
+    # append zero at the begining for start
+    start_finish_indices = np.hstack((0, comb_per_label))
+    # get cumulative sum
+    start_finish_indices.cumsum(out=start_finish_indices)
+
+    for i, label in enumerate(labels):
 
         # generate mask for current label
-        gen_mask = self.partial_labels == labels[i]
+        gen_mask = self.partial_labels == label
         gen_indx = np.where(gen_mask)
 
         # get k_genuine genuine neighbours
@@ -112,7 +121,7 @@ class Constraints(object):
                             return_distance=False))
 
         # generate mask for impostors of current label
-        imp_indx = np.where(np.invert(gen_mask))
+        imp_indx = np.where(~gen_mask)
 
         # get k_impostor impostor neighbours
         neigh.fit(X=X[imp_indx])
@@ -122,22 +131,13 @@ class Constraints(object):
                             return_distance=False))
 
         # length = len_label*k_genuine*k_impostor
-        finish += labels_count[i]*k_genuine_vec[i]*k_impostor_vec[i]
+        start, finish = start_finish_indices[i:i+2]
 
-        triplets[start:finish, :] = self._comb(gen_indx, gen_neigh, imp_neigh,
-                                               k_genuine_vec[i],
-                                               k_impostor_vec[i])
-        start = finish
+        triplets[start:finish, :] = comb(gen_indx, gen_neigh, imp_neigh,
+                                         k_genuine_vec[i],
+                                         k_impostor_vec[i])
 
     return triplets
-
-  def _comb(self, A, B, C, sizeB, sizeC):
-    # generate_knntriplets helper function
-    # generate an array will all combinations of choosing
-    # an element from A, B and C
-    return np.vstack((repmat(A, sizeB*sizeC, 1).ravel(order='F'),
-                      repmat(np.hstack(B), sizeC, 1).ravel(order='F'),
-                      repmat(C, 1, sizeB).ravel())).T
 
   def _pairs(self, num_constraints, same_label=True, max_iter=10,
              random_state=np.random):
@@ -195,6 +195,15 @@ class Constraints(object):
       chunks[ii] = idx
       idx += 1
     return chunks
+
+
+def comb(A, B, C, sizeB, sizeC):
+    # generate_knntriplets helper function
+    # generate an array with all combinations of choosing
+    # an element from A, B and C
+    return np.vstack((repmat(A, sizeB*sizeC, 1).ravel(order='F'),
+                      repmat(np.hstack(B), sizeC, 1).ravel(order='F'),
+                      repmat(C, 1, sizeB).ravel())).T
 
 
 def wrap_pairs(X, constraints):

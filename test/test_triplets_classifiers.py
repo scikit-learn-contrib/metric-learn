@@ -21,12 +21,7 @@ def test_predict_only_one_or_minus_one(estimator, build_dataset,
   triplets_train, triplets_test = train_test_split(input_data)
   estimator.fit(triplets_train)
   predictions = estimator.predict(triplets_test)
-  for i in range(len(input_data)):
-    prediction = estimator.predict(input_data[None, i])
-    if(prediction == 0):
-      print(input_data[i])
-      print(preprocessor[input_data[i]])
-      print(estimator.decision_function(input_data[None, i]))
+
   not_valid = [e for e in predictions if e not in [-1, 1]]
   assert len(not_valid) == 0
 
