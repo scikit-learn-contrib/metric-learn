@@ -72,32 +72,8 @@ def test_unknown_labels_not_in_chunks(num_chunks, chunk_size):
   assert np.all(chunks[labels < 0] < 0)
 
 
-def test_generate_knntriplets():
-  """Toy example validation of knn triplets construction"""
-  k = 1
-  X = np.array([[0, 0], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32], [64, 64],
-                [128, 128], [256, 256]])
-  y = np.array([1, 1, 1, 2, 2, 2, 3, 3, 3])
-
-  T_test = np.array([[0, 1, 3], [1, 0, 3], [2, 1, 3], [3, 4, 2], [4, 3, 2],
-                     [5, 4, 2], [6, 7, 5], [7, 6, 5], [8, 7, 5]])
-  T = Constraints(y).generate_knntriplets(X, k, k)
-
-  assert np.array_equal(sorted(T.tolist()), sorted(T_test.tolist()))
-
-
 @pytest.mark.parametrize("k_genuine, k_impostor, T_test",
-                         [(2, 3,
-                          [[0, 1, 3], [0, 1, 4], [0, 1, 5], [0, 2, 3],
-                           [0, 2, 4], [0, 2, 5], [1, 0, 3], [1, 0, 4],
-                           [1, 0, 5], [1, 2, 3], [1, 2, 4], [1, 2, 5],
-                           [2, 0, 3], [2, 0, 4], [2, 0, 5], [2, 1, 3],
-                           [2, 1, 4], [2, 1, 5], [3, 4, 0], [3, 4, 1],
-                           [3, 4, 2], [3, 5, 0], [3, 5, 1], [3, 5, 2],
-                           [4, 3, 0], [4, 3, 1], [4, 3, 2], [4, 5, 0],
-                           [4, 5, 1], [4, 5, 2], [5, 3, 0], [5, 3, 1],
-                           [5, 3, 2], [5, 4, 0], [5, 4, 1], [5, 4, 2]]),
-                          (2, 2,
+                         [(2, 2,
                           [[0, 1, 3], [0, 1, 4], [0, 2, 3], [0, 2, 4],
                            [1, 0, 3], [1, 0, 4], [1, 2, 3], [1, 2, 4],
                            [2, 0, 3], [2, 0, 4], [2, 1, 3], [2, 1, 4],
@@ -114,8 +90,30 @@ def test_generate_knntriplets():
                           [[0, 1, 3], [0, 1, 4], [1, 0, 3], [1, 0, 4],
                            [2, 1, 3], [2, 1, 4], [3, 4, 1], [3, 4, 2],
                            [4, 3, 1], [4, 3, 2], [5, 4, 1], [5, 4, 2]])])
-def test_generate_knntriplets_k(k_genuine, k_impostor, T_test):
-  """Checks edge cases of knn triplet construction"""
+def test_generate_knntriplets_under_edge(k_genuine, k_impostor, T_test):
+  """Checks under the edge cases of knn triplet construction with enough
+     neighbors"""
+
+  X = np.array([[0, 0], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32]])
+  y = np.array([1, 1, 1, 2, 2, 2])
+
+  T = Constraints(y).generate_knntriplets(X, k_genuine, k_impostor)
+
+  assert np.array_equal(sorted(T.tolist()), T_test)
+
+
+@pytest.mark.parametrize("k_genuine, k_impostor,",
+                         [(2, 3), (3, 3), (2, 4), (3, 4)])
+def test_generate_knntriplets(k_genuine, k_impostor):
+  """Checks edge and over the edge cases of knn triplet construction with not
+     enough neighbors"""
+
+  T_test = [[0, 1, 3], [0, 1, 4], [0, 1, 5], [0, 2, 3], [0, 2, 4], [0, 2, 5],
+            [1, 0, 3], [1, 0, 4], [1, 0, 5], [1, 2, 3], [1, 2, 4], [1, 2, 5],
+            [2, 0, 3], [2, 0, 4], [2, 0, 5], [2, 1, 3], [2, 1, 4], [2, 1, 5],
+            [3, 4, 0], [3, 4, 1], [3, 4, 2], [3, 5, 0], [3, 5, 1], [3, 5, 2],
+            [4, 3, 0], [4, 3, 1], [4, 3, 2], [4, 5, 0], [4, 5, 1], [4, 5, 2],
+            [5, 3, 0], [5, 3, 1], [5, 3, 2], [5, 4, 0], [5, 4, 1], [5, 4, 2]]
 
   X = np.array([[0, 0], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32]])
   y = np.array([1, 1, 1, 2, 2, 2])
