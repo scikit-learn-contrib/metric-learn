@@ -63,16 +63,15 @@ class Constraints(object):
     triplets : array-like, shape=(n_constraints, 3)
       2D array of triplets of indicators.
     """
-
-    labels, labels_count = np.unique(self.partial_labels, return_counts=True)
-    n_labels = len(labels)
-    len_input = self.partial_labels.shape[0]
+    known_labels = self.partial_labels[self.partial_labels >= 0]
+    labels, labels_count = np.unique(known_labels, return_counts=True)
+    len_input = known_labels.shape[0]
 
     # Handle the case where there are too few elements to yield k_genuine or
     # k_impostor neighbors for every class.
 
-    k_genuine_vec = np.full(n_labels, k_genuine)
-    k_impostor_vec = np.full(n_labels, k_impostor)
+    k_genuine_vec = np.full_like(labels, k_genuine)
+    k_impostor_vec = np.full_like(labels, k_impostor)
 
     for i, count in enumerate(labels_count):
       if k_genuine + 1 > count:
@@ -92,29 +91,29 @@ class Constraints(object):
                       .format(labels[i], k_impostor_vec[i], k_impostor,
                               k_impostor_vec[i]))
 
-    # The total number of possible triplets combinations comes from taking one
-    # of the k_genuine_vec[i] genuine neighbors and one of the
-    # k_impostor_vec[i] impostor neighbors for the labels_count[i] elements in
-    # every class
+    # The total number of possible triplets combinations per label comes from
+    # taking one of the k_genuine_vec[i] genuine neighbors and one of the
+    # k_impostor_vec[i] impostor neighbors for the labels_count[i] elements
     comb_per_label = labels_count * k_genuine_vec * k_impostor_vec
-    num_triplets = np.sum(comb_per_label)
+
+    # Get start and finish for later triplet assigning
+    # append zero at the begining for start and get cumulative sum
+    start_finish_indices = np.hstack((0, comb_per_label)).cumsum()
+
+    # Total number of triplets is the sum of all possible combinations per
+    # label
+    num_triplets = start_finish_indices[-1]
     triplets = np.empty((num_triplets, 3), dtype=np.intp)
 
     neigh = NearestNeighbors()
 
-    # Get start and finish for later triplet assiging
-    # append zero at the begining for start
-    start_finish_indices = np.hstack((0, comb_per_label))
-    # get cumulative sum
-    start_finish_indices.cumsum(out=start_finish_indices)
-
     for i, label in enumerate(labels):
 
         # generate mask for current label
-        gen_mask = self.partial_labels == label
+        gen_mask = known_labels == label
         gen_indx = np.where(gen_mask)
 
-        # get k_genuine genuine neighbours
+        # get k_genuine genuine neighbors
         neigh.fit(X=X[gen_indx])
         gen_neigh = np.take(gen_indx, neigh.kneighbors(
                             n_neighbors=k_genuine_vec[i],
@@ -123,7 +122,7 @@ class Constraints(object):
         # generate mask for impostors of current label
         imp_indx = np.where(~gen_mask)
 
-        # get k_impostor impostor neighbours
+        # get k_impostor impostor neighbors
         neigh.fit(X=X[imp_indx])
         imp_neigh = np.take(imp_indx, neigh.kneighbors(
                             n_neighbors=k_impostor_vec[i],
