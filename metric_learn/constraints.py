@@ -7,7 +7,6 @@ import warnings
 from six.moves import xrange
 from sklearn.utils import check_random_state
 from sklearn.neighbors import NearestNeighbors
-from numpy.matlib import repmat
 
 __all__ = ['Constraints']
 
@@ -119,19 +118,21 @@ class Constraints(object):
 
         # get k_genuine genuine neighbors
         neigh.fit(X=X[gen_indx])
-        gen_neigh = np.take(gen_indx, neigh.kneighbors(
-                            n_neighbors=k_genuine_vec[i],
-                            return_distance=False))
+        # Take elements of gen_indx according to the yielded k-neighbors
+        gen_relative_indx = neigh.kneighbors(n_neighbors=k_genuine_vec[i],
+                                             return_distance=False)
+        gen_neigh = np.take(gen_indx, gen_relative_indx)
 
         # generate mask for impostors of current label
         imp_indx = np.where(~gen_mask)
 
         # get k_impostor impostor neighbors
         neigh.fit(X=X[imp_indx])
-        imp_neigh = np.take(imp_indx, neigh.kneighbors(
-                            n_neighbors=k_impostor_vec[i],
-                            X=X[gen_mask],
-                            return_distance=False))
+        # Take elements of imp_indx according to the yielded k-neighbors
+        imp_relative_indx = neigh.kneighbors(n_neighbors=k_impostor_vec[i],
+                                             X=X[gen_mask],
+                                             return_distance=False)
+        imp_neigh = np.take(imp_indx, imp_relative_indx)
 
         # length = len_label*k_genuine*k_impostor
         start, finish = start_finish_indices[i:i+2]
@@ -204,9 +205,9 @@ def comb(A, B, C, sizeB, sizeC):
     # generate_knntriplets helper function
     # generate an array with all combinations of choosing
     # an element from A, B and C
-    return np.vstack((repmat(A, sizeB*sizeC, 1).ravel(order='F'),
-                      repmat(np.hstack(B), sizeC, 1).ravel(order='F'),
-                      repmat(C, 1, sizeB).ravel())).T
+    return np.vstack((np.tile(A, (sizeB*sizeC, 1)).ravel(order='F'),
+                      np.tile(np.hstack(B), (sizeC, 1)).ravel(order='F'),
+                      np.tile(C, (1, sizeB)).ravel())).T
 
 
 def wrap_pairs(X, constraints):
