@@ -63,7 +63,11 @@ class Constraints(object):
     triplets : array-like, shape=(n_constraints, 3)
       2D array of triplets of indicators.
     """
-    known_labels = self.partial_labels[self.partial_labels >= 0]
+    # Ignore unlabeled samples
+    known_labels_mask = self.partial_labels >= 0
+    known_labels = self.partial_labels[known_labels_mask]
+    X = X[known_labels_mask]
+
     labels, labels_count = np.unique(known_labels, return_counts=True)
     len_input = known_labels.shape[0]
 

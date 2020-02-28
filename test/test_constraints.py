@@ -94,8 +94,8 @@ def test_generate_knntriplets_under_edge(k_genuine, k_impostor, T_test):
   """Checks under the edge cases of knn triplet construction with enough
      neighbors"""
 
-  X = np.array([[0, 0], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32]])
-  y = np.array([1, 1, 1, 2, 2, 2])
+  X = np.array([[0, 0], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32], [64, 64]])
+  y = np.array([1, 1, 1, 2, 2, 2, -1])
 
   T = Constraints(y).generate_knntriplets(X, k_genuine, k_impostor)
 
@@ -115,8 +115,8 @@ def test_generate_knntriplets(k_genuine, k_impostor):
             [4, 3, 0], [4, 3, 1], [4, 3, 2], [4, 5, 0], [4, 5, 1], [4, 5, 2],
             [5, 3, 0], [5, 3, 1], [5, 3, 2], [5, 4, 0], [5, 4, 1], [5, 4, 2]]
 
-  X = np.array([[0, 0], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32]])
-  y = np.array([1, 1, 1, 2, 2, 2])
+  X = np.array([[0, 0], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32], [64, 64]])
+  y = np.array([1, 1, 1, 2, 2, 2, -1])
 
   T = Constraints(y).generate_knntriplets(X, k_genuine, k_impostor)
 
