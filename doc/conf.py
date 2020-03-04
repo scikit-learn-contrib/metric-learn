@@ -79,4 +79,3 @@ html4_writer = True
 def setup(app):
     app.add_javascript('js/copybutton.js')
     app.add_stylesheet("basic.css")
-    # app.connect('autodoc-process-docstring', generate_example_rst)
