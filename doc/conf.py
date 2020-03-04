@@ -70,6 +70,7 @@ autosummary_generate = True
 # as described in https://github.com/sphinx-doc/sphinx/issues/6705
 html4_writer = True
 
+
 # Temporary work-around for spacing problem between parameter and parameter
 # type in the doc, see https://github.com/numpy/numpydoc/issues/215. The bug
 # has been fixed in sphinx (https://github.com/sphinx-doc/sphinx/pull/5976) but
