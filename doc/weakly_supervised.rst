@@ -423,8 +423,7 @@ is the prior distance metric, set to identity matrix by default,
 
     .. [1] Jason V. Davis, et al. `Information-theoretic Metric Learning <https://icml.cc/imls/conferences/2007/proceedings/papers/404.pdf>`_. ICML 2007
 
-    .. [2] Adapted from Matlab code at
-           http://www.cs.utexas.edu/users/pjain/itml/
+    .. [2] Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
 
 
 .. _sdml:
