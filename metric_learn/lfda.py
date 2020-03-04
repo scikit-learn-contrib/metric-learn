@@ -27,27 +27,26 @@ class LFDA(MahalanobisMixin, TransformerMixin):
   Parameters
   ----------
   n_components : int or None, optional (default=None)
-      Dimensionality of reduced space (if None, defaults to dimension of X).
+    Dimensionality of reduced space (if None, defaults to dimension of X).
 
   num_dims : Not used
-
-      .. deprecated:: 0.5.0
-        `num_dims` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Use `n_components` instead.
+    .. deprecated:: 0.5.0
+      `num_dims` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use `n_components` instead.
 
   k : int, optional (default=None)
-      Number of nearest neighbors used in local scaling method. If None,
-      defaults to min(7, n_features - 1).
+    Number of nearest neighbors used in local scaling method. If None,
+    defaults to min(7, n_features - 1).
 
   embedding_type : str, optional (default: 'weighted')
-      Type of metric in the embedding space
-        'weighted'        - weighted eigenvectors
-        'orthonormalized' - orthonormalized
-        'plain'           - raw eigenvectors
+    Type of metric in the embedding space
+      'weighted'        - weighted eigenvectors
+      'orthonormalized' - orthonormalized
+      'plain'           - raw eigenvectors
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
 
   Attributes
   ----------

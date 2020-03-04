@@ -140,55 +140,55 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
   Parameters
   ----------
   prior : None, string or numpy array, optional (default=None)
-       Prior to set for the metric. Possible options are
-       'identity', 'covariance', 'random', and a numpy array of
-       shape (n_features, n_features). For LSML, the prior should be strictly
-       positive definite (PD). If `None`, will be set
-       automatically to 'identity' (this is to raise a warning if
-       `prior` is not set, and stays to its default value (None), in v0.5.0).
+    Prior to set for the metric. Possible options are
+    'identity', 'covariance', 'random', and a numpy array of
+    shape (n_features, n_features). For LSML, the prior should be strictly
+    positive definite (PD). If `None`, will be set
+    automatically to 'identity' (this is to raise a warning if
+    `prior` is not set, and stays to its default value (None), in v0.5.0).
 
-       'identity'
-          An identity matrix of shape (n_features, n_features).
+    'identity'
+      An identity matrix of shape (n_features, n_features).
 
-       'covariance'
-          The inverse covariance matrix.
+    'covariance'
+      The inverse covariance matrix.
 
-       'random'
-          The initial Mahalanobis matrix will be a random positive definite
-          (PD) matrix of shape `(n_features, n_features)`, generated using
-          `sklearn.datasets.make_spd_matrix`.
+    'random'
+      The initial Mahalanobis matrix will be a random positive definite
+      (PD) matrix of shape `(n_features, n_features)`, generated using
+      `sklearn.datasets.make_spd_matrix`.
 
-       numpy array
-           A positive definite (PD) matrix of shape
-           (n_features, n_features), that will be used as such to set the
-           prior.
+    numpy array
+      A positive definite (PD) matrix of shape
+      (n_features, n_features), that will be used as such to set the
+      prior.
 
   tol : float, optional (default=1e-3)
-      Convergence tolerance of the optimization procedure.
+    Convergence tolerance of the optimization procedure.
 
   max_iter : int, optional (default=1000)
-      Maximum number of iteration of the optimization procedure.
+    Maximum number of iteration of the optimization procedure.
 
   verbose : bool, optional (default=False)
-      If True, prints information while learning
+    If True, prints information while learning
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int. If
-      ``init='random'``, ``random_state`` is used to set the random
-      prior.
+    A pseudo random number generator object or a seed for it if int. If
+    ``init='random'``, ``random_state`` is used to set the random
+    prior.
 
   Attributes
   ----------
   n_iter_ : `int`
-      The number of iterations the solver has run.
+    The number of iterations the solver has run.
 
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
-      The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `components_from_metric`.)
+    The linear transformation ``L`` deduced from the learned Mahalanobis
+    metric (See function `components_from_metric`.)
 
   Examples
   --------
@@ -225,18 +225,19 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
     ----------
     quadruplets : array-like, shape=(n_constraints, 4, n_features) or \
                   (n_constraints, 4)
-        3D array-like of quadruplets of points or 2D array of quadruplets of
-        indicators. In order to supervise the algorithm in the right way, we
-        should have the four samples ordered in a way such that:
-        d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3]) for all 0 <= i <
-        n_constraints.
+      3D array-like of quadruplets of points or 2D array of quadruplets of
+      indicators. In order to supervise the algorithm in the right way, we
+      should have the four samples ordered in a way such that:
+      d(pairs[i, 0],X[i, 1]) < d(X[i, 2], X[i, 3]) for all 0 <= i <
+      n_constraints.
+
     weights : (n_constraints,) array of floats, optional
-        scale factor for each constraint
+      scale factor for each constraint
 
     Returns
     -------
     self : object
-        Returns the instance.
+      Returns the instance.
     """
     return self._fit(quadruplets, weights=weights)
 
@@ -252,60 +253,60 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   Parameters
   ----------
   tol : float, optional (default=1e-3)
-      Convergence tolerance of the optimization procedure.
+    Convergence tolerance of the optimization procedure.
 
   max_iter : int, optional (default=1000)
-      Number of maximum iterations of the optimization procedure.
+    Number of maximum iterations of the optimization procedure.
 
   prior : None, string or numpy array, optional (default=None)
-      Prior to set for the metric. Possible options are
-      'identity', 'covariance', 'random', and a numpy array of
-      shape (n_features, n_features). For LSML, the prior should be strictly
-      positive definite (PD). If `None`, will be set
-      automatically to 'identity' (this is to raise a warning if
-      `prior` is not set, and stays to its default value (None), in v0.5.0).
+    Prior to set for the metric. Possible options are
+    'identity', 'covariance', 'random', and a numpy array of
+    shape (n_features, n_features). For LSML, the prior should be strictly
+    positive definite (PD). If `None`, will be set
+    automatically to 'identity' (this is to raise a warning if
+    `prior` is not set, and stays to its default value (None), in v0.5.0).
 
-      'identity'
-          An identity matrix of shape (n_features, n_features).
+    'identity'
+      An identity matrix of shape (n_features, n_features).
 
-      'covariance'
-          The inverse covariance matrix.
+    'covariance'
+      The inverse covariance matrix.
 
-      'random'
-          The initial Mahalanobis matrix will be a random positive definite
-          (PD) matrix of shape `(n_features, n_features)`, generated using
-          `sklearn.datasets.make_spd_matrix`.
+    'random'
+      The initial Mahalanobis matrix will be a random positive definite
+      (PD) matrix of shape `(n_features, n_features)`, generated using
+      `sklearn.datasets.make_spd_matrix`.
 
-      numpy array
-          A positive definite (PD) matrix of shape
-          (n_features, n_features), that will be used as such to set the
-          prior.
+    numpy array
+      A positive definite (PD) matrix of shape
+      (n_features, n_features), that will be used as such to set the
+      prior.
 
   num_labeled : Not used
     .. deprecated:: 0.5.0
-       `num_labeled` was deprecated in version 0.5.0 and will
-       be removed in 0.6.0.
+      `num_labeled` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0.
 
   num_constraints: int, optional (default=None)
-      Number of constraints to generate. If None, default to `20 *
-      num_classes**2`.
+    Number of constraints to generate. If None, default to `20 *
+    num_classes**2`.
 
   weights : (num_constraints,) array of floats, optional (default=None)
-      Relative weight given to each constraint. If None, defaults to uniform
-      weights.
+    Relative weight given to each constraint. If None, defaults to uniform
+    weights.
 
   verbose : bool, optional (default=False)
-      If True, prints information while learning
+    If True, prints information while learning
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int. If
-      ``init='random'``, ``random_state`` is used to set the random
-      prior. In any case, `random_state` is also used to randomly sample
-      constraints from labels.
+    A pseudo random number generator object or a seed for it if int. If
+    ``init='random'``, ``random_state`` is used to set the random
+    prior. In any case, `random_state` is also used to randomly sample
+    constraints from labels.
 
   Examples
   --------
@@ -320,11 +321,11 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   Attributes
   ----------
   n_iter_ : `int`
-      The number of iterations the solver has run.
+    The number of iterations the solver has run.
 
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
-      The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `components_from_metric`.)
+    The linear transformation ``L`` deduced from the learned Mahalanobis
+    metric (See function `components_from_metric`.)
   """
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,
@@ -343,10 +344,10 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     Parameters
     ----------
     X : (n x d) matrix
-        Input data, where each row corresponds to a single instance.
+      Input data, where each row corresponds to a single instance.
 
     y : (n) array-like
-        Data labels.
+      Data labels.
 
     random_state : Not used
       .. deprecated:: 0.5.0

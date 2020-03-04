@@ -448,45 +448,45 @@ def _initialize_components(n_components, input, y=None, init='auto',
     The input labels (or not if there are no labels).
 
   init : string or numpy array, optional (default='auto')
-      Initialization of the linear transformation. Possible options are
-      'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
-      (n_features_a, n_features_b).
+    Initialization of the linear transformation. Possible options are
+    'auto', 'pca', 'lda', 'identity', 'random', and a numpy array of shape
+    (n_features_a, n_features_b).
 
-      'auto'
-          Depending on ``n_components``, the most reasonable initialization
-          will be chosen. If ``n_components <= n_classes`` we use 'lda' (see
-          the description of 'lda' init), as it uses labels information. If
-          not, but ``n_components < min(n_features, n_samples)``, we use 'pca',
-          as it projects data onto meaningful directions (those of higher
-          variance). Otherwise, we just use 'identity'.
+    'auto'
+      Depending on ``n_components``, the most reasonable initialization
+      will be chosen. If ``n_components <= n_classes`` we use 'lda' (see
+      the description of 'lda' init), as it uses labels information. If
+      not, but ``n_components < min(n_features, n_samples)``, we use 'pca',
+      as it projects data onto meaningful directions (those of higher
+      variance). Otherwise, we just use 'identity'.
 
-      'pca'
-          ``n_components`` principal components of the inputs passed
-          to :meth:`fit` will be used to initialize the transformation.
-          (See `sklearn.decomposition.PCA`)
+    'pca'
+      ``n_components`` principal components of the inputs passed
+      to :meth:`fit` will be used to initialize the transformation.
+      (See `sklearn.decomposition.PCA`)
 
-      'lda'
-          ``min(n_components, n_classes)`` most discriminative
-          components of the inputs passed to :meth:`fit` will be used to
-          initialize the transformation. (If ``n_components > n_classes``,
-          the rest of the components will be zero.) (See
-          `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`).
-          This initialization is possible only if `has_classes == True`.
+    'lda'
+      ``min(n_components, n_classes)`` most discriminative
+      components of the inputs passed to :meth:`fit` will be used to
+      initialize the transformation. (If ``n_components > n_classes``,
+      the rest of the components will be zero.) (See
+      `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`).
+      This initialization is possible only if `has_classes == True`.
 
-      'identity'
-          The identity matrix. If ``n_components`` is strictly smaller than the
-          dimensionality of the inputs passed to :meth:`fit`, the identity
-          matrix will be truncated to the first ``n_components`` rows.
+    'identity'
+      The identity matrix. If ``n_components`` is strictly smaller than the
+      dimensionality of the inputs passed to :meth:`fit`, the identity
+      matrix will be truncated to the first ``n_components`` rows.
 
-      'random'
-          The initial transformation will be a random array of shape
-          `(n_components, n_features)`. Each value is sampled from the
-          standard normal distribution.
+    'random'
+      The initial transformation will be a random array of shape
+      `(n_components, n_features)`. Each value is sampled from the
+      standard normal distribution.
 
-      numpy array
-          n_features_b must match the dimensionality of the inputs passed to
-          :meth:`fit` and n_features_a must be less than or equal to that.
-          If ``n_components`` is not None, n_features_a must match it.
+    numpy array
+      n_features_b must match the dimensionality of the inputs passed to
+      :meth:`fit` and n_features_a must be less than or equal to that.
+      If ``n_components`` is not None, n_features_a must match it.
 
   verbose : bool
     Whether to print the details of the initialization or not.
@@ -606,26 +606,26 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
     The input samples (can be tuples or regular samples).
 
   init : string or numpy array, optional (default='identity')
-         Specification for the matrix to initialize. Possible options are
-         'identity', 'covariance', 'random', and a numpy array of shape
-         (n_features, n_features).
+    Specification for the matrix to initialize. Possible options are
+    'identity', 'covariance', 'random', and a numpy array of shape
+    (n_features, n_features).
 
-         'identity'
-            An identity matrix of shape (n_features, n_features).
+    'identity'
+      An identity matrix of shape (n_features, n_features).
 
-         'covariance'
-            The (pseudo-)inverse covariance matrix (raises an error if the
-            covariance matrix is not definite and `strict_pd == True`)
+    'covariance'
+      The (pseudo-)inverse covariance matrix (raises an error if the
+      covariance matrix is not definite and `strict_pd == True`)
 
-         'random'
-             A random positive definite (PD) matrix of shape
-             `(n_features, n_features)`, generated using
-             `sklearn.datasets.make_spd_matrix`.
+    'random'
+      A random positive definite (PD) matrix of shape
+      `(n_features, n_features)`, generated using
+      `sklearn.datasets.make_spd_matrix`.
 
-         numpy array
-             A PSD matrix (or strictly PD if strict_pd==True) of
-             shape (n_features, n_features), that will be used as such to
-             initialize the metric, or set the prior.
+    numpy array
+      A PSD matrix (or strictly PD if strict_pd==True) of
+      shape (n_features, n_features), that will be used as such to
+      initialize the metric, or set the prior.
 
   random_state : int or `numpy.RandomState` or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If

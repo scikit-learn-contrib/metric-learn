@@ -113,17 +113,20 @@ class Constraints(object):
 
     Parameters
     ----------
-      num_chunks : int, optional (default=100)
-        Number of chunks to generate.
-      chunk_size : int, optional (default=2)
-        Number of points in each chunk.
-      random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int.
+    num_chunks : int, optional (default=100)
+      Number of chunks to generate.
+
+    chunk_size : int, optional (default=2)
+      Number of points in each chunk.
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int.
+
     Returns
     -------
     chunks : array-like, shape=(n_samples,)
-    1D array of chunk indicators, where -1 indicates that the point does not
-    belong to any chunk.
+      1D array of chunk indicators, where -1 indicates that the point does not
+      belong to any chunk.
     """
     random_state = check_random_state(random_state)
     chunks = -np.ones_like(self.partial_labels, dtype=int)

@@ -143,61 +143,61 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
   Parameters
   ----------
   balance_param : float, optional (default=0.5)
-      Trade off between sparsity and M0 prior.
+    Trade off between sparsity and M0 prior.
 
   sparsity_param : float, optional  (default=0.01)
-      Trade off between optimizer and sparseness (see graph_lasso).
+    Trade off between optimizer and sparseness (see graph_lasso).
 
   prior : None, string or numpy array, optional (default=None)
-       Prior to set for the metric. Possible options are
-       'identity', 'covariance', 'random', and a numpy array of
-       shape (n_features, n_features). For SDML, the prior should be strictly
-       positive definite (PD). If `None`, will be set
-       automatically to 'identity' (this is to raise a warning if
-       `prior` is not set, and stays to its default value (None), in v0.5.0).
+    Prior to set for the metric. Possible options are
+    'identity', 'covariance', 'random', and a numpy array of
+    shape (n_features, n_features). For SDML, the prior should be strictly
+    positive definite (PD). If `None`, will be set
+    automatically to 'identity' (this is to raise a warning if
+    `prior` is not set, and stays to its default value (None), in v0.5.0).
 
-       'identity'
-          An identity matrix of shape (n_features, n_features).
+    'identity'
+      An identity matrix of shape (n_features, n_features).
 
-       'covariance'
-          The inverse covariance matrix.
+    'covariance'
+      The inverse covariance matrix.
 
-       'random'
-          The prior will be a random positive definite (PD) matrix of shape
-          `(n_features, n_features)`, generated using
-          `sklearn.datasets.make_spd_matrix`.
+    'random'
+      The prior will be a random positive definite (PD) matrix of shape
+      `(n_features, n_features)`, generated using
+      `sklearn.datasets.make_spd_matrix`.
 
-       numpy array
-           A positive definite (PD) matrix of shape
-           (n_features, n_features), that will be used as such to set the
-           prior.
+    numpy array
+      A positive definite (PD) matrix of shape
+      (n_features, n_features), that will be used as such to set the
+      prior.
 
   use_cov : Not used.
-      .. deprecated:: 0.5.0
-        `A0` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Use 'prior' instead.
+    .. deprecated:: 0.5.0
+      `A0` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use 'prior' instead.
 
   verbose : bool, optional (default=False)
-      If True, prints information while learning.
+    If True, prints information while learning.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be gotten like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be gotten like this: X[indices].
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int. If
-      ``prior='random'``, ``random_state`` is used to set the prior.
+    A pseudo random number generator object or a seed for it if int. If
+    ``prior='random'``, ``random_state`` is used to set the prior.
 
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
-      The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `components_from_metric`.)
+    The linear transformation ``L`` deduced from the learned Mahalanobis
+    metric (See function `components_from_metric`.)
 
   threshold_ : `float`
-      If the distance metric between two points is lower than this threshold,
-      points will be classified as similar, otherwise they will be
-      classified as dissimilar.
+    If the distance metric between two points is lower than this threshold,
+    points will be classified as similar, otherwise they will be
+    classified as dissimilar.
 
   Examples
   --------
@@ -231,20 +231,22 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
     ----------
     pairs : array-like, shape=(n_constraints, 2, n_features) or \
            (n_constraints, 2)
-        3D Array of pairs with each row corresponding to two points,
-        or 2D array of indices of pairs if the metric learner uses a
-        preprocessor.
+      3D Array of pairs with each row corresponding to two points,
+      or 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
+
     y : array-like, of shape (n_constraints,)
-        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+      Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+
     calibration_params : `dict` or `None`
-        Dictionary of parameters to give to `calibrate_threshold` for the
-        threshold calibration step done at the end of `fit`. If `None` is
-        given, `calibrate_threshold` will use the default parameters.
+      Dictionary of parameters to give to `calibrate_threshold` for the
+      threshold calibration step done at the end of `fit`. If `None` is
+      given, `calibrate_threshold` will use the default parameters.
 
     Returns
     -------
     self : object
-        Returns the instance.
+      Returns the instance.
     """
     calibration_params = (calibration_params if calibration_params is not
                           None else dict())
@@ -264,67 +266,67 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   Parameters
   ----------
   balance_param : float, optional (default=0.5)
-      Trade off between sparsity and M0 prior.
+    Trade off between sparsity and M0 prior.
 
   sparsity_param : float, optional (default=0.01)
-      Trade off between optimizer and sparseness (see graph_lasso).
+    Trade off between optimizer and sparseness (see graph_lasso).
 
   prior : None, string or numpy array, optional (default=None)
-       Prior to set for the metric. Possible options are
-       'identity', 'covariance', 'random', and a numpy array of
-       shape (n_features, n_features). For SDML, the prior should be strictly
-       positive definite (PD). If `None`, will be set
-       automatically to 'identity' (this is to raise a warning if
-       `prior` is not set, and stays to its default value (None), in v0.5.0).
+    Prior to set for the metric. Possible options are
+    'identity', 'covariance', 'random', and a numpy array of
+    shape (n_features, n_features). For SDML, the prior should be strictly
+    positive definite (PD). If `None`, will be set
+    automatically to 'identity' (this is to raise a warning if
+    `prior` is not set, and stays to its default value (None), in v0.5.0).
 
-       'identity'
-          An identity matrix of shape (n_features, n_features).
+    'identity'
+      An identity matrix of shape (n_features, n_features).
 
-       'covariance'
-          The inverse covariance matrix.
+    'covariance'
+      The inverse covariance matrix.
 
-       'random'
-          The prior will be a random SPD matrix of shape
-          `(n_features, n_features)`, generated using
-          `sklearn.datasets.make_spd_matrix`.
+    'random'
+      The prior will be a random SPD matrix of shape
+      `(n_features, n_features)`, generated using
+      `sklearn.datasets.make_spd_matrix`.
 
-       numpy array
-           A positive definite (PD) matrix of shape
-           (n_features, n_features), that will be used as such to set the
-           prior.
+    numpy array
+      A positive definite (PD) matrix of shape
+      (n_features, n_features), that will be used as such to set the
+      prior.
 
   use_cov : Not used.
-      .. deprecated:: 0.5.0
-        `A0` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Use 'prior' instead.
+    .. deprecated:: 0.5.0
+      `A0` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use 'prior' instead.
 
   num_labeled : Not used
     .. deprecated:: 0.5.0
-       `num_labeled` was deprecated in version 0.5.0 and will
-       be removed in 0.6.0.
+      `num_labeled` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0.
 
   num_constraints : int, optional (default=None)
-      Number of constraints to generate. If None, defaults to `20 *
-      num_classes**2`.
+    Number of constraints to generate. If None, defaults to `20 *
+    num_classes**2`.
 
   verbose : bool, optional (default=False)
-      If True, prints information while learning.
+    If True, prints information while learning.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int. If
-      ``init='random'``, ``random_state`` is used to set the random
-      prior. In any case, `random_state` is also used to randomly sample
-      constraints from labels.
+    A pseudo random number generator object or a seed for it if int. If
+    ``init='random'``, ``random_state`` is used to set the random
+    prior. In any case, `random_state` is also used to randomly sample
+    constraints from labels.
 
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
-      The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `components_from_metric`.)
+    The linear transformation ``L`` deduced from the learned Mahalanobis
+    metric (See function `components_from_metric`.)
 
   See Also
   --------
@@ -350,9 +352,11 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     Parameters
     ----------
     X : array-like, shape (n, d)
-        data matrix, where each row corresponds to a single instance
+      data matrix, where each row corresponds to a single instance
+
     y : array-like, shape (n,)
-        data labels, one for each instance
+      data labels, one for each instance
+
     random_state : Not used
       .. deprecated:: 0.5.0
         `random_state` in the `fit` function was deprecated in version 0.5.0
@@ -362,7 +366,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     Returns
     -------
     self : object
-        Returns the instance.
+      Returns the instance.
     """
     if self.num_labeled != 'deprecated':
       warnings.warn('"num_labeled" parameter is not used.'

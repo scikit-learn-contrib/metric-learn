@@ -43,21 +43,21 @@ class RCA(MahalanobisMixin, TransformerMixin):
   Parameters
   ----------
   n_components : int or None, optional (default=None)
-      Dimensionality of reduced space (if None, defaults to dimension of X).
+    Dimensionality of reduced space (if None, defaults to dimension of X).
 
   num_dims : Not used
-      .. deprecated:: 0.5.0
-        `num_dims` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Use `n_components` instead.
+    .. deprecated:: 0.5.0
+      `num_dims` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use `n_components` instead.
 
   pca_comps : Not used
-      .. deprecated:: 0.5.0
+    .. deprecated:: 0.5.0
       `pca_comps` was deprecated in version 0.5.0 and will
       be removed in 0.6.0.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
 
   Examples
   --------
@@ -81,7 +81,7 @@ psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_components, n_features)
-      The learned linear transformation ``L``.
+    The learned linear transformation ``L``.
   """
 
   def __init__(self, n_components=None, num_dims='deprecated',
@@ -111,10 +111,11 @@ psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
     Parameters
     ----------
     data : (n x d) data matrix
-        Each row corresponds to a single instance
+      Each row corresponds to a single instance
+
     chunks : (n,) array of ints
-        When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
-        When ``chunks[i] == j``, point i belongs to chunklet j.
+      When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
+      When ``chunks[i] == j``, point i belongs to chunklet j.
     """
     if self.num_dims != 'deprecated':
       warnings.warn('"num_dims" parameter is not used.'
@@ -176,26 +177,26 @@ class RCA_Supervised(RCA):
   Parameters
   ----------
   n_components : int or None, optional (default=None)
-      Dimensionality of reduced space (if None, defaults to dimension of X).
+    Dimensionality of reduced space (if None, defaults to dimension of X).
 
   num_dims : Not used
-      .. deprecated:: 0.5.0
-        `num_dims` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Use `n_components` instead.
+    .. deprecated:: 0.5.0
+      `num_dims` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use `n_components` instead.
 
   num_chunks: int, optional (default=100)
-      Number of chunks to generate.
+    Number of chunks to generate.
 
   chunk_size: int, optional (default=2)
-      Number of points per chunk.
+    Number of points per chunk.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int.
-      It is used to randomly sample constraints from labels.
+    A pseudo random number generator object or a seed for it if int.
+    It is used to randomly sample constraints from labels.
 
   Examples
   --------
@@ -210,7 +211,7 @@ class RCA_Supervised(RCA):
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_components, n_features)
-      The learned linear transformation ``L``.
+    The learned linear transformation ``L``.
   """
 
   def __init__(self, num_dims='deprecated', n_components=None,
@@ -230,8 +231,10 @@ class RCA_Supervised(RCA):
     Parameters
     ----------
     X : (n x d) data matrix
-        each row corresponds to a single instance
+      each row corresponds to a single instance
+
     y : (n) data labels
+
     random_state : Not used
       .. deprecated:: 0.5.0
         `random_state` in the `fit` function was deprecated in version 0.5.0
