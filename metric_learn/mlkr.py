@@ -82,7 +82,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   tol: float, optional (default=None)
       Convergence tolerance for the optimization.
 
-  max_iter: int, optional
+  max_iter: int, optional (default=1000)
       Cap on number of conjugate gradient iterations.
 
   verbose : bool, optional (default=False)

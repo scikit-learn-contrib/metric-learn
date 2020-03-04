@@ -46,7 +46,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
       Dimensionality of reduced space (if None, defaults to dimension of X).
 
   num_dims : Not used
-
       .. deprecated:: 0.5.0
         `num_dims` was deprecated in version 0.5.0 and will
         be removed in 0.6.0. Use `n_components` instead.
@@ -180,14 +179,15 @@ class RCA_Supervised(RCA):
       Dimensionality of reduced space (if None, defaults to dimension of X).
 
   num_dims : Not used
-
       .. deprecated:: 0.5.0
         `num_dims` was deprecated in version 0.5.0 and will
         be removed in 0.6.0. Use `n_components` instead.
 
-  num_chunks: int, optional
+  num_chunks: int, optional (default=100)
+      Number of chunks to generate.
 
-  chunk_size: int, optional
+  chunk_size: int, optional (default=2)
+      Number of points per chunk.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,

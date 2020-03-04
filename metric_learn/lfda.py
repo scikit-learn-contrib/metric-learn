@@ -35,12 +35,12 @@ class LFDA(MahalanobisMixin, TransformerMixin):
         `num_dims` was deprecated in version 0.5.0 and will
         be removed in 0.6.0. Use `n_components` instead.
 
-  k : int, optional
-      Number of nearest neighbors used in local scaling method.
-      Defaults to min(7, n_components - 1).
+  k : int, optional (default=None)
+      Number of nearest neighbors used in local scaling method. If None,
+      defaults to min(7, n_features - 1).
 
-  embedding_type : str, optional
-      Type of metric in the embedding space (default: 'weighted')
+  embedding_type : str, optional (default: 'weighted')
+      Type of metric in the embedding space
         'weighted'        - weighted eigenvectors
         'orthonormalized' - orthonormalized
         'plain'           - raw eigenvectors

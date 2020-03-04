@@ -126,7 +126,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
   Parameters
   ----------
-  gamma : float, optional (default=1.)
+  gamma : float, optional (default=1.0)
       Value for slack variables
 
   max_iter : int, optional (default=1000)
@@ -266,17 +266,24 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   Parameters
   ----------
-  gamma : float, optional
-      value for slack variables
-  max_iter : int, optional
-  convergence_threshold : float, optional
+  gamma : float, optional (default=1.0)
+      Value for slack variables
+
+  max_iter : int, optional (default=1000)
+      Maximum number of iterations of the optimization procedure.
+
+  convergence_threshold : float, optional (default=1e-3)
+      Tolerance of the optimization procedure.
+
   num_labeled : Not used
         .. deprecated:: 0.5.0
            `num_labeled` was deprecated in version 0.5.0 and will
            be removed in 0.6.0.
-  num_constraints: int, optional
-      number of constraints to generate
-      (`20 * num_classes**2` constraints by default)
+
+  num_constraints: int, optional (default=None)
+      Number of constraints to generate. If None, default to `20 *
+      num_classes**2`.
+
   bounds : Not used
          .. deprecated:: 0.5.0
         `bounds` was deprecated in version 0.5.0 and will
@@ -304,15 +311,19 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
            A positive definite (PD) matrix of shape
            (n_features, n_features), that will be used as such to set the
            prior.
+
   A0 : Not used
     .. deprecated:: 0.5.0
        `A0` was deprecated in version 0.5.0 and will
        be removed in 0.6.0. Use 'prior' instead.
-  verbose : bool, optional
-      if True, prints information while learning
+
+  verbose : bool, optional (default=False)
+      If True, prints information while learning
+
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,
       tuples will be formed like this: X[indices].
+
   random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int. If
       ``prior='random'``, ``random_state`` is used to set the prior. In any
@@ -355,7 +366,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     that describes the supervised version of weakly supervised estimators.
   """
 
-  def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
+  def __init__(self, gamma=1.0, max_iter=1000, convergence_threshold=1e-3,
                num_labeled='deprecated', num_constraints=None,
                bounds='deprecated', prior='identity', A0='deprecated',
                verbose=False, preprocessor=None, random_state=None):

@@ -163,13 +163,19 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
            (n_features, n_features), that will be used as such to set the
            prior.
 
-  tol : float, optional
-  max_iter : int, optional
-  verbose : bool, optional
-      if True, prints information while learning
+  tol : float, optional (default=1e-3)
+      Convergence tolerance of the optimization procedure.
+
+  max_iter : int, optional (default=1000)
+      Maximum number of iteration of the optimization procedure.
+
+  verbose : bool, optional (default=False)
+      If True, prints information while learning
+
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,
       tuples will be formed like this: X[indices].
+
   random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int. If
       ``init='random'``, ``random_state`` is used to set the random
@@ -246,9 +252,11 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   Parameters
   ----------
   tol : float, optional (default=1e-3)
-      Tolerance for the convergence procedure.
+      Convergence tolerance of the optimization procedure.
+
   max_iter : int, optional (default=1000)
-      Number of maximum iterations of the convergence procedure.
+      Number of maximum iterations of the optimization procedure.
+
   prior : None, string or numpy array, optional (default=None)
       Prior to set for the metric. Possible options are
       'identity', 'covariance', 'random', and a numpy array of
@@ -272,20 +280,27 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
           A positive definite (PD) matrix of shape
           (n_features, n_features), that will be used as such to set the
           prior.
+
   num_labeled : Not used
     .. deprecated:: 0.5.0
        `num_labeled` was deprecated in version 0.5.0 and will
        be removed in 0.6.0.
-  num_constraints: int, optional
-      number of constraints to generate
-      (`20 * num_classes**2` constraints by default)
-  weights : (m,) array of floats, optional
-      scale factor for each constraint
-  verbose : bool, optional
-      if True, prints information while learning
+
+  num_constraints: int, optional (default=None)
+      Number of constraints to generate. If None, default to `20 *
+      num_classes**2`.
+
+  weights : (num_constraints,) array of floats, optional (default=None)
+      Relative weight given to each constraint. If None, defaults to uniform
+      weights.
+
+  verbose : bool, optional (default=False)
+      If True, prints information while learning
+
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,
       tuples will be formed like this: X[indices].
+
   random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int. If
       ``init='random'``, ``random_state`` is used to set the random

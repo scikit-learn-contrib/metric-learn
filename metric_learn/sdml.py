@@ -142,11 +142,11 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
   Parameters
   ----------
-  balance_param : float, optional
-      trade off between sparsity and M0 prior
+  balance_param : float, optional (default=0.5)
+      Trade off between sparsity and M0 prior.
 
-  sparsity_param : float, optional
-      trade off between optimizer and sparseness (see graph_lasso)
+  sparsity_param : float, optional  (default=0.01)
+      Trade off between optimizer and sparseness (see graph_lasso).
 
   prior : None, string or numpy array, optional (default=None)
        Prior to set for the metric. Possible options are
@@ -178,7 +178,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
         be removed in 0.6.0. Use 'prior' instead.
 
   verbose : bool, optional (default=False)
-      if True, prints information while learning
+      If True, prints information while learning.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,
@@ -264,9 +264,11 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   Parameters
   ----------
   balance_param : float, optional (default=0.5)
-      trade off between sparsity and M0 prior
+      Trade off between sparsity and M0 prior.
+
   sparsity_param : float, optional (default=0.01)
-      trade off between optimizer and sparseness (see graph_lasso)
+      Trade off between optimizer and sparseness (see graph_lasso).
+
   prior : None, string or numpy array, optional (default=None)
        Prior to set for the metric. Possible options are
        'identity', 'covariance', 'random', and a numpy array of
@@ -300,14 +302,18 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     .. deprecated:: 0.5.0
        `num_labeled` was deprecated in version 0.5.0 and will
        be removed in 0.6.0.
+
   num_constraints : int, optional (default=None)
-      number of constraints to generate
-      (`20 * num_classes**2` constraints by default)
+      Number of constraints to generate. If None, defaults to `20 *
+      num_classes**2`.
+
   verbose : bool, optional (default=False)
-      if True, prints information while learning
+      If True, prints information while learning.
+
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,
       tuples will be formed like this: X[indices].
+
   random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int. If
       ``init='random'``, ``random_state`` is used to set the random

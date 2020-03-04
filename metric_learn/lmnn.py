@@ -31,8 +31,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       Initialization of the linear transformation. Possible options are
       'auto', 'pca', 'identity', 'random', and a numpy array of shape
       (n_features_a, n_features_b). If None, will be set automatically to
-        'auto' (this option is to raise a warning if 'init' is not set,
-        and stays to its default value None, in v0.5.0).
+      'auto' (this option is to raise a warning if 'init' is not set, and
+      stays to its default value None, in v0.5.0).
 
       'auto'
           Depending on ``n_components``, the most reasonable initialization
@@ -69,7 +69,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
           :meth:`fit` and n_features_a must be less than or equal to that.
           If ``n_components`` is not None, n_features_a must match it.
 
-  k : int, optional
+  k : int, optional (default=3)
       Number of neighbors to consider, not including self-edges.
 
   min_iter : int, optional (default=50)
@@ -94,8 +94,9 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   verbose : bool, optional (default=False)
       Whether to print the progress of the optimization procedure.
 
-  regularization: float, optional
-      Weighting of pull and push terms, with 0.5 meaning equal weight.
+  regularization: float, optional (default=0.5)
+      Relative weight between pull and push terms, with 0.5 meaning equal
+      weight.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
       The preprocessor to call to get tuples from indices. If array-like,
