@@ -69,3 +69,14 @@ autosummary_generate = True
 # Switch to old behavior with html4, for a good display of references,
 # as described in https://github.com/sphinx-doc/sphinx/issues/6705
 html4_writer = True
+
+# Temporary work-around for spacing problem between parameter and parameter
+# type in the doc, see https://github.com/numpy/numpydoc/issues/215. The bug
+# has been fixed in sphinx (https://github.com/sphinx-doc/sphinx/pull/5976) but
+# through a change in sphinx basic.css except rtd_theme does not use basic.css.
+# In an ideal world, this would get fixed in this PR:
+# https://github.com/readthedocs/sphinx_rtd_theme/pull/747/files
+def setup(app):
+    app.add_javascript('js/copybutton.js')
+    app.add_stylesheet("basic.css")
+    # app.connect('autodoc-process-docstring', generate_example_rst)

@@ -123,7 +123,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
   .. [1] J. Goldberger, G. Hinton, S. Roweis, R. Salakhutdinov. `Neighbourhood
          Components Analysis
          <http://www.cs.nyu.edu/~roweis/papers/ncanips.pdf>`_.
-         Advances in Neural Information Processing Systems. 17, 513-520, 2005.
+         NIPS 2005.
 
   .. [2] Wikipedia entry on `Neighborhood Components Analysis
          <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_

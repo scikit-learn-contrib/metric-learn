@@ -383,10 +383,6 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
       An SPD matrix of shape (n_features, n_features), that will
       be used as such to initialize the metric.
 
-  preprocessor : array-like, shape=(n_samples, n_features) or callable
-    The preprocessor to call to get tuples from indices. If array-like,
-    tuples will be gotten like this: X[indices].
-
   A0 : Not used.
     .. deprecated:: 0.5.0
       `A0` was deprecated in version 0.5.0 and will
@@ -442,10 +438,11 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
 
   References
   ----------
-  .. [1] `Distance metric learning with application to clustering with
-         side-information <http://papers.nips.cc/paper/2164-distance-metric-\
-learning-with-application-to-clustering-with-side-information.pdf>`_
-         Xing, Jordan, Russell, Ng.
+  .. [1] Xing, Jordan, Russell, Ng. `Distance metric learning with application
+         to clustering with side-information
+         <http://papers.nips.cc/paper/2164-distance-metric-\
+         learning-with-application-to-clustering-with-side-information.pdf>`_.
+         NIPS 2002.
 
   See Also
   --------
@@ -537,10 +534,6 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     numpy array
       A numpy array of shape (n_features, n_features), that will
       be used as such to initialize the metric.
-
-  preprocessor : array-like, shape=(n_samples, n_features) or callable
-    The preprocessor to call to get tuples from indices. If array-like,
-    tuples will be gotten like this: X[indices].
 
   A0 : Not used.
     .. deprecated:: 0.5.0

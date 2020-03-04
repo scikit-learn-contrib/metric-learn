@@ -73,15 +73,15 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       :meth:`fit` and n_features_a must be less than or equal to that.
       If ``n_components`` is not None, n_features_a must match it.
 
-  A0: Not used.
+  A0 : Not used.
     .. deprecated:: 0.5.0
       `A0` was deprecated in version 0.5.0 and will
       be removed in 0.6.0. Use 'init' instead.
 
-  tol: float, optional (default=None)
+  tol : float, optional (default=None)
     Convergence tolerance for the optimization.
 
-  max_iter: int, optional (default=1000)
+  max_iter : int, optional (default=1000)
     Cap on number of conjugate gradient iterations.
 
   verbose : bool, optional (default=False)
@@ -118,9 +118,9 @@ class MLKR(MahalanobisMixin, TransformerMixin):
 
   References
   ----------
-  .. [1] `Information-theoretic Metric Learning
-     <http://machinelearning.wustl.edu/\
-mlpapers/paper_files/icml2007_DavisKJSD07.pdf>`_ Jason V. Davis, et al.
+  .. [1] K.Q. Weinberger and G. Tesauto. `Metric Learning for Kernel
+         Regression <http://proceedings.mlr.press/v2/weinberger07a\
+         /weinberger07a.pdf>`_. AISTATS 2007.
   """
 
   def __init__(self, n_components=None, num_dims='deprecated', init=None,

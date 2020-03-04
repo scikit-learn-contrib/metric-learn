@@ -39,7 +39,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
 
     Returns
     -------
-    scores: `numpy.ndarray` of shape=(n_pairs,)
+    scores : `numpy.ndarray` of shape=(n_pairs,)
       The score of every pair.
 
     See Also
@@ -69,19 +69,19 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
 
     Parameters
     ----------
-    input: array-like
+    X : array-like
       The input data array to check.
 
     y : array-like
       The input labels array to check.
 
-    type_of_inputs: `str` {'classic', 'tuples'}
+    type_of_inputs : `str` {'classic', 'tuples'}
       The type of inputs to check. If 'classic', the input should be
       a 2D array-like of points or a 1D array like of indicators of points. If
       'tuples', the input should be a 3D array-like of tuples or a 2D
       array-like of indicators of tuples.
 
-    **kwargs: dict
+    **kwargs : dict
       Arguments to pass to check_input.
 
     Returns
@@ -89,7 +89,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     X : `numpy.ndarray`
       The checked input data array.
 
-    y: `numpy.ndarray` (optional)
+    y : `numpy.ndarray` (optional)
       The checked input labels array.
     """
     self._check_preprocessor()
@@ -203,7 +203,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
     Returns
     -------
-    scores: `numpy.ndarray` of shape=(n_pairs,)
+    scores : `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
 
     See Also
@@ -271,7 +271,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
       Returns
       -------
-      distance: float
+      distance : float
         The distance between u and v according to the new metric.
       """
       u = validate_vector(u)

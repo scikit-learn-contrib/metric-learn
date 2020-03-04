@@ -19,12 +19,12 @@ class Constraints(object):
   Parameters
   ----------
   partial_labels : `numpy.ndarray` of ints, shape=(n_samples,)
-      Array of labels, with -1 indicating unknown label.
+    Array of labels, with -1 indicating unknown label.
 
   Attributes
   ----------
   partial_labels : `numpy.ndarray` of ints, shape=(n_samples,)
-      Array of labels, with -1 indicating unknown label.
+    Array of labels, with -1 indicating unknown label.
   """
 
   def __init__(self, partial_labels):
@@ -45,26 +45,29 @@ class Constraints(object):
 
     Parameters
     ----------
-      num_constraints : int
-        Number of positive and negative constraints to generate.
-      same_length : bool, optional (default=False)
-        If True, forces the number of positive and negative pairs to be
-        equal by ignoring some pairs from the larger set.
-      random_state : int or numpy.RandomState or None, optional (default=None)
-        A pseudo random number generator object or a seed for it if int.
+    num_constraints : int
+      Number of positive and negative constraints to generate.
+
+    same_length : bool, optional (default=False)
+      If True, forces the number of positive and negative pairs to be
+      equal by ignoring some pairs from the larger set.
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int.
+
     Returns
     -------
     a : array-like, shape=(n_constraints,)
-    1D array of indicators for the left elements of positive pairs.
+      1D array of indicators for the left elements of positive pairs.
 
     b : array-like, shape=(n_constraints,)
-    1D array of indicators for the right elements of positive pairs.
+      1D array of indicators for the right elements of positive pairs.
 
     c : array-like, shape=(n_constraints,)
-    1D array of indicators for the left elements of negative pairs.
+      1D array of indicators for the left elements of negative pairs.
 
     d : array-like, shape=(n_constraints,)
-    1D array of indicators for the right elements of negative pairs.
+      1D array of indicators for the right elements of negative pairs.
     """
     random_state = check_random_state(random_state)
     a, b = self._pairs(num_constraints, same_label=True,
