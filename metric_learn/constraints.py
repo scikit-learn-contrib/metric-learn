@@ -12,17 +12,60 @@ __all__ = ['Constraints']
 
 class Constraints(object):
   """
-  Class to build constraints from labels.
+  Class to build constraints from labeled data.
 
-  See more in the :ref:`User Guide <supervised_version>`
+  See more in the :ref:`User Guide <supervised_version>`.
+
+  Parameters
+  ----------
+  partial_labels : `numpy.ndarray` of ints, shape=(n_samples,)
+      Array of labels, with -1 indicating unknown label.
+
+  Attributes
+  ----------
+  partial_labels : `numpy.ndarray` of ints, shape=(n_samples,)
+      Array of labels, with -1 indicating unknown label.
   """
+
   def __init__(self, partial_labels):
-    '''partial_labels : int arraylike, -1 indicating unknown label'''
     partial_labels = np.asanyarray(partial_labels, dtype=int)
     self.partial_labels = partial_labels
 
   def positive_negative_pairs(self, num_constraints, same_length=False,
                               random_state=None):
+    """
+    Generates positive pairs and negative pairs from labeled data.
+
+    Positive pairs are formed by randomly drawing ``num_constraints`` pairs of
+    points with the same label. Negative pairs are formed by randomly drawing
+    ``num_constraints`` pairs of points with different label.
+
+    In the case where it is not possible to generate enough positive or
+    negative pairs, a smaller number of pairs will be returned with a warning.
+
+    Parameters
+    ----------
+      num_constraints : int
+        Number of positive and negative constraints to generate.
+      same_length : bool, optional (default=False)
+        If True, forces the number of positive and negative pairs to be
+        equal by ignoring some pairs from the larger set.
+      random_state : int or numpy.RandomState or None, optional (default=None)
+        A pseudo random number generator object or a seed for it if int.
+    Returns
+    -------
+    a : array-like, shape=(n_constraints,)
+    1D array of indicators for the left elements of positive pairs.
+
+    b : array-like, shape=(n_constraints,)
+    1D array of indicators for the right elements of positive pairs.
+
+    c : array-like, shape=(n_constraints,)
+    1D array of indicators for the left elements of negative pairs.
+
+    d : array-like, shape=(n_constraints,)
+    1D array of indicators for the right elements of negative pairs.
+    """
     random_state = check_random_state(random_state)
     a, b = self._pairs(num_constraints, same_label=True,
                        random_state=random_state)
@@ -60,7 +103,30 @@ class Constraints(object):
 
   def chunks(self, num_chunks=100, chunk_size=2, random_state=None):
     """
-    the random state object to be passed must be a numpy random seed
+    Generates chunks from labeled data.
+
+    Each of ``num_chunks`` chunks is composed of ``chunk_size`` points from
+    the same class drawn at random. Each point can belong to at most 1 chunk.
+
+    In the case where there is not enough points to generate ``num_chunks``
+    chunks of size ``chunk_size``, a ValueError will be raised.
+
+    Parameters
+    ----------
+    num_chunks : int, optional (default=100)
+      Number of chunks to generate.
+
+    chunk_size : int, optional (default=2)
+      Number of points in each chunk.
+
+    random_state : int or numpy.RandomState or None, optional (default=None)
+      A pseudo random number generator object or a seed for it if int.
+
+    Returns
+    -------
+    chunks : array-like, shape=(n_samples,)
+      1D array of chunk indicators, where -1 indicates that the point does not
+      belong to any chunk.
     """
     random_state = check_random_state(random_state)
     chunks = -np.ones_like(self.partial_labels, dtype=int)

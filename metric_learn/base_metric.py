@@ -154,12 +154,12 @@ class MetricTransformer(six.with_metaclass(ABCMeta)):
     Parameters
     ----------
     X : (n x d) matrix
-        Data to transform.
+      Data to transform.
 
     Returns
     -------
     transformed : (n x d) matrix
-        Input data transformed to the metric space by :math:`XL^{\\top}`
+      Input data transformed to the metric space by :math:`XL^{\\top}`
     """
 
 
@@ -180,7 +180,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_components, n_features)
-      The learned linear transformation ``L``.
+    The learned linear transformation ``L``.
   """
 
   def score_pairs(self, pairs):
@@ -313,9 +313,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
   Attributes
   ----------
   threshold_ : `float`
-      If the distance metric between two points is lower than this threshold,
-      points will be classified as similar, otherwise they will be
-      classified as dissimilar.
+    If the distance metric between two points is lower than this threshold,
+    points will be classified as similar, otherwise they will be
+    classified as dissimilar.
   """
 
   _tuple_size = 2  # number of points in a tuple, 2 for pairs
