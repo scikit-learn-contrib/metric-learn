@@ -211,14 +211,12 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
 
   References
   ----------
+  .. [1] Qi et al. `An efficient sparse metric learning in high-dimensional
+         space via L1-penalized log-determinant regularization
+         <http://www.machinelearning.org/archive/icml2009/papers/46.pdf>`_.
+         ICML 2009.
 
-  .. [1] Qi et al.
-         An efficient sparse metric learning in high-dimensional space via
-         L1-penalized log-determinant regularization. ICML 2009.
-         http://lms.comp.nus.edu.sg/sites/default/files/publication\
--attachments/icml09-guojun.pdf
-
-  .. [2] Adapted from https://gist.github.com/kcarnold/5439945
+  .. [2] Code adapted from https://gist.github.com/kcarnold/5439945
   """
 
   def fit(self, pairs, y, calibration_params=None):

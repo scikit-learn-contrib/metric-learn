@@ -211,9 +211,9 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
   References
   ----------
-  .. [1] `Information-theoretic Metric Learning
+  .. [1] Jason V. Davis, et al. `Information-theoretic Metric Learning
          <http://www.prateekjain.org/publications/all_papers\
-/DavisKJSD07_ICML.pdf>`_ Jason V. Davis, et al.
+          /DavisKJSD07_ICML.pdf>`_. ICML 2007.
   """
 
   def fit(self, pairs, y, bounds=None, calibration_params=None):
@@ -229,8 +229,10 @@ class ITML(_BaseITML, _PairsClassifierMixin):
       3D Array of pairs with each row corresponding to two points,
       or 2D array of indices of pairs if the metric learner uses a
       preprocessor.
+
     y: array-like, of shape (n_constraints,)
       Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+
     bounds : array-like of two numbers
       Bounds on similarity, aside slack variables, s.t.
       ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
@@ -239,6 +241,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
       If not provided at initialization, bounds_[0] and bounds_[1] will be
       set to the 5th and 95th percentile of the pairwise distances among all
       points present in the input `pairs`.
+
     calibration_params : `dict` or `None`
       Dictionary of parameters to give to `calibrate_threshold` for the
       threshold calibration step done at the end of `fit`. If `None` is
@@ -280,7 +283,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
       `num_labeled` was deprecated in version 0.5.0 and will
       be removed in 0.6.0.
 
-  num_constraints: int, optional (default=None)
+  num_constraints : int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
 

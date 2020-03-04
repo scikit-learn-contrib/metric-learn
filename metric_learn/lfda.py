@@ -39,10 +39,16 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     defaults to min(7, n_features - 1).
 
   embedding_type : str, optional (default: 'weighted')
-    Type of metric in the embedding space
-      'weighted'        - weighted eigenvectors
-      'orthonormalized' - orthonormalized
-      'plain'           - raw eigenvectors
+    Type of metric in the embedding space.
+
+    'weighted'
+      weighted eigenvectors
+
+    'orthonormalized'
+      orthonormalized
+
+    'plain'
+      raw eigenvectors
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
     The preprocessor to call to get tuples from indices. If array-like,
@@ -67,13 +73,14 @@ class LFDA(MahalanobisMixin, TransformerMixin):
 
   References
   ------------------
-  .. [1] `Dimensionality Reduction of Multimodal Labeled Data by Local Fisher
-         Discriminant Analysis <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA.pdf>`_
-         Masashi Sugiyama.
+  .. [1] Masashi Sugiyama. `Dimensionality Reduction of Multimodal Labeled
+         Data by Local Fisher Discriminant Analysis
+         <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA.pdf>`_. JMLR 2007.
 
-  .. [2] `Local Fisher Discriminant Analysis on Beer Style Clustering
-         <https://gastrograph.com/resources/whitepapers/local-fisher\
--discriminant-analysis-on-beer-style-clustering.html#>`_ Yuan Tang.
+  .. [2] Yuan Tang. `Local Fisher Discriminant Analysis on Beer Style
+        Clustering
+        <https://gastrograph.com/resources/whitepapers/local-fisher\
+        -discriminant-analysis-on-beer-style-clustering.html#>`_.
   '''
 
   def __init__(self, n_components=None, num_dims='deprecated',

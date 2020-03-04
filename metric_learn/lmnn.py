@@ -137,10 +137,11 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
   References
   ----------
-  .. [1] `Distance Metric Learning for Large Margin Nearest Neighbor
-         Classification <http://papers.nips.cc/paper/2795-distance-metric\
--learning-for-large-margin-nearest-neighbor-classification>`_
-         Kilian Q. Weinberger, John Blitzer, Lawrence K. Saul
+  .. [1] K. Q. Weinberger, J. Blitzer, L. K. Saul. `Distance Metric
+         Learning for Large Margin Nearest Neighbor Classification
+         <http://papers.nips.cc/paper/2795-distance-metric\
+         -learning-for-large-margin-nearest-neighbor-classification>`_. NIPS
+         2005.
   """
 
   def __init__(self, init=None, k=3, min_iter=50, max_iter=1000,

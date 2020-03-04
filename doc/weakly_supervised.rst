@@ -483,7 +483,7 @@ is the off-diagonal L1 norm.
        L1-penalized log-determinant regularization <https://icml.cc/Conferences/2009/papers/46.pdf>`_.
        ICML 2009.
 
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439945
+    .. [2] Code adapted from https://gist.github.com/kcarnold/5439945
 
 .. _rca:
 
@@ -893,6 +893,6 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
        `Metric Learning from Relative Comparisons by Minimizing Squared
        Residual <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012
 
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439917
+    .. [2] Code adapted from https://gist.github.com/kcarnold/5439917
 
 

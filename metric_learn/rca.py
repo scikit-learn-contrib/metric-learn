@@ -72,10 +72,10 @@ class RCA(MahalanobisMixin, TransformerMixin):
 
   References
   ------------------
-  .. [1] `Adjustment learning and relevant component analysis
-         <http://citeseerx.ist.\
-psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ Noam
-         Shental, et al.
+  .. [1] Noam Shental, et al. `Adjustment learning and relevant component
+         analysis <http://citeseerx.ist.\
+         psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ .
+         ECCV 2002.
 
 
   Attributes

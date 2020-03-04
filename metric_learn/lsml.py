@@ -208,7 +208,7 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
          Squared Residual
          <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012.
 
-  .. [2] Adapted from https://gist.github.com/kcarnold/5439917
+  .. [2] Code adapted from https://gist.github.com/kcarnold/5439917
 
   See Also
   --------
