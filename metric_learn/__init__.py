@@ -18,5 +18,5 @@ from ._version import __version__
 __all__ = ['Constraints', 'Covariance', 'ITML', 'ITML_Supervised',
            'LMNN', 'LSML', 'LSML_Supervised', 'SDML',
            'SDML_Supervised', 'NCA', 'LFDA', 'RCA', 'RCA_Supervised',
-           'MLKR', 'MMC', 'MMC_Supervised', 'SCML_global', 
+           'MLKR', 'MMC', 'MMC_Supervised', 'SCML_global',
            'SCML_global_Supervised', '__version__']

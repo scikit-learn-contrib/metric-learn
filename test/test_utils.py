@@ -16,14 +16,13 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
-                          Constraints)
+                          SCML_global, SCML_global_Supervised, Constraints)
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
                                       _PairsClassifierMixin,
                                       _TripletsClassifierMixin,
                                       _QuadrupletsClassifierMixin)
 from metric_learn.exceptions import PreprocessorError, NonPSDError
 from sklearn.datasets import make_regression, make_blobs, load_iris
-from metric_learn.lsml import _BaseLSML
 
 
 SEED = 42
@@ -98,21 +97,6 @@ def build_triplets(with_preprocessor=False):
     return X[triplets], None
 
 
-class mock_triplet_LSML(_BaseLSML, _TripletsClassifierMixin):
-  # Mock Triplet learner from LSML which is a quadruplets learner
-  # in order to test TripletClassifierMixin basic methods
-
-  _tuple_size = 4
-
-  def fit(self, triplets, weights=None):
-    quadruplets = triplets[:, [0, 1, 0, 2]]
-    return self._fit(quadruplets, weights=weights)
-
-  def decision_function(self, triplets):
-    self._tuple_size = 3
-    return _TripletsClassifierMixin.decision_function(self, triplets)
-
-
 def build_quadruplets(with_preprocessor=False):
   # builds a toy quadruplets problem
   X, indices = build_data()
@@ -133,7 +117,7 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
                                  quadruplets_learners]))
 
-triplets_learners = [(mock_triplet_LSML(), build_triplets)]
+triplets_learners = [(SCML_global(), build_triplets)]
 ids_triplets_learners = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
                               triplets_learners]))
@@ -155,7 +139,8 @@ classifiers = [(Covariance(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
                (RCA_Supervised(num_chunks=5), build_classification),
                (SDML_Supervised(prior='identity', balance_param=1e-5),
-               build_classification)]
+               build_classification), (SCML_global_Supervised(),
+                                       build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
@@ -165,6 +150,7 @@ ids_regressors = list(map(lambda x: x.__class__.__name__,
                           [learner for (learner, _) in regressors]))
 
 WeaklySupervisedClasses = (_PairsClassifierMixin,
+                           _TripletsClassifierMixin,
                            _QuadrupletsClassifierMixin)
 
 tuples_learners = pairs_learners + quadruplets_learners

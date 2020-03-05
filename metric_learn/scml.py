@@ -268,7 +268,7 @@ class SCML_global(_BaseSCML_global, _TripletsClassifierMixin):
     self : object
       Returns the instance.
     """
-    return _BaseSCML_global._fit(triplets)
+    return self._fit(triplets)
 
 
 class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
@@ -370,10 +370,6 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     self.preprocessor = X
-
-    # TODO:
-    # it can be a problem if fit is called more than once,
-    # should that case be handled?
 
     if(self.basis == "LDA"):
       self._generate_bases_LDA(X, y)
