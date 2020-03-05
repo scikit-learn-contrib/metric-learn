@@ -151,7 +151,7 @@ class _BaseSCML_global(MahalanobisMixin):
     K, d = basis.shape
 
     if(K < d):  # if metric is low-rank
-      return np.sqrt(w.T)*basis # equivalent to np.diag(np.sqrt(w)).dot(B)
+      return np.sqrt(w.T)*basis  # equivalent to np.diag(np.sqrt(w)).dot(B)
 
     else:   # if metric is full rank
       return np.linalg.cholesky(np.matmul(basis.T, w.T*basis, order='F')).T
