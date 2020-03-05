@@ -144,17 +144,17 @@ class _BaseSCML_global(MahalanobisMixin):
     """
 
     # get rid of inactive bases
-    active_idx = w > 0
-    w = w[active_idx]
-    basis = self.basis[np.squeeze(active_idx), :]
+    active_idx, = w > 0
+    w = w[..., active_idx]
+    basis = self.basis[active_idx, :]
 
     K, d = basis.shape
 
     if(K < d):  # if metric is low-rank
-      return basis*np.sqrt(w)[..., None]
+      return np.sqrt(w.T)*basis # equivalent to np.diag(np.sqrt(w)).dot(B)
 
     else:   # if metric is full rank
-      return np.linalg.cholesky(np.matmul(basis.T * w, basis, order='F')).T
+      return np.linalg.cholesky(np.matmul(basis.T, w.T*basis, order='F')).T
 
   def _to_index_points(self, triplets):
     shape = triplets.shape
