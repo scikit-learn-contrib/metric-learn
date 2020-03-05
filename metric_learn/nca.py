@@ -34,70 +34,69 @@ class NCA(MahalanobisMixin, TransformerMixin):
   Parameters
   ----------
   init : None, string or numpy array, optional (default=None)
-      Initialization of the linear transformation. Possible options are
-      'auto', 'pca', 'identity', 'random', and a numpy array of shape
-      (n_features_a, n_features_b). If None, will be set automatically to
-      'auto' (this option is to raise a warning if 'init' is not set,
-      and stays to its default value None, in v0.5.0).
+    Initialization of the linear transformation. Possible options are
+    'auto', 'pca', 'identity', 'random', and a numpy array of shape
+    (n_features_a, n_features_b). If None, will be set automatically to
+    'auto' (this option is to raise a warning if 'init' is not set,
+    and stays to its default value None, in v0.5.0).
 
-      'auto'
-          Depending on ``n_components``, the most reasonable initialization
-          will be chosen. If ``n_components <= n_classes`` we use 'lda', as
-          it uses labels information. If not, but
-          ``n_components < min(n_features, n_samples)``, we use 'pca', as
-          it projects data in meaningful directions (those of higher
-          variance). Otherwise, we just use 'identity'.
+    'auto'
+      Depending on ``n_components``, the most reasonable initialization
+      will be chosen. If ``n_components <= n_classes`` we use 'lda', as
+      it uses labels information. If not, but
+      ``n_components < min(n_features, n_samples)``, we use 'pca', as
+      it projects data in meaningful directions (those of higher
+      variance). Otherwise, we just use 'identity'.
 
-      'pca'
-          ``n_components`` principal components of the inputs passed
-          to :meth:`fit` will be used to initialize the transformation.
-          (See `sklearn.decomposition.PCA`)
+    'pca'
+      ``n_components`` principal components of the inputs passed
+      to :meth:`fit` will be used to initialize the transformation.
+      (See `sklearn.decomposition.PCA`)
 
-      'lda'
-          ``min(n_components, n_classes)`` most discriminative
-          components of the inputs passed to :meth:`fit` will be used to
-          initialize the transformation. (If ``n_components > n_classes``,
-          the rest of the components will be zero.) (See
-          `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)
+    'lda'
+      ``min(n_components, n_classes)`` most discriminative
+      components of the inputs passed to :meth:`fit` will be used to
+      initialize the transformation. (If ``n_components > n_classes``,
+      the rest of the components will be zero.) (See
+      `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)
 
-      'identity'
-          If ``n_components`` is strictly smaller than the
-          dimensionality of the inputs passed to :meth:`fit`, the identity
-          matrix will be truncated to the first ``n_components`` rows.
+    'identity'
+      If ``n_components`` is strictly smaller than the
+      dimensionality of the inputs passed to :meth:`fit`, the identity
+      matrix will be truncated to the first ``n_components`` rows.
 
-      'random'
-          The initial transformation will be a random array of shape
-          `(n_components, n_features)`. Each value is sampled from the
-          standard normal distribution.
+    'random'
+      The initial transformation will be a random array of shape
+      `(n_components, n_features)`. Each value is sampled from the
+      standard normal distribution.
 
-      numpy array
-          n_features_b must match the dimensionality of the inputs passed to
-          :meth:`fit` and n_features_a must be less than or equal to that.
-          If ``n_components`` is not None, n_features_a must match it.
+    numpy array
+      n_features_b must match the dimensionality of the inputs passed to
+      :meth:`fit` and n_features_a must be less than or equal to that.
+      If ``n_components`` is not None, n_features_a must match it.
 
   n_components : int or None, optional (default=None)
-      Dimensionality of reduced space (if None, defaults to dimension of X).
+    Dimensionality of reduced space (if None, defaults to dimension of X).
 
   num_dims : Not used
-
-      .. deprecated:: 0.5.0
-        `num_dims` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Use `n_components` instead.
+    .. deprecated:: 0.5.0
+      `num_dims` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use `n_components` instead.
 
   max_iter : int, optional (default=100)
     Maximum number of iterations done by the optimization algorithm.
 
   tol : float, optional (default=None)
-      Convergence tolerance for the optimization.
+    Convergence tolerance for the optimization.
 
   verbose : bool, optional (default=False)
     Whether to print progress messages or not.
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int. If
-      ``init='random'``, ``random_state`` is used to initialize the random
-      transformation. If ``init='pca'``, ``random_state`` is passed as an
-      argument to PCA when initializing the transformation.
+    A pseudo random number generator object or a seed for it if int. If
+    ``init='random'``, ``random_state`` is used to initialize the random
+    transformation. If ``init='pca'``, ``random_state`` is passed as an
+    argument to PCA when initializing the transformation.
 
   Examples
   --------
@@ -114,17 +113,17 @@ class NCA(MahalanobisMixin, TransformerMixin):
   Attributes
   ----------
   n_iter_ : `int`
-      The number of iterations the solver has run.
+    The number of iterations the solver has run.
 
   components_ : `numpy.ndarray`, shape=(n_components, n_features)
-      The learned linear transformation ``L``.
+    The learned linear transformation ``L``.
 
   References
   ----------
   .. [1] J. Goldberger, G. Hinton, S. Roweis, R. Salakhutdinov. `Neighbourhood
          Components Analysis
          <http://www.cs.nyu.edu/~roweis/papers/ncanips.pdf>`_.
-         Advances in Neural Information Processing Systems. 17, 513-520, 2005.
+         NIPS 2005.
 
   .. [2] Wikipedia entry on `Neighborhood Components Analysis
          <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_

@@ -39,7 +39,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
 
     Returns
     -------
-    scores: `numpy.ndarray` of shape=(n_pairs,)
+    scores : `numpy.ndarray` of shape=(n_pairs,)
       The score of every pair.
 
     See Also
@@ -69,19 +69,19 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
 
     Parameters
     ----------
-    input: array-like
+    X : array-like
       The input data array to check.
 
     y : array-like
       The input labels array to check.
 
-    type_of_inputs: `str` {'classic', 'tuples'}
+    type_of_inputs : `str` {'classic', 'tuples'}
       The type of inputs to check. If 'classic', the input should be
       a 2D array-like of points or a 1D array like of indicators of points. If
       'tuples', the input should be a 3D array-like of tuples or a 2D
       array-like of indicators of tuples.
 
-    **kwargs: dict
+    **kwargs : dict
       Arguments to pass to check_input.
 
     Returns
@@ -89,7 +89,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     X : `numpy.ndarray`
       The checked input data array.
 
-    y: `numpy.ndarray` (optional)
+    y : `numpy.ndarray` (optional)
       The checked input labels array.
     """
     self._check_preprocessor()
@@ -154,12 +154,12 @@ class MetricTransformer(six.with_metaclass(ABCMeta)):
     Parameters
     ----------
     X : (n x d) matrix
-        Data to transform.
+      Data to transform.
 
     Returns
     -------
     transformed : (n x d) matrix
-        Input data transformed to the metric space by :math:`XL^{\\top}`
+      Input data transformed to the metric space by :math:`XL^{\\top}`
     """
 
 
@@ -180,7 +180,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_components, n_features)
-      The learned linear transformation ``L``.
+    The learned linear transformation ``L``.
   """
 
   def score_pairs(self, pairs):
@@ -203,7 +203,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
     Returns
     -------
-    scores: `numpy.ndarray` of shape=(n_pairs,)
+    scores : `numpy.ndarray` of shape=(n_pairs,)
       The learned Mahalanobis distance for every pair.
 
     See Also
@@ -271,7 +271,7 @@ class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
 
       Returns
       -------
-      distance: float
+      distance : float
         The distance between u and v according to the new metric.
       """
       u = validate_vector(u)
@@ -313,9 +313,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
   Attributes
   ----------
   threshold_ : `float`
-      If the distance metric between two points is lower than this threshold,
-      points will be classified as similar, otherwise they will be
-      classified as dissimilar.
+    If the distance metric between two points is lower than this threshold,
+    points will be classified as similar, otherwise they will be
+    classified as dissimilar.
   """
 
   _tuple_size = 2  # number of points in a tuple, 2 for pairs
@@ -589,6 +589,90 @@ class _PairsClassifierMixin(BaseMetricLearner):
                          'Got {} instead.'.format(type(beta)))
 
 
+class _TripletsClassifierMixin(BaseMetricLearner):
+  """Base class for triplets learners.
+  """
+
+  _tuple_size = 3  # number of points in a tuple, 3 for triplets
+
+  def predict(self, triplets):
+    """Predicts the ordering between sample distances in input triplets.
+
+    For each triplets, returns 1 if the first element is closer to the second
+    than to the last and -1 if not.
+
+    Parameters
+    ----------
+    triplets : array-like, shape=(n_triplets, 3, n_features) or (n_triplets, 3)
+      3D array of triplets to predict, with each row corresponding to three
+      points, or 2D array of indices of triplets if the metric learner
+      uses a preprocessor.
+
+    Returns
+    -------
+    prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
+      Predictions of the ordering of pairs, for each triplet.
+    """
+    return np.sign(self.decision_function(triplets))
+
+  def decision_function(self, triplets):
+    """Predicts differences between sample distances in input triplets.
+
+    For each triplet (X_a, X_b, X_c) in the samples, computes the difference
+    between the learned distance of the second pair (X_a, X_c) minus the
+    learned distance of the first pair (X_a, X_b). The higher it is, the more
+    probable it is that the pairs in the triplets are presented in the right
+    order, i.e. that the label of the triplet is 1. The lower it is, the more
+    probable it is that the label of the triplet is -1.
+
+    Parameters
+    ----------
+    triplet : array-like, shape=(n_triplets, 3, n_features) or \
+                  (n_triplets, 3)
+      3D array of triplets to predict, with each row corresponding to three
+      points, or 2D array of indices of triplets if the metric learner
+      uses a preprocessor.
+
+    Returns
+    -------
+    decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)
+      Metric differences.
+    """
+    check_is_fitted(self, 'preprocessor_')
+    triplets = check_input(triplets, type_of_inputs='tuples',
+                           preprocessor=self.preprocessor_,
+                           estimator=self, tuple_size=self._tuple_size)
+    return (self.score_pairs(triplets[:, [0, 2]]) -
+            self.score_pairs(triplets[:, :2]))
+
+  def score(self, triplets):
+    """Computes score on input triplets.
+
+    Returns the accuracy score of the following classification task: a triplet
+    (X_a, X_b, X_c) is correctly classified if the predicted similarity between
+    the first pair (X_a, X_b) is higher than that of the second pair (X_a, X_c)
+
+    Parameters
+    ----------
+    triplets : array-like, shape=(n_triplets, 3, n_features) or \
+                  (n_triplets, 3)
+      3D array of triplets to score, with each row corresponding to three
+      points, or 2D array of indices of triplets if the metric learner
+      uses a preprocessor.
+
+    Returns
+    -------
+    score : float
+      The triplets score.
+    """
+    # Since the prediction is a vector of values in {-1, +1}, we need to
+    # rescale them to {0, 1} to compute the accuracy using the mean (because
+    # then 1 means a correctly classified result (pairs are in the right
+    # order), and a 0 an incorrectly classified result (pairs are in the
+    # wrong order).
+    return self.predict(triplets).mean() / 2 + 0.5
+
+
 class _QuadrupletsClassifierMixin(BaseMetricLearner):
   """Base class for quadruplets learners.
   """
@@ -614,10 +698,6 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each quadruplet.
     """
-    check_is_fitted(self, 'preprocessor_')
-    quadruplets = check_input(quadruplets, type_of_inputs='tuples',
-                              preprocessor=self.preprocessor_,
-                              estimator=self, tuple_size=self._tuple_size)
     return np.sign(self.decision_function(quadruplets))
 
   def decision_function(self, quadruplets):

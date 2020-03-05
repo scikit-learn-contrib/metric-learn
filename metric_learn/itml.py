@@ -126,75 +126,75 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
   Parameters
   ----------
-  gamma : float, optional (default=1.)
-      Value for slack variables
+  gamma : float, optional (default=1.0)
+    Value for slack variables
 
   max_iter : int, optional (default=1000)
-      Maximum number of iteration of the optimization procedure.
+    Maximum number of iteration of the optimization procedure.
 
   convergence_threshold : float, optional (default=1e-3)
-      Convergence tolerance.
+    Convergence tolerance.
 
   prior : string or numpy array, optional (default='identity')
-      The Mahalanobis matrix to use as a prior. Possible options are
-      'identity', 'covariance', 'random', and a numpy array of shape
-      (n_features, n_features). For ITML, the prior should be strictly
-      positive definite (PD).
+    The Mahalanobis matrix to use as a prior. Possible options are
+    'identity', 'covariance', 'random', and a numpy array of shape
+    (n_features, n_features). For ITML, the prior should be strictly
+    positive definite (PD).
 
-      'identity'
-          An identity matrix of shape (n_features, n_features).
+    'identity'
+      An identity matrix of shape (n_features, n_features).
 
-      'covariance'
-          The inverse covariance matrix.
+    'covariance'
+      The inverse covariance matrix.
 
-      'random'
-          The prior will be a random SPD matrix of shape
-          `(n_features, n_features)`, generated using
-          `sklearn.datasets.make_spd_matrix`.
+    'random'
+      The prior will be a random SPD matrix of shape
+      `(n_features, n_features)`, generated using
+      `sklearn.datasets.make_spd_matrix`.
 
-      numpy array
-          A positive definite (PD) matrix of shape
-          (n_features, n_features), that will be used as such to set the
-          prior.
+    numpy array
+      A positive definite (PD) matrix of shape
+      (n_features, n_features), that will be used as such to set the
+      prior.
 
   A0 : Not used
-      .. deprecated:: 0.5.0
-          `A0` was deprecated in version 0.5.0 and will
-          be removed in 0.6.0. Use 'prior' instead.
+    .. deprecated:: 0.5.0
+      `A0` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use 'prior' instead.
 
   verbose : bool, optional (default=False)
-      If True, prints information while learning
+    If True, prints information while learning
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int. If
-      ``prior='random'``, ``random_state`` is used to set the prior.
+    A pseudo random number generator object or a seed for it if int. If
+    ``prior='random'``, ``random_state`` is used to set the prior.
 
   Attributes
   ----------
   bounds_ : `numpy.ndarray`, shape=(2,)
-      Bounds on similarity, aside slack variables, s.t.
-      ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
-      and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
-      dissimilar points ``c`` and ``d``, with ``d`` the learned distance. If
-      not provided at initialization, bounds_[0] and bounds_[1] are set at
-      train time to the 5th and 95th percentile of the pairwise distances among
-      all points present in the input `pairs`.
+    Bounds on similarity, aside slack variables, s.t.
+    ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+    and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+    dissimilar points ``c`` and ``d``, with ``d`` the learned distance. If
+    not provided at initialization, bounds_[0] and bounds_[1] are set at
+    train time to the 5th and 95th percentile of the pairwise distances among
+    all points present in the input `pairs`.
 
   n_iter_ : `int`
-      The number of iterations the solver has run.
+    The number of iterations the solver has run.
 
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
-      The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `components_from_metric`.)
+    The linear transformation ``L`` deduced from the learned Mahalanobis
+    metric (See function `components_from_metric`.)
 
   threshold_ : `float`
-      If the distance metric between two points is lower than this threshold,
-      points will be classified as similar, otherwise they will be
-      classified as dissimilar.
+    If the distance metric between two points is lower than this threshold,
+    points will be classified as similar, otherwise they will be
+    classified as dissimilar.
 
   Examples
   --------
@@ -211,9 +211,9 @@ class ITML(_BaseITML, _PairsClassifierMixin):
 
   References
   ----------
-  .. [1] `Information-theoretic Metric Learning
+  .. [1] Jason V. Davis, et al. `Information-theoretic Metric Learning
          <http://www.prateekjain.org/publications/all_papers\
-/DavisKJSD07_ICML.pdf>`_ Jason V. Davis, et al.
+          /DavisKJSD07_ICML.pdf>`_. ICML 2007.
   """
 
   def fit(self, pairs, y, bounds=None, calibration_params=None):
@@ -226,28 +226,31 @@ class ITML(_BaseITML, _PairsClassifierMixin):
     ----------
     pairs: array-like, shape=(n_constraints, 2, n_features) or \
            (n_constraints, 2)
-        3D Array of pairs with each row corresponding to two points,
-        or 2D array of indices of pairs if the metric learner uses a
-        preprocessor.
+      3D Array of pairs with each row corresponding to two points,
+      or 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
+
     y: array-like, of shape (n_constraints,)
-        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+      Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.
+
     bounds : array-like of two numbers
-        Bounds on similarity, aside slack variables, s.t.
-        ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
-        and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
-        dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
-        If not provided at initialization, bounds_[0] and bounds_[1] will be
-        set to the 5th and 95th percentile of the pairwise distances among all
-        points present in the input `pairs`.
+      Bounds on similarity, aside slack variables, s.t.
+      ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+      and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+      dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
+      If not provided at initialization, bounds_[0] and bounds_[1] will be
+      set to the 5th and 95th percentile of the pairwise distances among all
+      points present in the input `pairs`.
+
     calibration_params : `dict` or `None`
-        Dictionary of parameters to give to `calibrate_threshold` for the
-        threshold calibration step done at the end of `fit`. If `None` is
-        given, `calibrate_threshold` will use the default parameters.
+      Dictionary of parameters to give to `calibrate_threshold` for the
+      threshold calibration step done at the end of `fit`. If `None` is
+      given, `calibrate_threshold` will use the default parameters.
 
     Returns
     -------
     self : object
-        Returns the instance.
+      Returns the instance.
     """
     calibration_params = (calibration_params if calibration_params is not
                           None else dict())
@@ -266,77 +269,88 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   Parameters
   ----------
-  gamma : float, optional
-      value for slack variables
-  max_iter : int, optional
-  convergence_threshold : float, optional
+  gamma : float, optional (default=1.0)
+    Value for slack variables
+
+  max_iter : int, optional (default=1000)
+    Maximum number of iterations of the optimization procedure.
+
+  convergence_threshold : float, optional (default=1e-3)
+    Tolerance of the optimization procedure.
+
   num_labeled : Not used
-        .. deprecated:: 0.5.0
-           `num_labeled` was deprecated in version 0.5.0 and will
-           be removed in 0.6.0.
-  num_constraints: int, optional
-      number of constraints to generate
-      (`20 * num_classes**2` constraints by default)
+    .. deprecated:: 0.5.0
+      `num_labeled` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0.
+
+  num_constraints : int, optional (default=None)
+    Number of constraints to generate. If None, default to `20 *
+    num_classes**2`.
+
   bounds : Not used
-         .. deprecated:: 0.5.0
-        `bounds` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Set `bounds` at fit time instead :
-        `itml_supervised.fit(X, y, bounds=...)`
+    .. deprecated:: 0.5.0
+      `bounds` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Set `bounds` at fit time instead :
+      `itml_supervised.fit(X, y, bounds=...)`
 
   prior : string or numpy array, optional (default='identity')
-       Initialization of the Mahalanobis matrix. Possible options are
-       'identity', 'covariance', 'random', and a numpy array of shape
-       (n_features, n_features). For ITML, the prior should be strictly
-       positive definite (PD).
+    Initialization of the Mahalanobis matrix. Possible options are
+    'identity', 'covariance', 'random', and a numpy array of shape
+    (n_features, n_features). For ITML, the prior should be strictly
+    positive definite (PD).
 
-       'identity'
-          An identity matrix of shape (n_features, n_features).
+    'identity'
+      An identity matrix of shape (n_features, n_features).
 
-       'covariance'
-          The inverse covariance matrix.
+    'covariance'
+      The inverse covariance matrix.
 
-       'random'
-          The prior will be a random SPD matrix of shape
-          `(n_features, n_features)`, generated using
-          `sklearn.datasets.make_spd_matrix`.
+    'random'
+      The prior will be a random SPD matrix of shape
+      `(n_features, n_features)`, generated using
+      `sklearn.datasets.make_spd_matrix`.
 
-       numpy array
-           A positive definite (PD) matrix of shape
-           (n_features, n_features), that will be used as such to set the
-           prior.
+    numpy array
+      A positive definite (PD) matrix of shape
+      (n_features, n_features), that will be used as such to set the
+      prior.
+
   A0 : Not used
     .. deprecated:: 0.5.0
-       `A0` was deprecated in version 0.5.0 and will
-       be removed in 0.6.0. Use 'prior' instead.
-  verbose : bool, optional
-      if True, prints information while learning
+      `A0` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use 'prior' instead.
+
+  verbose : bool, optional (default=False)
+    If True, prints information while learning
+
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
+
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int. If
-      ``prior='random'``, ``random_state`` is used to set the prior. In any
-        case, `random_state` is also used to randomly sample constraints from
-        labels.
+    A pseudo random number generator object or a seed for it if int. If
+    ``prior='random'``, ``random_state`` is used to set the prior. In any
+    case, `random_state` is also used to randomly sample constraints from
+    labels.
 
 
   Attributes
   ----------
   bounds_ : `numpy.ndarray`, shape=(2,)
-      Bounds on similarity, aside slack variables, s.t.
-      ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
-      and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
-      dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
-      If not provided at initialization, bounds_[0] and bounds_[1] are set at
-      train time to the 5th and 95th percentile of the pairwise distances
-      among all points in the training data `X`.
+    Bounds on similarity, aside slack variables, s.t.
+    ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+    and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+    dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
+    If not provided at initialization, bounds_[0] and bounds_[1] are set at
+    train time to the 5th and 95th percentile of the pairwise distances
+    among all points in the training data `X`.
 
   n_iter_ : `int`
-      The number of iterations the solver has run.
+    The number of iterations the solver has run.
 
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
-      The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `components_from_metric`.)
+    The linear transformation ``L`` deduced from the learned Mahalanobis
+    metric (See function `components_from_metric`.)
 
   Examples
   --------
@@ -355,7 +369,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     that describes the supervised version of weakly supervised estimators.
   """
 
-  def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
+  def __init__(self, gamma=1.0, max_iter=1000, convergence_threshold=1e-3,
                num_labeled='deprecated', num_constraints=None,
                bounds='deprecated', prior='identity', A0='deprecated',
                verbose=False, preprocessor=None, random_state=None):
@@ -374,10 +388,10 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     Parameters
     ----------
     X : (n x d) matrix
-        Input data, where each row corresponds to a single instance.
+      Input data, where each row corresponds to a single instance.
 
     y : (n) array-like
-        Data labels.
+      Data labels.
 
     random_state : Not used
       .. deprecated:: 0.5.0
@@ -386,13 +400,13 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
         instead (when instantiating a new `ITML_Supervised` object).
 
     bounds : array-like of two numbers
-        Bounds on similarity, aside slack variables, s.t.
-        ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
-        and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
-        dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
-        If not provided at initialization, bounds_[0] and bounds_[1] will be
-        set to the 5th and 95th percentile of the pairwise distances among all
-        points in the training data `X`.
+      Bounds on similarity, aside slack variables, s.t.
+      ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
+      and ``b``, and ``d(c, d) > bounds_[1]`` for all given pairs of
+      dissimilar points ``c`` and ``d``, with ``d`` the learned distance.
+      If not provided at initialization, bounds_[0] and bounds_[1] will be
+      set to the 5th and 95th percentile of the pairwise distances among all
+      points in the training data `X`.
     """
     # TODO: remove these in v0.6.0
     if self.num_labeled != 'deprecated':

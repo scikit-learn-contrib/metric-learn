@@ -483,7 +483,7 @@ is the off-diagonal L1 norm.
        L1-penalized log-determinant regularization <https://icml.cc/Conferences/2009/papers/46.pdf>`_.
        ICML 2009.
 
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439945
+    .. [2] Code adapted from https://gist.github.com/kcarnold/5439945
 
 .. _rca:
 
@@ -592,6 +592,114 @@ points, while constrains the sum of distances between dissimilar points:
         -with-side-information.pdf>`_. NIPS 2002
   .. [2] Adapted from Matlab code http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
 
+.. _learning_on_triplets:
+
+Learning on triplets
+====================
+
+Some metric learning algorithms learn on triplets of samples. In this case,
+one should provide the algorithm with `n_samples` triplets of points. The
+semantic of each triplet is that the first point should be closer to the
+second point than to the third one.
+
+Fitting
+-------
+Here is an example for fitting on triplets (see :ref:`fit_ws` for more
+details on the input data format and how to fit, in the general case of
+learning on tuples).
+
+>>> from metric_learn import SCML
+>>> triplets = np.array([[[1.2, 3.2], [2.3, 5.5], [2.1, 0.6]],
+>>>                      [[4.5, 2.3], [2.1, 2.3], [7.3, 3.4]]])
+>>> scml = SCML(random_state=42)
+>>> scml.fit(triplets)
+SCML(beta=1e-5, B=None, max_iter=100000, verbose=False,
+    preprocessor=None, random_state=None)
+
+Or alternatively (using a preprocessor):
+
+>>> X = np.array([[[1.2, 3.2], 
+>>>                [2.3, 5.5],
+>>>                [2.1, 0.6],
+>>>                [4.5, 2.3],
+>>>                [2.1, 2.3],
+>>>                [7.3, 3.4]])
+>>> triplets_indices = np.array([[0, 1, 2], [3, 4, 5]])
+>>> scml = SCML(preprocessor=X, random_state=42)
+>>> scml.fit(triplets_indices)
+SCML(beta=1e-5, B=None, max_iter=100000, verbose=False,
+   preprocessor=array([[1.2, 3.2],
+       [2.3, 5.5],
+       [2.4, 6.7],
+       [2.1, 0.6],
+       [4.5, 2.3],
+       [2.1, 2.3],
+       [0.6, 1.2],
+       [7.3, 3.4]]),
+    random_state=None)
+
+
+Here, we want to learn a metric that, for each of the two
+`triplets`, will make the first point closer to the
+second point than to the third one.
+
+.. _triplets_predicting:
+
+Prediction
+----------
+
+When a triplets learner is fitted, it is also able to predict, for an
+upcoming triplet, whether the first point is closer to the second point 
+than to the third one (+1), or not (-1).
+
+>>> triplets_test = np.array(
+... [[[5.6, 5.3], [2.2, 2.1], [1.2, 3.4]],
+...  [[6.0, 4.2], [4.3, 1.2], [0.1, 7.8]]])
+>>> scml.predict(triplets_test)
+array([-1.,  1.])
+
+.. _triplets_scoring:
+
+Scoring
+-------
+
+Triplet metric learners can also return a `decision_function` for a set of triplets,
+which corresponds to the distance between the first two points minus the distance
+between the first and last points of the triplet (the higher the value, the more
+similar the first point to the second point compared to the last one). This "score"
+can be interpreted as a measure of likeliness of having a +1 prediction for this 
+triplet.
+
+>>> scml.decision_function(triplets_test)
+array([-1.75700306,  4.98982131])
+
+In the above example, for the first triplet in `triplets_test`, the first 
+point is predicted less similar to the second point than to the last point
+(they are further away in the transformed space).
+
+Unlike pairs learners, triplets learners do not allow to give a `y` when fitting: we
+assume that the ordering of points within triplets is such that the training triplets
+are all positive. Therefore, it is not possible to use scikit-learn scoring functions
+(such as 'f1_score') for triplets learners.
+
+However, triplets learners do have a default scoring function, which will
+basically return the accuracy score on a given test set, i.e. the proportion
+of triplets that have the right predicted ordering.
+
+>>> scml.score(triplets_test)
+0.5
+
+.. note::
+   See :ref:`fit_ws` for more details on metric learners functions that are
+   not specific to learning on pairs, like `transform`, `score_pairs`,
+   `get_metric` and `get_mahalanobis_matrix`.
+
+
+
+
+Algorithms
+----------
+
 
 .. _learning_on_quadruplets:
 
@@ -599,7 +707,7 @@ Learning on quadruplets
 =======================
 
 Some metric learning algorithms learn on quadruplets of samples. In this case,
-one should provide the algorithm with `n_samples` quadruplets of points. Th
+one should provide the algorithm with `n_samples` quadruplets of points. The
 semantic of each quadruplet is that the first two points should be closer
 together than the last two points.
 
@@ -666,14 +774,12 @@ array([-1.,  1.])
 Scoring
 -------
 
-Quadruplet metric learners can also
-return a `decision_function` for a set of pairs. This is basically the "score"
-which sign will be taken to find the prediction for the pair, which
-corresponds to the difference between the distance between the two last points,
-and the distance between the two last points of the quadruplet (higher
-score means the two last points are more likely to be more dissimilar than
-the two first points (i.e. more likely to have a +1 prediction since it's
-the right ordering)).
+Quadruplet metric learners can also return a `decision_function` for a set of
+quadruplets, which corresponds to the distance between the first pair of points minus 
+the distance between the second pair of points of the triplet (the higher the value,
+the more similar the first pair is than the last pair). 
+This "score" can be interpreted as a measure of likeliness of having a +1 prediction 
+for this quadruplet.
 
 >>> lsml.decision_function(quadruplets_test)
 array([-1.75700306,  4.98982131])
@@ -682,17 +788,10 @@ In the above example, for the first quadruplet in `quadruplets_test`, the
 two first points are predicted less similar than the two last points (they
 are further away in the transformed space).
 
-Unlike for pairs learners, quadruplets learners don't allow to give a `y`
-when fitting, which does not allow to use scikit-learn scoring functions
-like:
-
->>> from sklearn.model_selection import cross_val_score
->>> cross_val_score(lsml, quadruplets, scoring='f1_score')  # this won't work
-
-(This is actually intentional, for more details
-about that, see
-`this comment <https://github.com/scikit-learn-contrib/metric-learn/pull/168#pullrequestreview-203730742>`_
-on github.)
+Like triplet learners, quadruplets learners do not allow to give a `y` when fitting: we
+assume that the ordering of points within triplets is such that the training triplets
+are all positive. Therefore, it is not possible to use scikit-learn scoring functions
+(such as 'f1_score') for triplets learners.
 
 However, quadruplets learners do have a default scoring function, which will
 basically return the accuracy score on a given test set, i.e. the proportion
@@ -794,6 +893,6 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
        `Metric Learning from Relative Comparisons by Minimizing Squared
        Residual <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012
 
-    .. [2] Adapted from https://gist.github.com/kcarnold/5439917
+    .. [2] Code adapted from https://gist.github.com/kcarnold/5439917
 
 

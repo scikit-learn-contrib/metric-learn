@@ -27,27 +27,32 @@ class LFDA(MahalanobisMixin, TransformerMixin):
   Parameters
   ----------
   n_components : int or None, optional (default=None)
-      Dimensionality of reduced space (if None, defaults to dimension of X).
+    Dimensionality of reduced space (if None, defaults to dimension of X).
 
   num_dims : Not used
+    .. deprecated:: 0.5.0
+      `num_dims` was deprecated in version 0.5.0 and will
+      be removed in 0.6.0. Use `n_components` instead.
 
-      .. deprecated:: 0.5.0
-        `num_dims` was deprecated in version 0.5.0 and will
-        be removed in 0.6.0. Use `n_components` instead.
+  k : int, optional (default=None)
+    Number of nearest neighbors used in local scaling method. If None,
+    defaults to min(7, n_features - 1).
 
-  k : int, optional
-      Number of nearest neighbors used in local scaling method.
-      Defaults to min(7, n_components - 1).
+  embedding_type : str, optional (default: 'weighted')
+    Type of metric in the embedding space.
 
-  embedding_type : str, optional
-      Type of metric in the embedding space (default: 'weighted')
-        'weighted'        - weighted eigenvectors
-        'orthonormalized' - orthonormalized
-        'plain'           - raw eigenvectors
+    'weighted'
+      weighted eigenvectors
+
+    'orthonormalized'
+      orthonormalized
+
+    'plain'
+      raw eigenvectors
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get tuples from indices. If array-like,
-      tuples will be formed like this: X[indices].
+    The preprocessor to call to get tuples from indices. If array-like,
+    tuples will be formed like this: X[indices].
 
   Attributes
   ----------
@@ -68,13 +73,14 @@ class LFDA(MahalanobisMixin, TransformerMixin):
 
   References
   ------------------
-  .. [1] `Dimensionality Reduction of Multimodal Labeled Data by Local Fisher
-         Discriminant Analysis <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA.pdf>`_
-         Masashi Sugiyama.
+  .. [1] Masashi Sugiyama. `Dimensionality Reduction of Multimodal Labeled
+         Data by Local Fisher Discriminant Analysis
+         <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA.pdf>`_. JMLR 2007.
 
-  .. [2] `Local Fisher Discriminant Analysis on Beer Style Clustering
-         <https://gastrograph.com/resources/whitepapers/local-fisher\
--discriminant-analysis-on-beer-style-clustering.html#>`_ Yuan Tang.
+  .. [2] Yuan Tang. `Local Fisher Discriminant Analysis on Beer Style
+        Clustering
+        <https://gastrograph.com/resources/whitepapers/local-fisher\
+        -discriminant-analysis-on-beer-style-clustering.html#>`_.
   '''
 
   def __init__(self, n_components=None, num_dims='deprecated',
