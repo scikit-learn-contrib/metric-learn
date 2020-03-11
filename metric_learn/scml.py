@@ -482,7 +482,7 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     elif self.n_basis < n_class:
       raise ValueError("The number of basis should be greater than the"
                        " number of classes")
-    elif np.issubdtype(self.n_basis, np.integer):
+    elif isinstance(self.n_basis, int):
       n_basis = self.n_basis
     else:
       raise ValueError("n_basis should be an integer, instead it is of type %s"
