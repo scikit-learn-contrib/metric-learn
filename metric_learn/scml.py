@@ -11,15 +11,16 @@ from sklearn.preprocessing import normalize
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import KMeans
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.utils import check_array
+from sklearn.utils import check_array, check_random_state
+import warnings
 
 
 class _BaseSCML_global(MahalanobisMixin):
 
   _tuple_size = 3   # constraints are triplets
 
-  def __init__(self, beta=1e-5, basis=None, n_basis=None, gamma=5e-3,
-               max_iter=100000, output_iter=5000, verbose=False,
+  def __init__(self, beta=1e-5, basis='triplet_diffs', n_basis=None,
+               gamma=5e-3, max_iter=100000, output_iter=5000, verbose=False,
                preprocessor=None, random_state=None):
     self.beta = beta
     self.basis = basis
@@ -32,20 +33,17 @@ class _BaseSCML_global(MahalanobisMixin):
     self.random_state = random_state
     super(_BaseSCML_global, self).__init__(preprocessor)
 
-  def _fit(self, triplets):
+  def _fit(self, triplets, X=None, basis=None, n_basis=None):
     """
     Optimization procedure to find a sparse vector of weights to
     construct the metric from the basis set. This is based on the
     dual averaging method.
     """
 
-    if self.preprocessor is not None:
-      n_features = self.preprocessor.shape[1]
-    else:
-      n_features = self.triplets.shape[1]
+    if X is not None:
+      triplets = X[triplets]
 
-    self._initialize_basis(n_features)
-
+    # Currently prepare_inputs makes triplets contain points and not indices
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
 
     # TODO:
@@ -53,18 +51,22 @@ class _BaseSCML_global(MahalanobisMixin):
     # compliant with the current handling of inputs it is converted
     # back to indices by the following function. This should be improved
     # in the future.
-    triplets, X = self._to_index_points(triplets)
+    triplets, X = self._to_index_points(triplets, X)
 
-    dist_diff = self._compute_dist_diff(triplets, X)
+    if basis is None:
+      basis, n_basis = self._initialize_basis(triplets, X)
+
+    dist_diff = self._compute_dist_diff(triplets, X, basis)
 
     sizeT = triplets.shape[0]
 
-    w = np.zeros((1, self.n_basis))
-    avg_grad_w = np.zeros((1, self.n_basis))
+    w = np.zeros((1, n_basis))
+    avg_grad_w = np.zeros((1, n_basis))
 
     best_obj = np.inf
 
-    rand_int = np.random.randint(low=0, high=sizeT, size=self.max_iter)
+    rng = check_random_state(self.random_state)
+    rand_int = rng.randint(low=0, high=sizeT, size=self.max_iter)
     for iter in range(self.max_iter):
       if (iter % self.output_iter == 0):
         # regularization part of obj function
@@ -111,17 +113,17 @@ class _BaseSCML_global(MahalanobisMixin):
       print("max iteration reached.")
 
     # return L matrix yielded from best weights
-    self.components_ = self._get_components(best_w)
+    self.components_ = self._get_components(best_w, basis)
 
     return self
 
-  def _compute_dist_diff(self, T, X):
+  def _compute_dist_diff(self, T, X, basis):
     """
     Helper function to compute the distance difference of every triplet in the
     space yielded by the basis set.
     """
     # Transformation of data by the basis set
-    XB = np.matmul(X, self.basis.T)
+    XB = np.matmul(X, basis.T)
 
     lenT = len(T)
     # get all positive and negative pairs with lowest index first
@@ -138,7 +140,7 @@ class _BaseSCML_global(MahalanobisMixin):
     # pairs
     return dist[indices[:lenT]]-dist[indices[lenT:]]
 
-  def _get_components(self, w):
+  def _get_components(self, w, basis):
     """
     get components matrix (L) from computed mahalanobis matrix
     """
@@ -146,7 +148,7 @@ class _BaseSCML_global(MahalanobisMixin):
     # get rid of inactive bases
     active_idx, = w > 0
     w = w[..., active_idx]
-    basis = self.basis[active_idx, :]
+    basis = basis[active_idx, :]
 
     K, d = basis.shape
 
@@ -156,29 +158,93 @@ class _BaseSCML_global(MahalanobisMixin):
     else:   # if metric is full rank
       return np.linalg.cholesky(np.matmul(basis.T, w.T*basis, order='F')).T
 
-  def _to_index_points(self, triplets):
+  def _to_index_points(self, triplets, X=None):
     shape = triplets.shape
-    X, triplets = np.unique(np.vstack(triplets), return_inverse=True, axis=0)
-    triplets = triplets.reshape(shape[:2])
-    return triplets, X
+    if len(shape) == 3:
+      X, triplets = np.unique(np.vstack(triplets), return_inverse=True, axis=0)
+      triplets = triplets.reshape(shape[:2])
+      return triplets, X
+    elif(len(shape) == 2 and X is not None):
+      return triplets, X
+    elif(self.preprocessor is not None):
+      return triplets, self.preprocessor
+    else:
+      raise ValueError('A preprocessor is needed when triplets are indices')
 
-  def _initialize_basis(self, n_features):
+  def _initialize_basis(self, triplets, X):
+    """ TODO: complete function description
+    """
+
+    if self.preprocessor is not None:
+      n_features = self.preprocessor.shape[1]
+    else:
+      n_features = triplets.shape[1]
+
     # TODO:
     # Add other options passed as string
-    authorized_basis = []
+    authorized_basis = ['triplet_diffs']
     if isinstance(self.basis, np.ndarray):
-      self.basis = check_array(self.basis)
-      self.n_basis = self.basis.shape[0]
-      if self.basis.shape[1] != n_features:
+      # TODO: should copy?
+      basis = check_array(self.basis, copy=True)
+      n_basis = basis.shape[0]
+      if basis.shape[1] != n_features:
         raise ValueError('The input dimensionality ({}) of the given '
                          'linear transformation `init` must match the '
                          'dimensionality of the given inputs `X` ({}).'
-                         .format(self.basis.shape[1], n_features))
+                         .format(basis.shape[1], n_features))
     elif self.basis not in authorized_basis:
       raise ValueError(
           "`basis` must be '{}' "
           "or a numpy array of shape (n_basis, n_features)."
           .format("', '".join(authorized_basis)))
+    if self.basis is authorized_basis[0]:
+      basis, n_basis = self._generate_bases_dist_diff(triplets, X)
+
+    return basis, n_basis
+
+  def _generate_bases_dist_diff(self, triplets, X):
+    """ Bases are generated from triplets as differences of positive or
+    negative pairs
+    TODO: complete function description
+    """
+
+    # TODO: Have a proportion of drawn pos and neg pairs?
+
+    # get all positive and negative pairs with lowest index first
+    # np.array (2*lenT,2)
+    T_pairs_sorted = np.sort(np.vstack((triplets[:, [0, 1]],
+                                        triplets[:, [0, 2]])),
+                             kind='stable')
+    # calculate all unique pairs and their indices
+    uniqPairs = np.unique(T_pairs_sorted, axis=0)
+
+    if self.n_basis is None:
+      n_basis = uniqPairs.shape[0]
+
+    elif self.n_basis > uniqPairs.shape[0]:
+      print("n_basis too big")
+      n_basis = uniqPairs.shape[0]
+
+    else:
+      n_basis = self.n_basis
+
+    if len(triplets.shape) == 3:
+      pass
+    elif X is not None:
+      uniqPairs = X[uniqPairs]
+    else:
+      raise ValueError('The processor must be set if indices are used for the'
+                       'triplets construction')
+
+    rng = check_random_state(self.random_state)
+
+    # Select n_basis
+    selected_pairs = uniqPairs[rng.choice(uniqPairs.shape[0],
+                               size=n_basis, replace=False), :, :]
+
+    basis = selected_pairs[:, 0]-selected_pairs[:, 1]
+
+    return basis, n_basis
 
 
 class SCML_global(_BaseSCML_global, _TripletsClassifierMixin):
@@ -268,6 +334,7 @@ class SCML_global(_BaseSCML_global, _TripletsClassifierMixin):
     self : object
       Returns the instance.
     """
+
     return self._fit(triplets)
 
 
@@ -342,7 +409,7 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     that describes the supervised version of weakly supervised estimators.
   """
 
-  def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis=None,
+  def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis='LDA',
                n_basis=None, gamma=5e-3, max_iter=100000, output_iter=5000,
                verbose=False, preprocessor=None, random_state=None):
     self.k_genuine = k_genuine
@@ -369,16 +436,17 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
       Returns the instance.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
-    self.preprocessor = X
 
+    # TODO: this should be replaced by a _initialize_bases_supervised
+    # for future adding of other approaches of basis generation
     if(self.basis == "LDA"):
-      self._generate_bases_LDA(X, y)
+      basis, n_basis = self._generate_bases_LDA(X, y)
 
     constraints = Constraints(y)
     triplets = constraints.generate_knntriplets(X, self.k_genuine,
                                                 self.k_impostor)
 
-    return self._fit(triplets)
+    return self._fit(triplets, X, basis, n_basis)
 
   def _generate_bases_LDA(self, X, y):
     """
@@ -392,21 +460,33 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     labels, class_count = np.unique(y, return_counts=True)
     n_class = len(labels)
 
-    # TODO: maybe a default value for this case?
-    if(self.n_basis is None):
-      raise ValueError('The number of basis given by n_basis must be set')
-
-    # n_basis must be greater or equal to n_class
-    if(self.n_basis < n_class):
-        ValueError("The number of basis should be greater than the number of "
-                   "classes")
-
-    n_features = np.size(X, 1)
+    n_features = X.shape[1]
     # Number of basis yielded from each LDA
     num_eig = min(n_class-1, n_features)
+
+    if self.n_basis is None:
+      n_basis = min(20*n_features, X.shape[0]*2*num_eig)
+      warnings.warn('The number of basis will be set to n_basis= %d' % n_basis)
+
+    # n_basis must be greater or equal to n_class
+    elif self.n_basis < n_class:
+      raise ValueError("The number of basis should be greater than the"
+                       " number of classes")
+    elif np.issubdtype(self.n_basis, np.integer):
+      n_basis = self.n_basis
+    else:
+      raise ValueError("n_basis should be an integer, instead it is of type %s"
+                       % type(self.n_basis))
+
     # Number of clusters needed for 2 scales given the number of basis
     # yielded by every LDA
-    n_clusters = int(np.ceil(self.n_basis/(2 * num_eig)))
+    n_clusters = int(np.ceil(n_basis/(2 * num_eig)))
+
+    if(n_clusters > X.shape[0]):
+      raise ValueError("There are not enough samples to yield the required"
+                       " amount of clusters for the selected number of basis,"
+                       " the current maximum is n_basis = %d" %
+                       X.shape[0]*2*num_eig)
 
     # TODO: maybe give acces to Kmeans jobs for faster computation?
     kmeans = KMeans(n_clusters=n_clusters, random_state=self.random_state,
@@ -426,8 +506,11 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
 
     idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
 
+    # TODO: It may be better to precompute this similarly to how it is done
+    # with the triplets generator
     start = 0
     finish = 0
+
     neigh = NearestNeighbors()
 
     for c in range(n_class):
@@ -443,11 +526,11 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
         start = finish
 
     # Compute basis for every cluster in first scale
-    self.basis = np.zeros((self.n_basis, n_features))
+    basis = np.zeros((n_basis, n_features))
     lda = LinearDiscriminantAnalysis()
     for i in range(n_clusters):
         lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
-        self.basis[num_eig*i: num_eig*(i+1), :] = normalize(lda.scalings_.T)
+        basis[num_eig*i: num_eig*(i+1), :] = normalize(lda.scalings_.T)
 
     # second scale
     k = 20
@@ -459,6 +542,8 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
 
     idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
 
+    # TODO: It may be better to precompute this similarly to how it is done
+    # with the triplets generator
     start = 0
     finish = 0
 
@@ -476,17 +561,17 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
 
     # Compute basis for every cluster in second scale
     finish = num_eig * n_clusters
-    lda = LinearDiscriminantAnalysis()
+
     for i in range(n_clusters):
         start = finish
         finish += num_eig
 
         # handle tail, as n_basis != n_clusters*2*n_eig
-        if (finish > self.n_basis):
-          finish = self.n_basis
+        if (finish > n_basis):
+          finish = n_basis
 
         lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
 
-        self.basis[start:finish, :] = normalize(lda.scalings_.T[:finish-start])
+        basis[start:finish, :] = normalize(lda.scalings_.T[:finish-start])
 
-    return
+    return basis, n_basis
