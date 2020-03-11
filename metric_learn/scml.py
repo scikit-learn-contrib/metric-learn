@@ -14,6 +14,16 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.utils import check_array, check_random_state
 import warnings
 
+# hack around lack of where in older numpy versions
+try:
+  np.sum([[0, 1], [1, 1]], where=[False, True], axis=1)
+except TypeError:
+  def sum_were(X, where):
+    return np.sum(X, where=where)
+else:
+  def sum_where(X, where):
+    return np.sum(X[where])
+
 
 class _BaseSCML_global(MahalanobisMixin):
 
@@ -74,12 +84,12 @@ class _BaseSCML_global(MahalanobisMixin):
 
       # Every triplet distance difference in the space given by L
       # plus a slack of one
-        slack_val = 1 + np.matmul(dist_diff, w.T, order='F')
+        slack_val = 1 + np.matmul(dist_diff, w.T)
       # Mask of places with positive slack
         slack_mask = slack_val > 0
 
         # loss function of learning task part of obj function
-        obj2 = np.sum(slack_val, where=slack_mask)/sizeT
+        obj2 = sum_where(slack_val, slack_mask)/sizeT
 
         obj = obj1 + obj2
         if(self.verbose):
@@ -156,7 +166,7 @@ class _BaseSCML_global(MahalanobisMixin):
       return np.sqrt(w.T)*basis  # equivalent to np.diag(np.sqrt(w)).dot(B)
 
     else:   # if metric is full rank
-      return np.linalg.cholesky(np.matmul(basis.T, w.T*basis, order='F')).T
+      return np.linalg.cholesky(np.matmul(basis.T, w.T*basis)).T
 
   def _to_index_points(self, triplets, X=None):
     shape = triplets.shape
