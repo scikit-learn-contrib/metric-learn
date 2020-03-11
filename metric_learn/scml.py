@@ -18,11 +18,11 @@ import warnings
 try:
   np.sum([[0, 1], [1, 1]], where=[False, True], axis=1)
 except TypeError:
-  def sum_were(X, where):
-    return np.sum(X, where=where)
-else:
   def sum_where(X, where):
     return np.sum(X[where])
+else:
+  def sum_where(X, where):
+    return np.sum(X, where=where)
 
 
 class _BaseSCML_global(MahalanobisMixin):
