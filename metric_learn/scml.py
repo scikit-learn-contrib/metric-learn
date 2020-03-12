@@ -170,16 +170,9 @@ class _BaseSCML_global(MahalanobisMixin):
 
   def _to_index_points(self, triplets, X=None):
     shape = triplets.shape
-    if len(shape) == 3:
-      X, triplets = np.unique(np.vstack(triplets), return_inverse=True, axis=0)
-      triplets = triplets.reshape(shape[:2])
-      return triplets, X
-    elif(len(shape) == 2 and X is not None):
-      return triplets, X
-    elif(self.preprocessor is not None):
-      return triplets, self.preprocessor
-    else:
-      raise ValueError('A preprocessor is needed when triplets are indices')
+    X, triplets = np.unique(np.vstack(triplets), return_inverse=True, axis=0)
+    triplets = triplets.reshape(shape[:2])
+    return triplets, X
 
   def _initialize_basis(self, triplets, X):
     """ TODO: complete function description
@@ -232,19 +225,15 @@ class _BaseSCML_global(MahalanobisMixin):
       n_basis = uniqPairs.shape[0]
 
     elif self.n_basis > uniqPairs.shape[0]:
-      print("n_basis too big")
       n_basis = uniqPairs.shape[0]
+      warnings.warn("The selected number of basis is greater than the number "
+                    "of points, only n_basis = %d will be generated" %
+                    n_basis)
 
     else:
       n_basis = self.n_basis
 
-    if len(triplets.shape) == 3:
-      pass
-    elif X is not None:
-      uniqPairs = X[uniqPairs]
-    else:
-      raise ValueError('The processor must be set if indices are used for the'
-                       'triplets construction')
+    uniqPairs = X[uniqPairs]
 
     rng = check_random_state(self.random_state)
 
@@ -447,16 +436,37 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
 
-    # TODO: this should be replaced by a _initialize_bases_supervised
-    # for future adding of other approaches of basis generation
-    if(self.basis == "LDA"):
-      basis, n_basis = self._generate_bases_LDA(X, y)
+    basis, n_basis = self._initialize_basis_supervised(X, y)
 
     constraints = Constraints(y)
     triplets = constraints.generate_knntriplets(X, self.k_genuine,
                                                 self.k_impostor)
 
     return self._fit(triplets, X, basis, n_basis)
+
+  def _initialize_basis_supervised(self, X, y):
+    """ TODO: complete function description
+    """
+
+    # TODO:
+    # Add other options passed as string
+    authorized_basis = ['triplet_diffs']
+    supervised_basis = ['LDA']
+    authorized_basis += supervised_basis
+
+    if not(isinstance(self.basis, np.ndarray)) \
+       and self.basis not in authorized_basis:
+      raise ValueError(
+          "`basis` must be '{}' "
+          "or a numpy array of shape (n_basis, n_features)."
+          .format("', '".join(authorized_basis)))
+
+    if self.basis is supervised_basis[0]:
+      basis, n_basis = self._generate_bases_LDA(X, y)
+    else:
+      basis, n_basis = None, None
+
+    return basis, n_basis
 
   def _generate_bases_LDA(self, X, y):
     """
