@@ -222,9 +222,17 @@ class _BaseSCML_global(MahalanobisMixin):
     uniqPairs = np.unique(T_pairs_sorted, axis=0)
 
     if self.n_basis is None:
+      # TODO: Get a good default n_basis directive
       n_basis = uniqPairs.shape[0]
+      warnings.warn('The number of basis will be set to n_basis= %d' % n_basis)
 
-    elif self.n_basis > uniqPairs.shape[0]:
+    elif isinstance(self.n_basis, int):
+      n_basis = self.n_basis
+    else:
+      raise ValueError("n_basis should be an integer, instead it is of type %s"
+                       % type(self.n_basis))
+
+    if n_basis > uniqPairs.shape[0]:
       n_basis = uniqPairs.shape[0]
       warnings.warn("The selected number of basis is greater than the number "
                     "of points, only n_basis = %d will be generated" %
@@ -452,7 +460,7 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     # Add other options passed as string
     authorized_basis = ['triplet_diffs']
     supervised_basis = ['LDA']
-    authorized_basis += supervised_basis
+    authorized_basis = supervised_basis + authorized_basis
 
     if not(isinstance(self.basis, np.ndarray)) \
        and self.basis not in authorized_basis:
@@ -485,18 +493,22 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     num_eig = min(n_class-1, n_features)
 
     if self.n_basis is None:
+      # TODO: Get a good default n_basis directive
       n_basis = min(20*n_features, X.shape[0]*2*num_eig)
       warnings.warn('The number of basis will be set to n_basis= %d' % n_basis)
 
-    # n_basis must be greater or equal to n_class
-    elif self.n_basis < n_class:
-      raise ValueError("The number of basis should be greater than the"
-                       " number of classes")
     elif isinstance(self.n_basis, int):
       n_basis = self.n_basis
     else:
       raise ValueError("n_basis should be an integer, instead it is of type %s"
                        % type(self.n_basis))
+
+    if n_basis <= n_class:
+      raise ValueError("The number of basis should be greater than the"
+                       " number of classes")
+    elif n_basis >= X.shape[0]*2*num_eig:
+      raise ValueError("The selected number of basis needs a greater number of"
+                       " clusters than the number of available samples")
 
     # Number of clusters needed for 2 scales given the number of basis
     # yielded by every LDA
