@@ -178,6 +178,25 @@ class TestSCML(MetricTestCase):
       scml.fit(X, y)
     assert msg == raised_error.value.args[0]
 
+  def test_array_basis_supervised(self):
+    """ Test that the proper error is raised when the shape of the input basis
+    array is not consistent with the input
+    """
+    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
+    y = np.array([1, 0, 1, 0])
+
+    basis = np.eye(3)
+
+    scml = SCML_global_Supervised(n_basis=3, basis=basis, k_genuine=1,
+                                  k_impostor=1)
+
+    msg = ('The input dimensionality ({}) of the given linear transformation '
+           '`init` must match the dimensionality of the given inputs `X` ({}).'
+           .format(basis.shape[1], X.shape[1]))
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(X, y)
+    assert msg == raised_error.value.args[0]
+
 
 class TestLSML(MetricTestCase):
   def test_iris(self):

@@ -177,11 +177,7 @@ class _BaseSCML_global(MahalanobisMixin):
   def _initialize_basis(self, triplets, X):
     """ TODO: complete function description
     """
-
-    if self.preprocessor is not None:
-      n_features = self.preprocessor.shape[1]
-    else:
-      n_features = triplets.shape[1]
+    n_features = X.shape[1]
 
     # TODO:
     # Add other options passed as string
@@ -510,12 +506,6 @@ class SCML_global_Supervised(_BaseSCML_global, TransformerMixin):
     # Number of clusters needed for 2 scales given the number of basis
     # yielded by every LDA
     n_clusters = int(np.ceil(n_basis/(2 * num_eig)))
-
-    if(n_clusters > X.shape[0]):
-      raise ValueError("There are not enough samples to yield the required"
-                       " amount of clusters for the selected number of basis,"
-                       " the current maximum is n_basis = %d" %
-                       X.shape[0]*2*num_eig)
 
     # TODO: maybe give acces to Kmeans jobs for faster computation?
     kmeans = KMeans(n_clusters=n_clusters, random_state=self.random_state,
