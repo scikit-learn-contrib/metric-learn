@@ -238,9 +238,6 @@ class _BaseSCML_global(MahalanobisMixin):
                     "of points, only n_basis = %d will be generated" %
                     n_basis)
 
-    else:
-      n_basis = self.n_basis
-
     uniqPairs = X[uniqPairs]
 
     rng = check_random_state(self.random_state)
