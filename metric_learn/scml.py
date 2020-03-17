@@ -43,15 +43,12 @@ class _BaseSCML(MahalanobisMixin):
     self.random_state = random_state
     super(_BaseSCML, self).__init__(preprocessor)
 
-  def _fit(self, triplets, X=None, basis=None, n_basis=None):
+  def _fit(self, triplets, basis=None, n_basis=None):
     """
     Optimization procedure to find a sparse vector of weights to
     construct the metric from the basis set. This is based on the
     dual averaging method.
     """
-
-    if X is not None:
-      triplets = X[triplets]
 
     # Currently prepare_inputs makes triplets contain points and not indices
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
@@ -475,7 +472,9 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     triplets = constraints.generate_knntriplets(X, self.k_genuine,
                                                 self.k_impostor)
 
-    return self._fit(triplets, X, basis, n_basis)
+    triplets = X[triplets]
+
+    return self._fit(triplets, basis, n_basis)
 
   def _initialize_basis_supervised(self, X, y):
     """ TODO: complete function description
