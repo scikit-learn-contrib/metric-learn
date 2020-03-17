@@ -16,7 +16,7 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
-                          SCML_global, SCML_global_Supervised, Constraints)
+                          SCML, SCML_Supervised, Constraints)
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
                                       _PairsClassifierMixin,
                                       _TripletsClassifierMixin,
@@ -117,7 +117,7 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
                                  quadruplets_learners]))
 
-triplets_learners = [(SCML_global(), build_triplets)]
+triplets_learners = [(SCML(), build_triplets)]
 ids_triplets_learners = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
                               triplets_learners]))
@@ -139,7 +139,7 @@ classifiers = [(Covariance(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
                (RCA_Supervised(num_chunks=5), build_classification),
                (SDML_Supervised(prior='identity', balance_param=1e-5),
-               build_classification), (SCML_global_Supervised(),
+               build_classification), (SCML_Supervised(),
                                        build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
