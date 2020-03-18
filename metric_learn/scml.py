@@ -556,24 +556,21 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
 
     idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
 
-    # TODO: It may be better to precompute this similarly to how it is done
-    # with the triplets generator
-    start = 0
-    finish = 0
+    start_finish_indices = np.hstack((0, k_class)).cumsum()
 
     neigh = NearestNeighbors()
 
     for c in range(n_class):
         sel_c = np.where(y == labels[c])
         kc = k_class[c]
+
         # get k_class same class neighbours
         neigh.fit(X=X[sel_c])
 
-        finish += kc
+        start, finish = start_finish_indices[c:c+2]
         idx_set[:, start:finish] = np.take(sel_c, neigh.kneighbors(X=cX,
                                            n_neighbors=kc,
                                            return_distance=False))
-        start = finish
 
     # Compute basis for every cluster in first scale
     basis = np.zeros((n_basis, n_features))
@@ -592,36 +589,35 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
 
     idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
 
-    # TODO: It may be better to precompute this similarly to how it is done
-    # with the triplets generator
-    start = 0
-    finish = 0
+    start_finish_indices = np.hstack((0, k_class)).cumsum()
 
     for c in range(n_class):
-        sel_c = np.where(y == labels[c])
-        kc = k_class[c]
+      sel_c = np.where(y == labels[c])
+      kc = k_class[c]
 
-        # get k_class genuine neighbours
-        neigh.fit(X=X[sel_c])
-        finish += kc
-        idx_set[:, start:finish] = np.take(sel_c, neigh.kneighbors(X=cX,
-                                           n_neighbors=kc,
-                                           return_distance=False))
-        start = finish
+      # get k_class genuine neighbours
+      neigh.fit(X=X[sel_c])
+
+      start, finish = start_finish_indices[c:c+2]
+      idx_set[:, start:finish] = np.take(sel_c, neigh.kneighbors(X=cX,
+                                         n_neighbors=kc,
+                                         return_distance=False))
 
     # Compute basis for every cluster in second scale
     finish = num_eig * n_clusters
 
+    start_finish_indices = np.arange(num_eig * n_clusters, n_basis, num_eig)
+    start_finish_indices = np.append(start_finish_indices, n_basis)
+
     for i in range(n_clusters):
-        start = finish
-        finish += num_eig
+      try:
+        start, finish = start_finish_indices[i:i+2]
+      except ValueError:
+        # No more clusters to be yielded
+        break
 
-        # handle tail, as n_basis != n_clusters*2*n_eig
-        if finish > n_basis:
-          finish = n_basis
+      lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
 
-        lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
-
-        basis[start:finish, :] = normalize(lda.scalings_.T[:finish-start])
+      basis[start:finish, :] = normalize(lda.scalings_.T[:finish-start])
 
     return basis, n_basis
