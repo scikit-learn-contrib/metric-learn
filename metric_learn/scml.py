@@ -124,7 +124,7 @@ class _BaseSCML(MahalanobisMixin):
 
     return self
 
-  def _compute_dist_diff(self, T, X, basis):
+  def _compute_dist_diff(self, triplets, X, basis):
     """
     Helper function to compute the distance difference of every triplet in the
     space yielded by the basis set.
@@ -132,24 +132,25 @@ class _BaseSCML(MahalanobisMixin):
     # Transformation of data by the basis set
     XB = np.matmul(X, basis.T)
 
-    lenT = T.shape[0]
+    n_triplets = triplets.shape[0]
     # get all positive and negative pairs with lowest index first
-    # np.array (2*lenT,2)
-    T_pairs_sorted = np.sort(np.vstack((T[:, [0, 1]], T[:, [0, 2]])),
-                             kind='stable')
+    # np.array (2*n_triplets,2)
+    triplets_pairs_sorted = np.sort(np.vstack((triplets[:, [0, 1]],
+                                               triplets[:, [0, 2]])),
+                                    kind='stable')
     # calculate all unique pairs and their indices
-    uniqPairs, indices = np.unique(T_pairs_sorted, return_inverse=True,
+    uniqPairs, indices = np.unique(triplets_pairs_sorted, return_inverse=True,
                                    axis=0)
     # calculate L2 distance acording to bases only for unique pairs
     dist = np.square(XB[uniqPairs[:, 0], :] - XB[uniqPairs[:, 1], :])
 
     # return the diference of distances between all positive and negative
     # pairs
-    return dist[indices[:lenT]] - dist[indices[lenT:]]
+    return dist[indices[:n_triplets]] - dist[indices[n_triplets:]]
 
   def _components_from_basis_weights(self, basis, w):
     """
-    get components matrix (L) from computed mahalanobis matrix
+    Get components matrix (L) from computed mahalanobis matrix.
     """
 
     # get rid of inactive bases
@@ -160,7 +161,7 @@ class _BaseSCML(MahalanobisMixin):
     n_basis, n_features = basis.shape
 
     if n_basis < n_features:  # if metric is low-rank
-      warnings.warn("The number of effective basis is less than the numbert of"
+      warnings.warn("The number of effective basis is less than the number of"
                     " features of the input, in consequence the learned "
                     "transformation reduces the dimension to %d." % n_basis)
       return np.sqrt(w.T)*basis  # equivalent to np.diag(np.sqrt(w)).dot(basis)
