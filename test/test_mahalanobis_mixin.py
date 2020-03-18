@@ -292,24 +292,23 @@ def test_components_is_2D(estimator, build_dataset):
   trunc_data = input_data[..., :1]
   # we drop duplicates that might have been formed, i.e. of the form
   # aabc or abcc or aabb for quadruplets, and aa for pairs.
+
   if isinstance(estimator, _QuadrupletsClassifierMixin):
-    for slice_idx in [slice(0, 2), slice(2, 4)]:
-      pairs = trunc_data[:, slice_idx, :]
-      diffs = pairs[:, 1, :] - pairs[:, 0, :]
-      to_keep = np.where(np.abs(diffs.ravel()) > 1e-9)
-      trunc_data = trunc_data[to_keep]
-      labels = labels[to_keep]
-  if isinstance(estimator, _TripletsClassifierMixin):
-    for slice_idx in [[0, 1], [0, 2]]:
-      pairs = trunc_data[:, slice_idx, :]
-      diffs = pairs[:, 1, :] - pairs[:, 0, :]
-      to_keep = np.abs(diffs.ravel()) > 1e-9
-      trunc_data = trunc_data[to_keep]
+    pairs_idx = [[0, 1], [2, 3]]
+  elif isinstance(estimator, _TripletsClassifierMixin):
+    pairs_idx = [[0, 1], [0, 2]]
   elif isinstance(estimator, _PairsClassifierMixin):
-    diffs = trunc_data[:, 1, :] - trunc_data[:, 0, :]
-    to_keep = np.where(np.abs(diffs.ravel()) > 1e-9)
+    pairs_idx = [[0, 1]]
+  else:
+    pairs_idx = []
+
+  for pair_idx in pairs_idx:
+    pairs = trunc_data[:, pair_idx, :]
+    diffs = pairs[:, 1, :] - pairs[:, 0, :]
+    to_keep = np.abs(diffs.ravel()) > 1e-9
     trunc_data = trunc_data[to_keep]
     labels = labels[to_keep]
+
   model.fit(*remove_y(estimator, trunc_data, labels))
   assert model.components_.shape == (1, 1)  # the components must be 2D
 
