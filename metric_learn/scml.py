@@ -201,47 +201,85 @@ class _BaseSCML(MahalanobisMixin):
     return basis, n_basis
 
   def _generate_bases_dist_diff(self, triplets, X):
-    """ Bases are generated from triplets as differences of positive or
-    negative pairs
-    TODO: complete function description
+    """ Constructs the basis set from the differences of positive and negative
+    pairs from the triplets constraints.
+
+    The basis set is constructed iteratively by taking n_features positive and
+    n_features negative pairs differences, then adding and substracting
+    respectively all the outerproducts, and finally adding the eigenvectors
+    of this matrix with positive eigenvalue.
     """
-
-    # TODO: Have a proportion of drawn pos and neg pairs?
-
-    # get all positive and negative pairs with lowest index first
-    # np.array (2*lenT,2)
-    T_pairs_sorted = np.sort(np.vstack((triplets[:, [0, 1]],
-                                        triplets[:, [0, 2]])),
-                             kind='stable')
-    # calculate all unique pairs and their indices
-    uniqPairs = np.unique(T_pairs_sorted, axis=0)
+    n_features = X.shape[1]
+    n_triplets = triplets.shape[0]
 
     if self.n_basis is None:
       # TODO: Get a good default n_basis directive
-      n_basis = uniqPairs.shape[0]
-      warnings.warn('The number of basis will be set to n_basis= %d' % n_basis)
-
+      n_basis = int(n_triplets/10)
+      warnings.warn('As no value for `n_basis` was selected, the number of '
+                    'basis will be set to n_basis= %d' % n_basis)
     elif isinstance(self.n_basis, int):
       n_basis = self.n_basis
     else:
       raise ValueError("n_basis should be an integer, instead it is of type %s"
                        % type(self.n_basis))
 
-    if n_basis > uniqPairs.shape[0]:
-      n_basis = uniqPairs.shape[0]
+    if n_basis > n_triplets:
+      n_basis = n_triplets
       warnings.warn("The selected number of basis is greater than the number "
                     "of points, only n_basis = %d will be generated" %
                     n_basis)
 
-    uniqPairs = X[uniqPairs]
+    basis = np.zeros((n_basis, n_features))
+
+    # get all positive and negative pairs with lowest index first
+    # np.array (2*n_triplets,2)
+    triplets_pairs_sorted = np.sort(np.vstack((triplets[:, [0, 1]],
+                                               triplets[:, [0, 2]])),
+                                    kind='stable')
+    # calculate all unique pairs and their indices
+    uniqPairs, indices = np.unique(triplets_pairs_sorted, return_inverse=True,
+                                   axis=0)
+    # calculate L2 distance according to bases only for unique pairs
+    diff = X[uniqPairs[:, 0], :] - X[uniqPairs[:, 1], :]
+
+    diff_pos = diff[indices[:n_triplets], :]
+    diff_neg = diff[indices[n_triplets:], :]
 
     rng = check_random_state(self.random_state)
 
-    # Select n_basis
-    selected_pairs = uniqPairs[rng.choice(uniqPairs.shape[0],
-                               size=n_basis, replace=False), :, :]
+    start = 0
+    finish = 0
 
-    basis = selected_pairs[:, 0]-selected_pairs[:, 1]
+    while(finish != n_basis):
+
+      # select n_features positive differences
+      d_pos = diff_pos[rng.choice(n_triplets,
+                                  size=n_features, replace=False),:]
+
+      # select n_features negative differences
+      d_neg = diff_neg[rng.choice(n_triplets,
+                                  size=n_features, replace=False),:]
+
+      # Yield matrix
+      diff_sum = d_pos.T.dot(d_pos) - d_neg.T.dot(d_neg)
+
+      # Calculate eigenvalue and eigenvectors
+      w, v = np.linalg.eigh(diff_sum.T.dot(diff_sum))
+
+      # Add eigenvectors with positive eigenvalue to basis set
+      pos_eig_mask = w > 0
+      start = finish
+      finish += pos_eig_mask.sum()
+
+      try:
+        basis[start:finish, :] = v[pos_eig_mask]
+      except ValueError:
+        # if finish is greater than n_basis
+        basis[start:, :] = v[pos_eig_mask][:n_basis-start]
+        break
+
+      # TODO: maybe add a warning in case there are no added bases, this could
+      # be caused by a bad triplet set. This would cause an infinite loop
 
     return basis, n_basis
 
