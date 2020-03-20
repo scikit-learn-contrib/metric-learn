@@ -28,6 +28,7 @@ else:
 class _BaseSCML(MahalanobisMixin):
 
   _tuple_size = 3   # constraints are triplets
+  _authorized_basis = ['triplet_diffs']
 
   def __init__(self, beta=1e-5, basis='triplet_diffs', n_basis=None,
                gamma=5e-3, max_iter=100000, output_iter=5000, verbose=False,
@@ -154,6 +155,7 @@ class _BaseSCML(MahalanobisMixin):
     """
 
     # get rid of inactive bases
+    # TODO: Maybe have a tolerance over zero?
     active_idx, = w > 0
     w = w[..., active_idx]
     basis = basis[active_idx, :]
@@ -176,13 +178,11 @@ class _BaseSCML(MahalanobisMixin):
     return triplets, X
 
   def _initialize_basis(self, triplets, X):
-    """ TODO: complete function description
+    """ Checks if the basis array is well constructed or constructs it based
+    on one of the available options.
     """
     n_features = X.shape[1]
 
-    # TODO:
-    # Add other options passed as string
-    authorized_basis = ['triplet_diffs']
     if isinstance(self.basis, np.ndarray):
       # TODO: should copy?
       basis = check_array(self.basis, copy=True)
@@ -190,11 +190,11 @@ class _BaseSCML(MahalanobisMixin):
         raise ValueError('The dimensionality ({}) of the provided bases must'
                          ' match the dimensionality of the given inputs `X` '
                          '({}).'.format(basis.shape[1], n_features))
-    elif self.basis not in authorized_basis:
+    elif self.basis not in self._authorized_basis:
       raise ValueError(
           "`basis` must be one of the options '{}' "
           "or an array of shape (n_basis, n_features)."
-          .format("', '".join(authorized_basis)))
+          .format("', '".join(self._authorized_basis)))
     if self.basis == 'triplet_diffs':
       basis, n_basis = self._generate_bases_dist_diff(triplets, X)
 
@@ -476,6 +476,8 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
   :ref:`supervised_version` : The section of the project documentation
     that describes the supervised version of weakly supervised estimators.
   """
+  # Add supervised authorized basis construction options
+  _authorized_basis = _BaseSCML._authorized_basis + ['LDA']
 
   def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis='LDA',
                n_basis=None, gamma=5e-3, max_iter=100000, output_iter=5000,
@@ -516,21 +518,9 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     return self._fit(triplets, basis, n_basis)
 
   def _initialize_basis_supervised(self, X, y):
-    """ TODO: complete function description
+    """ Constructs the basis set following one of the supervised options in
+    case one is selected.
     """
-
-    # TODO:
-    # Add other options passed as string
-    authorized_basis = ['triplet_diffs']
-    supervised_basis = ['LDA']
-    authorized_basis = supervised_basis + authorized_basis
-
-    if not(isinstance(self.basis, np.ndarray)) \
-       and self.basis not in authorized_basis:
-      raise ValueError(
-          "`basis` must be one of the options '{}' "
-          "or an array of shape (n_basis, n_features)."
-          .format("', '".join(authorized_basis)))
 
     if self.basis == 'LDA':
       basis, n_basis = self._generate_bases_LDA(X, y)
@@ -540,9 +530,10 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     return basis, n_basis
 
   def _generate_bases_LDA(self, X, y):
-    """
-    Helper function that computes the n_basis basis set constructed from the
-    LDA of significant local regions in the feature space via clustering, for
+    """ Generates bases for the 'LDA' option.
+
+    The basis set is constructed using Linear Discriminant Analysis of
+    significant local regions in the feature space via clustering, for
     each region center k-nearest neighbors are used to obtain the LDA scalings,
     which correspond to the locally discriminative basis. Currently this is
     done at two scales `k={10,20}` if `n_feature < 50` or else `k={20,50}`.
@@ -558,7 +549,8 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     if self.n_basis is None:
       # TODO: Get a good default n_basis directive
       n_basis = min(20*n_features, X.shape[0]*2*num_eig)
-      warnings.warn('The number of basis will be set to n_basis= %d' % n_basis)
+      warnings.warn('As no value for `n_basis` was selected, the number of '
+                    'basis will be set to n_basis= %d' % n_basis)
 
     elif isinstance(self.n_basis, int):
       n_basis = self.n_basis
@@ -614,9 +606,9 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     # Compute basis for every cluster in first scale
     basis = np.zeros((n_basis, n_features))
     lda = LinearDiscriminantAnalysis()
-    for i in range(n_clusters):
+    for i, start in enumerate(range(0, num_eig * n_clusters, num_eig)):
         lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
-        basis[num_eig*i: num_eig*(i+1), :] = normalize(lda.scalings_.T)
+        basis[start: start + num_eig, :] = normalize(lda.scalings_.T)
 
     # second scale
     k = 20
@@ -634,7 +626,7 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
       sel_c = np.where(y == labels[c])
       kc = k_class[c]
 
-      # get k_class genuine neighbours
+      # get k_class genuine neighbourss
       neigh.fit(X=X[sel_c])
 
       start, finish = start_finish_indices[c:c+2]
@@ -642,21 +634,14 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
                                          n_neighbors=kc,
                                          return_distance=False))
 
-    # Compute basis for every cluster in second scale
-    finish = num_eig * n_clusters
-
-    start_finish_indices = np.arange(num_eig * n_clusters, n_basis, num_eig)
-    start_finish_indices = np.append(start_finish_indices, n_basis)
-
-    for i in range(n_clusters):
-      try:
-        start, finish = start_finish_indices[i:i+2]
-      except ValueError:
-        # No more clusters to be yielded
-        break
-
+    for i, start in enumerate(range(num_eig * n_clusters,
+                                    2*num_eig * n_clusters, num_eig)):
       lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
-
-      basis[start:finish, :] = normalize(lda.scalings_.T[:finish-start])
+      try:
+        basis[start: start + num_eig, :] = normalize(lda.scalings_.T)
+      except ValueError:
+        # handle tail
+        basis[start:, :] = normalize(lda.scalings_.T[:n_basis-start])
+        break
 
     return basis, n_basis
