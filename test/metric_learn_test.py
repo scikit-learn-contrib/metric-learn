@@ -97,8 +97,8 @@ class TestSCML(MetricTestCase):
 
   def test_big_n_basis(self):
     scml = SCML(n_basis=4)
-    triplets = np.ones((3, 3, 3))
-    n_basis = 1
+    triplets = np.random.rand(3, 3, 3)
+    n_basis = 3
     msg = ("The selected number of basis is greater than the number of points"
            ", only n_basis = %d will be generated" % n_basis)
     with pytest.warns(UserWarning) as raised_warning:
@@ -126,9 +126,7 @@ class TestSCML(MetricTestCase):
     scml = SCML_Supervised(basis='bad_basis')
     X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
     y = np.array([1, 0, 1, 0])
-    authorized_basis = ['triplet_diffs']
-    supervised_basis = ['LDA']
-    authorized_basis = supervised_basis + authorized_basis
+    authorized_basis = ['triplet_diffs', 'LDA']
     msg = ("`basis` must be one of the options '{}' or an array of shape "
            "(n_basis, n_features).".format("', '".join(authorized_basis)))
     with pytest.raises(ValueError) as raised_error:
