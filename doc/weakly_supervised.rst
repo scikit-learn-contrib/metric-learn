@@ -700,6 +700,60 @@ of triplets that have the right predicted ordering.
 Algorithms
 ----------
 
+.. _scml:
+
+:py:class:`SCML <metric_learn.SCML>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Sparse Compositional Metric Learning
+(:py:class:`SCML <metric_learn.SCML>`)
+
+`SCML` learns an squared mahalanobis distance from triplet constraints by 
+optimizing sparse positive weights assigned to a set of :math:`K` locally discriminative 
+rank-one PSD bases. This can be formulated as an optimization problem with only :math:`K`
+parameters, that can be solved with an efficient stochastic composite scheme.
+
+The Mahalanobis Matrix :math:`M` is built from a basis set :math:`B = \{b_i\}_{i=\{1,...,K\}}`
+weighted by a :math:`K` dimensional vector :math:`w = \{w_i\}_{i=\{1,...,K\}}` as:
+
+.. math::
+
+    M = \sum_{i=1}^K w_i b_i b_i^T = B \cdot diag(w) \cdot B^T \quad w_i \geq 0
+
+Learning :math:`M` in this form makes it PSD by design, as it is a nonnegative sum of PSD matrices.
+The optimization problem of :math:`w` over the triplets constraints :math:`C` is formulated as a
+classic margin-based hinge loss function over the relative constrains, a regularization :math:`\ell_1`
+is added to yield an sparse representation. The formulation is the following:
+
+.. math::
+
+    \min_{w} \sum_{(x_a,x_b,x_c)\in C} [1 + d_w(x_a,x_b)-d_w(x_a,x_c)]_+ + \beta||w||_1
+
+Where :math:`[\cdot]_+` is the hinge loss. 
+ 
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import SCML
+
+    triplets = [[[1.2, 7.5], [1.3, 1.5], [6.2, 9.7]],
+                [[1.3, 4.5], [3.2, 4.6], [5.4, 5.4]],
+                [[3.2, 7.5], [3.3, 1.5], [8.2, 9.7]],
+                [[3.3, 4.5], [5.2, 4.6], [7.4, 5.4]]]
+
+    scml = SCML()
+    scml.fit(triplets)
+
+.. topic:: References:
+
+  .. [1] Y. Shi, A. Bellet and F. Sha. `Sparse Compositional Metric Learning.
+         <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
+         (AAAI), 2014.
+
+  .. [2] Adapted from original \
+         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+
 
 .. _learning_on_quadruplets:
 
