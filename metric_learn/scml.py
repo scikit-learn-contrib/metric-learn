@@ -254,11 +254,11 @@ class _BaseSCML(MahalanobisMixin):
 
       # select n_features positive differences
       d_pos = diff_pos[rng.choice(n_triplets,
-                                  size=n_features, replace=False),:]
+                                  size=n_features, replace=False), :]
 
       # select n_features negative differences
       d_neg = diff_neg[rng.choice(n_triplets,
-                                  size=n_features, replace=False),:]
+                                  size=n_features, replace=False), :]
 
       # Yield matrix
       diff_sum = d_pos.T.dot(d_pos) - d_neg.T.dot(d_neg)
