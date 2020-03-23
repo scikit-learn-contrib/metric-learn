@@ -569,79 +569,57 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     # yielded by every LDA
     n_clusters = int(np.ceil(n_basis/(2 * num_eig)))
 
-    # TODO: maybe give acces to Kmeans jobs for faster computation?
     kmeans = KMeans(n_clusters=n_clusters, random_state=self.random_state,
                     algorithm='elkan').fit(X)
     cX = kmeans.cluster_centers_
 
-    # TODO: find a better way to choose neighborhood size
+    n_scales = 2
     if n_features > 50:
-        k = 50
+      scales = [20, 50]
     else:
-        k = 10
+      scales = [10, 20]
 
-    # In case some class has less elements than k
-    k_class = np.minimum(class_count, k)
+    k_class = np.vstack((np.minimum(class_count, scales[0]),
+                         np.minimum(class_count, scales[1])))
 
-    # Construct index set with neighbors for every element of every class
+    idx_set = [np.zeros((n_clusters, sum(k_class[0, :])), dtype=np.int),
+               np.zeros((n_clusters, sum(k_class[1, :])), dtype=np.int)]
 
-    idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
-
-    start_finish_indices = np.hstack((0, k_class)).cumsum()
+    start_finish_indices = np.hstack((np.zeros((2, 1), np.int),
+                                     k_class)).cumsum(axis=1)
 
     neigh = NearestNeighbors()
 
     for c in range(n_class):
         sel_c = np.where(y == labels[c])
-        kc = k_class[c]
 
-        # get k_class same class neighbours
+        # get k_class same class neighbors
         neigh.fit(X=X[sel_c])
+        neighbors = neigh.kneighbors(X=cX, n_neighbors=k_class[1, c],
+                                     return_distance=False)
 
-        start, finish = start_finish_indices[c:c+2]
-        idx_set[:, start:finish] = np.take(sel_c, neigh.kneighbors(X=cX,
-                                           n_neighbors=kc,
-                                           return_distance=False))
+        # add index set of neighbors for every cluster center for both scales
+        for s, k in enumerate(k_class[:, c]):
+          start, finish = start_finish_indices[s, c:c+2]
+          idx_set[s][:, start:finish] = np.take(sel_c, neighbors[:, :k])
 
-    # Compute basis for every cluster in first scale
+    # Compute basis for every cluster in both scales
     basis = np.zeros((n_basis, n_features))
     lda = LinearDiscriminantAnalysis()
-    for i, start in enumerate(range(0, num_eig * n_clusters, num_eig)):
-        lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
-        basis[start: start + num_eig, :] = normalize(lda.scalings_.T)
+    start_finish_indices = np.hstack((np.vstack((0, n_clusters * num_eig)),
+                                     np.full((2, n_clusters),
+                                             num_eig))).cumsum(axis=1)
 
-    # second scale
-    k = 20
-
-    # In case some class has less elements than k
-    k_class = np.minimum(class_count, k)
-
-    # Construct index set with neighbors for every element of every class
-
-    idx_set = np.zeros((n_clusters, sum(k_class)), dtype=np.int)
-
-    start_finish_indices = np.hstack((0, k_class)).cumsum()
-
-    for c in range(n_class):
-      sel_c = np.where(y == labels[c])
-      kc = k_class[c]
-
-      # get k_class genuine neighbourss
-      neigh.fit(X=X[sel_c])
-
-      start, finish = start_finish_indices[c:c+2]
-      idx_set[:, start:finish] = np.take(sel_c, neigh.kneighbors(X=cX,
-                                         n_neighbors=kc,
-                                         return_distance=False))
-
-    for i, start in enumerate(range(num_eig * n_clusters,
-                                    2*num_eig * n_clusters, num_eig)):
-      lda.fit(X[idx_set[i, :]], y[idx_set[i, :]])
+    for s in range(n_scales):
+      for c in range(n_clusters):
+        lda.fit(X[idx_set[s][c, :]], y[idx_set[s][c, :]])
+        start, finish = start_finish_indices[s, c:c+2]
+        normalized_scalings = normalize(lda.scalings_.T)
       try:
-        basis[start: start + num_eig, :] = normalize(lda.scalings_.T)
+          basis[start: finish, :] = normalized_scalings
       except ValueError:
         # handle tail
-        basis[start:, :] = normalize(lda.scalings_.T[:n_basis-start])
+          basis[start:, :] = normalized_scalings[:n_basis-start]
         break
 
     return basis, n_basis
