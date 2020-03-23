@@ -543,7 +543,7 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
 
     if self.n_basis is None:
       # TODO: Get a good default n_basis directive
-      n_basis = min(20*n_features, X.shape[0]*2*num_eig)
+      n_basis = min(20*n_features, X.shape[0]*2*num_eig - 1)
       warnings.warn('As no value for `n_basis` was selected, the number of '
                     'basis will be set to n_basis= %d' % n_basis)
 

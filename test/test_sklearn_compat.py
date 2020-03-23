@@ -10,7 +10,8 @@ from sklearn.utils.testing import (assert_allclose_dense_sparse,
 
 from metric_learn import (Covariance, LFDA, LMNN, MLKR, NCA,
                           ITML_Supervised, LSML_Supervised,
-                          MMC_Supervised, RCA_Supervised, SDML_Supervised)
+                          MMC_Supervised, RCA_Supervised, SDML_Supervised,
+                          SCML_Supervised)
 from sklearn import clone
 import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
@@ -78,6 +79,9 @@ class TestSklearnCompat(unittest.TestCase):
 
   def test_rca(self):
     check_estimator(Stable_RCA_Supervised)
+
+  def test_scml(self):
+    check_estimator(SCML_Supervised)
 
 
 RNG = check_random_state(0)
