@@ -235,7 +235,7 @@ class _BaseSCML(MahalanobisMixin):
     # calculate all unique pairs and their indices
     uniqPairs, indices = np.unique(triplets_pairs_sorted, return_inverse=True,
                                    axis=0)
-    # calculate diferences only for unique pairs
+    # calculate differences only for unique pairs
     diff = X[uniqPairs[:, 0], :] - X[uniqPairs[:, 1], :]
 
     diff_pos = diff[indices[:n_triplets], :]
@@ -285,10 +285,11 @@ class _BaseSCML(MahalanobisMixin):
 class SCML(_BaseSCML, _TripletsClassifierMixin):
   """Sparse Compositional Metric Learning (SCML)
 
-  `SCML` learns a metric from triplet constraints by optimizing sparse
-  positive weights assigned to a set of `K` locally discriminative rank-one
-  PSD bases. This can be formulated as an optimization problem with only `K`
-  parameters, that can be solved with an efficient stochastic composite scheme.
+  `SCML` learns an squared Mahalanobis distance from triplet constraints by
+  optimizing sparse positive weights assigned to a set of :math:`K` rank-one
+  PSD bases. This can be formulated as an optimization problem with only
+  :math:`K` parameters, that can be solved with an efficient stochastic
+  composite scheme.
 
   Read more in the :ref:`User Guide <scml>`.
 
