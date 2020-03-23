@@ -98,9 +98,11 @@ class TestSCML(MetricTestCase):
   def test_big_n_basis(self):
     scml = SCML(n_basis=4)
     triplets = np.random.rand(3, 3, 3)
-    n_basis = 3
-    msg = ("The selected number of basis is greater than the number of points"
-           ", only n_basis = %d will be generated" % n_basis)
+    n_basis = 1
+    msg = ("The number of bases with nonzero weight is less than the "
+           "number of features of the input, in consequence the "
+           "learned transformation reduces the dimension to %d."
+           % n_basis)
     with pytest.warns(UserWarning) as raised_warning:
       scml.fit(triplets)
     assert msg == raised_warning[0].message.args[0]
@@ -126,7 +128,7 @@ class TestSCML(MetricTestCase):
     scml = SCML_Supervised(basis='bad_basis')
     X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
     y = np.array([1, 0, 1, 0])
-    authorized_basis = ['triplet_diffs', 'LDA']
+    authorized_basis = ['triplet_diffs', 'lda']
     msg = ("`basis` must be one of the options '{}' or an array of shape "
            "(n_basis, n_features).".format("', '".join(authorized_basis)))
     with pytest.raises(ValueError) as raised_error:
@@ -188,7 +190,7 @@ class TestSCML(MetricTestCase):
     scml = SCML_Supervised(n_basis=3, basis=basis, k_genuine=1, k_impostor=1)
 
     msg = ('The dimensionality ({}) of the provided bases must match the '
-           'dimensionality of the given inputs `X` ({}).'
+           'dimensionality of the data ({}).'
            .format(basis.shape[1], X.shape[1]))
     with pytest.raises(ValueError) as raised_error:
       scml.fit(X, y)

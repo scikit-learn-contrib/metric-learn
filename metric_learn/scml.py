@@ -163,9 +163,10 @@ class _BaseSCML(MahalanobisMixin):
     n_basis, n_features = basis.shape
 
     if n_basis < n_features:  # if metric is low-rank
-      warnings.warn("The number of effective basis is less than the number of"
-                    " features of the input, in consequence the learned "
-                    "transformation reduces the dimension to %d." % n_basis)
+      warnings.warn("The number of bases with nonzero weight is less than the "
+                    "number of features of the input, in consequence the "
+                    "learned transformation reduces the dimension to %d."
+                    % n_basis)
       return np.sqrt(w.T)*basis  # equivalent to np.diag(np.sqrt(w)).dot(basis)
 
     else:   # if metric is full rank
@@ -188,7 +189,7 @@ class _BaseSCML(MahalanobisMixin):
       basis = check_array(self.basis, copy=True)
       if basis.shape[1] != n_features:
         raise ValueError('The dimensionality ({}) of the provided bases must'
-                         ' match the dimensionality of the given inputs `X` '
+                         ' match the dimensionality of the data '
                          '({}).'.format(basis.shape[1], n_features))
     elif self.basis not in self._authorized_basis:
       raise ValueError(
@@ -204,17 +205,18 @@ class _BaseSCML(MahalanobisMixin):
     """ Constructs the basis set from the differences of positive and negative
     pairs from the triplets constraints.
 
-    The basis set is constructed iteratively by taking n_features positive and
-    n_features negative pairs differences, then adding and substracting
-    respectively all the outerproducts, and finally adding the eigenvectors
-    of this matrix with positive eigenvalue.
+    The basis set is constructed iteratively by taking n_features triplets,
+    then adding and substracting respectively all the outerproducts of the
+    positive and negative pairs, and finally selecting the eigenvectors
+    of this matrix with positive eigenvalue. This is done until n_basis are
+    selected.
     """
     n_features = X.shape[1]
     n_triplets = triplets.shape[0]
 
     if self.n_basis is None:
       # TODO: Get a good default n_basis directive
-      n_basis = int(n_triplets/10)
+      n_basis = n_features*80
       warnings.warn('As no value for `n_basis` was selected, the number of '
                     'basis will be set to n_basis= %d' % n_basis)
     elif isinstance(self.n_basis, int):
@@ -222,12 +224,6 @@ class _BaseSCML(MahalanobisMixin):
     else:
       raise ValueError("n_basis should be an integer, instead it is of type %s"
                        % type(self.n_basis))
-
-    if n_basis > n_triplets:
-      n_basis = n_triplets
-      warnings.warn("The selected number of basis is greater than the number "
-                    "of points, only n_basis = %d will be generated" %
-                    n_basis)
 
     basis = np.zeros((n_basis, n_features))
 
@@ -239,7 +235,7 @@ class _BaseSCML(MahalanobisMixin):
     # calculate all unique pairs and their indices
     uniqPairs, indices = np.unique(triplets_pairs_sorted, return_inverse=True,
                                    axis=0)
-    # calculate L2 distance according to bases only for unique pairs
+    # calculate diferences only for unique pairs
     diff = X[uniqPairs[:, 0], :] - X[uniqPairs[:, 1], :]
 
     diff_pos = diff[indices[:n_triplets], :]
@@ -252,13 +248,15 @@ class _BaseSCML(MahalanobisMixin):
 
     while(finish != n_basis):
 
+      # Select triplets to yield diff
+
+      select_triplet = rng.choice(n_triplets, size=n_features, replace=False)
+
       # select n_features positive differences
-      d_pos = diff_pos[rng.choice(n_triplets,
-                                  size=n_features, replace=False), :]
+      d_pos = diff_pos[select_triplet, :]
 
       # select n_features negative differences
-      d_neg = diff_neg[rng.choice(n_triplets,
-                                  size=n_features, replace=False), :]
+      d_neg = diff_neg[select_triplet, :]
 
       # Yield matrix
       diff_sum = d_pos.T.dot(d_pos) - d_neg.T.dot(d_neg)
@@ -297,51 +295,51 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
   Parameters
   ----------
   beta: float (default=1e-5)
-      L1 regularization parameter.
+    L1 regularization parameter.
 
   basis : string or array-like, optional (default='triplet_diffs')
-      Set of bases to construct the metric. Possible options are
-      'triplet_diffs', and an array-like of shape (n_basis, n_features).
+    Set of bases to construct the metric. Possible options are
+    'triplet_diffs', and an array-like of shape (n_basis, n_features).
 
-       'triplet_diffs'
-          The basis set is constructed from the differences between points of
-          `n_basis` positive or negative pairs taken from the triplets
-          constrains.
+    'triplet_diffs'
+      The basis set is constructed from the differences between points of
+      `n_basis` positive or negative pairs taken from the triplets
+      constrains.
 
-       array-like
-           A matrix of shape (n_basis, n_features), that will be used as
-           the basis set for the metric construction.
+    array-like
+        A matrix of shape (n_basis, n_features), that will be used as
+        the basis set for the metric construction.
 
   n_basis : int, optional
-      Number of basis to be yielded. In case it is not set it will be set based
-      on `basis`. If no value is selected a default will be computed based on
-      the input.
+    Number of basis to be yielded. In case it is not set it will be set based
+    on `basis`. If no value is selected a default will be computed based on
+    the input.
 
   gamma: float (default = 5e-3)
-      Learning rate for the optimization algorithm.
+    Learning rate for the optimization algorithm.
 
   max_iter : int (default = 100000)
-      Number of iterations for the algorithm.
+    Number of iterations for the algorithm.
 
   output_iter : int (default = 5000)
-      Number of iterations to check current weights performance and output this
-      information in case verbose is True.
+    Number of iterations to check current weights performance and output this
+    information in case verbose is True.
 
   verbose : bool, optional
-      If True, prints information while learning.
+    If True, prints information while learning.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get triplets from indices. If array-like,
-      triplets will be formed like this: X[indices].
+    The preprocessor to call to get triplets from indices. If array-like,
+    triplets will be formed like this: X[indices].
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int.
+    A pseudo random number generator object or a seed for it if int.
 
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
-      The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `_components_from_basis_weights`.)
+    The linear transformation ``L`` deduced from the learned Mahalanobis
+    metric (See function `_components_from_basis_weights`.)
 
   Examples
   --------
@@ -376,7 +374,7 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
     Parameters
     ----------
     triplets : array-like, shape=(n_constraints, 3, n_features) or \
-          (n_constraints, 3)
+      (n_constraints, 3)
       3D array-like of triplets of points or 2D array of triplets of
       indicators. Triplets are assumed to be ordered such that:
       d(triplets[i, 0],triplets[i, 1]) < d(triplets[i, 0], triplets[i, 2]).
@@ -402,52 +400,52 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
   Parameters
   ----------
   beta: float (default=1e-5)
-      L1 regularization parameter.
+    L1 regularization parameter.
 
-  basis : string or an array-like, optional (default='LDA')
-      Set of bases to construct the metric. Possible options are
-      'LDA', and an array-like of shape (n_basis, n_features).
+  basis : string or an array-like, optional (default='lda')
+    Set of bases to construct the metric. Possible options are
+    'lda', and an array-like of shape (n_basis, n_features).
 
-      'LDA'
-          The `n_basis` basis set is constructed from the LDA of significant
-          local regions in the feature space via clustering, for each region
-          center k-nearest neighbors are used to obtain the LDA scalings,
-          which correspond to the locally discriminative basis.
+    'lda'
+      The `n_basis` basis set is constructed from the LDA of significant
+      local regions in the feature space via clustering, for each region
+      center k-nearest neighbors are used to obtain the LDA scalings,
+      which correspond to the locally discriminative basis.
 
-       array-like
-           A matrix of shape (n_basis, n_features), that will be used as
-           the basis set for the metric construction.
+    array-like
+      A matrix of shape (n_basis, n_features), that will be used as
+      the basis set for the metric construction.
 
   n_basis : int, optional
-      Number of basis to be yielded. In case it is not set it will be set based
-      on `basis`. If no value is selected a default will be computed based on
-      the input.
+    Number of basis to be yielded. In case it is not set it will be set based
+    on `basis`. If no value is selected a default will be computed based on
+    the input.
 
   gamma: float (default = 5e-3)
-      Learning rate for the optimization algorithm.
+    Learning rate for the optimization algorithm.
 
   max_iter : int (default = 100000)
-      Number of iterations for the algorithm.
+    Number of iterations for the algorithm.
 
   output_iter : int (default = 5000)
-      Number of iterations to check current weights performance and output this
-      information in case verbose is True.
+    Number of iterations to check current weights performance and output this
+    information in case verbose is True.
 
   verbose : bool, optional
-      If True, prints information while learning.
+    If True, prints information while learning.
 
   preprocessor : array-like, shape=(n_samples, n_features) or callable
-      The preprocessor to call to get triplets from indices. If array-like,
-      triplets will be formed like this: X[indices].
+    The preprocessor to call to get triplets from indices. If array-like,
+    triplets will be formed like this: X[indices].
 
   random_state : int or numpy.RandomState or None, optional (default=None)
-      A pseudo random number generator object or a seed for it if int.
+    A pseudo random number generator object or a seed for it if int.
 
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
-      The linear transformation ``L`` deduced from the learned Mahalanobis
-      metric (See function `_components_from_basis_weights`.)
+    The linear transformation ``L`` deduced from the learned Mahalanobis
+    metric (See function `_components_from_basis_weights`.)
 
   Examples
   --------
@@ -470,16 +468,13 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
 
   See Also
   --------
-  metric_learn.SCML_Supervised : The supervised version of this
-    algorithm, which construct the triplets from the labels.
-
-  :ref:`supervised_version` : The section of the project documentation
-    that describes the supervised version of weakly supervised estimators.
+  metric_learn.SCML : The weakly supervised version of this
+    algorithm.
   """
   # Add supervised authorized basis construction options
-  _authorized_basis = _BaseSCML._authorized_basis + ['LDA']
+  _authorized_basis = _BaseSCML._authorized_basis + ['lda']
 
-  def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis='LDA',
+  def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis='lda',
                n_basis=None, gamma=5e-3, max_iter=100000, output_iter=5000,
                verbose=False, preprocessor=None, random_state=None):
     self.k_genuine = k_genuine
@@ -522,7 +517,7 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     case one is selected.
     """
 
-    if self.basis == 'LDA':
+    if self.basis == 'lda':
       basis, n_basis = self._generate_bases_LDA(X, y)
     else:
       basis, n_basis = None, None
@@ -530,7 +525,7 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     return basis, n_basis
 
   def _generate_bases_LDA(self, X, y):
-    """ Generates bases for the 'LDA' option.
+    """ Generates bases for the 'lda' option.
 
     The basis set is constructed using Linear Discriminant Analysis of
     significant local regions in the feature space via clustering, for
@@ -615,11 +610,11 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
         lda.fit(X[idx_set[s][c, :]], y[idx_set[s][c, :]])
         start, finish = start_finish_indices[s, c:c+2]
         normalized_scalings = normalize(lda.scalings_.T)
-      try:
+        try:
           basis[start: finish, :] = normalized_scalings
-      except ValueError:
-        # handle tail
+        except ValueError:
+          # handle tail
           basis[start:, :] = normalized_scalings[:n_basis-start]
-        break
+          break
 
     return basis, n_basis
