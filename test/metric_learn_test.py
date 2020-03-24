@@ -79,11 +79,11 @@ class TestCovariance(MetricTestCase):
 class TestSCML():
   def test_iris(self):
     X, y = load_iris(return_X_y=True)
-    scml = SCML_Supervised(n_basis=80, k_genuine=8, k_impostor=11,
+    scml = SCML_Supervised(n_basis=80, k_genuine=7, k_impostor=5,
                            random_state=42)
     scml.fit(X, y)
     csep = class_separation(scml.transform(X), y)
-    assert csep == 0.24555420119538296
+    assert csep < 0.23
 
   @pytest.mark.parametrize(('estimator', 'data', 'authorized_basis'),
                            [(SCML, (np.ones((3, 3, 3)),), ['triplet_diffs']),
