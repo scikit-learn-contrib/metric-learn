@@ -75,44 +75,36 @@ class TestCovariance(MetricTestCase):
     assert_allclose(pseudo_inverse.dot(cov_matrix).dot(pseudo_inverse),
                     pseudo_inverse)
 
-class TestSCML(MetricTestCase):
+
+class TestSCML():
   def test_iris(self):
-    scml = SCML_Supervised()
-    scml.fit(self.iris_points, self.iris_labels)
+    X, y = load_iris(return_X_y=True)
+    scml = SCML_Supervised(n_basis=80, k_genuine=8, k_impostor=11,
+                           random_state=42)
+    scml.fit(X, y)
+    csep = class_separation(scml.transform(X), y)
+    assert csep == 0.24555420119538296
 
-    csep = class_separation(scml.transform(self.iris_points), self.iris_labels)
-    self.assertLess(csep, 0.3)
-
-  
-  # TODO: merge into one by the use of parametrize
-
-  def test_bad_basis(self):
-    scml = SCML(basis='bad_basis')
-    triplets = np.ones((3, 3, 3))
-    authorized_basis = ['triplet_diffs']
+  @pytest.mark.parametrize(('estimator', 'data', 'authorized_basis'),
+                           [(SCML, (np.ones((3, 3, 3)),), ['triplet_diffs']),
+                            (SCML_Supervised, (np.array([[0, 0], [0, 1],
+                                                         [2, 0], [2, 1]]),
+                                               np.array([1, 0, 1, 0])),
+                             ['triplet_diffs', 'lda'])])
+  def test_bad_basis(self, estimator, data, authorized_basis):
+    model = estimator(basis='bad_basis')
     msg = ("`basis` must be one of the options '{}' or an array of shape "
            "(n_basis, n_features).".format("', '".join(authorized_basis)))
     with pytest.raises(ValueError) as raised_error:
-      scml.fit(triplets)
-    assert msg == raised_error.value.args[0]
-
-  def test_bad_basis_supervised(self):
-    scml = SCML_Supervised(basis='bad_basis')
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    authorized_basis = ['triplet_diffs', 'lda']
-    msg = ("`basis` must be one of the options '{}' or an array of shape "
-           "(n_basis, n_features).".format("', '".join(authorized_basis)))
-    with pytest.raises(ValueError) as raised_error:
-      scml.fit(X, y)
+      model.fit(*data)
     assert msg == raised_error.value.args[0]
 
   def test_dimension_reduction_msg(self):
     scml = SCML(n_basis=2)
     triplets = np.array([[[0, 1], [2, 1], [0, 0]],
-                                    [[2, 1], [0, 1], [2, 0]],
-                                    [[0, 0], [2, 0], [0, 1]],
-                                    [[2, 0], [0, 0], [2, 1]]])
+                         [[2, 1], [0, 1], [2, 0]],
+                         [[0, 0], [2, 0], [0, 1]],
+                         [[2, 0], [0, 0], [2, 1]]])
     n_basis = 1
     msg = ("The number of bases with nonzero weight is less than the "
            "number of features of the input, in consequence the "
@@ -122,39 +114,28 @@ class TestSCML(MetricTestCase):
       scml.fit(triplets)
     assert msg == raised_warning[0].message.args[0]
 
-  def test_n_basis_wrong_type(self):
-    triplets = np.array([[[0, 1], [2, 1], [0, 0]],
-                         [[2, 1], [0, 1], [2, 0]],
-                         [[0, 0], [2, 0], [0, 1]],
-                         [[2, 0], [0, 0], [2, 1]]])
+  @pytest.mark.parametrize(('estimator', 'data'),
+                           [(SCML, (np.array([[[0, 1], [2, 1], [0, 0]],
+                                              [[2, 1], [0, 1], [2, 0]],
+                                              [[0, 0], [2, 0], [0, 1]],
+                                              [[2, 0], [0, 0], [2, 1]]]),)),
+                           (SCML_Supervised, (np.array([[0, 0], [1, 1],
+                                                       [3, 3]]),
+                                              np.array([1, 2, 3])))])
+  def test_n_basis_wrong_type(self, estimator, data):
 
     n_basis = 4.0
-
-    scml = SCML(n_basis=n_basis)
+    model = estimator(n_basis=n_basis)
     msg = ("n_basis should be an integer, instead it is of type %s"
            % type(n_basis))
     with pytest.raises(ValueError) as raised_error:
-      scml.fit(triplets)
+      model.fit(*data)
     assert msg == raised_error.value.args[0]
 
-  def test_n_basis_wrong_type_supervised(self):
+  def test_small_n_basis_lda(self):
     X = np.array([[0, 0], [1, 1], [3, 3]])
     y = np.array([1, 2, 3])
 
-    n_basis = 4.0
-
-    scml = SCML_Supervised(n_basis=n_basis)
-    msg = ("n_basis should be an integer, instead it is of type %s"
-           % type(n_basis))
-    with pytest.raises(ValueError) as raised_error:
-      scml.fit(X, y)
-    assert msg == raised_error.value.args[0]
-
-  def test_small_n_basis_supervised(self):
-    X = np.array([[0, 0], [1, 1], [3, 3]])
-    y = np.array([1, 2, 3])
-
-    labels, class_count = np.unique(y, return_counts=True)
     n_class = 3
 
     scml = SCML_Supervised(n_basis=n_class)
@@ -163,11 +144,10 @@ class TestSCML(MetricTestCase):
       scml.fit(X, y)
     assert msg == raised_error.value.args[0]
 
-  def test_big_n_basis_supervised(self):
+  def test_big_n_basis_lda(self):
     X = np.array([[0, 0], [1, 1], [3, 3]])
     y = np.array([1, 2, 3])
 
-    labels, class_count = np.unique(y, return_counts=True)
     n_class = 3
     num_eig = min(n_class-1, X.shape[1])
 
@@ -180,39 +160,24 @@ class TestSCML(MetricTestCase):
       scml.fit(X, y)
     assert msg == raised_error.value.args[0]
 
-  def test_array_basis(self):
+  @pytest.mark.parametrize(('estimator', 'data'),
+                           [(SCML, (np.random.rand(3, 3, 2),)),
+                           (SCML_Supervised, (np.array([[0, 0], [0, 1],
+                                                        [2, 0], [2, 1]]),
+                                              np.array([1, 0, 1, 0])))])
+  def test_array_basis(self, estimator, data):
     """ Test that the proper error is raised when the shape of the input basis
     array is not consistent with the input
     """
-    triplets = np.random.rand(3, 3, 2)
-
     basis = np.eye(3)
 
-    scml = SCML(n_basis=3, basis=basis)
+    scml = estimator(n_basis=3, basis=basis)
 
     msg = ('The dimensionality ({}) of the provided bases must match the '
            'dimensionality of the data ({}).'
-           .format(basis.shape[1], triplets.shape[2]))
+           .format(basis.shape[1], data[0].shape[-1]))
     with pytest.raises(ValueError) as raised_error:
-      scml.fit(triplets)
-    assert msg == raised_error.value.args[0]
-
-  def test_array_basis_supervised(self):
-    """ Test that the proper error is raised when the shape of the input basis
-    array is not consistent with the input
-    """
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-
-    basis = np.eye(3)
-
-    scml = SCML_Supervised(n_basis=3, basis=basis, k_genuine=1, k_impostor=1)
-
-    msg = ('The dimensionality ({}) of the provided bases must match the '
-           'dimensionality of the data ({}).'
-           .format(basis.shape[1], X.shape[1]))
-    with pytest.raises(ValueError) as raised_error:
-      scml.fit(X, y)
+      scml.fit(*data)
     assert msg == raised_error.value.args[0]
 
 

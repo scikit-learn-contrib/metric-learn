@@ -593,7 +593,8 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
 
         # get k_class same class neighbors
         neigh.fit(X=X[sel_c])
-        neighbors = neigh.kneighbors(X=cX, n_neighbors=k_class[1, c],
+        # Only take the neighbors once for the bigest scale
+        neighbors = neigh.kneighbors(X=cX, n_neighbors=k_class[-1, c],
                                      return_distance=False)
 
         # add index set of neighbors for every cluster center for both scales
