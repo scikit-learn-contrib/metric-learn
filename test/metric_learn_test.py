@@ -180,6 +180,22 @@ class TestSCML(object):
       scml.fit(*data)
     assert msg == raised_error.value.args[0]
 
+  @pytest.mark.parametrize(('estimator', 'data'),
+                           [(SCML, (np.array([[0, 1, 2], [0, 1, 3], [1, 0, 2],
+                                              [1, 0, 3], [2, 3, 1], [2, 3, 0],
+                                              [3, 2, 1], [3, 2, 0]]),)),
+                           (SCML_Supervised, (np.array([0, 1, 2, 3]),
+                                              np.array([0, 0, 1, 1])))])
+  def test_verbose(self, estimator, data, capsys):
+    # assert there is proper output when verbose = True
+    model = estimator(preprocessor=np.array([[0, 0], [1, 1], [2, 2], [3, 3]]),
+                      max_iter=1, verbose=True)
+    model.fit(*data)
+    out, _ = capsys.readouterr()
+    expected_out = ('[Global] iter 0\t obj 1.000000\t num_imp 8\n'
+                    'max iteration reached.\n')
+    assert out == expected_out
+
 
 class TestLSML(MetricTestCase):
   def test_iris(self):
