@@ -5,6 +5,7 @@ Sparse Compositional Metric Learning (SCML)
 from __future__ import print_function, absolute_import, division
 import numpy as np
 from .base_metric import _TripletsClassifierMixin, MahalanobisMixin
+from ._util import components_from_metric
 from sklearn.base import TransformerMixin
 from .constraints import Constraints
 from sklearn.preprocessing import normalize
@@ -121,6 +122,7 @@ class _BaseSCML(MahalanobisMixin):
       print("max iteration reached.")
 
     # return L matrix yielded from best weights
+    self.n_iter_ = iter
     self.components_ = self._components_from_basis_weights(basis, best_w)
 
     return self
@@ -170,7 +172,7 @@ class _BaseSCML(MahalanobisMixin):
       return np.sqrt(w.T)*basis  # equivalent to np.diag(np.sqrt(w)).dot(basis)
 
     else:   # if metric is full rank
-      return np.linalg.cholesky(np.matmul(basis.T, w.T*basis)).T
+      return components_from_metric(np.matmul(basis.T, w.T*basis))
 
   def _to_index_points(self, triplets):
     shape = triplets.shape
