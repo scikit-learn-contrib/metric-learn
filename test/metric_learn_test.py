@@ -76,7 +76,7 @@ class TestCovariance(MetricTestCase):
                     pseudo_inverse)
 
 
-class TestSCML():
+class TestSCML(object):
   def test_iris(self):
     X, y = load_iris(return_X_y=True)
     scml = SCML_Supervised(n_basis=80, k_genuine=7, k_impostor=5,
@@ -85,16 +85,16 @@ class TestSCML():
     csep = class_separation(scml.transform(X), y)
     assert csep < 0.23
 
-  @pytest.mark.parametrize(('estimator', 'data', 'authorized_basis'),
-                           [(SCML, (np.ones((3, 3, 3)),), ['triplet_diffs']),
+  @pytest.mark.parametrize(('estimator', 'data'),
+                           [(SCML, (np.ones((3, 3, 3)),)),
                             (SCML_Supervised, (np.array([[0, 0], [0, 1],
                                                          [2, 0], [2, 1]]),
-                                               np.array([1, 0, 1, 0])),
-                             ['triplet_diffs', 'lda'])])
-  def test_bad_basis(self, estimator, data, authorized_basis):
+                                               np.array([1, 0, 1, 0])))])
+  def test_bad_basis(self, estimator, data):
     model = estimator(basis='bad_basis')
     msg = ("`basis` must be one of the options '{}' or an array of shape "
-           "(n_basis, n_features).".format("', '".join(authorized_basis)))
+           "(n_basis, n_features)."
+           .format("', '".join(model._authorized_basis)))
     with pytest.raises(ValueError) as raised_error:
       model.fit(*data)
     assert msg == raised_error.value.args[0]
