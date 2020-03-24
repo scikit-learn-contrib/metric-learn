@@ -15,16 +15,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.utils import check_array, check_random_state
 import warnings
 
-# hack around lack of where in older numpy versions
-try:
-  np.sum([[0, 1], [1, 1]], where=[False, True], axis=1)
-except TypeError:
-  def sum_where(X, where):
-    return np.sum(X[where])
-else:
-  def sum_where(X, where):
-    return np.sum(X, where=where)
-
 
 class _BaseSCML(MahalanobisMixin):
 
@@ -88,7 +78,7 @@ class _BaseSCML(MahalanobisMixin):
         slack_mask = slack_val > 0
 
         # loss function of learning task part of obj function
-        obj2 = sum_where(slack_val, slack_mask)/n_triplets
+        obj2 = np.sum(slack_val[slack_mask])/n_triplets
 
         obj = obj1 + obj2
         if self.verbose:
