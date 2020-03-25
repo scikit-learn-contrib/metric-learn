@@ -199,6 +199,27 @@ class TestSCML(object):
                     'max iteration reached.\n')
     assert out == expected_out
 
+  def test_triplet_diffs(self):
+    expected_n_basis = 10
+    model = SCML_Supervised(n_basis=expected_n_basis)
+    X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
+    triplets = np.array([[0, 1, 2], [0, 1, 3], [1, 0, 2], [1, 0, 3],
+                         [2, 3, 1], [2, 3, 0], [3, 2, 1], [3, 2, 0]])
+    basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+    expected_basis = np.ones((expected_n_basis, 2))/np.sqrt(2)
+    assert n_basis == expected_n_basis
+    np.testing.assert_allclose(basis, expected_basis)
+
+  def test_lda(self):
+    expected_n_basis = 7
+    model = SCML_Supervised(n_basis=expected_n_basis)
+    X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
+    y = np.array([0, 0, 1, 1])
+    basis, n_basis = model._generate_bases_LDA(X, y)
+    expected_basis = np.ones((expected_n_basis, 2))/np.sqrt(2)
+    assert n_basis == expected_n_basis
+    np.testing.assert_allclose(np.abs(basis), expected_basis)
+
 
 class TestLSML(MetricTestCase):
   def test_iris(self):
