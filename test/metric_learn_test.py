@@ -13,6 +13,7 @@ from numpy.testing import (assert_array_almost_equal, assert_array_equal,
 from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.validation import check_X_y
+from sklearn.preprocessing import StandardScaler
 try:
   from inverse_covariance import quic
   assert(quic)
@@ -85,6 +86,16 @@ class TestSCML(object):
     scml.fit(X, y)
     csep = class_separation(scml.transform(X), y)
     assert csep < 0.24
+
+  def test_big_n_features(self):
+    X, y = make_classification(n_samples=100, n_classes=3, n_features=60,
+                               n_informative=60, n_redundant=0, n_repeated=0,
+                               random_state=42)
+    X = StandardScaler().fit_transform(X)
+    scml = SCML_Supervised(random_state=42)
+    scml.fit(X, y)
+    csep = class_separation(scml.transform(X), y)
+    assert csep < 0.7
 
   @pytest.mark.parametrize(('estimator', 'data'),
                            [(SCML, (np.ones((3, 3, 3)),)),
