@@ -22,7 +22,9 @@ from test.test_utils import (metric_learners, ids_metric_learners,
                              mock_preprocessor, tuples_learners,
                              ids_tuples_learners, pairs_learners,
                              ids_pairs_learners, remove_y,
-                             triplets_learners, quadruplets_learners)
+                             triplets_learners, quadruplets_learners,
+                             metric_learners_pipeline,
+                             ids_metric_learners_pipeline)
 
 
 class Stable_RCA_Supervised(RCA_Supervised):
@@ -330,54 +332,49 @@ def test_estimators_fit_returns_self(estimator, build_dataset,
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_pipeline,
+                         ids=ids_metric_learners_pipeline)
 def test_pipeline_consistency(estimator, build_dataset,
                               with_preprocessor):
   # Adapted from scikit learn
   # check that make_pipeline(est) gives same score as est
-  # we do this test on all except quadruplets (since they don't have a y
-  # in fit):
-  no_label_learners = quadruplets_learners + triplets_learners
-  if estimator.__class__.__name__ not in [e.__class__.__name__
-                                          for (e, _) in
-                                          no_label_learners]:
-    input_data, y, preprocessor, _ = build_dataset(with_preprocessor)
 
-    def make_random_state(estimator, in_pipeline):
-      rs = {}
-      name_estimator = estimator.__class__.__name__
-      if name_estimator[-11:] == '_Supervised':
-        name_param = 'random_state'
-        if in_pipeline:
-            name_param = name_estimator.lower() + '__' + name_param
-        rs[name_param] = check_random_state(0)
-      return rs
+  input_data, y, preprocessor, _ = build_dataset(with_preprocessor)
 
-    estimator = clone(estimator)
-    estimator.set_params(preprocessor=preprocessor,
-                         **make_random_state(estimator, False))
-    pipeline = make_pipeline(estimator)
-    estimator.fit(input_data, y)
-    estimator.set_params(preprocessor=preprocessor)
-    pipeline.set_params(**make_random_state(estimator, True))
-    pipeline.fit(input_data, y)
+  def make_random_state(estimator, in_pipeline):
+    rs = {}
+    name_estimator = estimator.__class__.__name__
+    if name_estimator[-11:] == '_Supervised':
+      name_param = 'random_state'
+      if in_pipeline:
+          name_param = name_estimator.lower() + '__' + name_param
+      rs[name_param] = check_random_state(0)
+    return rs
 
-    if hasattr(estimator, 'score'):
-      result = estimator.score(input_data, y)
-      result_pipe = pipeline.score(input_data, y)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor,
+                        **make_random_state(estimator, False))
+  pipeline = make_pipeline(estimator)
+  estimator.fit(input_data, y)
+  estimator.set_params(preprocessor=preprocessor)
+  pipeline.set_params(**make_random_state(estimator, True))
+  pipeline.fit(input_data, y)
+
+  if hasattr(estimator, 'score'):
+    result = estimator.score(input_data, y)
+    result_pipe = pipeline.score(input_data, y)
+    assert_allclose_dense_sparse(result, result_pipe)
+
+  if hasattr(estimator, 'predict'):
+    result = estimator.predict(input_data)
+    result_pipe = pipeline.predict(input_data)
+    assert_allclose_dense_sparse(result, result_pipe)
+
+  if issubclass(estimator.__class__, TransformerMixin):
+    if hasattr(estimator, 'transform'):
+      result = estimator.transform(input_data)
+      result_pipe = pipeline.transform(input_data)
       assert_allclose_dense_sparse(result, result_pipe)
-
-    if hasattr(estimator, 'predict'):
-      result = estimator.predict(input_data)
-      result_pipe = pipeline.predict(input_data)
-      assert_allclose_dense_sparse(result, result_pipe)
-
-    if issubclass(estimator.__class__, TransformerMixin):
-      if hasattr(estimator, 'transform'):
-        result = estimator.transform(input_data)
-        result_pipe = pipeline.transform(input_data)
-        assert_allclose_dense_sparse(result, result_pipe)
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])

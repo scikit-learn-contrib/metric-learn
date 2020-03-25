@@ -139,8 +139,8 @@ classifiers = [(Covariance(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
                (RCA_Supervised(num_chunks=5), build_classification),
                (SDML_Supervised(prior='identity', balance_param=1e-5),
-               build_classification), (SCML_Supervised(),
-                                       build_classification)]
+               build_classification), 
+               (SCML_Supervised(), build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
@@ -162,6 +162,9 @@ ids_supervised_learners = ids_classifiers + ids_regressors
 
 metric_learners = tuples_learners + supervised_learners
 ids_metric_learners = ids_tuples_learners + ids_supervised_learners
+
+metric_learners_pipeline = pairs_learners + supervised_learners
+ids_metric_learners_pipeline = ids_pairs_learners + ids_supervised_learners
 
 
 def remove_y(estimator, X, y):
