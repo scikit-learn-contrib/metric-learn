@@ -133,16 +133,18 @@ class TestSCML(object):
     assert msg == raised_error.value.args[0]
 
   def test_small_n_basis_lda(self):
-    X = np.array([[0, 0], [1, 1], [3, 3]])
-    y = np.array([1, 2, 3])
+    X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
+    y = np.array([0, 0, 1, 1])
 
-    n_class = 3
+    n_class = 2
 
-    scml = SCML_Supervised(n_basis=n_class)
-    msg = ("The number of basis should be greater than the number of classes")
-    with pytest.raises(ValueError) as raised_error:
+    scml = SCML_Supervised(n_basis=n_class-1)
+    msg = ("The number of basis is less than the number of classes,"
+           " this will lead to less basis than the amount yielded by"
+           " LDA")
+    with pytest.warns(UserWarning) as raised_warning:
       scml.fit(X, y)
-    assert msg == raised_error.value.args[0]
+    assert msg == raised_warning[0].message.args[0]
 
   def test_big_n_basis_lda(self):
     X = np.array([[0, 0], [1, 1], [3, 3]])

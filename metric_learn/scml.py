@@ -546,9 +546,10 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
       raise ValueError("n_basis should be an integer, instead it is of type %s"
                        % type(self.n_basis))
 
-    if n_basis <= n_class:
-      raise ValueError("The number of basis should be greater than the"
-                       " number of classes")
+    if n_basis < n_class:
+      warnings.warn("The number of basis is less than the number of classes,"
+                    " this will lead to less basis than the amount yielded by"
+                    " LDA")
     elif n_basis >= X.shape[0]*2*num_eig:
       raise ValueError("The selected number of basis needs a greater number of"
                        " clusters than the number of available samples")
