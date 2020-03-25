@@ -140,9 +140,8 @@ class TestSCML(object):
     n_class = 2
 
     scml = SCML_Supervised(n_basis=n_class-1)
-    msg = ("The number of basis is less than the number of classes,"
-           " this will lead to less basis than the amount yielded by"
-           " LDA")
+    msg = ("The number of basis is less than the number of classes, which may"
+           " lead to poor discriminative performance.")
     with pytest.warns(UserWarning) as raised_warning:
       scml.fit(X, y)
     assert msg == raised_warning[0].message.args[0]
@@ -157,8 +156,9 @@ class TestSCML(object):
     n_basis = X.shape[0]*2*num_eig
 
     scml = SCML_Supervised(n_basis=n_basis)
-    msg = ("The selected number of basis needs a greater number of clusters"
-           " than the number of available samples")
+    msg = ("The needed number of clusters to generate the selected"
+           "number of basis is unfeasible to achieve as it is "
+           "greater than the number of available samples")
     with pytest.raises(ValueError) as raised_error:
       scml.fit(X, y)
     assert msg == raised_error.value.args[0]

@@ -546,17 +546,17 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
       raise ValueError("n_basis should be an integer, instead it is of type %s"
                        % type(self.n_basis))
 
-    if n_basis < n_class:
-      warnings.warn("The number of basis is less than the number of classes,"
-                    " this will lead to less basis than the amount yielded by"
-                    " LDA")
-    elif n_basis >= X.shape[0]*2*num_eig:
-      raise ValueError("The selected number of basis needs a greater number of"
-                       " clusters than the number of available samples")
-
     # Number of clusters needed for 2 scales given the number of basis
     # yielded by every LDA
     n_clusters = int(np.ceil(n_basis/(2 * num_eig)))
+
+    if n_basis < n_class:
+      warnings.warn("The number of basis is less than the number of classes, "
+                    "which may lead to poor discriminative performance.")
+    elif n_basis >= X.shape[0]*2*num_eig:
+      raise ValueError("The needed number of clusters to generate the selected"
+                       "number of basis is unfeasible to achieve as it is "
+                       "greater than the number of available samples")
 
     kmeans = KMeans(n_clusters=n_clusters, random_state=self.random_state,
                     algorithm='elkan').fit(X)
