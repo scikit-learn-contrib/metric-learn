@@ -26,7 +26,7 @@ from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           ITML_Supervised, SDML_Supervised, RCA_Supervised,
                           MMC_Supervised, SDML, RCA, ITML, LSML, SCML)
 # Import this specially for testing.
-from metric_learn.constraints import wrap_pairs
+from metric_learn.constraints import wrap_pairs, Constraints
 from metric_learn.lmnn import _sum_outer_products
 
 
@@ -210,7 +210,7 @@ class TestSCML(object):
                     'max iteration reached.\n' % estimator.__name__)
     assert out == expected_out
 
-  def test_triplet_diffs(self):
+  def test_triplet_diffs_toy(self):
     expected_n_basis = 10
     model = SCML_Supervised(n_basis=expected_n_basis)
     X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
@@ -223,7 +223,7 @@ class TestSCML(object):
     assert n_basis == expected_n_basis
     np.testing.assert_allclose(basis, expected_basis)
 
-  def test_lda(self):
+  def test_lda_toy(self):
     expected_n_basis = 7
     model = SCML_Supervised(n_basis=expected_n_basis)
     X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
@@ -235,6 +235,46 @@ class TestSCML(object):
     expected_basis = np.ones((expected_n_basis, 2))/np.sqrt(2)
     assert n_basis == expected_n_basis
     np.testing.assert_allclose(np.abs(basis), expected_basis)
+
+  @pytest.mark.parametrize('n_samples', [100, 500, 1000])
+  @pytest.mark.parametrize('n_features', [10, 50, 100])
+  @pytest.mark.parametrize('n_classes', [5, 10, 15])
+  def test_triplet_diffs(self, n_samples, n_features, n_classes):
+    X, y = make_classification(n_samples=n_samples, n_classes=n_classes,
+                               n_features=n_features, n_informative=n_features,
+                               n_redundant=0, n_repeated=0)
+    X = StandardScaler().fit_transform(X)
+
+    model = SCML_Supervised()
+    constraints = Constraints(y)
+    triplets = constraints.generate_knntriplets(X, model.k_genuine,
+                                                model.k_impostor)
+    basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+
+    expected_n_basis = n_features*80
+    expected_shape = (expected_n_basis, n_features)
+
+    assert n_basis == expected_n_basis
+    assert basis.shape == expected_shape
+
+  @pytest.mark.parametrize('n_samples', [100, 500, 1000])
+  @pytest.mark.parametrize('n_features', [10, 50, 100])
+  @pytest.mark.parametrize('n_classes', [5, 10, 15])
+  def test_lda(self, n_samples, n_features, n_classes):
+    X, y = make_classification(n_samples=n_samples, n_classes=n_classes,
+                               n_features=n_features, n_informative=n_features,
+                               n_redundant=0, n_repeated=0)
+    X = StandardScaler().fit_transform(X)
+
+    model = SCML_Supervised()
+    basis, n_basis = model._generate_bases_LDA(X, y)
+
+    num_eig = min(n_classes-1, n_features)
+    expected_n_basis = min(20*n_features, n_samples*2*num_eig - 1)
+    expected_shape = (expected_n_basis, n_features)
+
+    assert n_basis == expected_n_basis
+    assert basis.shape == expected_shape
 
 
 class TestLSML(MetricTestCase):
