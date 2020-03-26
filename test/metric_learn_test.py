@@ -217,6 +217,8 @@ class TestSCML(object):
     triplets = np.array([[0, 1, 2], [0, 1, 3], [1, 0, 2], [1, 0, 3],
                          [2, 3, 1], [2, 3, 0], [3, 2, 1], [3, 2, 0]])
     basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+    # All points are along the same line, so the only possible basis will be
+    # the vector along that line normalized.
     expected_basis = np.ones((expected_n_basis, 2))/np.sqrt(2)
     assert n_basis == expected_n_basis
     np.testing.assert_allclose(basis, expected_basis)
@@ -227,6 +229,9 @@ class TestSCML(object):
     X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
     y = np.array([0, 0, 1, 1])
     basis, n_basis = model._generate_bases_LDA(X, y)
+    # All points are along the same line, so the only possible basis will be
+    # the vector along that line normalized. In this case it is possible to
+    # obtain it with positive or negative orientations.
     expected_basis = np.ones((expected_n_basis, 2))/np.sqrt(2)
     assert n_basis == expected_n_basis
     np.testing.assert_allclose(np.abs(basis), expected_basis)
