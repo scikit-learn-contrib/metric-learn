@@ -83,8 +83,8 @@ class _BaseSCML(MahalanobisMixin):
         obj = obj1 + obj2
         if self.verbose:
           count = np.sum(slack_mask)
-          print("[Global] iter %d\t obj %.6f\t num_imp %d" % (iter+1,
-                obj, count))
+          print("[%s] iter %d\t obj %.6f\t num_imp %d" %
+                (self.__class__.__name__, iter+1, obj, count))
 
         # update the best
         if obj < best_obj:
@@ -473,8 +473,8 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     self.k_genuine = k_genuine
     self.k_impostor = k_impostor
     _BaseSCML.__init__(self, beta=beta, basis=basis, n_basis=n_basis,
-                       max_iter=max_iter, verbose=verbose,
-                       preprocessor=preprocessor,
+                       max_iter=max_iter, output_iter=output_iter,
+                       verbose=verbose, preprocessor=preprocessor,
                        random_state=random_state)
 
   def fit(self, X, y):
