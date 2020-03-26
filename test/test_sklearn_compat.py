@@ -22,7 +22,6 @@ from test.test_utils import (metric_learners, ids_metric_learners,
                              mock_preprocessor, tuples_learners,
                              ids_tuples_learners, pairs_learners,
                              ids_pairs_learners, remove_y,
-                             triplets_learners, quadruplets_learners,
                              metric_learners_pipeline,
                              ids_metric_learners_pipeline)
 
@@ -353,7 +352,7 @@ def test_pipeline_consistency(estimator, build_dataset,
 
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor,
-                        **make_random_state(estimator, False))
+                       **make_random_state(estimator, False))
   pipeline = make_pipeline(estimator)
   estimator.fit(input_data, y)
   estimator.set_params(preprocessor=preprocessor)
