@@ -67,7 +67,7 @@ class _BaseSCML(MahalanobisMixin):
     rng = check_random_state(self.random_state)
     rand_int = rng.randint(low=0, high=n_triplets, size=self.max_iter)
     for iter in range(self.max_iter):
-      if iter % self.output_iter == 0:
+      if (iter + 1) % self.output_iter == 0:
         # regularization part of obj function
         obj1 = np.sum(w)*self.beta
 
@@ -83,7 +83,7 @@ class _BaseSCML(MahalanobisMixin):
         obj = obj1 + obj2
         if self.verbose:
           count = np.sum(slack_mask)
-          print("[Global] iter %d\t obj %.6f\t num_imp %d" % (iter,
+          print("[Global] iter %d\t obj %.6f\t num_imp %d" % (iter+1,
                 obj, count))
 
         # update the best
