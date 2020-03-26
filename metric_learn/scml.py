@@ -554,9 +554,9 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
       warnings.warn("The number of basis is less than the number of classes, "
                     "which may lead to poor discriminative performance.")
     elif n_basis >= X.shape[0]*2*num_eig:
-      raise ValueError("The needed number of clusters to generate the selected"
-                       "number of basis is unfeasible to achieve as it is "
-                       "greater than the number of available samples")
+      raise ValueError("Not enough samples to generate %d LDA bases, n_basis"
+                       "should be smaller than %d" %
+                       (n_basis, X.shape[0]*2*num_eig))
 
     kmeans = KMeans(n_clusters=n_clusters, random_state=self.random_state,
                     algorithm='elkan').fit(X)

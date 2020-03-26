@@ -167,9 +167,9 @@ class TestSCML(object):
     n_basis = X.shape[0]*2*num_eig
 
     scml = SCML_Supervised(n_basis=n_basis)
-    msg = ("The needed number of clusters to generate the selected"
-           "number of basis is unfeasible to achieve as it is "
-           "greater than the number of available samples")
+    msg = ("Not enough samples to generate %d LDA bases, n_basis"
+           "should be smaller than %d" %
+           (n_basis, n_basis))
     with pytest.raises(ValueError) as raised_error:
       scml.fit(X, y)
     assert msg == raised_error.value.args[0]
