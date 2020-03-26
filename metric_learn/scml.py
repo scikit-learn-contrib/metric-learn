@@ -22,14 +22,15 @@ class _BaseSCML(MahalanobisMixin):
   _authorized_basis = ['triplet_diffs']
 
   def __init__(self, beta=1e-5, basis='triplet_diffs', n_basis=None,
-               gamma=5e-3, max_iter=100000, output_iter=5000, verbose=False,
-               preprocessor=None, random_state=None):
+               gamma=5e-3, max_iter=100000, output_iter=5000, batch_size=10,
+               verbose=False, preprocessor=None, random_state=None):
     self.beta = beta
     self.basis = basis
     self.n_basis = n_basis
     self.gamma = gamma
     self.max_iter = max_iter
     self.output_iter = output_iter
+    self.batch_size = batch_size
     self.verbose = verbose
     self.preprocessor = preprocessor
     self.random_state = random_state
@@ -65,9 +66,12 @@ class _BaseSCML(MahalanobisMixin):
     best_obj = np.inf
 
     rng = check_random_state(self.random_state)
-    rand_int = rng.randint(low=0, high=n_triplets, size=self.max_iter)
-    for iter in range(self.max_iter):
-      if (iter + 1) % self.output_iter == 0:
+    max_iter = int(self.max_iter/self.batch_size)
+    output_iter = int(self.output_iter/self.batch_size)
+    rand_int = rng.randint(low=0, high=n_triplets,
+                           size=(max_iter, self.batch_size))
+    for iter in range(max_iter):
+      if (iter + 1) % output_iter == 0:
         # regularization part of obj function
         obj1 = np.sum(w)*self.beta
 
@@ -84,26 +88,23 @@ class _BaseSCML(MahalanobisMixin):
         if self.verbose:
           count = np.sum(slack_mask)
           print("[%s] iter %d\t obj %.6f\t num_imp %d" %
-                (self.__class__.__name__, iter+1, obj, count))
+                (self.__class__.__name__, (iter+1)*self.batch_size, obj, count))
 
         # update the best
         if obj < best_obj:
           best_obj = obj
           best_w = w
 
-      # TODO:
-      # Maybe allow the usage of mini-batch opt?
-
       idx = rand_int[iter]
 
       slack_val = 1 + np.matmul(dist_diff[idx, :], w.T)
 
-      if slack_val > 0:
-        avg_grad_w = (iter * avg_grad_w + dist_diff[idx, :]) / (iter+1)
-      else:
-        avg_grad_w = iter * avg_grad_w / (iter+1)
+      slack_mask = np.squeeze(slack_val > 0, axis=1)
+      avg_grad_w = ((iter * avg_grad_w + np.sum(dist_diff[idx[slack_mask], :],
+                                                axis=0, keepdims=True))
+                    / (iter+1))
 
-      scale_f = -np.sqrt(iter+1) / self.gamma
+      scale_f = -np.sqrt(iter+1) / (self.gamma*self.batch_size)
 
       # proximal operator with negative trimming equivalent
       w = scale_f * np.minimum(avg_grad_w + self.beta, 0)
@@ -469,13 +470,14 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
 
   def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis='lda',
                n_basis=None, gamma=5e-3, max_iter=100000, output_iter=5000,
-               verbose=False, preprocessor=None, random_state=None):
+               batch_size=10, verbose=False, preprocessor=None,
+               random_state=None):
     self.k_genuine = k_genuine
     self.k_impostor = k_impostor
     _BaseSCML.__init__(self, beta=beta, basis=basis, n_basis=n_basis,
                        max_iter=max_iter, output_iter=output_iter,
-                       verbose=verbose, preprocessor=preprocessor,
-                       random_state=random_state)
+                       batch_size=batch_size, verbose=verbose,
+                       preprocessor=preprocessor, random_state=random_state)
 
   def fit(self, X, y):
     """Create constraints from labels and learn the SCML model.
