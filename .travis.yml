@@ -22,7 +22,7 @@ matrix:
     python: "3.4"
     before_install:
       - sudo apt-get install liblapack-dev
-      - pip install --upgrade pip pytest
+      - pip install --upgrade pip "pytest<5"
       - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
     script:
       - pytest test --cov;
