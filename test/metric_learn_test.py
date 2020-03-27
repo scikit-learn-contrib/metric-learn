@@ -236,7 +236,7 @@ class TestSCML(object):
     assert n_basis == expected_n_basis
     np.testing.assert_allclose(np.abs(basis), expected_basis)
 
-  @pytest.mark.parametrize('n_samples', [100, 500, 1000])
+  @pytest.mark.parametrize('n_samples', [100, 500])
   @pytest.mark.parametrize('n_features', [10, 50, 100])
   @pytest.mark.parametrize('n_classes', [5, 10, 15])
   def test_triplet_diffs(self, n_samples, n_features, n_classes):
@@ -257,7 +257,7 @@ class TestSCML(object):
     assert n_basis == expected_n_basis
     assert basis.shape == expected_shape
 
-  @pytest.mark.parametrize('n_samples', [100, 500, 1000])
+  @pytest.mark.parametrize('n_samples', [100, 500])
   @pytest.mark.parametrize('n_features', [10, 50, 100])
   @pytest.mark.parametrize('n_classes', [5, 10, 15])
   def test_lda(self, n_samples, n_features, n_classes):
