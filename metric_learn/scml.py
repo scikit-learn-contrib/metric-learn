@@ -22,7 +22,7 @@ class _BaseSCML(MahalanobisMixin):
   _authorized_basis = ['triplet_diffs']
 
   def __init__(self, beta=1e-5, basis='triplet_diffs', n_basis=None,
-               gamma=5e-3, max_iter=100000, output_iter=5000, batch_size=10,
+               gamma=5e-3, max_iter=10000, output_iter=500, batch_size=10,
                verbose=False, preprocessor=None, random_state=None):
     self.beta = beta
     self.basis = basis
@@ -66,12 +66,10 @@ class _BaseSCML(MahalanobisMixin):
     best_obj = np.inf
 
     rng = check_random_state(self.random_state)
-    max_iter = int(self.max_iter/self.batch_size)
-    output_iter = int(self.output_iter/self.batch_size)
     rand_int = rng.randint(low=0, high=n_triplets,
-                           size=(max_iter, self.batch_size))
-    for iter in range(max_iter):
-      if (iter + 1) % output_iter == 0:
+                           size=(self.max_iter, self.batch_size))
+    for iter in range(self.max_iter):
+      if (iter + 1) % self.output_iter == 0:
         # regularization part of obj function
         obj1 = np.sum(w)*self.beta
 
@@ -88,7 +86,7 @@ class _BaseSCML(MahalanobisMixin):
         if self.verbose:
           count = np.sum(slack_mask)
           print("[%s] iter %d\t obj %.6f\t num_imp %d" %
-                (self.__class__.__name__, (iter+1)*self.batch_size, obj, count))
+                (self.__class__.__name__, (iter+1), obj, count))
 
         # update the best
         if obj < best_obj:
@@ -469,7 +467,7 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
   _authorized_basis = _BaseSCML._authorized_basis + ['lda']
 
   def __init__(self, k_genuine=3, k_impostor=10, beta=1e-5, basis='lda',
-               n_basis=None, gamma=5e-3, max_iter=100000, output_iter=5000,
+               n_basis=None, gamma=5e-3, max_iter=10000, output_iter=500,
                batch_size=10, verbose=False, preprocessor=None,
                random_state=None):
     self.k_genuine = k_genuine
