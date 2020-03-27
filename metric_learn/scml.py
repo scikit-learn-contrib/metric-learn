@@ -73,10 +73,10 @@ class _BaseSCML(MahalanobisMixin):
         # regularization part of obj function
         obj1 = np.sum(w)*self.beta
 
-      # Every triplet distance difference in the space given by L
-      # plus a slack of one
+        # Every triplet distance difference in the space given by L
+        # plus a slack of one
         slack_val = 1 + np.matmul(dist_diff, w.T)
-      # Mask of places with positive slack
+        # Mask of places with positive slack
         slack_mask = slack_val > 0
 
         # loss function of learning task part of obj function
@@ -96,13 +96,13 @@ class _BaseSCML(MahalanobisMixin):
       idx = rand_int[iter]
 
       slack_val = 1 + np.matmul(dist_diff[idx, :], w.T)
-
       slack_mask = np.squeeze(slack_val > 0, axis=1)
-      avg_grad_w = ((iter * avg_grad_w + np.sum(dist_diff[idx[slack_mask], :],
-                                                axis=0, keepdims=True))
-                    / (iter+1))
 
-      scale_f = -np.sqrt(iter+1) / (self.gamma*self.batch_size)
+      grad_w = np.sum(dist_diff[idx[slack_mask], :],
+                      axis=0, keepdims=True)/self.batch_size
+      avg_grad_w = (iter * avg_grad_w + grad_w) / (iter+1)
+
+      scale_f = -np.sqrt(iter+1) / self.gamma
 
       # proximal operator with negative trimming equivalent
       w = scale_f * np.minimum(avg_grad_w + self.beta, 0)
