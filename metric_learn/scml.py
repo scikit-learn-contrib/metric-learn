@@ -60,8 +60,15 @@ class _BaseSCML(MahalanobisMixin):
 
     n_triplets = triplets.shape[0]
 
+    # weight vector
     w = np.zeros((1, n_basis))
+    # avarage obj gradient wrt weights
     avg_grad_w = np.zeros((1, n_basis))
+
+    # l2 norm in time of all obj gradients wrt weights
+    ada_grad_w = np.zeros((1, n_basis))
+    # slack for not dividing by zero
+    delta = 0.001
 
     best_obj = np.inf
 
@@ -102,7 +109,9 @@ class _BaseSCML(MahalanobisMixin):
                       axis=0, keepdims=True)/self.batch_size
       avg_grad_w = (iter * avg_grad_w + grad_w) / (iter+1)
 
-      scale_f = -np.sqrt(iter+1) / self.gamma
+      ada_grad_w = np.sqrt(np.square(ada_grad_w) + np.square(grad_w))
+
+      scale_f = -(iter+1) / self.gamma / (delta + ada_grad_w)
 
       # proximal operator with negative trimming equivalent
       w = scale_f * np.minimum(avg_grad_w + self.beta, 0)
