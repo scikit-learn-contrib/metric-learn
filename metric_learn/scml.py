@@ -43,6 +43,20 @@ class _BaseSCML(MahalanobisMixin):
     dual averaging method.
     """
 
+    if not isinstance(self.max_iter, int):
+      raise ValueError("max_iter should be an integer, instead it is of type"
+                       " %s" % type(self.max_iter))
+    if not isinstance(self.output_iter, int):
+      raise ValueError("output_iter should be an integer, instead it is of "
+                       "type %s" % type(self.output_iter))
+    if not isinstance(self.batch_size, int):
+      raise ValueError("batch_size should be an integer, instead it is of type"
+                       " %s" % type(self.batch_size))
+
+    if(self.output_iter > self.max_iter):
+      raise ValueError("The value of output_iter must be equal or smaller than"
+                       " max_iter.")
+
     # Currently prepare_inputs makes triplets contain points and not indices
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
 
@@ -76,6 +90,23 @@ class _BaseSCML(MahalanobisMixin):
     rand_int = rng.randint(low=0, high=n_triplets,
                            size=(self.max_iter, self.batch_size))
     for iter in range(self.max_iter):
+
+      idx = rand_int[iter]
+
+      slack_val = 1 + np.matmul(dist_diff[idx, :], w.T)
+      slack_mask = np.squeeze(slack_val > 0, axis=1)
+
+      grad_w = np.sum(dist_diff[idx[slack_mask], :],
+                      axis=0, keepdims=True)/self.batch_size
+      avg_grad_w = (iter * avg_grad_w + grad_w) / (iter+1)
+
+      ada_grad_w = np.sqrt(np.square(ada_grad_w) + np.square(grad_w))
+
+      scale_f = -(iter+1) / self.gamma / (delta + ada_grad_w)
+
+      # proximal operator with negative trimming equivalent
+      w = scale_f * np.minimum(avg_grad_w + self.beta, 0)
+
       if (iter + 1) % self.output_iter == 0:
         # regularization part of obj function
         obj1 = np.sum(w)*self.beta
@@ -99,22 +130,6 @@ class _BaseSCML(MahalanobisMixin):
         if obj < best_obj:
           best_obj = obj
           best_w = w
-
-      idx = rand_int[iter]
-
-      slack_val = 1 + np.matmul(dist_diff[idx, :], w.T)
-      slack_mask = np.squeeze(slack_val > 0, axis=1)
-
-      grad_w = np.sum(dist_diff[idx[slack_mask], :],
-                      axis=0, keepdims=True)/self.batch_size
-      avg_grad_w = (iter * avg_grad_w + grad_w) / (iter+1)
-
-      ada_grad_w = np.sqrt(np.square(ada_grad_w) + np.square(grad_w))
-
-      scale_f = -(iter+1) / self.gamma / (delta + ada_grad_w)
-
-      # proximal operator with negative trimming equivalent
-      w = scale_f * np.minimum(avg_grad_w + self.beta, 0)
 
     if self.verbose:
       print("max iteration reached.")
@@ -505,6 +520,13 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
 
     basis, n_basis = self._initialize_basis_supervised(X, y)
+
+    if not isinstance(self.k_genuine, int):
+      raise ValueError("k_genuine should be an integer, instead it is of type"
+                       " %s" % type(self.k_genuine))
+    if not isinstance(self.k_impostor, int):
+      raise ValueError("k_impostor should be an integer, instead it is of "
+                       "type %s" % type(self.k_impostor))
 
     constraints = Constraints(y)
     triplets = constraints.generate_knntriplets(X, self.k_genuine,

@@ -203,10 +203,11 @@ class TestSCML(object):
   def test_verbose(self, estimator, data, capsys):
     # assert there is proper output when verbose = True
     model = estimator(preprocessor=np.array([[0, 0], [1, 1], [2, 2], [3, 3]]),
-                      max_iter=1, output_iter=1, batch_size=1, verbose=True)
+                      max_iter=1, output_iter=1, batch_size=1, basis='triplet_diffs',
+                      random_state=42, verbose=True)
     model.fit(*data)
     out, _ = capsys.readouterr()
-    expected_out = ('[%s] iter 1\t obj 1.000000\t num_imp 8\n'
+    expected_out = ('[%s] iter 1\t obj 0.569946\t num_imp 2\n'
                     'max iteration reached.\n' % estimator.__name__)
     assert out == expected_out
 
@@ -275,6 +276,52 @@ class TestSCML(object):
 
     assert n_basis == expected_n_basis
     assert basis.shape == expected_shape
+
+  @pytest.mark.parametrize('name', ['max_iter', 'output_iter', 'batch_size',
+                                    'n_basis'])
+  def test_int_inputs(self, name):
+    value = 1.0
+    d = {name: value}
+    scml = SCML(**d)
+    triplets = np.array([[[0, 1], [2, 1], [0, 0]],
+                         [[2, 1], [0, 1], [2, 0]],
+                         [[0, 0], [2, 0], [0, 1]],
+                         [[2, 0], [0, 0], [2, 1]]])
+
+    msg = name
+    msg += (" should be an integer, instead it is of type"
+            " %s" % type(value))
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(triplets)
+    assert msg == raised_error.value.args[0]
+
+  @pytest.mark.parametrize('name', ['max_iter', 'output_iter', 'batch_size',
+                                    'k_genuine', 'k_impostor', 'n_basis'])
+  def test_int_inputs_supervised(self, name):
+    value = 1.0
+    d = {name: value}
+    scml = SCML_Supervised(**d)
+    X = np.array([[0, 0], [1, 1], [3, 3], [4, 4]])
+    y = np.array([1, 1, 0, 0])
+    msg = name
+    msg += (" should be an integer, instead it is of type"
+            " %s" % type(value))
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(X, y)
+    assert msg == raised_error.value.args[0]
+
+  def test_large_output_iter(self):
+    scml = SCML(max_iter=1, output_iter=2)
+    triplets = np.array([[[0, 1], [2, 1], [0, 0]],
+                         [[2, 1], [0, 1], [2, 0]],
+                         [[0, 0], [2, 0], [0, 1]],
+                         [[2, 0], [0, 0], [2, 1]]])
+    msg = ("The value of output_iter must be equal or smaller than"
+           " max_iter.")
+
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(triplets)
+    assert msg == raised_error.value.args[0]
 
 
 class TestLSML(MetricTestCase):
