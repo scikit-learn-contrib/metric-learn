@@ -5,12 +5,15 @@ Getting started
 Installation and Setup
 ======================
 
-Run ``pip install metric-learn`` to download and install from PyPI.
+**Installation**
 
-Alternately, download the source repository and run:
+metric-learn can be installed in either of the following ways:
 
--  ``python setup.py install`` for default installation.
--  ``pytest test`` to run all tests.
+- If you use Anaconda: ``conda install -c conda-forge metric-learn``. See more options `here <https://github.com/conda-forge/metric-learn-feedstock#installing-metric-learn>`_.
+
+- To install from PyPi: ``pip install metric-learn``.
+
+- For a manual install of the latest code, download the source repository and run ``python setup.py install``. You may then run ``pytest test`` to run all tests (you will need to have the ``pytest`` package installed).
 
 **Dependencies**
 

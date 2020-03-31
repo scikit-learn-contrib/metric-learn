@@ -35,7 +35,7 @@ metric-learn contains efficient Python implementations of several popular superv
 
 - To install from PyPi: ``pip install metric-learn``.
 
-- For a manual install of the latest code, download the package from GitHub and run ``python setup.py install``. You may then run ``pytest test`` to run all tests (you will need to have the ``pytest`` package installed).
+- For a manual install of the latest code, download the source repository and run ``python setup.py install``. You may then run ``pytest test`` to run all tests (you will need to have the ``pytest`` package installed).
 
 **Usage**
 
