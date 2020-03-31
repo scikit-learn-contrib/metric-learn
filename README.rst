@@ -31,8 +31,7 @@ metric-learn contains efficient Python implementations of several popular superv
 
 **Installation/Setup**
 
-- If you use Anaconda: ``conda install -c conda-forge metric-learn``. See more
-options `here <https://github.com/conda-forge/metric-learn-feedstock#installing-metric-learn>`_.
+- If you use Anaconda: ``conda install -c conda-forge metric-learn``. See more options `here <https://github.com/conda-forge/metric-learn-feedstock#installing-metric-learn>`_.
 
 - To install from PyPi: ``pip install metric-learn``.
 
