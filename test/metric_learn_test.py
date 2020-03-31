@@ -203,8 +203,8 @@ class TestSCML(object):
   def test_verbose(self, estimator, data, capsys):
     # assert there is proper output when verbose = True
     model = estimator(preprocessor=np.array([[0, 0], [1, 1], [2, 2], [3, 3]]),
-                      max_iter=1, output_iter=1, batch_size=1, basis='triplet_diffs',
-                      random_state=42, verbose=True)
+                      max_iter=1, output_iter=1, batch_size=1,
+                      basis='triplet_diffs', random_state=42, verbose=True)
     model.fit(*data)
     out, _ = capsys.readouterr()
     expected_out = ('[%s] iter 1\t obj 0.569946\t num_imp 2\n'
