@@ -283,10 +283,7 @@ class TestSCML(object):
     value = 1.0
     d = {name: value}
     scml = SCML(**d)
-    triplets = np.array([[[0, 1], [2, 1], [0, 0]],
-                         [[2, 1], [0, 1], [2, 0]],
-                         [[0, 0], [2, 0], [0, 1]],
-                         [[2, 0], [0, 0], [2, 1]]])
+    triplets = np.array([[[0, 1], [2, 1], [0, 0]]])
 
     msg = name
     msg += (" should be an integer, instead it is of type"
@@ -312,10 +309,7 @@ class TestSCML(object):
 
   def test_large_output_iter(self):
     scml = SCML(max_iter=1, output_iter=2)
-    triplets = np.array([[[0, 1], [2, 1], [0, 0]],
-                         [[2, 1], [0, 1], [2, 0]],
-                         [[0, 0], [2, 0], [0, 1]],
-                         [[2, 0], [0, 0], [2, 1]]])
+    triplets = np.array([[[0, 1], [2, 1], [0, 0]]])
     msg = ("The value of output_iter must be equal or smaller than"
            " max_iter.")
 

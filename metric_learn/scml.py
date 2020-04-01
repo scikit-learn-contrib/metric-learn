@@ -102,7 +102,7 @@ class _BaseSCML(MahalanobisMixin):
 
       ada_grad_w = np.sqrt(np.square(ada_grad_w) + np.square(grad_w))
 
-      scale_f = -(iter+1) / self.gamma / (delta + ada_grad_w)
+      scale_f = -(iter+1) / (self.gamma * (delta + ada_grad_w))
 
       # proximal operator with negative trimming equivalent
       w = scale_f * np.minimum(avg_grad_w + self.beta, 0)
