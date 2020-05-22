@@ -8,10 +8,10 @@ import time
 import sys
 import numpy as np
 from scipy.optimize import minimize
-from sklearn.metrics import pairwise_distances
-from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
-from sklearn.utils.fixes import logsumexp
+from scipy.special import logsumexp
 from sklearn.base import TransformerMixin
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
+from sklearn.metrics import pairwise_distances
 
 from ._util import _initialize_components, _check_n_components
 from .base_metric import MahalanobisMixin
