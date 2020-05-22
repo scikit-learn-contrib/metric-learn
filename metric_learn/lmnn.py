@@ -1,11 +1,9 @@
 """
 Large Margin Nearest Neighbor Metric learning (LMNN)
 """
-from __future__ import print_function, absolute_import
 import numpy as np
 import warnings
 from collections import Counter
-from six.moves import xrange
 from sklearn.exceptions import ChangedBehaviorWarning
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
@@ -229,7 +227,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
             "| learning rate")
 
     # main loop
-    for it in xrange(2, self.max_iter):
+    for it in range(2, self.max_iter):
       # then at each iteration, we try to find a value of L that has better
       # objective than the previous L, following the gradient:
       while True:
@@ -293,7 +291,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     # compute the gradient
     total_active = 0
     df = np.zeros((X.shape[1], X.shape[1]))
-    for nn_idx in reversed(xrange(k)):  # note: reverse not useful here
+    for nn_idx in reversed(range(k)):  # note: reverse not useful here
       act1 = g0 < g1[:, nn_idx]
       act2 = g0 < g2[:, nn_idx]
       total_active += act1.sum() + act2.sum()

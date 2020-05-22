@@ -4,7 +4,6 @@ import pytest
 import numpy as np
 import scipy
 from scipy.optimize import check_grad, approx_fprime
-from six.moves import xrange
 from sklearn.metrics import pairwise_distances, euclidean_distances
 from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
@@ -32,7 +31,7 @@ from metric_learn.lmnn import _sum_outer_products
 def class_separation(X, labels):
   unique_labels, label_inds = np.unique(labels, return_inverse=True)
   ratio = 0
-  for li in xrange(len(unique_labels)):
+  for li in range(len(unique_labels)):
     Xc = X[label_inds == li]
     Xnc = X[label_inds != li]
     ratio += pairwise_distances(Xc).mean() / pairwise_distances(Xc, Xnc).mean()
@@ -521,7 +520,7 @@ def test_toy_ex_lmnn(X, y, loss):
   # storage
   a1 = [None] * k
   a2 = [None] * k
-  for nn_idx in xrange(k):
+  for nn_idx in range(k):
     a1[nn_idx] = np.array([])
     a2[nn_idx] = np.array([])
 

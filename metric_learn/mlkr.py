@@ -1,7 +1,6 @@
 """
 Metric Learning for Kernel Regression (MLKR)
 """
-from __future__ import division, print_function
 import time
 import sys
 import warnings

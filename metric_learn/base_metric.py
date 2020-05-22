@@ -8,12 +8,11 @@ from sklearn.utils.validation import _is_arraylike, check_is_fitted
 from sklearn.metrics import roc_auc_score, roc_curve, precision_recall_curve
 import numpy as np
 from abc import ABCMeta, abstractmethod
-import six
 from ._util import ArrayIndexer, check_input, validate_vector
 import warnings
 
 
-class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
+class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   """
   Base class for all metric-learners.
 
@@ -145,7 +144,7 @@ class BaseMetricLearner(six.with_metaclass(ABCMeta, BaseEstimator)):
     """
 
 
-class MetricTransformer(six.with_metaclass(ABCMeta)):
+class MetricTransformer(metaclass=ABCMeta):
 
   @abstractmethod
   def transform(self, X):
@@ -163,8 +162,7 @@ class MetricTransformer(six.with_metaclass(ABCMeta)):
     """
 
 
-class MahalanobisMixin(six.with_metaclass(ABCMeta, BaseMetricLearner,
-                                          MetricTransformer)):
+class MahalanobisMixin(BaseMetricLearner, MetricTransformer, metaclass=ABCMeta):
   r"""Mahalanobis metric learning algorithms.
 
   Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x')`,

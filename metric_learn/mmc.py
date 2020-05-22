@@ -1,8 +1,6 @@
 """Mahalanobis Metric for Clustering (MMC)"""
-from __future__ import print_function, absolute_import, division
 import warnings
 import numpy as np
-from six.moves import xrange
 from sklearn.base import TransformerMixin
 from sklearn.utils.validation import assert_all_finite
 from sklearn.exceptions import ChangedBehaviorWarning
@@ -110,12 +108,12 @@ class _BaseMMC(MahalanobisMixin):
 
     A_old = A.copy()
 
-    for cycle in xrange(self.max_iter):
+    for cycle in range(self.max_iter):
 
       # projection of constraints C1 and C2
       satisfy = False
 
-      for it in xrange(self.max_proj):
+      for it in range(self.max_proj):
 
         # First constraint:
         # f(A) = \sum_{i,j \in S} d_ij' A d_ij <= t              (1)

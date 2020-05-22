@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .constraints import Constraints
 from .covariance import Covariance
 from .itml import ITML, ITML_Supervised
