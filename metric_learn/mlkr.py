@@ -6,16 +6,14 @@ import time
 import sys
 import warnings
 import numpy as np
-from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
-from sklearn.utils.fixes import logsumexp
 from scipy.optimize import minimize
+from scipy.special import logsumexp
 from sklearn.base import TransformerMixin
-
+from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.metrics import pairwise_distances
 
-from metric_learn._util import _check_n_components
 from .base_metric import MahalanobisMixin
-from ._util import _initialize_components
+from ._util import _initialize_components, _check_n_components
 
 EPS = np.finfo(float).eps
 
