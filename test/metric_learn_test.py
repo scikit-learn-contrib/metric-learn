@@ -384,15 +384,15 @@ def test_loss_func(capsys):
        for j in target_neighbors[i]:
          loss += (1 - reg) * np.sum((Lx[i] - Lx[j]) ** 2)
          grad += (1 - reg) * np.outer(Lx[i] - Lx[j], X[i] - X[j])
-         for l in range(X.shape[0]):
-           if y[i] != y[l]:
+         for k in range(X.shape[0]):
+           if y[i] != y[k]:
              hin, active = hinge(1 + np.sum((Lx[i] - Lx[j])**2) -
-                                 np.sum((Lx[i] - Lx[l])**2))
+                                 np.sum((Lx[i] - Lx[k])**2))
              total_active += active
              if active:
                loss += reg * hin
                grad += (reg * (np.outer(Lx[i] - Lx[j], X[i] - X[j]) -
-                               np.outer(Lx[i] - Lx[l], X[i] - X[l])))
+                               np.outer(Lx[i] - Lx[k], X[i] - X[k])))
      grad = 2 * grad
      return grad, loss, total_active
 
