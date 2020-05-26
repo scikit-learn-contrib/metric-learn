@@ -162,7 +162,8 @@ class MetricTransformer(metaclass=ABCMeta):
     """
 
 
-class MahalanobisMixin(BaseMetricLearner, MetricTransformer, metaclass=ABCMeta):
+class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
+                       metaclass=ABCMeta):
   r"""Mahalanobis metric learning algorithms.
 
   Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x')`,
