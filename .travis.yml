@@ -7,11 +7,11 @@ env:
     - SKGGM_VERSION=a0ed406586c4364ea3297a658f415e13b5cbdaf8
 matrix:
   include:
-  - name: "Pytest python 3.5 without skggm"
-    python: "3.5"
+  - name: "Pytest python 3.6 without skggm"
+    python: "3.6"
     before_install:
       - sudo apt-get install liblapack-dev
-      - pip install --upgrade pip "pytest<5"
+      - pip install --upgrade pip pytest
       - pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
     script:
       - pytest test --cov;
