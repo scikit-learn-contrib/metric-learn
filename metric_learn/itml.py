@@ -2,10 +2,8 @@
 Information Theoretic Metric Learning (ITML)
 """
 
-from __future__ import print_function, absolute_import
 import warnings
 import numpy as np
-from six.moves import xrange
 from sklearn.exceptions import ChangedBehaviorWarning
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array
@@ -69,7 +67,7 @@ class _BaseITML(MahalanobisMixin):
     pos_vv = pos_pairs[:, 0, :] - pos_pairs[:, 1, :]
     neg_vv = neg_pairs[:, 0, :] - neg_pairs[:, 1, :]
 
-    for it in xrange(self.max_iter):
+    for it in range(self.max_iter):
       # update positives
       for i, v in enumerate(pos_vv):
         wtw = v.dot(A).dot(v)  # scalar

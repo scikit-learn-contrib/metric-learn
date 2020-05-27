@@ -19,7 +19,7 @@ metric-learn contains efficient Python implementations of several popular superv
 
 **Dependencies**
 
--  Python 2.7+, 3.4+
+-  Python 3.6+
 -  numpy, scipy, scikit-learn>=0.20.3
 
 **Optional dependencies**

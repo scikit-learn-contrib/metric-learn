@@ -2,7 +2,6 @@
 Neighborhood Components Analysis (NCA)
 """
 
-from __future__ import absolute_import
 import warnings
 import time
 import sys

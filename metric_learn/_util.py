@@ -1,5 +1,4 @@
 import numpy as np
-import six
 from numpy.linalg import LinAlgError
 from sklearn.datasets import make_spd_matrix
 from sklearn.decomposition import PCA
@@ -283,7 +282,7 @@ def make_name(estimator):
   if a string is given
   """
   if estimator is not None:
-    if isinstance(estimator, six.string_types):
+    if isinstance(estimator, str):
       estimator_name = estimator
     else:
       estimator_name = estimator.__class__.__name__

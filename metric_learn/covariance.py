@@ -2,7 +2,6 @@
 Covariance metric (baseline method)
 """
 
-from __future__ import absolute_import
 import numpy as np
 import scipy
 from sklearn.base import TransformerMixin

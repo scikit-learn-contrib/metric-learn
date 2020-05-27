@@ -2,11 +2,9 @@
 Metric Learning from Relative Comparisons by Minimizing Squared Residual (LSML)
 """
 
-from __future__ import print_function, absolute_import, division
 import warnings
 import numpy as np
 import scipy.linalg
-from six.moves import xrange
 from sklearn.base import TransformerMixin
 from sklearn.exceptions import ChangedBehaviorWarning
 
@@ -66,7 +64,7 @@ class _BaseLSML(MahalanobisMixin):
     s_best = self._total_loss(M, vab, vcd, prior_inv)
     if self.verbose:
       print('initial loss', s_best)
-    for it in xrange(1, self.max_iter + 1):
+    for it in range(1, self.max_iter + 1):
       grad = self._gradient(M, vab, vcd, prior_inv)
       grad_norm = scipy.linalg.norm(grad)
       if grad_norm < self.tol:

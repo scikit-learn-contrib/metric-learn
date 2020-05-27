@@ -2,7 +2,6 @@
 Sparse High-Dimensional Metric Learning (SDML)
 """
 
-from __future__ import absolute_import
 import warnings
 import numpy as np
 from sklearn.base import TransformerMixin

@@ -29,7 +29,7 @@ setup(name='metric-learn',
       classifiers=[
           'Development Status :: 4 - Beta',
           'License :: OSI Approved :: MIT License',
-          'Programming Language :: Python',
+          'Programming Language :: Python :: 3',
           'Operating System :: OS Independent',
           'Intended Audience :: Science/Research',
           'Topic :: Scientific/Engineering'
@@ -39,7 +39,6 @@ setup(name='metric-learn',
           'numpy',
           'scipy',
           'scikit-learn',
-          'six'
       ],
       extras_require=dict(
           docs=['sphinx', 'shinx_rtd_theme', 'numpydoc'],

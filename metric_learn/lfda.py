@@ -1,11 +1,9 @@
 """
 Local Fisher Discriminant Analysis (LFDA)
 """
-from __future__ import division, absolute_import
 import numpy as np
 import scipy
 import warnings
-from six.moves import xrange
 from sklearn.metrics import pairwise_distances
 from sklearn.base import TransformerMixin
 
@@ -127,7 +125,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     tSb = np.zeros((d, d))
     tSw = np.zeros((d, d))
 
-    for c in xrange(num_classes):
+    for c in range(num_classes):
       Xc = X[y == c]
       nc = Xc.shape[0]
 

@@ -4,7 +4,6 @@ from supervised data labels.
 """
 import numpy as np
 import warnings
-from six.moves import xrange
 from sklearn.utils import check_random_state
 from sklearn.neighbors import NearestNeighbors
 
@@ -245,7 +244,7 @@ class Constraints(object):
     chunks = -np.ones_like(self.partial_labels, dtype=int)
     uniq, lookup = np.unique(self.partial_labels, return_inverse=True)
     unknown_uniq = np.where(uniq < 0)[0]
-    all_inds = [set(np.where(lookup == c)[0]) for c in xrange(len(uniq))
+    all_inds = [set(np.where(lookup == c)[0]) for c in range(len(uniq))
                 if c not in unknown_uniq]
     max_chunks = int(np.sum([len(s) // chunk_size for s in all_inds]))
     if max_chunks < num_chunks:

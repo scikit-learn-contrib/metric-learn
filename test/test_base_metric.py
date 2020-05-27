@@ -16,111 +16,59 @@ class TestStringRepr(unittest.TestCase):
 
   def test_covariance(self):
     self.assertEqual(remove_spaces(str(metric_learn.Covariance())),
-                     remove_spaces("Covariance(preprocessor=None)"))
+                     remove_spaces("Covariance()"))
 
   def test_lmnn(self):
     self.assertEqual(
-        remove_spaces(str(metric_learn.LMNN())),
-        remove_spaces(
-            "LMNN(convergence_tol=0.001, init=None, k=3, "
-            "learn_rate=1e-07, "
-            "max_iter=1000, min_iter=50, n_components=None, "
-            "num_dims='deprecated', preprocessor=None, random_state=None, "
-            "regularization=0.5, use_pca='deprecated', verbose=False)"))
+        remove_spaces(str(metric_learn.LMNN(convergence_tol=0.01, k=6))),
+        remove_spaces("LMNN(convergence_tol=0.01, k=6)"))
 
   def test_nca(self):
-    self.assertEqual(remove_spaces(str(metric_learn.NCA())),
-                     remove_spaces("NCA(init=None, max_iter=100,"
-                                   "n_components=None, "
-                                   "num_dims='deprecated', "
-                                   "preprocessor=None, random_state=None, "
-                                   "tol=None, verbose=False)"))
+    self.assertEqual(remove_spaces(str(metric_learn.NCA(max_iter=42))),
+                     remove_spaces("NCA(max_iter=42)"))
 
   def test_lfda(self):
-    self.assertEqual(remove_spaces(str(metric_learn.LFDA())),
-                     remove_spaces(
-        "LFDA(embedding_type='weighted', k=None, "
-        "n_components=None, num_dims='deprecated',"
-        "preprocessor=None)"))
+    self.assertEqual(remove_spaces(str(metric_learn.LFDA(k=2))),
+                     remove_spaces("LFDA(k=2)"))
 
   def test_itml(self):
-    self.assertEqual(remove_spaces(str(metric_learn.ITML())),
-                     remove_spaces("""
-ITML(A0='deprecated', convergence_threshold=0.001, gamma=1.0,
-   max_iter=1000, preprocessor=None, prior='identity', random_state=None,
-   verbose=False)
-"""))
-    self.assertEqual(remove_spaces(str(metric_learn.ITML_Supervised())),
-                     remove_spaces("""
-ITML_Supervised(A0='deprecated', bounds='deprecated',
-        convergence_threshold=0.001, gamma=1.0,
-        max_iter=1000, num_constraints=None, num_labeled='deprecated',
-        preprocessor=None, prior='identity', random_state=None, verbose=False)
-"""))
+    self.assertEqual(remove_spaces(str(metric_learn.ITML(gamma=0.5))),
+                     remove_spaces("ITML(gamma=0.5)"))
+    self.assertEqual(
+        remove_spaces(str(metric_learn.ITML_Supervised(num_constraints=7))),
+        remove_spaces("ITML_Supervised(num_constraints=7)"))
 
   def test_lsml(self):
-    self.assertEqual(remove_spaces(str(metric_learn.LSML())),
-                     remove_spaces("""
-LSML(max_iter=1000, preprocessor=None, prior=None,
-   random_state=None, tol=0.001, verbose=False)
-"""))
-    self.assertEqual(remove_spaces(str(metric_learn.LSML_Supervised())),
-                     remove_spaces("""
-LSML_Supervised(max_iter=1000, num_constraints=None,
-        num_labeled='deprecated', preprocessor=None, prior=None,
-        random_state=None, tol=0.001, verbose=False, weights=None)
-"""))
+    self.assertEqual(remove_spaces(str(metric_learn.LSML(tol=0.1))),
+                     remove_spaces("LSML(tol=0.1)"))
+    self.assertEqual(
+        remove_spaces(str(metric_learn.LSML_Supervised(verbose=True))),
+        remove_spaces("LSML_Supervised(verbose=True)"))
 
   def test_sdml(self):
-    self.assertEqual(remove_spaces(str(metric_learn.SDML())),
-                     remove_spaces("""
-SDML(balance_param=0.5, preprocessor=None, prior=None, random_state=None,
-   sparsity_param=0.01, use_cov='deprecated', verbose=False)
-"""))
-    self.assertEqual(remove_spaces(str(metric_learn.SDML_Supervised())),
-                     remove_spaces("""
-SDML_Supervised(balance_param=0.5, num_constraints=None,
-        num_labeled='deprecated', preprocessor=None, prior=None,
-        random_state=None, sparsity_param=0.01, use_cov='deprecated',
-        verbose=False)
-"""))
+    self.assertEqual(remove_spaces(str(metric_learn.SDML(verbose=True))),
+                     remove_spaces("SDML(verbose=True)"))
+    self.assertEqual(
+        remove_spaces(str(metric_learn.SDML_Supervised(sparsity_param=0.5))),
+        remove_spaces("SDML_Supervised(sparsity_param=0.5)"))
 
   def test_rca(self):
-    self.assertEqual(remove_spaces(str(metric_learn.RCA())),
-                     remove_spaces("RCA(n_components=None, "
-                                   "num_dims='deprecated', "
-                                   "pca_comps='deprecated', "
-                                   "preprocessor=None)"))
-    self.assertEqual(remove_spaces(str(metric_learn.RCA_Supervised())),
-                     remove_spaces(
-                         "RCA_Supervised(chunk_size=2, "
-                         "n_components=None, num_chunks=100, "
-                         "num_dims='deprecated', pca_comps='deprecated', "
-                         "preprocessor=None, random_state=None)"))
+    self.assertEqual(remove_spaces(str(metric_learn.RCA(n_components=3))),
+                     remove_spaces("RCA(n_components=3)"))
+    self.assertEqual(
+        remove_spaces(str(metric_learn.RCA_Supervised(num_chunks=5))),
+        remove_spaces("RCA_Supervised(num_chunks=5)"))
 
   def test_mlkr(self):
-    self.assertEqual(remove_spaces(str(metric_learn.MLKR())),
-                     remove_spaces("MLKR(A0='deprecated', init=None,"
-                                   "max_iter=1000, n_components=None,"
-                                   "num_dims='deprecated', preprocessor=None,"
-                                   "random_state=None, tol=None, "
-                                   "verbose=False)"
-                                   ))
+    self.assertEqual(remove_spaces(str(metric_learn.MLKR(max_iter=777))),
+                     remove_spaces("MLKR(max_iter=777)"))
 
   def test_mmc(self):
-    self.assertEqual(remove_spaces(str(metric_learn.MMC())),
-                     remove_spaces("""
-MMC(A0='deprecated', convergence_threshold=0.001, diagonal=False,
-  diagonal_c=1.0, init=None, max_iter=100, max_proj=10000,
-  preprocessor=None, random_state=None, verbose=False)
-"""))
-    self.assertEqual(remove_spaces(str(metric_learn.MMC_Supervised())),
-                     remove_spaces("""
-MMC_Supervised(A0='deprecated', convergence_threshold=1e-06, diagonal=False,
-        diagonal_c=1.0, init=None, max_iter=100, max_proj=10000,
-        num_constraints=None, num_labeled='deprecated', preprocessor=None,
-        random_state=None, verbose=False)
-"""))
+    self.assertEqual(remove_spaces(str(metric_learn.MMC(diagonal=True))),
+                     remove_spaces("MMC(diagonal=True)"))
+    self.assertEqual(
+        remove_spaces(str(metric_learn.MMC_Supervised(max_iter=1))),
+        remove_spaces("MMC_Supervised(max_iter=1)"))
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,

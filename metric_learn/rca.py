@@ -2,10 +2,8 @@
 Relative Components Analysis (RCA)
 """
 
-from __future__ import absolute_import
 import numpy as np
 import warnings
-from six.moves import xrange
 from sklearn.base import TransformerMixin
 from sklearn.exceptions import ChangedBehaviorWarning
 
@@ -22,7 +20,7 @@ def _chunk_mean_centering(data, chunks):
   # mean on it
   chunk_data = data[chunk_mask].astype(float, copy=False)
   chunk_labels = chunks[chunk_mask]
-  for c in xrange(num_chunks):
+  for c in range(num_chunks):
     mask = chunk_labels == c
     chunk_data[mask] -= chunk_data[mask].mean(axis=0)
 
