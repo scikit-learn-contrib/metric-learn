@@ -5,7 +5,7 @@ import metric_learn
 import numpy as np
 from sklearn import clone
 from sklearn.utils.testing import set_random_state
-from test.test_utils import ids_metric_learners, metric_learners
+from test.test_utils import ids_metric_learners, metric_learners, remove_y
 
 
 def remove_spaces(s):
@@ -83,12 +83,12 @@ def test_get_metric_is_independent_from_metric_learner(estimator,
 
   # we fit the metric learner on it and then we compute the metric on some
   # points
-  model.fit(input_data, labels)
+  model.fit(*remove_y(model, input_data, labels))
   metric = model.get_metric()
   score = metric(X[0], X[1])
 
   # then we refit the estimator on another dataset
-  model.fit(np.sin(input_data), labels)
+  model.fit(*remove_y(model, np.sin(input_data), labels))
 
   # we recompute the distance between the two points: it should be the same
   score_bis = metric(X[0], X[1])
@@ -103,7 +103,7 @@ def test_get_metric_raises_error(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(input_data, labels)
+  model.fit(*remove_y(model, input_data, labels))
   metric = model.get_metric()
 
   list_test_get_metric_raises = [(X[0].tolist() + [5.2], X[1]),  # vectors with
@@ -126,7 +126,7 @@ def test_get_metric_works_does_not_raise(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(input_data, labels)
+  model.fit(*remove_y(model, input_data, labels))
   metric = model.get_metric()
 
   list_test_get_metric_doesnt_raise = [(X[0], X[1]),
@@ -158,20 +158,20 @@ def test_n_components(estimator, build_dataset):
   if hasattr(model, 'n_components'):
     set_random_state(model)
     model.set_params(n_components=None)
-    model.fit(input_data, labels)
+    model.fit(*remove_y(model, input_data, labels))
     assert model.components_.shape == (X.shape[1], X.shape[1])
 
     model = clone(estimator)
     set_random_state(model)
     model.set_params(n_components=X.shape[1] - 1)
-    model.fit(input_data, labels)
+    model.fit(*remove_y(model, input_data, labels))
     assert model.components_.shape == (X.shape[1] - 1, X.shape[1])
 
     model = clone(estimator)
     set_random_state(model)
     model.set_params(n_components=X.shape[1] + 1)
     with pytest.raises(ValueError) as expected_err:
-      model.fit(input_data, labels)
+      model.fit(*remove_y(model, input_data, labels))
     assert (str(expected_err.value) ==
             'Invalid n_components, must be in [1, {}]'.format(X.shape[1]))
 
@@ -179,7 +179,7 @@ def test_n_components(estimator, build_dataset):
     set_random_state(model)
     model.set_params(n_components=0)
     with pytest.raises(ValueError) as expected_err:
-      model.fit(input_data, labels)
+      model.fit(*remove_y(model, input_data, labels))
     assert (str(expected_err.value) ==
             'Invalid n_components, must be in [1, {}]'.format(X.shape[1]))
 

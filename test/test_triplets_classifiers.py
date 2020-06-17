@@ -14,7 +14,7 @@ import numpy as np
 def test_predict_only_one_or_minus_one(estimator, build_dataset,
                                        with_preprocessor):
   """Test that all predicted values are either +1 or -1"""
-  input_data, preprocessor = build_dataset(with_preprocessor)
+  input_data, _, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
@@ -33,7 +33,7 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
   """Test that a NotFittedError is raised if someone tries to predict and
   the metric learner has not been fitted."""
-  input_data, preprocessor = build_dataset(with_preprocessor)
+  input_data, _, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
@@ -46,8 +46,7 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
 def test_accuracy_toy_example(estimator, build_dataset):
   """Test that the default scoring for triplets (accuracy) works on some
   toy example"""
-  triplets, X = build_dataset(with_preprocessor=True)
-  triplets = X[triplets]
+  triplets, _, _, X = build_dataset(with_preprocessor=False)
   estimator = clone(estimator)
   set_random_state(estimator)
   estimator.fit(triplets)

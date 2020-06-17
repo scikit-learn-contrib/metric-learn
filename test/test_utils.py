@@ -16,14 +16,13 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
-                          Constraints)
+                          SCML, SCML_Supervised, Constraints)
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
                                       _PairsClassifierMixin,
                                       _TripletsClassifierMixin,
                                       _QuadrupletsClassifierMixin)
 from metric_learn.exceptions import PreprocessorError, NonPSDError
 from sklearn.datasets import make_regression, make_blobs, load_iris
-from metric_learn.lsml import _BaseLSML
 
 
 SEED = 42
@@ -92,25 +91,10 @@ def build_triplets(with_preprocessor=False):
   triplets = constraints.generate_knntriplets(X, k_genuine=3, k_impostor=4)
   if with_preprocessor:
     # if preprocessor, we build a 2D array of triplets of indices
-    return triplets, X
+    return Dataset(triplets, np.ones(len(triplets)), X, np.arange(len(X)))
   else:
     # if not, we build a 3D array of triplets of samples
-    return X[triplets], None
-
-
-class mock_triplet_LSML(_BaseLSML, _TripletsClassifierMixin):
-  # Mock Triplet learner from LSML which is a quadruplets learner
-  # in order to test TripletClassifierMixin basic methods
-
-  _tuple_size = 4
-
-  def fit(self, triplets, weights=None):
-    quadruplets = triplets[:, [0, 1, 0, 2]]
-    return self._fit(quadruplets, weights=weights)
-
-  def decision_function(self, triplets):
-    self._tuple_size = 3
-    return _TripletsClassifierMixin.decision_function(self, triplets)
+    return Dataset(X[triplets], np.ones(len(triplets)), None, X)
 
 
 def build_quadruplets(with_preprocessor=False):
@@ -133,7 +117,7 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
                                  quadruplets_learners]))
 
-triplets_learners = [(mock_triplet_LSML(), build_triplets)]
+triplets_learners = [(SCML(), build_triplets)]
 ids_triplets_learners = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
                               triplets_learners]))
@@ -155,7 +139,8 @@ classifiers = [(Covariance(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
                (RCA_Supervised(num_chunks=5), build_classification),
                (SDML_Supervised(prior='identity', balance_param=1e-5),
-               build_classification)]
+               build_classification),
+               (SCML_Supervised(), build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
@@ -165,10 +150,12 @@ ids_regressors = list(map(lambda x: x.__class__.__name__,
                           [learner for (learner, _) in regressors]))
 
 WeaklySupervisedClasses = (_PairsClassifierMixin,
+                           _TripletsClassifierMixin,
                            _QuadrupletsClassifierMixin)
 
-tuples_learners = pairs_learners + quadruplets_learners
-ids_tuples_learners = ids_pairs_learners + ids_quadruplets_learners
+tuples_learners = pairs_learners + triplets_learners + quadruplets_learners
+ids_tuples_learners = ids_pairs_learners + ids_triplets_learners \
+                      + ids_quadruplets_learners
 
 supervised_learners = classifiers + regressors
 ids_supervised_learners = ids_classifiers + ids_regressors
@@ -176,14 +163,17 @@ ids_supervised_learners = ids_classifiers + ids_regressors
 metric_learners = tuples_learners + supervised_learners
 ids_metric_learners = ids_tuples_learners + ids_supervised_learners
 
+metric_learners_pipeline = pairs_learners + supervised_learners
+ids_metric_learners_pipeline = ids_pairs_learners + ids_supervised_learners
 
-def remove_y_quadruplets(estimator, X, y):
-  """Quadruplets learners have no y in fit, but to write test for all
-  estimators, it is convenient to have this function, that will return X and y
-  if the estimator needs a y to fit on, and just X otherwise."""
+
+def remove_y(estimator, X, y):
+  """Quadruplets and triplets learners have no y in fit, but to write test for
+  all estimators, it is convenient to have this function, that will return X
+  and y if the estimator needs a y to fit on, and just X otherwise."""
+  no_y_fit = quadruplets_learners + triplets_learners
   if estimator.__class__.__name__ in [e.__class__.__name__
-                                      for (e, _) in
-                                      quadruplets_learners]:
+                                      for (e, _) in no_y_fit]:
     return (X,)
   else:
     return (X, y)
@@ -831,13 +821,12 @@ def test_error_message_tuple_size(estimator, _):
   per tuple, it throws an error message"""
   estimator = clone(estimator)
   set_random_state(estimator)
-  invalid_pairs = np.array([[[1.3, 6.3], [3., 6.8], [6.5, 4.4]],
-                            [[1.9, 5.3], [1., 7.8], [3.2, 1.2]]])
+  invalid_pairs = np.ones((2, 5, 2))
   y = [1, 1]
   with pytest.raises(ValueError) as raised_err:
-    estimator.fit(*remove_y_quadruplets(estimator, invalid_pairs, y))
-  expected_msg = ("Tuples of {} element(s) expected{}. Got tuples of 3 "
-                  "element(s) instead (shape=(2, 3, 2)):\ninput={}.\n"
+    estimator.fit(*remove_y(estimator, invalid_pairs, y))
+  expected_msg = ("Tuples of {} element(s) expected{}. Got tuples of 5 "
+                  "element(s) instead (shape=(2, 5, 2)):\ninput={}.\n"
                   .format(estimator._tuple_size, make_context(estimator),
                           invalid_pairs))
   assert str(raised_err.value) == expected_msg
@@ -911,35 +900,21 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
                                    dataset_formed.data,
                                    random_state=SEED)
 
-  def make_random_state(estimator):
-    rs = {}
-    if estimator.__class__.__name__[-11:] == '_Supervised':
-      rs['random_state'] = check_random_state(SEED)
-    return rs
-
   estimator_with_preprocessor = clone(estimator)
   set_random_state(estimator_with_preprocessor)
   estimator_with_preprocessor.set_params(preprocessor=X)
-  estimator_with_preprocessor.fit(*remove_y_quadruplets(estimator,
-                                                        indices_train,
-                                                        y_train),
-                                  **make_random_state(estimator))
+  estimator_with_preprocessor.fit(*remove_y(estimator, indices_train, y_train))
 
   estimator_without_preprocessor = clone(estimator)
   set_random_state(estimator_without_preprocessor)
   estimator_without_preprocessor.set_params(preprocessor=None)
-  estimator_without_preprocessor.fit(*remove_y_quadruplets(estimator,
-                                                           formed_train,
-                                                           y_train),
-                                     **make_random_state(estimator))
+  estimator_without_preprocessor.fit(*remove_y(estimator, formed_train,
+                                               y_train))
 
   estimator_with_prep_formed = clone(estimator)
   set_random_state(estimator_with_prep_formed)
   estimator_with_prep_formed.set_params(preprocessor=X)
-  estimator_with_prep_formed.fit(*remove_y_quadruplets(estimator,
-                                                       indices_train,
-                                                       y_train),
-                                 **make_random_state(estimator))
+  estimator_with_prep_formed.fit(*remove_y(estimator, indices_train, y_train))
 
   # test prediction methods
   for method in ["predict", "decision_function"]:

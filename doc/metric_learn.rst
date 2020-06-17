@@ -33,6 +33,7 @@ Supervised Learning Algorithms
    metric_learn.MMC_Supervised
    metric_learn.SDML_Supervised
    metric_learn.RCA_Supervised
+   metric_learn.SCML_Supervised
 
 Weakly Supervised Learning Algorithms
 -------------------------------------
@@ -45,6 +46,7 @@ Weakly Supervised Learning Algorithms
    metric_learn.LSML
    metric_learn.MMC
    metric_learn.SDML
+   metric_learn.SCML
 
 Unsupervised Learning Algorithms
 --------------------------------

@@ -15,11 +15,12 @@ from sklearn.utils.testing import set_random_state
 
 from metric_learn._util import make_context, _initialize_metric_mahalanobis
 from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
+                                      _TripletsClassifierMixin,
                                       _PairsClassifierMixin)
 from metric_learn.exceptions import NonPSDError
 
 from test.test_utils import (ids_metric_learners, metric_learners,
-                             remove_y_quadruplets, ids_classifiers)
+                             remove_y, ids_classifiers)
 
 RNG = check_random_state(0)
 
@@ -33,7 +34,7 @@ def test_score_pairs_pairwise(estimator, build_dataset):
   X = X[:n_samples]
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
 
   pairwise = model.score_pairs(np.array(list(product(X, X))))\
       .reshape(n_samples, n_samples)
@@ -57,7 +58,7 @@ def test_score_pairs_toy_example(estimator, build_dataset):
     X = X[:n_samples]
     model = clone(estimator)
     set_random_state(model)
-    model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+    model.fit(*remove_y(estimator, input_data, labels))
     pairs = np.stack([X[:10], X[10:20]], axis=1)
     embedded_pairs = pairs.dot(model.components_.T)
     distances = np.sqrt(np.sum((embedded_pairs[:, 1] -
@@ -73,7 +74,7 @@ def test_score_pairs_finite(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   pairs = np.array(list(product(X, X)))
   assert np.isfinite(model.score_pairs(pairs)).all()
 
@@ -87,7 +88,7 @@ def test_score_pairs_dim(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   tuples = np.array(list(product(X, X)))
   assert model.score_pairs(tuples).shape == (tuples.shape[0],)
   context = make_context(estimator)
@@ -118,7 +119,7 @@ def test_embed_toy_example(estimator, build_dataset):
     X = X[:n_samples]
     model = clone(estimator)
     set_random_state(model)
-    model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+    model.fit(*remove_y(estimator, input_data, labels))
     embedded_points = X.dot(model.components_.T)
     assert_array_almost_equal(model.transform(X), embedded_points)
 
@@ -130,7 +131,7 @@ def test_embed_dim(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   assert model.transform(X).shape == X.shape
 
   # assert that ValueError is thrown if input shape is 1D
@@ -144,7 +145,7 @@ def test_embed_dim(estimator, build_dataset):
   # we test that the shape is also OK when doing dimensionality reduction
   if hasattr(model, 'n_components'):
     model.set_params(n_components=2)
-    model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+    model.fit(*remove_y(estimator, input_data, labels))
     assert model.transform(X).shape == (X.shape[0], 2)
     # assert that ValueError is thrown if input shape is 1D
     with pytest.raises(ValueError) as raised_error:
@@ -159,7 +160,7 @@ def test_embed_finite(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   assert np.isfinite(model.transform(X)).all()
 
 
@@ -170,7 +171,7 @@ def test_embed_is_linear(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   assert_array_almost_equal(model.transform(X[:10] + X[10:20]),
                             model.transform(X[:10]) +
                             model.transform(X[10:20]))
@@ -189,7 +190,7 @@ def test_get_metric_equivalent_to_explicit_mahalanobis(estimator,
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   metric = model.get_metric()
   n_features = X.shape[1]
   a, b = (rng.randn(n_features), rng.randn(n_features))
@@ -208,7 +209,7 @@ def test_get_metric_is_pseudo_metric(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   metric = model.get_metric()
 
   n_features = X.shape[1]
@@ -234,7 +235,7 @@ def test_metric_raises_deprecation_warning(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
 
   with pytest.warns(DeprecationWarning) as raised_warning:
     model.metric()
@@ -251,7 +252,7 @@ def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   clustering = DBSCAN(metric=model.get_metric())
   clustering.fit(X)
 
@@ -264,7 +265,7 @@ def test_get_squared_metric(estimator, build_dataset):
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   metric = model.get_metric()
 
   n_features = X.shape[1]
@@ -284,26 +285,31 @@ def test_components_is_2D(estimator, build_dataset):
   model = clone(estimator)
   set_random_state(model)
   # test that it works for X.shape[1] features
-  model.fit(*remove_y_quadruplets(estimator, input_data, labels))
+  model.fit(*remove_y(estimator, input_data, labels))
   assert model.components_.shape == (X.shape[1], X.shape[1])
 
   # test that it works for 1 feature
   trunc_data = input_data[..., :1]
   # we drop duplicates that might have been formed, i.e. of the form
   # aabc or abcc or aabb for quadruplets, and aa for pairs.
+
   if isinstance(estimator, _QuadrupletsClassifierMixin):
-    for slice_idx in [slice(0, 2), slice(2, 4)]:
-      pairs = trunc_data[:, slice_idx, :]
-      diffs = pairs[:, 1, :] - pairs[:, 0, :]
-      to_keep = np.where(np.abs(diffs.ravel()) > 1e-9)
-      trunc_data = trunc_data[to_keep]
-      labels = labels[to_keep]
+    pairs_idx = [[0, 1], [2, 3]]
+  elif isinstance(estimator, _TripletsClassifierMixin):
+    pairs_idx = [[0, 1], [0, 2]]
   elif isinstance(estimator, _PairsClassifierMixin):
-    diffs = trunc_data[:, 1, :] - trunc_data[:, 0, :]
-    to_keep = np.where(np.abs(diffs.ravel()) > 1e-9)
+    pairs_idx = [[0, 1]]
+  else:
+    pairs_idx = []
+
+  for pair_idx in pairs_idx:
+    pairs = trunc_data[:, pair_idx, :]
+    diffs = pairs[:, 1, :] - pairs[:, 0, :]
+    to_keep = np.abs(diffs.ravel()) > 1e-9
     trunc_data = trunc_data[to_keep]
     labels = labels[to_keep]
-  model.fit(*remove_y_quadruplets(estimator, trunc_data, labels))
+
+  model.fit(*remove_y(estimator, trunc_data, labels))
   assert model.components_.shape == (1, 1)  # the components must be 2D
 
 
@@ -735,9 +741,9 @@ def test_deterministic_initialization(estimator, build_dataset):
     model.set_params(prior='random')
   model1 = clone(model)
   set_random_state(model1, 42)
-  model1 = model1.fit(input_data, labels)
+  model1 = model1.fit(*remove_y(model, input_data, labels))
   model2 = clone(model)
   set_random_state(model2, 42)
-  model2 = model2.fit(input_data, labels)
+  model2 = model2.fit(*remove_y(model, input_data, labels))
   np.testing.assert_allclose(model1.get_mahalanobis_matrix(),
                              model2.get_mahalanobis_matrix())

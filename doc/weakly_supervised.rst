@@ -700,6 +700,63 @@ of triplets that have the right predicted ordering.
 Algorithms
 ----------
 
+.. _scml:
+
+:py:class:`SCML <metric_learn.SCML>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Sparse Compositional Metric Learning
+(:py:class:`SCML <metric_learn.SCML>`)
+
+`SCML` learns a squared Mahalanobis distance from triplet constraints by
+optimizing sparse positive weights assigned to a set of :math:`K` rank-one
+PSD bases. This can be formulated as an optimization problem with only
+:math:`K` parameters, that can be solved with an efficient stochastic
+composite scheme.
+
+The Mahalanobis matrix :math:`M` is built from a basis set :math:`B = \{b_i\}_{i=\{1,...,K\}}`
+weighted by a :math:`K` dimensional vector :math:`w = \{w_i\}_{i=\{1,...,K\}}` as:
+
+.. math::
+
+    M = \sum_{i=1}^K w_i b_i b_i^T = B \cdot diag(w) \cdot B^T \quad w_i \geq 0
+
+Learning :math:`M` in this form makes it PSD by design, as it is a
+nonnegative sum of PSD matrices. The basis set :math:`B` is fixed in advance
+and it is possible to construct it from the data. The optimization problem
+over :math:`w` is formulated as a classic margin-based hinge loss function
+involving the set :math:`C` of triplets. A regularization :math:`\ell_1`
+is added to yield a sparse combination. The formulation is the following:
+
+.. math::
+
+    \min_{w\geq 0} \sum_{(x_i,x_j,x_k)\in C} [1 + d_w(x_i,x_j)-d_w(x_i,x_k)]_+ + \beta||w||_1
+
+where :math:`[\cdot]_+` is the hinge loss. 
+ 
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import SCML
+
+    triplets = [[[1.2, 7.5], [1.3, 1.5], [6.2, 9.7]],
+                [[1.3, 4.5], [3.2, 4.6], [5.4, 5.4]],
+                [[3.2, 7.5], [3.3, 1.5], [8.2, 9.7]],
+                [[3.3, 4.5], [5.2, 4.6], [7.4, 5.4]]]
+
+    scml = SCML()
+    scml.fit(triplets)
+
+.. topic:: References:
+
+  .. [1] Y. Shi, A. Bellet and F. Sha. `Sparse Compositional Metric Learning.
+         <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
+         (AAAI), 2014.
+
+  .. [2] Adapted from original \
+         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+
 
 .. _learning_on_quadruplets:
 
@@ -829,13 +886,13 @@ extension leads to more stable estimation when the dimension is high and
 only a small amount of constraints is given.
 
 The loss function of each constraint 
-:math:`d(\mathbf{x}_a, \mathbf{x}_b) < d(\mathbf{x}_c, \mathbf{x}_d)` is 
+:math:`d(\mathbf{x}_i, \mathbf{x}_j) < d(\mathbf{x}_k, \mathbf{x}_l)` is 
 denoted as:
 
 .. math::
 
-    H(d_\mathbf{M}(\mathbf{x}_a, \mathbf{x}_b) 
-    - d_\mathbf{M}(\mathbf{x}_c, \mathbf{x}_d))
+    H(d_\mathbf{M}(\mathbf{x}_i, \mathbf{x}_j) 
+    - d_\mathbf{M}(\mathbf{x}_k, \mathbf{x}_l))
 
 where :math:`H(\cdot)` is the squared Hinge loss function defined as:
 
@@ -845,8 +902,8 @@ where :math:`H(\cdot)` is the squared Hinge loss function defined as:
     \,\,x^2 \qquad x>0\end{aligned}\right.\\
 
 The summed loss function :math:`L(C)` is the simple sum over all constraints 
-:math:`C = \{(\mathbf{x}_a , \mathbf{x}_b , \mathbf{x}_c , \mathbf{x}_d) 
-: d(\mathbf{x}_a , \mathbf{x}_b) < d(\mathbf{x}_c , \mathbf{x}_d)\}`. The 
+:math:`C = \{(\mathbf{x}_i , \mathbf{x}_j , \mathbf{x}_k , \mathbf{x}_l) 
+: d(\mathbf{x}_i , \mathbf{x}_j) < d(\mathbf{x}_k , \mathbf{x}_l)\}`. The 
 original paper suggested here should be a weighted sum since the confidence 
 or probability of each constraint might differ. However, for the sake of 
 simplicity and assumption of no extra knowledge provided, we just deploy 
@@ -858,9 +915,9 @@ knowledge:
 
 .. math::
 
-    \min_\mathbf{M}(D_{ld}(\mathbf{M, M_0}) + \sum_{(\mathbf{x}_a, 
-    \mathbf{x}_b, \mathbf{x}_c, \mathbf{x}_d)\in C}H(d_\mathbf{M}(
-    \mathbf{x}_a, \mathbf{x}_b) - d_\mathbf{M}(\mathbf{x}_c, \mathbf{x}_c))\\
+    \min_\mathbf{M}(D_{ld}(\mathbf{M, M_0}) + \sum_{(\mathbf{x}_i, 
+    \mathbf{x}_j, \mathbf{x}_k, \mathbf{x}_l)\in C}H(d_\mathbf{M}(
+    \mathbf{x}_i, \mathbf{x}_j) - d_\mathbf{M}(\mathbf{x}_k, \mathbf{x}_l))\\
 
 where :math:`\mathbf{M}_0` is the prior metric matrix, set as identity 
 by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:

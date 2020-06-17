@@ -12,6 +12,7 @@ from numpy.testing import (assert_array_almost_equal, assert_array_equal,
 from sklearn.utils.testing import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
 from sklearn.utils.validation import check_X_y
+from sklearn.preprocessing import StandardScaler
 try:
   from inverse_covariance import quic
   assert(quic)
@@ -20,11 +21,11 @@ except ImportError:
 else:
   HAS_SKGGM = True
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
-                          LSML_Supervised, ITML_Supervised, SDML_Supervised,
-                          RCA_Supervised, MMC_Supervised, SDML, RCA, ITML,
-                          LSML)
+                          SCML_Supervised, LSML_Supervised,
+                          ITML_Supervised, SDML_Supervised, RCA_Supervised,
+                          MMC_Supervised, SDML, RCA, ITML, LSML, SCML)
 # Import this specially for testing.
-from metric_learn.constraints import wrap_pairs
+from metric_learn.constraints import wrap_pairs, Constraints
 from metric_learn.lmnn import _sum_outer_products
 
 
@@ -73,6 +74,235 @@ class TestCovariance(MetricTestCase):
                     cov_matrix)
     assert_allclose(pseudo_inverse.dot(cov_matrix).dot(pseudo_inverse),
                     pseudo_inverse)
+
+
+class TestSCML(object):
+  @pytest.mark.parametrize('basis', ('lda', 'triplet_diffs'))
+  def test_iris(self, basis):
+    X, y = load_iris(return_X_y=True)
+    scml = SCML_Supervised(basis=basis, n_basis=85, k_genuine=7, k_impostor=5,
+                           random_state=42)
+    scml.fit(X, y)
+    csep = class_separation(scml.transform(X), y)
+    assert csep < 0.24
+
+  def test_big_n_features(self):
+    X, y = make_classification(n_samples=100, n_classes=3, n_features=60,
+                               n_informative=60, n_redundant=0, n_repeated=0,
+                               random_state=42)
+    X = StandardScaler().fit_transform(X)
+    scml = SCML_Supervised(random_state=42)
+    scml.fit(X, y)
+    csep = class_separation(scml.transform(X), y)
+    assert csep < 0.7
+
+  @pytest.mark.parametrize(('estimator', 'data'),
+                           [(SCML, (np.ones((3, 3, 3)),)),
+                            (SCML_Supervised, (np.array([[0, 0], [0, 1],
+                                                         [2, 0], [2, 1]]),
+                                               np.array([1, 0, 1, 0])))])
+  def test_bad_basis(self, estimator, data):
+    model = estimator(basis='bad_basis')
+    msg = ("`basis` must be one of the options '{}' or an array of shape "
+           "(n_basis, n_features)."
+           .format("', '".join(model._authorized_basis)))
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(*data)
+    assert msg == raised_error.value.args[0]
+
+  def test_dimension_reduction_msg(self):
+    scml = SCML(n_basis=2)
+    triplets = np.array([[[0, 1], [2, 1], [0, 0]],
+                         [[2, 1], [0, 1], [2, 0]],
+                         [[0, 0], [2, 0], [0, 1]],
+                         [[2, 0], [0, 0], [2, 1]]])
+    msg = ("The number of bases with nonzero weight is less than the "
+           "number of features of the input, in consequence the "
+           "learned transformation reduces the dimension to 1.")
+    with pytest.warns(UserWarning) as raised_warning:
+      scml.fit(triplets)
+    assert msg == raised_warning[0].message.args[0]
+
+  @pytest.mark.parametrize(('estimator', 'data'),
+                           [(SCML, (np.array([[[0, 1], [2, 1], [0, 0]],
+                                              [[2, 1], [0, 1], [2, 0]],
+                                              [[0, 0], [2, 0], [0, 1]],
+                                              [[2, 0], [0, 0], [2, 1]]]),)),
+                           (SCML_Supervised, (np.array([[0, 0], [1, 1],
+                                                       [3, 3]]),
+                                              np.array([1, 2, 3])))])
+  def test_n_basis_wrong_type(self, estimator, data):
+    n_basis = 4.0
+    model = estimator(n_basis=n_basis)
+    msg = ("n_basis should be an integer, instead it is of type %s"
+           % type(n_basis))
+    with pytest.raises(ValueError) as raised_error:
+      model.fit(*data)
+    assert msg == raised_error.value.args[0]
+
+  def test_small_n_basis_lda(self):
+    X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
+    y = np.array([0, 0, 1, 1])
+
+    n_class = 2
+    scml = SCML_Supervised(n_basis=n_class-1)
+    msg = ("The number of basis is less than the number of classes, which may"
+           " lead to poor discriminative performance.")
+    with pytest.warns(UserWarning) as raised_warning:
+      scml.fit(X, y)
+    assert msg == raised_warning[0].message.args[0]
+
+  def test_big_n_basis_lda(self):
+    X = np.array([[0, 0], [1, 1], [3, 3]])
+    y = np.array([1, 2, 3])
+
+    n_class = 3
+    num_eig = min(n_class - 1, X.shape[1])
+    n_basis = X.shape[0] * 2 * num_eig
+
+    scml = SCML_Supervised(n_basis=n_basis)
+    msg = ("Not enough samples to generate %d LDA bases, n_basis"
+           "should be smaller than %d" %
+           (n_basis, n_basis))
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(X, y)
+    assert msg == raised_error.value.args[0]
+
+  @pytest.mark.parametrize(('estimator', 'data'),
+                           [(SCML, (np.random.rand(3, 3, 2),)),
+                           (SCML_Supervised, (np.array([[0, 0], [0, 1],
+                                                        [2, 0], [2, 1]]),
+                                              np.array([1, 0, 1, 0])))])
+  def test_array_basis(self, estimator, data):
+    """ Test that the proper error is raised when the shape of the input basis
+    array is not consistent with the input
+    """
+    basis = np.eye(3)
+    scml = estimator(n_basis=3, basis=basis)
+
+    msg = ('The dimensionality ({}) of the provided bases must match the '
+           'dimensionality of the data ({}).'
+           .format(basis.shape[1], data[0].shape[-1]))
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(*data)
+    assert msg == raised_error.value.args[0]
+
+  @pytest.mark.parametrize(('estimator', 'data'),
+                           [(SCML, (np.array([[0, 1, 2], [0, 1, 3], [1, 0, 2],
+                                              [1, 0, 3], [2, 3, 1], [2, 3, 0],
+                                              [3, 2, 1], [3, 2, 0]]),)),
+                           (SCML_Supervised, (np.array([0, 1, 2, 3]),
+                                              np.array([0, 0, 1, 1])))])
+  def test_verbose(self, estimator, data, capsys):
+    # assert there is proper output when verbose = True
+    model = estimator(preprocessor=np.array([[0, 0], [1, 1], [2, 2], [3, 3]]),
+                      max_iter=1, output_iter=1, batch_size=1,
+                      basis='triplet_diffs', random_state=42, verbose=True)
+    model.fit(*data)
+    out, _ = capsys.readouterr()
+    expected_out = ('[%s] iter 1\t obj 0.569946\t num_imp 2\n'
+                    'max iteration reached.\n' % estimator.__name__)
+    assert out == expected_out
+
+  def test_triplet_diffs_toy(self):
+    expected_n_basis = 10
+    model = SCML_Supervised(n_basis=expected_n_basis)
+    X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
+    triplets = np.array([[0, 1, 2], [0, 1, 3], [1, 0, 2], [1, 0, 3],
+                         [2, 3, 1], [2, 3, 0], [3, 2, 1], [3, 2, 0]])
+    basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+    # All points are along the same line, so the only possible basis will be
+    # the vector along that line normalized.
+    expected_basis = np.ones((expected_n_basis, 2))/np.sqrt(2)
+    assert n_basis == expected_n_basis
+    np.testing.assert_allclose(basis, expected_basis)
+
+  def test_lda_toy(self):
+    expected_n_basis = 7
+    model = SCML_Supervised(n_basis=expected_n_basis)
+    X = np.array([[0, 0], [1, 1], [2, 2], [3, 3]])
+    y = np.array([0, 0, 1, 1])
+    basis, n_basis = model._generate_bases_LDA(X, y)
+    # All points are along the same line, so the only possible basis will be
+    # the vector along that line normalized. In this case it is possible to
+    # obtain it with positive or negative orientations.
+    expected_basis = np.ones((expected_n_basis, 2))/np.sqrt(2)
+    assert n_basis == expected_n_basis
+    np.testing.assert_allclose(np.abs(basis), expected_basis)
+
+  @pytest.mark.parametrize('n_samples', [100, 500])
+  @pytest.mark.parametrize('n_features', [10, 50, 100])
+  @pytest.mark.parametrize('n_classes', [5, 10, 15])
+  def test_triplet_diffs(self, n_samples, n_features, n_classes):
+    X, y = make_classification(n_samples=n_samples, n_classes=n_classes,
+                               n_features=n_features, n_informative=n_features,
+                               n_redundant=0, n_repeated=0)
+    X = StandardScaler().fit_transform(X)
+
+    model = SCML_Supervised()
+    constraints = Constraints(y)
+    triplets = constraints.generate_knntriplets(X, model.k_genuine,
+                                                model.k_impostor)
+    basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+
+    expected_n_basis = n_features * 80
+    assert n_basis == expected_n_basis
+    assert basis.shape == (expected_n_basis, n_features)
+
+  @pytest.mark.parametrize('n_samples', [100, 500])
+  @pytest.mark.parametrize('n_features', [10, 50, 100])
+  @pytest.mark.parametrize('n_classes', [5, 10, 15])
+  def test_lda(self, n_samples, n_features, n_classes):
+    X, y = make_classification(n_samples=n_samples, n_classes=n_classes,
+                               n_features=n_features, n_informative=n_features,
+                               n_redundant=0, n_repeated=0)
+    X = StandardScaler().fit_transform(X)
+
+    model = SCML_Supervised()
+    basis, n_basis = model._generate_bases_LDA(X, y)
+
+    num_eig = min(n_classes - 1, n_features)
+    expected_n_basis = min(20 * n_features, n_samples * 2 * num_eig - 1)
+    assert n_basis == expected_n_basis
+    assert basis.shape == (expected_n_basis, n_features)
+
+  @pytest.mark.parametrize('name', ['max_iter', 'output_iter', 'batch_size',
+                                    'n_basis'])
+  def test_int_inputs(self, name):
+    value = 1.0
+    d = {name: value}
+    scml = SCML(**d)
+    triplets = np.array([[[0, 1], [2, 1], [0, 0]]])
+
+    msg = ("%s should be an integer, instead it is of type"
+           " %s" % (name, type(value)))
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(triplets)
+    assert msg == raised_error.value.args[0]
+
+  @pytest.mark.parametrize('name', ['max_iter', 'output_iter', 'batch_size',
+                                    'k_genuine', 'k_impostor', 'n_basis'])
+  def test_int_inputs_supervised(self, name):
+    value = 1.0
+    d = {name: value}
+    scml = SCML_Supervised(**d)
+    X = np.array([[0, 0], [1, 1], [3, 3], [4, 4]])
+    y = np.array([1, 1, 0, 0])
+    msg = ("%s should be an integer, instead it is of type"
+           " %s" % (name, type(value)))
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(X, y)
+    assert msg == raised_error.value.args[0]
+
+  def test_large_output_iter(self):
+    scml = SCML(max_iter=1, output_iter=2)
+    triplets = np.array([[[0, 1], [2, 1], [0, 0]]])
+    msg = ("The value of output_iter must be equal or smaller than"
+           " max_iter.")
+
+    with pytest.raises(ValueError) as raised_error:
+      scml.fit(triplets)
+    assert msg == raised_error.value.args[0]
 
 
 class TestLSML(MetricTestCase):
