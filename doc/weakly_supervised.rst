@@ -708,7 +708,7 @@ Algorithms
 Sparse Compositional Metric Learning
 (:py:class:`SCML <metric_learn.SCML>`)
 
-`SCML` learns an squared Mahalanobis distance from triplet constraints by
+`SCML` learns a squared Mahalanobis distance from triplet constraints by
 optimizing sparse positive weights assigned to a set of :math:`K` rank-one
 PSD bases. This can be formulated as an optimization problem with only
 :math:`K` parameters, that can be solved with an efficient stochastic
@@ -722,7 +722,7 @@ weighted by a :math:`K` dimensional vector :math:`w = \{w_i\}_{i=\{1,...,K\}}` a
     M = \sum_{i=1}^K w_i b_i b_i^T = B \cdot diag(w) \cdot B^T \quad w_i \geq 0
 
 Learning :math:`M` in this form makes it PSD by design, as it is a
-nonnegative sum of PSD matrices. The basis set :math:`B` is fixed on advance
+nonnegative sum of PSD matrices. The basis set :math:`B` is fixed in advance
 and it is possible to construct it from the data. The optimization problem
 over :math:`w` is formulated as a classic margin-based hinge loss function
 involving the set :math:`C` of triplets. A regularization :math:`\ell_1`
