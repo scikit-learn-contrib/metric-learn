@@ -117,11 +117,9 @@ class TestSCML(object):
                          [[2, 1], [0, 1], [2, 0]],
                          [[0, 0], [2, 0], [0, 1]],
                          [[2, 0], [0, 0], [2, 1]]])
-    n_basis = 1
     msg = ("The number of bases with nonzero weight is less than the "
            "number of features of the input, in consequence the "
-           "learned transformation reduces the dimension to %d."
-           % n_basis)
+           "learned transformation reduces the dimension to 1.")
     with pytest.warns(UserWarning) as raised_warning:
       scml.fit(triplets)
     assert msg == raised_warning[0].message.args[0]
@@ -135,7 +133,6 @@ class TestSCML(object):
                                                        [3, 3]]),
                                               np.array([1, 2, 3])))])
   def test_n_basis_wrong_type(self, estimator, data):
-
     n_basis = 4.0
     model = estimator(n_basis=n_basis)
     msg = ("n_basis should be an integer, instead it is of type %s"
@@ -149,7 +146,6 @@ class TestSCML(object):
     y = np.array([0, 0, 1, 1])
 
     n_class = 2
-
     scml = SCML_Supervised(n_basis=n_class-1)
     msg = ("The number of basis is less than the number of classes, which may"
            " lead to poor discriminative performance.")
@@ -162,9 +158,8 @@ class TestSCML(object):
     y = np.array([1, 2, 3])
 
     n_class = 3
-    num_eig = min(n_class-1, X.shape[1])
-
-    n_basis = X.shape[0]*2*num_eig
+    num_eig = min(n_class - 1, X.shape[1])
+    n_basis = X.shape[0] * 2 * num_eig
 
     scml = SCML_Supervised(n_basis=n_basis)
     msg = ("Not enough samples to generate %d LDA bases, n_basis"
@@ -184,7 +179,6 @@ class TestSCML(object):
     array is not consistent with the input
     """
     basis = np.eye(3)
-
     scml = estimator(n_basis=3, basis=basis)
 
     msg = ('The dimensionality ({}) of the provided bases must match the '
@@ -252,11 +246,9 @@ class TestSCML(object):
                                                 model.k_impostor)
     basis, n_basis = model._generate_bases_dist_diff(triplets, X)
 
-    expected_n_basis = n_features*80
-    expected_shape = (expected_n_basis, n_features)
-
+    expected_n_basis = n_features * 80
     assert n_basis == expected_n_basis
-    assert basis.shape == expected_shape
+    assert basis.shape == (expected_n_basis, n_features)
 
   @pytest.mark.parametrize('n_samples', [100, 500])
   @pytest.mark.parametrize('n_features', [10, 50, 100])
@@ -270,12 +262,10 @@ class TestSCML(object):
     model = SCML_Supervised()
     basis, n_basis = model._generate_bases_LDA(X, y)
 
-    num_eig = min(n_classes-1, n_features)
-    expected_n_basis = min(20*n_features, n_samples*2*num_eig - 1)
-    expected_shape = (expected_n_basis, n_features)
-
+    num_eig = min(n_classes - 1, n_features)
+    expected_n_basis = min(20 * n_features, n_samples * 2 * num_eig - 1)
     assert n_basis == expected_n_basis
-    assert basis.shape == expected_shape
+    assert basis.shape == (expected_n_basis, n_features)
 
   @pytest.mark.parametrize('name', ['max_iter', 'output_iter', 'batch_size',
                                     'n_basis'])
@@ -285,9 +275,8 @@ class TestSCML(object):
     scml = SCML(**d)
     triplets = np.array([[[0, 1], [2, 1], [0, 0]]])
 
-    msg = name
-    msg += (" should be an integer, instead it is of type"
-            " %s" % type(value))
+    msg = ("%s should be an integer, instead it is of type"
+           " %s" % (name, type(value)))
     with pytest.raises(ValueError) as raised_error:
       scml.fit(triplets)
     assert msg == raised_error.value.args[0]
@@ -300,9 +289,8 @@ class TestSCML(object):
     scml = SCML_Supervised(**d)
     X = np.array([[0, 0], [1, 1], [3, 3], [4, 4]])
     y = np.array([1, 1, 0, 0])
-    msg = name
-    msg += (" should be an integer, instead it is of type"
-            " %s" % type(value))
+    msg = ("%s should be an integer, instead it is of type"
+           " %s" % (name, type(value)))
     with pytest.raises(ValueError) as raised_error:
       scml.fit(X, y)
     assert msg == raised_error.value.args[0]
