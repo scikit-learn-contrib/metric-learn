@@ -70,7 +70,6 @@ class TestTransformerMetricConversion(unittest.TestCase):
     assert_array_almost_equal(L.T.dot(L), lfda.get_mahalanobis_matrix())
 
   def test_rca_supervised(self):
-    seed = np.random.RandomState(1234)
     rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
     rca.fit(self.X, self.y)
     L = rca.components_
