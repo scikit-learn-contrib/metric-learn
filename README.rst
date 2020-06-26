@@ -11,6 +11,7 @@ metric-learn contains efficient Python implementations of several popular superv
 -  Information Theoretic Metric Learning (ITML)
 -  Sparse Determinant Metric Learning (SDML)
 -  Least Squares Metric Learning (LSML)
+-  Sparse Compositional Metric Learning (SCML)
 -  Neighborhood Components Analysis (NCA)
 -  Local Fisher Discriminant Analysis (LFDA)
 -  Relative Components Analysis (RCA)
