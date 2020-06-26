@@ -228,24 +228,6 @@ def test_get_metric_is_pseudo_metric(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
-def test_metric_raises_deprecation_warning(estimator, build_dataset):
-  """assert that a deprecation warning is raised if someones wants to call
-  the `metric` function"""
-  # TODO: remove this method in version 0.6.0
-  input_data, labels, _, X = build_dataset()
-  model = clone(estimator)
-  set_random_state(model)
-  model.fit(*remove_y(estimator, input_data, labels))
-
-  with pytest.warns(DeprecationWarning) as raised_warning:
-    model.metric()
-  assert (str(raised_warning[0].message) ==
-          ("`metric` is deprecated since version 0.5.0 and will be removed "
-           "in 0.6.0. Use `get_mahalanobis_matrix` instead."))
-
-
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
 def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
   """Check that the metric returned by get_metric is compatible with
   scikit-learn's algorithms using a custom metric, DBSCAN for instance"""

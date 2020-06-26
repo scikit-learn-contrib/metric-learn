@@ -37,8 +37,8 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
   def test_itml_supervised(self):
     seed = np.random.RandomState(1234)
-    itml = ITML_Supervised(num_constraints=200)
-    itml.fit(self.X, self.y, random_state=seed)
+    itml = ITML_Supervised(num_constraints=200, random_state=seed)
+    itml.fit(self.X, self.y)
     L = itml.components_
     assert_array_almost_equal(L.T.dot(L), itml.get_mahalanobis_matrix())
 
@@ -70,9 +70,8 @@ class TestTransformerMetricConversion(unittest.TestCase):
     assert_array_almost_equal(L.T.dot(L), lfda.get_mahalanobis_matrix())
 
   def test_rca_supervised(self):
-    seed = np.random.RandomState(1234)
     rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
-    rca.fit(self.X, self.y, random_state=seed)
+    rca.fit(self.X, self.y)
     L = rca.components_
     assert_array_almost_equal(L.T.dot(L), rca.get_mahalanobis_matrix())
 

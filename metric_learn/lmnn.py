@@ -2,9 +2,7 @@
 Large Margin Nearest Neighbor Metric learning (LMNN)
 """
 import numpy as np
-import warnings
 from collections import Counter
-from sklearn.exceptions import ChangedBehaviorWarning
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
 
@@ -25,12 +23,10 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
   Parameters
   ----------
-  init : None, string or numpy array, optional (default=None)
+  init : string or numpy array, optional (default='auto')
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
-    (n_features_a, n_features_b). If None, will be set automatically to
-    'auto' (this option is to raise a warning if 'init' is not set, and
-    stays to its default value None, in v0.5.0).
+    (n_features_a, n_features_b).
 
     'auto'
       Depending on ``n_components``, the most reasonable initialization
@@ -83,11 +79,6 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     Tolerance of the optimization procedure. If the objective value varies
     less than `tol`, we consider the algorithm has converged and stop it.
 
-  use_pca : Not used
-    .. deprecated:: 0.5.0
-      `use_pca` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0.
-
   verbose : bool, optional (default=False)
     Whether to print the progress of the optimization procedure.
 
@@ -101,11 +92,6 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
-
-  num_dims : Not used
-    .. deprecated:: 0.5.0
-      `num_dims` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use `n_components` instead.
 
   random_state : int or numpy.RandomState or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If
@@ -142,10 +128,10 @@ class LMNN(MahalanobisMixin, TransformerMixin):
          2005.
   """
 
-  def __init__(self, init=None, k=3, min_iter=50, max_iter=1000,
+  def __init__(self, init='auto', k=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
-               use_pca='deprecated', verbose=False, preprocessor=None,
-               n_components=None, num_dims='deprecated', random_state=None):
+               verbose=False, preprocessor=None,
+               n_components=None, random_state=None):
     self.init = init
     self.k = k
     self.min_iter = min_iter
@@ -153,24 +139,12 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     self.learn_rate = learn_rate
     self.regularization = regularization
     self.convergence_tol = convergence_tol
-    self.use_pca = use_pca
     self.verbose = verbose
     self.n_components = n_components
-    self.num_dims = num_dims
     self.random_state = random_state
     super(LMNN, self).__init__(preprocessor)
 
   def fit(self, X, y):
-    if self.num_dims != 'deprecated':
-      warnings.warn('"num_dims" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0. Use "n_components" instead',
-                    DeprecationWarning)
-    if self.use_pca != 'deprecated':
-      warnings.warn('"use_pca" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0.',
-                    DeprecationWarning)
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate
@@ -184,20 +158,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       raise ValueError('Must have one label per point.')
     self.labels_ = np.arange(len(unique_labels))
 
-    # if the init is the default (None), we raise a warning
-    if self.init is None:
-      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
-      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-             "the default init will now be set to 'auto', instead of the "
-             "previous identity matrix. If you still want to use the identity "
-             "matrix as before, set init='identity'. This warning "
-             "will disappear in v0.6.0, and `init` parameter's default value "
-             "will be set to 'auto'.")
-      warnings.warn(msg, ChangedBehaviorWarning)
-      init = 'auto'
-    else:
-      init = self.init
-    self.components_ = _initialize_components(output_dim, X, y, init,
+    self.components_ = _initialize_components(output_dim, X, y, self.init,
                                               self.verbose,
                                               random_state=self.random_state)
     required_k = np.bincount(label_inds).min()

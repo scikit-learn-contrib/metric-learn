@@ -28,23 +28,23 @@ from test.test_utils import (metric_learners, ids_metric_learners,
 
 class Stable_RCA_Supervised(RCA_Supervised):
 
-  def __init__(self, n_components=None, pca_comps=None,
+  def __init__(self, n_components=None,
                chunk_size=2, preprocessor=None, random_state=None):
     # this init makes RCA stable for scikit-learn examples.
     super(Stable_RCA_Supervised, self).__init__(
-        num_chunks=2, n_components=n_components, pca_comps=pca_comps,
+        num_chunks=2, n_components=n_components,
         chunk_size=chunk_size, preprocessor=preprocessor,
         random_state=random_state)
 
 
 class Stable_SDML_Supervised(SDML_Supervised):
 
-  def __init__(self, sparsity_param=0.01, num_labeled='deprecated',
+  def __init__(self, sparsity_param=0.01,
                num_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
     # this init makes SDML stable for scikit-learn examples.
     super(Stable_SDML_Supervised, self).__init__(
-        sparsity_param=sparsity_param, num_labeled=num_labeled,
+        sparsity_param=sparsity_param,
         num_constraints=num_constraints, verbose=verbose,
         preprocessor=preprocessor, balance_param=1e-5, prior='identity',
         random_state=random_state)

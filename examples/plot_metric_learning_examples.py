@@ -289,7 +289,7 @@ plot_tsne(X_nca, y)
 # - See more in the documentation of the class :py:class:`LFDA
 #   <metric_learn.LFDA>`
 
-lfda = metric_learn.LFDA(k=2, num_dims=2)
+lfda = metric_learn.LFDA(k=2, n_components=2)
 X_lfda = lfda.fit_transform(X, y)
 
 plot_tsne(X_lfda, y)

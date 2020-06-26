@@ -27,11 +27,6 @@ class LFDA(MahalanobisMixin, TransformerMixin):
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
-  num_dims : Not used
-    .. deprecated:: 0.5.0
-      `num_dims` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use `n_components` instead.
-
   k : int, optional (default=None)
     Number of nearest neighbors used in local scaling method. If None,
     defaults to min(7, n_features - 1).
@@ -81,12 +76,11 @@ class LFDA(MahalanobisMixin, TransformerMixin):
         -discriminant-analysis-on-beer-style-clustering.html#>`_.
   '''
 
-  def __init__(self, n_components=None, num_dims='deprecated',
+  def __init__(self, n_components=None,
                k=None, embedding_type='weighted', preprocessor=None):
     if embedding_type not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid embedding_type: %r' % embedding_type)
     self.n_components = n_components
-    self.num_dims = num_dims
     self.embedding_type = embedding_type
     self.k = k
     super(LFDA, self).__init__(preprocessor)
@@ -102,11 +96,6 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     y : (n,) array-like
         Class labels, one per point of data.
     '''
-    if self.num_dims != 'deprecated':
-      warnings.warn('"num_dims" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0. Use "n_components" instead',
-                    DeprecationWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     unique_classes, y = np.unique(y, return_inverse=True)
     n, d = X.shape

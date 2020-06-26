@@ -2,11 +2,9 @@
 Metric Learning from Relative Comparisons by Minimizing Squared Residual (LSML)
 """
 
-import warnings
 import numpy as np
 import scipy.linalg
 from sklearn.base import TransformerMixin
-from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
@@ -17,7 +15,7 @@ class _BaseLSML(MahalanobisMixin):
 
   _tuple_size = 4  # constraints are quadruplets
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
+  def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
                verbose=False, preprocessor=None, random_state=None):
     self.prior = prior
     self.tol = tol
@@ -40,21 +38,8 @@ class _BaseLSML(MahalanobisMixin):
     else:
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
-    # if the prior is the default (None), we raise a warning
-    if self.prior is None:
-      msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
-             "the default prior will now be set to "
-             "'identity', instead of 'covariance'. If you still want to use "
-             "the inverse of the covariance matrix as a prior, "
-             "set prior='covariance'. This warning will disappear in "
-             "v0.6.0, and `prior` parameter's default value will be set to "
-             "'identity'.")
-      warnings.warn(msg, ChangedBehaviorWarning)
-      prior = 'identity'
-    else:
-      prior = self.prior
     M, prior_inv = _initialize_metric_mahalanobis(
-        quadruplets, prior,
+        quadruplets, self.prior,
         return_inverse=True, strict_pd=True, matrix_name='prior',
         random_state=self.random_state)
 
@@ -137,13 +122,11 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
   Parameters
   ----------
-  prior : None, string or numpy array, optional (default=None)
+  prior : string or numpy array, optional (default='identity')
     Prior to set for the metric. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features). For LSML, the prior should be strictly
-    positive definite (PD). If `None`, will be set
-    automatically to 'identity' (this is to raise a warning if
-    `prior` is not set, and stays to its default value (None), in v0.5.0).
+    positive definite (PD).
 
     'identity'
       An identity matrix of shape (n_features, n_features).
@@ -256,13 +239,11 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   max_iter : int, optional (default=1000)
     Number of maximum iterations of the optimization procedure.
 
-  prior : None, string or numpy array, optional (default=None)
+  prior : string or numpy array, optional (default='identity')
     Prior to set for the metric. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features). For LSML, the prior should be strictly
-    positive definite (PD). If `None`, will be set
-    automatically to 'identity' (this is to raise a warning if
-    `prior` is not set, and stays to its default value (None), in v0.5.0).
+    positive definite (PD).
 
     'identity'
       An identity matrix of shape (n_features, n_features).
@@ -279,11 +260,6 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       A positive definite (PD) matrix of shape
       (n_features, n_features), that will be used as such to set the
       prior.
-
-  num_labeled : Not used
-    .. deprecated:: 0.5.0
-      `num_labeled` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0.
 
   num_constraints: int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
@@ -326,17 +302,16 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     metric (See function `components_from_metric`.)
   """
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
-               num_labeled='deprecated', num_constraints=None, weights=None,
+  def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
+               num_constraints=None, weights=None,
                verbose=False, preprocessor=None, random_state=None):
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                        verbose=verbose, preprocessor=preprocessor,
                        random_state=random_state)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights
 
-  def fit(self, X, y, random_state='deprecated'):
+  def fit(self, X, y):
     """Create constraints from labels and learn the LSML model.
 
     Parameters
@@ -346,29 +321,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
 
     y : (n) array-like
       Data labels.
-
-    random_state : Not used
-      .. deprecated:: 0.5.0
-        `random_state` in the `fit` function was deprecated in version 0.5.0
-        and will be removed in 0.6.0. Set `random_state` at initialization
-        instead (when instantiating a new `LSML_Supervised` object).
     """
-    if self.num_labeled != 'deprecated':
-      warnings.warn('"num_labeled" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0', DeprecationWarning)
-    if random_state != 'deprecated':
-      warnings.warn('"random_state" parameter in the `fit` function is '
-                    'deprecated. Set `random_state` at initialization '
-                    'instead (when instantiating a new `LSML_Supervised` '
-                    'object).', DeprecationWarning)
-    else:
-      warnings.warn('As of v0.5.0, `LSML_Supervised` now uses the '
-                    '`random_state` given at initialization to sample '
-                    'constraints, not the default `np.random` from the `fit` '
-                    'method, since this argument is now deprecated. '
-                    'This warning will disappear in v0.6.0.',
-                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:

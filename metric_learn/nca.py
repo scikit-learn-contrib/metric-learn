@@ -9,7 +9,7 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.special import logsumexp
 from sklearn.base import TransformerMixin
-from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import pairwise_distances
 
 from ._util import _initialize_components, _check_n_components
@@ -32,12 +32,10 @@ class NCA(MahalanobisMixin, TransformerMixin):
 
   Parameters
   ----------
-  init : None, string or numpy array, optional (default=None)
+  init : string or numpy array, optional (default='auto')
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
-    (n_features_a, n_features_b). If None, will be set automatically to
-    'auto' (this option is to raise a warning if 'init' is not set,
-    and stays to its default value None, in v0.5.0).
+    (n_features_a, n_features_b).
 
     'auto'
       Depending on ``n_components``, the most reasonable initialization
@@ -76,11 +74,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
 
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
-
-  num_dims : Not used
-    .. deprecated:: 0.5.0
-      `num_dims` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use `n_components` instead.
 
   max_iter : int, optional (default=100)
     Maximum number of iterations done by the optimization algorithm.
@@ -128,12 +121,11 @@ class NCA(MahalanobisMixin, TransformerMixin):
          <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_
   """
 
-  def __init__(self, init=None, n_components=None, num_dims='deprecated',
+  def __init__(self, init='auto', n_components=None,
                max_iter=100, tol=None, verbose=False, preprocessor=None,
                random_state=None):
     self.n_components = n_components
     self.init = init
-    self.num_dims = num_dims
     self.max_iter = max_iter
     self.tol = tol
     self.verbose = verbose
@@ -145,11 +137,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
-    if self.num_dims != 'deprecated':
-      warnings.warn('"num_dims" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0. Use "n_components" instead',
-                    DeprecationWarning)
     X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
     n_components = _check_n_components(d, self.n_components)
@@ -158,22 +145,8 @@ class NCA(MahalanobisMixin, TransformerMixin):
     train_time = time.time()
 
     # Initialize A
-    # if the init is the default (None), we raise a warning
-    if self.init is None:
-      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
-      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-             "the default init will now be set to 'auto', instead of the "
-             "previous scaling matrix. If you still want to use the same "
-             "scaling matrix as before, set "
-             "init=np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min(axis=0)"
-             ", EPS))). This warning will disappear in v0.6.0, and `init` "
-             "parameter's default value will be set to 'auto'.")
-      warnings.warn(msg, ChangedBehaviorWarning)
-      init = 'auto'
-    else:
-      init = self.init
-    A = _initialize_components(n_components, X, labels, init, self.verbose,
-                               self.random_state)
+    A = _initialize_components(n_components, X, labels, self.init,
+                               self.verbose, self.random_state)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]

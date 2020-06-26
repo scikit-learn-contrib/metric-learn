@@ -2,9 +2,7 @@
 Information Theoretic Metric Learning (ITML)
 """
 
-import warnings
 import numpy as np
-from sklearn.exceptions import ChangedBehaviorWarning
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
@@ -19,23 +17,17 @@ class _BaseITML(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
-               prior='identity', A0='deprecated', verbose=False,
+               prior='identity', verbose=False,
                preprocessor=None, random_state=None):
     self.gamma = gamma
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
     self.prior = prior
-    self.A0 = A0
     self.verbose = verbose
     self.random_state = random_state
     super(_BaseITML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y, bounds=None):
-    if self.A0 != 'deprecated':
-      warnings.warn('"A0" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0. Use "prior" instead.',
-                    DeprecationWarning)
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
     # init bounds
@@ -155,11 +147,6 @@ class ITML(_BaseITML, _PairsClassifierMixin):
       (n_features, n_features), that will be used as such to set the
       prior.
 
-  A0 : Not used
-    .. deprecated:: 0.5.0
-      `A0` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use 'prior' instead.
-
   verbose : bool, optional (default=False)
     If True, prints information while learning
 
@@ -276,20 +263,9 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   convergence_threshold : float, optional (default=1e-3)
     Tolerance of the optimization procedure.
 
-  num_labeled : Not used
-    .. deprecated:: 0.5.0
-      `num_labeled` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0.
-
   num_constraints : int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
-
-  bounds : Not used
-    .. deprecated:: 0.5.0
-      `bounds` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Set `bounds` at fit time instead :
-      `itml_supervised.fit(X, y, bounds=...)`
 
   prior : string or numpy array, optional (default='identity')
     Initialization of the Mahalanobis matrix. Possible options are
@@ -312,11 +288,6 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
       A positive definite (PD) matrix of shape
       (n_features, n_features), that will be used as such to set the
       prior.
-
-  A0 : Not used
-    .. deprecated:: 0.5.0
-      `A0` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use 'prior' instead.
 
   verbose : bool, optional (default=False)
     If True, prints information while learning
@@ -368,18 +339,15 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   """
 
   def __init__(self, gamma=1.0, max_iter=1000, convergence_threshold=1e-3,
-               num_labeled='deprecated', num_constraints=None,
-               bounds='deprecated', prior='identity', A0='deprecated',
+               num_constraints=None, prior='identity',
                verbose=False, preprocessor=None, random_state=None):
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
-                       A0=A0, prior=prior, verbose=verbose,
+                       prior=prior, verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
-    self.bounds = bounds
 
-  def fit(self, X, y, random_state='deprecated', bounds=None):
+  def fit(self, X, y, bounds=None):
     """Create constraints from labels and learn the ITML model.
 
 
@@ -391,12 +359,6 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     y : (n) array-like
       Data labels.
 
-    random_state : Not used
-      .. deprecated:: 0.5.0
-        `random_state` in the `fit` function was deprecated in version 0.5.0
-        and will be removed in 0.6.0. Set `random_state` at initialization
-        instead (when instantiating a new `ITML_Supervised` object).
-
     bounds : array-like of two numbers
       Bounds on similarity, aside slack variables, s.t.
       ``d(a, b) < bounds_[0]`` for all given pairs of similar points ``a``
@@ -406,28 +368,6 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
       set to the 5th and 95th percentile of the pairwise distances among all
       points in the training data `X`.
     """
-    # TODO: remove these in v0.6.0
-    if self.num_labeled != 'deprecated':
-      warnings.warn('"num_labeled" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0', DeprecationWarning)
-    if self.bounds != 'deprecated':
-      warnings.warn('"bounds" parameter from initialization is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0. Use the "bounds" parameter of this '
-                    'fit method instead.', DeprecationWarning)
-    if random_state != 'deprecated':
-      warnings.warn('"random_state" parameter in the `fit` function is '
-                    'deprecated. Set `random_state` at initialization '
-                    'instead (when instantiating a new `ITML_Supervised` '
-                    'object).', DeprecationWarning)
-    else:
-      warnings.warn('As of v0.5.0, `ITML_Supervised` now uses the '
-                    '`random_state` given at initialization to sample '
-                    'constraints, not the default `np.random` from the `fit` '
-                    'method, since this argument is now deprecated. '
-                    'This warning will disappear in v0.6.0.',
-                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:

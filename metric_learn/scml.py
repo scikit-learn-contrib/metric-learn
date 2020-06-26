@@ -308,6 +308,10 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
 
   Read more in the :ref:`User Guide <scml>`.
 
+  .. warning::
+    SCML is still a bit experimental, don't hesitate to report if
+    something fails/doesn't work as expected.
+
   Parameters
   ----------
   beta: float (default=1e-5)
@@ -412,6 +416,10 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
   point and then runs the SCML algorithm on these triplets.
 
   Read more in the :ref:`User Guide <scml>`.
+
+  .. warning::
+    SCML is still a bit experimental, don't hesitate to report if
+    something fails/doesn't work as expected.
 
   Parameters
   ----------
