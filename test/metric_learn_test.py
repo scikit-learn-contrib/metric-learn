@@ -629,8 +629,7 @@ class TestSDML(MetricTestCase):
     # load_iris: dataset where we know scikit-learn's graphical lasso fails
     # with a Floating Point error
     X, y = load_iris(return_X_y=True)
-    sdml_supervised = SDML_Supervised(balance_param=0.5, use_cov=True,
-                                      sparsity_param=0.01)
+    sdml_supervised = SDML_Supervised(balance_param=0.5, sparsity_param=0.01)
     msg = ("There was a problem in SDML when using scikit-learn's graphical "
            "lasso solver. skggm's graphical lasso can sometimes converge on "
            "non SPD cases where scikit-learn's graphical lasso fails to "
@@ -733,8 +732,8 @@ class TestSDML(MetricTestCase):
     rs = np.random.RandomState(5555)
 
     sdml = SDML_Supervised(num_constraints=1500, prior='identity',
-                           balance_param=5e-5)
-    sdml.fit(self.iris_points, self.iris_labels, random_state=rs)
+                           balance_param=5e-5, random_state=rs)
+    sdml.fit(self.iris_points, self.iris_labels)
     csep = class_separation(sdml.transform(self.iris_points),
                             self.iris_labels)
     self.assertLess(csep, 0.22)

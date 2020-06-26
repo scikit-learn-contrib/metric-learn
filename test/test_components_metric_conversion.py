@@ -37,8 +37,8 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
   def test_itml_supervised(self):
     seed = np.random.RandomState(1234)
-    itml = ITML_Supervised(num_constraints=200)
-    itml.fit(self.X, self.y, random_state=seed)
+    itml = ITML_Supervised(num_constraints=200, random_state=seed)
+    itml.fit(self.X, self.y)
     L = itml.components_
     assert_array_almost_equal(L.T.dot(L), itml.get_mahalanobis_matrix())
 
