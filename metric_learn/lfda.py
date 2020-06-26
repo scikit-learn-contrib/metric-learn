@@ -81,7 +81,6 @@ class LFDA(MahalanobisMixin, TransformerMixin):
     if embedding_type not in ('weighted', 'orthonormalized', 'plain'):
       raise ValueError('Invalid embedding_type: %r' % embedding_type)
     self.n_components = n_components
-    self.num_dims = num_dims
     self.embedding_type = embedding_type
     self.k = k
     super(LFDA, self).__init__(preprocessor)

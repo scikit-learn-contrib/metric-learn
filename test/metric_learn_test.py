@@ -437,24 +437,6 @@ class TestLMNN(MetricTestCase):
                 np.linalg.norm(approx_fprime(L.ravel(), fun, epsilon)))
     np.testing.assert_almost_equal(rel_diff, 0., decimal=5)
 
-  def test_changed_behaviour_warning(self):
-    # test that a ChangedBehavior warning is thrown about the init, if the
-    # default parameters are used.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    lmnn = LMNN(k=2)
-    msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-           "the default init will now be set to 'auto', instead of the "
-           "previous identity matrix. If you still want to use the identity "
-           "matrix as before, set init='identity'. This warning "
-           "will disappear in v0.6.0, and `init` parameter's default value "
-           "will be set to 'auto'.")
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      lmnn.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-
 def test_loss_func(capsys):
   """Test the loss function (and its gradient) on a simple example,
   by comparing the results with the actual implementation of metric-learn,
@@ -1150,6 +1132,7 @@ class TestMMC(MetricTestCase):
     mmc.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mmc.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.2)
+
 
 @pytest.mark.parametrize(('algo_class', 'dataset'),
                          [(NCA, make_classification()),

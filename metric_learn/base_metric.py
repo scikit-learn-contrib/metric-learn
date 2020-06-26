@@ -9,7 +9,6 @@ from sklearn.metrics import roc_auc_score, roc_curve, precision_recall_curve
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from ._util import ArrayIndexer, check_input, validate_vector
-import warnings
 
 
 class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):

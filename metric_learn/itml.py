@@ -2,9 +2,7 @@
 Information Theoretic Metric Learning (ITML)
 """
 
-import warnings
 import numpy as np
-from sklearn.exceptions import ChangedBehaviorWarning
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array
 from sklearn.base import TransformerMixin
@@ -25,7 +23,6 @@ class _BaseITML(MahalanobisMixin):
     self.max_iter = max_iter
     self.convergence_threshold = convergence_threshold
     self.prior = prior
-    self.A0 = A0
     self.verbose = verbose
     self.random_state = random_state
     super(_BaseITML, self).__init__(preprocessor)
@@ -346,11 +343,9 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
                verbose=False, preprocessor=None, random_state=None):
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
-                       A0=A0, prior=prior, verbose=verbose,
+                       prior=prior, verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
-    self.bounds = bounds
 
   def fit(self, X, y, bounds=None):
     """Create constraints from labels and learn the ITML model.

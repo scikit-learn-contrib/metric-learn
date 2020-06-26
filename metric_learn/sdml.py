@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.base import TransformerMixin
 from scipy.linalg import pinvh
 from sklearn.covariance import graphical_lasso
-from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
+from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
 from .constraints import Constraints, wrap_pairs
@@ -24,13 +24,12 @@ class _BaseSDML(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior='identity',
                verbose=False, preprocessor=None,
                random_state=None):
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
     self.prior = prior
-    self.use_cov = use_cov
     self.verbose = verbose
     self.random_state = random_state
     super(_BaseSDML, self).__init__(preprocessor)
@@ -47,23 +46,8 @@ class _BaseSDML(MahalanobisMixin):
 
     # set up (the inverse of) the prior M
     # if the prior is the default (None), we raise a warning
-    if self.prior is None:
-      # TODO:
-      #  replace prior=None by prior='identity' in v0.6.0 and remove the
-      #  warning
-      msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
-             "the default prior will now be set to "
-             "'identity', instead of 'covariance'. If you still want to use "
-             "the inverse of the covariance matrix as a prior, "
-             "set prior='covariance'. This warning will disappear in "
-             "v0.6.0, and `prior` parameter's default value will be set to "
-             "'identity'.")
-      warnings.warn(msg, ChangedBehaviorWarning)
-      prior = 'identity'
-    else:
-      prior = self.prior
     _, prior_inv = _initialize_metric_mahalanobis(
-        pairs, prior,
+        pairs, self.prior,
         return_inverse=True, strict_pd=True, matrix_name='prior',
         random_state=self.random_state)
     diff = pairs[:, 0] - pairs[:, 1]
@@ -142,13 +126,11 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
   sparsity_param : float, optional  (default=0.01)
     Trade off between optimizer and sparseness (see graph_lasso).
 
-  prior : None, string or numpy array, optional (default=None)
+  prior : 'identity', string or numpy array, optional (default=None)
     Prior to set for the metric. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features). For SDML, the prior should be strictly
-    positive definite (PD). If `None`, will be set
-    automatically to 'identity' (this is to raise a warning if
-    `prior` is not set, and stays to its default value (None), in v0.5.0).
+    positive definite (PD).
 
     'identity'
       An identity matrix of shape (n_features, n_features).
@@ -258,13 +240,11 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   sparsity_param : float, optional (default=0.01)
     Trade off between optimizer and sparseness (see graph_lasso).
 
-  prior : None, string or numpy array, optional (default=None)
+  prior : 'identity', string or numpy array, optional (default=None)
     Prior to set for the metric. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features). For SDML, the prior should be strictly
-    positive definite (PD). If `None`, will be set
-    automatically to 'identity' (this is to raise a warning if
-    `prior` is not set, and stays to its default value (None), in v0.5.0).
+    positive definite (PD).
 
     'identity'
       An identity matrix of shape (n_features, n_features).
@@ -317,9 +297,8 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
                random_state=None):
     _BaseSDML.__init__(self, balance_param=balance_param,
                        sparsity_param=sparsity_param, prior=prior,
-                       use_cov=use_cov, verbose=verbose,
+                       verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
   def fit(self, X, y):

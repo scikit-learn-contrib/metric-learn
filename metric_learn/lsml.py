@@ -2,11 +2,9 @@
 Metric Learning from Relative Comparisons by Minimizing Squared Residual (LSML)
 """
 
-import warnings
 import numpy as np
 import scipy.linalg
 from sklearn.base import TransformerMixin
-from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
@@ -17,7 +15,7 @@ class _BaseLSML(MahalanobisMixin):
 
   _tuple_size = 4  # constraints are quadruplets
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
+  def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
                verbose=False, preprocessor=None, random_state=None):
     self.prior = prior
     self.tol = tol
@@ -40,21 +38,8 @@ class _BaseLSML(MahalanobisMixin):
     else:
       self.w_ = weights
     self.w_ /= self.w_.sum()  # weights must sum to 1
-    # if the prior is the default (None), we raise a warning
-    if self.prior is None:
-      msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
-             "the default prior will now be set to "
-             "'identity', instead of 'covariance'. If you still want to use "
-             "the inverse of the covariance matrix as a prior, "
-             "set prior='covariance'. This warning will disappear in "
-             "v0.6.0, and `prior` parameter's default value will be set to "
-             "'identity'.")
-      warnings.warn(msg, ChangedBehaviorWarning)
-      prior = 'identity'
-    else:
-      prior = self.prior
     M, prior_inv = _initialize_metric_mahalanobis(
-        quadruplets, prior,
+        quadruplets, self.prior,
         return_inverse=True, strict_pd=True, matrix_name='prior',
         random_state=self.random_state)
 
@@ -321,13 +306,12 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     metric (See function `components_from_metric`.)
   """
 
-  def __init__(self, tol=1e-3, max_iter=1000, prior=None,
+  def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
                num_constraints=None, weights=None,
                verbose=False, preprocessor=None, random_state=None):
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                        verbose=verbose, preprocessor=preprocessor,
                        random_state=random_state)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
     self.weights = weights
 

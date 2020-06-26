@@ -5,7 +5,6 @@ Relative Components Analysis (RCA)
 import numpy as np
 import warnings
 from sklearn.base import TransformerMixin
-from sklearn.exceptions import ChangedBehaviorWarning
 
 from ._util import _check_n_components
 from .base_metric import MahalanobisMixin
@@ -74,8 +73,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
 
   def __init__(self, n_components=None, preprocessor=None):
     self.n_components = n_components
-    self.num_dims = num_dims
-    self.pca_comps = pca_comps
     super(RCA, self).__init__(preprocessor)
 
   def _check_dimension(self, rank, X):
@@ -105,12 +102,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
       When ``chunks[i] == j``, point i belongs to chunklet j.
     """
     X, chunks = self._prepare_inputs(X, chunks, ensure_min_samples=2)
-
-    warnings.warn(
-        "RCA will no longer center the data before training. If you want "
-        "to do some preprocessing, you should do it manually (you can also "
-        "use an `sklearn.pipeline.Pipeline` for instance). This warning "
-        "will disappear in version 0.6.0.", ChangedBehaviorWarning)
 
     chunks = np.asanyarray(chunks, dtype=int)
     chunk_mask, chunked_data = _chunk_mean_centering(X, chunks)
@@ -184,8 +175,7 @@ class RCA_Supervised(RCA):
   def __init__(self, n_components=None, num_chunks=100, chunk_size=2,
                preprocessor=None, random_state=None):
     """Initialize the supervised version of `RCA`."""
-    RCA.__init__(self, num_dims=num_dims, n_components=n_components,
-                 pca_comps=pca_comps, preprocessor=preprocessor)
+    RCA.__init__(self, n_components=n_components, preprocessor=preprocessor)
     self.num_chunks = num_chunks
     self.chunk_size = chunk_size
     self.random_state = random_state

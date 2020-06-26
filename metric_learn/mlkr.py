@@ -8,7 +8,7 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.special import logsumexp
 from sklearn.base import TransformerMixin
-from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import pairwise_distances
 
 from .base_metric import MahalanobisMixin
@@ -32,12 +32,10 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
-  init : None, string or numpy array, optional (default=None)
+  init : 'auto', string or numpy array, optional (default=None)
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
-    (n_features_a, n_features_b). If None, will be set automatically to
-    'auto' (this option is to raise a warning if 'init' is not set,
-    and stays to its default value None, in v0.5.0).
+    (n_features_a, n_features_b).
 
     'auto'
       Depending on ``n_components``, the most reasonable initialization
@@ -110,13 +108,11 @@ class MLKR(MahalanobisMixin, TransformerMixin):
          /weinberger07a.pdf>`_. AISTATS 2007.
   """
 
-  def __init__(self, n_components=None, init=None,
+  def __init__(self, n_components=None, init='auto',
                tol=None, max_iter=1000, verbose=False,
                preprocessor=None, random_state=None):
     self.n_components = n_components
-    self.num_dims = num_dims
     self.init = init
-    self.A0 = A0
     self.tol = tol
     self.max_iter = max_iter
     self.verbose = verbose
@@ -144,19 +140,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       if m is None:
           m = d
       # if the init is the default (None), we raise a warning
-      if self.init is None:
-        # TODO:
-        #  replace init=None by init='auto' in v0.6.0 and remove the warning
-        msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-               "the default init will now be set to 'auto', instead of 'pca'. "
-               "If you still want to use PCA as an init, set init='pca'. "
-               "This warning will disappear in v0.6.0, and `init` parameter's"
-               " default value will be set to 'auto'.")
-        warnings.warn(msg, ChangedBehaviorWarning)
-        init = 'auto'
-      else:
-        init = self.init
-      A = _initialize_components(m, X, y, init=init,
+      A = _initialize_components(m, X, y, init=self.init,
                                  random_state=self.random_state,
                                  # MLKR works on regression targets:
                                  has_classes=False)

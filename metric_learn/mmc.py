@@ -1,9 +1,7 @@
 """Mahalanobis Metric for Clustering (MMC)"""
-import warnings
 import numpy as np
 from sklearn.base import TransformerMixin
 from sklearn.utils.validation import assert_all_finite
-from sklearn.exceptions import ChangedBehaviorWarning
 
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
@@ -15,14 +13,13 @@ class _BaseMMC(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               init=None, diagonal=False,
+               init='auto', diagonal=False,
                diagonal_c=1.0, verbose=False, preprocessor=None,
                random_state=None):
     self.max_iter = max_iter
     self.max_proj = max_proj
     self.convergence_threshold = convergence_threshold
     self.init = init
-    self.A0 = A0
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
     self.verbose = verbose
@@ -33,22 +30,7 @@ class _BaseMMC(MahalanobisMixin):
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
-    if self.init is None:
-      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
-      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-             "the default init will now be set to 'identity', instead of the "
-             "identity divided by a scaling factor of 10. "
-             "If you still want to use the same init as in previous "
-             "versions, set init=np.eye(d)/10, where d is the dimension "
-             "of your input space (d=pairs.shape[1]). "
-             "This warning will disappear in v0.6.0, and `init` parameter's"
-             " default value will be set to 'auto'.")
-      warnings.warn(msg, ChangedBehaviorWarning)
-      init = 'identity'
-    else:
-      init = self.init
-
-    self.A_ = _initialize_metric_mahalanobis(pairs, init,
+    self.A_ = _initialize_metric_mahalanobis(pairs, self.init,
                                              random_state=self.random_state,
                                              matrix_name='init')
 
@@ -353,12 +335,10 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   convergence_threshold : float, optional (default=1e-3)
     Convergence threshold for the optimization procedure.
 
-  init : None, string or numpy array, optional (default=None)
+  init : 'auto', string or numpy array, optional (default=None)
     Initialization of the Mahalanobis matrix. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
-    shape (n_features, n_features). If None, will be set
-    automatically to 'identity' (this is to raise a warning if
-    'init' is not set, and stays to its default value (None), in v0.5.0).
+    shape (n_features, n_features).
 
     'identity'
       An identity matrix of shape (n_features, n_features).
@@ -496,12 +476,10 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
 
-  init : None, string or numpy array, optional (default=None)
+  init : 'auto', string or numpy array, optional (default=None)
     Initialization of the Mahalanobis matrix. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
-    shape (n_features, n_features). If None, will be set
-    automatically to 'identity' (this is to raise a warning if
-    'init' is not set, and stays to its default value (None), in v0.5.0).
+    shape (n_features, n_features).
 
     'identity'
       An identity matrix of shape (n_features, n_features).
@@ -566,10 +544,9 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
                preprocessor=None, random_state=None):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,
-                      init=init, A0=A0, diagonal=diagonal,
+                      init=init, diagonal=diagonal,
                       diagonal_c=diagonal_c, verbose=verbose,
                       preprocessor=preprocessor, random_state=random_state)
-    self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
   def fit(self, X, y):

@@ -9,7 +9,7 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.special import logsumexp
 from sklearn.base import TransformerMixin
-from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import pairwise_distances
 
 from ._util import _initialize_components, _check_n_components
@@ -32,11 +32,10 @@ class NCA(MahalanobisMixin, TransformerMixin):
 
   Parameters
   ----------
-  init : None, string or numpy array, optional (default=None)
+  init : 'auto', string or numpy array, optional (default=None)
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
-    (n_features_a, n_features_b). If None, will be set automatically to
-    'auto' (this option is to raise a warning if 'init' is not set,
+    (n_features_a, n_features_b).
     and stays to its default value None, in v0.5.0).
 
     'auto'
@@ -128,7 +127,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
                random_state=None):
     self.n_components = n_components
     self.init = init
-    self.num_dims = num_dims
     self.max_iter = max_iter
     self.tol = tol
     self.verbose = verbose
@@ -148,22 +146,8 @@ class NCA(MahalanobisMixin, TransformerMixin):
     train_time = time.time()
 
     # Initialize A
-    # if the init is the default (None), we raise a warning
-    if self.init is None:
-      # TODO: replace init=None by init='auto' in v0.6.0 and remove the warning
-      msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-             "the default init will now be set to 'auto', instead of the "
-             "previous scaling matrix. If you still want to use the same "
-             "scaling matrix as before, set "
-             "init=np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min(axis=0)"
-             ", EPS))). This warning will disappear in v0.6.0, and `init` "
-             "parameter's default value will be set to 'auto'.")
-      warnings.warn(msg, ChangedBehaviorWarning)
-      init = 'auto'
-    else:
-      init = self.init
-    A = _initialize_components(n_components, X, labels, init, self.verbose,
-                               self.random_state)
+    A = _initialize_components(n_components, X, labels, self.init,
+                               self.verbose, self.random_state)
 
     # Run NCA
     mask = labels[:, np.newaxis] == labels[np.newaxis, :]
