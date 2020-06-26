@@ -23,7 +23,7 @@ else:
 from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           SCML_Supervised, LSML_Supervised,
                           ITML_Supervised, SDML_Supervised, RCA_Supervised,
-                          MMC_Supervised, SDML, RCA, ITML, LSML, SCML)
+                          MMC_Supervised, SDML, RCA, ITML, SCML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs, Constraints
 from metric_learn.lmnn import _sum_outer_products
