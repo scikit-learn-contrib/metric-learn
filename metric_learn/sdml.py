@@ -126,7 +126,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
   sparsity_param : float, optional  (default=0.01)
     Trade off between optimizer and sparseness (see graph_lasso).
 
-  prior : 'identity', string or numpy array, optional (default=None)
+  prior : string or numpy array, optional (default='identity')
     Prior to set for the metric. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features). For SDML, the prior should be strictly
@@ -240,7 +240,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   sparsity_param : float, optional (default=0.01)
     Trade off between optimizer and sparseness (see graph_lasso).
 
-  prior : 'identity', string or numpy array, optional (default=None)
+  prior : string or numpy array, optional (default='identity')
     Prior to set for the metric. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features). For SDML, the prior should be strictly

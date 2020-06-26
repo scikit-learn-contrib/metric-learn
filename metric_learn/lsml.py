@@ -122,13 +122,11 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
   Parameters
   ----------
-  prior : None, string or numpy array, optional (default=None)
+  prior : string or numpy array, optional (default='identity')
     Prior to set for the metric. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features). For LSML, the prior should be strictly
-    positive definite (PD). If `None`, will be set
-    automatically to 'identity' (this is to raise a warning if
-    `prior` is not set, and stays to its default value (None), in v0.5.0).
+    positive definite (PD).
 
     'identity'
       An identity matrix of shape (n_features, n_features).
@@ -241,13 +239,11 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   max_iter : int, optional (default=1000)
     Number of maximum iterations of the optimization procedure.
 
-  prior : None, string or numpy array, optional (default=None)
+  prior : string or numpy array, optional (default='identity')
     Prior to set for the metric. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features). For LSML, the prior should be strictly
-    positive definite (PD). If `None`, will be set
-    automatically to 'identity' (this is to raise a warning if
-    `prior` is not set, and stays to its default value (None), in v0.5.0).
+    positive definite (PD).
 
     'identity'
       An identity matrix of shape (n_features, n_features).

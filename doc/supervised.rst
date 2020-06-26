@@ -50,7 +50,7 @@ classes will be large. To do so, we fit the metric learner (example:
 >>> from metric_learn import NCA
 >>> nca = NCA(random_state=42)
 >>> nca.fit(X, y)
-NCA(init=None, max_iter=100, n_components=None, num_dims='deprecated',
+NCA(init='auto', max_iter=100, n_components=None, num_dims='deprecated',
   preprocessor=None, random_state=42, tol=None, verbose=False)
 
 

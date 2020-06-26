@@ -335,7 +335,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   convergence_threshold : float, optional (default=1e-3)
     Convergence threshold for the optimization procedure.
 
-  init : 'auto', string or numpy array, optional (default=None)
+  init : string or numpy array, optional (default='auto')
     Initialization of the Mahalanobis matrix. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features).
@@ -476,7 +476,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
 
-  init : 'auto', string or numpy array, optional (default=None)
+  init : string or numpy array, optional (default='auto')
     Initialization of the Mahalanobis matrix. Possible options are
     'identity', 'covariance', 'random', and a numpy array of
     shape (n_features, n_features).
@@ -539,7 +539,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_constraints=None, init=None,
+               num_constraints=None, init='auto',
                diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None, random_state=None):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,

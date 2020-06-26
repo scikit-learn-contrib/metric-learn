@@ -23,7 +23,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
   Parameters
   ----------
-  init : 'auto', string or numpy array, optional (default=None)
+  init : 'auto', string or numpy array, optional (default='auto')
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
     (n_features_a, n_features_b).
@@ -128,7 +128,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
          2005.
   """
 
-  def __init__(self, init=None, k=3, min_iter=50, max_iter=1000,
+  def __init__(self, init='auto', k=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
                verbose=False, preprocessor=None,
                n_components=None, random_state=None):

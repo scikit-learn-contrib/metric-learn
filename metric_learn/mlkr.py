@@ -32,7 +32,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
-  init : 'auto', string or numpy array, optional (default=None)
+  init : string or numpy array, optional (default='auto')
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
     (n_features_a, n_features_b).

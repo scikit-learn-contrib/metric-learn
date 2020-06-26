@@ -10,7 +10,7 @@ from sklearn.datasets import (load_iris, make_classification, make_regression,
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
                            assert_allclose)
 from sklearn.utils.testing import assert_warns_message
-from sklearn.exceptions import ConvergenceWarning, ChangedBehaviorWarning
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
 try:
@@ -313,31 +313,6 @@ class TestLSML(MetricTestCase):
     csep = class_separation(lsml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible
 
-  def test_changed_behaviour_warning(self):
-    # test that a ChangedBehavior warning is thrown about the init, if the
-    # default parameters are used.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    lsml_supervised = LSML_Supervised()
-    msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
-           "the default prior will now be set to "
-           "'identity', instead of 'covariance'. If you still want to use "
-           "the inverse of the covariance matrix as a prior, "
-           "set prior='covariance'. This warning will disappear in "
-           "v0.6.0, and `prior` parameter's default value will be set to "
-           "'identity'.")
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      lsml_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-    pairs = np.array([[[-10., 0.], [10., 0.], [-5., 3.], [5., 0.]],
-                      [[0., 50.], [0., -60], [-10., 0.], [10., 0.]]])
-    lsml = LSML()
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      lsml.fit(pairs)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
 
 class TestITML(MetricTestCase):
   def test_iris(self):
@@ -436,6 +411,7 @@ class TestLMNN(MetricTestCase):
     rel_diff = (check_grad(fun, grad, L.ravel()) /
                 np.linalg.norm(approx_fprime(L.ravel(), fun, epsilon)))
     np.testing.assert_almost_equal(rel_diff, 0., decimal=5)
+
 
 def test_loss_func(capsys):
   """Test the loss function (and its gradient) on a simple example,
@@ -969,24 +945,6 @@ class TestNCA(MetricTestCase):
       nca = NCA(init=A, max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.components_, A)
-
-  def test_changed_behaviour_warning(self):
-    # test that a ChangedBehavior warning is thrown about the init, if the
-    # default parameters are used.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    nca = NCA()
-    msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-           "the default init will now be set to 'auto', instead of the "
-           "previous scaling matrix. If you still want to use the same "
-           "scaling matrix as before, set "
-           "init=np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min(axis=0)"
-           ", EPS))). This warning will disappear in v0.6.0, and `init` "
-           "parameter's default value will be set to 'auto'.")
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      nca.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 class TestLFDA(MetricTestCase):

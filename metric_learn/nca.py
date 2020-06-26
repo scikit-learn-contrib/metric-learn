@@ -32,11 +32,10 @@ class NCA(MahalanobisMixin, TransformerMixin):
 
   Parameters
   ----------
-  init : 'auto', string or numpy array, optional (default=None)
+  init : string or numpy array, optional (default='auto')
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
     (n_features_a, n_features_b).
-    and stays to its default value None, in v0.5.0).
 
     'auto'
       Depending on ``n_components``, the most reasonable initialization
@@ -122,7 +121,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
          <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_
   """
 
-  def __init__(self, init=None, n_components=None,
+  def __init__(self, init='auto', n_components=None,
                max_iter=100, tol=None, verbose=False, preprocessor=None,
                random_state=None):
     self.n_components = n_components
