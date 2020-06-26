@@ -23,7 +23,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
   Parameters
   ----------
-  init : 'auto', string or numpy array, optional (default='auto')
+  init : string or numpy array, optional (default='auto')
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
     (n_features_a, n_features_b).
