@@ -292,7 +292,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     that describes the supervised version of weakly supervised estimators.
   """
 
-  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
+  def __init__(self, balance_param=0.5, sparsity_param=0.01, prior='identity',
                num_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
     _BaseSDML.__init__(self, balance_param=balance_param,
