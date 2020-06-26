@@ -313,18 +313,6 @@ class TestLSML(MetricTestCase):
     csep = class_separation(lsml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.8)  # it's pretty terrible
 
-  def test_deprecation_num_labeled(self):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    lsml_supervised = LSML_Supervised(num_labeled=np.inf)
-    msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           ' removed in 0.6.0')
-    assert_warns_message(DeprecationWarning, msg, lsml_supervised.fit, X, y)
-
   def test_changed_behaviour_warning(self):
     # test that a ChangedBehavior warning is thrown about the init, if the
     # default parameters are used.
@@ -350,37 +338,6 @@ class TestLSML(MetricTestCase):
       lsml.fit(pairs)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
-  def test_deprecation_random_state(self):
-    # test that a deprecation message is thrown if random_state is set at
-    # fit time
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    lsml_supervised = LSML_Supervised()
-    msg = ('"random_state" parameter in the `fit` function is '
-           'deprecated. Set `random_state` at initialization '
-           'instead (when instantiating a new `LSML_Supervised` '
-           'object).')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      lsml_supervised.fit(X, y, random_state=np.random)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_changed_behaviour_warning_random_state(self):
-    # test that a ChangedBehavior warning is thrown if the random_state is
-    # not set in fit.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    lsml_supervised = LSML_Supervised()
-    msg = ('As of v0.5.0, `LSML_Supervised` now uses the '
-           '`random_state` given at initialization to sample '
-           'constraints, not the default `np.random` from the `fit` '
-           'method, since this argument is now deprecated. '
-           'This warning will disappear in v0.6.0.')
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      lsml_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
 
 class TestITML(MetricTestCase):
   def test_iris(self):
@@ -389,83 +346,6 @@ class TestITML(MetricTestCase):
 
     csep = class_separation(itml.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.2)
-
-  def test_deprecation_num_labeled(self):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    itml_supervised = ITML_Supervised(num_labeled=np.inf)
-    msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           ' removed in 0.6.0')
-    assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
-
-  def test_deprecation_bounds(self):
-    # test that a deprecation message is thrown if bounds is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    itml_supervised = ITML_Supervised(bounds=None)
-    msg = ('"bounds" parameter from initialization is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           ' removed in 0.6.0. Use the "bounds" parameter of this '
-           'fit method instead.')
-    assert_warns_message(DeprecationWarning, msg, itml_supervised.fit, X, y)
-
-  def test_deprecation_A0(self):
-    # test that a deprecation message is thrown if A0 is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    itml_supervised = ITML_Supervised(A0=np.ones_like(X))
-    msg = ('"A0" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "prior" instead.')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      itml_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
-    y_pairs = [1, -1]
-    itml = ITML(A0=np.ones_like(X))
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      itml.fit(pairs, y_pairs)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_deprecation_random_state(self):
-    # test that a deprecation message is thrown if random_state is set at
-    # fit time
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    itml_supervised = ITML_Supervised()
-    msg = ('"random_state" parameter in the `fit` function is '
-           'deprecated. Set `random_state` at initialization '
-           'instead (when instantiating a new `ITML_Supervised` '
-           'object).')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      itml_supervised.fit(X, y, random_state=np.random)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_changed_behaviour_warning_random_state(self):
-    # test that a ChangedBehavior warning is thrown if the random_state is
-    # not set in fit.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    itml_supervised = ITML_Supervised()
-    msg = ('As of v0.5.0, `ITML_Supervised` now uses the '
-           '`random_state` given at initialization to sample '
-           'constraints, not the default `np.random` from the `fit` '
-           'method, since this argument is now deprecated. '
-           'This warning will disappear in v0.6.0.')
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      itml_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 @pytest.mark.parametrize('bounds', [None, (20., 100.), [20., 100.],
@@ -573,18 +453,6 @@ class TestLMNN(MetricTestCase):
     with pytest.warns(ChangedBehaviorWarning) as raised_warning:
       lmnn.fit(X, y)
     assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_deprecation_use_pca(self):
-    # test that a DeprecationWarning is thrown about use_pca, if the
-    # default parameters are used.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    lmnn = LMNN(k=2, use_pca=True)
-    msg = ('"use_pca" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           ' removed in 0.6.0.')
-    assert_warns_message(DeprecationWarning, msg, lmnn.fit, X, y)
 
 
 def test_loss_func(capsys):
@@ -913,18 +781,6 @@ class TestSDML(MetricTestCase):
                             self.iris_labels)
     self.assertLess(csep, 0.22)
 
-  def test_deprecation_num_labeled(self):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X, y = make_classification(random_state=42)
-    sdml_supervised = SDML_Supervised(num_labeled=np.inf, prior='identity',
-                                      balance_param=5e-5)
-    msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           ' removed in 0.6.0')
-    assert_warns_message(DeprecationWarning, msg, sdml_supervised.fit, X, y)
-
   def test_sdml_raises_warning_non_psd(self):
     """Tests that SDML raises a warning on a toy example where we know the
     pseudo-covariance matrix is not PSD"""
@@ -966,83 +822,6 @@ class TestSDML(MetricTestCase):
                            prior='covariance',
                            random_state=np.random.RandomState(42))
     sdml.fit(X, y)
-
-  def test_deprecation_use_cov(self):
-    # test that a deprecation message is thrown if use_cov  is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    sdml_supervised = SDML_Supervised(use_cov=np.ones_like(X),
-                                      balance_param=1e-5)
-    msg = ('"use_cov" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "prior" instead.')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      sdml_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
-    y_pairs = [1, -1]
-    sdml = SDML(use_cov=np.ones_like(X), balance_param=1e-5)
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      sdml.fit(pairs, y_pairs)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_changed_behaviour_warning(self):
-    # test that a ChangedBehavior warning is thrown about the init, if the
-    # default parameters are used (except for the balance_param that we need
-    # to set for the algorithm to not diverge)
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    sdml_supervised = SDML_Supervised(balance_param=1e-5)
-    msg = ("Warning, no prior was set (`prior=None`). As of version 0.5.0, "
-           "the default prior will now be set to "
-           "'identity', instead of 'covariance'. If you still want to use "
-           "the inverse of the covariance matrix as a prior, "
-           "set prior='covariance'. This warning will disappear in "
-           "v0.6.0, and `prior` parameter's default value will be set to "
-           "'identity'.")
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      sdml_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
-    y_pairs = [1, -1]
-    sdml = SDML(balance_param=1e-5)
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      sdml.fit(pairs, y_pairs)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_deprecation_random_state(self):
-    # test that a deprecation message is thrown if random_state is set at
-    # fit time
-    # TODO: remove in v.0.6
-    X, y = load_iris(return_X_y=True)
-    sdml_supervised = SDML_Supervised(balance_param=5e-5)
-    msg = ('"random_state" parameter in the `fit` function is '
-           'deprecated. Set `random_state` at initialization '
-           'instead (when instantiating a new `SDML_Supervised` '
-           'object).')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      sdml_supervised.fit(X, y, random_state=np.random)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_changed_behaviour_warning_random_state(self):
-    # test that a ChangedBehavior warning is thrown if the random_state is
-    # not set in fit.
-    # TODO: remove in v.0.6
-    X, y = load_iris(return_X_y=True)
-    sdml_supervised = SDML_Supervised(balance_param=5e-5)
-    msg = ('As of v0.5.0, `SDML_Supervised` now uses the '
-           '`random_state` given at initialization to sample '
-           'constraints, not the default `np.random` from the `fit` '
-           'method, since this argument is now deprecated. '
-           'This warning will disappear in v0.6.0.')
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      sdml_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
 @pytest.mark.skipif(not HAS_SKGGM,
@@ -1228,22 +1007,6 @@ class TestNCA(MetricTestCase):
     assert any(msg == str(wrn.message) for wrn in raised_warning)
 
 
-@pytest.mark.parametrize('num_dims', [None, 2])
-def test_deprecation_num_dims_nca(num_dims):
-  # test that a deprecation message is thrown if num_dims is set at
-  # initialization
-  # TODO: remove in v.0.6
-  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-  y = np.array([1, 0, 1, 0])
-  nca = NCA(num_dims=num_dims)
-  msg = ('"num_dims" parameter is not used.'
-         ' It has been deprecated in version 0.5.0 and will be'
-         ' removed in 0.6.0. Use "n_components" instead')
-  with pytest.warns(DeprecationWarning) as raised_warning:
-    nca.fit(X, y)
-  assert (str(raised_warning[0].message) == msg)
-
-
 class TestLFDA(MetricTestCase):
   def test_iris(self):
     lfda = LFDA(k=2, n_components=2)
@@ -1256,68 +1019,12 @@ class TestLFDA(MetricTestCase):
     self.assertEqual(lfda.components_.shape, (2, 4))
 
 
-@pytest.mark.parametrize('num_dims', [None, 2])
-def test_deprecation_num_dims_lfda(num_dims):
-  # test that a deprecation message is thrown if num_dims is set at
-  # initialization
-  # TODO: remove in v.0.6
-  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-  y = np.array([1, 0, 1, 0])
-  lfda = LFDA(num_dims=num_dims)
-  msg = ('"num_dims" parameter is not used.'
-         ' It has been deprecated in version 0.5.0 and will be'
-         ' removed in 0.6.0. Use "n_components" instead')
-  with pytest.warns(DeprecationWarning) as raised_warning:
-    lfda.fit(X, y)
-  assert (str(raised_warning[0].message) == msg)
-
-
 class TestRCA(MetricTestCase):
   def test_iris(self):
     rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.29)
-
-  def test_deprecation_pca_comps(self):
-    # test that a deprecation message is thrown if pca_comps is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X, y = make_classification(random_state=42, n_samples=100)
-    rca_supervised = RCA_Supervised(pca_comps=X.shape[1], num_chunks=20)
-    msg = ('"pca_comps" parameter is not used. '
-           'It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. RCA will not do PCA preprocessing anymore. If '
-           'you still want to do it, you could use '
-           '`sklearn.decomposition.PCA` and an `sklearn.pipeline.Pipeline`.')
-    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
-      rca_supervised.fit(X, y)
-    assert any(str(w.message) == msg for w in expected_msg)
-
-    rca = RCA(pca_comps=X.shape[1])
-    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
-      rca.fit(X, y)
-    assert any(str(w.message) == msg for w in expected_msg)
-
-  def test_changedbehaviorwarning_preprocessing(self):
-    # test that a ChangedBehaviorWarning is thrown when using RCA
-    # TODO: remove in v.0.6
-
-    msg = ("RCA will no longer center the data before training. If you want "
-           "to do some preprocessing, you should do it manually (you can also "
-           "use an `sklearn.pipeline.Pipeline` for instance). This warning "
-           "will disappear in version 0.6.0.")
-
-    X, y = make_classification(random_state=42, n_samples=100)
-    rca_supervised = RCA_Supervised(num_chunks=20)
-    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
-      rca_supervised.fit(X, y)
-    assert any(str(w.message) == msg for w in expected_msg)
-
-    rca = RCA()
-    with pytest.warns(ChangedBehaviorWarning) as expected_msg:
-      rca.fit(X, y)
-    assert any(str(w.message) == msg for w in expected_msg)
 
   def test_rank_deficient_returns_warning(self):
     """Checks that if the covariance matrix is not invertible, we raise a
@@ -1337,35 +1044,6 @@ class TestRCA(MetricTestCase):
     with pytest.warns(None) as raised_warnings:
       rca.fit(X, y)
     assert any(str(w.message) == msg for w in raised_warnings)
-
-  def test_deprecation_random_state(self):
-    # test that a deprecation message is thrown if random_state is set at
-    # fit time
-    # TODO: remove in v.0.6
-    X, y = make_classification(random_state=42, n_samples=100)
-    rca_supervised = RCA_Supervised(num_chunks=20)
-    msg = ('"random_state" parameter in the `fit` function is '
-           'deprecated. Set `random_state` at initialization '
-           'instead (when instantiating a new `RCA_Supervised` '
-           'object).')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      rca_supervised.fit(X, y, random_state=np.random)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_changed_behaviour_warning_random_state(self):
-    # test that a ChangedBehavior warning is thrown if the random_state is
-    # not set in fit.
-    # TODO: remove in v.0.6
-    X, y = make_classification(random_state=42, n_samples=100)
-    rca_supervised = RCA_Supervised(num_chunks=20)
-    msg = ('As of v0.5.0, `RCA_Supervised` now uses the '
-           '`random_state` given at initialization to sample '
-           'constraints, not the default `np.random` from the `fit` '
-           'method, since this argument is now deprecated. '
-           'This warning will disappear in v0.6.0.')
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      rca_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
 
   def test_unknown_labels(self):
     n = 200
@@ -1403,30 +1081,6 @@ class TestRCA(MetricTestCase):
     assert any(str(w.message) == msg for w in raised_warning)
 
 
-@pytest.mark.parametrize('num_dims', [None, 2])
-def test_deprecation_num_dims_rca(num_dims):
-  # test that a deprecation message is thrown if num_dims is set at
-  # initialization
-  # TODO: remove in v.0.6
-  X, y = load_iris(return_X_y=True)
-  rca = RCA(num_dims=num_dims)
-  msg = ('"num_dims" parameter is not used.'
-         ' It has been deprecated in version 0.5.0 and will be'
-         ' removed in 0.6.0. Use "n_components" instead')
-  with pytest.warns(DeprecationWarning) as raised_warning:
-    rca.fit(X, y)
-  assert any(str(w.message) == msg for w in raised_warning)
-
-  # we take a small number of chunks so that RCA works on iris
-  rca_supervised = RCA_Supervised(num_dims=num_dims, num_chunks=10)
-  msg = ('"num_dims" parameter is not used.'
-         ' It has been deprecated in version 0.5.0 and will be'
-         ' removed in 0.6.0. Use "n_components" instead')
-  with pytest.warns(DeprecationWarning) as raised_warning:
-    rca_supervised.fit(X, y)
-  assert any(str(w.message) == msg for w in raised_warning)
-
-
 class TestMLKR(MetricTestCase):
   def test_iris(self):
     mlkr = MLKR()
@@ -1456,52 +1110,6 @@ class TestMLKR(MetricTestCase):
     # compute relative error
     rel_diff = check_grad(fun, grad_fn, M.ravel()) / np.linalg.norm(grad_fn(M))
     np.testing.assert_almost_equal(rel_diff, 0.)
-
-  def test_deprecation_A0(self):
-    # test that a deprecation message is thrown if A0 is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    mlkr = MLKR(A0=np.ones_like(X))
-    msg = ('"A0" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "init" instead.')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      mlkr.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_changed_behaviour_warning(self):
-    # test that a ChangedBehavior warning is thrown about the init, if the
-    # default parameters are used.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([0.1, 0.2, 0.3, 0.4])
-    mlkr = MLKR()
-    msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-           "the default init will now be set to 'auto', instead of 'pca'. "
-           "If you still want to use PCA as an init, set init='pca'. "
-           "This warning will disappear in v0.6.0, and `init` parameter's"
-           " default value will be set to 'auto'.")
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      mlkr.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-
-@pytest.mark.parametrize('num_dims', [None, 2])
-def test_deprecation_num_dims_mlkr(num_dims):
-  # test that a deprecation message is thrown if num_dims is set at
-  # initialization
-  # TODO: remove in v.0.6
-  X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-  y = np.array([1, 0, 1, 0])
-  mlkr = MLKR(num_dims=num_dims)
-  msg = ('"num_dims" parameter is not used.'
-         ' It has been deprecated in version 0.5.0 and will be'
-         ' removed in 0.6.0. Use "n_components" instead')
-  with pytest.warns(DeprecationWarning) as raised_warning:
-    mlkr.fit(X, y)
-  assert (str(raised_warning[0].message) == msg)
 
 
 class TestMMC(MetricTestCase):
@@ -1542,97 +1150,6 @@ class TestMMC(MetricTestCase):
     mmc.fit(self.iris_points, self.iris_labels)
     csep = class_separation(mmc.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.2)
-
-  def test_deprecation_num_labeled(self):
-    # test that a deprecation message is thrown if num_labeled is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    mmc_supervised = MMC_Supervised(num_labeled=np.inf)
-    msg = ('"num_labeled" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           ' removed in 0.6.0')
-    assert_warns_message(DeprecationWarning, msg, mmc_supervised.fit, X, y)
-
-  def test_deprecation_A0(self):
-    # test that a deprecation message is thrown if A0 is set at
-    # initialization
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    mmc_supervised = MMC_Supervised(A0=np.ones_like(X))
-    msg = ('"A0" parameter is not used.'
-           ' It has been deprecated in version 0.5.0 and will be'
-           'removed in 0.6.0. Use "init" instead.')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      mmc_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
-    y_pairs = [1, -1]
-    mmc = MMC(A0=np.ones_like(X))
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      mmc.fit(pairs, y_pairs)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_changed_behaviour_warning(self):
-    # test that a ChangedBehavior warning is thrown about the init, if the
-    # default parameters are used.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    mmc_supervised = MMC_Supervised()
-    msg = ("Warning, no init was set (`init=None`). As of version 0.5.0, "
-           "the default init will now be set to 'identity', instead of the "
-           "identity divided by a scaling factor of 10. "
-           "If you still want to use the same init as in previous "
-           "versions, set init=np.eye(d)/10, where d is the dimension "
-           "of your input space (d=pairs.shape[1]). "
-           "This warning will disappear in v0.6.0, and `init` parameter's"
-           " default value will be set to 'auto'.")
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      mmc_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-    pairs = np.array([[[-10., 0.], [10., 0.]], [[0., 50.], [0., -60]]])
-    y_pairs = [1, -1]
-    mmc = MMC()
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      mmc.fit(pairs, y_pairs)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_deprecation_random_state(self):
-    # test that a deprecation message is thrown if random_state is set at
-    # fit time
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    mmc_supervised = MMC_Supervised()
-    msg = ('"random_state" parameter in the `fit` function is '
-           'deprecated. Set `random_state` at initialization '
-           'instead (when instantiating a new `MMC_Supervised` '
-           'object).')
-    with pytest.warns(DeprecationWarning) as raised_warning:
-      mmc_supervised.fit(X, y, random_state=np.random)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
-  def test_changed_behaviour_warning_random_state(self):
-    # test that a ChangedBehavior warning is thrown if the random_state is
-    # not set in fit.
-    # TODO: remove in v.0.6
-    X = np.array([[0, 0], [0, 1], [2, 0], [2, 1]])
-    y = np.array([1, 0, 1, 0])
-    mmc_supervised = MMC_Supervised()
-    msg = ('As of v0.5.0, `MMC_Supervised` now uses the '
-           '`random_state` given at initialization to sample '
-           'constraints, not the default `np.random` from the `fit` '
-           'method, since this argument is now deprecated. '
-           'This warning will disappear in v0.6.0.')
-    with pytest.warns(ChangedBehaviorWarning) as raised_warning:
-      mmc_supervised.fit(X, y)
-    assert any(msg == str(wrn.message) for wrn in raised_warning)
-
 
 @pytest.mark.parametrize(('algo_class', 'dataset'),
                          [(NCA, make_classification()),

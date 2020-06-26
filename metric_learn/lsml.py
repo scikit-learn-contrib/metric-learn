@@ -280,11 +280,6 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       (n_features, n_features), that will be used as such to set the
       prior.
 
-  num_labeled : Not used
-    .. deprecated:: 0.5.0
-      `num_labeled` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0.
-
   num_constraints: int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
@@ -327,7 +322,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   """
 
   def __init__(self, tol=1e-3, max_iter=1000, prior=None,
-               num_labeled='deprecated', num_constraints=None, weights=None,
+               num_constraints=None, weights=None,
                verbose=False, preprocessor=None, random_state=None):
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                        verbose=verbose, preprocessor=preprocessor,
@@ -336,7 +331,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     self.num_constraints = num_constraints
     self.weights = weights
 
-  def fit(self, X, y, random_state='deprecated'):
+  def fit(self, X, y):
     """Create constraints from labels and learn the LSML model.
 
     Parameters
@@ -346,29 +341,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
 
     y : (n) array-like
       Data labels.
-
-    random_state : Not used
-      .. deprecated:: 0.5.0
-        `random_state` in the `fit` function was deprecated in version 0.5.0
-        and will be removed in 0.6.0. Set `random_state` at initialization
-        instead (when instantiating a new `LSML_Supervised` object).
     """
-    if self.num_labeled != 'deprecated':
-      warnings.warn('"num_labeled" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0', DeprecationWarning)
-    if random_state != 'deprecated':
-      warnings.warn('"random_state" parameter in the `fit` function is '
-                    'deprecated. Set `random_state` at initialization '
-                    'instead (when instantiating a new `LSML_Supervised` '
-                    'object).', DeprecationWarning)
-    else:
-      warnings.warn('As of v0.5.0, `LSML_Supervised` now uses the '
-                    '`random_state` given at initialization to sample '
-                    'constraints, not the default `np.random` from the `fit` '
-                    'method, since this argument is now deprecated. '
-                    'This warning will disappear in v0.6.0.',
-                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:

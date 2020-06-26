@@ -285,15 +285,6 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
 
   get_metric.__doc__ = BaseMetricLearner.get_metric.__doc__
 
-  def metric(self):
-    """Deprecated. Will be removed in v0.6.0. Use `get_mahalanobis_matrix`
-    instead"""
-    # TODO: remove this method in version 0.6.0
-    warnings.warn(("`metric` is deprecated since version 0.5.0 and will be "
-                   "removed in 0.6.0. Use `get_mahalanobis_matrix` instead."),
-                  DeprecationWarning)
-    return self.get_mahalanobis_matrix()
-
   def get_mahalanobis_matrix(self):
     """Returns a copy of the Mahalanobis matrix learned by the metric learner.
 

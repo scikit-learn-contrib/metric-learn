@@ -39,12 +39,12 @@ class Stable_RCA_Supervised(RCA_Supervised):
 
 class Stable_SDML_Supervised(SDML_Supervised):
 
-  def __init__(self, sparsity_param=0.01, num_labeled='deprecated',
+  def __init__(self, sparsity_param=0.01,
                num_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
     # this init makes SDML stable for scikit-learn examples.
     super(Stable_SDML_Supervised, self).__init__(
-        sparsity_param=sparsity_param, num_labeled=num_labeled,
+        sparsity_param=sparsity_param,
         num_constraints=num_constraints, verbose=verbose,
         preprocessor=preprocessor, balance_param=1e-5, prior='identity',
         random_state=random_state)

@@ -83,11 +83,6 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     Tolerance of the optimization procedure. If the objective value varies
     less than `tol`, we consider the algorithm has converged and stop it.
 
-  use_pca : Not used
-    .. deprecated:: 0.5.0
-      `use_pca` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0.
-
   verbose : bool, optional (default=False)
     Whether to print the progress of the optimization procedure.
 
@@ -101,11 +96,6 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
-
-  num_dims : Not used
-    .. deprecated:: 0.5.0
-      `num_dims` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use `n_components` instead.
 
   random_state : int or numpy.RandomState or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If
@@ -144,8 +134,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
   def __init__(self, init=None, k=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
-               use_pca='deprecated', verbose=False, preprocessor=None,
-               n_components=None, num_dims='deprecated', random_state=None):
+               verbose=False, preprocessor=None,
+               n_components=None, random_state=None):
     self.init = init
     self.k = k
     self.min_iter = min_iter
@@ -161,16 +151,6 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     super(LMNN, self).__init__(preprocessor)
 
   def fit(self, X, y):
-    if self.num_dims != 'deprecated':
-      warnings.warn('"num_dims" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0. Use "n_components" instead',
-                    DeprecationWarning)
-    if self.use_pca != 'deprecated':
-      warnings.warn('"use_pca" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0.',
-                    DeprecationWarning)
     k = self.k
     reg = self.regularization
     learn_rate = self.learn_rate

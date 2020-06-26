@@ -25,7 +25,7 @@ class _BaseSDML(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
-               use_cov='deprecated', verbose=False, preprocessor=None,
+               verbose=False, preprocessor=None,
                random_state=None):
     self.balance_param = balance_param
     self.sparsity_param = sparsity_param
@@ -36,11 +36,6 @@ class _BaseSDML(MahalanobisMixin):
     super(_BaseSDML, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
-    if self.use_cov != 'deprecated':
-      warnings.warn('"use_cov" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0. Use "prior" instead.',
-                    DeprecationWarning)
     if not HAS_SKGGM:
       if self.verbose:
         print("SDML will use scikit-learn's graphical lasso solver.")
@@ -171,11 +166,6 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
       (n_features, n_features), that will be used as such to set the
       prior.
 
-  use_cov : Not used.
-    .. deprecated:: 0.5.0
-      `A0` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use 'prior' instead.
-
   verbose : bool, optional (default=False)
     If True, prints information while learning.
 
@@ -292,16 +282,6 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
       (n_features, n_features), that will be used as such to set the
       prior.
 
-  use_cov : Not used.
-    .. deprecated:: 0.5.0
-      `A0` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use 'prior' instead.
-
-  num_labeled : Not used
-    .. deprecated:: 0.5.0
-      `num_labeled` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0.
-
   num_constraints : int, optional (default=None)
     Number of constraints to generate. If None, defaults to `20 *
     num_classes**2`.
@@ -333,7 +313,6 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   """
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, prior=None,
-               use_cov='deprecated', num_labeled='deprecated',
                num_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
     _BaseSDML.__init__(self, balance_param=balance_param,
@@ -343,7 +322,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
-  def fit(self, X, y, random_state='deprecated'):
+  def fit(self, X, y):
     """Create constraints from labels and learn the SDML model.
 
     Parameters
@@ -354,33 +333,11 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
     y : array-like, shape (n,)
       data labels, one for each instance
 
-    random_state : Not used
-      .. deprecated:: 0.5.0
-        `random_state` in the `fit` function was deprecated in version 0.5.0
-        and will be removed in 0.6.0. Set `random_state` at initialization
-        instead (when instantiating a new `SDML_Supervised` object).
-
     Returns
     -------
     self : object
       Returns the instance.
     """
-    if self.num_labeled != 'deprecated':
-      warnings.warn('"num_labeled" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0', DeprecationWarning)
-    if random_state != 'deprecated':
-      warnings.warn('"random_state" parameter in the `fit` function is '
-                    'deprecated. Set `random_state` at initialization '
-                    'instead (when instantiating a new `SDML_Supervised` '
-                    'object).', DeprecationWarning)
-    else:
-      warnings.warn('As of v0.5.0, `SDML_Supervised` now uses the '
-                    '`random_state` given at initialization to sample '
-                    'constraints, not the default `np.random` from the `fit` '
-                    'method, since this argument is now deprecated. '
-                    'This warning will disappear in v0.6.0.',
-                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:

@@ -77,11 +77,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
-  num_dims : Not used
-    .. deprecated:: 0.5.0
-      `num_dims` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use `n_components` instead.
-
   max_iter : int, optional (default=100)
     Maximum number of iterations done by the optimization algorithm.
 
@@ -128,7 +123,7 @@ class NCA(MahalanobisMixin, TransformerMixin):
          <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_
   """
 
-  def __init__(self, init=None, n_components=None, num_dims='deprecated',
+  def __init__(self, init=None, n_components=None,
                max_iter=100, tol=None, verbose=False, preprocessor=None,
                random_state=None):
     self.n_components = n_components
@@ -145,11 +140,6 @@ class NCA(MahalanobisMixin, TransformerMixin):
     X: data matrix, (n x d)
     y: scalar labels, (n)
     """
-    if self.num_dims != 'deprecated':
-      warnings.warn('"num_dims" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0. Use "n_components" instead',
-                    DeprecationWarning)
     X, labels = self._prepare_inputs(X, y, ensure_min_samples=2)
     n, d = X.shape
     n_components = _check_n_components(d, self.n_components)

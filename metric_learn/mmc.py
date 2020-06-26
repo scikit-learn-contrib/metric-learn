@@ -15,7 +15,7 @@ class _BaseMMC(MahalanobisMixin):
   _tuple_size = 2  # constraints are pairs
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
-               init=None, A0='deprecated', diagonal=False,
+               init=None, diagonal=False,
                diagonal_c=1.0, verbose=False, preprocessor=None,
                random_state=None):
     self.max_iter = max_iter
@@ -30,11 +30,6 @@ class _BaseMMC(MahalanobisMixin):
     super(_BaseMMC, self).__init__(preprocessor)
 
   def _fit(self, pairs, y):
-    if self.A0 != 'deprecated':
-      warnings.warn('"A0" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    'removed in 0.6.0. Use "init" instead.',
-                    DeprecationWarning)
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
 
@@ -381,11 +376,6 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
       An SPD matrix of shape (n_features, n_features), that will
       be used as such to initialize the metric.
 
-  A0 : Not used.
-    .. deprecated:: 0.5.0
-      `A0` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use 'init' instead.
-
   diagonal : bool, optional (default=False)
     If True, a diagonal metric will be learned,
     i.e., a simple scaling of dimensions. The initialization will then
@@ -502,11 +492,6 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   convergence_threshold : float, optional (default=1e-3)
     Convergence threshold for the optimization procedure.
 
-  num_labeled : Not used
-    .. deprecated:: 0.5.0
-      `num_labeled` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0.
-
   num_constraints: int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
@@ -532,11 +517,6 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     numpy array
       A numpy array of shape (n_features, n_features), that will
       be used as such to initialize the metric.
-
-  A0 : Not used.
-    .. deprecated:: 0.5.0
-      `A0` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use 'init' instead.
 
   diagonal : bool, optional (default=False)
     If True, a diagonal metric will be learned,
@@ -581,8 +561,8 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_labeled='deprecated', num_constraints=None, init=None,
-               A0='deprecated', diagonal=False, diagonal_c=1.0, verbose=False,
+               num_constraints=None, init=None,
+               diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None, random_state=None):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       convergence_threshold=convergence_threshold,
@@ -592,7 +572,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     self.num_labeled = num_labeled
     self.num_constraints = num_constraints
 
-  def fit(self, X, y, random_state='deprecated'):
+  def fit(self, X, y):
     """Create constraints from labels and learn the MMC model.
 
     Parameters
@@ -602,29 +582,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
 
     y : (n) array-like
       Data labels.
-
-    random_state : Not used
-      .. deprecated:: 0.5.0
-        `random_state` in the `fit` function was deprecated in version 0.5.0
-        and will be removed in 0.6.0. Set `random_state` at initialization
-        instead (when instantiating a new `MMC_Supervised` object).
     """
-    if self.num_labeled != 'deprecated':
-      warnings.warn('"num_labeled" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0', DeprecationWarning)
-    if random_state != 'deprecated':
-      warnings.warn('"random_state" parameter in the `fit` function is '
-                    'deprecated. Set `random_state` at initialization '
-                    'instead (when instantiating a new `MMC_Supervised` '
-                    'object).', DeprecationWarning)
-    else:
-      warnings.warn('As of v0.5.0, `MMC_Supervised` now uses the '
-                    '`random_state` given at initialization to sample '
-                    'constraints, not the default `np.random` from the `fit` '
-                    'method, since this argument is now deprecated. '
-                    'This warning will disappear in v0.6.0.',
-                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     num_constraints = self.num_constraints
     if num_constraints is None:

@@ -43,16 +43,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
-  num_dims : Not used
-    .. deprecated:: 0.5.0
-      `num_dims` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use `n_components` instead.
-
-  pca_comps : Not used
-    .. deprecated:: 0.5.0
-      `pca_comps` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0.
-
   preprocessor : array-like, shape=(n_samples, n_features) or callable
     The preprocessor to call to get tuples from indices. If array-like,
     tuples will be formed like this: X[indices].
@@ -82,8 +72,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
     The learned linear transformation ``L``.
   """
 
-  def __init__(self, n_components=None, num_dims='deprecated',
-               pca_comps='deprecated', preprocessor=None):
+  def __init__(self, n_components=None, preprocessor=None):
     self.n_components = n_components
     self.num_dims = num_dims
     self.pca_comps = pca_comps
@@ -115,21 +104,6 @@ class RCA(MahalanobisMixin, TransformerMixin):
       When ``chunks[i] == -1``, point i doesn't belong to any chunklet.
       When ``chunks[i] == j``, point i belongs to chunklet j.
     """
-    if self.num_dims != 'deprecated':
-      warnings.warn('"num_dims" parameter is not used.'
-                    ' It has been deprecated in version 0.5.0 and will be'
-                    ' removed in 0.6.0. Use "n_components" instead',
-                    DeprecationWarning)
-
-    if self.pca_comps != 'deprecated':
-      warnings.warn(
-          '"pca_comps" parameter is not used. '
-          'It has been deprecated in version 0.5.0 and will be'
-          'removed in 0.6.0. RCA will not do PCA preprocessing anymore. If '
-          'you still want to do it, you could use '
-          '`sklearn.decomposition.PCA` and an `sklearn.pipeline.Pipeline`.',
-          DeprecationWarning)
-
     X, chunks = self._prepare_inputs(X, chunks, ensure_min_samples=2)
 
     warnings.warn(
@@ -177,11 +151,6 @@ class RCA_Supervised(RCA):
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
-  num_dims : Not used
-    .. deprecated:: 0.5.0
-      `num_dims` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use `n_components` instead.
-
   num_chunks: int, optional (default=100)
     Number of chunks to generate.
 
@@ -212,8 +181,7 @@ class RCA_Supervised(RCA):
     The learned linear transformation ``L``.
   """
 
-  def __init__(self, num_dims='deprecated', n_components=None,
-               pca_comps='deprecated', num_chunks=100, chunk_size=2,
+  def __init__(self, n_components=None, num_chunks=100, chunk_size=2,
                preprocessor=None, random_state=None):
     """Initialize the supervised version of `RCA`."""
     RCA.__init__(self, num_dims=num_dims, n_components=n_components,
@@ -222,7 +190,7 @@ class RCA_Supervised(RCA):
     self.chunk_size = chunk_size
     self.random_state = random_state
 
-  def fit(self, X, y, random_state='deprecated'):
+  def fit(self, X, y):
     """Create constraints from labels and learn the RCA model.
     Needs num_constraints specified in constructor.
 
@@ -232,25 +200,7 @@ class RCA_Supervised(RCA):
       each row corresponds to a single instance
 
     y : (n) data labels
-
-    random_state : Not used
-      .. deprecated:: 0.5.0
-        `random_state` in the `fit` function was deprecated in version 0.5.0
-        and will be removed in 0.6.0. Set `random_state` at initialization
-        instead (when instantiating a new `RCA_Supervised` object).
     """
-    if random_state != 'deprecated':
-      warnings.warn('"random_state" parameter in the `fit` function is '
-                    'deprecated. Set `random_state` at initialization '
-                    'instead (when instantiating a new `RCA_Supervised` '
-                    'object).', DeprecationWarning)
-    else:
-      warnings.warn('As of v0.5.0, `RCA_Supervised` now uses the '
-                    '`random_state` given at initialization to sample '
-                    'constraints, not the default `np.random` from the `fit` '
-                    'method, since this argument is now deprecated. '
-                    'This warning will disappear in v0.6.0.',
-                    ChangedBehaviorWarning)
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     chunks = Constraints(y).chunks(num_chunks=self.num_chunks,
                                    chunk_size=self.chunk_size,

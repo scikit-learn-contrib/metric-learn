@@ -32,11 +32,6 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
-  num_dims : Not used
-    .. deprecated:: 0.5.0
-      `num_dims` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use `n_components` instead.
-
   init : None, string or numpy array, optional (default=None)
     Initialization of the linear transformation. Possible options are
     'auto', 'pca', 'identity', 'random', and a numpy array of shape
@@ -69,11 +64,6 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       n_features_b must match the dimensionality of the inputs passed to
       :meth:`fit` and n_features_a must be less than or equal to that.
       If ``n_components`` is not None, n_features_a must match it.
-
-  A0 : Not used.
-    .. deprecated:: 0.5.0
-      `A0` was deprecated in version 0.5.0 and will
-      be removed in 0.6.0. Use 'init' instead.
 
   tol : float, optional (default=None)
     Convergence tolerance for the optimization.
@@ -120,8 +110,8 @@ class MLKR(MahalanobisMixin, TransformerMixin):
          /weinberger07a.pdf>`_. AISTATS 2007.
   """
 
-  def __init__(self, n_components=None, num_dims='deprecated', init=None,
-               A0='deprecated', tol=None, max_iter=1000, verbose=False,
+  def __init__(self, n_components=None, init=None,
+               tol=None, max_iter=1000, verbose=False,
                preprocessor=None, random_state=None):
     self.n_components = n_components
     self.num_dims = num_dims
@@ -142,18 +132,6 @@ class MLKR(MahalanobisMixin, TransformerMixin):
       X : (n x d) array of samples
       y : (n) data labels
       """
-      if self.A0 != 'deprecated':
-        warnings.warn('"A0" parameter is not used.'
-                      ' It has been deprecated in version 0.5.0 and will be'
-                      'removed in 0.6.0. Use "init" instead.',
-                      DeprecationWarning)
-
-      if self.num_dims != 'deprecated':
-        warnings.warn('"num_dims" parameter is not used.'
-                      ' It has been deprecated in version 0.5.0 and will be'
-                      ' removed in 0.6.0. Use "n_components" instead',
-                      DeprecationWarning)
-
       X, y = self._prepare_inputs(X, y, y_numeric=True,
                                   ensure_min_samples=2)
       n, d = X.shape
