@@ -204,7 +204,7 @@ class _BaseMMC(MahalanobisMixin):
       obj = (np.dot(s_sum, w_tmp) + self.diagonal_c *
              self._D_objective(neg_pairs, w_tmp))
       assert_all_finite(obj)
-      obj_previous = obj + 1  # just to get the while-loop started
+      obj_previous = np.inf  # just to get the while-loop started
 
       inner_it = 0
       while obj < obj_previous:
