@@ -20,7 +20,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'metric-learn'
-copyright = (u'2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien '
+copyright = (u'2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien '
              u'Bellet and Nathalie Vauquier')
 author = (u'CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and '
           u'Nathalie Vauquier')
