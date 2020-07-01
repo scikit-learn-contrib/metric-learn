@@ -1,55 +1,63 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>2. Supervised Metric Learning &mdash; metric-learn 0.5.0 documentation</title>
+  <title>2. Supervised Metric Learning &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="3. Weakly Supervised Metric Learning" href="weakly_supervised.html" />
     <link rel="prev" title="1. What is Metric Learning?" href="introduction.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="index.html" class="icon icon-home"> metric-learn
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -59,7 +67,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -76,6 +84,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -97,10 +106,10 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#algorithms">2.2. Algorithms</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#lmnn">2.2.1. <code class="docutils literal notranslate"><span class="pre">LMNN</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#nca">2.2.2. <code class="docutils literal notranslate"><span class="pre">NCA</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#lfda">2.2.3. <code class="docutils literal notranslate"><span class="pre">LFDA</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#mlkr">2.2.4. <code class="docutils literal notranslate"><span class="pre">MLKR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lmnn">2.2.1. <code class="xref py py-class docutils literal notranslate"><span class="pre">LMNN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nca">2.2.2. <code class="xref py py-class docutils literal notranslate"><span class="pre">NCA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lfda">2.2.3. <code class="xref py py-class docutils literal notranslate"><span class="pre">LFDA</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mlkr">2.2.4. <code class="xref py py-class docutils literal notranslate"><span class="pre">MLKR</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#supervised-versions-of-weakly-supervised-algorithms">2.2.5. Supervised versions of weakly-supervised algorithms</a></li>
 </ul>
 </li>
@@ -122,6 +131,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -160,11 +170,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="user_guide.html">User Guide</a> &raquo;</li>
         
-      <li>2. Supervised Metric Learning</li>
+      <li><span class="section-number">2. </span>Supervised Metric Learning</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -184,22 +194,22 @@
            <div itemprop="articleBody">
             
   <div class="section" id="supervised-metric-learning">
-<h1>2. Supervised Metric Learning<a class="headerlink" href="#supervised-metric-learning" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">2. </span>Supervised Metric Learning<a class="headerlink" href="#supervised-metric-learning" title="Permalink to this headline">¶</a></h1>
 <p>Supervised metric learning algorithms take as inputs points <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> and target
-labels <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>, and learn a distance matrix that make points from the same class
+labels <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-177" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>, and learn a distance matrix that make points from the same class
 (for classification) or with close target value (for regression) close to each
 other, and points from different classes or with distant target values far away
 from each other.</p>
 <div class="section" id="general-api">
-<h2>2.1. General API<a class="headerlink" href="#general-api" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.1. </span>General API<a class="headerlink" href="#general-api" title="Permalink to this headline">¶</a></h2>
 <p>Supervised metric learning algorithms essentially use the same API as
 scikit-learn.</p>
 <div class="section" id="input-data">
-<h3>2.1.1. Input data<a class="headerlink" href="#input-data" title="Permalink to this headline">¶</a></h3>
-<p>In order to train a model, you need two <a class="reference external" href="https://scikit-learn .org/stable/glossary.html#term-array-like">array-like</a> objects, <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>. <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>
+<h3><span class="section-number">2.1.1. </span>Input data<a class="headerlink" href="#input-data" title="Permalink to this headline">¶</a></h3>
+<p>In order to train a model, you need two <a class="reference external" href="https://scikit-learn .org/stable/glossary.html#term-array-like">array-like</a> objects, <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-177" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>. <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>
 should be a 2D array-like of shape <code class="xref any docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_features)</span></code>, where
-<a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> is the number of points of your dataset and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-features" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_features</span></code></a> is the
-number of attributes describing each point. <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> should be a 1D
+<a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> is the number of points of your dataset and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-features" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">n_features</span></code></a> is the
+number of attributes describing each point. <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-177" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> should be a 1D
 array-like
 of shape <code class="xref any docutils literal notranslate"><span class="pre">(n_samples,)</span></code>, containing for each point in <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> the class it
 belongs to (or the value to regress for this sample, if you use <a class="reference internal" href="#mlkr"><span class="std std-ref">MLKR</span></a> for
@@ -207,7 +217,7 @@ instance).</p>
 <p>Here is an example of a dataset of two dogs and one
 cat (the classes are ‘dog’ and ‘cat’) an animal being represented by
 two numbers.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2.3</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.7</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">])</span>
 </pre></div>
@@ -219,16 +229,16 @@ two numbers.</p>
 </div>
 </div>
 <div class="section" id="fit-transform-and-so-on">
-<h3>2.1.2. Fit, transform, and so on<a class="headerlink" href="#fit-transform-and-so-on" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.1.2. </span>Fit, transform, and so on<a class="headerlink" href="#fit-transform-and-so-on" title="Permalink to this headline">¶</a></h3>
 <p>The goal of supervised metric-learning algorithms is to transform
 points in a new space, in which the distance between two points from the
 same class will be small, and the distance between two points from different
 classes will be large. To do so, we fit the metric learner (example:
 <a class="reference internal" href="#nca"><span class="std std-ref">NCA</span></a>).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">NCA</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="go">NCA(init=None, max_iter=100, n_components=None, num_dims=&#39;deprecated&#39;,</span>
+<span class="go">NCA(init=&#39;auto&#39;, max_iter=100, n_components=None,</span>
 <span class="go">  preprocessor=None, random_state=42, tol=None, verbose=False)</span>
 </pre></div>
 </div>
@@ -236,7 +246,7 @@ classes will be large. To do so, we fit the metric learner (example:
 purposes.</p>
 <p>First, you can transform the data in the learned space, using <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.transform" title="metric_learn.Covariance.transform"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">transform</span></code></a>:
 Here we transform two points in the new embedding space.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">9.4</span><span class="p">,</span> <span class="mf">4.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">4.4</span><span class="p">]])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">9.4</span><span class="p">,</span> <span class="mf">4.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">4.4</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_new</span><span class="p">)</span>
 <span class="go">array([[ 5.91884732, 10.25406973],</span>
 <span class="go">       [ 3.1545886 ,  6.80350083]])</span>
@@ -248,16 +258,16 @@ points. You can use this distance in two main ways:</p>
 <li>You can either return the distance between pairs of points using the
 <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.score_pairs" title="metric_learn.Covariance.score_pairs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">score_pairs</span></code></a> function:</li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">score_pairs</span><span class="p">([[[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.6</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">]],</span> <span class="p">[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">]]])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">score_pairs</span><span class="p">([[[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.6</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">]],</span> <span class="p">[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">]]])</span>
 <span class="go">array([0.49627072, 3.65287282])</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li>Or you can return a function that will return the distance (in the new
 space) between two 1D arrays (the coordinates of the points in the original
-space), similarly to distance functions in <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html#module-scipy.spatial.distance" title="(in SciPy v1.3.0)"><code class="xref any docutils literal notranslate"><span class="pre">scipy.spatial.distance</span></code></a>.</li>
+space), similarly to distance functions in <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html#module-scipy.spatial.distance" title="(in SciPy v1.5.0)"><code class="xref any docutils literal notranslate"><span class="pre">scipy.spatial.distance</span></code></a>.</li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">metric_fun</span> <span class="o">=</span> <span class="n">nca</span><span class="o">.</span><span class="n">get_metric</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">metric_fun</span> <span class="o">=</span> <span class="n">nca</span><span class="o">.</span><span class="n">get_metric</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">metric_fun</span><span class="p">([</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.6</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">])</span>
 <span class="go">0.4962707194621285</span>
 </pre></div>
@@ -267,7 +277,7 @@ space), similarly to distance functions in <a class="reference external" href="h
 <p>If the metric learner that you use learns a <a class="reference internal" href="introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis distance</span></a> (like it is the case for all algorithms
 currently in metric-learn), you can get the plain learned Mahalanobis
 matrix using <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.get_mahalanobis_matrix" title="metric_learn.Covariance.get_mahalanobis_matrix"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>.</p>
-<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">get_mahalanobis_matrix</span><span class="p">()</span>
+<div class="doctest last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">get_mahalanobis_matrix</span><span class="p">()</span>
 <span class="go">array([[0.43680409, 0.89169412],</span>
 <span class="go">       [0.89169412, 1.9542479 ]])</span>
 </pre></div>
@@ -275,20 +285,20 @@ matrix using <a class="reference internal" href="generated/metric_learn.Covarian
 </div>
 </div>
 <div class="section" id="scikit-learn-compatibility">
-<h3>2.1.3. Scikit-learn compatibility<a class="headerlink" href="#scikit-learn-compatibility" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">2.1.3. </span>Scikit-learn compatibility<a class="headerlink" href="#scikit-learn-compatibility" title="Permalink to this headline">¶</a></h3>
 <p>All supervised algorithms are scikit-learn estimators
-(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></a>) and transformers
-(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></a>) so they are compatible with pipelines
-(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code></a>) and
+(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></a>) and transformers
+(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></a>) so they are compatible with pipelines
+(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.pipeline.Pipeline</span></code></a>) and
 scikit-learn model selection routines
-(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html#sklearn.model_selection.cross_val_score" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.cross_val_score</span></code></a>,
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a>, etc).</p>
+(<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html#sklearn.model_selection.cross_val_score" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.cross_val_score</span></code></a>,
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a>, etc).</p>
 </div>
 </div>
 <div class="section" id="algorithms">
-<h2>2.2. Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.2. </span>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="lmnn">
-<span id="id1"></span><h3>2.2.1. <a class="reference internal" href="generated/metric_learn.LMNN.html#metric_learn.LMNN" title="metric_learn.LMNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">LMNN</span></code></a><a class="headerlink" href="#lmnn" title="Permalink to this headline">¶</a></h3>
+<span id="id1"></span><h3><span class="section-number">2.2.1. </span><a class="reference internal" href="generated/metric_learn.LMNN.html#metric_learn.LMNN" title="metric_learn.LMNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">LMNN</span></code></a><a class="headerlink" href="#lmnn" title="Permalink to this headline">¶</a></h3>
 <p>Large Margin Nearest Neighbor Metric Learning
 (<a class="reference internal" href="generated/metric_learn.LMNN.html#metric_learn.LMNN" title="metric_learn.LMNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">LMNN</span></code></a>)</p>
 <p><a class="reference internal" href="#lmnn"><span class="std std-ref">LMNN</span></a> learns a Mahalanobis distance metric in the kNN classification
@@ -301,17 +311,17 @@ the distribution of the data.</p>
 \[\min_\mathbf{L}\sum_{i, j}\eta_{ij}||\mathbf{L(x_i-x_j)}||^2 +
 c\sum_{i, j, l}\eta_{ij}(1-y_{ij})[1+||\mathbf{L(x_i-x_j)}||^2-||
 \mathbf{L(x_i-x_l)}||^2]_+)\]</div>
-<p>where <span class="math notranslate nohighlight">\(\mathbf{x}_i\)</span> is an data point, <span class="math notranslate nohighlight">\(\mathbf{x}_j\)</span> is one
-of its k nearest neighbors sharing the same label, and <span class="math notranslate nohighlight">\(\mathbf{x}_l\)</span>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{x}_i\)</span> is a data point, <span class="math notranslate nohighlight">\(\mathbf{x}_j\)</span> is one
+of its k-nearest neighbors sharing the same label, and <span class="math notranslate nohighlight">\(\mathbf{x}_l\)</span>
 are all the other instances within that region with different labels,
 <span class="math notranslate nohighlight">\(\eta_{ij}, y_{ij} \in \{0, 1\}\)</span> are both the indicators,
-<span class="math notranslate nohighlight">\(\eta_{ij}\)</span> represents <span class="math notranslate nohighlight">\(\mathbf{x}_{j}\)</span> is the k nearest
-neighbors(with same labels) of <span class="math notranslate nohighlight">\(\mathbf{x}_{i}\)</span>, <span class="math notranslate nohighlight">\(y_{ij}=0\)</span>
-indicates <span class="math notranslate nohighlight">\(\mathbf{x}_{i}, \mathbf{x}_{j}\)</span> belong to different class,
+<span class="math notranslate nohighlight">\(\eta_{ij}\)</span> represents <span class="math notranslate nohighlight">\(\mathbf{x}_{j}\)</span> is the k-nearest
+neighbors (with same labels) of <span class="math notranslate nohighlight">\(\mathbf{x}_{i}\)</span>, <span class="math notranslate nohighlight">\(y_{ij}=0\)</span>
+indicates <span class="math notranslate nohighlight">\(\mathbf{x}_{i}, \mathbf{x}_{j}\)</span> belong to different classes,
 <span class="math notranslate nohighlight">\([\cdot]_+=\max(0, \cdot)\)</span> is the Hinge loss.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">LMNN</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">LMNN</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
@@ -322,7 +332,7 @@ indicates <span class="math notranslate nohighlight">\(\mathbf{x}_{i}, \mathbf{x
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -340,7 +350,7 @@ JMLR 2009</td></tr>
 </div>
 </div>
 <div class="section" id="nca">
-<span id="id4"></span><h3>2.2.2. <a class="reference internal" href="generated/metric_learn.NCA.html#metric_learn.NCA" title="metric_learn.NCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">NCA</span></code></a><a class="headerlink" href="#nca" title="Permalink to this headline">¶</a></h3>
+<span id="id4"></span><h3><span class="section-number">2.2.2. </span><a class="reference internal" href="generated/metric_learn.NCA.html#metric_learn.NCA" title="metric_learn.NCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">NCA</span></code></a><a class="headerlink" href="#nca" title="Permalink to this headline">¶</a></h3>
 <p>Neighborhood Components Analysis (<a class="reference internal" href="generated/metric_learn.NCA.html#metric_learn.NCA" title="metric_learn.NCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">NCA</span></code></a>)</p>
 <p><a class="reference internal" href="#nca"><span class="std std-ref">NCA</span></a> is a distance metric learning algorithm which aims to improve the
 accuracy of nearest neighbors classification compared to the standard
@@ -365,8 +375,8 @@ the sum of probability of being correctly classified:</p>
 <div class="math notranslate nohighlight">
 \[\mathbf{L} = \text{argmax}\sum_i p_i\]</div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">NCA</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
@@ -377,7 +387,7 @@ the sum of probability of being correctly classified:</p>
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id5" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -395,9 +405,9 @@ NIPS 2005</td></tr>
 </div>
 </div>
 <div class="section" id="lfda">
-<span id="id7"></span><h3>2.2.3. <a class="reference internal" href="generated/metric_learn.LFDA.html#metric_learn.LFDA" title="metric_learn.LFDA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LFDA</span></code></a><a class="headerlink" href="#lfda" title="Permalink to this headline">¶</a></h3>
+<span id="id7"></span><h3><span class="section-number">2.2.3. </span><a class="reference internal" href="generated/metric_learn.LFDA.html#metric_learn.LFDA" title="metric_learn.LFDA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LFDA</span></code></a><a class="headerlink" href="#lfda" title="Permalink to this headline">¶</a></h3>
 <p>Local Fisher Discriminant Analysis (<a class="reference internal" href="generated/metric_learn.LFDA.html#metric_learn.LFDA" title="metric_learn.LFDA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LFDA</span></code></a>)</p>
-<p><a class="reference internal" href="#lfda"><span class="std std-ref">LFDA</span></a> is a linear supervised dimensionality reduction method. It is
+<p><a class="reference internal" href="#lfda"><span class="std std-ref">LFDA</span></a> is a linear supervised dimensionality reduction method which effectively combines the ideas of <code class="xref any docutils literal notranslate"><span class="pre">Linear</span> <span class="pre">Discriminant</span> <span class="pre">Analysis</span></code> and Locality-Preserving Projection . It is
 particularly useful when dealing with multi-modality, where one ore more classes
 consist of separate clusters in input space. The core optimization problem of
 LFDA is solved as a generalized eigenvalue problem.</p>
@@ -415,20 +425,20 @@ LFDA is solved as a generalized eigenvalue problem.</p>
 W_{ij}^{(b)} = \left\{\begin{aligned}1/n \qquad y_i\neq y_j \\
 \,\,\mathbf{A}_{i,j}(1/n-1/n_l) \qquad y_i = y_j\end{aligned}\right.\\\end{split}\]</div>
 <p>here <span class="math notranslate nohighlight">\(\mathbf{A}_{i,j}\)</span> is the <span class="math notranslate nohighlight">\((i,j)\)</span>-th entry of the affinity
-matrix <span class="math notranslate nohighlight">\(\mathbf{A}\)</span>:, which can be calculated with local scaling methods.</p>
+matrix <span class="math notranslate nohighlight">\(\mathbf{A}\)</span>:, which can be calculated with local scaling methods, <code class="xref any docutils literal notranslate"><span class="pre">n</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">n_l</span></code> are the total number of points and the number of points per cluster <code class="xref any docutils literal notranslate"><span class="pre">l</span></code> respectively.</p>
 <p>Then the learning problem becomes derive the LFDA transformation matrix
-<span class="math notranslate nohighlight">\(\mathbf{T}_{LFDA}\)</span>:</p>
+<span class="math notranslate nohighlight">\(\mathbf{L}_{LFDA}\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{T}_{LFDA} = \arg\max_\mathbf{T}
-[\text{tr}((\mathbf{T}^T\mathbf{S}^{(w)}
-\mathbf{T})^{-1}\mathbf{T}^T\mathbf{S}^{(b)}\mathbf{T})]\]</div>
-<p>That is, it is looking for a transformation matrix <span class="math notranslate nohighlight">\(\mathbf{T}\)</span> such that
+\[\mathbf{L}_{LFDA} = \arg\max_\mathbf{L}
+[\text{tr}((\mathbf{L}^T\mathbf{S}^{(w)}
+\mathbf{L})^{-1}\mathbf{L}^T\mathbf{S}^{(b)}\mathbf{L})]\]</div>
+<p>That is, it is looking for a transformation matrix <span class="math notranslate nohighlight">\(\mathbf{L}\)</span> such that
 nearby data pairs in the same class are made close and the data pairs in
 different classes are separated from each other; far apart data pairs in the
 same class are not imposed to be close.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">LFDA</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">LFDA</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
@@ -439,7 +449,7 @@ same class are not imposed to be close.</p>
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id8" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -457,7 +467,7 @@ JMLR 2007</td></tr>
 </div>
 </div>
 <div class="section" id="mlkr">
-<span id="id10"></span><h3>2.2.4. <a class="reference internal" href="generated/metric_learn.MLKR.html#metric_learn.MLKR" title="metric_learn.MLKR"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKR</span></code></a><a class="headerlink" href="#mlkr" title="Permalink to this headline">¶</a></h3>
+<span id="id10"></span><h3><span class="section-number">2.2.4. </span><a class="reference internal" href="generated/metric_learn.MLKR.html#metric_learn.MLKR" title="metric_learn.MLKR"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKR</span></code></a><a class="headerlink" href="#mlkr" title="Permalink to this headline">¶</a></h3>
 <p>Metric Learning for Kernel Regression (<a class="reference internal" href="generated/metric_learn.MLKR.html#metric_learn.MLKR" title="metric_learn.MLKR"><code class="xref py py-class docutils literal notranslate"><span class="pre">MLKR</span></code></a>)</p>
 <p><a class="reference internal" href="#mlkr"><span class="std std-ref">MLKR</span></a> is an algorithm for supervised metric learning, which learns a
 distance function by directly minimizing the leave-one-out regression error.
@@ -472,9 +482,9 @@ empirical development. The Gaussian kernel is denoted as:</p>
 \mathbf{x}_j)}{\sigma^2})\]</div>
 <p>where <span class="math notranslate nohighlight">\(d(\cdot, \cdot)\)</span> is the squared distance under some metrics,
 here in the fashion of Mahalanobis, it should be <span class="math notranslate nohighlight">\(d(\mathbf{x}_i,
-\mathbf{x}_j) = ||\mathbf{A}(\mathbf{x}_i - \mathbf{x}_j)||\)</span>, the transition
-matrix <span class="math notranslate nohighlight">\(\mathbf{A}\)</span> is derived from the decomposition of Mahalanobis
-matrix <span class="math notranslate nohighlight">\(\mathbf{M=A^TA}\)</span>.</p>
+\mathbf{x}_j) = ||\mathbf{L}(\mathbf{x}_i - \mathbf{x}_j)||\)</span>, the transition
+matrix <span class="math notranslate nohighlight">\(\mathbf{L}\)</span> is derived from the decomposition of Mahalanobis
+matrix <span class="math notranslate nohighlight">\(\mathbf{M=L^TL}\)</span>.</p>
 <p>Since <span class="math notranslate nohighlight">\(\sigma^2\)</span> can be integrated into <span class="math notranslate nohighlight">\(d(\cdot)\)</span>, we can set
 <span class="math notranslate nohighlight">\(\sigma^2=1\)</span> for the sake of simplicity. Here we use the cumulative
 leave-one-out quadratic regression error of the training samples as the
@@ -485,8 +495,8 @@ loss function:</p>
 calculating a weighted average of all the training samples:</p>
 <div class="math notranslate nohighlight">
 \[\hat{y}_i = \frac{\sum_{j\neq i}y_jk_{ij}}{\sum_{j\neq i}k_{ij}}\]</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MLKR</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MLKR</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
@@ -497,7 +507,7 @@ calculating a weighted average of all the training samples:</p>
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id11" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -507,13 +517,19 @@ calculating a weighted average of all the training samples:</p>
 </div>
 </div>
 <div class="section" id="supervised-versions-of-weakly-supervised-algorithms">
-<span id="supervised-version"></span><h3>2.2.5. Supervised versions of weakly-supervised algorithms<a class="headerlink" href="#supervised-versions-of-weakly-supervised-algorithms" title="Permalink to this headline">¶</a></h3>
+<span id="supervised-version"></span><h3><span class="section-number">2.2.5. </span>Supervised versions of weakly-supervised algorithms<a class="headerlink" href="#supervised-versions-of-weakly-supervised-algorithms" title="Permalink to this headline">¶</a></h3>
 <p>Each <a class="reference internal" href="weakly_supervised.html#weakly-supervised-section"><span class="std std-ref">weakly-supervised algorithm</span></a>
 has a supervised version of the form <code class="xref any docutils literal notranslate"><span class="pre">*_Supervised</span></code> where similarity tuples are
 randomly generated from the labels information and passed to the underlying
 algorithm.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Supervised versions of weakly-supervised algorithms interpret label -1
+(or any negative label) as a point with unknown label.
+Those points are discarded in the learning process.</p>
+</div>
 <p>For pairs learners (see <a class="reference internal" href="weakly_supervised.html#learning-on-pairs"><span class="std std-ref">Learning on pairs</span></a>), pairs (tuple of two points
-from the dataset), and pair labels (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a> indicating whether the two points
+from the dataset), and pair labels (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a> indicating whether the two points
 are similar (+1) or dissimilar (-1)), are sampled with the function
 <code class="xref any docutils literal notranslate"><span class="pre">metric_learn.constraints.positive_negative_pairs</span></code>. To sample positive pairs
 (of label +1), this method will look at all the samples from the same label and
@@ -529,8 +545,8 @@ concatenated so that we have a 3D array of
 quadruplets, where for each quadruplet the two first points are from the same
 class, and the two last points are from a different class (so indeed the two
 last points should be less similar than the two first points).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MMC_Supervised</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MMC_Supervised</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
@@ -555,7 +571,7 @@ last points should be less similar than the two first points).</p>
         <a href="weakly_supervised.html" class="btn btn-neutral float-right" title="3. Weakly Supervised Metric Learning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="introduction.html" class="btn btn-neutral" title="1. What is Metric Learning?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="introduction.html" class="btn btn-neutral float-left" title="1. What is Metric Learning?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -564,11 +580,19 @@ last points should be less similar than the two first points).</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -580,27 +604,16 @@ last points should be less similar than the two first points).</p>
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

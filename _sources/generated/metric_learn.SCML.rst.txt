@@ -1,0 +1,16 @@
+:mod:`metric_learn`.SCML
+===============================
+
+.. currentmodule:: metric_learn
+
+.. autoclass:: SCML
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :special-members: __init__
+
+.. include:: metric_learn.SCML.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_metric_learning_examples.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_metric_learning_examples.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_metric_learning_examples.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_metric_learning_examples.py:
 
 
 Algorithms walkthrough
@@ -16,8 +18,7 @@ with some visualizations to provide intuitions into what they are designed
 to achieve.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     # License: BSD 3 clause
@@ -30,13 +31,13 @@ to achieve.
 
 
 
+
 Imports
 ^^^^^^^
 
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     from sklearn.manifold import TSNE
@@ -56,6 +57,7 @@ Imports
 
 
 
+
 Loading our dataset and setting up plotting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -67,8 +69,7 @@ scikit-learn. The dataset will contain:
     labels) and two are random noise with large magnitude
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     X, y = make_classification(n_samples=100, n_classes=3, n_clusters_per_class=2,
@@ -82,13 +83,13 @@ scikit-learn. The dataset will contain:
 
 
 
+
 Note that the dimensionality of the data is 5, so to plot the
 transformed data in 2D, we will use the t-sne algorithm. (See
 `sklearn.manifold.TSNE`).
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
 
@@ -113,11 +114,11 @@ transformed data in 2D, we will use the t-sne algorithm. (See
 
 
 
+
 Let's now plot the dataset as is.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
 
@@ -127,7 +128,18 @@ Let's now plot the dataset as is.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_001.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -169,7 +181,6 @@ Metric-learn can be easily integrated with your other machine learning
 pipelines, and follows scikit-learn conventions.
 
 
-
 Large Margin Nearest Neighbour
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -191,14 +202,12 @@ the same class to cluster together.
 - See more in the documentation of the class :py:class:`LMNN
   <metric_learn.LMNN>`
 
-
 Fit and then transform!
 -----------------------
 
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     # setting up LMNN
@@ -217,16 +226,15 @@ Fit and then transform!
 
 
 
-So what have we learned? The matrix :math:`M` we talked about before.
 
+So what have we learned? The matrix :math:`M` we talked about before.
 
 Now let us plot the transformed space - this tells us what the original
 space looks like after being transformed with the new learned metric.
 
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     plot_tsne(X_lmnn, y)
@@ -236,7 +244,18 @@ space looks like after being transformed with the new learned metric.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_002.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -249,13 +268,12 @@ and then ``transform`` to see our data transformed, we can also use
 ``fit_transform``. The rest of the examples and illustrations will use
 ``fit_transform``.
 
-
 Information Theoretic Metric Learning
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ITML uses a regularizer that automatically enforces a Semi-Definite
 Positive Matrix condition - the LogDet divergence. It uses soft
-must-link or cannot like constraints, and a simple algorithm based on
+must-link or cannot-link constraints, and a simple algorithm based on
 Bregman projections. Unlike LMNN, ITML will implicitly enforce points from
 the same class to belong to the same cluster, as you can see below.
 
@@ -264,8 +282,7 @@ the same class to belong to the same cluster, as you can see below.
   <metric_learn.ITML>`
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     itml = metric_learn.ITML_Supervised()
@@ -278,7 +295,20 @@ the same class to belong to the same cluster, as you can see below.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_003.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -296,8 +326,7 @@ subject to an inequality constraint.
   <metric_learn.MMC>`
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     mmc = metric_learn.MMC_Supervised()
@@ -309,7 +338,18 @@ subject to an inequality constraint.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_004.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -328,8 +368,7 @@ intrinsic high dimensional feature space.
   <metric_learn.SDML>`
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     sdml = metric_learn.SDML_Supervised(sparsity_param=0.1, balance_param=0.0015,
@@ -343,7 +382,20 @@ intrinsic high dimensional feature space.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_005.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/metric_learn/_util.py:707: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
+      X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -361,8 +413,7 @@ the sum of squared hinge loss of violated constraints.
   <metric_learn.LSML>`
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     lsml = metric_learn.LSML_Supervised(tol=0.0001, max_iter=10000,
@@ -376,7 +427,20 @@ the sum of squared hinge loss of violated constraints.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_006.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/metric_learn/_util.py:707: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
+      X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -402,8 +466,7 @@ enforces conditions at a local neighborhood scale.
   <metric_learn.NCA>`
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     nca = metric_learn.NCA(max_iter=1000)
@@ -415,7 +478,18 @@ enforces conditions at a local neighborhood scale.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_007.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -435,11 +509,10 @@ from the same class in a unique cluster.
   <metric_learn.LFDA>`
 
 
+.. code-block:: default
 
-.. code-block:: python
 
-
-    lfda = metric_learn.LFDA(k=2, num_dims=2)
+    lfda = metric_learn.LFDA(k=2, n_components=2)
     X_lfda = lfda.fit_transform(X, y)
 
     plot_tsne(X_lfda, y)
@@ -449,7 +522,18 @@ from the same class in a unique cluster.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_008.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -469,8 +553,7 @@ subsets of points that are known to belong to the same class.
   <metric_learn.RCA>`
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     rca = metric_learn.RCA_Supervised(num_chunks=30, chunk_size=2)
@@ -482,7 +565,18 @@ subsets of points that are known to belong to the same class.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_009.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -509,8 +603,7 @@ regression target from a linear model), and two are random noise with the
 same magnitude.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     X_reg, y_reg = make_regression(n_samples=100, n_informative=3, n_features=5,
@@ -522,11 +615,11 @@ same magnitude.
 
 
 
+
 Let's plot the dataset as is
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     plot_tsne(X_reg, y_reg, plt.cm.Oranges)
@@ -535,7 +628,18 @@ Let's plot the dataset as is
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_010.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -543,8 +647,7 @@ Let's plot the dataset as is
 And let's plot the dataset after transformation by MLKR:
 
 
-
-.. code-block:: python
+.. code-block:: default
 
     mlkr = metric_learn.MLKR()
     X_mlkr = mlkr.fit_transform(X_reg, y_reg)
@@ -554,7 +657,18 @@ And let's plot the dataset after transformation by MLKR:
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_011.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -562,7 +676,6 @@ And let's plot the dataset after transformation by MLKR:
 Points that have the same value to regress are now closer to each
 other ! This would improve the performance of
 `sklearn.neighbors.KNeighborsRegressor` for instance.
-
 
 Metric Learning from Weaker Supervision
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -605,8 +718,7 @@ going to go ahead and assume that two points labeled the same will be
 closer than two points in different labels.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
 
@@ -657,12 +769,12 @@ closer than two points in different labels.
 
 
 
+
 Now that we've created our constraints, let's see what it looks like!
 
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     print(pairs)
@@ -683,10 +795,12 @@ Now that we've created our constraints, let's see what it looks like!
      [ 0  9]
      [ 0 10]
      ...
-     [35 23]
-     [52 64]
-     [86 63]]
+     [54 61]
+     [69 71]
+     [54 44]]
     [ 1.  1.  1. ... -1. -1. -1.]
+
+
 
 
 Using our constraints, let's now train ITML again. Note that we are no
@@ -699,8 +813,7 @@ about more advanced uses of `preprocessor`) and the pair information `pairs`
 and `pairs_labels` in the fit method.
 
 
-
-.. code-block:: python
+.. code-block:: default
 
 
     itml = metric_learn.ITML(preprocessor=X)
@@ -715,7 +828,20 @@ and `pairs_labels` in the fit method.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_metric_learning_examples_012.png
+    :alt: plot metric learning examples
     :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
+      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
+    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show()
 
 
 
@@ -740,11 +866,12 @@ cross-validations (see also this :ref:`section <sklearn_compat_ws>`). You
 can also look at some :ref:`use cases <use_cases>` where you could combine
 metric-learn with scikit-learn estimators.
 
-
 This brings us to the end of this tutorial! Have fun Metric Learning :)
 
 
-**Total running time of the script:** ( 1 minutes  15.365 seconds)
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 3 minutes  56.187 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_metric_learning_examples.py:
@@ -757,13 +884,13 @@ This brings us to the end of this tutorial! Have fun Metric Learning :)
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_metric_learning_examples.py <plot_metric_learning_examples.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_metric_learning_examples.ipynb <plot_metric_learning_examples.ipynb>`
 
@@ -772,4 +899,4 @@ This brings us to the end of this tutorial! Have fun Metric Learning :)
 
  .. rst-class:: sphx-glr-signature
 
-    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.readthedocs.io>`_
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

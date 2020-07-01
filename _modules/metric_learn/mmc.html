@@ -1,53 +1,61 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.mmc &mdash; metric-learn 0.5.0 documentation</title>
+  <title>metric_learn.mmc &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
 
   
-  <script src="../../_static/js/modernizr.min.js"></script>
+  
+  
+  
 
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="../../index.html" class="icon icon-home"> metric-learn
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -57,7 +65,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -74,6 +82,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -97,6 +106,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -135,7 +145,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -156,32 +166,27 @@
             
   <h1>Source code for metric_learn.mmc</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Mahalanobis Metric for Clustering (MMC)&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">assert_all_finite</span>
-<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="k">import</span> <span class="n">ChangedBehaviorWarning</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">assert_all_finite</span>
 
-<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">_PairsClassifierMixin</span><span class="p">,</span> <span class="n">MahalanobisMixin</span>
-<span class="kn">from</span> <span class="nn">.constraints</span> <span class="k">import</span> <span class="n">Constraints</span><span class="p">,</span> <span class="n">wrap_pairs</span>
-<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">components_from_metric</span><span class="p">,</span> <span class="n">_initialize_metric_mahalanobis</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="kn">import</span> <span class="n">_PairsClassifierMixin</span><span class="p">,</span> <span class="n">MahalanobisMixin</span>
+<span class="kn">from</span> <span class="nn">.constraints</span> <span class="kn">import</span> <span class="n">Constraints</span><span class="p">,</span> <span class="n">wrap_pairs</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="kn">import</span> <span class="n">components_from_metric</span><span class="p">,</span> <span class="n">_initialize_metric_mahalanobis</span>
 
 
 <span class="k">class</span> <span class="nc">_BaseMMC</span><span class="p">(</span><span class="n">MahalanobisMixin</span><span class="p">):</span>
 
   <span class="n">_tuple_size</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># constraints are pairs</span>
 
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-               <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">A0</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+               <span class="n">init</span><span class="o">=</span><span class="s1">&#39;identity&#39;</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">diagonal_c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">max_proj</span> <span class="o">=</span> <span class="n">max_proj</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">convergence_threshold</span> <span class="o">=</span> <span class="n">convergence_threshold</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">init</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">A0</span> <span class="o">=</span> <span class="n">A0</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">diagonal</span> <span class="o">=</span> <span class="n">diagonal</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">=</span> <span class="n">diagonal_c</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
@@ -189,30 +194,10 @@
     <span class="nb">super</span><span class="p">(</span><span class="n">_BaseMMC</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">A0</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;A0&quot; parameter is not used.&#39;</span>
-                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
-                    <span class="s1">&#39;removed in 0.6.0. Use &quot;init&quot; instead.&#39;</span><span class="p">,</span>
-                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
     <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
                                     <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;tuples&#39;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="c1"># TODO: replace init=None by init=&#39;auto&#39; in v0.6.0 and remove the warning</span>
-      <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Warning, no init was set (`init=None`). As of version 0.5.0, &quot;</span>
-             <span class="s2">&quot;the default init will now be set to &#39;identity&#39;, instead of the &quot;</span>
-             <span class="s2">&quot;identity divided by a scaling factor of 10. &quot;</span>
-             <span class="s2">&quot;If you still want to use the same init as in previous &quot;</span>
-             <span class="s2">&quot;versions, set init=np.eye(d)/10, where d is the dimension &quot;</span>
-             <span class="s2">&quot;of your input space (d=pairs.shape[1]). &quot;</span>
-             <span class="s2">&quot;This warning will disappear in v0.6.0, and `init` parameter&#39;s&quot;</span>
-             <span class="s2">&quot; default value will be set to &#39;auto&#39;.&quot;</span><span class="p">)</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
-      <span class="n">init</span> <span class="o">=</span> <span class="s1">&#39;identity&#39;</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span>
-
-    <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">_initialize_metric_mahalanobis</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">A_</span> <span class="o">=</span> <span class="n">_initialize_metric_mahalanobis</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span>
                                              <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">,</span>
                                              <span class="n">matrix_name</span><span class="o">=</span><span class="s1">&#39;init&#39;</span><span class="p">)</span>
 
@@ -227,10 +212,10 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    X : (n x d) data matrix</span>
-<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">      Each row corresponds to a single instance.</span>
 <span class="sd">    constraints : 4-tuple of arrays</span>
-<span class="sd">        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
-<span class="sd">        dissimilar pairs</span>
+<span class="sd">      (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
+<span class="sd">      dissimilar pairs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">num_dim</span> <span class="o">=</span> <span class="n">pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
@@ -267,12 +252,12 @@
 
     <span class="n">A_old</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">):</span>
 
       <span class="c1"># projection of constraints C1 and C2</span>
       <span class="n">satisfy</span> <span class="o">=</span> <span class="kc">False</span>
 
-      <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_proj</span><span class="p">):</span>
+      <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_proj</span><span class="p">):</span>
 
         <span class="c1"># First constraint:</span>
         <span class="c1"># f(A) = \sum_{i,j \in S} d_ij&#39; A d_ij &lt;= t              (1)</span>
@@ -352,10 +337,10 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    X : (n x d) data matrix</span>
-<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">      Each row corresponds to a single instance.</span>
 <span class="sd">    constraints : 4-tuple of arrays</span>
-<span class="sd">        (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
-<span class="sd">        dissimilar pairs</span>
+<span class="sd">      (a,b,c,d) indices into X, with (a,b) specifying similar and (c,d)</span>
+<span class="sd">      dissimilar pairs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">num_dim</span> <span class="o">=</span> <span class="n">pairs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">pos_pairs</span><span class="p">,</span> <span class="n">neg_pairs</span> <span class="o">=</span> <span class="n">pairs</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pairs</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -386,7 +371,7 @@
       <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">s_sum</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagonal_c</span> <span class="o">*</span>
              <span class="bp">self</span><span class="o">.</span><span class="n">_D_objective</span><span class="p">(</span><span class="n">neg_pairs</span><span class="p">,</span> <span class="n">w_tmp</span><span class="p">))</span>
       <span class="n">assert_all_finite</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-      <span class="n">obj_previous</span> <span class="o">=</span> <span class="n">obj</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># just to get the while-loop started</span>
+      <span class="n">obj_previous</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>  <span class="c1"># just to get the while-loop started</span>
 
       <span class="n">inner_it</span> <span class="o">=</span> <span class="mi">0</span>
       <span class="k">while</span> <span class="n">obj</span> <span class="o">&lt;</span> <span class="n">obj_previous</span><span class="p">:</span>
@@ -509,94 +494,90 @@
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
 <span class="sd">  max_iter : int, optional (default=100)</span>
-<span class="sd">      Maximum number of iterations of the convergence procedure.</span>
+<span class="sd">    Maximum number of iterations of the optimization procedure.</span>
 
 <span class="sd">  max_proj : int, optional (default=10000)</span>
-<span class="sd">      Maximum number of projection steps.</span>
+<span class="sd">    Maximum number of projection steps.</span>
 
-<span class="sd">  convergence_threshold : float, optional (default=1e-6)</span>
-<span class="sd">      Convergence threshold for the convergence procedure.</span>
+<span class="sd">  convergence_threshold : float, optional (default=1e-3)</span>
+<span class="sd">    Convergence threshold for the optimization procedure.</span>
 
-<span class="sd">  init : None, string or numpy array, optional (default=None)</span>
-<span class="sd">     Initialization of the Mahalanobis matrix. Possible options are</span>
-<span class="sd">     &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
-<span class="sd">     shape (n_features, n_features). If None, will be set</span>
-<span class="sd">     automatically to &#39;identity&#39; (this is to raise a warning if</span>
-<span class="sd">     &#39;init&#39; is not set, and stays to its default value (None), in v0.5.0).</span>
+<span class="sd">  init : string or numpy array, optional (default=&#39;identity&#39;)</span>
+<span class="sd">    Initialization of the Mahalanobis matrix. Possible options are</span>
+<span class="sd">    &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
+<span class="sd">    shape (n_features, n_features).</span>
 
-<span class="sd">      &#39;identity&#39;</span>
-<span class="sd">         An identity matrix of shape (n_features, n_features).</span>
+<span class="sd">    &#39;identity&#39;</span>
+<span class="sd">      An identity matrix of shape (n_features, n_features).</span>
 
-<span class="sd">      &#39;covariance&#39;</span>
-<span class="sd">         The (pseudo-)inverse of the covariance matrix.</span>
+<span class="sd">    &#39;covariance&#39;</span>
+<span class="sd">      The (pseudo-)inverse of the covariance matrix.</span>
 
-<span class="sd">      &#39;random&#39;</span>
-<span class="sd">         The initial Mahalanobis matrix will be a random SPD matrix of</span>
-<span class="sd">         shape</span>
-<span class="sd">         `(n_features, n_features)`, generated using</span>
-<span class="sd">         `sklearn.datasets.make_spd_matrix`.</span>
+<span class="sd">    &#39;random&#39;</span>
+<span class="sd">      The initial Mahalanobis matrix will be a random SPD matrix of</span>
+<span class="sd">      shape</span>
+<span class="sd">      `(n_features, n_features)`, generated using</span>
+<span class="sd">      `sklearn.datasets.make_spd_matrix`.</span>
 
-<span class="sd">      numpy array</span>
-<span class="sd">          An SPD matrix of shape (n_features, n_features), that will</span>
-<span class="sd">          be used as such to initialize the metric.</span>
+<span class="sd">    numpy array</span>
+<span class="sd">      An SPD matrix of shape (n_features, n_features), that will</span>
+<span class="sd">      be used as such to initialize the metric.</span>
 
-<span class="sd">  verbose : bool, optional</span>
-<span class="sd">     if True, prints information while learning</span>
+<span class="sd">  diagonal : bool, optional (default=False)</span>
+<span class="sd">    If True, a diagonal metric will be learned,</span>
+<span class="sd">    i.e., a simple scaling of dimensions. The initialization will then</span>
+<span class="sd">    be the diagonal coefficients of the matrix given as &#39;init&#39;.</span>
+
+<span class="sd">  diagonal_c : float, optional (default=1.0)</span>
+<span class="sd">    Weight of the dissimilarity constraint for diagonal</span>
+<span class="sd">    metric learning. Ignored if ``diagonal=False``.</span>
+
+<span class="sd">  verbose : bool, optional (default=False)</span>
+<span class="sd">    If True, prints information while learning</span>
 
 <span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
-<span class="sd">     The preprocessor to call to get tuples from indices. If array-like,</span>
-<span class="sd">     tuples will be gotten like this: X[indices].</span>
-<span class="sd">  A0 : Not used.</span>
-<span class="sd">     .. deprecated:: 0.5.0</span>
-<span class="sd">       `A0` was deprecated in version 0.5.0 and will</span>
-<span class="sd">       be removed in 0.6.0. Use &#39;init&#39; instead.</span>
-<span class="sd">  diagonal : bool, optional</span>
-<span class="sd">     if True, a diagonal metric will be learned,</span>
-<span class="sd">     i.e., a simple scaling of dimensions. The initialization will then</span>
-<span class="sd">     be the diagonal coefficients of the matrix given as &#39;init&#39;.</span>
-<span class="sd">  diagonal_c : float, optional</span>
-<span class="sd">     weight of the dissimilarity constraint for diagonal</span>
-<span class="sd">     metric learning</span>
-<span class="sd">  verbose : bool, optional</span>
-<span class="sd">     if True, prints information while learning</span>
-<span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
-<span class="sd">     The preprocessor to call to get tuples from indices. If array-like,</span>
-<span class="sd">     tuples will be gotten like this: X[indices].</span>
+<span class="sd">    The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">    tuples will be gotten like this: X[indices].</span>
+
 <span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
-<span class="sd">     A pseudo random number generator object or a seed for it if int. If</span>
-<span class="sd">     ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
-<span class="sd">     transformation.</span>
+<span class="sd">    A pseudo random number generator object or a seed for it if int. If</span>
+<span class="sd">    ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
+<span class="sd">    transformation.</span>
 
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  n_iter_ : `int`</span>
-<span class="sd">      The number of iterations the solver has run.</span>
+<span class="sd">    The number of iterations the solver has run.</span>
 
 <span class="sd">  components_ : `numpy.ndarray`, shape=(n_features, n_features)</span>
-<span class="sd">      The linear transformation ``L`` deduced from the learned Mahalanobis</span>
-<span class="sd">      metric (See function `components_from_metric`.)</span>
+<span class="sd">    The linear transformation ``L`` deduced from the learned Mahalanobis</span>
+<span class="sd">    metric (See function `components_from_metric`.)</span>
 
 <span class="sd">  threshold_ : `float`</span>
-<span class="sd">      If the distance metric between two points is lower than this threshold,</span>
-<span class="sd">      points will be classified as similar, otherwise they will be</span>
-<span class="sd">      classified as dissimilar.</span>
+<span class="sd">    If the distance metric between two points is lower than this threshold,</span>
+<span class="sd">    points will be classified as similar, otherwise they will be</span>
+<span class="sd">    classified as dissimilar.</span>
 
 <span class="sd">  Examples</span>
 <span class="sd">  --------</span>
-<span class="sd">  &gt;&gt;&gt; from metric_learn import MMC_Supervised</span>
-<span class="sd">  &gt;&gt;&gt; from sklearn.datasets import load_iris</span>
-<span class="sd">  &gt;&gt;&gt; iris_data = load_iris()</span>
-<span class="sd">  &gt;&gt;&gt; X = iris_data[&#39;data&#39;]</span>
-<span class="sd">  &gt;&gt;&gt; Y = iris_data[&#39;target&#39;]</span>
-<span class="sd">  &gt;&gt;&gt; mmc = MMC_Supervised(num_constraints=200)</span>
-<span class="sd">  &gt;&gt;&gt; mmc.fit(X, Y)</span>
+<span class="sd">  &gt;&gt;&gt; from metric_learn import MMC</span>
+<span class="sd">  &gt;&gt;&gt; pairs = [[[1.2, 7.5], [1.3, 1.5]],</span>
+<span class="sd">  &gt;&gt;&gt;          [[6.4, 2.6], [6.2, 9.7]],</span>
+<span class="sd">  &gt;&gt;&gt;          [[1.3, 4.5], [3.2, 4.6]],</span>
+<span class="sd">  &gt;&gt;&gt;          [[6.2, 5.5], [5.4, 5.4]]]</span>
+<span class="sd">  &gt;&gt;&gt; y = [1, 1, -1, -1]</span>
+<span class="sd">  &gt;&gt;&gt; # in this task we want points where the first feature is close to be</span>
+<span class="sd">  &gt;&gt;&gt; # closer to each other, no matter how close the second feature is</span>
+<span class="sd">  &gt;&gt;&gt; mmc = MMC()</span>
+<span class="sd">  &gt;&gt;&gt; mmc.fit(pairs, y)</span>
 
 <span class="sd">  References</span>
 <span class="sd">  ----------</span>
-<span class="sd">  .. [1] `Distance metric learning with application to clustering with</span>
-<span class="sd">         side-information &lt;http://papers.nips.cc/paper/2164-distance-metric-\</span>
-<span class="sd">learning-with-application-to-clustering-with-side-information.pdf&gt;`_</span>
-<span class="sd">         Xing, Jordan, Russell, Ng.</span>
+<span class="sd">  .. [1] Xing, Jordan, Russell, Ng. `Distance metric learning with application</span>
+<span class="sd">         to clustering with side-information</span>
+<span class="sd">         &lt;http://papers.nips.cc/paper/2164-distance-metric-\</span>
+<span class="sd">         learning-with-application-to-clustering-with-side-information.pdf&gt;`_.</span>
+<span class="sd">         NIPS 2002.</span>
 
 <span class="sd">  See Also</span>
 <span class="sd">  --------</span>
@@ -615,19 +596,22 @@
 <span class="sd">    ----------</span>
 <span class="sd">    pairs : array-like, shape=(n_constraints, 2, n_features) or \</span>
 <span class="sd">           (n_constraints, 2)</span>
-<span class="sd">        3D Array of pairs with each row corresponding to two points,</span>
-<span class="sd">        or 2D array of indices of pairs if the metric learner uses a</span>
-<span class="sd">        preprocessor.</span>
+<span class="sd">      3D Array of pairs with each row corresponding to two points,</span>
+<span class="sd">      or 2D array of indices of pairs if the metric learner uses a</span>
+<span class="sd">      preprocessor.</span>
+
 <span class="sd">    y : array-like, of shape (n_constraints,)</span>
-<span class="sd">        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.</span>
+<span class="sd">      Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.</span>
+
 <span class="sd">    calibration_params : `dict` or `None`</span>
-<span class="sd">        Dictionary of parameters to give to `calibrate_threshold` for the</span>
-<span class="sd">        threshold calibration step done at the end of `fit`. If `None` is</span>
-<span class="sd">        given, `calibrate_threshold` will use the default parameters.</span>
+<span class="sd">      Dictionary of parameters to give to `calibrate_threshold` for the</span>
+<span class="sd">      threshold calibration step done at the end of `fit`. If `None` is</span>
+<span class="sd">      given, `calibrate_threshold` will use the default parameters.</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    self : object</span>
-<span class="sd">        Returns the instance.</span>
+<span class="sd">      Returns the instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">calibration_params</span> <span class="o">=</span> <span class="p">(</span><span class="n">calibration_params</span> <span class="k">if</span> <span class="n">calibration_params</span> <span class="ow">is</span> <span class="ow">not</span>
                           <span class="kc">None</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">())</span>
@@ -646,121 +630,103 @@
 
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
-<span class="sd">  max_iter : int, optional</span>
-<span class="sd">  max_proj : int, optional</span>
-<span class="sd">  convergence_threshold : float, optional</span>
-<span class="sd">  num_labeled : Not used</span>
-<span class="sd">    .. deprecated:: 0.5.0</span>
-<span class="sd">       `num_labeled` was deprecated in version 0.5.0 and will</span>
-<span class="sd">       be removed in 0.6.0.</span>
-<span class="sd">  num_constraints: int, optional</span>
-<span class="sd">      number of constraints to generate</span>
-<span class="sd">  init : None, string or numpy array, optional (default=None)</span>
-<span class="sd">      Initialization of the Mahalanobis matrix. Possible options are</span>
-<span class="sd">      &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
-<span class="sd">      shape (n_features, n_features). If None, will be set</span>
-<span class="sd">      automatically to &#39;identity&#39; (this is to raise a warning if</span>
-<span class="sd">      &#39;init&#39; is not set, and stays to its default value (None), in v0.5.0).</span>
+<span class="sd">  max_iter : int, optional (default=100)</span>
+<span class="sd">    Maximum number of iterations of the optimization procedure.</span>
 
-<span class="sd">       &#39;identity&#39;</span>
-<span class="sd">           An identity matrix of shape (n_features, n_features).</span>
+<span class="sd">  max_proj : int, optional (default=10000)</span>
+<span class="sd">    Maximum number of projection steps.</span>
 
-<span class="sd">       &#39;covariance&#39;</span>
-<span class="sd">           The (pseudo-)inverse of the covariance matrix.</span>
+<span class="sd">  convergence_threshold : float, optional (default=1e-3)</span>
+<span class="sd">    Convergence threshold for the optimization procedure.</span>
 
-<span class="sd">       &#39;random&#39;</span>
-<span class="sd">           The initial Mahalanobis matrix will be a random SPD matrix of</span>
-<span class="sd">           shape `(n_features, n_features)`, generated using</span>
-<span class="sd">           `sklearn.datasets.make_spd_matrix`.</span>
+<span class="sd">  num_constraints: int, optional (default=None)</span>
+<span class="sd">    Number of constraints to generate. If None, default to `20 *</span>
+<span class="sd">    num_classes**2`.</span>
 
-<span class="sd">       numpy array</span>
-<span class="sd">           A numpy array of shape (n_features, n_features), that will</span>
-<span class="sd">           be used as such to initialize the metric.</span>
+<span class="sd">  init : string or numpy array, optional (default=&#39;identity&#39;)</span>
+<span class="sd">    Initialization of the Mahalanobis matrix. Possible options are</span>
+<span class="sd">    &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
+<span class="sd">    shape (n_features, n_features).</span>
 
-<span class="sd">  verbose : bool, optional</span>
-<span class="sd">      if True, prints information while learning</span>
+<span class="sd">    &#39;identity&#39;</span>
+<span class="sd">      An identity matrix of shape (n_features, n_features).</span>
+
+<span class="sd">    &#39;covariance&#39;</span>
+<span class="sd">      The (pseudo-)inverse of the covariance matrix.</span>
+
+<span class="sd">    &#39;random&#39;</span>
+<span class="sd">      The initial Mahalanobis matrix will be a random SPD matrix of</span>
+<span class="sd">      shape `(n_features, n_features)`, generated using</span>
+<span class="sd">      `sklearn.datasets.make_spd_matrix`.</span>
+
+<span class="sd">    numpy array</span>
+<span class="sd">      A numpy array of shape (n_features, n_features), that will</span>
+<span class="sd">      be used as such to initialize the metric.</span>
+
+<span class="sd">  diagonal : bool, optional (default=False)</span>
+<span class="sd">    If True, a diagonal metric will be learned,</span>
+<span class="sd">    i.e., a simple scaling of dimensions. The initialization will then</span>
+<span class="sd">    be the diagonal coefficients of the matrix given as &#39;init&#39;.</span>
+
+<span class="sd">  diagonal_c : float, optional (default=1.0)</span>
+<span class="sd">    Weight of the dissimilarity constraint for diagonal</span>
+<span class="sd">    metric learning. Ignored if ``diagonal=False``.</span>
+
+<span class="sd">  verbose : bool, optional (default=False)</span>
+<span class="sd">    If True, prints information while learning</span>
 
 <span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
-<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
-<span class="sd">      tuples will be gotten like this: X[indices].</span>
-<span class="sd">  A0 : Not used.</span>
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `A0` was deprecated in version 0.5.0 and will</span>
-<span class="sd">        be removed in 0.6.0. Use &#39;init&#39; instead.</span>
-<span class="sd">  diagonal : bool, optional</span>
-<span class="sd">      if True, a diagonal metric will be learned,</span>
-<span class="sd">      i.e., a simple scaling of dimensions</span>
-<span class="sd">  diagonal_c : float, optional</span>
-<span class="sd">      weight of the dissimilarity constraint for diagonal</span>
-<span class="sd">      metric learning</span>
-<span class="sd">  verbose : bool, optional</span>
-<span class="sd">      if True, prints information while learning</span>
-<span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
-<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
-<span class="sd">      tuples will be formed like this: X[indices].</span>
+<span class="sd">    The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">    tuples will be formed like this: X[indices].</span>
+
 <span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
-<span class="sd">      A pseudo random number generator object or a seed for it if int. If</span>
-<span class="sd">      ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
-<span class="sd">      Mahalanobis matrix.  In any case, `random_state` is also used to</span>
-<span class="sd">      randomly sample constraints from labels.</span>
+<span class="sd">    A pseudo random number generator object or a seed for it if int. If</span>
+<span class="sd">    ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
+<span class="sd">    Mahalanobis matrix.  In any case, `random_state` is also used to</span>
+<span class="sd">    randomly sample constraints from labels.</span>
 
-<span class="sd">  `MMC_Supervised` creates pairs of similar sample by taking same class</span>
-<span class="sd">  samples, and pairs of dissimilar samples by taking different class</span>
-<span class="sd">  samples. It then passes these pairs to `MMC` for training.</span>
+<span class="sd">  Examples</span>
+<span class="sd">  --------</span>
+<span class="sd">  &gt;&gt;&gt; from metric_learn import MMC_Supervised</span>
+<span class="sd">  &gt;&gt;&gt; from sklearn.datasets import load_iris</span>
+<span class="sd">  &gt;&gt;&gt; iris_data = load_iris()</span>
+<span class="sd">  &gt;&gt;&gt; X = iris_data[&#39;data&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; Y = iris_data[&#39;target&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; mmc = MMC_Supervised(num_constraints=200)</span>
+<span class="sd">  &gt;&gt;&gt; mmc.fit(X, Y)</span>
 
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  n_iter_ : `int`</span>
-<span class="sd">      The number of iterations the solver has run.</span>
+<span class="sd">    The number of iterations the solver has run.</span>
 
 <span class="sd">  components_ : `numpy.ndarray`, shape=(n_features, n_features)</span>
-<span class="sd">      The linear transformation ``L`` deduced from the learned Mahalanobis</span>
-<span class="sd">      metric (See function `components_from_metric`.)</span>
+<span class="sd">    The linear transformation ``L`` deduced from the learned Mahalanobis</span>
+<span class="sd">    metric (See function `components_from_metric`.)</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MMC_Supervised.__init__"><a class="viewcode-back" href="../../generated/metric_learn.MMC_Supervised.html#metric_learn.MMC_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
-               <span class="n">num_labeled</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">num_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">A0</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diagonal_c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="MMC_Supervised.__init__"><a class="viewcode-back" href="../../generated/metric_learn.MMC_Supervised.html#metric_learn.MMC_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">convergence_threshold</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+               <span class="n">num_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s1">&#39;identity&#39;</span><span class="p">,</span>
+               <span class="n">diagonal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diagonal_c</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">_BaseMMC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">max_proj</span><span class="o">=</span><span class="n">max_proj</span><span class="p">,</span>
                       <span class="n">convergence_threshold</span><span class="o">=</span><span class="n">convergence_threshold</span><span class="p">,</span>
-                      <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span> <span class="n">A0</span><span class="o">=</span><span class="n">A0</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="n">diagonal</span><span class="p">,</span>
+                      <span class="n">init</span><span class="o">=</span><span class="n">init</span><span class="p">,</span> <span class="n">diagonal</span><span class="o">=</span><span class="n">diagonal</span><span class="p">,</span>
                       <span class="n">diagonal_c</span><span class="o">=</span><span class="n">diagonal_c</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
                       <span class="n">preprocessor</span><span class="o">=</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">num_labeled</span> <span class="o">=</span> <span class="n">num_labeled</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_constraints</span> <span class="o">=</span> <span class="n">num_constraints</span></div>
 
-<div class="viewcode-block" id="MMC_Supervised.fit"><a class="viewcode-back" href="../../generated/metric_learn.MMC_Supervised.html#metric_learn.MMC_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="MMC_Supervised.fit"><a class="viewcode-back" href="../../generated/metric_learn.MMC_Supervised.html#metric_learn.MMC_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create constraints from labels and learn the MMC model.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    X : (n x d) matrix</span>
-<span class="sd">        Input data, where each row corresponds to a single instance.</span>
+<span class="sd">      Input data, where each row corresponds to a single instance.</span>
+
 <span class="sd">    y : (n) array-like</span>
-<span class="sd">        Data labels.</span>
-<span class="sd">    random_state : Not used</span>
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `random_state` in the `fit` function was deprecated in version 0.5.0</span>
-<span class="sd">        and will be removed in 0.6.0. Set `random_state` at initialization</span>
-<span class="sd">        instead (when instantiating a new `MMC_Supervised` object).</span>
+<span class="sd">      Data labels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_labeled</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_labeled&quot; parameter is not used.&#39;</span>
-                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
-                    <span class="s1">&#39; removed in 0.6.0&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">random_state</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;random_state&quot; parameter in the `fit` function is &#39;</span>
-                    <span class="s1">&#39;deprecated. Set `random_state` at initialization &#39;</span>
-                    <span class="s1">&#39;instead (when instantiating a new `MMC_Supervised` &#39;</span>
-                    <span class="s1">&#39;object).&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;As of v0.5.0, `MMC_Supervised` now uses the &#39;</span>
-                    <span class="s1">&#39;`random_state` given at initialization to sample &#39;</span>
-                    <span class="s1">&#39;constraints, not the default `np.random` from the `fit` &#39;</span>
-                    <span class="s1">&#39;method, since this argument is now deprecated. &#39;</span>
-                    <span class="s1">&#39;This warning will disappear in v0.6.0.&#39;</span><span class="p">,</span>
-                    <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
     <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_constraints</span>
     <span class="k">if</span> <span class="n">num_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -784,11 +750,19 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -800,27 +774,16 @@
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

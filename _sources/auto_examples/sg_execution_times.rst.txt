@@ -1,0 +1,14 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_sg_execution_times:
+
+Computation times
+=================
+**03:56.187** total execution time for **auto_examples** files:
+
++-------------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_plot_metric_learning_examples.py` (``plot_metric_learning_examples.py``) | 03:56.187 | 0.0 MB |
++-------------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_plot_sandwich.py` (``plot_sandwich.py``)                                 | 00:00.000 | 0.0 MB |
++-------------------------------------------------------------------------------------------------------+-----------+--------+

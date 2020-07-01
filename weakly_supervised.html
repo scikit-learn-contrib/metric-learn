@@ -1,55 +1,63 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>3. Weakly Supervised Metric Learning &mdash; metric-learn 0.5.0 documentation</title>
+  <title>3. Weakly Supervised Metric Learning &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="4. Unsupervised Metric Learning" href="unsupervised.html" />
     <link rel="prev" title="2. Supervised Metric Learning" href="supervised.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="index.html" class="icon icon-home"> metric-learn
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -59,7 +67,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -76,6 +84,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -105,11 +114,18 @@
 <li class="toctree-l4"><a class="reference internal" href="#algorithms">3.2.4. Algorithms</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#learning-on-quadruplets">3.3. Learning on quadruplets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#learning-on-triplets">3.3. Learning on triplets</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id16">3.3.1. Fitting</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#quadruplets-predicting">3.3.2. Prediction</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#quadruplets-scoring">3.3.3. Scoring</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#triplets-predicting">3.3.2. Prediction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#triplets-scoring">3.3.3. Scoring</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id19">3.3.4. Algorithms</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#learning-on-quadruplets">3.4. Learning on quadruplets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id24">3.4.1. Fitting</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#quadruplets-predicting">3.4.2. Prediction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#quadruplets-scoring">3.4.3. Scoring</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id27">3.4.4. Algorithms</a></li>
 </ul>
 </li>
 </ul>
@@ -129,6 +145,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -167,11 +184,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="user_guide.html">User Guide</a> &raquo;</li>
         
-      <li>3. Weakly Supervised Metric Learning</li>
+      <li><span class="section-number">3. </span>Weakly Supervised Metric Learning</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -191,21 +208,21 @@
            <div itemprop="articleBody">
             
   <div class="section" id="weakly-supervised-metric-learning">
-<span id="weakly-supervised-section"></span><h1>3. Weakly Supervised Metric Learning<a class="headerlink" href="#weakly-supervised-metric-learning" title="Permalink to this headline">¶</a></h1>
+<span id="weakly-supervised-section"></span><h1><span class="section-number">3. </span>Weakly Supervised Metric Learning<a class="headerlink" href="#weakly-supervised-metric-learning" title="Permalink to this headline">¶</a></h1>
 <p>Weakly supervised algorithms work on weaker information about the data points
 than supervised algorithms. Rather than labeled points, they take as input
 similarity judgments on tuples of data points, for instance pairs of similar
 and dissimilar points. Refer to the documentation of each algorithm for its
 particular form of input data.</p>
 <div class="section" id="general-api">
-<h2>3.1. General API<a class="headerlink" href="#general-api" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">3.1. </span>General API<a class="headerlink" href="#general-api" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="input-data">
-<h3>3.1.1. Input data<a class="headerlink" href="#input-data" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.1.1. </span>Input data<a class="headerlink" href="#input-data" title="Permalink to this headline">¶</a></h3>
 <p>In the following paragraph we talk about tuples for sake of generality. These
 can be pairs, triplets, quadruplets etc, depending on the particular metric
 learning algorithm we use.</p>
 <div class="section" id="basic-form">
-<h4>3.1.1.1. Basic form<a class="headerlink" href="#basic-form" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">3.1.1.1. </span>Basic form<a class="headerlink" href="#basic-form" title="Permalink to this headline">¶</a></h4>
 <p>Every weakly supervised algorithm will take as input tuples of
 points, and if needed labels for theses tuples. The tuples of points can
 also be called “constraints”. They are a set of points that we consider (ex:
@@ -218,15 +235,15 @@ specific forms of tuples, refer to the appropriate sections
 <p>The <code class="xref any docutils literal notranslate"><span class="pre">tuples</span></code> argument is the first argument of every method (like the <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>
 argument for classical algorithms in scikit-learn). The second argument is the
 label of the tuple: its semantic depends on the algorithm used. For instance
-for pairs learners <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> is a label indicating whether the pair is of similar
+for pairs learners <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-177" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> is a label indicating whether the pair is of similar
 samples or dissimilar samples.</p>
 <p>Then one can fit a Weakly Supervised Metric Learner on this tuple, like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_algo</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tuples</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_algo</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tuples</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Like in a classical setting we split the points <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> between train and test,
 here we split the <code class="xref any docutils literal notranslate"><span class="pre">tuples</span></code> between train and test.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pairs_train</span><span class="p">,</span> <span class="n">pairs_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -234,13 +251,13 @@ here we split the <code class="xref any docutils literal notranslate"><span clas
 learn:</p>
 </div>
 <div class="section" id="d-array-of-tuples">
-<h4>3.1.1.2. 3D array of tuples<a class="headerlink" href="#d-array-of-tuples" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">3.1.1.2. </span>3D array of tuples<a class="headerlink" href="#d-array-of-tuples" title="Permalink to this headline">¶</a></h4>
 <p>The most intuitive way to represent tuples is to provide the algorithm with a
-3D array-like of tuples of shape <code class="xref any docutils literal notranslate"><span class="pre">(n_tuples,</span> <span class="pre">t,</span> <span class="pre">n_features)</span></code>, where
+3D array-like of tuples of shape <code class="xref any docutils literal notranslate"><span class="pre">(n_tuples,</span> <span class="pre">tuple_size,</span> <span class="pre">n_features)</span></code>, where
 <code class="xref any docutils literal notranslate"><span class="pre">n_tuples</span></code> is the number of tuples, <code class="xref any docutils literal notranslate"><span class="pre">tuple_size</span></code> is the number of elements
-in a tuple (2 for pairs, 3 for triplets for instance), and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-features" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_features</span></code></a> is
+in a tuple (2 for pairs, 3 for triplets for instance), and <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-features" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">n_features</span></code></a> is
 the number of features of each point.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tuples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="o">-</span><span class="mf">0.12</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.21</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.20</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>                    <span class="p">[</span><span class="o">+</span><span class="mf">0.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.19</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">]],</span>
 <span class="go">&gt;&gt;&gt;</span>
@@ -265,12 +282,12 @@ to specify pairs is more efficient</p>
 </div>
 </div>
 <div class="section" id="d-array-of-indicators-preprocessor">
-<h4>3.1.1.3. 2D array of indicators + preprocessor<a class="headerlink" href="#d-array-of-indicators-preprocessor" title="Permalink to this headline">¶</a></h4>
+<h4><span class="section-number">3.1.1.3. </span>2D array of indicators + preprocessor<a class="headerlink" href="#d-array-of-indicators-preprocessor" title="Permalink to this headline">¶</a></h4>
 <p>Instead of forming each point in each tuple, a more efficient representation
 would be to keep the dataset of points <code class="xref any docutils literal notranslate"><span class="pre">X</span></code> aside, and just represent tuples
 as a collection of tuples of <em>indices</em> from the points in <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>. Since we loose
 the feature dimension there, the resulting array is 2D.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.12</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.21</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.20</span><span class="p">],</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.12</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.21</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.20</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span><span class="o">+</span><span class="mf">0.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.19</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span><span class="o">-</span><span class="mf">2.16</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.11</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span><span class="o">+</span><span class="mf">1.58</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.16</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.93</span><span class="p">],</span>
@@ -298,20 +315,20 @@ paths in the filesystem, name of records in a database etc…) See section
 </div>
 </div>
 <div class="section" id="fit-transform-and-so-on">
-<span id="fit-ws"></span><h3>3.1.2. Fit, transform, and so on<a class="headerlink" href="#fit-transform-and-so-on" title="Permalink to this headline">¶</a></h3>
+<span id="fit-ws"></span><h3><span class="section-number">3.1.2. </span>Fit, transform, and so on<a class="headerlink" href="#fit-transform-and-so-on" title="Permalink to this headline">¶</a></h3>
 <p>The goal of weakly-supervised metric-learning algorithms is to transform
 points in a new space, in which the tuple-wise constraints between points
 are respected.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MMC</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MMC</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span> <span class="o">=</span> <span class="n">MMC</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tuples</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="go">MMC(A0=&#39;deprecated&#39;, convergence_threshold=0.001, diagonal=False,</span>
-<span class="go">  diagonal_c=1.0, init=None, max_iter=100, max_proj=10000,</span>
+<span class="go">  diagonal_c=1.0, init=&#39;auto&#39;, max_iter=100, max_proj=10000,</span>
 <span class="go">  preprocessor=None, random_state=42, verbose=False)</span>
 </pre></div>
 </div>
 <p>Or alternatively (using a preprocessor):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MMC</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MMC</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span> <span class="o">=</span> <span class="n">MMC</span><span class="p">(</span><span class="n">preprocessor</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs_indice</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
@@ -320,7 +337,7 @@ are respected.</p>
 purposes.</p>
 <p>First, you can transform the data in the learned space, using <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.transform" title="metric_learn.Covariance.transform"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">transform</span></code></a>:
 Here we transform two points in the new embedding space.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">9.4</span><span class="p">,</span> <span class="mf">4.1</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">4.4</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">]])</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">9.4</span><span class="p">,</span> <span class="mf">4.1</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">4.4</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_new</span><span class="p">)</span>
 <span class="go">array([[-3.24667162e+01,  4.62622348e-07,  3.88325421e-08],</span>
 <span class="go">       [-3.61531114e+01,  4.86778289e-07,  2.12654397e-08]])</span>
@@ -332,7 +349,7 @@ points. You can use this distance in two main ways:</p>
 <li>You can either return the distance between pairs of points using the
 <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.score_pairs" title="metric_learn.Covariance.score_pairs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">score_pairs</span></code></a> function:</li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">score_pairs</span><span class="p">([[[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">,</span> <span class="mf">5.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.6</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">6.7</span><span class="p">]],</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">score_pairs</span><span class="p">([[[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">,</span> <span class="mf">5.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.6</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">6.7</span><span class="p">]],</span>
 <span class="gp">... </span>                 <span class="p">[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">,</span> <span class="mf">7.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]]])</span>
 <span class="go">array([7.27607365, 0.88853014])</span>
 </pre></div>
@@ -341,9 +358,9 @@ points. You can use this distance in two main ways:</p>
 <li>Or you can return a function that will return the distance
 (in the new space) between two 1D arrays (the coordinates of the points in
 the original space), similarly to distance functions in
-<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html#module-scipy.spatial.distance" title="(in SciPy v1.3.0)"><code class="xref any docutils literal notranslate"><span class="pre">scipy.spatial.distance</span></code></a>. To do that, use the <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.get_metric" title="metric_learn.Covariance.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a> method.</li>
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/spatial.distance.html#module-scipy.spatial.distance" title="(in SciPy v1.5.0)"><code class="xref any docutils literal notranslate"><span class="pre">scipy.spatial.distance</span></code></a>. To do that, use the <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.get_metric" title="metric_learn.Covariance.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a> method.</li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">metric_fun</span> <span class="o">=</span> <span class="n">mmc</span><span class="o">.</span><span class="n">get_metric</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">metric_fun</span> <span class="o">=</span> <span class="n">mmc</span><span class="o">.</span><span class="n">get_metric</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">metric_fun</span><span class="p">([</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">,</span> <span class="mf">5.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.6</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">6.7</span><span class="p">])</span>
 <span class="go">7.276073646278203</span>
 </pre></div>
@@ -354,7 +371,7 @@ the original space), similarly to distance functions in
 currently in metric-learn), you can get the plain Mahalanobis matrix using
 <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.get_mahalanobis_matrix" title="metric_learn.Covariance.get_mahalanobis_matrix"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">get_mahalanobis_matrix</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">get_mahalanobis_matrix</span><span class="p">()</span>
 <span class="go">array([[ 0.58603894, -5.69883982, -1.66614919],</span>
 <span class="go">       [-5.69883982, 55.41743549, 16.20219519],</span>
 <span class="go">       [-1.66614919, 16.20219519,  4.73697721]])</span>
@@ -362,7 +379,7 @@ currently in metric-learn), you can get the plain Mahalanobis matrix using
 </div>
 </div>
 <div class="section" id="prediction-and-scoring">
-<span id="sklearn-compat-ws"></span><h3>3.1.3. Prediction and scoring<a class="headerlink" href="#prediction-and-scoring" title="Permalink to this headline">¶</a></h3>
+<span id="sklearn-compat-ws"></span><h3><span class="section-number">3.1.3. </span>Prediction and scoring<a class="headerlink" href="#prediction-and-scoring" title="Permalink to this headline">¶</a></h3>
 <p>Since weakly supervised are also able, after being fitted, to predict for a
 given tuple what is its label (for pairs) or ordering (for quadruplets). See
 the appropriate section for more details, either <a class="reference internal" href="#pairs-predicting"><span class="std std-ref">this
@@ -374,15 +391,15 @@ one</span></a> for pairs, or <a class="reference internal" href="#learning-on-qu
 for quadruplets.</p>
 </div>
 <div class="section" id="scikit-learn-compatibility">
-<h3>3.1.4. Scikit-learn compatibility<a class="headerlink" href="#scikit-learn-compatibility" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.1.4. </span>Scikit-learn compatibility<a class="headerlink" href="#scikit-learn-compatibility" title="Permalink to this headline">¶</a></h3>
 <p>Weakly supervised estimators are compatible with scikit-learn routines for
-model selection (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html#sklearn.model_selection.cross_val_score" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.cross_val_score</span></code></a>,
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a>, etc).</p>
+model selection (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_val_score.html#sklearn.model_selection.cross_val_score" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.cross_val_score</span></code></a>,
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a>, etc).</p>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MMC</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MMC</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">cross_val_score</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># let&#39;s sample 30 random pairs and labels of pairs</span>
@@ -395,25 +412,25 @@ model selection (<a class="reference external" href="https://scikit-learn.org/st
 </div>
 </div>
 <div class="section" id="learning-on-pairs">
-<span id="id1"></span><h2>3.2. Learning on pairs<a class="headerlink" href="#learning-on-pairs" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2><span class="section-number">3.2. </span>Learning on pairs<a class="headerlink" href="#learning-on-pairs" title="Permalink to this headline">¶</a></h2>
 <p>Some metric learning algorithms learn on pairs of samples. In this case, one
-should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> pairs of points, with a
-corresponding target containing <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> values being either +1 or -1.
+should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> pairs of points, with a
+corresponding target containing <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> values being either +1 or -1.
 These values indicate whether the given pairs are similar points or
 dissimilar points.</p>
 <div class="section" id="fitting">
-<h3>3.2.1. Fitting<a class="headerlink" href="#fitting" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.1. </span>Fitting<a class="headerlink" href="#fitting" title="Permalink to this headline">¶</a></h3>
 <p>Here is an example for fitting on pairs (see <a class="reference internal" href="#fit-ws"><span class="std std-ref">Fit, transform, and so on</span></a> for more details on
 the input data format and how to fit, in the general case of learning on
 tuples).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MMC</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MMC</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">]],</span>
 <span class="gp">&gt;&gt;&gt; </span>                  <span class="p">[[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">]]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span> <span class="o">=</span> <span class="n">MMC</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y_pairs</span><span class="p">)</span>
-<span class="go">MMC(A0=&#39;deprecated&#39;, convergence_threshold=0.001, diagonal=False,</span>
-<span class="go">    diagonal_c=1.0, init=None, max_iter=100, max_proj=10000, preprocessor=None,</span>
+<span class="go">MMC(convergence_threshold=0.001, diagonal=False,</span>
+<span class="go">    diagonal_c=1.0, init=&#39;auto&#39;, max_iter=100, max_proj=10000, preprocessor=None,</span>
 <span class="go">    random_state=42, verbose=False)</span>
 </pre></div>
 </div>
@@ -422,16 +439,16 @@ together in the transformed space, and the two next points further away from
 each other.</p>
 </div>
 <div class="section" id="prediction">
-<span id="pairs-predicting"></span><h3>3.2.2. Prediction<a class="headerlink" href="#prediction" title="Permalink to this headline">¶</a></h3>
+<span id="pairs-predicting"></span><h3><span class="section-number">3.2.2. </span>Prediction<a class="headerlink" href="#prediction" title="Permalink to this headline">¶</a></h3>
 <p>When a pairs learner is fitted, it is also able to predict, for an unseen
 pair, whether it is a pair of similar or dissimilar points.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">predict</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">predict</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
 <span class="gp">... </span>             <span class="p">[[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.4</span><span class="p">,</span> <span class="mf">6.1</span><span class="p">]]])</span>
 <span class="go">array([1, -1])</span>
 </pre></div>
 </div>
 <div class="section" id="prediction-threshold">
-<span id="calibration"></span><h4>3.2.2.1. Prediction threshold<a class="headerlink" href="#prediction-threshold" title="Permalink to this headline">¶</a></h4>
+<span id="calibration"></span><h4><span class="section-number">3.2.2.1. </span>Prediction threshold<a class="headerlink" href="#prediction-threshold" title="Permalink to this headline">¶</a></h4>
 <p>Predicting whether a new pair represents similar or dissimilar
 samples requires to set a threshold on the learned distance, so that points
 closer (in the learned space) than this threshold are predicted as similar,
@@ -446,7 +463,7 @@ documentation of the <a class="reference internal" href="generated/metric_learn.
 of points for more information). Note that calibrating on the training set
 may cause some overfitting. If you want to avoid that, calibrate the
 threshold after fitting, on a validation set.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1"># will fit the threshold automatically after fitting</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="c1"># will fit the threshold automatically after fitting</span>
 </pre></div>
 </div>
 </li>
@@ -454,35 +471,35 @@ threshold after fitting, on a validation set.</p>
 calibrate the threshold to achieve a particular score on a validation set,
 the score being among the classical scores for classification (accuracy, f1
 score…).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">calibrate_threshold</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">calibrate_threshold</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first"><strong>Manual threshold</strong>: calling <a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML.set_threshold" title="metric_learn.ITML.set_threshold"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">set_threshold</span></code></a> will set the threshold to a
 particular value.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">set_threshold</span><span class="p">(</span><span class="mf">0.4</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">set_threshold</span><span class="p">(</span><span class="mf">0.4</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
 </ul>
-<p>See also: <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a>.</p>
+<p>See also: <a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a>.</p>
 </div>
 </div>
 <div class="section" id="scoring">
-<span id="pairs-scoring"></span><h3>3.2.3. Scoring<a class="headerlink" href="#scoring" title="Permalink to this headline">¶</a></h3>
+<span id="pairs-scoring"></span><h3><span class="section-number">3.2.3. </span>Scoring<a class="headerlink" href="#scoring" title="Permalink to this headline">¶</a></h3>
 <p>Pair metric learners can also return a <a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML.decision_function" title="metric_learn.ITML.decision_function"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">decision_function</span></code></a> for a set of pairs.
 It is basically the “score” that will be thresholded to find the prediction
 for the pair. This score corresponds to the opposite of the distance in the
 new space (higher score means points are similar, and lower score dissimilar).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">decision_function</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">decision_function</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
 <span class="gp">... </span>                       <span class="p">[[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.4</span><span class="p">,</span> <span class="mf">6.1</span><span class="p">]]])</span>
 <span class="go">array([-0.12811124, -0.74750256])</span>
 </pre></div>
 </div>
 <p>This allows to use common scoring functions for binary classification, like
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.metrics.accuracy_score</span></code></a> for instance, which
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.accuracy_score.html#sklearn.metrics.accuracy_score" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.metrics.accuracy_score</span></code></a> for instance, which
 can be used inside cross-validation routines:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">cross_val_score</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pairs_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
 <span class="gp">... </span>                       <span class="p">[[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.4</span><span class="p">,</span> <span class="mf">6.1</span><span class="p">]],</span>
 <span class="gp">... </span>                       <span class="p">[[</span><span class="mf">7.7</span><span class="p">,</span> <span class="mf">5.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.23</span><span class="p">,</span> <span class="mf">8.4</span><span class="p">]]])</span>
@@ -492,8 +509,8 @@ can be used inside cross-validation routines:</p>
 </pre></div>
 </div>
 <p>Pairs learners also have a default score, which basically
-returns the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.metrics.roc_auc_score</span></code></a> (which is threshold-independent).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pairs_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
+returns the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html#sklearn.metrics.roc_auc_score" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.metrics.roc_auc_score</span></code></a> (which is threshold-independent).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pairs_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="mf">2.75</span><span class="p">]],</span>
 <span class="gp">... </span>                       <span class="p">[[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.4</span><span class="p">,</span> <span class="mf">6.1</span><span class="p">]],</span>
 <span class="gp">... </span>                       <span class="p">[[</span><span class="mf">7.7</span><span class="p">,</span> <span class="mf">5.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.23</span><span class="p">,</span> <span class="mf">8.4</span><span class="p">]]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">])</span>
@@ -509,9 +526,9 @@ not specific to learning on pairs, like <a class="reference internal" href="gene
 </div>
 </div>
 <div class="section" id="algorithms">
-<h3>3.2.4. Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">3.2.4. </span>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="itml">
-<span id="id2"></span><h4>3.2.4.1. <a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML" title="metric_learn.ITML"><code class="xref py py-class docutils literal notranslate"><span class="pre">ITML</span></code></a><a class="headerlink" href="#itml" title="Permalink to this headline">¶</a></h4>
+<span id="id2"></span><h4><span class="section-number">3.2.4.1. </span><a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML" title="metric_learn.ITML"><code class="xref py py-class docutils literal notranslate"><span class="pre">ITML</span></code></a><a class="headerlink" href="#itml" title="Permalink to this headline">¶</a></h4>
 <p>Information Theoretic Metric Learning (<a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML" title="metric_learn.ITML"><code class="xref py py-class docutils literal notranslate"><span class="pre">ITML</span></code></a>)</p>
 <p><a class="reference internal" href="#itml"><span class="std std-ref">ITML</span></a> minimizes the (differential) relative entropy, aka Kullback–Leibler
 divergence, between two multivariate Gaussians subject to constraints on the
@@ -521,32 +538,32 @@ linear constraints. This algorithm can handle a wide variety of constraints
 and can optionally incorporate a prior on the distance function. Unlike some
 other methods, <a class="reference internal" href="#itml"><span class="std std-ref">ITML</span></a> does not rely on an eigenvalue computation or
 semi-definite programming.</p>
-<p>Given a Mahalanobis distance parameterized by <span class="math notranslate nohighlight">\(A\)</span>, its corresponding
+<p>Given a Mahalanobis distance parameterized by <span class="math notranslate nohighlight">\(M\)</span>, its corresponding
 multivariate Gaussian is denoted as:</p>
 <div class="math notranslate nohighlight">
-\[p(\mathbf{x}; \mathbf{A}) = \frac{1}{Z}\exp(-\frac{1}{2}d_\mathbf{A}
+\[p(\mathbf{x}; \mathbf{M}) = \frac{1}{Z}\exp(-\frac{1}{2}d_\mathbf{M}
 (\mathbf{x}, \mu))
-=  \frac{1}{Z}\exp(-\frac{1}{2}((\mathbf{x} - \mu)^T\mathbf{A}
+=  \frac{1}{Z}\exp(-\frac{1}{2}((\mathbf{x} - \mu)^T\mathbf{M}
 (\mathbf{x} - \mu))\]</div>
 <p>where <span class="math notranslate nohighlight">\(Z\)</span> is the normalization constant, the inverse of Mahalanobis
-matrix <span class="math notranslate nohighlight">\(\mathbf{A}^{-1}\)</span> is the covariance of the Gaussian.</p>
+matrix <span class="math notranslate nohighlight">\(\mathbf{M}^{-1}\)</span> is the covariance of the Gaussian.</p>
 <p>Given pairs of similar points <span class="math notranslate nohighlight">\(S\)</span> and pairs of dissimilar points
 <span class="math notranslate nohighlight">\(D\)</span>, the distance metric learning problem is to minimize the LogDet
 divergence, which is equivalent as minimizing <span class="math notranslate nohighlight">\(\textbf{KL}(p(\mathbf{x};
-\mathbf{A}_0) || p(\mathbf{x}; \mathbf{A}))\)</span>:</p>
+\mathbf{M}_0) || p(\mathbf{x}; \mathbf{M}))\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}\min_\mathbf{A} D_{\ell \mathrm{d}}\left(A, A_{0}\right) =
-\operatorname{tr}\left(A A_{0}^{-1}\right)-\log \operatorname{det}
-\left(A A_{0}^{-1}\right)-n\\
-\text{subject to } \quad d_\mathbf{A}(\mathbf{x}_i, \mathbf{x}_j)
+\[\begin{split}\min_\mathbf{A} D_{\ell \mathrm{d}}\left(M, M_{0}\right) =
+\operatorname{tr}\left(M M_{0}^{-1}\right)-\log \operatorname{det}
+\left(M M_{0}^{-1}\right)-n\\
+\text{subject to } \quad d_\mathbf{M}(\mathbf{x}_i, \mathbf{x}_j)
 \leq u \qquad (\mathbf{x}_i, \mathbf{x}_j)\in S \\
-d_\mathbf{A}(\mathbf{x}_i, \mathbf{x}_j) \geq l \qquad (\mathbf{x}_i,
+d_\mathbf{M}(\mathbf{x}_i, \mathbf{x}_j) \geq l \qquad (\mathbf{x}_i,
 \mathbf{x}_j)\in D\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(l\)</span> is the upper and the lower bound of distance
-for similar and dissimilar pairs respectively, and <span class="math notranslate nohighlight">\(\mathbf{A}_0\)</span>
+for similar and dissimilar pairs respectively, and <span class="math notranslate nohighlight">\(\mathbf{M}_0\)</span>
 is the prior distance metric, set to identity matrix by default,
 <span class="math notranslate nohighlight">\(D_{\ell \mathrm{d}}(\cdot)\)</span> is the log determinant.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">ITML</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">ITML</span>
 
 <span class="n">pairs</span> <span class="o">=</span> <span class="p">[[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]],</span>
          <span class="p">[[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">]],</span>
@@ -563,7 +580,7 @@ is the prior distance metric, set to identity matrix by default,
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -579,7 +596,7 @@ is the prior distance metric, set to identity matrix by default,
 </div>
 </div>
 <div class="section" id="sdml">
-<span id="id5"></span><h4>3.2.4.2. <a class="reference internal" href="generated/metric_learn.SDML.html#metric_learn.SDML" title="metric_learn.SDML"><code class="xref py py-class docutils literal notranslate"><span class="pre">SDML</span></code></a><a class="headerlink" href="#sdml" title="Permalink to this headline">¶</a></h4>
+<span id="id5"></span><h4><span class="section-number">3.2.4.2. </span><a class="reference internal" href="generated/metric_learn.SDML.html#metric_learn.SDML" title="metric_learn.SDML"><code class="xref py py-class docutils literal notranslate"><span class="pre">SDML</span></code></a><a class="headerlink" href="#sdml" title="Permalink to this headline">¶</a></h4>
 <p>Sparse High-Dimensional Metric Learning
 (<a class="reference internal" href="generated/metric_learn.SDML.html#metric_learn.SDML" title="metric_learn.SDML"><code class="xref py py-class docutils literal notranslate"><span class="pre">SDML</span></code></a>)</p>
 <p><a class="reference internal" href="#sdml"><span class="std std-ref">SDML</span></a> is an efficient sparse metric learning in high-dimensional space via
@@ -600,7 +617,7 @@ Laplacian matrix <span class="math notranslate nohighlight">\(\mathbf{L}=\mathbf
 <span class="math notranslate nohighlight">\(\mathbf{K}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{D}\)</span>, a diagonal matrix whose entries are
 the sums of the row elements of <span class="math notranslate nohighlight">\(\mathbf{K}\)</span>., <span class="math notranslate nohighlight">\(||\cdot||_{1, off}\)</span>
 is the off-diagonal L1 norm.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">SDML</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">SDML</span>
 
 <span class="n">pairs</span> <span class="o">=</span> <span class="p">[[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]],</span>
          <span class="p">[[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">]],</span>
@@ -616,7 +633,7 @@ is the off-diagonal L1 norm.</p>
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id6" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -629,13 +646,13 @@ ICML 2009.</td></tr>
 <table class="docutils footnote" frame="void" id="id7" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[2]</td><td>Adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439945">https://gist.github.com/kcarnold/5439945</a></td></tr>
+<tr><td class="label">[2]</td><td>Code adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439945">https://gist.github.com/kcarnold/5439945</a></td></tr>
 </tbody>
 </table>
 </div>
 </div>
 <div class="section" id="rca">
-<span id="id8"></span><h4>3.2.4.3. <a class="reference internal" href="generated/metric_learn.RCA.html#metric_learn.RCA" title="metric_learn.RCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCA</span></code></a><a class="headerlink" href="#rca" title="Permalink to this headline">¶</a></h4>
+<span id="id8"></span><h4><span class="section-number">3.2.4.3. </span><a class="reference internal" href="generated/metric_learn.RCA.html#metric_learn.RCA" title="metric_learn.RCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCA</span></code></a><a class="headerlink" href="#rca" title="Permalink to this headline">¶</a></h4>
 <p>Relative Components Analysis (<a class="reference internal" href="generated/metric_learn.RCA.html#metric_learn.RCA" title="metric_learn.RCA"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCA</span></code></a>)</p>
 <p><a class="reference internal" href="#rca"><span class="std std-ref">RCA</span></a> learns a full rank Mahalanobis distance metric based on a weighted sum of
 in-chunklets covariance matrices. It applies a global linear transformation to
@@ -651,23 +668,20 @@ algorithm is efficient since it simply amounts to computing</p>
 <p>where chunklet <span class="math notranslate nohighlight">\(j\)</span> consists of <span class="math notranslate nohighlight">\(\{\mathbf{x}_{ji}\}_{i=1}^{n_j}\)</span>
 with a mean <span class="math notranslate nohighlight">\(\hat{m}_j\)</span>. The inverse of <span class="math notranslate nohighlight">\(\mathbf{C}^{-1}\)</span> is used
 as the Mahalanobis matrix.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">RCA</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">RCA</span>
 
-<span class="n">pairs</span> <span class="o">=</span> <span class="p">[[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]],</span>
-         <span class="p">[[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">]],</span>
-         <span class="p">[[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">]],</span>
-         <span class="p">[[</span><span class="mf">6.2</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.4</span><span class="p">,</span> <span class="mf">5.4</span><span class="p">]]]</span>
-<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-<span class="c1"># in this task we want points where the first feature is close to be closer</span>
-<span class="c1"># to each other, no matter how close the second feature is</span>
+<span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span>  <span class="mf">3.0</span><span class="p">],[</span><span class="mf">0.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.55</span><span class="p">],[</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">3.55</span><span class="p">],</span>
+    <span class="p">[</span><span class="o">-</span><span class="mf">0.95</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">],[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span>  <span class="mf">0.05</span><span class="p">],[</span><span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">]]</span>
+<span class="n">chunks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 
 <span class="n">rca</span> <span class="o">=</span> <span class="n">RCA</span><span class="p">()</span>
-<span class="n">rca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">rca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id9" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -689,7 +703,7 @@ as the Mahalanobis matrix.</p>
 </div>
 </div>
 <div class="section" id="mmc">
-<span id="id12"></span><h4>3.2.4.4. <a class="reference internal" href="generated/metric_learn.MMC.html#metric_learn.MMC" title="metric_learn.MMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">MMC</span></code></a><a class="headerlink" href="#mmc" title="Permalink to this headline">¶</a></h4>
+<span id="id12"></span><h4><span class="section-number">3.2.4.4. </span><a class="reference internal" href="generated/metric_learn.MMC.html#metric_learn.MMC" title="metric_learn.MMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">MMC</span></code></a><a class="headerlink" href="#mmc" title="Permalink to this headline">¶</a></h4>
 <p>Metric Learning with Application for Clustering with Side Information
 (<a class="reference internal" href="generated/metric_learn.MMC.html#metric_learn.MMC" title="metric_learn.MMC"><code class="xref py py-class docutils literal notranslate"><span class="pre">MMC</span></code></a>)</p>
 <p><a class="reference internal" href="#mmc"><span class="std std-ref">MMC</span></a> minimizes the sum of squared distances between similar points, while
@@ -709,7 +723,7 @@ points, while constrains the sum of distances between dissimilar points:</p>
 \mathbf{x}_j)\in S} d_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j)
 \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}_i, \mathbf{x}_j)
 \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1\]</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">MMC</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MMC</span>
 
 <span class="n">pairs</span> <span class="o">=</span> <span class="p">[[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]],</span>
          <span class="p">[[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">]],</span>
@@ -725,7 +739,7 @@ points, while constrains the sum of distances between dissimilar points:</p>
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id13" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -743,18 +757,163 @@ side-information</a>. NIPS 2002</td></tr>
 </div>
 </div>
 </div>
+<div class="section" id="learning-on-triplets">
+<span id="id15"></span><h2><span class="section-number">3.3. </span>Learning on triplets<a class="headerlink" href="#learning-on-triplets" title="Permalink to this headline">¶</a></h2>
+<p>Some metric learning algorithms learn on triplets of samples. In this case,
+one should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> triplets of points. The
+semantic of each triplet is that the first point should be closer to the
+second point than to the third one.</p>
+<div class="section" id="id16">
+<h3><span class="section-number">3.3.1. </span>Fitting<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<p>Here is an example for fitting on triplets (see <a class="reference internal" href="#fit-ws"><span class="std std-ref">Fit, transform, and so on</span></a> for more
+details on the input data format and how to fit, in the general case of
+learning on tuples).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">SCML</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">triplets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]],</span>
+<span class="gp">&gt;&gt;&gt; </span>                     <span class="p">[[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">7.3</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">]]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scml</span> <span class="o">=</span> <span class="n">SCML</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">triplets</span><span class="p">)</span>
+<span class="go">SCML(beta=1e-5, B=None, max_iter=100000, verbose=False,</span>
+<span class="go">    preprocessor=None, random_state=None)</span>
+</pre></div>
+</div>
+<p>Or alternatively (using a preprocessor):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>               <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>               <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>               <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>               <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>               <span class="p">[</span><span class="mf">7.3</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">triplets_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scml</span> <span class="o">=</span> <span class="n">SCML</span><span class="p">(</span><span class="n">preprocessor</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">triplets_indices</span><span class="p">)</span>
+<span class="go">SCML(beta=1e-5, B=None, max_iter=100000, verbose=False,</span>
+<span class="go">   preprocessor=array([[1.2, 3.2],</span>
+<span class="go">       [2.3, 5.5],</span>
+<span class="go">       [2.4, 6.7],</span>
+<span class="go">       [2.1, 0.6],</span>
+<span class="go">       [4.5, 2.3],</span>
+<span class="go">       [2.1, 2.3],</span>
+<span class="go">       [0.6, 1.2],</span>
+<span class="go">       [7.3, 3.4]]),</span>
+<span class="go">    random_state=None)</span>
+</pre></div>
+</div>
+<p>Here, we want to learn a metric that, for each of the two
+<code class="xref any docutils literal notranslate"><span class="pre">triplets</span></code>, will make the first point closer to the
+second point than to the third one.</p>
+</div>
+<div class="section" id="triplets-predicting">
+<span id="id17"></span><h3><span class="section-number">3.3.2. </span>Prediction<a class="headerlink" href="#triplets-predicting" title="Permalink to this headline">¶</a></h3>
+<p>When a triplets learner is fitted, it is also able to predict, for an
+upcoming triplet, whether the first point is closer to the second point
+than to the third one (+1), or not (-1).</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">triplets_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+<span class="gp">... </span><span class="p">[[[</span><span class="mf">5.6</span><span class="p">,</span> <span class="mf">5.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">]],</span>
+<span class="gp">... </span> <span class="p">[[</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.3</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">]]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scml</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">triplets_test</span><span class="p">)</span>
+<span class="go">array([-1.,  1.])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="triplets-scoring">
+<span id="id18"></span><h3><span class="section-number">3.3.3. </span>Scoring<a class="headerlink" href="#triplets-scoring" title="Permalink to this headline">¶</a></h3>
+<p>Triplet metric learners can also return a <a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML.decision_function" title="metric_learn.ITML.decision_function"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">decision_function</span></code></a> for a set of triplets,
+which corresponds to the distance between the first two points minus the distance
+between the first and last points of the triplet (the higher the value, the more
+similar the first point to the second point compared to the last one). This “score”
+can be interpreted as a measure of likeliness of having a +1 prediction for this
+triplet.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">scml</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">triplets_test</span><span class="p">)</span>
+<span class="go">array([-1.75700306,  4.98982131])</span>
+</pre></div>
+</div>
+<p>In the above example, for the first triplet in <code class="xref any docutils literal notranslate"><span class="pre">triplets_test</span></code>, the first
+point is predicted less similar to the second point than to the last point
+(they are further away in the transformed space).</p>
+<p>Unlike pairs learners, triplets learners do not allow to give a <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-177" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> when fitting: we
+assume that the ordering of points within triplets is such that the training triplets
+are all positive. Therefore, it is not possible to use scikit-learn scoring functions
+(such as ‘f1_score’) for triplets learners.</p>
+<p>However, triplets learners do have a default scoring function, which will
+basically return the accuracy score on a given test set, i.e. the proportion
+of triplets that have the right predicted ordering.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">scml</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">triplets_test</span><span class="p">)</span>
+<span class="go">0.5</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">See <a class="reference internal" href="#fit-ws"><span class="std std-ref">Fit, transform, and so on</span></a> for more details on metric learners functions that are
+not specific to learning on pairs, like <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.transform" title="metric_learn.Covariance.transform"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">transform</span></code></a>, <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.score_pairs" title="metric_learn.Covariance.score_pairs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">score_pairs</span></code></a>,
+<a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.get_metric" title="metric_learn.Covariance.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a> and <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.get_mahalanobis_matrix" title="metric_learn.Covariance.get_mahalanobis_matrix"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>.</p>
+</div>
+</div>
+<div class="section" id="id19">
+<h3><span class="section-number">3.3.4. </span>Algorithms<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="scml">
+<span id="id20"></span><h4><span class="section-number">3.3.4.1. </span><a class="reference internal" href="generated/metric_learn.SCML.html#metric_learn.SCML" title="metric_learn.SCML"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCML</span></code></a><a class="headerlink" href="#scml" title="Permalink to this headline">¶</a></h4>
+<p>Sparse Compositional Metric Learning
+(<a class="reference internal" href="generated/metric_learn.SCML.html#metric_learn.SCML" title="metric_learn.SCML"><code class="xref py py-class docutils literal notranslate"><span class="pre">SCML</span></code></a>)</p>
+<p><a class="reference internal" href="#scml"><span class="std std-ref">SCML</span></a> learns a squared Mahalanobis distance from triplet constraints by
+optimizing sparse positive weights assigned to a set of <span class="math notranslate nohighlight">\(K\)</span> rank-one
+PSD bases. This can be formulated as an optimization problem with only
+<span class="math notranslate nohighlight">\(K\)</span> parameters, that can be solved with an efficient stochastic
+composite scheme.</p>
+<p>The Mahalanobis matrix <span class="math notranslate nohighlight">\(M\)</span> is built from a basis set <span class="math notranslate nohighlight">\(B = \{b_i\}_{i=\{1,...,K\}}\)</span>
+weighted by a <span class="math notranslate nohighlight">\(K\)</span> dimensional vector <span class="math notranslate nohighlight">\(w = \{w_i\}_{i=\{1,...,K\}}\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[M = \sum_{i=1}^K w_i b_i b_i^T = B \cdot diag(w) \cdot B^T \quad w_i \geq 0\]</div>
+<p>Learning <span class="math notranslate nohighlight">\(M\)</span> in this form makes it PSD by design, as it is a
+nonnegative sum of PSD matrices. The basis set <span class="math notranslate nohighlight">\(B\)</span> is fixed in advance
+and it is possible to construct it from the data. The optimization problem
+over <span class="math notranslate nohighlight">\(w\)</span> is formulated as a classic margin-based hinge loss function
+involving the set <span class="math notranslate nohighlight">\(C\)</span> of triplets. A regularization <span class="math notranslate nohighlight">\(\ell_1\)</span>
+is added to yield a sparse combination. The formulation is the following:</p>
+<div class="math notranslate nohighlight">
+\[\min_{w\geq 0} \sum_{(x_i,x_j,x_k)\in C} [1 + d_w(x_i,x_j)-d_w(x_i,x_k)]_+ + \beta||w||_1\]</div>
+<p>where <span class="math notranslate nohighlight">\([\cdot]_+\)</span> is the hinge loss.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">SCML</span>
+
+<span class="n">triplets</span> <span class="o">=</span> <span class="p">[[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">]],</span>
+            <span class="p">[[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.4</span><span class="p">,</span> <span class="mf">5.4</span><span class="p">]],</span>
+            <span class="p">[[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">8.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">]],</span>
+            <span class="p">[[</span><span class="mf">3.3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.2</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">7.4</span><span class="p">,</span> <span class="mf">5.4</span><span class="p">]]]</span>
+
+<span class="n">scml</span> <span class="o">=</span> <span class="n">SCML</span><span class="p">()</span>
+<span class="n">scml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">triplets</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="topic">
+<p class="topic-title">References:</p>
+<table class="docutils footnote" frame="void" id="id21" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td>Y. Shi, A. Bellet and F. Sha. <a class="reference external" href="http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf">Sparse Compositional Metric Learning.</a>. (AAAI), 2014.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id22" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[2]</td><td>Adapted from original <a href="#id31"><span class="problematic" id="id32">`Matlab implementation.&lt;https://github.com/bellet/SCML&gt;`_</span></a>.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
 <div class="section" id="learning-on-quadruplets">
-<span id="id15"></span><h2>3.3. Learning on quadruplets<a class="headerlink" href="#learning-on-quadruplets" title="Permalink to this headline">¶</a></h2>
+<span id="id23"></span><h2><span class="section-number">3.4. </span>Learning on quadruplets<a class="headerlink" href="#learning-on-quadruplets" title="Permalink to this headline">¶</a></h2>
 <p>Some metric learning algorithms learn on quadruplets of samples. In this case,
-one should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> quadruplets of points. Th
+one should provide the algorithm with <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-n-samples" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">n_samples</span></code></a> quadruplets of points. The
 semantic of each quadruplet is that the first two points should be closer
 together than the last two points.</p>
-<div class="section" id="id16">
-<h3>3.3.1. Fitting<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id24">
+<h3><span class="section-number">3.4.1. </span>Fitting<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
 <p>Here is an example for fitting on quadruplets (see <a class="reference internal" href="#fit-ws"><span class="std std-ref">Fit, transform, and so on</span></a> for more
 details on the input data format and how to fit, in the general case of
 learning on tuples).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">LSML</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">LSML</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">quadruplets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="mf">6.7</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]],</span>
 <span class="gp">&gt;&gt;&gt; </span>                        <span class="p">[[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">7.3</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">]]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lsml</span> <span class="o">=</span> <span class="n">LSML</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
@@ -764,7 +923,7 @@ learning on tuples).</p>
 </pre></div>
 </div>
 <p>Or alternatively (using a preprocessor):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">],</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span><span class="mf">2.3</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="mf">6.7</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span>
@@ -792,11 +951,11 @@ learning on tuples).</p>
 last points.</p>
 </div>
 <div class="section" id="quadruplets-predicting">
-<span id="id17"></span><h3>3.3.2. Prediction<a class="headerlink" href="#quadruplets-predicting" title="Permalink to this headline">¶</a></h3>
+<span id="id25"></span><h3><span class="section-number">3.4.2. </span>Prediction<a class="headerlink" href="#quadruplets-predicting" title="Permalink to this headline">¶</a></h3>
 <p>When a quadruplets learner is fitted, it is also able to predict, for an
 upcoming quadruplet, whether the two first points are more similar than the
 two last points (+1), or not (-1).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">quadruplets_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">quadruplets_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
 <span class="gp">... </span><span class="p">[[[</span><span class="mf">5.6</span><span class="p">,</span> <span class="mf">5.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.2</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">]],</span>
 <span class="gp">... </span> <span class="p">[[</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.3</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">]]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lsml</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">quadruplets_test</span><span class="p">)</span>
@@ -805,37 +964,28 @@ two last points (+1), or not (-1).</p>
 </div>
 </div>
 <div class="section" id="quadruplets-scoring">
-<span id="id18"></span><h3>3.3.3. Scoring<a class="headerlink" href="#quadruplets-scoring" title="Permalink to this headline">¶</a></h3>
-<p>Quadruplet metric learners can also
-return a <a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML.decision_function" title="metric_learn.ITML.decision_function"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">decision_function</span></code></a> for a set of pairs. This is basically the “score”
-which sign will be taken to find the prediction for the pair, which
-corresponds to the difference between the distance between the two last points,
-and the distance between the two last points of the quadruplet (higher
-score means the two last points are more likely to be more dissimilar than
-the two first points (i.e. more likely to have a +1 prediction since it’s
-the right ordering)).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lsml</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">quadruplets_test</span><span class="p">)</span>
+<span id="id26"></span><h3><span class="section-number">3.4.3. </span>Scoring<a class="headerlink" href="#quadruplets-scoring" title="Permalink to this headline">¶</a></h3>
+<p>Quadruplet metric learners can also return a <a class="reference internal" href="generated/metric_learn.ITML.html#metric_learn.ITML.decision_function" title="metric_learn.ITML.decision_function"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">decision_function</span></code></a> for a set of
+quadruplets, which corresponds to the distance between the first pair of points minus
+the distance between the second pair of points of the triplet (the higher the value,
+the more similar the first pair is than the last pair).
+This “score” can be interpreted as a measure of likeliness of having a +1 prediction
+for this quadruplet.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lsml</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">quadruplets_test</span><span class="p">)</span>
 <span class="go">array([-1.75700306,  4.98982131])</span>
 </pre></div>
 </div>
 <p>In the above example, for the first quadruplet in <code class="xref any docutils literal notranslate"><span class="pre">quadruplets_test</span></code>, the
 two first points are predicted less similar than the two last points (they
 are further away in the transformed space).</p>
-<p>Unlike for pairs learners, quadruplets learners don’t allow to give a <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-175" title="(in scikit-learn v0.21.3)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a>
-when fitting, which does not allow to use scikit-learn scoring functions
-like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">cross_val_score</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cross_val_score</span><span class="p">(</span><span class="n">lsml</span><span class="p">,</span> <span class="n">quadruplets</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;f1_score&#39;</span><span class="p">)</span>  <span class="c1"># this won&#39;t work</span>
-</pre></div>
-</div>
-<p>(This is actually intentional, for more details
-about that, see
-<a class="reference external" href="https://github.com/scikit-learn-contrib/metric-learn/pull/168#pullrequestreview-203730742">this comment</a>
-on github.)</p>
+<p>Like triplet learners, quadruplets learners do not allow to give a <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-177" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">y</span></code></a> when fitting: we
+assume that the ordering of points within triplets is such that the training triplets
+are all positive. Therefore, it is not possible to use scikit-learn scoring functions
+(such as ‘f1_score’) for triplets learners.</p>
 <p>However, quadruplets learners do have a default scoring function, which will
 basically return the accuracy score on a given test set, i.e. the proportion
 of quadruplets have the right predicted ordering.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lsml</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">quadruplets_test</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lsml</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">quadruplets_test</span><span class="p">)</span>
 <span class="go">0.5</span>
 </pre></div>
 </div>
@@ -846,10 +996,10 @@ not specific to learning on pairs, like <a class="reference internal" href="gene
 <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.get_metric" title="metric_learn.Covariance.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a> and <a class="reference internal" href="generated/metric_learn.Covariance.html#metric_learn.Covariance.get_mahalanobis_matrix" title="metric_learn.Covariance.get_mahalanobis_matrix"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>.</p>
 </div>
 </div>
-<div class="section" id="id19">
-<h3>3.3.4. Algorithms<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id27">
+<h3><span class="section-number">3.4.4. </span>Algorithms<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="lsml">
-<span id="id20"></span><h4>3.3.4.1. <a class="reference internal" href="generated/metric_learn.LSML.html#metric_learn.LSML" title="metric_learn.LSML"><code class="xref py py-class docutils literal notranslate"><span class="pre">LSML</span></code></a><a class="headerlink" href="#lsml" title="Permalink to this headline">¶</a></h4>
+<span id="id28"></span><h4><span class="section-number">3.4.4.1. </span><a class="reference internal" href="generated/metric_learn.LSML.html#metric_learn.LSML" title="metric_learn.LSML"><code class="xref py py-class docutils literal notranslate"><span class="pre">LSML</span></code></a><a class="headerlink" href="#lsml" title="Permalink to this headline">¶</a></h4>
 <p>Metric Learning from Relative Comparisons by Minimizing Squared Residual
 (<a class="reference internal" href="generated/metric_learn.LSML.html#metric_learn.LSML" title="metric_learn.LSML"><code class="xref py py-class docutils literal notranslate"><span class="pre">LSML</span></code></a>)</p>
 <p><a class="reference internal" href="#lsml"><span class="std std-ref">LSML</span></a> proposes a simple, yet effective, algorithm that minimizes a convex
@@ -861,18 +1011,18 @@ based algorithms become infeasible to be deployed. Furthermore, its sparsity
 extension leads to more stable estimation when the dimension is high and
 only a small amount of constraints is given.</p>
 <p>The loss function of each constraint
-<span class="math notranslate nohighlight">\(d(\mathbf{x}_a, \mathbf{x}_b) &lt; d(\mathbf{x}_c, \mathbf{x}_d)\)</span> is
+<span class="math notranslate nohighlight">\(d(\mathbf{x}_i, \mathbf{x}_j) &lt; d(\mathbf{x}_k, \mathbf{x}_l)\)</span> is
 denoted as:</p>
 <div class="math notranslate nohighlight">
-\[H(d_\mathbf{M}(\mathbf{x}_a, \mathbf{x}_b)
-- d_\mathbf{M}(\mathbf{x}_c, \mathbf{x}_d))\]</div>
+\[H(d_\mathbf{M}(\mathbf{x}_i, \mathbf{x}_j)
+- d_\mathbf{M}(\mathbf{x}_k, \mathbf{x}_l))\]</div>
 <p>where <span class="math notranslate nohighlight">\(H(\cdot)\)</span> is the squared Hinge loss function defined as:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}H(x) = \left\{\begin{aligned}0 \qquad x\leq 0 \\
 \,\,x^2 \qquad x&gt;0\end{aligned}\right.\\\end{split}\]</div>
 <p>The summed loss function <span class="math notranslate nohighlight">\(L(C)\)</span> is the simple sum over all constraints
-<span class="math notranslate nohighlight">\(C = \{(\mathbf{x}_a , \mathbf{x}_b , \mathbf{x}_c , \mathbf{x}_d)
-: d(\mathbf{x}_a , \mathbf{x}_b) &lt; d(\mathbf{x}_c , \mathbf{x}_d)\}\)</span>. The
+<span class="math notranslate nohighlight">\(C = \{(\mathbf{x}_i , \mathbf{x}_j , \mathbf{x}_k , \mathbf{x}_l)
+: d(\mathbf{x}_i , \mathbf{x}_j) &lt; d(\mathbf{x}_k , \mathbf{x}_l)\}\)</span>. The
 original paper suggested here should be a weighted sum since the confidence
 or probability of each constraint might differ. However, for the sake of
 simplicity and assumption of no extra knowledge provided, we just deploy
@@ -881,15 +1031,15 @@ the simple sum here as well as what the authors did in the experiments.</p>
 function of all constraints plus a regularization term w.r.t. the prior
 knowledge:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}\min_\mathbf{M}(D_{ld}(\mathbf{M, M_0}) + \sum_{(\mathbf{x}_a,
-\mathbf{x}_b, \mathbf{x}_c, \mathbf{x}_d)\in C}H(d_\mathbf{M}(
-\mathbf{x}_a, \mathbf{x}_b) - d_\mathbf{M}(\mathbf{x}_c, \mathbf{x}_c))\\\end{split}\]</div>
+\[\begin{split}\min_\mathbf{M}(D_{ld}(\mathbf{M, M_0}) + \sum_{(\mathbf{x}_i,
+\mathbf{x}_j, \mathbf{x}_k, \mathbf{x}_l)\in C}H(d_\mathbf{M}(
+\mathbf{x}_i, \mathbf{x}_j) - d_\mathbf{M}(\mathbf{x}_k, \mathbf{x}_l))\\\end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\mathbf{M}_0\)</span> is the prior metric matrix, set as identity
 by default, <span class="math notranslate nohighlight">\(D_{ld}(\mathbf{\cdot, \cdot})\)</span> is the LogDet divergence:</p>
 <div class="math notranslate nohighlight">
 \[D_{ld}(\mathbf{M, M_0}) = \text{tr}(\mathbf{MM_0}) − \text{logdet}
 (\mathbf{M})\]</div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">LSML</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">LSML</span>
 
 <span class="n">quadruplets</span> <span class="o">=</span> <span class="p">[[[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.2</span><span class="p">,</span> <span class="mf">9.7</span><span class="p">]],</span>
                <span class="p">[[</span><span class="mf">1.3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">4.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">6.2</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">5.4</span><span class="p">,</span> <span class="mf">5.4</span><span class="p">]],</span>
@@ -904,8 +1054,8 @@ by default, <span class="math notranslate nohighlight">\(D_{ld}(\mathbf{\cdot, \
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
-<table class="docutils footnote" frame="void" id="id21" rules="none">
+<p class="topic-title">References:</p>
+<table class="docutils footnote" frame="void" id="id29" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label">[1]</td><td>Liu et al.
@@ -913,10 +1063,10 @@ by default, <span class="math notranslate nohighlight">\(D_{ld}(\mathbf{\cdot, \
 Residual</a>. ICDM 2012</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id22" rules="none">
+<table class="docutils footnote" frame="void" id="id30" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[2]</td><td>Adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439917">https://gist.github.com/kcarnold/5439917</a></td></tr>
+<tr><td class="label">[2]</td><td>Code adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439917">https://gist.github.com/kcarnold/5439917</a></td></tr>
 </tbody>
 </table>
 </div>
@@ -936,7 +1086,7 @@ Residual</a>. ICDM 2012</td></tr>
         <a href="unsupervised.html" class="btn btn-neutral float-right" title="4. Unsupervised Metric Learning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="supervised.html" class="btn btn-neutral" title="2. Supervised Metric Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="supervised.html" class="btn btn-neutral float-left" title="2. Supervised Metric Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -945,11 +1095,19 @@ Residual</a>. ICDM 2012</td></tr>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -961,27 +1119,16 @@ Residual</a>. ICDM 2012</td></tr>
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

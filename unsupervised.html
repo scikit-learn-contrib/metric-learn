@@ -1,55 +1,63 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>4. Unsupervised Metric Learning &mdash; metric-learn 0.5.0 documentation</title>
+  <title>4. Unsupervised Metric Learning &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="5. Preprocessor" href="preprocessor.html" />
     <link rel="prev" title="3. Weakly Supervised Metric Learning" href="weakly_supervised.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="index.html" class="icon icon-home"> metric-learn
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -59,7 +67,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -76,6 +84,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -112,6 +121,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -150,11 +160,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="user_guide.html">User Guide</a> &raquo;</li>
         
-      <li>4. Unsupervised Metric Learning</li>
+      <li><span class="section-number">4. </span>Unsupervised Metric Learning</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -174,20 +184,20 @@
            <div itemprop="articleBody">
             
   <div class="section" id="unsupervised-metric-learning">
-<h1>4. Unsupervised Metric Learning<a class="headerlink" href="#unsupervised-metric-learning" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">4. </span>Unsupervised Metric Learning<a class="headerlink" href="#unsupervised-metric-learning" title="Permalink to this headline">¶</a></h1>
 <p>Unsupervised metric learning algorithms only take as input an (unlabeled)
 dataset <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>. For now, in metric-learn, there only is <a class="reference internal" href="#covariance"><span class="std std-ref">Covariance</span></a>, which is a
 simple baseline algorithm (see below).</p>
 <div class="section" id="algorithms">
-<h2>4.1. Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">4.1. </span>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="covariance">
-<span id="id1"></span><h3>4.1.1. Covariance<a class="headerlink" href="#covariance" title="Permalink to this headline">¶</a></h3>
+<span id="id1"></span><h3><span class="section-number">4.1.1. </span>Covariance<a class="headerlink" href="#covariance" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference internal" href="#covariance"><span class="std std-ref">Covariance</span></a> does not “learn” anything, rather it calculates
 the covariance matrix of the input data. This is a simple baseline method.
 It can be used for ZCA whitening of the data (see the Wikipedia page of
 <a class="reference external" href="https://en.wikipedia.org/wiki/ Whitening_transformation">whitening transformation</a>).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="k">import</span> <span class="n">Covariance</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_iris</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">Covariance</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 
 <span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
 
@@ -196,7 +206,7 @@ It can be used for ZCA whitening of the data (see the Wikipedia page of
 </pre></div>
 </div>
 <div class="topic">
-<p class="topic-title first">References:</p>
+<p class="topic-title">References:</p>
 <table class="docutils footnote" frame="void" id="id2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
@@ -219,7 +229,7 @@ It can be used for ZCA whitening of the data (see the Wikipedia page of
         <a href="preprocessor.html" class="btn btn-neutral float-right" title="5. Preprocessor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="weakly_supervised.html" class="btn btn-neutral" title="3. Weakly Supervised Metric Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="weakly_supervised.html" class="btn btn-neutral float-left" title="3. Weakly Supervised Metric Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -228,11 +238,19 @@ It can be used for ZCA whitening of the data (see the Wikipedia page of
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -244,27 +262,16 @@ It can be used for ZCA whitening of the data (see the Wikipedia page of
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

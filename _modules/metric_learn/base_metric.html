@@ -1,53 +1,61 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.base_metric &mdash; metric-learn 0.5.0 documentation</title>
+  <title>metric_learn.base_metric &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
 
   
-  <script src="../../_static/js/modernizr.min.js"></script>
+  
+  
+  
 
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="../../index.html" class="icon icon-home"> metric-learn
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -57,7 +65,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -74,6 +82,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -97,6 +106,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -135,7 +145,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -159,18 +169,16 @@
 <span class="sd">Base module.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">BaseEstimator</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="k">import</span> <span class="n">stable_cumsum</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">_is_arraylike</span><span class="p">,</span> <span class="n">check_is_fitted</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">roc_curve</span><span class="p">,</span> <span class="n">precision_recall_curve</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.extmath</span> <span class="kn">import</span> <span class="n">stable_cumsum</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">_is_arraylike</span><span class="p">,</span> <span class="n">check_is_fitted</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">roc_curve</span><span class="p">,</span> <span class="n">precision_recall_curve</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">import</span> <span class="nn">six</span>
-<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">ArrayIndexer</span><span class="p">,</span> <span class="n">check_input</span><span class="p">,</span> <span class="n">validate_vector</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="kn">import</span> <span class="n">ArrayIndexer</span><span class="p">,</span> <span class="n">check_input</span><span class="p">,</span> <span class="n">validate_vector</span>
 
 
-<div class="viewcode-block" id="BaseMetricLearner"><a class="viewcode-back" href="../../generated/metric_learn.base_metric.BaseMetricLearner.html#metric_learn.BaseMetricLearner">[docs]</a><span class="k">class</span> <span class="nc">BaseMetricLearner</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">)):</span>
+<div class="viewcode-block" id="BaseMetricLearner"><a class="viewcode-back" href="../../generated/metric_learn.base_metric.BaseMetricLearner.html#metric_learn.BaseMetricLearner">[docs]</a><span class="k">class</span> <span class="nc">BaseMetricLearner</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">  Base class for all metric-learners.</span>
 
@@ -181,7 +189,7 @@
 <span class="sd">    tuples will be gotten like this: X[indices].</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="BaseMetricLearner.__init__"><a class="viewcode-back" href="../../generated/metric_learn.base_metric.BaseMetricLearner.html#metric_learn.BaseMetricLearner.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseMetricLearner.__init__"><a class="viewcode-back" href="../../generated/metric_learn.base_metric.BaseMetricLearner.html#metric_learn.BaseMetricLearner.__init__">[docs]</a>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">preprocessor</span> <span class="o">=</span> <span class="n">preprocessor</span></div>
 
 <div class="viewcode-block" id="BaseMetricLearner.score_pairs"><a class="viewcode-back" href="../../generated/metric_learn.base_metric.BaseMetricLearner.html#metric_learn.BaseMetricLearner.score_pairs">[docs]</a>  <span class="nd">@abstractmethod</span>
@@ -196,7 +204,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    scores: `numpy.ndarray` of shape=(n_pairs,)</span>
+<span class="sd">    scores : `numpy.ndarray` of shape=(n_pairs,)</span>
 <span class="sd">      The score of every pair.</span>
 
 <span class="sd">    See Also</span>
@@ -226,19 +234,19 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    input: array-like</span>
+<span class="sd">    X : array-like</span>
 <span class="sd">      The input data array to check.</span>
 
 <span class="sd">    y : array-like</span>
 <span class="sd">      The input labels array to check.</span>
 
-<span class="sd">    type_of_inputs: `str` {&#39;classic&#39;, &#39;tuples&#39;}</span>
+<span class="sd">    type_of_inputs : `str` {&#39;classic&#39;, &#39;tuples&#39;}</span>
 <span class="sd">      The type of inputs to check. If &#39;classic&#39;, the input should be</span>
 <span class="sd">      a 2D array-like of points or a 1D array like of indicators of points. If</span>
 <span class="sd">      &#39;tuples&#39;, the input should be a 3D array-like of tuples or a 2D</span>
 <span class="sd">      array-like of indicators of tuples.</span>
 
-<span class="sd">    **kwargs: dict</span>
+<span class="sd">    **kwargs : dict</span>
 <span class="sd">      Arguments to pass to check_input.</span>
 
 <span class="sd">    Returns</span>
@@ -246,10 +254,12 @@
 <span class="sd">    X : `numpy.ndarray`</span>
 <span class="sd">      The checked input data array.</span>
 
-<span class="sd">    y: `numpy.ndarray` (optional)</span>
+<span class="sd">    y : `numpy.ndarray` (optional)</span>
 <span class="sd">      The checked input labels array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_check_preprocessor</span><span class="p">()</span>
+
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;preprocessor_&#39;</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">check_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
                        <span class="n">type_of_inputs</span><span class="o">=</span><span class="n">type_of_inputs</span><span class="p">,</span>
                        <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
@@ -300,7 +310,7 @@
 <span class="sd">    &quot;&quot;&quot;</span></div></div>
 
 
-<span class="k">class</span> <span class="nc">MetricTransformer</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">)):</span>
+<span class="k">class</span> <span class="nc">MetricTransformer</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
 
   <span class="nd">@abstractmethod</span>
   <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
@@ -309,17 +319,17 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    X : (n x d) matrix</span>
-<span class="sd">        Data to transform.</span>
+<span class="sd">      Data to transform.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    transformed : (n x d) matrix</span>
-<span class="sd">        Input data transformed to the metric space by :math:`XL^{\\top}`</span>
+<span class="sd">      Input data transformed to the metric space by :math:`XL^{\\top}`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">MahalanobisMixin</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="n">BaseMetricLearner</span><span class="p">,</span>
-                                          <span class="n">MetricTransformer</span><span class="p">)):</span>
+<span class="k">class</span> <span class="nc">MahalanobisMixin</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">,</span> <span class="n">MetricTransformer</span><span class="p">,</span>
+                       <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
   <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mahalanobis metric learning algorithms.</span>
 
 <span class="sd">  Algorithm that learns a Mahalanobis (pseudo) distance :math:`d_M(x, x&#39;)`,</span>
@@ -335,7 +345,7 @@
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  components_ : `numpy.ndarray`, shape=(n_components, n_features)</span>
-<span class="sd">      The learned linear transformation ``L``.</span>
+<span class="sd">    The learned linear transformation ``L``.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="k">def</span> <span class="nf">score_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">):</span>
@@ -358,7 +368,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    scores: `numpy.ndarray` of shape=(n_pairs,)</span>
+<span class="sd">    scores : `numpy.ndarray` of shape=(n_pairs,)</span>
 <span class="sd">      The learned Mahalanobis distance for every pair.</span>
 
 <span class="sd">    See Also</span>
@@ -372,6 +382,7 @@
 <span class="sd">    :ref:`mahalanobis_distances` : The section of the project documentation</span>
 <span class="sd">      that describes Mahalanobis Distances.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;preprocessor_&#39;</span><span class="p">])</span>
     <span class="n">pairs</span> <span class="o">=</span> <span class="n">check_input</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;tuples&#39;</span><span class="p">,</span>
                         <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
                         <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuple_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -397,12 +408,14 @@
 <span class="sd">    X_embedded : `numpy.ndarray`, shape=(n_samples, n_components)</span>
 <span class="sd">      The embedded data points.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;preprocessor_&#39;</span><span class="p">,</span> <span class="s1">&#39;components_&#39;</span><span class="p">])</span>
     <span class="n">X_checked</span> <span class="o">=</span> <span class="n">check_input</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;classic&#39;</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
                             <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
                             <span class="n">accept_sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">X_checked</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">get_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;components_&#39;</span><span class="p">)</span>
     <span class="n">components_T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">metric_fun</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">squared</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -423,7 +436,7 @@
 
 <span class="sd">      Returns</span>
 <span class="sd">      -------</span>
-<span class="sd">      distance: float</span>
+<span class="sd">      distance : float</span>
 <span class="sd">        The distance between u and v according to the new metric.</span>
 <span class="sd">      &quot;&quot;&quot;</span>
       <span class="n">u</span> <span class="o">=</span> <span class="n">validate_vector</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
@@ -438,15 +451,6 @@
 
   <span class="n">get_metric</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">BaseMetricLearner</span><span class="o">.</span><span class="n">get_metric</span><span class="o">.</span><span class="vm">__doc__</span>
 
-  <span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Deprecated. Will be removed in v0.6.0. Use `get_mahalanobis_matrix`</span>
-<span class="sd">    instead&quot;&quot;&quot;</span>
-    <span class="c1"># TODO: remove this method in version 0.6.0</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;`metric` is deprecated since version 0.5.0 and will be &quot;</span>
-                   <span class="s2">&quot;removed in 0.6.0. Use `get_mahalanobis_matrix` instead.&quot;</span><span class="p">),</span>
-                  <span class="ne">DeprecationWarning</span><span class="p">)</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mahalanobis_matrix</span><span class="p">()</span>
-
   <span class="k">def</span> <span class="nf">get_mahalanobis_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns a copy of the Mahalanobis matrix learned by the metric learner.</span>
 
@@ -455,6 +459,7 @@
 <span class="sd">    M : `numpy.ndarray`, shape=(n_features, n_features)</span>
 <span class="sd">      The copy of the learned Mahalanobis matrix.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;components_&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components_</span><span class="p">)</span>
 
 
@@ -464,9 +469,9 @@
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  threshold_ : `float`</span>
-<span class="sd">      If the distance metric between two points is lower than this threshold,</span>
-<span class="sd">      points will be classified as similar, otherwise they will be</span>
-<span class="sd">      classified as dissimilar.</span>
+<span class="sd">    If the distance metric between two points is lower than this threshold,</span>
+<span class="sd">    points will be classified as similar, otherwise they will be</span>
+<span class="sd">    classified as dissimilar.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="n">_tuple_size</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># number of points in a tuple, 2 for pairs</span>
@@ -490,7 +495,12 @@
 <span class="sd">    y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)</span>
 <span class="sd">      The predicted learned metric value between samples in every pair.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;threshold_&#39;</span><span class="p">,</span> <span class="s1">&#39;components_&#39;</span><span class="p">])</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;preprocessor_&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;threshold_&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;A threshold for this estimator has not been set, &quot;</span>
+             <span class="s2">&quot;call its set_threshold or calibrate_threshold method.&quot;</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span></div>
 
 <div class="viewcode-block" id="_PairsClassifierMixin.decision_function"><a class="viewcode-back" href="../../generated/metric_learn.base_metric._PairsClassifierMixin.html#metric_learn._PairsClassifierMixin.decision_function">[docs]</a>  <span class="k">def</span> <span class="nf">decision_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">):</span>
@@ -514,6 +524,7 @@
 <span class="sd">    y_predicted : `numpy.ndarray` of floats, shape=(n_constraints,)</span>
 <span class="sd">      The predicted decision function value for each pair.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;preprocessor_&#39;</span><span class="p">)</span>
     <span class="n">pairs</span> <span class="o">=</span> <span class="n">check_input</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;tuples&#39;</span><span class="p">,</span>
                         <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
                         <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuple_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tuple_size</span><span class="p">)</span>
@@ -564,6 +575,8 @@
 <span class="sd">    self : `_PairsClassifier`</span>
 <span class="sd">      The pairs classifier with the new threshold set.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;preprocessor_&#39;</span><span class="p">)</span>
+
     <span class="bp">self</span><span class="o">.</span><span class="n">threshold_</span> <span class="o">=</span> <span class="n">threshold</span>
     <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -626,6 +639,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    sklearn.calibration : scikit-learn&#39;s module for calibrating classifiers</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;preprocessor_&#39;</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_validate_calibration_params</span><span class="p">(</span><span class="n">strategy</span><span class="p">,</span> <span class="n">min_rate</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
 
@@ -731,6 +745,90 @@
                          <span class="s1">&#39;Got </span><span class="si">{}</span><span class="s1"> instead.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">beta</span><span class="p">)))</span></div>
 
 
+<div class="viewcode-block" id="_TripletsClassifierMixin"><a class="viewcode-back" href="../../generated/metric_learn.base_metric._TripletsClassifierMixin.html#metric_learn._TripletsClassifierMixin">[docs]</a><span class="k">class</span> <span class="nc">_TripletsClassifierMixin</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Base class for triplets learners.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">_tuple_size</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># number of points in a tuple, 3 for triplets</span>
+
+<div class="viewcode-block" id="_TripletsClassifierMixin.predict"><a class="viewcode-back" href="../../generated/metric_learn.base_metric._TripletsClassifierMixin.html#metric_learn._TripletsClassifierMixin.predict">[docs]</a>  <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">triplets</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Predicts the ordering between sample distances in input triplets.</span>
+
+<span class="sd">    For each triplets, returns 1 if the first element is closer to the second</span>
+<span class="sd">    than to the last and -1 if not.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    triplets : array-like, shape=(n_triplets, 3, n_features) or (n_triplets, 3)</span>
+<span class="sd">      3D array of triplets to predict, with each row corresponding to three</span>
+<span class="sd">      points, or 2D array of indices of triplets if the metric learner</span>
+<span class="sd">      uses a preprocessor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    prediction : `numpy.ndarray` of floats, shape=(n_constraints,)</span>
+<span class="sd">      Predictions of the ordering of pairs, for each triplet.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">triplets</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="_TripletsClassifierMixin.decision_function"><a class="viewcode-back" href="../../generated/metric_learn.base_metric._TripletsClassifierMixin.html#metric_learn._TripletsClassifierMixin.decision_function">[docs]</a>  <span class="k">def</span> <span class="nf">decision_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">triplets</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Predicts differences between sample distances in input triplets.</span>
+
+<span class="sd">    For each triplet (X_a, X_b, X_c) in the samples, computes the difference</span>
+<span class="sd">    between the learned distance of the second pair (X_a, X_c) minus the</span>
+<span class="sd">    learned distance of the first pair (X_a, X_b). The higher it is, the more</span>
+<span class="sd">    probable it is that the pairs in the triplets are presented in the right</span>
+<span class="sd">    order, i.e. that the label of the triplet is 1. The lower it is, the more</span>
+<span class="sd">    probable it is that the label of the triplet is -1.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    triplet : array-like, shape=(n_triplets, 3, n_features) or \</span>
+<span class="sd">                  (n_triplets, 3)</span>
+<span class="sd">      3D array of triplets to predict, with each row corresponding to three</span>
+<span class="sd">      points, or 2D array of indices of triplets if the metric learner</span>
+<span class="sd">      uses a preprocessor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)</span>
+<span class="sd">      Metric differences.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;preprocessor_&#39;</span><span class="p">)</span>
+    <span class="n">triplets</span> <span class="o">=</span> <span class="n">check_input</span><span class="p">(</span><span class="n">triplets</span><span class="p">,</span> <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;tuples&#39;</span><span class="p">,</span>
+                           <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
+                           <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuple_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tuple_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">score_pairs</span><span class="p">(</span><span class="n">triplets</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span> <span class="o">-</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score_pairs</span><span class="p">(</span><span class="n">triplets</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="_TripletsClassifierMixin.score"><a class="viewcode-back" href="../../generated/metric_learn.base_metric._TripletsClassifierMixin.html#metric_learn._TripletsClassifierMixin.score">[docs]</a>  <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">triplets</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes score on input triplets.</span>
+
+<span class="sd">    Returns the accuracy score of the following classification task: a triplet</span>
+<span class="sd">    (X_a, X_b, X_c) is correctly classified if the predicted similarity between</span>
+<span class="sd">    the first pair (X_a, X_b) is higher than that of the second pair (X_a, X_c)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    triplets : array-like, shape=(n_triplets, 3, n_features) or \</span>
+<span class="sd">                  (n_triplets, 3)</span>
+<span class="sd">      3D array of triplets to score, with each row corresponding to three</span>
+<span class="sd">      points, or 2D array of indices of triplets if the metric learner</span>
+<span class="sd">      uses a preprocessor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    score : float</span>
+<span class="sd">      The triplets score.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Since the prediction is a vector of values in {-1, +1}, we need to</span>
+    <span class="c1"># rescale them to {0, 1} to compute the accuracy using the mean (because</span>
+    <span class="c1"># then 1 means a correctly classified result (pairs are in the right</span>
+    <span class="c1"># order), and a 0 an incorrectly classified result (pairs are in the</span>
+    <span class="c1"># wrong order).</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">triplets</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span></div></div>
+
+
 <div class="viewcode-block" id="_QuadrupletsClassifierMixin"><a class="viewcode-back" href="../../generated/metric_learn.base_metric._QuadrupletsClassifierMixin.html#metric_learn._QuadrupletsClassifierMixin">[docs]</a><span class="k">class</span> <span class="nc">_QuadrupletsClassifierMixin</span><span class="p">(</span><span class="n">BaseMetricLearner</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;Base class for quadruplets learners.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
@@ -756,10 +854,6 @@
 <span class="sd">    prediction : `numpy.ndarray` of floats, shape=(n_constraints,)</span>
 <span class="sd">      Predictions of the ordering of pairs, for each quadruplet.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;components_&#39;</span><span class="p">)</span>
-    <span class="n">quadruplets</span> <span class="o">=</span> <span class="n">check_input</span><span class="p">(</span><span class="n">quadruplets</span><span class="p">,</span> <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;tuples&#39;</span><span class="p">,</span>
-                              <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
-                              <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuple_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tuple_size</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">quadruplets</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="_QuadrupletsClassifierMixin.decision_function"><a class="viewcode-back" href="../../generated/metric_learn.base_metric._QuadrupletsClassifierMixin.html#metric_learn._QuadrupletsClassifierMixin.decision_function">[docs]</a>  <span class="k">def</span> <span class="nf">decision_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quadruplets</span><span class="p">):</span>
@@ -785,6 +879,7 @@
 <span class="sd">    decision_function : `numpy.ndarray` of floats, shape=(n_constraints,)</span>
 <span class="sd">      Metric differences.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;preprocessor_&#39;</span><span class="p">)</span>
     <span class="n">quadruplets</span> <span class="o">=</span> <span class="n">check_input</span><span class="p">(</span><span class="n">quadruplets</span><span class="p">,</span> <span class="n">type_of_inputs</span><span class="o">=</span><span class="s1">&#39;tuples&#39;</span><span class="p">,</span>
                               <span class="n">preprocessor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessor_</span><span class="p">,</span>
                               <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">tuple_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tuple_size</span><span class="p">)</span>
@@ -829,11 +924,19 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -845,27 +948,16 @@
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

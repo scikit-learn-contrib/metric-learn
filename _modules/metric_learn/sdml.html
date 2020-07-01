@@ -1,53 +1,61 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.sdml &mdash; metric-learn 0.5.0 documentation</title>
+  <title>metric_learn.sdml &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
 
   
-  <script src="../../_static/js/modernizr.min.js"></script>
+  
+  
+  
 
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="../../index.html" class="icon icon-home"> metric-learn
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -57,7 +65,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -74,6 +82,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -97,6 +106,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -135,7 +145,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -159,19 +169,18 @@
 <span class="sd">Sparse High-Dimensional Metric Learning (SDML)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
-<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="k">import</span> <span class="n">pinvh</span>
-<span class="kn">from</span> <span class="nn">sklearn.covariance</span> <span class="k">import</span> <span class="n">graphical_lasso</span>
-<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="k">import</span> <span class="n">ConvergenceWarning</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">pinvh</span>
+<span class="kn">from</span> <span class="nn">sklearn.covariance</span> <span class="kn">import</span> <span class="n">graphical_lasso</span>
+<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="kn">import</span> <span class="n">ConvergenceWarning</span>
 
-<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">MahalanobisMixin</span><span class="p">,</span> <span class="n">_PairsClassifierMixin</span>
-<span class="kn">from</span> <span class="nn">.constraints</span> <span class="k">import</span> <span class="n">Constraints</span><span class="p">,</span> <span class="n">wrap_pairs</span>
-<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">components_from_metric</span><span class="p">,</span> <span class="n">_initialize_metric_mahalanobis</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="kn">import</span> <span class="n">MahalanobisMixin</span><span class="p">,</span> <span class="n">_PairsClassifierMixin</span>
+<span class="kn">from</span> <span class="nn">.constraints</span> <span class="kn">import</span> <span class="n">Constraints</span><span class="p">,</span> <span class="n">wrap_pairs</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="kn">import</span> <span class="n">components_from_metric</span><span class="p">,</span> <span class="n">_initialize_metric_mahalanobis</span>
 <span class="k">try</span><span class="p">:</span>
-  <span class="kn">from</span> <span class="nn">inverse_covariance</span> <span class="k">import</span> <span class="n">quic</span>
+  <span class="kn">from</span> <span class="nn">inverse_covariance</span> <span class="kn">import</span> <span class="n">quic</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
   <span class="n">HAS_SKGGM</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="k">else</span><span class="p">:</span>
@@ -182,23 +191,17 @@
 
   <span class="n">_tuple_size</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># constraints are pairs</span>
 
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">use_cov</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="s1">&#39;identity&#39;</span><span class="p">,</span>
+               <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">balance_param</span> <span class="o">=</span> <span class="n">balance_param</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">sparsity_param</span> <span class="o">=</span> <span class="n">sparsity_param</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">prior</span> <span class="o">=</span> <span class="n">prior</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">use_cov</span> <span class="o">=</span> <span class="n">use_cov</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
     <span class="nb">super</span><span class="p">(</span><span class="n">_BaseSDML</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cov</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;use_cov&quot; parameter is not used.&#39;</span>
-                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
-                    <span class="s1">&#39;removed in 0.6.0. Use &quot;prior&quot; instead.&#39;</span><span class="p">,</span>
-                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_SKGGM</span><span class="p">:</span>
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SDML will use scikit-learn&#39;s graphical lasso solver.&quot;</span><span class="p">)</span>
@@ -210,23 +213,8 @@
 
     <span class="c1"># set up (the inverse of) the prior M</span>
     <span class="c1"># if the prior is the default (None), we raise a warning</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="c1"># TODO:</span>
-      <span class="c1">#  replace prior=None by prior=&#39;identity&#39; in v0.6.0 and remove the</span>
-      <span class="c1">#  warning</span>
-      <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Warning, no prior was set (`prior=None`). As of version 0.5.0, &quot;</span>
-             <span class="s2">&quot;the default prior will now be set to &quot;</span>
-             <span class="s2">&quot;&#39;identity&#39;, instead of &#39;covariance&#39;. If you still want to use &quot;</span>
-             <span class="s2">&quot;the inverse of the covariance matrix as a prior, &quot;</span>
-             <span class="s2">&quot;set prior=&#39;covariance&#39;. This warning will disappear in &quot;</span>
-             <span class="s2">&quot;v0.6.0, and `prior` parameter&#39;s default value will be set to &quot;</span>
-             <span class="s2">&quot;&#39;identity&#39;.&quot;</span><span class="p">)</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
-      <span class="n">prior</span> <span class="o">=</span> <span class="s1">&#39;identity&#39;</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">prior_inv</span> <span class="o">=</span> <span class="n">_initialize_metric_mahalanobis</span><span class="p">(</span>
-        <span class="n">pairs</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span>
+        <span class="n">pairs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="p">,</span>
         <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">strict_pd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">matrix_name</span><span class="o">=</span><span class="s1">&#39;prior&#39;</span><span class="p">,</span>
         <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
@@ -299,62 +287,55 @@
 
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
-<span class="sd">  balance_param : float, optional</span>
-<span class="sd">      trade off between sparsity and M0 prior</span>
+<span class="sd">  balance_param : float, optional (default=0.5)</span>
+<span class="sd">    Trade off between sparsity and M0 prior.</span>
 
-<span class="sd">  sparsity_param : float, optional</span>
-<span class="sd">      trade off between optimizer and sparseness (see graph_lasso)</span>
+<span class="sd">  sparsity_param : float, optional  (default=0.01)</span>
+<span class="sd">    Trade off between optimizer and sparseness (see graph_lasso).</span>
 
-<span class="sd">  prior : None, string or numpy array, optional (default=None)</span>
-<span class="sd">       Prior to set for the metric. Possible options are</span>
-<span class="sd">       &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
-<span class="sd">       shape (n_features, n_features). For SDML, the prior should be strictly</span>
-<span class="sd">       positive definite (PD). If `None`, will be set</span>
-<span class="sd">       automatically to &#39;identity&#39; (this is to raise a warning if</span>
-<span class="sd">       `prior` is not set, and stays to its default value (None), in v0.5.0).</span>
+<span class="sd">  prior : string or numpy array, optional (default=&#39;identity&#39;)</span>
+<span class="sd">    Prior to set for the metric. Possible options are</span>
+<span class="sd">    &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
+<span class="sd">    shape (n_features, n_features). For SDML, the prior should be strictly</span>
+<span class="sd">    positive definite (PD).</span>
 
-<span class="sd">       &#39;identity&#39;</span>
-<span class="sd">          An identity matrix of shape (n_features, n_features).</span>
+<span class="sd">    &#39;identity&#39;</span>
+<span class="sd">      An identity matrix of shape (n_features, n_features).</span>
 
-<span class="sd">       &#39;covariance&#39;</span>
-<span class="sd">          The inverse covariance matrix.</span>
+<span class="sd">    &#39;covariance&#39;</span>
+<span class="sd">      The inverse covariance matrix.</span>
 
-<span class="sd">       &#39;random&#39;</span>
-<span class="sd">          The prior will be a random positive definite (PD) matrix of shape</span>
-<span class="sd">          `(n_features, n_features)`, generated using</span>
-<span class="sd">          `sklearn.datasets.make_spd_matrix`.</span>
+<span class="sd">    &#39;random&#39;</span>
+<span class="sd">      The prior will be a random positive definite (PD) matrix of shape</span>
+<span class="sd">      `(n_features, n_features)`, generated using</span>
+<span class="sd">      `sklearn.datasets.make_spd_matrix`.</span>
 
-<span class="sd">       numpy array</span>
-<span class="sd">           A positive definite (PD) matrix of shape</span>
-<span class="sd">           (n_features, n_features), that will be used as such to set the</span>
-<span class="sd">           prior.</span>
-
-<span class="sd">  use_cov : Not used.</span>
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `A0` was deprecated in version 0.5.0 and will</span>
-<span class="sd">        be removed in 0.6.0. Use &#39;prior&#39; instead.</span>
+<span class="sd">    numpy array</span>
+<span class="sd">      A positive definite (PD) matrix of shape</span>
+<span class="sd">      (n_features, n_features), that will be used as such to set the</span>
+<span class="sd">      prior.</span>
 
 <span class="sd">  verbose : bool, optional (default=False)</span>
-<span class="sd">      if True, prints information while learning</span>
+<span class="sd">    If True, prints information while learning.</span>
 
 <span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
-<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
-<span class="sd">      tuples will be gotten like this: X[indices].</span>
+<span class="sd">    The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">    tuples will be gotten like this: X[indices].</span>
 
 <span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
-<span class="sd">      A pseudo random number generator object or a seed for it if int. If</span>
-<span class="sd">      ``prior=&#39;random&#39;``, ``random_state`` is used to set the prior.</span>
+<span class="sd">    A pseudo random number generator object or a seed for it if int. If</span>
+<span class="sd">    ``prior=&#39;random&#39;``, ``random_state`` is used to set the prior.</span>
 
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  components_ : `numpy.ndarray`, shape=(n_features, n_features)</span>
-<span class="sd">      The linear transformation ``L`` deduced from the learned Mahalanobis</span>
-<span class="sd">      metric (See function `components_from_metric`.)</span>
+<span class="sd">    The linear transformation ``L`` deduced from the learned Mahalanobis</span>
+<span class="sd">    metric (See function `components_from_metric`.)</span>
 
 <span class="sd">  threshold_ : `float`</span>
-<span class="sd">      If the distance metric between two points is lower than this threshold,</span>
-<span class="sd">      points will be classified as similar, otherwise they will be</span>
-<span class="sd">      classified as dissimilar.</span>
+<span class="sd">    If the distance metric between two points is lower than this threshold,</span>
+<span class="sd">    points will be classified as similar, otherwise they will be</span>
+<span class="sd">    classified as dissimilar.</span>
 
 <span class="sd">  Examples</span>
 <span class="sd">  --------</span>
@@ -368,14 +349,12 @@
 
 <span class="sd">  References</span>
 <span class="sd">  ----------</span>
+<span class="sd">  .. [1] Qi et al. `An efficient sparse metric learning in high-dimensional</span>
+<span class="sd">         space via L1-penalized log-determinant regularization</span>
+<span class="sd">         &lt;http://www.machinelearning.org/archive/icml2009/papers/46.pdf&gt;`_.</span>
+<span class="sd">         ICML 2009.</span>
 
-<span class="sd">  .. [1] Qi et al.</span>
-<span class="sd">         An efficient sparse metric learning in high-dimensional space via</span>
-<span class="sd">         L1-penalized log-determinant regularization. ICML 2009.</span>
-<span class="sd">         http://lms.comp.nus.edu.sg/sites/default/files/publication\</span>
-<span class="sd">-attachments/icml09-guojun.pdf</span>
-
-<span class="sd">  .. [2] Adapted from https://gist.github.com/kcarnold/5439945</span>
+<span class="sd">  .. [2] Code adapted from https://gist.github.com/kcarnold/5439945</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SDML.fit"><a class="viewcode-back" href="../../generated/metric_learn.SDML.html#metric_learn.SDML.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">calibration_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -388,20 +367,22 @@
 <span class="sd">    ----------</span>
 <span class="sd">    pairs : array-like, shape=(n_constraints, 2, n_features) or \</span>
 <span class="sd">           (n_constraints, 2)</span>
-<span class="sd">        3D Array of pairs with each row corresponding to two points,</span>
-<span class="sd">        or 2D array of indices of pairs if the metric learner uses a</span>
-<span class="sd">        preprocessor.</span>
+<span class="sd">      3D Array of pairs with each row corresponding to two points,</span>
+<span class="sd">      or 2D array of indices of pairs if the metric learner uses a</span>
+<span class="sd">      preprocessor.</span>
+
 <span class="sd">    y : array-like, of shape (n_constraints,)</span>
-<span class="sd">        Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.</span>
+<span class="sd">      Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.</span>
+
 <span class="sd">    calibration_params : `dict` or `None`</span>
-<span class="sd">        Dictionary of parameters to give to `calibrate_threshold` for the</span>
-<span class="sd">        threshold calibration step done at the end of `fit`. If `None` is</span>
-<span class="sd">        given, `calibrate_threshold` will use the default parameters.</span>
+<span class="sd">      Dictionary of parameters to give to `calibrate_threshold` for the</span>
+<span class="sd">      threshold calibration step done at the end of `fit`. If `None` is</span>
+<span class="sd">      given, `calibrate_threshold` will use the default parameters.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    self : object</span>
-<span class="sd">        Returns the instance.</span>
+<span class="sd">      Returns the instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">calibration_params</span> <span class="o">=</span> <span class="p">(</span><span class="n">calibration_params</span> <span class="k">if</span> <span class="n">calibration_params</span> <span class="ow">is</span> <span class="ow">not</span>
                           <span class="kc">None</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">())</span>
@@ -421,60 +402,55 @@
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
 <span class="sd">  balance_param : float, optional (default=0.5)</span>
-<span class="sd">      trade off between sparsity and M0 prior</span>
+<span class="sd">    Trade off between sparsity and M0 prior.</span>
+
 <span class="sd">  sparsity_param : float, optional (default=0.01)</span>
-<span class="sd">      trade off between optimizer and sparseness (see graph_lasso)</span>
-<span class="sd">  prior : None, string or numpy array, optional (default=None)</span>
-<span class="sd">       Prior to set for the metric. Possible options are</span>
-<span class="sd">       &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
-<span class="sd">       shape (n_features, n_features). For SDML, the prior should be strictly</span>
-<span class="sd">       positive definite (PD). If `None`, will be set</span>
-<span class="sd">       automatically to &#39;identity&#39; (this is to raise a warning if</span>
-<span class="sd">       `prior` is not set, and stays to its default value (None), in v0.5.0).</span>
+<span class="sd">    Trade off between optimizer and sparseness (see graph_lasso).</span>
 
-<span class="sd">       &#39;identity&#39;</span>
-<span class="sd">          An identity matrix of shape (n_features, n_features).</span>
+<span class="sd">  prior : string or numpy array, optional (default=&#39;identity&#39;)</span>
+<span class="sd">    Prior to set for the metric. Possible options are</span>
+<span class="sd">    &#39;identity&#39;, &#39;covariance&#39;, &#39;random&#39;, and a numpy array of</span>
+<span class="sd">    shape (n_features, n_features). For SDML, the prior should be strictly</span>
+<span class="sd">    positive definite (PD).</span>
 
-<span class="sd">       &#39;covariance&#39;</span>
-<span class="sd">          The inverse covariance matrix.</span>
+<span class="sd">    &#39;identity&#39;</span>
+<span class="sd">      An identity matrix of shape (n_features, n_features).</span>
 
-<span class="sd">       &#39;random&#39;</span>
-<span class="sd">          The prior will be a random SPD matrix of shape</span>
-<span class="sd">          `(n_features, n_features)`, generated using</span>
-<span class="sd">          `sklearn.datasets.make_spd_matrix`.</span>
+<span class="sd">    &#39;covariance&#39;</span>
+<span class="sd">      The inverse covariance matrix.</span>
 
-<span class="sd">       numpy array</span>
-<span class="sd">           A positive definite (PD) matrix of shape</span>
-<span class="sd">           (n_features, n_features), that will be used as such to set the</span>
-<span class="sd">           prior.</span>
+<span class="sd">    &#39;random&#39;</span>
+<span class="sd">      The prior will be a random SPD matrix of shape</span>
+<span class="sd">      `(n_features, n_features)`, generated using</span>
+<span class="sd">      `sklearn.datasets.make_spd_matrix`.</span>
 
-<span class="sd">  use_cov : Not used.</span>
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `A0` was deprecated in version 0.5.0 and will</span>
-<span class="sd">        be removed in 0.6.0. Use &#39;prior&#39; instead.</span>
+<span class="sd">    numpy array</span>
+<span class="sd">      A positive definite (PD) matrix of shape</span>
+<span class="sd">      (n_features, n_features), that will be used as such to set the</span>
+<span class="sd">      prior.</span>
 
-<span class="sd">  num_labeled : Not used</span>
-<span class="sd">    .. deprecated:: 0.5.0</span>
-<span class="sd">       `num_labeled` was deprecated in version 0.5.0 and will</span>
-<span class="sd">       be removed in 0.6.0.</span>
 <span class="sd">  num_constraints : int, optional (default=None)</span>
-<span class="sd">      number of constraints to generate</span>
+<span class="sd">    Number of constraints to generate. If None, defaults to `20 *</span>
+<span class="sd">    num_classes**2`.</span>
+
 <span class="sd">  verbose : bool, optional (default=False)</span>
-<span class="sd">      if True, prints information while learning</span>
+<span class="sd">    If True, prints information while learning.</span>
+
 <span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
-<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
-<span class="sd">      tuples will be formed like this: X[indices].</span>
+<span class="sd">    The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">    tuples will be formed like this: X[indices].</span>
+
 <span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
-<span class="sd">      A pseudo random number generator object or a seed for it if int. If</span>
-<span class="sd">      ``init=&#39;random&#39;``, ``random_state`` is used to set the random</span>
-<span class="sd">      prior. In any case, `random_state` is also used to randomly sample</span>
-<span class="sd">      constraints from labels.</span>
+<span class="sd">    A pseudo random number generator object or a seed for it if int. If</span>
+<span class="sd">    ``init=&#39;random&#39;``, ``random_state`` is used to set the random</span>
+<span class="sd">    prior. In any case, `random_state` is also used to randomly sample</span>
+<span class="sd">    constraints from labels.</span>
 
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  components_ : `numpy.ndarray`, shape=(n_features, n_features)</span>
-<span class="sd">      The linear transformation ``L`` deduced from the learned Mahalanobis</span>
-<span class="sd">      metric (See function `components_from_metric`.)</span>
+<span class="sd">    The linear transformation ``L`` deduced from the learned Mahalanobis</span>
+<span class="sd">    metric (See function `components_from_metric`.)</span>
 
 <span class="sd">  See Also</span>
 <span class="sd">  --------</span>
@@ -483,53 +459,31 @@
 <span class="sd">    that describes the supervised version of weakly supervised estimators.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SDML_Supervised.__init__"><a class="viewcode-back" href="../../generated/metric_learn.SDML_Supervised.html#metric_learn.SDML_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">use_cov</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">num_labeled</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="SDML_Supervised.__init__"><a class="viewcode-back" href="../../generated/metric_learn.SDML_Supervised.html#metric_learn.SDML_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sparsity_param</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="s1">&#39;identity&#39;</span><span class="p">,</span>
                <span class="n">num_constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">_BaseSDML</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">balance_param</span><span class="o">=</span><span class="n">balance_param</span><span class="p">,</span>
                        <span class="n">sparsity_param</span><span class="o">=</span><span class="n">sparsity_param</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span>
-                       <span class="n">use_cov</span><span class="o">=</span><span class="n">use_cov</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                       <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
                        <span class="n">preprocessor</span><span class="o">=</span><span class="n">preprocessor</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">num_labeled</span> <span class="o">=</span> <span class="n">num_labeled</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_constraints</span> <span class="o">=</span> <span class="n">num_constraints</span></div>
 
-<div class="viewcode-block" id="SDML_Supervised.fit"><a class="viewcode-back" href="../../generated/metric_learn.SDML_Supervised.html#metric_learn.SDML_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="SDML_Supervised.fit"><a class="viewcode-back" href="../../generated/metric_learn.SDML_Supervised.html#metric_learn.SDML_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create constraints from labels and learn the SDML model.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    X : array-like, shape (n, d)</span>
-<span class="sd">        data matrix, where each row corresponds to a single instance</span>
+<span class="sd">      data matrix, where each row corresponds to a single instance</span>
+
 <span class="sd">    y : array-like, shape (n,)</span>
-<span class="sd">        data labels, one for each instance</span>
-<span class="sd">    random_state : Not used</span>
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `random_state` in the `fit` function was deprecated in version 0.5.0</span>
-<span class="sd">        and will be removed in 0.6.0. Set `random_state` at initialization</span>
-<span class="sd">        instead (when instantiating a new `SDML_Supervised` object).</span>
+<span class="sd">      data labels, one for each instance</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    self : object</span>
-<span class="sd">        Returns the instance.</span>
+<span class="sd">      Returns the instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_labeled</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_labeled&quot; parameter is not used.&#39;</span>
-                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
-                    <span class="s1">&#39; removed in 0.6.0&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">random_state</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;random_state&quot; parameter in the `fit` function is &#39;</span>
-                    <span class="s1">&#39;deprecated. Set `random_state` at initialization &#39;</span>
-                    <span class="s1">&#39;instead (when instantiating a new `SDML_Supervised` &#39;</span>
-                    <span class="s1">&#39;object).&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;As of v0.5.0, `SDML_Supervised` now uses the &#39;</span>
-                    <span class="s1">&#39;`random_state` given at initialization to sample &#39;</span>
-                    <span class="s1">&#39;constraints, not the default `np.random` from the `fit` &#39;</span>
-                    <span class="s1">&#39;method, since this argument is now deprecated. &#39;</span>
-                    <span class="s1">&#39;This warning will disappear in v0.6.0.&#39;</span><span class="p">,</span>
-                    <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
     <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">num_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_constraints</span>
     <span class="k">if</span> <span class="n">num_constraints</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -553,11 +507,19 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -569,27 +531,16 @@
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

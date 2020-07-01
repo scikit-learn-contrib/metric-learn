@@ -1,53 +1,61 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.rca &mdash; metric-learn 0.5.0 documentation</title>
+  <title>metric_learn.rca &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
 
   
-  <script src="../../_static/js/modernizr.min.js"></script>
+  
+  
+  
 
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="../../index.html" class="icon icon-home"> metric-learn
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -57,7 +65,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -74,6 +82,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -97,6 +106,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -135,7 +145,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -159,16 +169,13 @@
 <span class="sd">Relative Components Analysis (RCA)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
-<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="k">import</span> <span class="n">ChangedBehaviorWarning</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span>
 
-<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">_check_n_components</span>
-<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">MahalanobisMixin</span>
-<span class="kn">from</span> <span class="nn">.constraints</span> <span class="k">import</span> <span class="n">Constraints</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="kn">import</span> <span class="n">_check_n_components</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="kn">import</span> <span class="n">MahalanobisMixin</span>
+<span class="kn">from</span> <span class="nn">.constraints</span> <span class="kn">import</span> <span class="n">Constraints</span>
 
 
 <span class="c1"># mean center each chunklet separately</span>
@@ -179,7 +186,7 @@
   <span class="c1"># mean on it</span>
   <span class="n">chunk_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
   <span class="n">chunk_labels</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">[</span><span class="n">chunk_mask</span><span class="p">]</span>
-  <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">):</span>
+  <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chunks</span><span class="p">):</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">chunk_labels</span> <span class="o">==</span> <span class="n">c</span>
     <span class="n">chunk_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-=</span> <span class="n">chunk_data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
@@ -200,60 +207,49 @@
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
 <span class="sd">  n_components : int or None, optional (default=None)</span>
-<span class="sd">      Dimensionality of reduced space (if None, defaults to dimension of X).</span>
-
-<span class="sd">  num_dims : Not used</span>
-
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `num_dims` was deprecated in version 0.5.0 and will</span>
-<span class="sd">        be removed in 0.6.0. Use `n_components` instead.</span>
-
-<span class="sd">  pca_comps : Not used</span>
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">      `pca_comps` was deprecated in version 0.5.0 and will</span>
-<span class="sd">      be removed in 0.6.0.</span>
+<span class="sd">    Dimensionality of reduced space (if None, defaults to dimension of X).</span>
 
 <span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
-<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
-<span class="sd">      tuples will be formed like this: X[indices].</span>
+<span class="sd">    The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">    tuples will be formed like this: X[indices].</span>
 
 <span class="sd">  Examples</span>
 <span class="sd">  --------</span>
-<span class="sd">  &gt;&gt;&gt; from metric_learn import RCA_Supervised</span>
-<span class="sd">  &gt;&gt;&gt; from sklearn.datasets import load_iris</span>
-<span class="sd">  &gt;&gt;&gt; iris_data = load_iris()</span>
-<span class="sd">  &gt;&gt;&gt; X = iris_data[&#39;data&#39;]</span>
-<span class="sd">  &gt;&gt;&gt; Y = iris_data[&#39;target&#39;]</span>
-<span class="sd">  &gt;&gt;&gt; rca = RCA_Supervised(num_chunks=30, chunk_size=2)</span>
-<span class="sd">  &gt;&gt;&gt; rca.fit(X, Y)</span>
+<span class="sd">  &gt;&gt;&gt; from metric_learn import RCA</span>
+<span class="sd">  &gt;&gt;&gt; X = [[-0.05,  3.0],[0.05, -3.0],</span>
+<span class="sd">  &gt;&gt;&gt;     [0.1, -3.55],[-0.1, 3.55],</span>
+<span class="sd">  &gt;&gt;&gt;     [-0.95, -0.05],[0.95, 0.05],</span>
+<span class="sd">  &gt;&gt;&gt;     [0.4,  0.05],[-0.4, -0.05]]</span>
+<span class="sd">  &gt;&gt;&gt; chunks = [0, 0, 1, 1, 2, 2, 3, 3]</span>
+<span class="sd">  &gt;&gt;&gt; rca = RCA()</span>
+<span class="sd">  &gt;&gt;&gt; rca.fit(X, chunks)</span>
 
 <span class="sd">  References</span>
 <span class="sd">  ------------------</span>
-<span class="sd">  .. [1] `Adjustment learning and relevant component analysis</span>
-<span class="sd">         &lt;http://citeseerx.ist.\</span>
-<span class="sd">psu.edu/viewdoc/download?doi=10.1.1.19.2871&amp;rep=rep1&amp;type=pdf&gt;`_ Noam</span>
-<span class="sd">         Shental, et al.</span>
+<span class="sd">  .. [1] Noam Shental, et al. `Adjustment learning and relevant component</span>
+<span class="sd">         analysis &lt;http://citeseerx.ist.\</span>
+<span class="sd">         psu.edu/viewdoc/download?doi=10.1.1.19.2871&amp;rep=rep1&amp;type=pdf&gt;`_ .</span>
+<span class="sd">         ECCV 2002.</span>
 
 
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  components_ : `numpy.ndarray`, shape=(n_components, n_features)</span>
-<span class="sd">      The learned linear transformation ``L``.</span>
+<span class="sd">    The learned linear transformation ``L``.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RCA.__init__"><a class="viewcode-back" href="../../generated/metric_learn.RCA.html#metric_learn.RCA.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span>
-               <span class="n">pca_comps</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="RCA.__init__"><a class="viewcode-back" href="../../generated/metric_learn.RCA.html#metric_learn.RCA.__init__">[docs]</a>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">=</span> <span class="n">num_dims</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">pca_comps</span> <span class="o">=</span> <span class="n">pca_comps</span>
     <span class="nb">super</span><span class="p">(</span><span class="n">RCA</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span></div>
 
   <span class="k">def</span> <span class="nf">_check_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
     <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
       <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;The inner covariance matrix is not invertible, &#39;</span>
                     <span class="s1">&#39;so the transformation matrix may contain Nan values. &#39;</span>
-                    <span class="s1">&#39;You should reduce the dimensionality of your input,&#39;</span>
+                    <span class="s1">&#39;You should remove any linearly dependent features and/or &#39;</span>
+                    <span class="s1">&#39;reduce the dimensionality of your input, &#39;</span>
                     <span class="s1">&#39;for instance using `sklearn.decomposition.PCA` as a &#39;</span>
                     <span class="s1">&#39;preprocessing step.&#39;</span><span class="p">)</span>
 
@@ -266,33 +262,13 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : (n x d) data matrix</span>
-<span class="sd">        Each row corresponds to a single instance</span>
+<span class="sd">      Each row corresponds to a single instance</span>
+
 <span class="sd">    chunks : (n,) array of ints</span>
-<span class="sd">        When ``chunks[i] == -1``, point i doesn&#39;t belong to any chunklet.</span>
-<span class="sd">        When ``chunks[i] == j``, point i belongs to chunklet j.</span>
+<span class="sd">      When ``chunks[i] == -1``, point i doesn&#39;t belong to any chunklet.</span>
+<span class="sd">      When ``chunks[i] == j``, point i belongs to chunklet j.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_dims&quot; parameter is not used.&#39;</span>
-                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
-                    <span class="s1">&#39; removed in 0.6.0. Use &quot;n_components&quot; instead&#39;</span><span class="p">,</span>
-                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pca_comps</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-          <span class="s1">&#39;&quot;pca_comps&quot; parameter is not used. &#39;</span>
-          <span class="s1">&#39;It has been deprecated in version 0.5.0 and will be&#39;</span>
-          <span class="s1">&#39;removed in 0.6.0. RCA will not do PCA preprocessing anymore. If &#39;</span>
-          <span class="s1">&#39;you still want to do it, you could use &#39;</span>
-          <span class="s1">&#39;`sklearn.decomposition.PCA` and an `sklearn.pipeline.Pipeline`.&#39;</span><span class="p">,</span>
-          <span class="ne">DeprecationWarning</span><span class="p">)</span>
-
     <span class="n">X</span><span class="p">,</span> <span class="n">chunks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-        <span class="s2">&quot;RCA will no longer center the data before training. If you want &quot;</span>
-        <span class="s2">&quot;to do some preprocessing, you should do it manually (you can also &quot;</span>
-        <span class="s2">&quot;use an `sklearn.pipeline.Pipeline` for instance). This warning &quot;</span>
-        <span class="s2">&quot;will disappear in version 0.6.0.&quot;</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
 
     <span class="n">chunks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">chunk_mask</span><span class="p">,</span> <span class="n">chunked_data</span> <span class="o">=</span> <span class="n">_chunk_mean_centering</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span>
@@ -331,73 +307,70 @@
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
 <span class="sd">  n_components : int or None, optional (default=None)</span>
-<span class="sd">      Dimensionality of reduced space (if None, defaults to dimension of X).</span>
+<span class="sd">    Dimensionality of reduced space (if None, defaults to dimension of X).</span>
 
-<span class="sd">  num_dims : Not used</span>
+<span class="sd">  num_chunks: int, optional (default=100)</span>
+<span class="sd">    Number of chunks to generate.</span>
 
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `num_dims` was deprecated in version 0.5.0 and will</span>
-<span class="sd">        be removed in 0.6.0. Use `n_components` instead.</span>
-
-<span class="sd">  num_chunks: int, optional</span>
-
-<span class="sd">  chunk_size: int, optional</span>
+<span class="sd">  chunk_size: int, optional (default=2)</span>
+<span class="sd">    Number of points per chunk.</span>
 
 <span class="sd">  preprocessor : array-like, shape=(n_samples, n_features) or callable</span>
-<span class="sd">      The preprocessor to call to get tuples from indices. If array-like,</span>
-<span class="sd">      tuples will be formed like this: X[indices].</span>
+<span class="sd">    The preprocessor to call to get tuples from indices. If array-like,</span>
+<span class="sd">    tuples will be formed like this: X[indices].</span>
 
 <span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
-<span class="sd">      A pseudo random number generator object or a seed for it if int.</span>
-<span class="sd">      It is used to randomly sample constraints from labels.</span>
+<span class="sd">    A pseudo random number generator object or a seed for it if int.</span>
+<span class="sd">    It is used to randomly sample constraints from labels.</span>
+
+<span class="sd">  Examples</span>
+<span class="sd">  --------</span>
+<span class="sd">  &gt;&gt;&gt; from metric_learn import RCA_Supervised</span>
+<span class="sd">  &gt;&gt;&gt; from sklearn.datasets import load_iris</span>
+<span class="sd">  &gt;&gt;&gt; iris_data = load_iris()</span>
+<span class="sd">  &gt;&gt;&gt; X = iris_data[&#39;data&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; Y = iris_data[&#39;target&#39;]</span>
+<span class="sd">  &gt;&gt;&gt; rca = RCA_Supervised(num_chunks=30, chunk_size=2)</span>
+<span class="sd">  &gt;&gt;&gt; rca.fit(X, Y)</span>
 
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  components_ : `numpy.ndarray`, shape=(n_components, n_features)</span>
-<span class="sd">      The learned linear transformation ``L``.</span>
+<span class="sd">    The learned linear transformation ``L``.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RCA_Supervised.__init__"><a class="viewcode-back" href="../../generated/metric_learn.RCA_Supervised.html#metric_learn.RCA_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">pca_comps</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span> <span class="n">num_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<div class="viewcode-block" id="RCA_Supervised.__init__"><a class="viewcode-back" href="../../generated/metric_learn.RCA_Supervised.html#metric_learn.RCA_Supervised.__init__">[docs]</a>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Initialize the supervised version of `RCA`.&quot;&quot;&quot;</span>
-    <span class="n">RCA</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="n">num_dims</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span>
-                 <span class="n">pca_comps</span><span class="o">=</span><span class="n">pca_comps</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="n">preprocessor</span><span class="p">)</span>
+    <span class="n">RCA</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="n">preprocessor</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">num_chunks</span> <span class="o">=</span> <span class="n">num_chunks</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span> <span class="o">=</span> <span class="n">chunk_size</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span></div>
 
-<div class="viewcode-block" id="RCA_Supervised.fit"><a class="viewcode-back" href="../../generated/metric_learn.RCA_Supervised.html#metric_learn.RCA_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="RCA_Supervised.fit"><a class="viewcode-back" href="../../generated/metric_learn.RCA_Supervised.html#metric_learn.RCA_Supervised.fit">[docs]</a>  <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create constraints from labels and learn the RCA model.</span>
 <span class="sd">    Needs num_constraints specified in constructor.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    X : (n x d) data matrix</span>
-<span class="sd">        each row corresponds to a single instance</span>
+<span class="sd">      each row corresponds to a single instance</span>
+
 <span class="sd">    y : (n) data labels</span>
-<span class="sd">    random_state : Not used</span>
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `random_state` in the `fit` function was deprecated in version 0.5.0</span>
-<span class="sd">        and will be removed in 0.6.0. Set `random_state` at initialization</span>
-<span class="sd">        instead (when instantiating a new `RCA_Supervised` object).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">random_state</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;random_state&quot; parameter in the `fit` function is &#39;</span>
-                    <span class="s1">&#39;deprecated. Set `random_state` at initialization &#39;</span>
-                    <span class="s1">&#39;instead (when instantiating a new `RCA_Supervised` &#39;</span>
-                    <span class="s1">&#39;object).&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;As of v0.5.0, `RCA_Supervised` now uses the &#39;</span>
-                    <span class="s1">&#39;`random_state` given at initialization to sample &#39;</span>
-                    <span class="s1">&#39;constraints, not the default `np.random` from the `fit` &#39;</span>
-                    <span class="s1">&#39;method, since this argument is now deprecated. &#39;</span>
-                    <span class="s1">&#39;This warning will disappear in v0.6.0.&#39;</span><span class="p">,</span>
-                    <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
     <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">chunks</span> <span class="o">=</span> <span class="n">Constraints</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">chunks</span><span class="p">(</span><span class="n">num_chunks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_chunks</span><span class="p">,</span>
                                    <span class="n">chunk_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span><span class="p">,</span>
                                    <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chunks</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Due to the parameters of RCA_Supervised, &#39;</span>
+                    <span class="s1">&#39;the inner covariance matrix is not invertible, &#39;</span>
+                    <span class="s1">&#39;so the transformation matrix will contain Nan values. &#39;</span>
+                    <span class="s1">&#39;Increase the number or size of the chunks to correct &#39;</span>
+                    <span class="s1">&#39;this problem.&#39;</span>
+                    <span class="p">)</span>
+
     <span class="k">return</span> <span class="n">RCA</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span></div></div>
 </pre></div>
 
@@ -411,11 +384,19 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -427,27 +408,16 @@
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

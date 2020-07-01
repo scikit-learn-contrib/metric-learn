@@ -1,53 +1,63 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.base_metric._PairsClassifierMixin &mdash; metric-learn 0.5.0 documentation</title>
+  <title>metric_learn.base_metric._PairsClassifierMixin &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
 
   
-  <script src="../_static/js/modernizr.min.js"></script>
+  
+  
+  
 
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="metric_learn.base_metric._TripletsClassifierMixin" href="metric_learn.base_metric._TripletsClassifierMixin.html" />
+    <link rel="prev" title="metric_learn.base_metric.BaseMetricLearner" href="metric_learn.base_metric.BaseMetricLearner.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="../index.html" class="icon icon-home"> metric-learn
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -74,6 +84,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -91,12 +102,11 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../metric_learn.html">Package Contents</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../metric_learn.html#module-contents">Module Contents</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../metric_learn.html#base-classes">Base Classes</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.Constraints.html"><code class="docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</a></li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.BaseMetricLearner.html"><code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._QuadrupletsClassifierMixin.html"><code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._QuadrupletsClassifierMixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.Constraints.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.BaseMetricLearner.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._TripletsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._TripletsClassifierMixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._QuadrupletsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._QuadrupletsClassifierMixin</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../metric_learn.html#supervised-learning-algorithms">Supervised Learning Algorithms</a></li>
@@ -112,6 +122,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -150,11 +161,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../metric_learn.html">metric_learn package</a> &raquo;</li>
         
-      <li><code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin</li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -175,17 +186,16 @@
             
   <div class="section" id="metric-learn-base-metric-pairsclassifiermixin">
 <h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin<a class="headerlink" href="#metric-learn-base-metric-pairsclassifiermixin" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="metric_learn.base_metric._PairsClassifierMixin">
-<em class="property">class </em><code class="descclassname">metric_learn.base_metric.</code><code class="descname">_PairsClassifierMixin</code><span class="sig-paren">(</span><em>preprocessor=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">metric_learn.base_metric.</code><code class="descname">_PairsClassifierMixin</code><span class="sig-paren">(</span><em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for pairs learners.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>threshold_</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">float</span></code></a></span></dt>
-<dd><p class="first last">If the distance metric between two points is lower than this threshold,
+<dt><strong>threshold_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref any docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>If the distance metric between two points is lower than this threshold,
 points will be classified as similar, otherwise they will be
 classified as dissimilar.</p>
 </dd>
@@ -195,50 +205,50 @@ classified as dissimilar.</p>
 </tbody>
 </table>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table border="1" class="longtable docutils align-default">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.calibrate_threshold" title="metric_learn.base_metric._PairsClassifierMixin.calibrate_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a>(pairs_valid,&nbsp;y_valid[,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.calibrate_threshold" title="metric_learn.base_metric._PairsClassifierMixin.calibrate_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a>(self,&nbsp;pairs_valid,&nbsp;y_valid)</td>
 <td>Decision threshold calibration for pairwise binary classification</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.decision_function" title="metric_learn.base_metric._PairsClassifierMixin.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.decision_function" title="metric_learn.base_metric._PairsClassifierMixin.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(self,&nbsp;pairs)</td>
 <td>Returns the decision function used to classify the pairs.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.get_metric" title="metric_learn.base_metric._PairsClassifierMixin.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.get_metric" title="metric_learn.base_metric._PairsClassifierMixin.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>(self)</td>
 <td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.get_params" title="metric_learn.base_metric._PairsClassifierMixin.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.get_params" title="metric_learn.base_metric._PairsClassifierMixin.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>(self[,&nbsp;deep])</td>
 <td>Get parameters for this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.predict" title="metric_learn.base_metric._PairsClassifierMixin.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(pairs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.predict" title="metric_learn.base_metric._PairsClassifierMixin.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(self,&nbsp;pairs)</td>
 <td>Predicts the learned metric between input pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.score" title="metric_learn.base_metric._PairsClassifierMixin.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(pairs,&nbsp;y)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.score" title="metric_learn.base_metric._PairsClassifierMixin.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(self,&nbsp;pairs,&nbsp;y)</td>
 <td>Computes score of pairs similarity prediction.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.score_pairs" title="metric_learn.base_metric._PairsClassifierMixin.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.score_pairs" title="metric_learn.base_metric._PairsClassifierMixin.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(self,&nbsp;pairs)</td>
 <td>Returns the score between pairs (can be a similarity, or a distance/metric depending on the algorithm)</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.set_params" title="metric_learn.base_metric._PairsClassifierMixin.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.set_params" title="metric_learn.base_metric._PairsClassifierMixin.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(self,&nbsp;**params)</td>
 <td>Set the parameters of this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.set_threshold" title="metric_learn.base_metric._PairsClassifierMixin.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(threshold)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.set_threshold" title="metric_learn.base_metric._PairsClassifierMixin.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(self,&nbsp;threshold)</td>
 <td>Sets the threshold of the metric learner to the given value <code class="xref any docutils literal notranslate"><span class="pre">threshold</span></code>.</td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>preprocessor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.calibrate_threshold">
-<code class="descname">calibrate_threshold</code><span class="sig-paren">(</span><em>pairs_valid</em>, <em>y_valid</em>, <em>strategy='accuracy'</em>, <em>min_rate=None</em>, <em>beta=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.calibrate_threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.calibrate_threshold" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calibrate_threshold</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs_valid</span></em>, <em><span class="n">y_valid</span></em>, <em><span class="n">strategy</span><span class="o">=</span><span class="default_value">'accuracy'</span></em>, <em><span class="n">min_rate</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">beta</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.calibrate_threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.calibrate_threshold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decision threshold calibration for pairwise binary classification</p>
 <p>Method that calibrates the decision threshold (cutoff point) of the metric
 learner. This threshold will then be used when calling the method
@@ -252,41 +262,32 @@ the chosen score on the validation set <code class="docutils literal notranslate
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>strategy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional (default=’accuracy’)</span></dt>
-<dd><p class="first">The strategy to use for choosing the cutoff threshold.</p>
-<dl class="last docutils">
-<dt>‘accuracy’</dt>
-<dd><p class="first last">Selects a decision threshold that maximizes the accuracy.</p>
+<dt><strong>strategy</strong><span class="classifier">str, optional (default=’accuracy’)</span></dt><dd><p>The strategy to use for choosing the cutoff threshold.</p>
+<dl class="docutils">
+<dt>‘accuracy’</dt><dd><p>Selects a decision threshold that maximizes the accuracy.</p>
 </dd>
-<dt>‘f_beta’</dt>
-<dd><p class="first last">Selects a decision threshold that maximizes the f_beta score,
+<dt>‘f_beta’</dt><dd><p>Selects a decision threshold that maximizes the f_beta score,
 with beta given by the parameter <code class="xref any docutils literal notranslate"><span class="pre">beta</span></code>.</p>
 </dd>
-<dt>‘max_tpr’</dt>
-<dd><p class="first last">Selects a decision threshold that yields the highest true positive
+<dt>‘max_tpr’</dt><dd><p>Selects a decision threshold that yields the highest true positive
 rate with true negative rate at least equal to the value of the
 parameter <code class="xref any docutils literal notranslate"><span class="pre">min_rate</span></code>.</p>
 </dd>
-<dt>‘max_tnr’</dt>
-<dd><p class="first last">Selects a decision threshold that yields the highest true negative
+<dt>‘max_tnr’</dt><dd><p>Selects a decision threshold that yields the highest true negative
 rate with true positive rate at least equal to the value of the
 parameter <code class="xref any docutils literal notranslate"><span class="pre">min_rate</span></code>.</p>
 </dd>
 </dl>
 </dd>
-<dt><strong>beta</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float in [0, 1], optional (default=None)</span></dt>
-<dd><p class="first last">Beta value to be used in case strategy == ‘f_beta’.</p>
+<dt><strong>beta</strong><span class="classifier">float in [0, 1], optional (default=None)</span></dt><dd><p>Beta value to be used in case strategy == ‘f_beta’.</p>
 </dd>
-<dt><strong>min_rate</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float in [0, 1] or None, (default=None)</span></dt>
-<dd><p class="first last">In case strategy is ‘max_tpr’ or ‘max_tnr’ this parameter must be set
+<dt><strong>min_rate</strong><span class="classifier">float in [0, 1] or None, (default=None)</span></dt><dd><p>In case strategy is ‘max_tpr’ or ‘max_tnr’ this parameter must be set
 to specify the minimal value for the true negative rate or true positive
 rate respectively that needs to be achieved.</p>
 </dd>
-<dt><strong>pairs_valid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape=(n_pairs_valid, 2, n_features)</span></dt>
-<dd><p class="first last">The validation set of pairs to use to set the threshold.</p>
+<dt><strong>pairs_valid</strong><span class="classifier">array-like, shape=(n_pairs_valid, 2, n_features)</span></dt><dd><p>The validation set of pairs to use to set the threshold.</p>
 </dd>
-<dt><strong>y_valid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape=(n_pairs_valid,)</span></dt>
-<dd><p class="first last">The labels of the pairs of the validation set to use to set the
+<dt><strong>y_valid</strong><span class="classifier">array-like, shape=(n_pairs_valid,)</span></dt><dd><p>The labels of the pairs of the validation set to use to set the
 threshold. They must be +1 for positive pairs and -1 for negative pairs.</p>
 </dd>
 </dl>
@@ -297,15 +298,14 @@ threshold. They must be +1 for positive pairs and -1 for negative pairs.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.21.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a></dt>
-<dd>scikit-learn’s module for calibrating classifiers</dd>
+<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a></dt><dd>scikit-learn’s module for calibrating classifiers</dd>
 </dl>
 </div>
 <p class="rubric">References</p>
 <table class="docutils citation" frame="void" id="r94296ab4aa25-1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Receiver-operating characteristic (ROC) plots: a fundamental
+<tr><td class="label">[1]</td><td>Receiver-operating characteristic (ROC) plots: a fundamental
 evaluation tool in clinical medicine, MH Zweig, G Campbell -
 Clinical chemistry, 1993</td></tr>
 </tbody>
@@ -313,14 +313,14 @@ Clinical chemistry, 1993</td></tr>
 <table class="docutils citation" frame="void" id="r94296ab4aa25-2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>most of the code of this function is from scikit-learn’s PR #10117</td></tr>
+<tr><td class="label">[2]</td><td>most of the code of this function is from scikit-learn’s PR #10117</td></tr>
 </tbody>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.decision_function">
-<code class="descname">decision_function</code><span class="sig-paren">(</span><em>pairs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.decision_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.decision_function" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decision_function</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.decision_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.decision_function" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the decision function used to classify the pairs.</p>
 <p>Returns the opposite of the learned metric value between samples in every
 pair, to be consistent with scikit-learn conventions. Hence it should
@@ -332,8 +332,7 @@ This is the decision function that is used to classify pairs as similar
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>pairs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt>
-<dd><p class="first last">3D Array of pairs to predict, with each row corresponding to two
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to predict, with each row corresponding to two
 points, or 2D array of indices of pairs if the metric learner uses a
 preprocessor.</p>
 </dd>
@@ -341,8 +340,7 @@ preprocessor.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
-<dd><p class="first last">The predicted decision function value for each pair.</p>
+<dt><strong>y_predicted</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt><dd><p>The predicted decision function value for each pair.</p>
 </dd>
 </dl>
 </td>
@@ -351,22 +349,21 @@ preprocessor.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.get_metric">
-<code class="descname">get_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.get_metric" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="descname">get_metric</code><span class="sig-paren">(</span><em><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.get_metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a function that takes as input two 1D arrays and outputs the
 learned metric score on these two points.</p>
 <p>This function will be independent from the metric learner that learned it
 (it will not be modified if the initial metric learner is modified),
-and it can be directly plugged into the <a class="reference internal" href="metric_learn.Covariance.html#metric_learn.Covariance.metric" title="metric_learn.Covariance.metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">metric</span></code></a> argument of
+and it can be directly plugged into the <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-metric" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">metric</span></code></a> argument of
 scikit-learn’s estimators.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>metric_fun</strong> <span class="classifier-delimiter">:</span> <span class="classifier">function</span></dt>
-<dd><p class="first last">The function described above.</p>
+<dt><strong>metric_fun</strong><span class="classifier">function</span></dt><dd><p>The function described above.</p>
 </dd>
 </dl>
 </td>
@@ -376,12 +373,11 @@ scikit-learn’s estimators.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.score_pairs" title="metric_learn.base_metric._PairsClassifierMixin.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a></dt>
-<dd>a method that returns the metric score between several pairs of points. Unlike <a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.get_metric" title="metric_learn.base_metric._PairsClassifierMixin.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</dd>
+<dt><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.score_pairs" title="metric_learn.base_metric._PairsClassifierMixin.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a></dt><dd>a method that returns the metric score between several pairs of points. Unlike <a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.get_metric" title="metric_learn.base_metric._PairsClassifierMixin.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
+<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">()</span>
@@ -398,25 +394,23 @@ scikit-learn’s estimators.</p>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.get_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_params</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>deep</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
-<dd><p class="first last">If True, will return the parameters for this estimator and
+<dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
 contained subobjects that are estimators.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>params</strong> <span class="classifier-delimiter">:</span> <span class="classifier">mapping of string to any</span></dt>
-<dd><p class="first last">Parameter names mapped to their values.</p>
+<dt><strong>params</strong><span class="classifier">mapping of string to any</span></dt><dd><p>Parameter names mapped to their values.</p>
 </dd>
 </dl>
 </td>
@@ -425,9 +419,9 @@ contained subobjects that are estimators.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em>pairs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.predict" title="Permalink to this definition">¶</a></dt>
+<code class="descname">predict</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predicts the learned metric between input pairs. (For now it just
 calls decision function).</p>
 <p>Returns the learned metric value between samples in every pair. It should
@@ -437,8 +431,7 @@ ideally be low for similar samples and high for dissimilar samples.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>pairs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt>
-<dd><p class="first last">3D Array of pairs to predict, with each row corresponding to two
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to predict, with each row corresponding to two
 points, or 2D array of indices of pairs if the metric learner uses a
 preprocessor.</p>
 </dd>
@@ -446,8 +439,7 @@ preprocessor.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y_predicted</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt>
-<dd><p class="first last">The predicted learned metric value between samples in every pair.</p>
+<dt><strong>y_predicted</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt><dd><p>The predicted learned metric value between samples in every pair.</p>
 </dd>
 </dl>
 </td>
@@ -456,9 +448,9 @@ preprocessor.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.score">
-<code class="descname">score</code><span class="sig-paren">(</span><em>pairs</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.score" title="Permalink to this definition">¶</a></dt>
+<code class="descname">score</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em>, <em><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes score of pairs similarity prediction.</p>
 <p>Returns the <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> score of the fitted metric learner. It is
 computed in the following way: for every value of a threshold
@@ -471,20 +463,17 @@ true positives as in a classical <code class="docutils literal notranslate"><spa
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>pairs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt>
-<dd><p class="first last">3D Array of pairs, with each row corresponding to two points,
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs, with each row corresponding to two points,
 or 2D array of indices of pairs if the metric learner uses a
 preprocessor.</p>
 </dd>
-<dt><strong>y</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, shape=(n_constraints,)</span></dt>
-<dd><p class="first last">The corresponding labels.</p>
+<dt><strong>y</strong><span class="classifier">array-like, shape=(n_constraints,)</span></dt><dd><p>The corresponding labels.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>score</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">The <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> score.</p>
+<dt><strong>score</strong><span class="classifier">float</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> score.</p>
 </dd>
 </dl>
 </td>
@@ -493,9 +482,9 @@ preprocessor.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.score_pairs">
-<code class="descname">score_pairs</code><span class="sig-paren">(</span><em>pairs</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.score_pairs" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="descname">score_pairs</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.score_pairs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the score between pairs
 (can be a similarity, or a distance/metric depending on the algorithm)</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -503,15 +492,13 @@ preprocessor.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>pairs</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, 2, n_features)</span></dt>
-<dd><p class="first last">3D array of pairs.</p>
+<dt><strong>pairs</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, 2, n_features)</span></dt><dd><p>3D array of pairs.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>scores: `numpy.ndarray` of shape=(n_pairs,)</strong></dt>
-<dd><p class="first last">The score of every pair.</p>
+<dt><strong>scores</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of shape=(n_pairs,)</span></dt><dd><p>The score of every pair.</p>
 </dd>
 </dl>
 </td>
@@ -521,15 +508,14 @@ preprocessor.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.get_metric" title="metric_learn.base_metric._PairsClassifierMixin.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt>
-<dd>a method that returns a function to compute the metric between two points. The difference with <a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.score_pairs" title="metric_learn.base_metric._PairsClassifierMixin.score_pairs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">score_pairs</span></code></a> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</dd>
+<dt><a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.get_metric" title="metric_learn.base_metric._PairsClassifierMixin.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd>a method that returns a function to compute the metric between two points. The difference with <a class="reference internal" href="#metric_learn.base_metric._PairsClassifierMixin.score_pairs" title="metric_learn.base_metric._PairsClassifierMixin.score_pairs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">score_pairs</span></code></a> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</dd>
 </dl>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.set_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_params</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.set_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
 (such as pipelines). The latter have parameters of the form
@@ -539,9 +525,15 @@ component of a nested object.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>self</strong></dt>
-<dd></dd>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>Estimator instance.</p>
+</dd>
 </dl>
 </td>
 </tr>
@@ -549,9 +541,9 @@ component of a nested object.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="metric_learn.base_metric._PairsClassifierMixin.set_threshold">
-<code class="descname">set_threshold</code><span class="sig-paren">(</span><em>threshold</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.set_threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.set_threshold" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_threshold</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">threshold</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#_PairsClassifierMixin.set_threshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric._PairsClassifierMixin.set_threshold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the threshold of the metric learner to the given value <code class="xref any docutils literal notranslate"><span class="pre">threshold</span></code>.</p>
 <p>See more in the <a class="reference internal" href="../weakly_supervised.html#calibration"><span class="std std-ref">User Guide</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -559,8 +551,7 @@ component of a nested object.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>threshold</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">The threshold value we want to set. It is the value to which the
+<dt><strong>threshold</strong><span class="classifier">float</span></dt><dd><p>The threshold value we want to set. It is the value to which the
 predicted distance for test pairs will be compared. If they are superior
 to the threshold they will be classified as similar (+1),
 and dissimilar (-1) if not.</p>
@@ -569,8 +560,7 @@ and dissimilar (-1) if not.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>self</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref any docutils literal notranslate"><span class="pre">_PairsClassifier</span></code></span></dt>
-<dd><p class="first last">The pairs classifier with the new threshold set.</p>
+<dt><strong>self</strong><span class="classifier"><code class="xref any docutils literal notranslate"><span class="pre">_PairsClassifier</span></code></span></dt><dd><p>The pairs classifier with the new threshold set.</p>
 </dd>
 </dl>
 </td>
@@ -589,16 +579,33 @@ and dissimilar (-1) if not.</p>
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="metric_learn.base_metric._TripletsClassifierMixin.html" class="btn btn-neutral float-right" title="metric_learn.base_metric._TripletsClassifierMixin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="metric_learn.base_metric.BaseMetricLearner.html" class="btn btn-neutral float-left" title="metric_learn.base_metric.BaseMetricLearner" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -610,27 +617,16 @@ and dissimilar (-1) if not.</p>
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

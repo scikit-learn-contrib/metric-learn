@@ -1,53 +1,61 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.constraints &mdash; metric-learn 0.5.0 documentation</title>
+  <title>metric_learn.constraints &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
 
   
-  <script src="../../_static/js/modernizr.min.js"></script>
+  
+  
+  
 
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="../../index.html" class="icon icon-home"> metric-learn
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -57,7 +65,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -74,6 +82,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -97,6 +106,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -135,7 +145,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -161,40 +171,71 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">xrange</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="k">import</span> <span class="n">coo_matrix</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="k">import</span> <span class="n">check_random_state</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Constraints&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="Constraints"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints">[docs]</a><span class="k">class</span> <span class="nc">Constraints</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
   <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">  Class to build constraints from labels.</span>
+<span class="sd">  Class to build constraints from labeled data.</span>
 
-<span class="sd">  See more in the :ref:`User Guide &lt;supervised_version&gt;`</span>
+<span class="sd">  See more in the :ref:`User Guide &lt;supervised_version&gt;`.</span>
+
+<span class="sd">  Parameters</span>
+<span class="sd">  ----------</span>
+<span class="sd">  partial_labels : `numpy.ndarray` of ints, shape=(n_samples,)</span>
+<span class="sd">    Array of labels, with -1 indicating unknown label.</span>
+
+<span class="sd">  Attributes</span>
+<span class="sd">  ----------</span>
+<span class="sd">  partial_labels : `numpy.ndarray` of ints, shape=(n_samples,)</span>
+<span class="sd">    Array of labels, with -1 indicating unknown label.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Constraints.__init__"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partial_labels</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;partial_labels : int arraylike, -1 indicating unknown label&#39;&#39;&#39;</span>
-    <span class="n">partial_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">partial_labels</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="o">=</span> <span class="n">partial_labels</span><span class="o">.</span><span class="n">shape</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">known_label_idx</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">partial_labels</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">known_labels</span> <span class="o">=</span> <span class="n">partial_labels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">known_label_idx</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Constraints.adjacency_matrix"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.adjacency_matrix">[docs]</a>  <span class="k">def</span> <span class="nf">adjacency_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positive_negative_pairs</span><span class="p">(</span><span class="n">num_constraints</span><span class="p">,</span>
-                                              <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="n">row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span>
-    <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">data</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">):]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="n">adj</span> <span class="o">=</span> <span class="n">coo_matrix</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_points</span><span class="p">,)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="c1"># symmetrize</span>
-    <span class="k">return</span> <span class="n">adj</span> <span class="o">+</span> <span class="n">adj</span><span class="o">.</span><span class="n">T</span></div>
+<div class="viewcode-block" id="Constraints.__init__"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.__init__">[docs]</a>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partial_labels</span><span class="p">):</span>
+    <span class="n">partial_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">partial_labels</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span> <span class="o">=</span> <span class="n">partial_labels</span></div>
 
 <div class="viewcode-block" id="Constraints.positive_negative_pairs"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.positive_negative_pairs">[docs]</a>  <span class="k">def</span> <span class="nf">positive_negative_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                               <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates positive pairs and negative pairs from labeled data.</span>
+
+<span class="sd">    Positive pairs are formed by randomly drawing ``num_constraints`` pairs of</span>
+<span class="sd">    points with the same label. Negative pairs are formed by randomly drawing</span>
+<span class="sd">    ``num_constraints`` pairs of points with different label.</span>
+
+<span class="sd">    In the case where it is not possible to generate enough positive or</span>
+<span class="sd">    negative pairs, a smaller number of pairs will be returned with a warning.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_constraints : int</span>
+<span class="sd">      Number of positive and negative constraints to generate.</span>
+
+<span class="sd">    same_length : bool, optional (default=False)</span>
+<span class="sd">      If True, forces the number of positive and negative pairs to be</span>
+<span class="sd">      equal by ignoring some pairs from the larger set.</span>
+
+<span class="sd">    random_state : int or numpy.RandomState or None, optional (default=None)</span>
+<span class="sd">      A pseudo random number generator object or a seed for it if int.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    a : array-like, shape=(n_constraints,)</span>
+<span class="sd">      1D array of indicators for the left elements of positive pairs.</span>
+
+<span class="sd">    b : array-like, shape=(n_constraints,)</span>
+<span class="sd">      1D array of indicators for the right elements of positive pairs.</span>
+
+<span class="sd">    c : array-like, shape=(n_constraints,)</span>
+<span class="sd">      1D array of indicators for the left elements of negative pairs.</span>
+
+<span class="sd">    d : array-like, shape=(n_constraints,)</span>
+<span class="sd">      1D array of indicators for the right elements of negative pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairs</span><span class="p">(</span><span class="n">num_constraints</span><span class="p">,</span> <span class="n">same_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
@@ -205,19 +246,130 @@
       <span class="k">return</span> <span class="n">a</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">b</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">c</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">d</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span></div>
 
+<div class="viewcode-block" id="Constraints.generate_knntriplets"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.generate_knntriplets">[docs]</a>  <span class="k">def</span> <span class="nf">generate_knntriplets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">k_genuine</span><span class="p">,</span> <span class="n">k_impostor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates triplets from labeled data.</span>
+
+<span class="sd">    For every point (X_a) the triplets (X_a, X_b, X_c) are constructed from all</span>
+<span class="sd">    the combinations of taking one of its `k_genuine`-nearest neighbors of the</span>
+<span class="sd">    same class (X_b) and taking one of its `k_impostor`-nearest neighbors of</span>
+<span class="sd">    other classes (X_c).</span>
+
+<span class="sd">    In the case a class doesn&#39;t have enough points in the same class (other</span>
+<span class="sd">    classes) to yield `k_genuine` (`k_impostor`) neighbors a warning will be</span>
+<span class="sd">    raised and the maximum value of genuine (impostor) neighbors will be used</span>
+<span class="sd">    for that class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">      X : (n x d) matrix</span>
+<span class="sd">        Input data, where each row corresponds to a single instance.</span>
+<span class="sd">      k_genuine : int</span>
+<span class="sd">        Number of neighbors of the same class to be taken into account.</span>
+<span class="sd">      k_impostor : int</span>
+<span class="sd">        Number of neighbors of different classes to be taken into account.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    triplets : array-like, shape=(n_constraints, 3)</span>
+<span class="sd">      2D array of triplets of indicators.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ignore unlabeled samples</span>
+    <span class="n">known_labels_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="n">known_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span><span class="p">[</span><span class="n">known_labels_mask</span><span class="p">]</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">known_labels_mask</span><span class="p">]</span>
+
+    <span class="n">labels</span><span class="p">,</span> <span class="n">labels_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">known_labels</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">len_input</span> <span class="o">=</span> <span class="n">known_labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Handle the case where there are too few elements to yield k_genuine or</span>
+    <span class="c1"># k_impostor neighbors for every class.</span>
+
+    <span class="n">k_genuine_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">k_genuine</span><span class="p">)</span>
+    <span class="n">k_impostor_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">k_impostor</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels_count</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">k_genuine</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="n">count</span><span class="p">:</span>
+        <span class="n">k_genuine_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The class </span><span class="si">{}</span><span class="s2"> has </span><span class="si">{}</span><span class="s2"> elements, which is not sufficient &quot;</span>
+                      <span class="s2">&quot;to generate </span><span class="si">{}</span><span class="s2"> genuine neighbors as specified by &quot;</span>
+                      <span class="s2">&quot;k_genuine. Will generate </span><span class="si">{}</span><span class="s2"> genuine neighbors instead.&quot;</span>
+                      <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">,</span> <span class="n">k_genuine</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+                              <span class="n">k_genuine_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+      <span class="k">if</span> <span class="n">k_impostor</span> <span class="o">&gt;</span> <span class="n">len_input</span> <span class="o">-</span> <span class="n">count</span><span class="p">:</span>
+        <span class="n">k_impostor_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">len_input</span> <span class="o">-</span> <span class="n">count</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The class </span><span class="si">{}</span><span class="s2"> has </span><span class="si">{}</span><span class="s2"> elements of other classes, which is&quot;</span>
+                      <span class="s2">&quot; not sufficient to generate </span><span class="si">{}</span><span class="s2"> impostor neighbors as &quot;</span>
+                      <span class="s2">&quot;specified by k_impostor. Will generate </span><span class="si">{}</span><span class="s2"> impostor &quot;</span>
+                      <span class="s2">&quot;neighbors instead.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">k_impostor_vec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">k_impostor</span><span class="p">,</span>
+                              <span class="n">k_impostor_vec</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+    <span class="c1"># The total number of possible triplets combinations per label comes from</span>
+    <span class="c1"># taking one of the k_genuine_vec[i] genuine neighbors and one of the</span>
+    <span class="c1"># k_impostor_vec[i] impostor neighbors for the labels_count[i] elements</span>
+    <span class="n">comb_per_label</span> <span class="o">=</span> <span class="n">labels_count</span> <span class="o">*</span> <span class="n">k_genuine_vec</span> <span class="o">*</span> <span class="n">k_impostor_vec</span>
+
+    <span class="c1"># Get start and finish for later triplet assigning</span>
+    <span class="c1"># append zero at the begining for start and get cumulative sum</span>
+    <span class="n">start_finish_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">comb_per_label</span><span class="p">))</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+
+    <span class="c1"># Total number of triplets is the sum of all possible combinations per</span>
+    <span class="c1"># label</span>
+    <span class="n">num_triplets</span> <span class="o">=</span> <span class="n">start_finish_indices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">triplets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_triplets</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+
+    <span class="n">neigh</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+
+        <span class="c1"># generate mask for current label</span>
+        <span class="n">gen_mask</span> <span class="o">=</span> <span class="n">known_labels</span> <span class="o">==</span> <span class="n">label</span>
+        <span class="n">gen_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">gen_mask</span><span class="p">)</span>
+
+        <span class="c1"># get k_genuine genuine neighbors</span>
+        <span class="n">neigh</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">gen_indx</span><span class="p">])</span>
+        <span class="c1"># Take elements of gen_indx according to the yielded k-neighbors</span>
+        <span class="n">gen_relative_indx</span> <span class="o">=</span> <span class="n">neigh</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_genuine_vec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                             <span class="n">return_distance</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">gen_neigh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">gen_indx</span><span class="p">,</span> <span class="n">gen_relative_indx</span><span class="p">)</span>
+
+        <span class="c1"># generate mask for impostors of current label</span>
+        <span class="n">imp_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">gen_mask</span><span class="p">)</span>
+
+        <span class="c1"># get k_impostor impostor neighbors</span>
+        <span class="n">neigh</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">imp_indx</span><span class="p">])</span>
+        <span class="c1"># Take elements of imp_indx according to the yielded k-neighbors</span>
+        <span class="n">imp_relative_indx</span> <span class="o">=</span> <span class="n">neigh</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_impostor_vec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                             <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">[</span><span class="n">gen_mask</span><span class="p">],</span>
+                                             <span class="n">return_distance</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">imp_neigh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">imp_indx</span><span class="p">,</span> <span class="n">imp_relative_indx</span><span class="p">)</span>
+
+        <span class="c1"># length = len_label*k_genuine*k_impostor</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">finish</span> <span class="o">=</span> <span class="n">start_finish_indices</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">triplets</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">finish</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">comb</span><span class="p">(</span><span class="n">gen_indx</span><span class="p">,</span> <span class="n">gen_neigh</span><span class="p">,</span> <span class="n">imp_neigh</span><span class="p">,</span>
+                                         <span class="n">k_genuine_vec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                         <span class="n">k_impostor_vec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">triplets</span></div>
+
   <span class="k">def</span> <span class="nf">_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">,</span> <span class="n">same_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
              <span class="n">random_state</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="p">):</span>
-    <span class="n">num_labels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known_labels</span><span class="p">)</span>
+    <span class="n">known_label_idx</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">known_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span><span class="p">[</span><span class="n">known_label_idx</span><span class="p">]</span>
+    <span class="n">num_labels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_labels</span><span class="p">)</span>
     <span class="n">ab</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="n">max_iter</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_constraints</span><span class="p">:</span>
       <span class="n">nc</span> <span class="o">=</span> <span class="n">num_constraints</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span>
       <span class="k">for</span> <span class="n">aidx</span> <span class="ow">in</span> <span class="n">random_state</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">num_labels</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nc</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">same_label</span><span class="p">:</span>
-          <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_labels</span><span class="p">[</span><span class="n">aidx</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_labels</span>
+          <span class="n">mask</span> <span class="o">=</span> <span class="n">known_labels</span><span class="p">[</span><span class="n">aidx</span><span class="p">]</span> <span class="o">==</span> <span class="n">known_labels</span>
           <span class="n">mask</span><span class="p">[</span><span class="n">aidx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># avoid identity pairs</span>
         <span class="k">else</span><span class="p">:</span>
-          <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_labels</span><span class="p">[</span><span class="n">aidx</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_labels</span>
+          <span class="n">mask</span> <span class="o">=</span> <span class="n">known_labels</span><span class="p">[</span><span class="n">aidx</span><span class="p">]</span> <span class="o">!=</span> <span class="n">known_labels</span>
         <span class="n">b_choices</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b_choices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
           <span class="n">ab</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">aidx</span><span class="p">,</span> <span class="n">random_state</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">b_choices</span><span class="p">)))</span>
@@ -226,16 +378,47 @@
       <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Only generated </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> constraints (requested </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
           <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">),</span> <span class="s1">&#39;positive&#39;</span> <span class="k">if</span> <span class="n">same_label</span> <span class="k">else</span> <span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">))</span>
     <span class="n">ab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ab</span><span class="p">)[:</span><span class="n">num_constraints</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">known_label_idx</span><span class="p">[</span><span class="n">ab</span><span class="o">.</span><span class="n">T</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">known_label_idx</span><span class="p">[</span><span class="n">ab</span><span class="o">.</span><span class="n">T</span><span class="p">]</span>
 
 <div class="viewcode-block" id="Constraints.chunks"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.chunks">[docs]</a>  <span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    the random state object to be passed must be a numpy random seed</span>
+<span class="sd">    Generates chunks from labeled data.</span>
+
+<span class="sd">    Each of ``num_chunks`` chunks is composed of ``chunk_size`` points from</span>
+<span class="sd">    the same class drawn at random. Each point can belong to at most 1 chunk.</span>
+
+<span class="sd">    In the case where there is not enough points to generate ``num_chunks``</span>
+<span class="sd">    chunks of size ``chunk_size``, a ValueError will be raised.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_chunks : int, optional (default=100)</span>
+<span class="sd">      Number of chunks to generate.</span>
+
+<span class="sd">    chunk_size : int, optional (default=2)</span>
+<span class="sd">      Number of points in each chunk.</span>
+
+<span class="sd">    random_state : int or numpy.RandomState or None, optional (default=None)</span>
+<span class="sd">      A pseudo random number generator object or a seed for it if int.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    chunks : array-like, shape=(n_samples,)</span>
+<span class="sd">      1D array of chunk indicators, where -1 indicates that the point does not</span>
+<span class="sd">      belong to any chunk.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="n">chunks</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known_label_idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">uniq</span><span class="p">,</span> <span class="n">lookup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known_labels</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">all_inds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lookup</span> <span class="o">==</span> <span class="n">c</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uniq</span><span class="p">))]</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">uniq</span><span class="p">,</span> <span class="n">lookup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">unknown_uniq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">uniq</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">all_inds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lookup</span> <span class="o">==</span> <span class="n">c</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uniq</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unknown_uniq</span><span class="p">]</span>
+    <span class="n">max_chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">//</span> <span class="n">chunk_size</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">all_inds</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="n">max_chunks</span> <span class="o">&lt;</span> <span class="n">num_chunks</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s1">&#39;Not enough possible chunks of </span><span class="si">%d</span><span class="s1"> elements in each&#39;</span>
+                        <span class="s1">&#39; class to form expected </span><span class="si">%d</span><span class="s1"> chunks - maximum number&#39;</span>
+                        <span class="s1">&#39; of chunks is </span><span class="si">%d</span><span class="s1">&#39;</span>
+                        <span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">max_chunks</span><span class="p">))</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">num_chunks</span> <span class="ow">and</span> <span class="n">all_inds</span><span class="p">:</span>
       <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_inds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -250,10 +433,16 @@
       <span class="n">inds</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
       <span class="n">chunks</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
       <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">num_chunks</span><span class="p">:</span>
-      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to make </span><span class="si">%d</span><span class="s1"> chunks of </span><span class="si">%d</span><span class="s1"> examples each&#39;</span> <span class="o">%</span>
-                       <span class="p">(</span><span class="n">num_chunks</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">chunks</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">sizeB</span><span class="p">,</span> <span class="n">sizeC</span><span class="p">):</span>
+    <span class="c1"># generate_knntriplets helper function</span>
+    <span class="c1"># generate an array with all combinations of choosing</span>
+    <span class="c1"># an element from A, B and C</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="p">(</span><span class="n">sizeB</span><span class="o">*</span><span class="n">sizeC</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">),</span>
+                      <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">B</span><span class="p">),</span> <span class="p">(</span><span class="n">sizeC</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">),</span>
+                      <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sizeB</span><span class="p">))</span><span class="o">.</span><span class="n">ravel</span><span class="p">()))</span><span class="o">.</span><span class="n">T</span>
 
 
 <span class="k">def</span> <span class="nf">wrap_pairs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
@@ -277,11 +466,19 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -293,27 +490,16 @@
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

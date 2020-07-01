@@ -96,7 +96,7 @@ examples (for code illustrating some of these use-cases, see the
   metric learning provides a way to bias the clusters found by algorithms like
   K-Means towards the intended semantics.
 - Information retrieval: the learned metric can be used to retrieve the
-  elements of a database that are semantically closer to a query element.
+  elements of a database that are semantically closest to a query element.
 - Dimensionality reduction: metric learning may be seen as a way to reduce the
   data dimension in a (weakly) supervised setting.
 - More generally, the learned transformation :math:`L` can be used to project

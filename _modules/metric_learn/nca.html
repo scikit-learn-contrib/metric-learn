@@ -1,53 +1,61 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html4" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>metric_learn.nca &mdash; metric-learn 0.5.0 documentation</title>
+  <title>metric_learn.nca &mdash; metric-learn 0.6.0 documentation</title>
   
 
   
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
 
   
-  <script src="../../_static/js/modernizr.min.js"></script>
+  
+  
+  
 
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
-            <a href="../../index.html" class="icon icon-home"> metric-learn
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
 
           
@@ -57,7 +65,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.6.0
               </div>
             
           
@@ -74,6 +82,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -97,6 +106,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -135,7 +145,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
@@ -159,19 +169,18 @@
 <span class="sd">Neighborhood Components Analysis (NCA)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">pairwise_distances</span>
-<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="k">import</span> <span class="n">ConvergenceWarning</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span>
-<span class="kn">from</span> <span class="nn">sklearn.utils.fixes</span> <span class="k">import</span> <span class="n">logsumexp</span>
-<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="k">import</span> <span class="n">TransformerMixin</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">logsumexp</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span>
+<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="kn">import</span> <span class="n">ConvergenceWarning</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">pairwise_distances</span>
 
-<span class="kn">from</span> <span class="nn">._util</span> <span class="k">import</span> <span class="n">_initialize_components</span><span class="p">,</span> <span class="n">_check_n_components</span>
-<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="k">import</span> <span class="n">MahalanobisMixin</span>
+<span class="kn">from</span> <span class="nn">._util</span> <span class="kn">import</span> <span class="n">_initialize_components</span><span class="p">,</span> <span class="n">_check_n_components</span>
+<span class="kn">from</span> <span class="nn">.base_metric</span> <span class="kn">import</span> <span class="n">MahalanobisMixin</span>
 
 <span class="n">EPS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
 
@@ -190,71 +199,63 @@
 
 <span class="sd">  Parameters</span>
 <span class="sd">  ----------</span>
-<span class="sd">  init : None, string or numpy array, optional (default=None)</span>
-<span class="sd">      Initialization of the linear transformation. Possible options are</span>
-<span class="sd">      &#39;auto&#39;, &#39;pca&#39;, &#39;identity&#39;, &#39;random&#39;, and a numpy array of shape</span>
-<span class="sd">      (n_features_a, n_features_b). If None, will be set automatically to</span>
-<span class="sd">      &#39;auto&#39; (this option is to raise a warning if &#39;init&#39; is not set,</span>
-<span class="sd">      and stays to its default value None, in v0.5.0).</span>
+<span class="sd">  init : string or numpy array, optional (default=&#39;auto&#39;)</span>
+<span class="sd">    Initialization of the linear transformation. Possible options are</span>
+<span class="sd">    &#39;auto&#39;, &#39;pca&#39;, &#39;identity&#39;, &#39;random&#39;, and a numpy array of shape</span>
+<span class="sd">    (n_features_a, n_features_b).</span>
 
-<span class="sd">      &#39;auto&#39;</span>
-<span class="sd">          Depending on ``n_components``, the most reasonable initialization</span>
-<span class="sd">          will be chosen. If ``n_components &lt;= n_classes`` we use &#39;lda&#39;, as</span>
-<span class="sd">          it uses labels information. If not, but</span>
-<span class="sd">          ``n_components &lt; min(n_features, n_samples)``, we use &#39;pca&#39;, as</span>
-<span class="sd">          it projects data in meaningful directions (those of higher</span>
-<span class="sd">          variance). Otherwise, we just use &#39;identity&#39;.</span>
+<span class="sd">    &#39;auto&#39;</span>
+<span class="sd">      Depending on ``n_components``, the most reasonable initialization</span>
+<span class="sd">      will be chosen. If ``n_components &lt;= n_classes`` we use &#39;lda&#39;, as</span>
+<span class="sd">      it uses labels information. If not, but</span>
+<span class="sd">      ``n_components &lt; min(n_features, n_samples)``, we use &#39;pca&#39;, as</span>
+<span class="sd">      it projects data in meaningful directions (those of higher</span>
+<span class="sd">      variance). Otherwise, we just use &#39;identity&#39;.</span>
 
-<span class="sd">      &#39;pca&#39;</span>
-<span class="sd">          ``n_components`` principal components of the inputs passed</span>
-<span class="sd">          to :meth:`fit` will be used to initialize the transformation.</span>
-<span class="sd">          (See `sklearn.decomposition.PCA`)</span>
+<span class="sd">    &#39;pca&#39;</span>
+<span class="sd">      ``n_components`` principal components of the inputs passed</span>
+<span class="sd">      to :meth:`fit` will be used to initialize the transformation.</span>
+<span class="sd">      (See `sklearn.decomposition.PCA`)</span>
 
-<span class="sd">      &#39;lda&#39;</span>
-<span class="sd">          ``min(n_components, n_classes)`` most discriminative</span>
-<span class="sd">          components of the inputs passed to :meth:`fit` will be used to</span>
-<span class="sd">          initialize the transformation. (If ``n_components &gt; n_classes``,</span>
-<span class="sd">          the rest of the components will be zero.) (See</span>
-<span class="sd">          `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)</span>
+<span class="sd">    &#39;lda&#39;</span>
+<span class="sd">      ``min(n_components, n_classes)`` most discriminative</span>
+<span class="sd">      components of the inputs passed to :meth:`fit` will be used to</span>
+<span class="sd">      initialize the transformation. (If ``n_components &gt; n_classes``,</span>
+<span class="sd">      the rest of the components will be zero.) (See</span>
+<span class="sd">      `sklearn.discriminant_analysis.LinearDiscriminantAnalysis`)</span>
 
-<span class="sd">      &#39;identity&#39;</span>
-<span class="sd">          If ``n_components`` is strictly smaller than the</span>
-<span class="sd">          dimensionality of the inputs passed to :meth:`fit`, the identity</span>
-<span class="sd">          matrix will be truncated to the first ``n_components`` rows.</span>
+<span class="sd">    &#39;identity&#39;</span>
+<span class="sd">      If ``n_components`` is strictly smaller than the</span>
+<span class="sd">      dimensionality of the inputs passed to :meth:`fit`, the identity</span>
+<span class="sd">      matrix will be truncated to the first ``n_components`` rows.</span>
 
-<span class="sd">      &#39;random&#39;</span>
-<span class="sd">          The initial transformation will be a random array of shape</span>
-<span class="sd">          `(n_components, n_features)`. Each value is sampled from the</span>
-<span class="sd">          standard normal distribution.</span>
+<span class="sd">    &#39;random&#39;</span>
+<span class="sd">      The initial transformation will be a random array of shape</span>
+<span class="sd">      `(n_components, n_features)`. Each value is sampled from the</span>
+<span class="sd">      standard normal distribution.</span>
 
-<span class="sd">      numpy array</span>
-<span class="sd">          n_features_b must match the dimensionality of the inputs passed to</span>
-<span class="sd">          :meth:`fit` and n_features_a must be less than or equal to that.</span>
-<span class="sd">          If ``n_components`` is not None, n_features_a must match it.</span>
+<span class="sd">    numpy array</span>
+<span class="sd">      n_features_b must match the dimensionality of the inputs passed to</span>
+<span class="sd">      :meth:`fit` and n_features_a must be less than or equal to that.</span>
+<span class="sd">      If ``n_components`` is not None, n_features_a must match it.</span>
 
 <span class="sd">  n_components : int or None, optional (default=None)</span>
-<span class="sd">      Dimensionality of reduced space (if None, defaults to dimension of X).</span>
-
-<span class="sd">  num_dims : Not used</span>
-
-<span class="sd">      .. deprecated:: 0.5.0</span>
-<span class="sd">        `num_dims` was deprecated in version 0.5.0 and will</span>
-<span class="sd">        be removed in 0.6.0. Use `n_components` instead.</span>
+<span class="sd">    Dimensionality of reduced space (if None, defaults to dimension of X).</span>
 
 <span class="sd">  max_iter : int, optional (default=100)</span>
 <span class="sd">    Maximum number of iterations done by the optimization algorithm.</span>
 
 <span class="sd">  tol : float, optional (default=None)</span>
-<span class="sd">      Convergence tolerance for the optimization.</span>
+<span class="sd">    Convergence tolerance for the optimization.</span>
 
 <span class="sd">  verbose : bool, optional (default=False)</span>
 <span class="sd">    Whether to print progress messages or not.</span>
 
 <span class="sd">  random_state : int or numpy.RandomState or None, optional (default=None)</span>
-<span class="sd">      A pseudo random number generator object or a seed for it if int. If</span>
-<span class="sd">      ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
-<span class="sd">      transformation. If ``init=&#39;pca&#39;``, ``random_state`` is passed as an</span>
-<span class="sd">      argument to PCA when initializing the transformation.</span>
+<span class="sd">    A pseudo random number generator object or a seed for it if int. If</span>
+<span class="sd">    ``init=&#39;random&#39;``, ``random_state`` is used to initialize the random</span>
+<span class="sd">    transformation. If ``init=&#39;pca&#39;``, ``random_state`` is passed as an</span>
+<span class="sd">    argument to PCA when initializing the transformation.</span>
 
 <span class="sd">  Examples</span>
 <span class="sd">  --------</span>
@@ -271,28 +272,27 @@
 <span class="sd">  Attributes</span>
 <span class="sd">  ----------</span>
 <span class="sd">  n_iter_ : `int`</span>
-<span class="sd">      The number of iterations the solver has run.</span>
+<span class="sd">    The number of iterations the solver has run.</span>
 
 <span class="sd">  components_ : `numpy.ndarray`, shape=(n_components, n_features)</span>
-<span class="sd">      The learned linear transformation ``L``.</span>
+<span class="sd">    The learned linear transformation ``L``.</span>
 
 <span class="sd">  References</span>
 <span class="sd">  ----------</span>
 <span class="sd">  .. [1] J. Goldberger, G. Hinton, S. Roweis, R. Salakhutdinov. `Neighbourhood</span>
 <span class="sd">         Components Analysis</span>
 <span class="sd">         &lt;http://www.cs.nyu.edu/~roweis/papers/ncanips.pdf&gt;`_.</span>
-<span class="sd">         Advances in Neural Information Processing Systems. 17, 513-520, 2005.</span>
+<span class="sd">         NIPS 2005.</span>
 
 <span class="sd">  .. [2] Wikipedia entry on `Neighborhood Components Analysis</span>
 <span class="sd">         &lt;https://en.wikipedia.org/wiki/Neighbourhood_components_analysis&gt;`_</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="NCA.__init__"><a class="viewcode-back" href="../../generated/metric_learn.NCA.html#metric_learn.NCA.__init__">[docs]</a>  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_dims</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="NCA.__init__"><a class="viewcode-back" href="../../generated/metric_learn.NCA.html#metric_learn.NCA.__init__">[docs]</a>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preprocessor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="n">init</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">=</span> <span class="n">num_dims</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">tol</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
@@ -304,11 +304,6 @@
 <span class="sd">    X: data matrix, (n x d)</span>
 <span class="sd">    y: scalar labels, (n)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_dims&quot; parameter is not used.&#39;</span>
-                    <span class="s1">&#39; It has been deprecated in version 0.5.0 and will be&#39;</span>
-                    <span class="s1">&#39; removed in 0.6.0. Use &quot;n_components&quot; instead&#39;</span><span class="p">,</span>
-                    <span class="ne">DeprecationWarning</span><span class="p">)</span>
     <span class="n">X</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ensure_min_samples</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">n_components</span> <span class="o">=</span> <span class="n">_check_n_components</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">)</span>
@@ -317,22 +312,8 @@
     <span class="n">train_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
     <span class="c1"># Initialize A</span>
-    <span class="c1"># if the init is the default (None), we raise a warning</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="c1"># TODO: replace init=None by init=&#39;auto&#39; in v0.6.0 and remove the warning</span>
-      <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Warning, no init was set (`init=None`). As of version 0.5.0, &quot;</span>
-             <span class="s2">&quot;the default init will now be set to &#39;auto&#39;, instead of the &quot;</span>
-             <span class="s2">&quot;previous scaling matrix. If you still want to use the same &quot;</span>
-             <span class="s2">&quot;scaling matrix as before, set &quot;</span>
-             <span class="s2">&quot;init=np.eye(X.shape[1])/(np.maximum(X.max(axis=0)-X.min(axis=0)&quot;</span>
-             <span class="s2">&quot;, EPS))). This warning will disappear in v0.6.0, and `init` &quot;</span>
-             <span class="s2">&quot;parameter&#39;s default value will be set to &#39;auto&#39;.&quot;</span><span class="p">)</span>
-      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ChangedBehaviorWarning</span><span class="p">)</span>
-      <span class="n">init</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span>
-    <span class="n">A</span> <span class="o">=</span> <span class="n">_initialize_components</span><span class="p">(</span><span class="n">n_components</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">init</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">_initialize_components</span><span class="p">(</span><span class="n">n_components</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span><span class="p">)</span>
 
     <span class="c1"># Run NCA</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">==</span> <span class="n">labels</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
@@ -421,11 +402,19 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2015-2019, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
+        
+        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -437,27 +426,16 @@
   </div>
   
 
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

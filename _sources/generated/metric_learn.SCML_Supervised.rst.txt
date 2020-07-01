@@ -1,0 +1,16 @@
+:mod:`metric_learn`.SCML_Supervised
+==========================================
+
+.. currentmodule:: metric_learn
+
+.. autoclass:: SCML_Supervised
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :special-members: __init__
+
+.. include:: metric_learn.SCML_Supervised.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>
