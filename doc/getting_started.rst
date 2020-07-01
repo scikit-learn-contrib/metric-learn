@@ -17,15 +17,16 @@ metric-learn can be installed in either of the following ways:
 
 **Dependencies**
 
--  Python 2.7+, 3.4+
--  numpy, scipy, scikit-learn>=0.20.3
+- Python 3.6+ (the last version supporting Python 2 and Python 3.5 was
+  `v0.5.0 <https://pypi.org/project/metric-learn/0.5.0/>`_)
+- numpy, scipy, scikit-learn>=0.20.3
 
 **Optional dependencies**
 
 - For SDML, using skggm will allow the algorithm to solve problematic cases
   (install from commit `a0ed406 <https://github.com/skggm/skggm/commit/a0ed406586c4364ea3297a658f415e13b5cbdaf8>`_).
   ``pip install 'git+https://github.com/skggm/skggm.git@a0ed406586c4364ea3297a658f415e13b5cbdaf8'`` to install the required version of skggm from GitHub.
--  For running the examples only: matplotlib
+- For running the examples only: matplotlib
 
 Quick start
 ===========
