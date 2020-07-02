@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_plot_sandwich.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_plot_sandwich.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_sandwich.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_sandwich.py:
 
 
 Sandwich demo
@@ -15,6 +17,7 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_sandwich_001.png
+    :alt: input space, LMNN, ITML_Supervised, SDML_Supervised, LSML_Supervised
     :class: sphx-glr-single-img
 
 
@@ -24,22 +27,11 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 
  .. code-block:: none
 
-    /home/william/metric-learn/metric_learn/lmnn.py:198: ChangedBehaviorWarning: Warning, no init was set (`init=None`). As of version 0.5.0, the default init will now be set to 'auto', instead of the previous identity matrix. If you still want to use the identity matrix as before, set init='identity'. This warning will disappear in v0.6.0, and `init` parameter's default value will be set to 'auto'.
-      warnings.warn(msg, ChangedBehaviorWarning)
-    /home/william/metric-learn/metric_learn/itml.py:404: ChangedBehaviorWarning: As of v0.5.0, `ITML_Supervised` now uses the `random_state` given at initialization to sample constraints, not the default `np.random` from the `fit` method, since this argument is now deprecated. This warning will disappear in v0.6.0.
-      ChangedBehaviorWarning)
-    /home/william/metric-learn/metric_learn/itml.py:45: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
+    /home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-    /home/william/metric-learn/metric_learn/sdml.py:375: ChangedBehaviorWarning: As of v0.5.0, `SDML_Supervised` now uses the `random_state` given at initialization to sample constraints, not the default `np.random` from the `fit` method, since this argument is now deprecated. This warning will disappear in v0.6.0.
-      ChangedBehaviorWarning)
-    /home/william/metric-learn/metric_learn/sdml.py:67: ChangedBehaviorWarning: Warning, no prior was set (`prior=None`). As of version 0.5.0, the default prior will now be set to 'identity', instead of 'covariance'. If you still want to use the inverse of the covariance matrix as a prior, set prior='covariance'. This warning will disappear in v0.6.0, and `prior` parameter's default value will be set to 'identity'.
-      warnings.warn(msg, ChangedBehaviorWarning)
-    /home/william/metric-learn/metric_learn/lsml.py:344: ChangedBehaviorWarning: As of v0.5.0, `LSML_Supervised` now uses the `random_state` given at initialization to sample constraints, not the default `np.random` from the `fit` method, since this argument is now deprecated. This warning will disappear in v0.6.0.
-      ChangedBehaviorWarning)
-    /home/william/metric-learn/metric_learn/lsml.py:54: ChangedBehaviorWarning: Warning, no prior was set (`prior=None`). As of version 0.5.0, the default prior will now be set to 'identity', instead of 'covariance'. If you still want to use the inverse of the covariance matrix as a prior, set prior='covariance'. This warning will disappear in v0.6.0, and `prior` parameter's default value will be set to 'identity'.
-      warnings.warn(msg, ChangedBehaviorWarning)
     /home/william/metric-learn/examples/plot_sandwich.py:46: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
       plt.show()
+
 
 
 
@@ -145,7 +137,7 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.805 seconds)
+   **Total running time of the script:** ( 0 minutes  8.315 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sandwich.py:
@@ -158,13 +150,13 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: plot_sandwich.py <plot_sandwich.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: plot_sandwich.ipynb <plot_sandwich.ipynb>`
 

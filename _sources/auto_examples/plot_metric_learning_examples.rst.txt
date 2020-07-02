@@ -795,9 +795,9 @@ Now that we've created our constraints, let's see what it looks like!
      [ 0  9]
      [ 0 10]
      ...
-     [54 61]
-     [69 71]
-     [54 44]]
+     [95 78]
+     [48 60]
+     [28 62]]
     [ 1.  1.  1. ... -1. -1. -1.]
 
 
@@ -871,7 +871,7 @@ This brings us to the end of this tutorial! Have fun Metric Learning :)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  56.187 seconds)
+   **Total running time of the script:** ( 3 minutes  13.586 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_metric_learning_examples.py:

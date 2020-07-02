@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Sandwich demo &mdash; metric-learn 0.6.0 documentation</title>
+  <title>Sandwich demo &mdash; metric-learn 0.6.2 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.6.0
+                0.6.2
               </div>
             
           
@@ -176,27 +176,15 @@
             
   <div class="sphx-glr-download-link-note admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-sandwich-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+<p class="last">Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-sandwich-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="sandwich-demo">
 <span id="sphx-glr-auto-examples-plot-sandwich-py"></span><h1>Sandwich demo<a class="headerlink" href="#sandwich-demo" title="Permalink to this headline">¶</a></h1>
 <p>Sandwich demo based on code from <a class="reference external" href="http://nbviewer.ipython.org/6576096">http://nbviewer.ipython.org/6576096</a></p>
-<img alt="../_images/sphx_glr_plot_sandwich_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_sandwich_001.png" />
+<img alt="input space, LMNN, ITML_Supervised, SDML_Supervised, LSML_Supervised" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_sandwich_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/metric_learn/lmnn.py:198: ChangedBehaviorWarning: Warning, no init was set (`init=None`). As of version 0.5.0, the default init will now be set to &#39;auto&#39;, instead of the previous identity matrix. If you still want to use the identity matrix as before, set init=&#39;identity&#39;. This warning will disappear in v0.6.0, and `init` parameter&#39;s default value will be set to &#39;auto&#39;.
-  warnings.warn(msg, ChangedBehaviorWarning)
-/home/william/metric-learn/metric_learn/itml.py:404: ChangedBehaviorWarning: As of v0.5.0, `ITML_Supervised` now uses the `random_state` given at initialization to sample constraints, not the default `np.random` from the `fit` method, since this argument is now deprecated. This warning will disappear in v0.6.0.
-  ChangedBehaviorWarning)
-/home/william/metric-learn/metric_learn/itml.py:45: FutureWarning: arrays to stack must be passed as a &quot;sequence&quot; type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a &quot;sequence&quot; type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
   X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-/home/william/metric-learn/metric_learn/sdml.py:375: ChangedBehaviorWarning: As of v0.5.0, `SDML_Supervised` now uses the `random_state` given at initialization to sample constraints, not the default `np.random` from the `fit` method, since this argument is now deprecated. This warning will disappear in v0.6.0.
-  ChangedBehaviorWarning)
-/home/william/metric-learn/metric_learn/sdml.py:67: ChangedBehaviorWarning: Warning, no prior was set (`prior=None`). As of version 0.5.0, the default prior will now be set to &#39;identity&#39;, instead of &#39;covariance&#39;. If you still want to use the inverse of the covariance matrix as a prior, set prior=&#39;covariance&#39;. This warning will disappear in v0.6.0, and `prior` parameter&#39;s default value will be set to &#39;identity&#39;.
-  warnings.warn(msg, ChangedBehaviorWarning)
-/home/william/metric-learn/metric_learn/lsml.py:344: ChangedBehaviorWarning: As of v0.5.0, `LSML_Supervised` now uses the `random_state` given at initialization to sample constraints, not the default `np.random` from the `fit` method, since this argument is now deprecated. This warning will disappear in v0.6.0.
-  ChangedBehaviorWarning)
-/home/william/metric-learn/metric_learn/lsml.py:54: ChangedBehaviorWarning: Warning, no prior was set (`prior=None`). As of version 0.5.0, the default prior will now be set to &#39;identity&#39;, instead of &#39;covariance&#39;. If you still want to use the inverse of the covariance matrix as a prior, set prior=&#39;covariance&#39;. This warning will disappear in v0.6.0, and `prior` parameter&#39;s default value will be set to &#39;identity&#39;.
-  warnings.warn(msg, ChangedBehaviorWarning)
 /home/william/metric-learn/examples/plot_sandwich.py:46: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
   plt.show()
 </pre></div>
@@ -247,7 +235,7 @@
 <span class="c1"># TODO: use this somewhere</span>
 <span class="k">def</span> <span class="nf">visualize_class_separation</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
   <span class="n">_</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-  <span class="n">label_order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+  <span class="n">label_order</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.argsort.html#numpy.argsort" title="numpy.argsort" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">argsort</span></a><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
   <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">pairwise_distances</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">label_order</span><span class="p">]),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
   <span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">pairwise_distances</span><span class="p">(</span><span class="n">labels</span><span class="p">[</span><span class="n">label_order</span><span class="p">,</span> <span class="kc">None</span><span class="p">]),</span>
              <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
@@ -267,21 +255,21 @@
   <span class="c1"># distance between layers, the points of each class are in a layer</span>
   <span class="n">dist</span> <span class="o">=</span> <span class="mf">0.7</span>
 
-  <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-  <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_points</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+  <span class="n">data</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+  <span class="n">labels</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">num_points</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
-  <span class="n">x_centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_points</span> <span class="o">/</span> <span class="mi">2</span>
-  <span class="n">y_centers</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_classes</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+  <span class="n">x_centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.arange.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="n">num_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_points</span> <span class="o">/</span> <span class="mi">2</span>
+  <span class="n">y_centers</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">*</span> <span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.arange.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="n">num_classes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_classes</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
   <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">yc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y_centers</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">xc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x_centers</span><span class="p">):</span>
-      <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">xc</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
-      <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">yc</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+      <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.normal.html#numpy.random.normal" title="numpy.random.normal" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span></a><span class="p">(</span><span class="n">xc</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+      <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.normal.html#numpy.random.normal" title="numpy.random.normal" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span></a><span class="p">(</span><span class="n">yc</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
     <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">i</span>
   <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="n">labels</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">plot_sandwich_data</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">plt</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;rbgmky&#39;</span><span class="p">):</span>
-  <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+  <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.unique.html#numpy.unique" title="numpy.unique" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
     <span class="n">xi</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">y</span> <span class="o">==</span> <span class="n">val</span><span class="p">]</span>
     <span class="n">axis</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">xi</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">facecolors</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="n">colors</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
 
@@ -296,11 +284,11 @@
   <span class="n">sandwich_demo</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.805 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.315 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-sandwich-py">
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
 <a class="reference download internal" download="" href="../_downloads/a6bf7d7136399675f28d77d001faa48f/plot_sandwich.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_sandwich.py</span></code></a></div>
-<div class="sphx-glr-download docutils container">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <a class="reference download internal" download="" href="../_downloads/4f011433714ef22e0c66be75bbfd08e3/plot_sandwich.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_sandwich.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
