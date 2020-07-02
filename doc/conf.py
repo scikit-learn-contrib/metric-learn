@@ -24,8 +24,8 @@ copyright = (u'2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien '
              u'Bellet and Nathalie Vauquier')
 author = (u'CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and '
           u'Nathalie Vauquier')
-version = '0.6.0'
-release = '0.6.0'
+version = '0.6.2'
+release = '0.6.2'
 language = 'en'
 
 exclude_patterns = ['_build']
