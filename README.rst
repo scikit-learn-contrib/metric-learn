@@ -54,12 +54,15 @@ citations to the following paper:
 
 Bibtex entry::
 
-  @techreport{metric-learn,
-    title = {metric-learn: {M}etric {L}earning {A}lgorithms in {P}ython},
-    author = {{de Vazelhes}, William and {Carey}, CJ and {Tang}, Yuan and
-              {Vauquier}, Nathalie and {Bellet}, Aur{\'e}lien},
-    institution = {arXiv:1908.04710},
-    year = {2019}
+  @article{JMLR:v21:19-678,
+  author  = {William de Vazelhes and CJ Carey and Yuan Tang and Nathalie Vauquier and AurÃ©lien Bellet},
+  title   = {metric-learn: Metric Learning Algorithms in Python},
+  journal = {Journal of Machine Learning Research},
+  year    = {2020},
+  volume  = {21},
+  number  = {138},
+  pages   = {1-6},
+  url     = {http://jmlr.org/papers/v21/19-678.html}
   }
 
 .. _sphinx documentation: http://contrib.scikit-learn.org/metric-learn/
