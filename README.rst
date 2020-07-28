@@ -55,7 +55,7 @@ citations to the following paper:
 Bibtex entry::
 
   @article{metric-learn,
-    title   = {metric-learn: {M}etric {L}earning {A}lgorithms in {P}ython},
+    title = {metric-learn: {M}etric {L}earning {A}lgorithms in {P}ython},
     author = {{de Vazelhes}, William and {Carey}, CJ and {Tang}, Yuan and
               {Vauquier}, Nathalie and {Bellet}, Aur{\'e}lien},
     journal = {Journal of Machine Learning Research},
