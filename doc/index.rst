@@ -15,17 +15,20 @@ If you use metric-learn in a scientific publication, we would appreciate
 citations to the following paper:
 
 `metric-learn: Metric Learning Algorithms in Python
-<https://arxiv.org/abs/1908.04710>`_, de Vazelhes
-*et al.*, arXiv:1908.04710, 2019.
+<http://www.jmlr.org/papers/volume21/19-678/19-678.pdf>`_, de Vazelhes
+*et al.*, Journal of Machine Learning Research, 21(138):1-6, 2020.
 
 Bibtex entry::
 
-  @techreport{metric-learn,
-    title = {metric-learn: {M}etric {L}earning {A}lgorithms in {P}ython},
+  @article{metric-learn,
+    title   = {metric-learn: {M}etric {L}earning {A}lgorithms in {P}ython},
     author = {{de Vazelhes}, William and {Carey}, CJ and {Tang}, Yuan and
               {Vauquier}, Nathalie and {Bellet}, Aur{\'e}lien},
-    institution = {arXiv:1908.04710},
-    year = {2019}
+    journal = {Journal of Machine Learning Research},
+    year = {2020},
+    volume = {21},
+    number = {138},
+    pages = {1--6}
   }
 
 
