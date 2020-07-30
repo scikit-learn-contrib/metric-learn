@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import warnings
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -80,3 +81,9 @@ html4_writer = True
 def setup(app):
     app.add_javascript('js/copybutton.js')
     app.add_stylesheet("basic.css")
+
+
+# Remove matplotlib agg warnings from generated doc when using plt.show
+warnings.filterwarnings("ignore", category=UserWarning,
+                        message='Matplotlib is currently using agg, which is a'
+                                ' non-GUI backend, so cannot show the figure.')
