@@ -317,25 +317,25 @@ Learning for Large Margin Nearest Neighbor Classification</a>. NIPS
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.fit_transform" title="metric_learn.LMNN.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(self,&nbsp;X[,&nbsp;y])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.fit_transform" title="metric_learn.LMNN.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[,&nbsp;y])</td>
 <td>Fit to data, then transform it.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.get_mahalanobis_matrix" title="metric_learn.LMNN.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>(self)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.get_mahalanobis_matrix" title="metric_learn.LMNN.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
 <td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.get_metric" title="metric_learn.LMNN.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>(self)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.get_metric" title="metric_learn.LMNN.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
 <td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.get_params" title="metric_learn.LMNN.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>(self[,&nbsp;deep])</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.get_params" title="metric_learn.LMNN.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
 <td>Get parameters for this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.score_pairs" title="metric_learn.LMNN.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(self,&nbsp;pairs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.score_pairs" title="metric_learn.LMNN.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
 <td>Returns the learned Mahalanobis distance between pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.set_params" title="metric_learn.LMNN.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(self,&nbsp;**params)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.LMNN.set_params" title="metric_learn.LMNN.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
 <td>Set the parameters of this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.transform" title="metric_learn.LMNN.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(self,&nbsp;X)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.LMNN.transform" title="metric_learn.LMNN.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
 <td>Embeds data points in the learned linear embedding space.</td>
 </tr>
 </tbody>
@@ -353,18 +353,18 @@ Learning for Large Margin Nearest Neighbor Classification</a>. NIPS
 </table>
 <dl class="py method">
 <dt id="metric_learn.LMNN.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">init</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em><span class="n">k</span><span class="o">=</span><span class="default_value">3</span></em>, <em><span class="n">min_iter</span><span class="o">=</span><span class="default_value">50</span></em>, <em><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em><span class="n">learn_rate</span><span class="o">=</span><span class="default_value">1e-07</span></em>, <em><span class="n">regularization</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em><span class="n">convergence_tol</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">n_components</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/lmnn.html#LMNN.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.LMNN.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">init</span><span class="o">=</span><span class="default_value">'auto'</span></em>, <em><span class="n">k</span><span class="o">=</span><span class="default_value">3</span></em>, <em><span class="n">min_iter</span><span class="o">=</span><span class="default_value">50</span></em>, <em><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em><span class="n">learn_rate</span><span class="o">=</span><span class="default_value">1e-07</span></em>, <em><span class="n">regularization</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em><span class="n">convergence_tol</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">n_components</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/lmnn.html#LMNN.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.LMNN.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="metric_learn.LMNN.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">X</span></em>, <em><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/lmnn.html#LMNN.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.LMNN.fit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fit</code><span class="sig-paren">(</span><em><span class="n">X</span></em>, <em><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/lmnn.html#LMNN.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.LMNN.fit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="metric_learn.LMNN.fit_transform">
-<code class="descname">fit_transform</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">X</span></em>, <em><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="o">**</span><span class="n">fit_params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.fit_transform" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em><span class="n">X</span></em>, <em><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="o">**</span><span class="n">fit_params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.fit_transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fit to data, then transform it.</p>
 <p>Fits transformer to X and y with optional parameters fit_params
 and returns a transformed version of X.</p>
@@ -393,7 +393,7 @@ and returns a transformed version of X.</p>
 
 <dl class="py method">
 <dt id="metric_learn.LMNN.get_mahalanobis_matrix">
-<code class="descname">get_mahalanobis_matrix</code><span class="sig-paren">(</span><em><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.get_mahalanobis_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_mahalanobis_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.get_mahalanobis_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -411,7 +411,7 @@ and returns a transformed version of X.</p>
 
 <dl class="py method">
 <dt id="metric_learn.LMNN.get_metric">
-<code class="descname">get_metric</code><span class="sig-paren">(</span><em><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.get_metric" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.get_metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a function that takes as input two 1D arrays and outputs the
 learned metric score on these two points.</p>
 <p>This function will be independent from the metric learner that learned it
@@ -456,7 +456,7 @@ scikit-learn’s estimators.</p>
 
 <dl class="py method">
 <dt id="metric_learn.LMNN.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.get_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_params</code><span class="sig-paren">(</span><em><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -481,7 +481,7 @@ contained subobjects that are estimators.</p>
 
 <dl class="py method">
 <dt id="metric_learn.LMNN.score_pairs">
-<code class="descname">score_pairs</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.score_pairs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">score_pairs</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.score_pairs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the learned Mahalanobis distance between pairs.</p>
 <p>This distance is defined as: <span class="math notranslate nohighlight">\(d_M(x, x') = \sqrt{(x-x')^T M (x-x')}\)</span>
 where <code class="docutils literal notranslate"><span class="pre">M</span></code> is the learned Mahalanobis matrix, for every pair of points
@@ -521,7 +521,7 @@ preprocessor.</p>
 
 <dl class="py method">
 <dt id="metric_learn.LMNN.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.set_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_params</code><span class="sig-paren">(</span><em><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.set_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
 (such as pipelines). The latter have parameters of the form
@@ -549,7 +549,7 @@ component of a nested object.</p>
 
 <dl class="py method">
 <dt id="metric_learn.LMNN.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.transform" title="Permalink to this definition">¶</a></dt>
+<code class="descname">transform</code><span class="sig-paren">(</span><em><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.LMNN.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Embeds data points in the learned linear embedding space.</p>
 <p>Transforms samples in <code class="docutils literal notranslate"><span class="pre">X</span></code> into <code class="docutils literal notranslate"><span class="pre">X_embedded</span></code>, samples inside a new
 embedding space such that: <code class="docutils literal notranslate"><span class="pre">X_embedded</span> <span class="pre">=</span> <span class="pre">X.dot(L.T)</span></code>, where <code class="docutils literal notranslate"><span class="pre">L</span></code> is

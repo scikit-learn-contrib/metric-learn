@@ -216,26 +216,26 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Constraints.chunks" title="metric_learn.Constraints.chunks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chunks</span></code></a>(self[,&nbsp;num_chunks,&nbsp;chunk_size,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Constraints.chunks" title="metric_learn.Constraints.chunks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chunks</span></code></a>([num_chunks,&nbsp;chunk_size,&nbsp;random_state])</td>
 <td>Generates chunks from labeled data.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Constraints.generate_knntriplets" title="metric_learn.Constraints.generate_knntriplets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_knntriplets</span></code></a>(self,&nbsp;X,&nbsp;k_genuine,&nbsp;…)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Constraints.generate_knntriplets" title="metric_learn.Constraints.generate_knntriplets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_knntriplets</span></code></a>(X,&nbsp;k_genuine,&nbsp;k_impostor)</td>
 <td>Generates triplets from labeled data.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Constraints.positive_negative_pairs" title="metric_learn.Constraints.positive_negative_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">positive_negative_pairs</span></code></a>(self,&nbsp;num_constraints)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Constraints.positive_negative_pairs" title="metric_learn.Constraints.positive_negative_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">positive_negative_pairs</span></code></a>(num_constraints[,&nbsp;…])</td>
 <td>Generates positive pairs and negative pairs from labeled data.</td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt id="metric_learn.Constraints.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">partial_labels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">partial_labels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="metric_learn.Constraints.chunks">
-<code class="descname">chunks</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">num_chunks</span><span class="o">=</span><span class="default_value">100</span></em>, <em><span class="n">chunk_size</span><span class="o">=</span><span class="default_value">2</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.chunks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.chunks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">chunks</code><span class="sig-paren">(</span><em><span class="n">num_chunks</span><span class="o">=</span><span class="default_value">100</span></em>, <em><span class="n">chunk_size</span><span class="o">=</span><span class="default_value">2</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.chunks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.chunks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates chunks from labeled data.</p>
 <p>Each of <code class="docutils literal notranslate"><span class="pre">num_chunks</span></code> chunks is composed of <code class="docutils literal notranslate"><span class="pre">chunk_size</span></code> points from
 the same class drawn at random. Each point can belong to at most 1 chunk.</p>
@@ -268,7 +268,7 @@ belong to any chunk.</p>
 
 <dl class="py method">
 <dt id="metric_learn.Constraints.generate_knntriplets">
-<code class="descname">generate_knntriplets</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">X</span></em>, <em><span class="n">k_genuine</span></em>, <em><span class="n">k_impostor</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.generate_knntriplets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.generate_knntriplets" title="Permalink to this definition">¶</a></dt>
+<code class="descname">generate_knntriplets</code><span class="sig-paren">(</span><em><span class="n">X</span></em>, <em><span class="n">k_genuine</span></em>, <em><span class="n">k_impostor</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.generate_knntriplets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.generate_knntriplets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates triplets from labeled data.</p>
 <p>For every point (X_a) the triplets (X_a, X_b, X_c) are constructed from all
 the combinations of taking one of its <code class="xref any docutils literal notranslate"><span class="pre">k_genuine</span></code>-nearest neighbors of the
@@ -308,7 +308,7 @@ for that class.</p>
 
 <dl class="py method">
 <dt id="metric_learn.Constraints.positive_negative_pairs">
-<code class="descname">positive_negative_pairs</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">num_constraints</span></em>, <em><span class="n">same_length</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.positive_negative_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.positive_negative_pairs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">positive_negative_pairs</code><span class="sig-paren">(</span><em><span class="n">num_constraints</span></em>, <em><span class="n">same_length</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.positive_negative_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.positive_negative_pairs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates positive pairs and negative pairs from labeled data.</p>
 <p>Positive pairs are formed by randomly drawing <code class="docutils literal notranslate"><span class="pre">num_constraints</span></code> pairs of
 points with the same label. Negative pairs are formed by randomly drawing

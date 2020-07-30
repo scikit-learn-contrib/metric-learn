@@ -132,15 +132,6 @@ Let's now plot the dataset as is.
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
-
 
 
 
@@ -248,15 +239,6 @@ space looks like after being transformed with the new learned metric.
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
-
 
 
 
@@ -307,8 +289,6 @@ the same class to belong to the same cluster, as you can see below.
 
     /home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
@@ -341,15 +321,6 @@ subject to an inequality constraint.
     :alt: plot metric learning examples
     :class: sphx-glr-single-img
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
@@ -394,8 +365,6 @@ intrinsic high dimensional feature space.
 
     /home/william/metric-learn/metric_learn/_util.py:707: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
       X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
@@ -439,8 +408,6 @@ the sum of squared hinge loss of violated constraints.
 
     /home/william/metric-learn/metric_learn/_util.py:707: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
       X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
@@ -482,15 +449,6 @@ enforces conditions at a local neighborhood scale.
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
-
 
 
 
@@ -526,15 +484,6 @@ from the same class in a unique cluster.
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
-
 
 
 
@@ -568,15 +517,6 @@ subsets of points that are known to belong to the same class.
     :alt: plot metric learning examples
     :class: sphx-glr-single-img
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
@@ -632,15 +572,6 @@ Let's plot the dataset as is
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
-
 
 
 
@@ -660,15 +591,6 @@ And let's plot the dataset after transformation by MLKR:
     :alt: plot metric learning examples
     :class: sphx-glr-single-img
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
@@ -795,9 +717,9 @@ Now that we've created our constraints, let's see what it looks like!
      [ 0  9]
      [ 0 10]
      ...
-     [95 78]
-     [48 60]
-     [28 62]]
+     [39 21]
+     [86 89]
+     [91 15]]
     [ 1.  1.  1. ... -1. -1. -1.]
 
 
@@ -840,8 +762,6 @@ and `pairs_labels` in the fit method.
 
     /home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-    /home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
@@ -871,7 +791,7 @@ This brings us to the end of this tutorial! Have fun Metric Learning :)
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  13.586 seconds)
+   **Total running time of the script:** ( 3 minutes  15.600 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_metric_learning_examples.py:

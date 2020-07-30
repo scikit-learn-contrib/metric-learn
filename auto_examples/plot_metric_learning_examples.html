@@ -262,11 +262,6 @@ transformed data in 2D, we will use the t-sne algorithm. (See
 </pre></div>
 </div>
 <img alt="plot metric learning examples" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
 <p>We can see that the classes appear mixed up: this is because t-sne
 is based on preserving the original neighborhood of points in the embedding
 space, but this original neighborhood is based on the euclidean
@@ -335,11 +330,6 @@ space looks like after being transformed with the new learned metric.</p>
 </pre></div>
 </div>
 <img alt="plot metric learning examples" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_002.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
 <p>Pretty neat, huh?</p>
 <p>The rest of this notebook will briefly explain the other Metric Learning
 algorithms before plotting them. Also, while we have first run <code class="docutils literal notranslate"><span class="pre">fit</span></code>
@@ -369,8 +359,6 @@ the same class to belong to the same cluster, as you can see below.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a &quot;sequence&quot; type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
   X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
 </pre></div>
 </div>
 </div>
@@ -391,11 +379,6 @@ subject to an inequality constraint.</p>
 </pre></div>
 </div>
 <img alt="plot metric learning examples" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_004.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
 </div>
 <div class="section" id="sparse-determinant-metric-learning">
 <h2>Sparse Determinant Metric Learning<a class="headerlink" href="#sparse-determinant-metric-learning" title="Permalink to this headline">¶</a></h2>
@@ -419,8 +402,6 @@ intrinsic high dimensional feature space.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/metric_learn/_util.py:707: FutureWarning: arrays to stack must be passed as a &quot;sequence&quot; type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
   X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
-/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
 </pre></div>
 </div>
 </div>
@@ -445,8 +426,6 @@ the sum of squared hinge loss of violated constraints.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/metric_learn/_util.py:707: FutureWarning: arrays to stack must be passed as a &quot;sequence&quot; type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
   X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
-/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
 </pre></div>
 </div>
 </div>
@@ -460,7 +439,7 @@ neighbors rule is maximized in the transformed space. The key insight to
 the algorithm is that a matrix <span class="math notranslate nohighlight">\(A\)</span> corresponding to the
 transformation can be found by defining a differentiable objective function
 for <span class="math notranslate nohighlight">\(A\)</span>, followed by use of an iterative solver such as
-<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html#scipy.optimize.fmin_l_bfgs_b" title="(in SciPy v1.5.0)"><code class="xref any docutils literal notranslate"><span class="pre">scipy.optimize.fmin_l_bfgs_b</span></code></a>. Like LMNN, this algorithm does not try to
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_l_bfgs_b.html#scipy.optimize.fmin_l_bfgs_b" title="(in SciPy v1.5.2)"><code class="xref any docutils literal notranslate"><span class="pre">scipy.optimize.fmin_l_bfgs_b</span></code></a>. Like LMNN, this algorithm does not try to
 cluster points from the same class in a unique cluster, because it
 enforces conditions at a local neighborhood scale.</p>
 <ul class="simple">
@@ -474,11 +453,6 @@ enforces conditions at a local neighborhood scale.</p>
 </pre></div>
 </div>
 <img alt="plot metric learning examples" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_007.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
 </div>
 <div class="section" id="local-fisher-discriminant-analysis">
 <h2>Local Fisher Discriminant Analysis<a class="headerlink" href="#local-fisher-discriminant-analysis" title="Permalink to this headline">¶</a></h2>
@@ -499,11 +473,6 @@ from the same class in a unique cluster.</p>
 </pre></div>
 </div>
 <img alt="plot metric learning examples" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_008.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
 </div>
 <div class="section" id="relative-components-analysis">
 <h2>Relative Components Analysis<a class="headerlink" href="#relative-components-analysis" title="Permalink to this headline">¶</a></h2>
@@ -524,11 +493,6 @@ subsets of points that are known to belong to the same class.</p>
 </pre></div>
 </div>
 <img alt="plot metric learning examples" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_009.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
 </div>
 <div class="section" id="regression-example-metric-learning-for-kernel-regression">
 <h2>Regression example: Metric Learning for Kernel Regression<a class="headerlink" href="#regression-example-metric-learning-for-kernel-regression" title="Permalink to this headline">¶</a></h2>
@@ -557,11 +521,6 @@ same magnitude.</p>
 </pre></div>
 </div>
 <img alt="plot metric learning examples" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_010.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
 <p>And let’s plot the dataset after transformation by MLKR:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mlkr</span> <span class="o">=</span> <span class="n">metric_learn</span><span class="o">.</span><span class="n">MLKR</span><span class="p">()</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_mlkr</span></a> <span class="o">=</span> <span class="n">mlkr</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_reg</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_reg</span></a><span class="p">)</span>
@@ -569,11 +528,6 @@ same magnitude.</p>
 </pre></div>
 </div>
 <img alt="plot metric learning examples" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_metric_learning_examples_011.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
-</pre></div>
-</div>
 <p>Points that have the same value to regress are now closer to each
 other ! This would improve the performance of
 <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html#sklearn.neighbors.KNeighborsRegressor" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.neighbors.KNeighborsRegressor</span></code></a> for instance.</p>
@@ -665,9 +619,9 @@ closer than two points in different labels.</p>
  [ 0  9]
  [ 0 10]
  ...
- [95 78]
- [48 60]
- [28 62]]
+ [39 21]
+ [86 89]
+ [91 15]]
 [ 1.  1.  1. ... -1. -1. -1.]
 </pre></div>
 </div>
@@ -690,8 +644,6 @@ and <code class="xref any docutils literal notranslate"><span class="pre">pairs_
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a &quot;sequence&quot; type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
   X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-/home/william/metric-learn/examples/plot_metric_learning_examples.py:66: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-  plt.show()
 </pre></div>
 </div>
 <p>And that’s the result of ITML after being trained on our manually
@@ -711,7 +663,7 @@ cross-validations (see also this <a class="reference internal" href="../weakly_s
 can also look at some <a class="reference internal" href="../introduction.html#use-cases"><span class="std std-ref">use cases</span></a> where you could combine
 metric-learn with scikit-learn estimators.</p>
 <p>This brings us to the end of this tutorial! Have fun Metric Learning :)</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  13.586 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 3 minutes  15.600 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-metric-learning-examples-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <a class="reference download internal" download="" href="../_downloads/bd873dc20743b4004d594a33f6abf089/plot_metric_learning_examples.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_metric_learning_examples.py</span></code></a></div>

@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**03:21.902** total execution time for **auto_examples** files:
+**03:24.243** total execution time for **auto_examples** files:
 
 +-------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_metric_learning_examples.py` (``plot_metric_learning_examples.py``) | 03:13.586 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_metric_learning_examples.py` (``plot_metric_learning_examples.py``) | 03:15.600 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_sandwich.py` (``plot_sandwich.py``)                                 | 00:08.315 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_sandwich.py` (``plot_sandwich.py``)                                 | 00:08.643 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------+-----------+--------+

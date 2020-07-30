@@ -287,53 +287,53 @@ classified as dissimilar.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.calibrate_threshold" title="metric_learn.SDML.calibrate_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a>(self,&nbsp;pairs_valid,&nbsp;y_valid)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.calibrate_threshold" title="metric_learn.SDML.calibrate_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a>(pairs_valid,&nbsp;y_valid[,&nbsp;…])</td>
 <td>Decision threshold calibration for pairwise binary classification</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.decision_function" title="metric_learn.SDML.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(self,&nbsp;pairs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.decision_function" title="metric_learn.SDML.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(pairs)</td>
 <td>Returns the decision function used to classify the pairs.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.fit" title="metric_learn.SDML.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(self,&nbsp;pairs,&nbsp;y[,&nbsp;calibration_params])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.fit" title="metric_learn.SDML.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(pairs,&nbsp;y[,&nbsp;calibration_params])</td>
 <td>Learn the SDML model.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_mahalanobis_matrix" title="metric_learn.SDML.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>(self)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_mahalanobis_matrix" title="metric_learn.SDML.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
 <td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>(self)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
 <td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_params" title="metric_learn.SDML.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>(self[,&nbsp;deep])</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_params" title="metric_learn.SDML.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
 <td>Get parameters for this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.predict" title="metric_learn.SDML.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(self,&nbsp;pairs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.predict" title="metric_learn.SDML.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(pairs)</td>
 <td>Predicts the learned metric between input pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.score" title="metric_learn.SDML.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(self,&nbsp;pairs,&nbsp;y)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.score" title="metric_learn.SDML.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(pairs,&nbsp;y)</td>
 <td>Computes score of pairs similarity prediction.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.score_pairs" title="metric_learn.SDML.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(self,&nbsp;pairs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.score_pairs" title="metric_learn.SDML.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
 <td>Returns the learned Mahalanobis distance between pairs.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.set_params" title="metric_learn.SDML.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(self,&nbsp;**params)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.set_params" title="metric_learn.SDML.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
 <td>Set the parameters of this estimator.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.set_threshold" title="metric_learn.SDML.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(self,&nbsp;threshold)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.set_threshold" title="metric_learn.SDML.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(threshold)</td>
 <td>Sets the threshold of the metric learner to the given value <code class="xref any docutils literal notranslate"><span class="pre">threshold</span></code>.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.transform" title="metric_learn.SDML.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(self,&nbsp;X)</td>
+<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.transform" title="metric_learn.SDML.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
 <td>Embeds data points in the learned linear embedding space.</td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt id="metric_learn.SDML.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">balance_param</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em><span class="n">sparsity_param</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em><span class="n">prior</span><span class="o">=</span><span class="default_value">'identity'</span></em>, <em><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">balance_param</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em><span class="n">sparsity_param</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em><span class="n">prior</span><span class="o">=</span><span class="default_value">'identity'</span></em>, <em><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.calibrate_threshold">
-<code class="descname">calibrate_threshold</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs_valid</span></em>, <em><span class="n">y_valid</span></em>, <em><span class="n">strategy</span><span class="o">=</span><span class="default_value">'accuracy'</span></em>, <em><span class="n">min_rate</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">beta</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.calibrate_threshold" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calibrate_threshold</code><span class="sig-paren">(</span><em><span class="n">pairs_valid</span></em>, <em><span class="n">y_valid</span></em>, <em><span class="n">strategy</span><span class="o">=</span><span class="default_value">'accuracy'</span></em>, <em><span class="n">min_rate</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">beta</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.calibrate_threshold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decision threshold calibration for pairwise binary classification</p>
 <p>Method that calibrates the decision threshold (cutoff point) of the metric
 learner. This threshold will then be used when calling the method
@@ -405,7 +405,7 @@ Clinical chemistry, 1993</td></tr>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.decision_function">
-<code class="descname">decision_function</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.decision_function" title="Permalink to this definition">¶</a></dt>
+<code class="descname">decision_function</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.decision_function" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the decision function used to classify the pairs.</p>
 <p>Returns the opposite of the learned metric value between samples in every
 pair, to be consistent with scikit-learn conventions. Hence it should
@@ -436,7 +436,7 @@ preprocessor.</p>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em>, <em><span class="n">y</span></em>, <em><span class="n">calibration_params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/sdml.html#SDML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.SDML.fit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fit</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em>, <em><span class="n">y</span></em>, <em><span class="n">calibration_params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/sdml.html#SDML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.SDML.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Learn the SDML model.</p>
 <p>The threshold will be calibrated on the trainset using the parameters
 <code class="xref any docutils literal notranslate"><span class="pre">calibration_params</span></code>.</p>
@@ -470,7 +470,7 @@ given, <a class="reference internal" href="#metric_learn.SDML.calibrate_threshol
 
 <dl class="py method">
 <dt id="metric_learn.SDML.get_mahalanobis_matrix">
-<code class="descname">get_mahalanobis_matrix</code><span class="sig-paren">(</span><em><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_mahalanobis_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_mahalanobis_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_mahalanobis_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -488,7 +488,7 @@ given, <a class="reference internal" href="#metric_learn.SDML.calibrate_threshol
 
 <dl class="py method">
 <dt id="metric_learn.SDML.get_metric">
-<code class="descname">get_metric</code><span class="sig-paren">(</span><em><span class="n">self</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_metric" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a function that takes as input two 1D arrays and outputs the
 learned metric score on these two points.</p>
 <p>This function will be independent from the metric learner that learned it
@@ -533,7 +533,7 @@ scikit-learn’s estimators.</p>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_params</code><span class="sig-paren">(</span><em><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get parameters for this estimator.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -558,7 +558,7 @@ contained subobjects that are estimators.</p>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.predict" title="Permalink to this definition">¶</a></dt>
+<code class="descname">predict</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predicts the learned metric between input pairs. (For now it just
 calls decision function).</p>
 <p>Returns the learned metric value between samples in every pair. It should
@@ -587,7 +587,7 @@ preprocessor.</p>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.score">
-<code class="descname">score</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em>, <em><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.score" title="Permalink to this definition">¶</a></dt>
+<code class="descname">score</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em>, <em><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes score of pairs similarity prediction.</p>
 <p>Returns the <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> score of the fitted metric learner. It is
 computed in the following way: for every value of a threshold
@@ -621,7 +621,7 @@ preprocessor.</p>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.score_pairs">
-<code class="descname">score_pairs</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.score_pairs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">score_pairs</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.score_pairs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the learned Mahalanobis distance between pairs.</p>
 <p>This distance is defined as: <span class="math notranslate nohighlight">\(d_M(x, x') = \sqrt{(x-x')^T M (x-x')}\)</span>
 where <code class="docutils literal notranslate"><span class="pre">M</span></code> is the learned Mahalanobis matrix, for every pair of points
@@ -661,7 +661,7 @@ preprocessor.</p>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.set_params" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_params</code><span class="sig-paren">(</span><em><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.set_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
 (such as pipelines). The latter have parameters of the form
@@ -689,7 +689,7 @@ component of a nested object.</p>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.set_threshold">
-<code class="descname">set_threshold</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">threshold</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.set_threshold" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_threshold</code><span class="sig-paren">(</span><em><span class="n">threshold</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.set_threshold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the threshold of the metric learner to the given value <code class="xref any docutils literal notranslate"><span class="pre">threshold</span></code>.</p>
 <p>See more in the <a class="reference internal" href="../weakly_supervised.html#calibration"><span class="std std-ref">User Guide</span></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -717,7 +717,7 @@ and dissimilar (-1) if not.</p>
 
 <dl class="py method">
 <dt id="metric_learn.SDML.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em><span class="n">self</span></em>, <em><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.transform" title="Permalink to this definition">¶</a></dt>
+<code class="descname">transform</code><span class="sig-paren">(</span><em><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Embeds data points in the learned linear embedding space.</p>
 <p>Transforms samples in <code class="docutils literal notranslate"><span class="pre">X</span></code> into <code class="docutils literal notranslate"><span class="pre">X_embedded</span></code>, samples inside a new
 embedding space such that: <code class="docutils literal notranslate"><span class="pre">X_embedded</span> <span class="pre">=</span> <span class="pre">X.dot(L.T)</span></code>, where <code class="docutils literal notranslate"><span class="pre">L</span></code> is

@@ -29,8 +29,6 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 
     /home/william/metric-learn/metric_learn/itml.py:35: FutureWarning: arrays to stack must be passed as a "sequence" type such as list or tuple. Support for non-sequence iterables such as generators is deprecated as of NumPy 1.16 and will raise an error in the future.
       X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
-    /home/william/metric-learn/examples/plot_sandwich.py:46: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show()
 
 
 
@@ -137,7 +135,7 @@ Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  8.315 seconds)
+   **Total running time of the script:** ( 0 minutes  8.643 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sandwich.py:
