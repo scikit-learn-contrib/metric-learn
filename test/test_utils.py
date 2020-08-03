@@ -1055,6 +1055,53 @@ def test__check_sdp_from_eigen_returns_definiteness(w, is_definite):
   assert _check_sdp_from_eigen(w) == is_definite
 
 
+@pytest.mark.unit
+@pytest.mark.parametrize('w, tol, is_definite',
+                         [(np.array([5., 3.]), 2, True),
+                          (np.array([5., 1.]), 2, False),
+                          (np.array([5., -1.]), 2, False)])
+def test__check_sdp_from_eigen_tol_psd(w, tol, is_definite):
+  """Tests that _check_sdp_from_eigen, for PSD matrices, returns
+  False if an eigenvalue is lower than tol"""
+  assert _check_sdp_from_eigen(w, tol=tol) == is_definite
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w, tol',
+                         [(np.array([5., -3.]), 2),
+                          (np.array([1., -3.]), 2)])
+def test__check_sdp_from_eigen_tol_non_psd(w, tol):
+  """Tests that _check_sdp_from_eigen raises a NonPSDError
+  when there is a negative value with abs value higher than tol"""
+  with pytest.raises(NonPSDError):
+    _check_sdp_from_eigen(w, tol=tol)
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w, is_definite',
+                         [(np.array([1e5, 1e5, 1e5, 1e5, 
+                                     1e5, 1e5, 1e-20]), False),
+                          (np.array([1e-10, 1e-10]), True)])
+def test__check_sdp_from_eigen_tol_default_psd(w, is_definite):
+  """Tests that the default tol argument gives good results for edge cases
+  like even if the determinant is high but clearly one eigenvalue is low,
+  (undefinite so returns False) or when all eigenvalues are low (definite so
+  returns True)"""
+  assert _check_sdp_from_eigen(w, tol=None) == is_definite
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize('w',
+                         [np.array([1., -1.]),
+                          np.array([-1e-10, 1e-10])])
+def test__check_sdp_from_eigen_tol_default_non_psd(w):
+  """Tests that the default tol argument is good for raising
+  NonPSDError, e.g. that when a value is clearly relatively
+  negative it raises such an error"""
+  with pytest.raises(NonPSDError):
+    _check_sdp_from_eigen(w, tol=None)
+
+
 def test__check_n_components():
   """Checks that n_components returns what is expected
   (including the errors)"""

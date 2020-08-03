@@ -117,17 +117,14 @@ class TestTransformerMetricConversion(unittest.TestCase):
     L = components_from_metric(M)
     assert_allclose(L.T.dot(L), M)
 
-    # matrix with a determinant still high but which should be considered as a
-    # non-definite matrix (to check we don't test the definiteness with the
-    # determinant which is a bad strategy)
+    # matrix with a determinant still high but which is
+    # undefinite w.r.t to numpy standards
     M = np.diag([1e5, 1e5, 1e5, 1e5, 1e5, 1e5, 1e-20])
     M = P.dot(M).dot(P.T)
     assert np.abs(np.linalg.det(M)) > 10
     assert np.linalg.slogdet(M)[1] > 1  # (just to show that the computed
     # determinant is far from null)
-    with pytest.raises(LinAlgError) as err_msg:
-      np.linalg.cholesky(M)
-    assert str(err_msg.value) == 'Matrix is not positive definite'
+    assert np.linalg.matrix_rank(M) < M.shape[0]
     # (just to show that this case is indeed considered by numpy as an
     # indefinite case)
     L = components_from_metric(M)
