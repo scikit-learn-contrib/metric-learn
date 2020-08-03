@@ -1,7 +1,6 @@
 import unittest
 import numpy as np
 import pytest
-from numpy.linalg import LinAlgError
 from scipy.stats import ortho_group
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal, assert_allclose
