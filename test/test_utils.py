@@ -1079,7 +1079,7 @@ def test__check_sdp_from_eigen_tol_non_psd(w, tol):
 
 @pytest.mark.unit
 @pytest.mark.parametrize('w, is_definite',
-                         [(np.array([1e5, 1e5, 1e5, 1e5, 
+                         [(np.array([1e5, 1e5, 1e5, 1e5,
                                      1e5, 1e5, 1e-20]), False),
                           (np.array([1e-10, 1e-10]), True)])
 def test__check_sdp_from_eigen_tol_default_psd(w, is_definite):
