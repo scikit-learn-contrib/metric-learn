@@ -931,7 +931,7 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
       assert np.array(output_with_prep == output_with_prep_formed).all()
 
   # test score_pairs
-  idx1 = np.array([[0, 2],[5, 3]], dtype=int)
+  idx1 = np.array([[0, 2], [5, 3]], dtype=int)
   output_with_prep = estimator_with_preprocessor.score_pairs(
       indicators_to_transform[idx1])
   output_without_prep = estimator_without_preprocessor.score_pairs(
