@@ -109,7 +109,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   """
 
   def __init__(self, n_components=None, init='auto',
-               tol=None, max_iter=1000, verbose=False,
+               tol=None, max_iter=1000, sigma=1, learn_rate=1e-4, verbose=False,
                preprocessor=None, random_state=None):
     self.n_components = n_components
     self.init = init
@@ -117,6 +117,8 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     self.max_iter = max_iter
     self.verbose = verbose
     self.random_state = random_state
+    self.lr = learn_rate
+    self.sigma = sigma
     super(MLKR, self).__init__(preprocessor)
 
   def fit(self, X, y):
@@ -182,7 +184,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
 
     A = flatA.reshape((-1, X.shape[1]))
     X_embedded = np.dot(X, A.T)
-    dist = pairwise_distances(X_embedded, squared=True)
+    dist = pairwise_distances(X_embedded, squared=True) / self.sigma
     np.fill_diagonal(dist, np.inf)
     softmax = np.exp(- dist - logsumexp(- dist, axis=1)[:, np.newaxis])
     yhat = softmax.dot(y)
@@ -193,7 +195,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     W = softmax * ydiff[:, np.newaxis] * (y - yhat[:, np.newaxis])
     W_sym = W + W.T
     np.fill_diagonal(W_sym, - W.sum(axis=0))
-    grad = 4 * (X_embedded.T.dot(W_sym)).dot(X)
+    grad = self.lr * 4 * (X_embedded.T.dot(W_sym)).dot(X)
 
     if self.verbose:
       start_time = time.time() - start_time
