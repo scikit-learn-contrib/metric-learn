@@ -69,6 +69,12 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   max_iter : int, optional (default=1000)
     Cap on number of conjugate gradient iterations.
 
+  length_scale : float, optional (default=1)
+    The length scale of the kernel. Equivalent to the sigma^2 in Gaussian kernel.
+    
+  learn_rate : float, optional (default=1e-4)
+    Learning rate of the gradient update procedure.
+    
   verbose : bool, optional (default=False)
     Whether to print progress messages or not.
 
@@ -109,7 +115,8 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   """
 
   def __init__(self, n_components=None, init='auto',
-               tol=None, max_iter=1000, sigma=1, learn_rate=1e-4, verbose=False,
+               tol=None, max_iter=1000, length_scale=1, 
+               learn_rate=1e-4, verbose=False,
                preprocessor=None, random_state=None):
     self.n_components = n_components
     self.init = init
@@ -118,7 +125,7 @@ class MLKR(MahalanobisMixin, TransformerMixin):
     self.verbose = verbose
     self.random_state = random_state
     self.lr = learn_rate
-    self.sigma = sigma
+    self.sigma = length_scale
     super(MLKR, self).__init__(preprocessor)
 
   def fit(self, X, y):
