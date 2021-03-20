@@ -20,8 +20,8 @@ class TestStringRepr(unittest.TestCase):
 
   def test_lmnn(self):
     self.assertEqual(
-        remove_spaces(str(metric_learn.LMNN(convergence_tol=0.01, k=6))),
-        remove_spaces("LMNN(convergence_tol=0.01, k=6)"))
+        remove_spaces(str(metric_learn.LMNN(tol=0.01, n_neighbors=6))),
+        remove_spaces("LMNN(n_neighbors=6,tol=0.01)"))
 
   def test_nca(self):
     self.assertEqual(remove_spaces(str(metric_learn.NCA(max_iter=42))),
