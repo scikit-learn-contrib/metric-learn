@@ -169,9 +169,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     :return: The trained LMNN model.
     """
 
-    # Validate inputs
+    # Check input arrays
     X, y = self._prepare_inputs(X, y, dtype=float, ensure_min_samples=2)
-    X, y, classes = self._validate_params(X, y)
 
     n_samples, n_features = X.shape
     n_components = _check_n_components(n_features, self.n_components)
@@ -180,6 +179,9 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     self.components_ = _initialize_components(n_components, X, y, self.init,
                                               verbose=self.verbose,
                                               random_state=self.random_state)
+
+    # remove singletons after initializing components
+    X, y, classes = self._validate_params(X, y)
 
     # Find the target neighbors of each sample
     target_neighbors = self._select_target_neighbors(X, y, classes)
