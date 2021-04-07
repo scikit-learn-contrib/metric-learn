@@ -4,7 +4,13 @@ import unittest
 import metric_learn
 import numpy as np
 from sklearn import clone
-from sklearn.utils.testing import set_random_state
+import sklearn
+from packaging import version
+if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
+    from sklearn.utils._testing import set_random_state
+else:
+    from sklearn.utils.testing import set_random_state
+
 from test.test_utils import ids_metric_learners, metric_learners, remove_y
 
 

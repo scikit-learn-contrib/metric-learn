@@ -4,7 +4,12 @@ import pytest
 from scipy.stats import ortho_group
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal, assert_allclose
-from sklearn.utils.testing import ignore_warnings
+import sklearn
+from packaging import version
+if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
+    from sklearn.utils._testing import ignore_warnings
+else:
+    from sklearn.utils.testing import ignore_warnings
 
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,

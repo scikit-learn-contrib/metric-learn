@@ -4,9 +4,17 @@ from sklearn.utils.estimator_checks import check_estimator
 from sklearn.base import TransformerMixin
 from sklearn.pipeline import make_pipeline
 from sklearn.utils import check_random_state
-from sklearn.utils.estimator_checks import is_public_parameter
-from sklearn.utils.testing import (assert_allclose_dense_sparse,
-                                   set_random_state)
+import sklearn
+from packaging import version
+if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
+    from sklearn.utils._testing import (assert_allclose_dense_sparse,
+                                        set_random_state, _get_args)
+    from sklearn.utils.estimator_checks import (_is_public_parameter
+                                                as is_public_parameter)
+else:
+    from sklearn.utils.testing import (assert_allclose_dense_sparse,
+                                       set_random_state, _get_args)
+    from sklearn.utils.estimator_checks import is_public_parameter
 
 from metric_learn import (Covariance, LFDA, LMNN, MLKR, NCA,
                           ITML_Supervised, LSML_Supervised,
@@ -16,8 +24,10 @@ from sklearn import clone
 import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
-from sklearn.metrics.scorer import get_scorer
-from sklearn.utils.testing import _get_args
+if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
+    from sklearn.metrics._scorer import get_scorer
+else:
+    from sklearn.metrics.scorer import get_scorer
 from test.test_utils import (metric_learners, ids_metric_learners,
                              mock_preprocessor, tuples_learners,
                              ids_tuples_learners, pairs_learners,
@@ -52,37 +62,37 @@ class Stable_SDML_Supervised(SDML_Supervised):
 
 class TestSklearnCompat(unittest.TestCase):
   def test_covariance(self):
-    check_estimator(Covariance)
+    check_estimator(Covariance())
 
   def test_lmnn(self):
-    check_estimator(LMNN)
+    check_estimator(LMNN())
 
   def test_lfda(self):
-    check_estimator(LFDA)
+    check_estimator(LFDA())
 
   def test_mlkr(self):
-    check_estimator(MLKR)
+    check_estimator(MLKR())
 
   def test_nca(self):
-    check_estimator(NCA)
+    check_estimator(NCA())
 
   def test_lsml(self):
-    check_estimator(LSML_Supervised)
+    check_estimator(LSML_Supervised())
 
   def test_itml(self):
-    check_estimator(ITML_Supervised)
+    check_estimator(ITML_Supervised())
 
   def test_mmc(self):
-    check_estimator(MMC_Supervised)
+    check_estimator(MMC_Supervised())
 
   def test_sdml(self):
-    check_estimator(Stable_SDML_Supervised)
+    check_estimator(Stable_SDML_Supervised())
 
   def test_rca(self):
-    check_estimator(Stable_RCA_Supervised)
+    check_estimator(Stable_RCA_Supervised())
 
   def test_scml(self):
-    check_estimator(SCML_Supervised)
+    check_estimator(SCML_Supervised())
 
 
 RNG = check_random_state(0)
@@ -160,7 +170,7 @@ def test_various_scoring_on_tuples_learners(estimator, build_dataset,
                                             with_preprocessor):
   """Tests that scikit-learn's scoring returns something finite,
   for other scoring than default scoring. (List of scikit-learn's scores can be
-  found in sklearn.metrics.scorer). For each type of output (predict,
+  found in sklearn.metrics._scorer). For each type of output (predict,
   predict_proba, decision_function), we test a bunch of scores.
   We only test on pairs learners because quadruplets don't have a y argument.
   """
