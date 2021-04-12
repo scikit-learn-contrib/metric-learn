@@ -6,13 +6,12 @@ import numpy as np
 from sklearn import clone
 import sklearn
 from packaging import version
+from test.test_utils import ids_metric_learners, metric_learners, remove_y
 skversion = version.parse(sklearn.__version__)
 if skversion >= version.parse('0.22.0'):
     from sklearn.utils._testing import set_random_state
 else:
     from sklearn.utils.testing import set_random_state
-
-from test.test_utils import ids_metric_learners, metric_learners, remove_y
 
 
 def remove_spaces(s):
