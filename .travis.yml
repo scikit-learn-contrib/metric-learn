@@ -40,6 +40,7 @@ matrix:
     after_success:
       - bash <(curl -s https://codecov.io/bash)
   - name: "Pytest python 3.6 with skggm + scikit-learn 0.20.3"
+    # checks that tests work for the oldest supported scikit-learn version
     python: "3.6"
     before_install:
       - sudo apt-get install liblapack-dev
