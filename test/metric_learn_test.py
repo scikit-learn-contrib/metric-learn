@@ -9,12 +9,7 @@ from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
                            assert_allclose)
-import sklearn
-from packaging import version
-if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
-    from sklearn.utils._testing import assert_warns_message
-else:
-    from sklearn.utils.testing import assert_warns_message
+from metric_learn.sklearn_shims import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler

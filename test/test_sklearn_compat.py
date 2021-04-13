@@ -4,18 +4,9 @@ from sklearn.utils.estimator_checks import check_estimator
 from sklearn.base import TransformerMixin
 from sklearn.pipeline import make_pipeline
 from sklearn.utils import check_random_state
-import sklearn
-from packaging import version
-if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
-    from sklearn.utils._testing import (assert_allclose_dense_sparse,
-                                        set_random_state, _get_args)
-    from sklearn.utils.estimator_checks import (_is_public_parameter
-                                                as is_public_parameter)
-else:
-    from sklearn.utils.testing import (assert_allclose_dense_sparse,
-                                       set_random_state, _get_args)
-    from sklearn.utils.estimator_checks import is_public_parameter
-
+from metric_learn.sklearn_shims import (assert_allclose_dense_sparse,
+                                        set_random_state, _get_args,
+                                        is_public_parameter, get_scorer)
 from metric_learn import (Covariance, LFDA, LMNN, MLKR, NCA,
                           ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -24,10 +15,6 @@ from sklearn import clone
 import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
-if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
-    from sklearn.metrics._scorer import get_scorer
-else:
-    from sklearn.metrics.scorer import get_scorer
 from test.test_utils import (metric_learners, ids_metric_learners,
                              mock_preprocessor, tuples_learners,
                              ids_tuples_learners, pairs_learners,

@@ -4,14 +4,8 @@ import unittest
 import metric_learn
 import numpy as np
 from sklearn import clone
-import sklearn
-from packaging import version
 from test.test_utils import ids_metric_learners, metric_learners, remove_y
-skversion = version.parse(sklearn.__version__)
-if skversion >= version.parse('0.22.0'):
-    from sklearn.utils._testing import set_random_state
-else:
-    from sklearn.utils.testing import set_random_state
+from metric_learn.sklearn_shims import set_random_state, SKLEARN_AT_LEAST_0_22
 
 
 def remove_spaces(s):
@@ -24,7 +18,7 @@ def sk_repr_kwargs(def_kwargs, nndef_kwargs):
     in the __repr__ of the estimator, depending on the
     version of scikit-learn.
     """
-    if skversion >= version.parse('0.22.0'):
+    if SKLEARN_AT_LEAST_0_22:
         def_kwargs = {}
     def_kwargs.update(nndef_kwargs)
     args_str = ",".join(f"{key}={repr(value)}"

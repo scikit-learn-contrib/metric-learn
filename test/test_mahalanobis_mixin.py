@@ -11,12 +11,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.datasets import make_spd_matrix, make_blobs
 from sklearn.utils import check_random_state, shuffle
 from sklearn.utils.multiclass import type_of_target
-import sklearn
-from packaging import version
-if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
-    from sklearn.utils._testing import set_random_state
-else:
-    from sklearn.utils.testing import set_random_state
+from metric_learn.sklearn_shims import set_random_state
 
 from metric_learn._util import make_context, _initialize_metric_mahalanobis
 from metric_learn.base_metric import (_QuadrupletsClassifierMixin,

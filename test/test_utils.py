@@ -5,12 +5,7 @@ import numpy as np
 from numpy.testing import assert_array_equal, assert_equal
 from sklearn.model_selection import train_test_split
 from sklearn.utils import check_random_state, shuffle
-import sklearn
-from packaging import version
-if version.parse(sklearn.__version__) >= version.parse('0.22.0'):
-    from sklearn.utils._testing import set_random_state
-else:
-    from sklearn.utils.testing import set_random_state
+from metric_learn.sklearn_shims import set_random_state
 from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,
