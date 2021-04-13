@@ -3,7 +3,6 @@ from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
 
 from test.test_utils import quadruplets_learners, ids_quadruplets_learners
-
 from metric_learn.sklearn_shims import set_random_state
 from sklearn import clone
 import numpy as np
