@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_array_equal, assert_equal
 from sklearn.model_selection import train_test_split
 from sklearn.utils import check_random_state, shuffle
-from sklearn.utils.testing import set_random_state
+from metric_learn.sklearn_shims import set_random_state
 from sklearn.base import clone
 from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 make_name, preprocess_points,

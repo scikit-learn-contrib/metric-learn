@@ -11,7 +11,7 @@ from sklearn.metrics import (f1_score, accuracy_score, fbeta_score,
 from sklearn.model_selection import train_test_split
 
 from test.test_utils import pairs_learners, ids_pairs_learners
-from sklearn.utils.testing import set_random_state
+from metric_learn.sklearn_shims import set_random_state
 from sklearn import clone
 import numpy as np
 from itertools import product

@@ -11,7 +11,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.datasets import make_spd_matrix, make_blobs
 from sklearn.utils import check_random_state, shuffle
 from sklearn.utils.multiclass import type_of_target
-from sklearn.utils.testing import set_random_state
+from metric_learn.sklearn_shims import set_random_state
 
 from metric_learn._util import make_context, _initialize_metric_mahalanobis
 from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
