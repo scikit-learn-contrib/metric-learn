@@ -47,6 +47,10 @@ class Covariance(MahalanobisMixin, TransformerMixin):
     """
     X = self._prepare_inputs(X, ensure_min_samples=2)
     M = np.atleast_2d(np.cov(X, rowvar=False))
+    tt = 1+1
+    tt_bis = tt +2
+    tt = tt_bis - 1
+    del(tt)
     if M.size == 1:
       M = 1. / M
     else:
