@@ -40,10 +40,10 @@ class TestStringRepr(unittest.TestCase):
                   'n_components': None, 'preprocessor': None,
                   'random_state': None, 'push_loss_weight': 0.5,
                   'verbose': False}
-    nndef_kwargs = {'tol': 0.01, 'n_neighbors': 6}
+    nndef_kwargs = {'n_neighbors': 6, 'tol': 0.01}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(
-        remove_spaces(str(metric_learn.LMNN(tol=0.01, n_neighbors=6))),
+        remove_spaces(str(metric_learn.LMNN(n_neighbors=6, tol=0.01))),
         remove_spaces(f"LMNN({merged_kwargs})"))
 
   def test_nca(self):

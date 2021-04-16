@@ -9,6 +9,7 @@ from scipy.optimize import minimize
 from scipy.sparse import coo_matrix, csr_matrix, csc_matrix
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import euclidean_distances
+from sklearn.utils import gen_batches, check_random_state
 from sklearn.base import TransformerMixin
 from sklearn.exceptions import ConvergenceWarning
 
@@ -74,6 +75,11 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       n_features_b must match the dimensionality of the inputs passed to
       :meth:`fit` and n_features_a must be less than or equal to that.
       If ``n_components`` is not None, n_features_a must match it.
+
+  max_impostors : int, optional (default=500_000)
+      Maximum number of impostors to consider per iteration. In the worst
+      case this will allow ``max_impostors * n_neighbors`` constraints to be
+      active.
 
   neighbors_params : dict, optional (default=None)
     Parameters to pass to a :class:`neighbors.NearestNeighbors` instance -
@@ -146,12 +152,14 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
   """
   def __init__(self, n_neighbors=3, n_components=None, init='auto',
-               neighbors_params=None, push_loss_weight=0.5, max_iter=50,
-               tol=1e-5, preprocessor=None, verbose=False, random_state=None):
+               max_impostors=500_000, neighbors_params=None,
+               push_loss_weight=0.5, max_iter=50, tol=1e-5,
+               preprocessor=None, verbose=False, random_state=None):
 
     self.n_neighbors = n_neighbors
     self.n_components = n_components
     self.init = init
+    self.max_impostors = max_impostors
     self.neighbors_params = neighbors_params
     self.push_loss_weight = push_loss_weight
     self.max_iter = max_iter
@@ -161,7 +169,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     super(LMNN, self).__init__(preprocessor)
 
   def fit(self, X, y):
-    """ Train Large Margin Nearest Neighbor model.
+    """Train Large Margin Nearest Neighbor model.
 
     :param X: array, shape (n_samples, n_features), the training samples.
     :param y: array, shape (n_samples,), the training labels.
@@ -175,10 +183,13 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     n_samples, n_features = X.shape
     n_components = _check_n_components(n_features, self.n_components)
 
+    # Initialize the random generator
+    self.random_state_ = check_random_state(self.random_state)
+
     # Initialize transformation
     self.components_ = _initialize_components(n_components, X, y, self.init,
                                               verbose=self.verbose,
-                                              random_state=self.random_state)
+                                              random_state=self.random_state_)
 
     # remove singletons after initializing components
     X, y, classes = self._validate_params(X, y)
@@ -186,13 +197,13 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     # Find the target neighbors of each sample
     target_neighbors = self._select_target_neighbors(X, y, classes)
 
-    # Compute the gradient w.r.t. the target neighbors which remains constant
+    # Compute the pull loss gradient w.r.t. M, which remains constant
     tn_graph = _make_knn_graph(target_neighbors)
-    const_grad = _sum_weighted_outer_differences(X, tn_graph)
+    pull_loss_grad_m = _sum_weighted_outer_products(X, tn_graph)
 
     # Compute the pull loss weight such that the push loss weight becomes 1
     pull_loss_weight = (1 - self.push_loss_weight) / self.push_loss_weight
-    const_grad *= pull_loss_weight
+    pull_loss_grad_m *= pull_loss_weight
 
     int_verbose = int(self.verbose)
     disp = int_verbose - 2 if int_verbose > 1 else -1
@@ -200,7 +211,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       'method': 'L-BFGS-B',
       'fun': self._loss_grad_lbfgs,
       'jac': True,
-      'args': (X, y, classes, target_neighbors, const_grad),
+      'args': (X, y, classes, target_neighbors, pull_loss_grad_m),
       'x0': self.components_,
       'tol': self.tol,
       'options': dict(maxiter=self.max_iter, disp=disp),
@@ -224,7 +235,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     return self
 
   def _validate_params(self, X, y):
-    """ Validate parameters as soon as :meth:`fit` is called.
+    """Validate parameters as soon as :meth:`fit` is called.
 
     :param X: array, shape (n_samples, n_features), the training samples.
     :param y: array, shape (n_samples,), the training labels.
@@ -274,8 +285,9 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
     return X, y, classes_inverse_non_singleton
 
-  def _loss_grad_lbfgs(self, L, X, y, classes, target_neighbors, const_grad):
-    """ Compute loss and gradient after one optimization iteration.
+  def _loss_grad_lbfgs(self, L, X, y, classes, target_neighbors,
+                       pull_loss_grad_m):
+    """Compute loss and gradient after one optimization iteration.
 
     :param L: array, shape (n_components * n_features,)
               The current (flattened) linear transformation.
@@ -284,8 +296,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     :param classes: array, shape (n_classes,), classes encoded as intergers.
     :param target_neighbors: array, shape (n_samples, n_neighbors),
                              the target neighbors of each training sample.
-    :param const_grad: array, shape (n_features, n_features),
-                       the (weighted) gradient component due to target
+    :param pull_loss_grad_m: array, shape (n_features, n_features),
+                       the (weighted) gradient (w.r.t M=L.T@L) due to target
                        neighbors that stays fixed throughout the algorithm.
 
     :return:
@@ -326,19 +338,21 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     dist_tn += 1
 
     # Find impostors
-    impostors_graph = _find_impostors(X_embedded, y, classes, dist_tn[:, -1])
+    impostors_graph = self._find_impostors(X_embedded, y, classes,
+                                           dist_tn[:, -1])
 
     # Compute the push loss and its gradient
-    push_loss, push_loss_grad, n_active = _compute_push_loss(
+    push_loss, push_loss_grad_m, n_active = _push_loss_grad(
       X, target_neighbors, dist_tn, impostors_graph)
 
     # Compute the total loss
     M = L.T @ L
-    new_pull_loss = np.dot(const_grad.ravel(), M.ravel())
+    # It holds that trace(M.T @ C) = np.dot(M.ravel(), C.ravel())
+    new_pull_loss = np.dot(pull_loss_grad_m.ravel(), M.ravel())
     loss = push_loss + new_pull_loss
 
-    # Compute the total gradient
-    grad = np.dot(L, const_grad + push_loss_grad)
+    # Compute the total gradient (grad_L = 2L grad_M)
+    grad = np.dot(L, pull_loss_grad_m + push_loss_grad_m)
     grad *= 2
 
     # Report iteration metrics
@@ -347,14 +361,14 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       elapsed_time = time.time() - start_time
       values_fmt = '[{}] {:>10} {:>20.6e} {:>20,} {:>10.2f}'
       cls_name = self.__class__.__name__
-      print(values_fmt.format(cls_name, self.n_iter_, loss, n_active,
-                              elapsed_time))
+      print(values_fmt.format(cls_name, self.n_iter_, loss,
+                              n_active, elapsed_time))
       sys.stdout.flush()
 
     return loss, grad.ravel()
 
   def _select_target_neighbors(self, X, y, classes):
-    """ Find the target neighbors of each training sample.
+    """Find the target neighbors of each training sample.
 
     :param X: array, shape (n_samples, n_features), the training samples.
     :param y: array, shape (n_samples,), the training labels.
@@ -387,68 +401,152 @@ class LMNN(MahalanobisMixin, TransformerMixin):
 
     return target_neighbors
 
+  def _find_impostors(self, X_embedded, y, classes, margin_radii):
+    """Find the samples that violate the margin.
 
-def _find_impostors(X_embedded, y, classes, margin_radii):
-  """ Find the samples that violate the margin.
+    :param X_embedded: array, shape (n_samples, n_components),
+                       the training samples in the embedding space.
+    :param y: array, shape (n_samples,), training labels.
+    :param classes: array, shape (n_classes,), the classes encoded as integers.
+    :param margin_radii: array, shape (n_samples,), squared distances of
+                         training samples to their farthest target neighbors
+                         plus margin.
 
-  :param X_embedded: array, shape (n_samples, n_components),
-                     the training samples in the embedding space.
-  :param y: array, shape (n_samples,), training labels.
-  :param classes: array, shape (n_classes,), the classes encoded as integers.
-  :param margin_radii: array, shape (n_samples,), squared distances of
-                       training samples to their farthest target neighbors
-                       plus margin.
+    :return: coo_matrix, shape (n_samples, n_neighbors),
+             If sample i is an impostor to sample j or vice versa, then the
+             value of A[i, j] is the squared distance between samples i and j.
+             Otherwise A[i, j] is zero.
 
-  :return: coo_matrix, shape (n_samples, n_neighbors),
-           If sample i is an impostor to sample j or vice versa, then the
-           value of A[i, j] is the squared distance between samples i and j.
-           Otherwise A[i, j] is zero.
+    """
 
+    # Initialize lists for impostors storage
+    imp_row, imp_col = [], []
+
+    for label in classes[:-1]:
+      ind_a = np.where(y == label)[0]
+      ind_b = np.where(y > label)[0]
+
+      ind_impostors = _find_impostors_blockwise(X_embedded, margin_radii,
+                                                ind_b, ind_a)
+
+      n_impostors = len(ind_impostors)
+      if n_impostors:
+        if n_impostors > self.max_impostors:
+          ind_samples = self.random_state_.choice(
+            n_impostors, self.max_impostors, replace=False)
+          ind_impostors = ind_impostors[ind_samples]
+
+        dims = (len(ind_b), len(ind_a))
+        ib, ia = np.unravel_index(ind_impostors, shape=dims)
+
+        imp_row.extend(ind_b[ib])
+        imp_col.extend(ind_a[ia])
+
+    # turn lists to numpy arrays
+    imp_row = np.asarray(imp_row, dtype=np.intp)
+    imp_col = np.asarray(imp_col, dtype=np.intp)
+
+    # Make sure we do not exceed max_impostors
+    n_impostors = len(imp_row)
+    if n_impostors > self.max_impostors:
+      ind_samples = self.random_state_.choice(
+        n_impostors, self.max_impostors, replace=False)
+      imp_row = imp_row[ind_samples]
+      imp_col = imp_col[ind_samples]
+
+    # Compute distances
+    imp_dist = _paired_distances_blockwise(X_embedded, imp_row, imp_col)
+
+    # store impostors as a sparse matrix
+    n = X_embedded.shape[0]
+    impostors_graph = coo_matrix((imp_dist, (imp_row, imp_col)), shape=(n, n))
+
+    return impostors_graph
+
+
+########################
+# Some core functions #
+#######################
+
+def _find_impostors_blockwise(X, radii, ind_a, ind_b,
+                              return_distance=False, block_size=8):
+  """Find (sample, impostor) pairs in blocks to avoid large memory usage.
+
+  Parameters
+  ----------
+  X : array, shape (n_samples, n_components)
+      Transformed data samples.
+
+  radii : array, shape (n_samples,)
+      Squared distances of the samples in ``X`` to their margins.
+
+  ind_a : array, shape (n_samples_a,)
+      Indices of samples from class A.
+
+  ind_b : array, shape (n_samples_b,)
+      Indices of samples from class B.
+
+  block_size : int, optional (default=8)
+      The maximum number of mebibytes (MiB) of memory to use at a time for
+      calculating paired squared distances.
+  return_distance : bool, optional (default=False)
+      Whether to return the squared distances to the impostors.
+
+  Returns
+  -------
+  imp_indices : array, shape (n_impostors,)
+      Unraveled indices of (sample, impostor) pairs referring to a matrix
+      of shape (n_samples_a, n_samples_b).
+  imp_distances : array, shape (n_impostors,), optional
+      imp_distances[i] is the squared distance between samples imp_row[i] and
+      imp_col[i], where
+      imp_row, imp_col = np.unravel_index(imp_indices, shape=(n_samples_a,
+      n_samples_b))
   """
 
-  # Initialize lists for impostors storage
-  imp_row, imp_col, imp_dist = [], [], []
+  n_samples_a = len(ind_a)
+  bytes_per_row = len(ind_b) * X.itemsize
+  block_n_rows = int(block_size * 1024 * 1024 // bytes_per_row)
 
-  for label in classes[:-1]:
-    ind_a = np.where(y == label)[0]
-    ind_b = np.where(y > label)[0]
+  imp_indices, imp_distances = [], []
 
-    dist = euclidean_distances(X_embedded[ind_b], X_embedded[ind_a],
-                               squared=True)  # (b, a)
+  # data
+  X_b = X[ind_b]
+  radii_a = radii[ind_a]
+  radii_b = radii[ind_b]
 
-    radii_a = margin_radii[ind_a]  # (a,)
-    radii_b = margin_radii[ind_b]  # (b,)
+  # X_b squared norm stays constant, so pre-compute it to get a speed-up
+  X_b_norm_squared = np.einsum('ij,ij->i', X_b, X_b).reshape(1, -1)
+  for chunk in gen_batches(n_samples_a, block_n_rows):
 
-    # Find samples in B that are impostors to A
-    imp_ba = np.where((dist < radii_a[None, :]).ravel())[0]
+    dist = euclidean_distances(X[ind_a[chunk]], X_b, squared=True,
+                               Y_norm_squared=X_b_norm_squared)
 
-    # Find samples in A that are impostors to B
-    imp_ab = np.where((dist < radii_b[:, None]).ravel())[0]
+    ind_b, = np.where((dist < radii_a[chunk, None]).ravel())
+    ind_a, = np.where((dist < radii_b[None, :]).ravel())
+    ind = np.unique(np.concatenate((ind_a, ind_b)))
 
-    # merge and filter unique impostors
-    ind_impostors = np.unique(np.concatenate((imp_ba, imp_ab)))
+    if len(ind):
+      ind_plus_offset = ind + chunk.start * X_b.shape[0]
+      imp_indices.extend(ind_plus_offset)
 
-    if len(ind_impostors):
-      # Map indices back to the original training data indices
-      ii, jj = np.unravel_index(ind_impostors, dist.shape)
-      imp_row.extend(ind_b[ii])
-      imp_col.extend(ind_a[jj])
-      imp_dist.extend(dist.ravel()[ind_impostors])
+      if return_distance:
+        # We only need to do clipping if we return the distances.
+        distances_chunk = dist.ravel()[ind]
+        # Clip only the indexed (unique) distances
+        np.maximum(distances_chunk, 0, out=distances_chunk)
+        imp_distances.extend(distances_chunk)
 
-  # turn lists to numpy arrays
-  imp_row = np.asarray(imp_row, dtype=np.intp)
-  imp_col = np.asarray(imp_col, dtype=np.intp)
-  imp_dist = np.asarray(imp_dist)
+  imp_indices = np.asarray(imp_indices)
 
-  # store impostors as a sparse matrix
-  n = X_embedded.shape[0]
-  impostors_graph = coo_matrix((imp_dist, (imp_row, imp_col)), shape=(n, n))
-
-  return impostors_graph
+  if return_distance:
+    return imp_indices, np.asarray(imp_distances)
+  else:
+    return imp_indices
 
 
-def _compute_push_loss(X, target_neighbors, inflated_dist_tn, impostors_graph):
-  """ Compute the push loss L_push = max(d(a, p) + 1 - d(a, n), 0)
+def _push_loss_grad(X, target_neighbors, inflated_dist_tn, impostors_graph):
+  """Compute the push loss max(d(a, p) + 1 - d(a, n), 0) and its gradient.
 
   :param X: array, shape (n_samples, n_features), the training samples.
   :param target_neighbors: array, shape (n_samples, n_neighbors),
@@ -460,7 +558,8 @@ def _compute_push_loss(X, target_neighbors, inflated_dist_tn, impostors_graph):
 
   :return:
     loss: float, the push loss due to the given target neighbors and impostors.
-    grad: array, shape (n_features, n_features), the gradient of the push loss.
+    grad: array, shape (n_features, n_features), the gradient of the push loss
+          with respect to M = L.T @ L.
     n_active_triplets: int, the number of active triplet constraints.
 
   """
@@ -496,19 +595,68 @@ def _compute_push_loss(X, target_neighbors, inflated_dist_tn, impostors_graph):
     A3 = csr_matrix((val, (sample_range, target_neighbors[:, k])), shape)
     A0 = A0 - A1 - A2 + A3
 
-  grad = _sum_weighted_outer_differences(X, A0)
+  grad = _sum_weighted_outer_products(X, A0)
 
   return loss, grad, n_active_triplets
 
 
-def _sum_weighted_outer_differences(X, weights):
-  """ Compute the sum of weighted outer pairwise differences.
+##########################
+# Some helper functions #
+#########################
+
+def _paired_distances_blockwise(X, ind_a, ind_b, squared=True, block_size=8):
+    """Equivalent to row_norms(X[ind_a] - X[ind_b], squared=squared).
+
+    Parameters
+    ----------
+    X : array, shape (n_samples, n_features)
+        An array of data samples.
+    ind_a : array, shape (n_indices,)
+        An array of sample indices.
+    ind_b : array, shape (n_indices,)
+        Another array of sample indices.
+    squared : bool (default=True)
+        Whether to return the squared distances.
+    block_size : int, optional (default=8)
+        The maximum number of mebibytes (MiB) of memory to use at a time for
+        calculating paired (squared) distances.
+
+    Returns
+    -------
+    distances: array, shape (n_indices,)
+        An array of paired, optionally squared, distances.
+    """
+
+    bytes_per_row = X.shape[1] * X.itemsize
+    batch_size = int(block_size*1024*1024 // bytes_per_row)
+
+    n_pairs = len(ind_a)
+    distances = np.zeros(n_pairs)
+    for chunk in gen_batches(n_pairs, batch_size):
+      diffs = X[ind_a[chunk]] - X[ind_b[chunk]]
+      distances[chunk] = np.einsum('ij,ij->i', diffs, diffs)
+
+    return distances if squared else np.sqrt(distances, out=distances)
+
+
+def _sum_weighted_outer_products(X, weights):
+  """Compute the sum of weighted outer products.
+
+      Consider the squared Mahalanobis distance between x_i and x_j:
+
+      d_{ij} = (x_i - x_j)^T M (x_i - x_j)
+             = x_i^T M x_i - x_i^T M x_j - x_j^T M x_i + x_j^T M x_j
+
+      The gradient of d_{ij} with respect to M is a sum of outer products:
+
+      \nabla_M d_{ij} = x_i x_i^T - x_j x_i^T - x_i x_j^T + x_j x_j^T
+
 
   :param X: array, shape (n_samples, n_features), data samples.
   :param weights: csr_matrix, shape (n_samples, n_samples), sparse weights.
 
   :return: array, shape (n_features, n_features),
-           the sum of all outer weighted differences.
+           the sum of all weighted outer products.
   """
 
   W = weights + weights.T
@@ -522,7 +670,7 @@ def _sum_weighted_outer_differences(X, weights):
 
 
 def _make_knn_graph(indices):
-  """ Convert a dense indices matrix to a sparse adjacency matrix.
+  """Convert a dense indices matrix to a sparse adjacency matrix.
 
   :param indices: array, shape (n_samples, n_neighbors),
                   indices of the k nearest neighbors of each sample.

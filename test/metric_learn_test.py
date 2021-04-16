@@ -27,10 +27,9 @@ from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs, Constraints
 from metric_learn.lmnn import (
-    _sum_weighted_outer_differences,
+    _sum_weighted_outer_products,
     _make_knn_graph,
-    _find_impostors,
-    _compute_push_loss
+    _push_loss_grad
 )
 
 
@@ -395,13 +394,13 @@ class TestLMNN(MetricTestCase):
 
     # sum outer products
     tn_graph = _make_knn_graph(target_neighbors)
-    const_grad = _sum_weighted_outer_differences(X, tn_graph)
+    pull_loss_grad_m = _sum_weighted_outer_products(X, tn_graph)
 
 
     kwargs = {
         'classes':  classes,
         'target_neighbors': target_neighbors,
-        'const_grad': const_grad,
+        'pull_loss_grad_m': pull_loss_grad_m,
     }
 
     def fun(L):
@@ -438,9 +437,9 @@ def test_compute_push_loss():
     dist_tn = dist_tn[:, None]
     dist_tn += 1
     margin_radii = dist_tn[:, -1]
-    impostors_graph = _find_impostors(X, y, classes, margin_radii)
-    loss, grad, _ = _compute_push_loss(X, target_neighbors, dist_tn,
-                                       impostors_graph)
+    impostors_graph = lmnn._find_impostors(X, y, classes, margin_radii)
+    loss, grad, _ = _push_loss_grad(X, target_neighbors, dist_tn,
+                                    impostors_graph)
 
     # The loss should be 4. (1. for each of the 4 violation)
     assert loss == 4.
@@ -467,7 +466,7 @@ def test_toy_ex_lmnn(X, y, loss):
 
   # sum outer products
   tn_graph = _make_knn_graph(target_neighbors)
-  const_grad = _sum_weighted_outer_differences(X, tn_graph)
+  const_grad = _sum_weighted_outer_products(X, tn_graph)
 
   #  assert that the loss equals the one computed by hand
   lmnn.n_iter_ = 0
