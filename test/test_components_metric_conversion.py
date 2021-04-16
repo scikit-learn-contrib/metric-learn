@@ -4,7 +4,7 @@ import pytest
 from scipy.stats import ortho_group
 from sklearn.datasets import load_iris
 from numpy.testing import assert_array_almost_equal, assert_allclose
-from sklearn.utils.testing import ignore_warnings
+from metric_learn.sklearn_shims import ignore_warnings
 
 from metric_learn import (
     LMNN, NCA, LFDA, Covariance, MLKR,

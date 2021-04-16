@@ -39,6 +39,19 @@ matrix:
       - pytest test --cov;
     after_success:
       - bash <(curl -s https://codecov.io/bash)
+  - name: "Pytest python 3.6 with skggm + scikit-learn 0.20.3"
+    # checks that tests work for the oldest supported scikit-learn version
+    python: "3.6"
+    before_install:
+      - sudo apt-get install liblapack-dev
+      - pip install --upgrade pip pytest
+      - pip install wheel cython numpy scipy codecov pytest-cov
+      - pip install scikit-learn==0.20.3
+      - pip install git+https://github.com/skggm/skggm.git@${SKGGM_VERSION};
+    script:
+      - pytest test --cov;
+    after_success:
+      - bash <(curl -s https://codecov.io/bash)
   - name: "Syntax checking with flake8"
     python: "3.7"
     before_install:
