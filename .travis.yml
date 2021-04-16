@@ -16,6 +16,7 @@ matrix:
     script:
       - pytest test --cov;
     after_success:
+      - env
       - bash <(curl -s https://codecov.io/bash)
   - name: "Pytest python 3.6 with skggm"
     python: "3.6"
@@ -27,6 +28,7 @@ matrix:
     script:
       - pytest test --cov;
     after_success:
+      - env
       - bash <(curl -s https://codecov.io/bash)
   - name: "Pytest python 3.7 with skggm"
     python: "3.7"
@@ -38,6 +40,7 @@ matrix:
     script:
       - pytest test --cov;
     after_success:
+      - env
       - bash <(curl -s https://codecov.io/bash)
   - name: "Pytest python 3.6 with skggm + scikit-learn 0.20.3"
     # checks that tests work for the oldest supported scikit-learn version
@@ -51,6 +54,7 @@ matrix:
     script:
       - pytest test --cov;
     after_success:
+      - env
       - bash <(curl -s https://codecov.io/bash)
   - name: "Syntax checking with flake8"
     python: "3.7"
