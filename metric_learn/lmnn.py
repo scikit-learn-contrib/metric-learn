@@ -276,10 +276,10 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     min_non_singleton_size = class_sizes[~mask_singleton_class].min()
     if self.n_neighbors >= min_non_singleton_size:
       warnings.warn('`n_neighbors` (={}) is not less than the number of '
-           'samples in the smallest non-singleton class (={}). '
-           '`n_neighbors_` will be set to {} for estimation.'
-           .format(self.n_neighbors, min_non_singleton_size,
-                   min_non_singleton_size - 1))
+                    'samples in the smallest non-singleton class (={}). '
+                    '`n_neighbors_` will be set to {} for estimation.'
+                    .format(self.n_neighbors, min_non_singleton_size,
+                            min_non_singleton_size - 1))
 
     self.n_neighbors_ = min(self.n_neighbors, min_non_singleton_size - 1)
 

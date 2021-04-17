@@ -2,9 +2,8 @@ import unittest
 import re
 import pytest
 import numpy as np
-import scipy
 from scipy.optimize import check_grad, approx_fprime
-from sklearn.metrics import pairwise_distances, euclidean_distances
+from sklearn.metrics import pairwise_distances
 from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
