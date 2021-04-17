@@ -396,7 +396,6 @@ class TestLMNN(MetricTestCase):
     tn_graph = _make_knn_graph(target_neighbors)
     pull_loss_grad_m = _sum_weighted_outer_products(X, tn_graph)
 
-
     kwargs = {
         'classes':  classes,
         'target_neighbors': target_neighbors,
