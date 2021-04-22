@@ -1,0 +1,18 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Have you read the docs?
+    url: http://contrib.scikit-learn.org/metric-learn/
+    about: Much help can be found in the docs
+  - name: Ask a question
+    url: https://github.com/sklearn-contrib/metric-learn/discussions/new
+    about: Ask a question or start a discussion about metric-learn
+  - name: Stack Overflow
+    url: https://stackoverflow.com
+    about: Please ask and answer metric-learn usage questions (API, installation...) on Stack Overflow
+  - name: Cross Validated
+    url: https://stats.stackexchange.com
+    about: Please ask and answer metric learning questions (use cases, algorithms & theory...) on Cross Validated
+  - name: Blank issue
+    url: https://github.com/sklearn-contrib/metric-learn/issues/new
+    about: Please note that Github Discussions should be used in most cases instead
