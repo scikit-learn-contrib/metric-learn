@@ -122,6 +122,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
     The number of iterations the solver has run.
 
+  random_state_ : numpy.RandomState
+    Pseudo random number generator object used during initialization.
 
   Examples
   --------
@@ -484,7 +486,7 @@ def _find_impostors_blockwise(X, radii, ind_a, ind_b,
       Indices of samples from class A.
 
   ind_b : array, shape (n_samples_b,)
-      Indices of samples from class B.
+      Indices of samples from class B, where n_samples_b << n_samples_a.
 
   block_size : int, optional (default=8)
       The maximum number of mebibytes (MiB) of memory to use at a time for
@@ -522,9 +524,9 @@ def _find_impostors_blockwise(X, radii, ind_a, ind_b,
     dist = euclidean_distances(X[ind_a[chunk]], X_b, squared=True,
                                Y_norm_squared=X_b_norm_squared)
 
-    ind_b, = np.where((dist < radii_a[chunk, None]).ravel())
-    ind_a, = np.where((dist < radii_b[None, :]).ravel())
-    ind = np.unique(np.concatenate((ind_a, ind_b)))
+    ind_ba, = np.where((dist < radii_a[chunk, None]).ravel())
+    ind_ab, = np.where((dist < radii_b[None, :]).ravel())
+    ind = np.unique(np.concatenate((ind_ab, ind_ba)))
 
     if len(ind):
       ind_plus_offset = ind + chunk.start * X_b.shape[0]
