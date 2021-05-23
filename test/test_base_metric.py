@@ -36,9 +36,10 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces(f"Covariance({merged_kwargs})"))
 
   def test_lmnn(self):
-    def_kwargs = {'n_neighbors': 3, 'n_components': None, 'init': 'auto',
-                  'max_impostors': 500_000, 'neighbors_params': None,
-                  'push_loss_weight': 0.5, 'max_iter': 50, 'tol': 1e-5,
+    def_kwargs = {'n_neighbors': 3, 'k': 'deprecated', 'n_components': None,
+                  'init': 'auto', 'max_impostors': 500_000,
+                  'neighbors_params': None, 'push_loss_weight': 0.5,
+                  'regularization': 'deprecated', 'max_iter': 50, 'tol': 1e-5,
                   'preprocessor': None, 'verbose': False,
                   'random_state': None}
     def_kwargs = {k: def_kwargs[k] for k in sorted(def_kwargs.keys())}
