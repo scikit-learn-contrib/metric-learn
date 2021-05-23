@@ -33,6 +33,12 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   n_neighbors : int, optional (default=3)
     Number of neighbors to consider, not including self-edges.
 
+  k : Not used
+     .. deprecated:: 0.6.3
+    `k` was deprecated in version 0.6.3 and will
+    be removed in 0.6.4. It is replaced by `n_neighbors` to have more
+    consistent terminology with scikit-learn.
+
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
@@ -89,6 +95,13 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   push_loss_weight: float, optional (default=0.5)
     Relative weight between pull and push terms, with 0.5 meaning equal
     weight.
+
+  regularization : Not used
+     .. deprecated:: 0.6.3
+    `regularization` was deprecated in version 0.6.3 and will
+    be removed in 0.6.4. It is replaced by `push_loss_weight` that more
+    explicitly defines which loss term is meant to be weighted.
+
 
   max_iter : int, optional (default=1000)
     Maximum number of iterations of the optimization procedure.
@@ -153,17 +166,19 @@ class LMNN(MahalanobisMixin, TransformerMixin):
          https://en.wikipedia.org/wiki/Large_margin_nearest_neighbor
 
   """
-  def __init__(self, n_neighbors=3, n_components=None, init='auto',
-               max_impostors=500_000, neighbors_params=None,
-               push_loss_weight=0.5, max_iter=50, tol=1e-5,
-               preprocessor=None, verbose=False, random_state=None):
+  def __init__(self, n_neighbors=3, k='deprecated', n_components=None,
+               init='auto', max_impostors=500_000, neighbors_params=None,
+               push_loss_weight=0.5, regularization='deprecated', max_iter=50,
+               tol=1e-5, preprocessor=None, verbose=False, random_state=None):
 
     self.n_neighbors = n_neighbors
+    self.k = k
     self.n_components = n_components
     self.init = init
     self.max_impostors = max_impostors
     self.neighbors_params = neighbors_params
     self.push_loss_weight = push_loss_weight
+    self.regularization = regularization
     self.max_iter = max_iter
     self.tol = tol
     self.verbose = verbose
@@ -247,6 +262,19 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       y: array, shape (n_samples,), the validated training labels.
       classes: array, shape (n_classes,), the non-singleton classes encoded.
     """
+
+    # TODO: remove these in v0.6.4
+    if self.k != 'deprecated':
+      warnings.warn('"k" parameter from initialization is not used.'
+                    ' It has been deprecated in version 0.6.3 and will be'
+                    ' removed in 0.6.4. Use the "n_neighbors" parameter '
+                    'instead.', DeprecationWarning)
+
+    if self.regularization != 'deprecated':
+      warnings.warn('"regularization" parameter from initialization is not '
+                    'used. It has been deprecated in version 0.6.3 and will '
+                    'be removed in 0.6.4. Use the "push_loss_weight" parameter'
+                    'instead.', DeprecationWarning)
 
     # Find the appearing classes and the class index of each of the samples
     classes, y = np.unique(y, return_inverse=True)
@@ -630,7 +658,7 @@ def _paired_distances_blockwise(X, ind_a, ind_b, squared=True, block_size=8):
     """
 
     bytes_per_row = X.shape[1] * X.itemsize
-    batch_size = int(block_size*1024*1024 // bytes_per_row)
+    batch_size = int(block_size * 1024 * 1024 // bytes_per_row)
 
     n_pairs = len(ind_a)
     distances = np.zeros(n_pairs)

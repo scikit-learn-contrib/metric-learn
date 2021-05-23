@@ -396,7 +396,7 @@ class TestLMNN(MetricTestCase):
     pull_loss_grad_m = _sum_weighted_outer_products(X, tn_graph)
 
     kwargs = {
-        'classes':  classes,
+        'classes': classes,
         'target_neighbors': target_neighbors,
         'pull_loss_grad_m': pull_loss_grad_m,
     }
@@ -407,8 +407,19 @@ class TestLMNN(MetricTestCase):
     def grad(L):
         return lmnn._loss_grad_lbfgs(L, X, y, **kwargs)[1]
 
+    # compute gradient with and without finite differences
+    epsilon = np.sqrt(np.finfo(float).eps)
+    grad_fin_diff = approx_fprime(L.ravel(), fun, epsilon)
+    grad_lmnn = grad(L)
+
+    # compute absolute error
+    grad_error = np.sqrt((grad_lmnn - grad_fin_diff)**2)
+
     # compute relative error
-    rel_diff = check_grad(fun, grad, L.ravel()) / np.linalg.norm(grad(L))
+    # rel_diff1 = grad_error / np.linalg.norm(grad_fin_diff)
+    # rel_diff2 = grad_error / np.linalg.norm(grad_lmnn)
+
+    rel_diff = grad_error / np.linalg.norm(grad_lmnn)
     np.testing.assert_almost_equal(rel_diff, 0., decimal=5)
 
 
