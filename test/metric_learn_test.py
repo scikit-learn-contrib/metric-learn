@@ -2,9 +2,8 @@ import unittest
 import re
 import pytest
 import numpy as np
-import scipy
 from scipy.optimize import check_grad, approx_fprime
-from sklearn.metrics import pairwise_distances, euclidean_distances
+from sklearn.metrics import pairwise_distances
 from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
@@ -26,7 +25,11 @@ from metric_learn import (LMNN, NCA, LFDA, Covariance, MLKR, MMC,
                           MMC_Supervised, SDML, RCA, ITML, SCML)
 # Import this specially for testing.
 from metric_learn.constraints import wrap_pairs, Constraints
-from metric_learn.lmnn import _sum_outer_products
+from metric_learn.lmnn import (
+    _sum_weighted_outer_products,
+    _make_knn_graph,
+    _push_loss_grad
+)
 
 
 def class_separation(X, labels):
@@ -362,12 +365,11 @@ def test_bounds_parameters_invalid(bounds):
 
 class TestLMNN(MetricTestCase):
   def test_iris(self):
-    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn = LMNN(n_neighbors=5, verbose=False)
     lmnn.fit(self.iris_points, self.iris_labels)
 
-    csep = class_separation(lmnn.transform(self.iris_points),
-                            self.iris_labels)
-    self.assertLess(csep, 0.25)
+    csep = class_separation(lmnn.transform(self.iris_points), self.iris_labels)
+    self.assertLess(csep, 0.26)
 
   def test_loss_grad_lbfgs(self):
     """Test gradient of loss function
@@ -378,38 +380,46 @@ class TestLMNN(MetricTestCase):
     X, y = make_classification(random_state=rng)
     L = rng.randn(rng.randint(1, X.shape[1] + 1), X.shape[1])
     lmnn = LMNN()
+    lmnn.n_iter_ = 0
+    lmnn.n_neighbors_ = lmnn.n_neighbors
 
-    k = lmnn.k
-    reg = lmnn.regularization
-
-    X, y = lmnn._prepare_inputs(X, y, dtype=float,
-                                ensure_min_samples=2)
+    X, y = lmnn._prepare_inputs(X, y, dtype=float, ensure_min_samples=2)
     num_pts, n_components = X.shape
-    unique_labels, label_inds = np.unique(y, return_inverse=True)
-    lmnn.labels_ = np.arange(len(unique_labels))
+    unique_labels, y_inverse = np.unique(y, return_inverse=True)
+    classes = np.arange(len(unique_labels))
     lmnn.components_ = np.eye(n_components)
 
-    target_neighbors = lmnn._select_targets(X, label_inds)
+    target_neighbors = lmnn._select_target_neighbors(X, y_inverse, classes)
 
     # sum outer products
-    dfG = _sum_outer_products(X, target_neighbors.flatten(),
-                              np.repeat(np.arange(X.shape[0]), k))
+    tn_graph = _make_knn_graph(target_neighbors)
+    pull_loss_grad_m = _sum_weighted_outer_products(X, tn_graph)
 
-    # initialize L
-    def loss_grad(flat_L):
-      return lmnn._loss_grad(X, flat_L.reshape(-1, X.shape[1]), dfG,
-                             k, reg, target_neighbors, label_inds)
+    kwargs = {
+        'classes': classes,
+        'target_neighbors': target_neighbors,
+        'pull_loss_grad_m': pull_loss_grad_m,
+    }
 
-    def fun(x):
-      return loss_grad(x)[1]
+    def fun(L):
+        return lmnn._loss_grad_lbfgs(L, X, y, **kwargs)[0]
 
-    def grad(x):
-      return loss_grad(x)[0].ravel()
+    def grad(L):
+        return lmnn._loss_grad_lbfgs(L, X, y, **kwargs)[1]
+
+    # compute gradient with and without finite differences
+    epsilon = np.sqrt(np.finfo(float).eps)
+    grad_fin_diff = approx_fprime(L.ravel(), fun, epsilon)
+    grad_lmnn = grad(L)
+
+    # compute absolute error
+    grad_error = np.sqrt((grad_lmnn - grad_fin_diff)**2)
 
     # compute relative error
-    epsilon = np.sqrt(np.finfo(float).eps)
-    rel_diff = (check_grad(fun, grad, L.ravel()) /
-                np.linalg.norm(approx_fprime(L.ravel(), fun, epsilon)))
+    # rel_diff1 = grad_error / np.linalg.norm(grad_fin_diff)
+    # rel_diff2 = grad_error / np.linalg.norm(grad_lmnn)
+
+    rel_diff = grad_error / np.linalg.norm(grad_lmnn)
     np.testing.assert_almost_equal(rel_diff, 0., decimal=5)
 
 
@@ -418,8 +428,11 @@ def test_loss_func(capsys):
   by comparing the results with the actual implementation of metric-learn,
   with a very simple (but nonperformant) implementation"""
 
+  import scipy
+  from sklearn.metrics import euclidean_distances
+
   # toy dataset to use
-  X, y = make_classification(n_samples=10, n_classes=2,
+  X, y = make_classification(n_samples=40, n_classes=2,
                              n_features=6,
                              n_redundant=0, shuffle=True,
                              scale=[1, 1, 20, 20, 20, 20], random_state=42)
@@ -471,118 +484,75 @@ def test_loss_func(capsys):
   x0 = np.random.randn(1, n_features)
 
   def loss(x0):
-    return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
+    return loss_fn(x0.reshape(-1, n_features), X, y, target_neighbors,
                    regularization)[1]
 
   def grad(x0):
-    return loss_fn(x0.reshape(-1, X.shape[1]), X, y, target_neighbors,
+    return loss_fn(x0.reshape(-1, n_features), X, y, target_neighbors,
                    regularization)[0].ravel()
 
   scipy.optimize.check_grad(loss, grad, x0.ravel())
 
-  class LMNN_with_callback(LMNN):
-    """ We will use a callback to get the gradient (see later)
+
+def test_compute_push_loss():
+    """Test if the push loss is computed correctly
+
+    This test continues on the example from test_find_impostors. The push
+    loss is easy to compute, as we have only 4 violations and all of them
+    amount to 1 (squared distance to target neighbor + 1 - squared distance
+    to impostor = 4 + 1 - 4).
     """
 
-    def __init__(self, callback, *args, **kwargs):
-      self.callback = callback
-      super(LMNN_with_callback, self).__init__(*args, **kwargs)
+    class_distance = 4.
+    X_a = np.array([[-1., 1], [-1., -1.], [1., 1.], [1., -1.]])
+    X_b = X_a + np.array([class_distance, 0])
+    X = np.concatenate((X_a, X_b))
+    y = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+    lmnn = LMNN(n_neighbors=1)
+    lmnn.n_neighbors_ = 1
+    classes = np.unique(y)
+    target_neighbors = lmnn._select_target_neighbors(X, y, classes)
+    diffs = X - X[target_neighbors[:, 0]]
+    dist_tn = np.einsum('ij,ij->i', diffs, diffs)
+    dist_tn = dist_tn[:, None]
+    dist_tn += 1
+    margin_radii = dist_tn[:, -1]
+    impostors_graph = lmnn._find_impostors(X, y, classes, margin_radii)
+    loss, grad, _ = _push_loss_grad(X, target_neighbors, dist_tn,
+                                    impostors_graph)
 
-    def _loss_grad(self, *args, **kwargs):
-      grad, objective, total_active = (
-          super(LMNN_with_callback, self)._loss_grad(*args, **kwargs))
-      self.callback.append(grad)
-      return grad, objective, total_active
-
-  class LMNN_nonperformant(LMNN_with_callback):
-
-    def fit(self, X, y):
-      self.y = y
-      return super(LMNN_nonperformant, self).fit(X, y)
-
-    def _loss_grad(self, X, L, dfG, k, reg, target_neighbors, label_inds):
-      grad, loss, total_active = loss_fn(L.ravel(), X, self.y,
-                                         target_neighbors, self.regularization)
-      self.callback.append(grad)
-      return grad, loss, total_active
-
-  mem1, mem2 = [], []
-  lmnn_perf = LMNN_with_callback(verbose=True, random_state=42,
-                                 init='identity', max_iter=30, callback=mem1)
-  lmnn_nonperf = LMNN_nonperformant(verbose=True, random_state=42,
-                                    init='identity', max_iter=30,
-                                    callback=mem2)
-  objectives, obj_diffs, learn_rate, total_active = (dict(), dict(), dict(),
-                                                     dict())
-  for algo, name in zip([lmnn_perf, lmnn_nonperf], ['perf', 'nonperf']):
-    algo.fit(X, y)
-    out, _ = capsys.readouterr()
-    lines = re.split("\n+", out)
-    # we get every variable that is printed from the algorithm in verbose
-    num = r'(-?\d+.?\d*(e[+|-]\d+)?)'
-    strings = [re.search(r"\d+ (?:{}) (?:{}) (?:(\d+)) (?:{})"
-                         .format(num, num, num), s) for s in lines]
-    objectives[name] = [float(match.group(1)) for match in strings if match is
-                        not None]
-    obj_diffs[name] = [float(match.group(3)) for match in strings if match is
-                       not None]
-    total_active[name] = [float(match.group(5)) for match in strings if
-                          match is not
-                          None]
-    learn_rate[name] = [float(match.group(6)) for match in strings if match is
-                        not None]
-    assert len(strings) >= 10  # we ensure that we actually did more than 10
-    # iterations
-    assert total_active[name][0] >= 2  # we ensure that we have some active
-    # constraints (that's the case we want to test)
-    # we remove the last element because it can be equal to the penultimate
-    # if the last gradient update is null
-  for i in range(len(mem1)):
-    np.testing.assert_allclose(lmnn_perf.callback[i],
-                               lmnn_nonperf.callback[i],
-                               err_msg='Gradient different at position '
-                                       '{}'.format(i))
-  np.testing.assert_allclose(objectives['perf'], objectives['nonperf'])
-  np.testing.assert_allclose(obj_diffs['perf'], obj_diffs['nonperf'])
-  np.testing.assert_allclose(total_active['perf'], total_active['nonperf'])
-  np.testing.assert_allclose(learn_rate['perf'], learn_rate['nonperf'])
+    # The loss should be 4. (1. for each of the 4 violation)
+    assert loss == 4.
 
 
 @pytest.mark.parametrize('X, y, loss', [(np.array([[0], [1], [2], [3]]),
-                                         [1, 1, 0, 0], 3.0),
+                                         [1, 1, 0, 0], 6.0),
                                         (np.array([[0], [1], [2], [3]]),
-                                         [1, 0, 0, 1], 26.)])
+                                         [1, 0, 0, 1], 256.)])
 def test_toy_ex_lmnn(X, y, loss):
   """Test that the loss give the right result on a toy example"""
   L = np.array([[1]])
-  lmnn = LMNN(k=1, regularization=0.5)
+  lmnn = LMNN(n_neighbors=1, push_loss_weight=0.5)
 
-  k = lmnn.k
-  reg = lmnn.regularization
+  lmnn.n_neighbors_ = lmnn.n_neighbors
 
-  X, y = lmnn._prepare_inputs(X, y, dtype=float,
-                              ensure_min_samples=2)
+  X, y = lmnn._prepare_inputs(X, y, dtype=float, ensure_min_samples=2)
   num_pts, n_components = X.shape
   unique_labels, label_inds = np.unique(y, return_inverse=True)
-  lmnn.labels_ = np.arange(len(unique_labels))
+  classes = np.arange(len(unique_labels))
   lmnn.components_ = np.eye(n_components)
 
-  target_neighbors = lmnn._select_targets(X, label_inds)
+  target_neighbors = lmnn._select_target_neighbors(X, label_inds, classes)
 
   # sum outer products
-  dfG = _sum_outer_products(X, target_neighbors.flatten(),
-                            np.repeat(np.arange(X.shape[0]), k))
-
-  # storage
-  a1 = [None] * k
-  a2 = [None] * k
-  for nn_idx in range(k):
-    a1[nn_idx] = np.array([])
-    a2[nn_idx] = np.array([])
+  tn_graph = _make_knn_graph(target_neighbors)
+  const_grad = _sum_weighted_outer_products(X, tn_graph)
 
   #  assert that the loss equals the one computed by hand
-  assert lmnn._loss_grad(X, L.reshape(-1, X.shape[1]), dfG, k,
-                         reg, target_neighbors, label_inds)[1] == loss
+  lmnn.n_iter_ = 0
+  predicted_loss = lmnn._loss_grad_lbfgs(L, X, y, classes, target_neighbors,
+                                         const_grad)[0]
+  assert predicted_loss == loss
 
 
 def test_convergence_simple_example(capsys):
@@ -592,28 +562,7 @@ def test_convergence_simple_example(capsys):
   lmnn = LMNN(verbose=True)
   lmnn.fit(X, y)
   out, _ = capsys.readouterr()
-  assert "LMNN converged with objective" in out
-
-
-def test_no_twice_same_objective(capsys):
-  # test that the objective function never has twice the same value
-  # see https://github.com/scikit-learn-contrib/metric-learn/issues/88
-  X, y = make_classification(random_state=0)
-  lmnn = LMNN(verbose=True)
-  lmnn.fit(X, y)
-  out, _ = capsys.readouterr()
-  lines = re.split("\n+", out)
-  # we get only objectives from each line:
-  # the regexp matches a float that follows an integer (the iteration
-  # number), and which is followed by a (signed) float (delta obj). It
-  # matches for instance:
-  # 3 **1113.7665747189938** -3.182774197440267 46431.0200999999999998e-06
-  objectives = [re.search(r"\d* (?:(\d*.\d*))[ | -]\d*.\d*", s)
-                for s in lines]
-  objectives = [match.group(1) for match in objectives if match is not None]
-  # we remove the last element because it can be equal to the penultimate
-  # if the last gradient update is null
-  assert len(objectives[:-1]) == len(set(objectives[:-1]))
+  assert "LMNN did not converge" not in out
 
 
 class TestSDML(MetricTestCase):

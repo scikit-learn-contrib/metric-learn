@@ -36,15 +36,17 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces(f"Covariance({merged_kwargs})"))
 
   def test_lmnn(self):
-    def_kwargs = {'convergence_tol': 0.001, 'init': 'auto', 'k': 3,
-                  'learn_rate': 1e-07, 'max_iter': 1000, 'min_iter': 50,
-                  'n_components': None, 'preprocessor': None,
-                  'random_state': None, 'regularization': 0.5,
-                  'verbose': False}
-    nndef_kwargs = {'convergence_tol': 0.01, 'k': 6}
+    def_kwargs = {'n_neighbors': 3, 'k': 'deprecated', 'n_components': None,
+                  'init': 'auto', 'max_impostors': 500_000,
+                  'neighbors_params': None, 'push_loss_weight': 0.5,
+                  'regularization': 'deprecated', 'max_iter': 50, 'tol': 1e-5,
+                  'preprocessor': None, 'verbose': False,
+                  'random_state': None}
+    def_kwargs = {k: def_kwargs[k] for k in sorted(def_kwargs.keys())}
+    nndef_kwargs = {'n_neighbors': 6, 'tol': 0.01}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(
-        remove_spaces(str(metric_learn.LMNN(convergence_tol=0.01, k=6))),
+        remove_spaces(str(metric_learn.LMNN(n_neighbors=6, tol=0.01))),
         remove_spaces(f"LMNN({merged_kwargs})"))
 
   def test_nca(self):

@@ -42,7 +42,7 @@ class TestTransformerMetricConversion(unittest.TestCase):
     assert_array_almost_equal(L.T.dot(L), itml.get_mahalanobis_matrix())
 
   def test_lmnn(self):
-    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn = LMNN(n_neighbors=5, verbose=False)
     lmnn.fit(self.X, self.y)
     L = lmnn.components_
     assert_array_almost_equal(L.T.dot(L), lmnn.get_mahalanobis_matrix())
