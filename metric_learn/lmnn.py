@@ -93,15 +93,16 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     neighbors.
 
   push_loss_weight: float, optional (default=0.5)
-    Relative weight between pull and push terms, with 0.5 meaning equal
-    weight.
+    Relative weight between pull loss and push loss terms, with 0.5 meaning
+    equal weight. Note that in practice the push loss weight will be
+    unweighted and the pull loss will be weighted accordingly by a factor
+    `(1 - push_loss_weight) / push_loss_weight`.
 
   regularization : Not used
      .. deprecated:: 0.6.3
     `regularization` was deprecated in version 0.6.3 and will
     be removed in 0.6.4. It is replaced by `push_loss_weight` that more
     explicitly defines which loss term is meant to be weighted.
-
 
   max_iter : int, optional (default=1000)
     Maximum number of iterations of the optimization procedure.
