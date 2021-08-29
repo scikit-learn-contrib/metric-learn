@@ -135,8 +135,6 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   n_iter_ : `int`
     The number of iterations the solver has run.
 
-  random_state_ : numpy.RandomState
-    Pseudo random number generator object used during initialization.
 
   Examples
   --------
@@ -201,12 +199,12 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     n_components = _check_n_components(n_features, self.n_components)
 
     # Initialize the random generator
-    self.random_state_ = check_random_state(self.random_state)
+    self._random_state = check_random_state(self.random_state)
 
     # Initialize transformation
     self.components_ = _initialize_components(n_components, X, y, self.init,
                                               verbose=self.verbose,
-                                              random_state=self.random_state_)
+                                              random_state=self._random_state)
 
     # remove singletons after initializing components
     X, y, classes = self._validate_params(X, y)
@@ -462,7 +460,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       n_impostors = len(ind_impostors)
       if n_impostors:
         if n_impostors > self.max_impostors:
-          ind_samples = self.random_state_.choice(
+          ind_samples = self._random_state.choice(
             n_impostors, self.max_impostors, replace=False)
           ind_impostors = ind_impostors[ind_samples]
 
@@ -479,7 +477,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     # Make sure we do not exceed max_impostors
     n_impostors = len(imp_row)
     if n_impostors > self.max_impostors:
-      ind_samples = self.random_state_.choice(
+      ind_samples = self._random_state.choice(
         n_impostors, self.max_impostors, replace=False)
       imp_row = imp_row[ind_samples]
       imp_col = imp_col[ind_samples]

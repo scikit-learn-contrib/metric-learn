@@ -423,6 +423,77 @@ class TestLMNN(MetricTestCase):
     np.testing.assert_almost_equal(rel_diff, 0., decimal=5)
 
 
+def test_loss_func(capsys):
+  """Test the loss function (and its gradient) on a simple example,
+  by comparing the results with the actual implementation of metric-learn,
+  with a very simple (but nonperformant) implementation"""
+
+  import scipy
+  from sklearn.metrics import euclidean_distances
+
+  # toy dataset to use
+  X, y = make_classification(n_samples=40, n_classes=2,
+                             n_features=6,
+                             n_redundant=0, shuffle=True,
+                             scale=[1, 1, 20, 20, 20, 20], random_state=42)
+
+  def hinge(a):
+    if a > 0:
+      return a, 1
+    else:
+      return 0, 0
+
+  def loss_fn(L, X, y, target_neighbors, reg):
+     L = L.reshape(-1, X.shape[1])
+     Lx = np.dot(X, L.T)
+     loss = 0
+     total_active = 0
+     grad = np.zeros_like(L)
+     for i in range(X.shape[0]):
+       for j in target_neighbors[i]:
+         loss += (1 - reg) * np.sum((Lx[i] - Lx[j]) ** 2)
+         grad += (1 - reg) * np.outer(Lx[i] - Lx[j], X[i] - X[j])
+         for k in range(X.shape[0]):
+           if y[i] != y[k]:
+             hin, active = hinge(1 + np.sum((Lx[i] - Lx[j])**2) -
+                                 np.sum((Lx[i] - Lx[k])**2))
+             total_active += active
+             if active:
+               loss += reg * hin
+               grad += (reg * (np.outer(Lx[i] - Lx[j], X[i] - X[j]) -
+                               np.outer(Lx[i] - Lx[k], X[i] - X[k])))
+     grad = 2 * grad
+     return grad, loss, total_active
+
+  # we check that the gradient we have computed in the non-performant implem
+  # is indeed the true gradient on a toy example:
+
+  def _select_targets(X, y, k):
+    target_neighbors = np.empty((X.shape[0], k), dtype=int)
+    for label in np.unique(y):
+      inds, = np.nonzero(y == label)
+      dd = euclidean_distances(X[inds], squared=True)
+      np.fill_diagonal(dd, np.inf)
+      nn = np.argsort(dd)[..., :k]
+      target_neighbors[inds] = inds[nn]
+    return target_neighbors
+
+  target_neighbors = _select_targets(X, y, 2)
+  regularization = 0.5
+  n_features = X.shape[1]
+  x0 = np.random.randn(1, n_features)
+
+  def loss(x0):
+    return loss_fn(x0.reshape(-1, n_features), X, y, target_neighbors,
+                   regularization)[1]
+
+  def grad(x0):
+    return loss_fn(x0.reshape(-1, n_features), X, y, target_neighbors,
+                   regularization)[0].ravel()
+
+  scipy.optimize.check_grad(loss, grad, x0.ravel())
+
+
 def test_compute_push_loss():
     """Test if the push loss is computed correctly
 
