@@ -123,12 +123,12 @@ class TestStringRepr(unittest.TestCase):
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(remove_spaces(str(metric_learn.RCA(n_components=3))),
                      remove_spaces(f"RCA({merged_kwargs})"))
-    def_kwargs = {'chunk_size': 2, 'n_components': None, 'num_chunks': 100,
+    def_kwargs = {'chunk_size': 2, 'n_components': None, 'n_chunks': 100,
                   'preprocessor': None, 'random_state': None}
-    nndef_kwargs = {'num_chunks': 5}
+    nndef_kwargs = {'n_chunks': 5}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(
-        remove_spaces(str(metric_learn.RCA_Supervised(num_chunks=5))),
+        remove_spaces(str(metric_learn.RCA_Supervised(n_chunks=5))),
         remove_spaces(f"RCA_Supervised({merged_kwargs})"))
 
   def test_mlkr(self):

@@ -29,7 +29,7 @@ class Stable_RCA_Supervised(RCA_Supervised):
                chunk_size=2, preprocessor=None, random_state=None):
     # this init makes RCA stable for scikit-learn examples.
     super(Stable_RCA_Supervised, self).__init__(
-        num_chunks=2, n_components=n_components,
+        n_chunks=2, n_components=n_components,
         chunk_size=chunk_size, preprocessor=preprocessor,
         random_state=random_state)
 

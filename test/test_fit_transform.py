@@ -99,13 +99,13 @@ class TestFitTransform(unittest.TestCase):
 
   def test_rca_supervised(self):
     seed = np.random.RandomState(1234)
-    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2,
+    rca = RCA_Supervised(n_components=2, n_chunks=30, chunk_size=2,
                          random_state=seed)
     rca.fit(self.X, self.y)
     res_1 = rca.transform(self.X)
 
     seed = np.random.RandomState(1234)
-    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2,
+    rca = RCA_Supervised(n_components=2, n_chunks=30, chunk_size=2,
                          random_state=seed)
     res_2 = rca.fit_transform(self.X, self.y)
 

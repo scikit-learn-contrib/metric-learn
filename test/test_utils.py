@@ -137,7 +137,7 @@ classifiers = [(Covariance(), build_classification),
                (ITML_Supervised(max_iter=5), build_classification),
                (LSML_Supervised(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
-               (RCA_Supervised(num_chunks=5), build_classification),
+               (RCA_Supervised(n_chunks=5), build_classification),
                (SDML_Supervised(prior='identity', balance_param=1e-5),
                build_classification),
                (SCML_Supervised(), build_classification)]

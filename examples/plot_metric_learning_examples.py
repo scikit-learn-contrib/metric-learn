@@ -310,7 +310,7 @@ plot_tsne(X_lfda, y)
 # - See more in the documentation of the class :py:class:`RCA
 #   <metric_learn.RCA>`
 
-rca = metric_learn.RCA_Supervised(num_chunks=30, chunk_size=2)
+rca = metric_learn.RCA_Supervised(n_chunks=30, chunk_size=2)
 X_rca = rca.fit_transform(X, y)
 
 plot_tsne(X_rca, y)

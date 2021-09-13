@@ -11,7 +11,7 @@ CLASSES = {
     'LSML_Supervised': metric_learn.LSML_Supervised(n_constraints=200),
     'MLKR': metric_learn.MLKR(),
     'NCA': metric_learn.NCA(max_iter=700, n_components=2),
-    'RCA_Supervised': metric_learn.RCA_Supervised(dim=2, num_chunks=30,
+    'RCA_Supervised': metric_learn.RCA_Supervised(dim=2, n_chunks=30,
                                                   chunk_size=2),
     'SDML_Supervised': metric_learn.SDML_Supervised(n_constraints=1500)
 }

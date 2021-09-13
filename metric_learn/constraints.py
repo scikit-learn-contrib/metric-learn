@@ -213,19 +213,19 @@ class Constraints(object):
     ab = np.array(list(ab)[:n_constraints], dtype=int)
     return known_label_idx[ab.T]
 
-  def chunks(self, num_chunks=100, chunk_size=2, random_state=None):
+  def chunks(self, n_chunks=100, chunk_size=2, random_state=None):
     """
     Generates chunks from labeled data.
 
-    Each of ``num_chunks`` chunks is composed of ``chunk_size`` points from
+    Each of ``n_chunks`` chunks is composed of ``chunk_size`` points from
     the same class drawn at random. Each point can belong to at most 1 chunk.
 
-    In the case where there is not enough points to generate ``num_chunks``
+    In the case where there is not enough points to generate ``n_chunks``
     chunks of size ``chunk_size``, a ValueError will be raised.
 
     Parameters
     ----------
-    num_chunks : int, optional (default=100)
+    n_chunks : int, optional (default=100)
       Number of chunks to generate.
 
     chunk_size : int, optional (default=2)
@@ -247,13 +247,13 @@ class Constraints(object):
     all_inds = [set(np.where(lookup == c)[0]) for c in range(len(uniq))
                 if c not in unknown_uniq]
     max_chunks = int(np.sum([len(s) // chunk_size for s in all_inds]))
-    if max_chunks < num_chunks:
+    if max_chunks < n_chunks:
       raise ValueError(('Not enough possible chunks of %d elements in each'
                         ' class to form expected %d chunks - maximum number'
                         ' of chunks is %d'
-                        ) % (chunk_size, num_chunks, max_chunks))
+                        ) % (chunk_size, n_chunks, max_chunks))
     idx = 0
-    while idx < num_chunks and all_inds:
+    while idx < n_chunks and all_inds:
       if len(all_inds) == 1:
         c = 0
       else:

@@ -7,14 +7,14 @@ from sklearn.datasets import make_blobs
 SEED = 42
 
 
-def gen_labels_for_chunks(num_chunks, chunk_size,
+def gen_labels_for_chunks(n_chunks, chunk_size,
                           n_classes=10, n_unknown_labels=5):
-  """Generates num_chunks*chunk_size labels that split in num_chunks chunks,
+  """Generates n_chunks*chunk_size labels that split in n_chunks chunks,
   that are homogeneous in the label."""
-  assert min(num_chunks, chunk_size) > 0
+  assert min(n_chunks, chunk_size) > 0
   classes = shuffle(np.arange(n_classes), random_state=SEED)
-  n_per_class = chunk_size * (num_chunks // n_classes)
-  n_maj_class = chunk_size * num_chunks - n_per_class * (n_classes - 1)
+  n_per_class = chunk_size * (n_chunks // n_classes)
+  n_maj_class = chunk_size * n_chunks - n_per_class * (n_classes - 1)
 
   first_labels = classes[0] * np.ones(n_maj_class, dtype=int)
   remaining_labels = np.concatenate([k * np.ones(n_per_class, dtype=int)
@@ -25,48 +25,48 @@ def gen_labels_for_chunks(num_chunks, chunk_size,
   return shuffle(labels, random_state=SEED)
 
 
-@pytest.mark.parametrize("num_chunks, chunk_size", [(5, 10), (10, 50)])
-def test_exact_num_points_for_chunks(num_chunks, chunk_size):
+@pytest.mark.parametrize("n_chunks, chunk_size", [(5, 10), (10, 50)])
+def test_exact_num_points_for_chunks(n_chunks, chunk_size):
   """Checks that the chunk generation works well with just enough points."""
-  labels = gen_labels_for_chunks(num_chunks, chunk_size)
+  labels = gen_labels_for_chunks(n_chunks, chunk_size)
 
   constraints = Constraints(labels)
-  chunks = constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
+  chunks = constraints.chunks(n_chunks=n_chunks, chunk_size=chunk_size,
                               random_state=SEED)
 
   chunk_no, size_each_chunk = np.unique(chunks[chunks >= 0],
                                         return_counts=True)
 
   np.testing.assert_array_equal(size_each_chunk, chunk_size)
-  assert chunk_no.shape[0] == num_chunks
+  assert chunk_no.shape[0] == n_chunks
 
 
-@pytest.mark.parametrize("num_chunks, chunk_size", [(5, 10), (10, 50)])
-def test_chunk_case_one_miss_point(num_chunks, chunk_size):
+@pytest.mark.parametrize("n_chunks, chunk_size", [(5, 10), (10, 50)])
+def test_chunk_case_one_miss_point(n_chunks, chunk_size):
   """Checks that the chunk generation breaks when one point is missing."""
-  labels = gen_labels_for_chunks(num_chunks, chunk_size)
+  labels = gen_labels_for_chunks(n_chunks, chunk_size)
 
   assert len(labels) >= 1
   constraints = Constraints(labels[1:])
   with pytest.raises(ValueError) as e:
-    constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
+    constraints.chunks(n_chunks=n_chunks, chunk_size=chunk_size,
                        random_state=SEED)
 
   expected_message = (('Not enough possible chunks of %d elements in each'
                        ' class to form expected %d chunks - maximum number'
                        ' of chunks is %d'
-                       ) % (chunk_size, num_chunks, num_chunks - 1))
+                       ) % (chunk_size, n_chunks, n_chunks - 1))
 
   assert str(e.value) == expected_message
 
 
-@pytest.mark.parametrize("num_chunks, chunk_size", [(5, 10), (10, 50)])
-def test_unknown_labels_not_in_chunks(num_chunks, chunk_size):
+@pytest.mark.parametrize("n_chunks, chunk_size", [(5, 10), (10, 50)])
+def test_unknown_labels_not_in_chunks(n_chunks, chunk_size):
   """Checks that unknown labels are not assigned to any chunk."""
-  labels = gen_labels_for_chunks(num_chunks, chunk_size)
+  labels = gen_labels_for_chunks(n_chunks, chunk_size)
 
   constraints = Constraints(labels)
-  chunks = constraints.chunks(num_chunks=num_chunks, chunk_size=chunk_size,
+  chunks = constraints.chunks(n_chunks=n_chunks, chunk_size=chunk_size,
                               random_state=SEED)
 
   assert np.all(chunks[labels < 0] < 0)

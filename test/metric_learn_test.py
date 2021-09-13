@@ -965,7 +965,7 @@ class TestLFDA(MetricTestCase):
 
 class TestRCA(MetricTestCase):
   def test_iris(self):
-    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, n_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.29)
@@ -991,15 +991,15 @@ class TestRCA(MetricTestCase):
 
   def test_unknown_labels(self):
     n = 200
-    num_chunks = 50
+    n_chunks = 50
     X, y = make_classification(random_state=42, n_samples=2 * n,
                                n_features=6, n_informative=6, n_redundant=0)
     y2 = np.concatenate((y[:n], -np.ones(n)))
 
-    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     rca.fit(X[:n], y[:n])
 
-    rca2 = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca2 = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     rca2.fit(X, y2)
 
     assert not np.any(np.isnan(rca.components_))
@@ -1009,11 +1009,11 @@ class TestRCA(MetricTestCase):
 
   def test_bad_parameters(self):
     n = 200
-    num_chunks = 3
+    n_chunks = 3
     X, y = make_classification(random_state=42, n_samples=n,
                                n_features=6, n_informative=6, n_redundant=0)
 
-    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     msg = ('Due to the parameters of RCA_Supervised, '
            'the inner covariance matrix is not invertible, '
            'so the transformation matrix will contain Nan values. '
