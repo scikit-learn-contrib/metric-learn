@@ -367,7 +367,7 @@ def test_bounds_parameters_invalid(bounds):
 
 class TestLMNN(MetricTestCase):
   def test_iris(self):
-    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6, verbose=False)
     lmnn.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(lmnn.transform(self.iris_points),
@@ -384,7 +384,7 @@ class TestLMNN(MetricTestCase):
     L = rng.randn(rng.randint(1, X.shape[1] + 1), X.shape[1])
     lmnn = LMNN()
 
-    k = lmnn.k
+    k = lmnn.n_neighbors
     reg = lmnn.regularization
 
     X, y = lmnn._prepare_inputs(X, y, dtype=float,
@@ -560,9 +560,9 @@ def test_loss_func(capsys):
 def test_toy_ex_lmnn(X, y, loss):
   """Test that the loss give the right result on a toy example"""
   L = np.array([[1]])
-  lmnn = LMNN(k=1, regularization=0.5)
+  lmnn = LMNN(n_neighbors=1, regularization=0.5)
 
-  k = lmnn.k
+  k = lmnn.n_neighbors
   reg = lmnn.regularization
 
   X, y = lmnn._prepare_inputs(X, y, dtype=float,

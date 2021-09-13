@@ -52,11 +52,11 @@ class TestFitTransform(unittest.TestCase):
     assert_array_almost_equal(res_1, res_2)
 
   def test_lmnn(self):
-    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6, verbose=False)
     lmnn.fit(self.X, self.y)
     res_1 = lmnn.transform(self.X)
 
-    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6, verbose=False)
     res_2 = lmnn.fit_transform(self.X, self.y)
 
     assert_array_almost_equal(res_1, res_2)

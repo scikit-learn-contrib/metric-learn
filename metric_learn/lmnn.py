@@ -116,7 +116,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> lmnn = LMNN(k=5, learn_rate=1e-6)
+  >>> lmnn = LMNN(n_neighbors=5, learn_rate=1e-6)
   >>> lmnn.fit(X, Y, verbose=False)
 
   References

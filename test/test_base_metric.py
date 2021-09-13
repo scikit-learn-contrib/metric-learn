@@ -44,7 +44,7 @@ class TestStringRepr(unittest.TestCase):
     nndef_kwargs = {'convergence_tol': 0.01, 'k': 6}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(
-        remove_spaces(str(metric_learn.LMNN(convergence_tol=0.01, k=6))),
+        remove_spaces(str(metric_learn.LMNN(convergence_tol=0.01, n_neighbors=6))),
         remove_spaces(f"LMNN({merged_kwargs})"))
 
   def test_nca(self):
