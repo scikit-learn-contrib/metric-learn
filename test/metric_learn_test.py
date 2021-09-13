@@ -1067,7 +1067,7 @@ class TestMMC(MetricTestCase):
 
     # Full metric
     n_features = self.iris_points.shape[1]
-    mmc = MMC(convergence_threshold=0.01, init=np.eye(n_features) / 10)
+    mmc = MMC(tol=0.01, init=np.eye(n_features) / 10)
     mmc.fit(*wrap_pairs(self.iris_points, [a, b, c, d]))
     expected = [[+0.000514, +0.000868, -0.001195, -0.001703],
                 [+0.000868, +0.001468, -0.002021, -0.002879],

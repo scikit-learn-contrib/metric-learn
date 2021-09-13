@@ -65,14 +65,14 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces(f"LFDA({merged_kwargs})"))
 
   def test_itml(self):
-    def_kwargs = {'convergence_threshold': 0.001, 'gamma': 1.0,
+    def_kwargs = {'tol': 0.001, 'gamma': 1.0,
                   'max_iter': 1000, 'preprocessor': None,
                   'prior': 'identity', 'random_state': None, 'verbose': False}
     nndef_kwargs = {'gamma': 0.5}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(remove_spaces(str(metric_learn.ITML(gamma=0.5))),
                      remove_spaces(f"ITML({merged_kwargs})"))
-    def_kwargs = {'convergence_threshold': 0.001, 'gamma': 1.0,
+    def_kwargs = {'tol': 0.001, 'gamma': 1.0,
                   'max_iter': 1000, 'n_constraints': None,
                   'preprocessor': None, 'prior': 'identity',
                   'random_state': None, 'verbose': False}
@@ -141,7 +141,7 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces(f"MLKR({merged_kwargs})"))
 
   def test_mmc(self):
-    def_kwargs = {'convergence_threshold': 0.001, 'diagonal': False,
+    def_kwargs = {'tol': 0.001, 'diagonal': False,
                   'diagonal_c': 1.0, 'init': 'identity', 'max_iter': 100,
                   'max_proj': 10000, 'preprocessor': None,
                   'random_state': None, 'verbose': False}
@@ -149,7 +149,7 @@ class TestStringRepr(unittest.TestCase):
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(remove_spaces(str(metric_learn.MMC(diagonal=True))),
                      remove_spaces(f"MMC({merged_kwargs})"))
-    def_kwargs = {'convergence_threshold': 1e-06, 'diagonal': False,
+    def_kwargs = {'tol': 1e-06, 'diagonal': False,
                   'diagonal_c': 1.0, 'init': 'identity', 'max_iter': 100,
                   'max_proj': 10000, 'n_constraints': None,
                   'preprocessor': None, 'random_state': None,

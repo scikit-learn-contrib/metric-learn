@@ -134,7 +134,7 @@ are respected.
 >>> from metric_learn import MMC
 >>> mmc = MMC(random_state=42)
 >>> mmc.fit(tuples, y)
-MMC(A0='deprecated', convergence_threshold=0.001, diagonal=False,
+MMC(A0='deprecated', tol=0.001, diagonal=False,
   diagonal_c=1.0, init='auto', max_iter=100, max_proj=10000,
   preprocessor=None, random_state=42, verbose=False)
 
@@ -250,7 +250,7 @@ tuples).
 >>> y_pairs = np.array([1, -1])
 >>> mmc = MMC(random_state=42)
 >>> mmc.fit(pairs, y_pairs)
-MMC(convergence_threshold=0.001, diagonal=False,
+MMC(tol=0.001, diagonal=False,
     diagonal_c=1.0, init='auto', max_iter=100, max_proj=10000, preprocessor=None,
     random_state=42, verbose=False)
 

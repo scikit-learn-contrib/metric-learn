@@ -12,13 +12,13 @@ class _BaseMMC(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
+  def __init__(self, max_iter=100, max_proj=10000, tol=1e-3,
                init='identity', diagonal=False,
                diagonal_c=1.0, verbose=False, preprocessor=None,
                random_state=None):
     self.max_iter = max_iter
     self.max_proj = max_proj
-    self.convergence_threshold = convergence_threshold
+    self.tol = tol
     self.init = init
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
@@ -145,13 +145,13 @@ class _BaseMMC(MahalanobisMixin):
         A[:] = A_old + alpha * M
 
       delta = np.linalg.norm(alpha * M) / np.linalg.norm(A_old)
-      if delta < self.convergence_threshold:
+      if delta < self.tol:
         break
       if self.verbose:
         print('mmc iter: %d, conv = %f, projections = %d' %
               (cycle, delta, it + 1))
 
-    if delta > self.convergence_threshold:
+    if delta > self.tol:
       self.converged_ = False
       if self.verbose:
         print('mmc did not converge, conv = %f' % (delta,))
@@ -185,7 +185,7 @@ class _BaseMMC(MahalanobisMixin):
     reduction = 2.0
     w = np.diag(self.A_).copy()
 
-    while error > self.convergence_threshold and it < self.max_iter:
+    while error > self.tol and it < self.max_iter:
 
       fD0, fD_1st_d, fD_2nd_d = self._D_constraint(neg_pairs, w)
       obj_initial = np.dot(s_sum, w) + self.diagonal_c * fD0
@@ -332,7 +332,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   max_proj : int, optional (default=10000)
     Maximum number of projection steps.
 
-  convergence_threshold : float, optional (default=1e-3)
+  tol : float, optional (default=1e-3)
     Convergence threshold for the optimization procedure.
 
   init : string or numpy array, optional (default='identity')
@@ -469,7 +469,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   max_proj : int, optional (default=10000)
     Maximum number of projection steps.
 
-  convergence_threshold : float, optional (default=1e-3)
+  tol : float, optional (default=1e-3)
     Convergence threshold for the optimization procedure.
 
   n_constraints: int, optional (default=None)
@@ -538,12 +538,12 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     metric (See function `components_from_metric`.)
   """
 
-  def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
+  def __init__(self, max_iter=100, max_proj=10000, tol=1e-6,
                n_constraints=None, init='identity',
                diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None, random_state=None):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
-                      convergence_threshold=convergence_threshold,
+                      tol=tol,
                       init=init, diagonal=diagonal,
                       diagonal_c=diagonal_c, verbose=verbose,
                       preprocessor=preprocessor, random_state=random_state)

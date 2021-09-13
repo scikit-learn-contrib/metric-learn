@@ -16,12 +16,12 @@ class _BaseITML(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
+  def __init__(self, gamma=1., max_iter=1000, tol=1e-3,
                prior='identity', verbose=False,
                preprocessor=None, random_state=None):
     self.gamma = gamma
     self.max_iter = max_iter
-    self.convergence_threshold = convergence_threshold
+    self.tol = tol
     self.prior = prior
     self.verbose = verbose
     self.random_state = random_state
@@ -86,7 +86,7 @@ class _BaseITML(MahalanobisMixin):
         conv = np.inf
         break
       conv = np.abs(lambdaold - _lambda).sum() / normsum
-      if conv < self.convergence_threshold:
+      if conv < self.tol:
         break
       lambdaold = _lambda.copy()
       if self.verbose:
@@ -122,7 +122,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   max_iter : int, optional (default=1000)
     Maximum number of iteration of the optimization procedure.
 
-  convergence_threshold : float, optional (default=1e-3)
+  tol : float, optional (default=1e-3)
     Convergence tolerance.
 
   prior : string or numpy array, optional (default='identity')
@@ -260,7 +260,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   max_iter : int, optional (default=1000)
     Maximum number of iterations of the optimization procedure.
 
-  convergence_threshold : float, optional (default=1e-3)
+  tol : float, optional (default=1e-3)
     Tolerance of the optimization procedure.
 
   n_constraints : int, optional (default=None)
@@ -338,11 +338,11 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     that describes the supervised version of weakly supervised estimators.
   """
 
-  def __init__(self, gamma=1.0, max_iter=1000, convergence_threshold=1e-3,
+  def __init__(self, gamma=1.0, max_iter=1000, tol=1e-3,
                n_constraints=None, prior='identity',
                verbose=False, preprocessor=None, random_state=None):
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
-                       convergence_threshold=convergence_threshold,
+                       tol=tol,
                        prior=prior, verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
     self.n_constraints = n_constraints
