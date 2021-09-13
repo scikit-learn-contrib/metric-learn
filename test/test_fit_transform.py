@@ -29,24 +29,24 @@ class TestFitTransform(unittest.TestCase):
 
   def test_lsml_supervised(self):
     seed = np.random.RandomState(1234)
-    lsml = LSML_Supervised(num_constraints=200, random_state=seed)
+    lsml = LSML_Supervised(n_constraints=200, random_state=seed)
     lsml.fit(self.X, self.y)
     res_1 = lsml.transform(self.X)
 
     seed = np.random.RandomState(1234)
-    lsml = LSML_Supervised(num_constraints=200, random_state=seed)
+    lsml = LSML_Supervised(n_constraints=200, random_state=seed)
     res_2 = lsml.fit_transform(self.X, self.y)
 
     assert_array_almost_equal(res_1, res_2)
 
   def test_itml_supervised(self):
     seed = np.random.RandomState(1234)
-    itml = ITML_Supervised(num_constraints=200, random_state=seed)
+    itml = ITML_Supervised(n_constraints=200, random_state=seed)
     itml.fit(self.X, self.y)
     res_1 = itml.transform(self.X)
 
     seed = np.random.RandomState(1234)
-    itml = ITML_Supervised(num_constraints=200, random_state=seed)
+    itml = ITML_Supervised(n_constraints=200, random_state=seed)
     res_2 = itml.fit_transform(self.X, self.y)
 
     assert_array_almost_equal(res_1, res_2)
@@ -63,13 +63,13 @@ class TestFitTransform(unittest.TestCase):
 
   def test_sdml_supervised(self):
     seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500, balance_param=1e-5,
+    sdml = SDML_Supervised(n_constraints=1500, balance_param=1e-5,
                            prior='identity', random_state=seed)
     sdml.fit(self.X, self.y)
     res_1 = sdml.transform(self.X)
 
     seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500, balance_param=1e-5,
+    sdml = SDML_Supervised(n_constraints=1500, balance_param=1e-5,
                            prior='identity', random_state=seed)
     res_2 = sdml.fit_transform(self.X, self.y)
 
@@ -123,12 +123,12 @@ class TestFitTransform(unittest.TestCase):
 
   def test_mmc_supervised(self):
     seed = np.random.RandomState(1234)
-    mmc = MMC_Supervised(num_constraints=200, random_state=seed)
+    mmc = MMC_Supervised(n_constraints=200, random_state=seed)
     mmc.fit(self.X, self.y)
     res_1 = mmc.transform(self.X)
 
     seed = np.random.RandomState(1234)
-    mmc = MMC_Supervised(num_constraints=200, random_state=seed)
+    mmc = MMC_Supervised(n_constraints=200, random_state=seed)
     res_2 = mmc.fit_transform(self.X, self.y)
 
     assert_array_almost_equal(res_1, res_2)

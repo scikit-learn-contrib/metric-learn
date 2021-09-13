@@ -28,9 +28,9 @@ def sandwich_demo():
 
   mls = [
       LMNN(),
-      ITML_Supervised(num_constraints=200),
-      SDML_Supervised(num_constraints=200, balance_param=0.001),
-      LSML_Supervised(num_constraints=200),
+      ITML_Supervised(n_constraints=200),
+      SDML_Supervised(n_constraints=200, balance_param=0.001),
+      LSML_Supervised(n_constraints=200),
   ]
 
   for ax_num, ml in enumerate(mls, start=3):

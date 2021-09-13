@@ -5,15 +5,15 @@ import metric_learn
 
 CLASSES = {
     'Covariance': metric_learn.Covariance(),
-    'ITML_Supervised': metric_learn.ITML_Supervised(num_constraints=200),
+    'ITML_Supervised': metric_learn.ITML_Supervised(n_constraints=200),
     'LFDA': metric_learn.LFDA(k=2, dim=2),
     'LMNN': metric_learn.LMNN(k=5, learn_rate=1e-6, verbose=False),
-    'LSML_Supervised': metric_learn.LSML_Supervised(num_constraints=200),
+    'LSML_Supervised': metric_learn.LSML_Supervised(n_constraints=200),
     'MLKR': metric_learn.MLKR(),
     'NCA': metric_learn.NCA(max_iter=700, n_components=2),
     'RCA_Supervised': metric_learn.RCA_Supervised(dim=2, num_chunks=30,
                                                   chunk_size=2),
-    'SDML_Supervised': metric_learn.SDML_Supervised(num_constraints=1500)
+    'SDML_Supervised': metric_learn.SDML_Supervised(n_constraints=1500)
 }
 
 

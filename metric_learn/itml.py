@@ -263,7 +263,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   convergence_threshold : float, optional (default=1e-3)
     Tolerance of the optimization procedure.
 
-  num_constraints : int, optional (default=None)
+  n_constraints : int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
 
@@ -328,7 +328,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> itml = ITML_Supervised(num_constraints=200)
+  >>> itml = ITML_Supervised(n_constraints=200)
   >>> itml.fit(X, Y)
 
   See Also
@@ -339,13 +339,13 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   """
 
   def __init__(self, gamma=1.0, max_iter=1000, convergence_threshold=1e-3,
-               num_constraints=None, prior='identity',
+               n_constraints=None, prior='identity',
                verbose=False, preprocessor=None, random_state=None):
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        convergence_threshold=convergence_threshold,
                        prior=prior, verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
-    self.num_constraints = num_constraints
+    self.n_constraints = n_constraints
 
   def fit(self, X, y, bounds=None):
     """Create constraints from labels and learn the ITML model.
@@ -369,13 +369,13 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
       points in the training data `X`.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
-    num_constraints = self.num_constraints
-    if num_constraints is None:
+    n_constraints = self.n_constraints
+    if n_constraints is None:
       num_classes = len(np.unique(y))
-      num_constraints = 20 * num_classes**2
+      n_constraints = 20 * num_classes**2
 
     c = Constraints(y)
-    pos_neg = c.positive_negative_pairs(num_constraints,
+    pos_neg = c.positive_negative_pairs(n_constraints,
                                         random_state=self.random_state)
     pairs, y = wrap_pairs(X, pos_neg)
     return _BaseITML._fit(self, pairs, y, bounds=bounds)

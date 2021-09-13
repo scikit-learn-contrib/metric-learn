@@ -472,7 +472,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   convergence_threshold : float, optional (default=1e-3)
     Convergence threshold for the optimization procedure.
 
-  num_constraints: int, optional (default=None)
+  n_constraints: int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
 
@@ -525,7 +525,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> mmc = MMC_Supervised(num_constraints=200)
+  >>> mmc = MMC_Supervised(n_constraints=200)
   >>> mmc.fit(X, Y)
 
   Attributes
@@ -539,7 +539,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   """
 
   def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_constraints=None, init='identity',
+               n_constraints=None, init='identity',
                diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None, random_state=None):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
@@ -547,7 +547,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
                       init=init, diagonal=diagonal,
                       diagonal_c=diagonal_c, verbose=verbose,
                       preprocessor=preprocessor, random_state=random_state)
-    self.num_constraints = num_constraints
+    self.n_constraints = n_constraints
 
   def fit(self, X, y):
     """Create constraints from labels and learn the MMC model.
@@ -561,13 +561,13 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
       Data labels.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
-    num_constraints = self.num_constraints
-    if num_constraints is None:
+    n_constraints = self.n_constraints
+    if n_constraints is None:
       num_classes = len(np.unique(y))
-      num_constraints = 20 * num_classes**2
+      n_constraints = 20 * num_classes**2
 
     c = Constraints(y)
-    pos_neg = c.positive_negative_pairs(num_constraints,
+    pos_neg = c.positive_negative_pairs(n_constraints,
                                         random_state=self.random_state)
     pairs, y = wrap_pairs(X, pos_neg)
     return _BaseMMC._fit(self, pairs, y)

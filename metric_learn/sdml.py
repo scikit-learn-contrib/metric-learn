@@ -177,7 +177,7 @@ class SDML(_BaseSDML, _PairsClassifierMixin):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> sdml = SDML_Supervised(num_constraints=200)
+  >>> sdml = SDML_Supervised(n_constraints=200)
   >>> sdml.fit(X, Y)
 
   References
@@ -262,7 +262,7 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
       (n_features, n_features), that will be used as such to set the
       prior.
 
-  num_constraints : int, optional (default=None)
+  n_constraints : int, optional (default=None)
     Number of constraints to generate. If None, defaults to `20 *
     num_classes**2`.
 
@@ -293,13 +293,13 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
   """
 
   def __init__(self, balance_param=0.5, sparsity_param=0.01, prior='identity',
-               num_constraints=None, verbose=False, preprocessor=None,
+               n_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
     _BaseSDML.__init__(self, balance_param=balance_param,
                        sparsity_param=sparsity_param, prior=prior,
                        verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
-    self.num_constraints = num_constraints
+    self.n_constraints = n_constraints
 
   def fit(self, X, y):
     """Create constraints from labels and learn the SDML model.
@@ -318,13 +318,13 @@ class SDML_Supervised(_BaseSDML, TransformerMixin):
       Returns the instance.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
-    num_constraints = self.num_constraints
-    if num_constraints is None:
+    n_constraints = self.n_constraints
+    if n_constraints is None:
       num_classes = len(np.unique(y))
-      num_constraints = 20 * num_classes**2
+      n_constraints = 20 * num_classes**2
 
     c = Constraints(y)
-    pos_neg = c.positive_negative_pairs(num_constraints,
+    pos_neg = c.positive_negative_pairs(n_constraints,
                                         random_state=self.random_state)
     pairs, y = wrap_pairs(X, pos_neg)
     return _BaseSDML._fit(self, pairs, y)

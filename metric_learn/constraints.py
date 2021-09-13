@@ -31,21 +31,21 @@ class Constraints(object):
     partial_labels = np.asanyarray(partial_labels, dtype=int)
     self.partial_labels = partial_labels
 
-  def positive_negative_pairs(self, num_constraints, same_length=False,
+  def positive_negative_pairs(self, n_constraints, same_length=False,
                               random_state=None):
     """
     Generates positive pairs and negative pairs from labeled data.
 
-    Positive pairs are formed by randomly drawing ``num_constraints`` pairs of
+    Positive pairs are formed by randomly drawing ``n_constraints`` pairs of
     points with the same label. Negative pairs are formed by randomly drawing
-    ``num_constraints`` pairs of points with different label.
+    ``n_constraints`` pairs of points with different label.
 
     In the case where it is not possible to generate enough positive or
     negative pairs, a smaller number of pairs will be returned with a warning.
 
     Parameters
     ----------
-    num_constraints : int
+    n_constraints : int
       Number of positive and negative constraints to generate.
 
     same_length : bool, optional (default=False)
@@ -70,9 +70,9 @@ class Constraints(object):
       1D array of indicators for the right elements of negative pairs.
     """
     random_state = check_random_state(random_state)
-    a, b = self._pairs(num_constraints, same_label=True,
+    a, b = self._pairs(n_constraints, same_label=True,
                        random_state=random_state)
-    c, d = self._pairs(num_constraints, same_label=False,
+    c, d = self._pairs(n_constraints, same_label=False,
                        random_state=random_state)
     if same_length and len(a) != len(c):
       n = min(len(a), len(c))
@@ -188,15 +188,15 @@ class Constraints(object):
 
     return triplets
 
-  def _pairs(self, num_constraints, same_label=True, max_iter=10,
+  def _pairs(self, n_constraints, same_label=True, max_iter=10,
              random_state=np.random):
     known_label_idx, = np.where(self.partial_labels >= 0)
     known_labels = self.partial_labels[known_label_idx]
     num_labels = len(known_labels)
     ab = set()
     it = 0
-    while it < max_iter and len(ab) < num_constraints:
-      nc = num_constraints - len(ab)
+    while it < max_iter and len(ab) < n_constraints:
+      nc = n_constraints - len(ab)
       for aidx in random_state.randint(num_labels, size=nc):
         if same_label:
           mask = known_labels[aidx] == known_labels
@@ -207,10 +207,10 @@ class Constraints(object):
         if len(b_choices) > 0:
           ab.add((aidx, random_state.choice(b_choices)))
       it += 1
-    if len(ab) < num_constraints:
+    if len(ab) < n_constraints:
       warnings.warn("Only generated %d %s constraints (requested %d)" % (
-          len(ab), 'positive' if same_label else 'negative', num_constraints))
-    ab = np.array(list(ab)[:num_constraints], dtype=int)
+          len(ab), 'positive' if same_label else 'negative', n_constraints))
+    ab = np.array(list(ab)[:n_constraints], dtype=int)
     return known_label_idx[ab.T]
 
   def chunks(self, num_chunks=100, chunk_size=2, random_state=None):

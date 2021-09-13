@@ -312,7 +312,7 @@ class TestSCML(object):
 
 class TestLSML(MetricTestCase):
   def test_iris(self):
-    lsml = LSML_Supervised(num_constraints=200)
+    lsml = LSML_Supervised(n_constraints=200)
     lsml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(lsml.transform(self.iris_points), self.iris_labels)
@@ -321,7 +321,7 @@ class TestLSML(MetricTestCase):
 
 class TestITML(MetricTestCase):
   def test_iris(self):
-    itml = ITML_Supervised(num_constraints=200)
+    itml = ITML_Supervised(n_constraints=200)
     itml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(itml.transform(self.iris_points), self.iris_labels)
@@ -736,7 +736,7 @@ class TestSDML(MetricTestCase):
     # TODO: un-flake it!
     rs = np.random.RandomState(5555)
 
-    sdml = SDML_Supervised(num_constraints=1500, prior='identity',
+    sdml = SDML_Supervised(n_constraints=1500, prior='identity',
                            balance_param=5e-5, random_state=rs)
     sdml.fit(self.iris_points, self.iris_labels)
     csep = class_separation(sdml.transform(self.iris_points),

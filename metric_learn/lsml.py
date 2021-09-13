@@ -261,11 +261,11 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       (n_features, n_features), that will be used as such to set the
       prior.
 
-  num_constraints: int, optional (default=None)
+  n_constraints: int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
 
-  weights : (num_constraints,) array of floats, optional (default=None)
+  weights : (n_constraints,) array of floats, optional (default=None)
     Relative weight given to each constraint. If None, defaults to uniform
     weights.
 
@@ -289,7 +289,7 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> lsml = LSML_Supervised(num_constraints=200)
+  >>> lsml = LSML_Supervised(n_constraints=200)
   >>> lsml.fit(X, Y)
 
   Attributes
@@ -303,12 +303,12 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   """
 
   def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
-               num_constraints=None, weights=None,
+               n_constraints=None, weights=None,
                verbose=False, preprocessor=None, random_state=None):
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                        verbose=verbose, preprocessor=preprocessor,
                        random_state=random_state)
-    self.num_constraints = num_constraints
+    self.n_constraints = n_constraints
     self.weights = weights
 
   def fit(self, X, y):
@@ -323,13 +323,13 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
       Data labels.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
-    num_constraints = self.num_constraints
-    if num_constraints is None:
+    n_constraints = self.n_constraints
+    if n_constraints is None:
       num_classes = len(np.unique(y))
-      num_constraints = 20 * num_classes**2
+      n_constraints = 20 * num_classes**2
 
     c = Constraints(y)
-    pos_neg = c.positive_negative_pairs(num_constraints, same_length=True,
+    pos_neg = c.positive_negative_pairs(n_constraints, same_length=True,
                                         random_state=self.random_state)
     return _BaseLSML._fit(self, X[np.column_stack(pos_neg)],
                           weights=self.weights)

@@ -29,14 +29,14 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
   def test_lsml_supervised(self):
     seed = np.random.RandomState(1234)
-    lsml = LSML_Supervised(num_constraints=200, random_state=seed)
+    lsml = LSML_Supervised(n_constraints=200, random_state=seed)
     lsml.fit(self.X, self.y)
     L = lsml.components_
     assert_array_almost_equal(L.T.dot(L), lsml.get_mahalanobis_matrix())
 
   def test_itml_supervised(self):
     seed = np.random.RandomState(1234)
-    itml = ITML_Supervised(num_constraints=200, random_state=seed)
+    itml = ITML_Supervised(n_constraints=200, random_state=seed)
     itml.fit(self.X, self.y)
     L = itml.components_
     assert_array_almost_equal(L.T.dot(L), itml.get_mahalanobis_matrix())
@@ -49,7 +49,7 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
   def test_sdml_supervised(self):
     seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500, prior='identity',
+    sdml = SDML_Supervised(n_constraints=1500, prior='identity',
                            balance_param=1e-5, random_state=seed)
     sdml.fit(self.X, self.y)
     L = sdml.components_
