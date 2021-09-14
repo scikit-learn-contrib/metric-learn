@@ -36,12 +36,12 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces(f"Covariance({merged_kwargs})"))
 
   def test_lmnn(self):
-    def_kwargs = {'convergence_tol': 0.001, 'init': 'auto', 'k': 3,
+    def_kwargs = {'convergence_tol': 0.001, 'init': 'auto', 'n_neighbors': 3,
                   'learn_rate': 1e-07, 'max_iter': 1000, 'min_iter': 50,
                   'n_components': None, 'preprocessor': None,
                   'random_state': None, 'regularization': 0.5,
                   'verbose': False}
-    nndef_kwargs = {'convergence_tol': 0.01, 'k': 6}
+    nndef_kwargs = {'convergence_tol': 0.01, 'n_neighbors': 6}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(
         remove_spaces(str(metric_learn.LMNN(convergence_tol=0.01, n_neighbors=6))),
