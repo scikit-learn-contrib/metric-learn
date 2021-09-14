@@ -503,12 +503,12 @@ def test_init_mahalanobis(estimator, build_dataset):
       model.fit(input_data, labels)
 
       # Initialize with a random spd matrix
-      init = make_spd_matrix(X.shape[1], random_state=rng)
+      init = make_spd_matrix(n_dim=X.shape[1], random_state=rng)
       model.set_params(**{param: init})
       model.fit(input_data, labels)
 
       # init.shape[1] must match X.shape[1]
-      init = make_spd_matrix(X.shape[1] + 1, X.shape[1] + 1)
+      init = make_spd_matrix(n_dim=X.shape[1] + 1, random_state=rng)
       model.set_params(**{param: init})
       msg = ('The input dimensionality {} of the given '
              'mahalanobis matrix `{}` must match the '

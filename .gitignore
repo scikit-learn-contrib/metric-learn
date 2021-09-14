@@ -8,3 +8,4 @@ htmlcov/
 .pytest_cache/
 doc/auto_examples/*
 doc/generated/*
+venv/
