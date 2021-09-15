@@ -20,11 +20,6 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ['2.7', '3.6', '3.7', '3.8', 'pypy-2.7', 'pypy-3.6']
-        exclude:
-          - os: macos-latest
-            python-version: '3.8'
-          - os: windows-latest
-            python-version: '3.6'
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -32,8 +27,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Display Python version
-      - run:  sudo apt-get install liblapack-dev
-      - run:  pip install --upgrade pip pytest
-      - run:  pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
-      - run:  pytest test --cov
+        run:  |
+          sudo apt-get install liblapack-dev
+          pip install --upgrade pip pytest
+          pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
+          pytest test --cov
 
