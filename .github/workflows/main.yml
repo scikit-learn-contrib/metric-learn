@@ -32,7 +32,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Display Python version
-        run:  sudo apt-get install liblapack-dev
+        run:  |
+              sudo apt-get install liblapack-dev
               pip install --upgrade pip pytest
               pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
               pytest test --cov
