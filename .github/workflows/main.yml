@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.6', '3.7', '3.8', '3.9', 'pypy-3.6']
+        python-version: ['3.6', '3.7', '3.8', '3.9', 'pypy-3.6', 'pypy-3.7']
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -32,4 +32,5 @@ jobs:
           pip install --upgrade pip pytest
           pip install wheel cython numpy scipy codecov pytest-cov scikit-learn
           pytest test --cov
-
+      - name: Codecov
+        uses: codecov/codecov-action@v2.1.0
