@@ -292,6 +292,11 @@ same class are not imposed to be close.
     lfda = LFDA(k=2, dim=2)
     lfda.fit(X, Y)
 
+.. note::
+    LDFA suffers from a problem called “sign indeterminacy”, which means the sign of the ``components`` and the output from transform depend on a random state. This is directly related to the calculation of eigenvectors in the algorithm. The same input ran in different times might lead to different transforms, but both valid.
+    
+    To work around this, fit instances of this class to data once, then keep the instance around to do transformations.
+
 .. topic:: References:
 
     .. [1] Sugiyama. `Dimensionality Reduction of Multimodal Labeled Data by Local
