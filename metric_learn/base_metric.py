@@ -180,7 +180,8 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
       pairs = check_input(pairs, type_of_inputs='tuples',
                           preprocessor=self.preprocessor_,
                           estimator=self, tuple_size=2)
-      return np.dot(np.dot(pairs[:, 1, :], self.components_), pairs[:, 0, :].T)
+
+      return [np.dot(np.dot(u, self.components_), v.T) for u,v in zip(pairs[:, 1, :], pairs[:, 0, :])]
 
   def get_metric(self):
       check_is_fitted(self, 'components_')

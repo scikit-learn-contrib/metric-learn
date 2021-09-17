@@ -9,7 +9,7 @@ def test_toy_distance():
     mixin.fit([u, v], [0, 0])
     #mixin.components_ = np.array([[1, 0, 0],[0, 1, 0],[0, 0, 1]])
 
-    dist = mixin.score_pairs([[u, v]])
+    dist = mixin.score_pairs([[u, v],[v, u]])
     print(dist)
 
 test_toy_distance()
