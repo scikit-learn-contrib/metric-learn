@@ -160,6 +160,58 @@ class MetricTransformer(metaclass=ABCMeta):
       Input data transformed to the metric space by :math:`XL^{\\top}`
     """
 
+class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
+
+  def score_pairs(self, pairs):
+      r"""
+      Parameters
+      ----------
+      pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+        3D Array of pairs to score, with each row corresponding to two points,
+        for 2D array of indices of pairs if the metric learner uses a
+        preprocessor.
+
+      Returns
+      -------
+      scores : `numpy.ndarray` of shape=(n_pairs,)
+        The learned Mahalanobis distance for every pair.
+      """
+      check_is_fitted(self, ['preprocessor_', 'components_'])
+      pairs = check_input(pairs, type_of_inputs='tuples',
+                          preprocessor=self.preprocessor_,
+                          estimator=self, tuple_size=2)
+      return np.dot(np.dot(pairs[:, 1, :], self.components_), pairs[:, 0, :].T)
+
+  def get_metric(self):
+      check_is_fitted(self, 'components_')
+      components = self.components_.copy()
+
+      def metric_fun(u, v):
+          """This function computes the metric between u and v, according to the
+          previously learned metric.
+
+          Parameters
+          ----------
+          u : array-like, shape=(n_features,)
+            The first point involved in the distance computation.
+
+          v : array-like, shape=(n_features,)
+            The second point involved in the distance computation.
+
+          Returns
+          -------
+          distance : float
+            The distance between u and v according to the new metric.
+          """
+          u = validate_vector(u)
+          v = validate_vector(v)
+          return np.dot(np.dot(u, components), v.T)
+
+      return metric_fun
+
+  def get_bilinear_matrix(self):
+      check_is_fitted(self, 'components_')
+      return self.components_
 
 class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
                        metaclass=ABCMeta):
