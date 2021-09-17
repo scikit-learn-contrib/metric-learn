@@ -3,6 +3,7 @@ import numpy as np
 from numpy.testing import assert_array_almost_equal
 
 def test_toy_distance():
+    # Random generalized test for 2 points
     d = 100
 
     u = np.random.rand(d)
@@ -21,5 +22,21 @@ def test_toy_distance():
     
     assert_array_almost_equal(dist1, desired)
     assert_array_almost_equal(dist2, desired)
+
+    # Handmade example
+    u = np.array([0, 1 ,2])
+    v = np.array([3, 4, 5])
+
+    mixin.components_= np.array([[2,4,6], [6,4,2], [1, 2, 3]])
+    dists = mixin.score_pairs([[u, v], [v, u]])
+    assert_array_almost_equal(dists, [96, 120])
+
+    # Symetric example
+    u = np.array([0, 1 ,2])
+    v = np.array([3, 4, 5])
+
+    mixin.components_= np.identity(3) # Identity matrix
+    dists = mixin.score_pairs([[u, v], [v, u]])
+    assert_array_almost_equal(dists, [14, 14])
 
 test_toy_distance()
