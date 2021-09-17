@@ -409,8 +409,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
       The pairs classifier with the new threshold set.
     """
     check_is_fitted(self, 'preprocessor_')
-
-    self.threshold_ = float(threshold) # Will raise ValueError if input was not a number
+    
+    # Will raise ValueError if input was not a number
+    self.threshold_ = float(threshold)
     return self
 
   def calibrate_threshold(self, pairs_valid, y_valid, strategy='accuracy',
