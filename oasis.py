@@ -1,5 +1,6 @@
+from metric_learn.oasis import OASIS
 import numpy as np
-from numpy.random.mtrand import random_integers
+from numpy.random.mtrand import random_integers, seed
 from sklearn.utils import check_random_state
 
 class _BaseOASIS():
@@ -17,7 +18,7 @@ class _BaseOASIS():
         self.n_iter = n_iter
         self.c = c
         self.random_state = seed
-        self.components_ = np.identity(self.d)  # W_0 = I, Here and once, to reuse self.components_ for partial_fit
+        
 
     def _fit(self, triplets):
         """
@@ -26,7 +27,8 @@ class _BaseOASIS():
         Matrix W is already defined as I at __init___
         """
         self.d = np.shape(triplets)[2]       # Number of features
-        
+        self.components_ = np.identity(self.d)  # W_0 = I, Here and once, to reuse self.components_ for partial_fit
+
         n_triplets = np.shape(triplets)[0]
         rng = check_random_state(self.random_state)
 
@@ -35,7 +37,8 @@ class _BaseOASIS():
 
         i = 0
         while i < self.n_iter:
-            current_triplet = triplets[random_indices]
+            current_triplet = np.array(triplets[random_indices[i]])
+            #print(f'i={i} {current_triplet}')
             loss = self._loss(current_triplet)
             vi = self._vi_matrix(current_triplet)
             fs = self._frobenius_squared(vi)
@@ -43,6 +46,7 @@ class _BaseOASIS():
 
             # Update components
             self.components_ = np.add(self.components_, tau_i * vi)
+            print(self.components_)
 
             i = i + 1
     
@@ -71,6 +75,7 @@ class _BaseOASIS():
 
         It uses self.components_ as current matrix W
         """
+        pairs = np.array(pairs)
         return np.diagonal(np.dot(np.dot(pairs[:, 0, :], self.components_), pairs[:, 1, :].T))
 
 
@@ -78,7 +83,8 @@ class _BaseOASIS():
         """
         Loss function in a triplet
         """
-        return np.maximum(0, 1 - self._score_pairs([ [triplet[0], triplet[2]], ][1]) + self._score_pairs([ [triplet[0], triplet[2]], ][0]))
+        #print(np.shape(triplet[0]))
+        return np.maximum(0, 1 - self._score_pairs([ [triplet[0], triplet[1]]])[0] + self._score_pairs([ [triplet[0], triplet[2]], ])[0] )
     
 
     def _vi_matrix(self, triplet):
@@ -91,4 +97,16 @@ class _BaseOASIS():
         for v in triplet[0]:
             result.append( v * diff)
 
-        return result # (d, d)
+        return np.array(result) # (d, d)
+
+
+def test_OASIS():
+    triplets = np.array([[[0, 1], [2, 1], [0, 0]],
+                         [[2, 1], [0, 1], [2, 0]],
+                         [[0, 0], [2, 0], [0, 1]],
+                         [[2, 0], [0, 0], [2, 1]]])
+    
+    oasis = _BaseOASIS(n_iter=10, c=1e-5, seed=33)
+    oasis._fit(triplets)
+
+test_OASIS()
