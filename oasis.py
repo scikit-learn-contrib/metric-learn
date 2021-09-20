@@ -27,7 +27,7 @@ class _BaseOASIS():
         Matrix W is already defined as I at __init___
         """
         self.d = np.shape(triplets)[2]       # Number of features
-        self.components_ = np.identity(self.d)  # W_0 = I, Here and once, to reuse self.components_ for partial_fit
+        self.components_ = np.identity(self.d) if self.components_ is None else self.components_  # W_0 = I, Here and once, to reuse self.components_ for partial_fit
 
         n_triplets = np.shape(triplets)[0]
         rng = check_random_state(self.random_state)
@@ -35,14 +35,14 @@ class _BaseOASIS():
         # Gen n_iter random indices
         random_indices = rng.randint(low=0, high=n_triplets, size=(self.n_iter))
 
+        # TODO: restict n_iter >, < or = to n_triplets
         i = 0
         while i < self.n_iter:
             current_triplet = np.array(triplets[random_indices[i]])
-            #print(f'i={i} {current_triplet}')
             loss = self._loss(current_triplet)
             vi = self._vi_matrix(current_triplet)
             fs = self._frobenius_squared(vi)
-            tau_i = np.minimum(self.c, loss / fs)
+            tau_i = np.minimum(self.c, loss / fs) # Global GD or Adjust to tuple
 
             # Update components
             self.components_ = np.add(self.components_, tau_i * vi)
@@ -75,7 +75,6 @@ class _BaseOASIS():
 
         It uses self.components_ as current matrix W
         """
-        pairs = np.array(pairs)
         return np.diagonal(np.dot(np.dot(pairs[:, 0, :], self.components_), pairs[:, 1, :].T))
 
 
@@ -83,21 +82,22 @@ class _BaseOASIS():
         """
         Loss function in a triplet
         """
-        #print(np.shape(triplet[0]))
-        return np.maximum(0, 1 - self._score_pairs([ [triplet[0], triplet[1]]])[0] + self._score_pairs([ [triplet[0], triplet[2]], ])[0] )
+        return np.maximum(0, 1 - self._score_pairs(np.array([ [triplet[0], triplet[1]], ]))[0] + self._score_pairs(np.array([ [triplet[0], triplet[2]], ]))[0] )
     
 
     def _vi_matrix(self, triplet):
         """
         Computes V_i, the gradient matrix in a triplet
         """
-        diff = np.subtract(triplet[1], triplet[2]) # (, d)
+        # (pi+ - pi-)
+        diff = np.subtract(triplet[1], triplet[2]) # Shape (, d)
         result = []
 
+        # For each scalar in first triplet, multiply by the diff of pi+ and pi-
         for v in triplet[0]:
             result.append( v * diff)
 
-        return np.array(result) # (d, d)
+        return np.array(result) # Shape (d, d)
 
 
 def test_OASIS():
@@ -106,7 +106,12 @@ def test_OASIS():
                          [[0, 0], [2, 0], [0, 1]],
                          [[2, 0], [0, 0], [2, 1]]])
     
-    oasis = _BaseOASIS(n_iter=10, c=1e-5, seed=33)
+    oasis = _BaseOASIS(n_iter=2, c=0.24, seed=33)
     oasis._fit(triplets)
+
+    new_triplets = np.array([[[0, 1], [4, 5], [0, 0]],
+                            [[2,0], [4, 7], [2, 0]]])
+
+    oasis._partial_fit(new_triplets)
 
 test_OASIS()
