@@ -160,6 +160,7 @@ class MetricTransformer(metaclass=ABCMeta):
       Input data transformed to the metric space by :math:`XL^{\\top}`
     """
 
+
 class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
 
   def score_pairs(self, pairs):
@@ -180,14 +181,15 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
       pairs = check_input(pairs, type_of_inputs='tuples',
                           preprocessor=self.preprocessor_,
                           estimator=self, tuple_size=2)
-                          
       # Note: For bilinear order matters, dist(a,b) != dist(b,a)
       # We always choose first pair first, then second pair
       # (In contrast with Mahalanobis implementation)
-      
       # I dont know wich implementation performs better
-      return np.diagonal(np.dot(np.dot(pairs[:, 0, :], self.components_), pairs[:, 1, :].T))
-      return [np.dot(np.dot(u.T, self.components_), v) for u,v in zip(pairs[:, 0, :], pairs[:, 1, :])]
+      return np.diagonal(np.dot(
+                      np.dot(pairs[:, 0, :], self.components_),
+                      pairs[:, 1, :].T))
+      return np.array([np.dot(np.dot(u.T, self.components_), v)
+                      for u, v in zip(pairs[:, 0, :], pairs[:, 1, :])])
 
   def get_metric(self):
       check_is_fitted(self, 'components_')
@@ -219,6 +221,7 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
   def get_bilinear_matrix(self):
       check_is_fitted(self, 'components_')
       return self.components_
+
 
 class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
                        metaclass=ABCMeta):
