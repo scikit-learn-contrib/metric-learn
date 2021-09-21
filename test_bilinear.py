@@ -1,6 +1,7 @@
 from metric_learn.oasis import OASIS
 import numpy as np
 from numpy.testing import assert_array_almost_equal
+from timeit import default_timer as timer
 
 
 def test_toy_distance():
@@ -41,4 +42,52 @@ def test_toy_distance():
     assert_array_almost_equal(dists, [14, 14])
 
 
-test_toy_distance()
+def test_bilinar_properties():
+    d = 100
+
+    u = np.random.rand(d)
+    v = np.random.rand(d)
+
+    mixin = OASIS()
+    mixin.fit([u, v], [0, 0])  # Dummy fit
+
+    dist1 = mixin.score_pairs([[u, u], [v, v], [u, v], [v, u]])
+
+    print(dist1)
+
+
+def test_performace():
+
+    features = int(1e4)
+    samples = int(1e3)
+
+    a = [np.random.rand(features) for i in range(samples)]
+    b = [np.random.rand(features) for i in range(samples)]
+    pairs = np.array([(aa, bb) for aa, bb in zip(a, b)])
+    components = np.identity(features)
+
+    def op_1(pairs, components):
+        return np.diagonal(np.dot(
+            np.dot(pairs[:, 0, :], components),
+            pairs[:, 1, :].T))
+
+    def op_2(pairs, components):
+        return np.array([np.dot(np.dot(u.T, components), v)
+                         for u, v in zip(pairs[:, 0, :], pairs[:, 1, :])])
+
+    # Test first method
+    start = timer()
+    op_1(pairs, components)
+    end = timer()
+    print(f'First method took {end - start}')
+
+    # Test second method
+    start = timer()
+    op_2(pairs, components)
+    end = timer()
+    print(f'Second method took {end - start}')
+
+
+# test_toy_distance()
+# test_bilinar_properties()
+test_performace()
