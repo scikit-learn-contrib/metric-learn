@@ -409,7 +409,9 @@ class _PairsClassifierMixin(BaseMetricLearner):
       The pairs classifier with the new threshold set.
     """
     check_is_fitted(self, 'preprocessor_')
-    # Will raise ValueError if input was not a number
+    if threshold is isinstance(threshold, (bool)):
+        raise ValueError('Parameter threshold must be a real number. '
+                         'Got {} instead.'.format(type(threshold)))
     self.threshold_ = float(threshold)
     return self
 

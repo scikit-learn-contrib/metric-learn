@@ -178,6 +178,36 @@ def test_set_threshold():
   assert identity_pairs_classifier.threshold_ == 0.5
 
 
+def test_set_wrong_type_threshold():
+  # test that set_threshold indeed sets the threshold
+  # and cannot accept nothing but float or integers
+  identity_pairs_classifier = IdentityPairsClassifier()
+  pairs = np.array([[[0.], [1.]], [[1.], [3.]], [[2.], [5.]], [[3.], [7.]]])
+  y = np.array([1, 1, -1, -1])
+  identity_pairs_classifier.fit(pairs, y)
+  with pytest.raises(ValueError):
+    identity_pairs_classifier.set_threshold("ABC")      # String
+  with pytest.raises(ValueError):
+    identity_pairs_classifier.set_threshold(True)       # Bool
+  with pytest.raises(TypeError):
+    identity_pairs_classifier.set_threshold(None)       # None
+  with pytest.raises(TypeError):
+    identity_pairs_classifier.set_threshold([1, 2, 3])  # List
+  with pytest.raises(TypeError):
+    identity_pairs_classifier.set_threshold({'key': None})  # Dict
+  with pytest.raises(TypeError):
+    identity_pairs_classifier.set_threshold((1, 2))     # Tuple
+  with pytest.raises(TypeError):
+    identity_pairs_classifier.set_threshold(set())      # Set
+  with pytest.raises(TypeError):
+    identity_pairs_classifier.set_threshold(pairs)      # np.array
+  identity_pairs_classifier.set_threshold(1)            # Integer
+  identity_pairs_classifier.set_threshold(0.1)          # Float
+  identity_pairs_classifier.set_threshold(np.array([0.5]))  # 1D np.array
+  identity_pairs_classifier.set_threshold(np.array([[[0.5]]]))  # 1D* np.array
+  assert identity_pairs_classifier.threshold_ == 0.5
+
+
 def test_f_beta_1_is_f_1():
   # test that putting beta to 1 indeed finds the best threshold to optimize
   # the f1_score
