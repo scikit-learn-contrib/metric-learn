@@ -2,6 +2,7 @@ from metric_learn.base_metric import BilinearMixin
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 
+
 class IdentityBilinearMixin(BilinearMixin):
     """A simple Identity bilinear mixin that returns an identity matrix
     M as learned. Can change M for a random matrix calling random_M.
@@ -15,17 +16,18 @@ class IdentityBilinearMixin(BilinearMixin):
         self.d = np.shape(X[0])[-1]
         self.components_ = np.identity(self.d)
         return self
-    
+
     def random_M(self):
         self.components_ = np.random.rand(self.d, self.d)
+
 
 def test_same_similarity_with_two_methods():
     d = 100
     u = np.random.rand(d)
     v = np.random.rand(d)
     mixin = IdentityBilinearMixin()
-    mixin.fit([u, v], [0, 0])  # Dummy fit
-    mixin.random_M()
+    mixin.fit([u, v], [0, 0])
+    mixin.random_M()  # Dummy fit
 
     # The distances must match, whether calc with get_metric() or score_pairs()
     dist1 = mixin.score_pairs([[u, v], [v, u]])
@@ -33,32 +35,35 @@ def test_same_similarity_with_two_methods():
 
     assert_array_almost_equal(dist1, dist2)
 
+
 def test_check_correctness_similarity():
     d = 100
     u = np.random.rand(d)
     v = np.random.rand(d)
     mixin = IdentityBilinearMixin()
-    mixin.fit([u, v], [0, 0])  # Dummy fit
+    mixin.fit([u, v], [0, 0])  # Identity fit
     dist1 = mixin.score_pairs([[u, v], [v, u]])
     u_v = np.dot(np.dot(u.T, np.identity(d)), v)
     v_u = np.dot(np.dot(v.T, np.identity(d)), u)
     desired = [u_v, v_u]
     assert_array_almost_equal(dist1, desired)
 
+
 def test_check_handmade_example():
     u = np.array([0, 1, 2])
     v = np.array([3, 4, 5])
     mixin = IdentityBilinearMixin()
-    mixin.fit([u, v], [0, 0])
+    mixin.fit([u, v], [0, 0])  # Identity fit
     c = np.array([[2, 4, 6], [6, 4, 2], [1, 2, 3]])
-    mixin.components_ = c # Force a components_
+    mixin.components_ = c  # Force components_
     dists = mixin.score_pairs([[u, v], [v, u]])
     assert_array_almost_equal(dists, [96, 120])
+
 
 def test_check_handmade_symmetric_example():
     u = np.array([0, 1, 2])
     v = np.array([3, 4, 5])
     mixin = IdentityBilinearMixin()
-    mixin.fit([u, v], [0, 0])
+    mixin.fit([u, v], [0, 0])   # Identity fit
     dists = mixin.score_pairs([[u, v], [v, u]])
     assert_array_almost_equal(dists, [14, 14])
