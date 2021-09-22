@@ -76,7 +76,8 @@ def test_performace():
                          for u, v in zip(pairs[:, 0, :], pairs[:, 1, :])])
 
     def op_3(pairs, components):
-        return (np.dot(pairs[:, 0, :], components) * pairs[:, 1, :]).sum(-1)
+        return np.sum(np.dot(pairs[:, 0, :], components) * pairs[:, 1, :],
+                      axis=-1)
 
     # Test first method
     start = timer()
@@ -89,7 +90,6 @@ def test_performace():
     op_2(pairs, components)
     end = timer()
     print(f'Second method took {end - start}')
-    
     # Test second method
     start = timer()
     op_3(pairs, components)
