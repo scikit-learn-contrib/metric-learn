@@ -59,7 +59,7 @@ def test_bilinar_properties():
 def test_performace():
 
     features = int(1e4)
-    samples = int(1e3)
+    samples = int(1e4)
 
     a = [np.random.rand(features) for i in range(samples)]
     b = [np.random.rand(features) for i in range(samples)]
@@ -75,6 +75,9 @@ def test_performace():
         return np.array([np.dot(np.dot(u.T, components), v)
                          for u, v in zip(pairs[:, 0, :], pairs[:, 1, :])])
 
+    def op_3(pairs, components):
+        return (np.dot(pairs[:, 0, :], components) * pairs[:, 1, :]).sum(-1)
+
     # Test first method
     start = timer()
     op_1(pairs, components)
@@ -86,8 +89,9 @@ def test_performace():
     op_2(pairs, components)
     end = timer()
     print(f'Second method took {end - start}')
-
-
-# test_toy_distance()
-# test_bilinar_properties()
-test_performace()
+    
+    # Test second method
+    start = timer()
+    op_3(pairs, components)
+    end = timer()
+    print(f'Third method took {end - start}')
