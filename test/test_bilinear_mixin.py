@@ -10,6 +10,7 @@ from sklearn.utils import check_random_state
 
 RNG = check_random_state(0)
 
+
 class IdentityBilinearMixin(BilinearMixin):
   """A simple Identity bilinear mixin that returns an identity matrix
   M as learned. Can change M for a random matrix calling random_M.
@@ -50,7 +51,7 @@ def identity_fit(d=100, n=100, n_pairs=None, random=False):
   mixin.fit(X, [0 for _ in range(n)], random=random)
   if n_pairs is not None:
     random_pairs = [[X[RNG.randint(0, n)], X[RNG.randint(0, n)]]
-                  for _ in range(n_pairs)]
+                    for _ in range(n_pairs)]
   else:
     random_pairs = None
   return X, random_pairs, mixin
@@ -62,7 +63,7 @@ def test_same_similarity_with_two_methods():
   In both cases, the results must match for the same input.
   Tests it for 'n_pairs' sampled from 'n' d-dimentional arrays.
   """
-  d, n, n_pairs= 100, 100, 1000
+  d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
   dist1 = mixin.score_pairs(random_pairs)
   dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
@@ -76,11 +77,12 @@ def test_check_correctness_similarity():
   get_metric(). Results are compared with the real bilinear similarity
   calculated in-place.
   """
-  d, n, n_pairs= 100, 100, 1000
+  d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
   dist1 = mixin.score_pairs(random_pairs)
   dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
-  desired = [np.dot(np.dot(p[0].T, mixin.components_), p[1]) for p in random_pairs]
+  desired = [np.dot(np.dot(p[0].T, mixin.components_), p[1])
+             for p in random_pairs]
 
   assert_array_almost_equal(dist1, desired)  # score_pairs
   assert_array_almost_equal(dist2, desired)  # get_metric
@@ -108,7 +110,7 @@ def test_check_handmade_symmetric_example():
   checks the random case: when the matrix is pd and symetric.
   """
   # Random pairs for M = Identity
-  d, n, n_pairs= 100, 100, 1000
+  d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs)
   pairs_reverse = [[p[1], p[0]] for p in random_pairs]
   dist1 = mixin.score_pairs(random_pairs)
@@ -122,13 +124,14 @@ def test_check_handmade_symmetric_example():
   dist2 = mixin.score_pairs(pairs_reverse)
   assert_array_almost_equal(dist1, dist2)
 
+
 def test_score_pairs_finite():
   """
   Checks for 'n' score_pairs() of 'd' dimentions, that all
   similarities are finite numbers, not NaN, +inf or -inf.
   Considering a random M for bilinear similarity.
   """
-  d, n, n_pairs= 100, 100, 1000
+  d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
   dist1 = mixin.score_pairs(random_pairs)
   assert np.isfinite(dist1).all()
@@ -140,7 +143,7 @@ def test_score_pairs_dim():
   and scoring of 2D arrays (one tuple) should return an error (like
   scikit-learn's error when scoring 1D arrays)
   """
-  d, n, n_pairs= 100, 100, 1000
+  d, n = 100, 100
   X, _, mixin = identity_fit(d=d, n=n, n_pairs=None, random=True)
   tuples = np.array(list(product(X, X)))
   assert mixin.score_pairs(tuples).shape == (tuples.shape[0],)
@@ -156,7 +159,7 @@ def test_score_pairs_dim():
 def test_check_scikitlearn_compatibility():
   """Check that the similarity returned by get_metric() is compatible with
   scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
-  d, n= 100, 100
+  d, n = 100, 100
   X, _, mixin = identity_fit(d=d, n=n, n_pairs=None, random=True)
   clustering = DBSCAN(metric=mixin.get_metric())
   clustering.fit(X)
