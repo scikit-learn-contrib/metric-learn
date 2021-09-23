@@ -5,7 +5,10 @@ from numpy.testing import assert_array_almost_equal
 import pytest
 from metric_learn._util import make_context
 from sklearn.cluster import DBSCAN
+from sklearn.datasets import make_spd_matrix
+from sklearn.utils import check_random_state
 
+RNG = check_random_state(0)
 
 class IdentityBilinearMixin(BilinearMixin):
   """A simple Identity bilinear mixin that returns an identity matrix
@@ -15,14 +18,17 @@ class IdentityBilinearMixin(BilinearMixin):
   def __init__(self, preprocessor=None):
     super().__init__(preprocessor=preprocessor)
 
-  def fit(self, X, y):
+  def fit(self, X, y, random=False):
     """
     Checks input's format. Sets M matrix to identity of shape (d,d)
     where d is the dimension of the input.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     self.d = np.shape(X[0])[-1]
-    self.components_ = np.identity(self.d)
+    if random:
+      self.components_ = np.random.rand(self.d, self.d)
+    else:
+      self.components_ = np.identity(self.d)
     return self
 
   def random_M(self):
@@ -32,29 +38,34 @@ class IdentityBilinearMixin(BilinearMixin):
     self.components_ = np.random.rand(self.d, self.d)
 
 
-def identity_fit(d=100):
+def identity_fit(d=100, n=100, n_pairs=None, random=False):
   """
-  Creates two d-dimentional arrays. Fits an IdentityBilinearMixin()
-  and then returns the two arrays and the mixin. Testing purposes
+  Creates 'n' d-dimentional arrays. Also generates 'n_pairs'
+  sampled from the 'n' arrays. Fits an IdentityBilinearMixin()
+  and then returns the arrays, the pairs and the mixin. Only
+  generates the pairs if n_pairs is not None
   """
-  d = 100
-  u = np.random.rand(d)
-  v = np.random.rand(d)
+  X = np.array([np.random.rand(d) for _ in range(n)])
   mixin = IdentityBilinearMixin()
-  mixin.fit([u, v], [0, 0])
-  return u, v, mixin
+  mixin.fit(X, [0 for _ in range(n)], random=random)
+  if n_pairs is not None:
+    random_pairs = [[X[RNG.randint(0, n)], X[RNG.randint(0, n)]]
+                  for _ in range(n_pairs)]
+  else:
+    random_pairs = None
+  return X, random_pairs, mixin
 
 
 def test_same_similarity_with_two_methods():
   """"
   Tests that score_pairs() and get_metric() give consistent results.
   In both cases, the results must match for the same input.
+  Tests it for 'n_pairs' sampled from 'n' d-dimentional arrays.
   """
-  u, v, mixin = identity_fit()
-  mixin.random_M()  # Dummy fit
-  # The distances must match, whether calc with get_metric() or score_pairs()
-  dist1 = mixin.score_pairs([[u, v], [v, u]])
-  dist2 = [mixin.get_metric()(u, v), mixin.get_metric()(v, u)]
+  d, n, n_pairs= 100, 100, 1000
+  _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
+  dist1 = mixin.score_pairs(random_pairs)
+  dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
 
   assert_array_almost_equal(dist1, dist2)
 
@@ -65,14 +76,12 @@ def test_check_correctness_similarity():
   get_metric(). Results are compared with the real bilinear similarity
   calculated in-place.
   """
-  d = 100
-  u, v, mixin = identity_fit(d)
-  dist1 = mixin.score_pairs([[u, v], [v, u]])
-  dist2 = [mixin.get_metric()(u, v), mixin.get_metric()(v, u)]
+  d, n, n_pairs= 100, 100, 1000
+  _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
+  dist1 = mixin.score_pairs(random_pairs)
+  dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
+  desired = [np.dot(np.dot(p[0].T, mixin.components_), p[1]) for p in random_pairs]
 
-  u_v = np.dot(np.dot(u.T, np.identity(d)), v)
-  v_u = np.dot(np.dot(v.T, np.identity(d)), u)
-  desired = [u_v, v_u]
   assert_array_almost_equal(dist1, desired)  # score_pairs
   assert_array_almost_equal(dist2, desired)  # get_metric
 
@@ -98,13 +107,20 @@ def test_check_handmade_symmetric_example():
   between two arrays must be equal: S(u,v) = S(v,u). Also
   checks the random case: when the matrix is pd and symetric.
   """
-  u = np.array([0, 1, 2])
-  v = np.array([3, 4, 5])
-  mixin = IdentityBilinearMixin()
-  mixin.fit([u, v], [0, 0])   # Identity fit
-  dists = mixin.score_pairs([[u, v], [v, u]])
-  assert_array_almost_equal(dists, [14, 14])
+  # Random pairs for M = Identity
+  d, n, n_pairs= 100, 100, 1000
+  _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs)
+  pairs_reverse = [[p[1], p[0]] for p in random_pairs]
+  dist1 = mixin.score_pairs(random_pairs)
+  dist2 = mixin.score_pairs(pairs_reverse)
+  assert_array_almost_equal(dist1, dist2)
 
+  # Random pairs for M = spd Matrix
+  spd_matrix = make_spd_matrix(d, random_state=RNG)
+  mixin.components_ = spd_matrix
+  dist1 = mixin.score_pairs(random_pairs)
+  dist2 = mixin.score_pairs(pairs_reverse)
+  assert_array_almost_equal(dist1, dist2)
 
 def test_score_pairs_finite():
   """
@@ -112,13 +128,10 @@ def test_score_pairs_finite():
   similarities are finite numbers, not NaN, +inf or -inf.
   Considering a random M for bilinear similarity.
   """
-  d = 100
-  u, v, mixin = identity_fit(d)
-  mixin.random_M()  # Dummy fit
-  n = 100
-  X = np.array([np.random.rand(d) for i in range(n)])
-  pairs = np.array(list(product(X, X)))
-  assert np.isfinite(mixin.score_pairs(pairs)).all()
+  d, n, n_pairs= 100, 100, 1000
+  _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
+  dist1 = mixin.score_pairs(random_pairs)
+  assert np.isfinite(dist1).all()
 
 
 def test_score_pairs_dim():
@@ -127,11 +140,8 @@ def test_score_pairs_dim():
   and scoring of 2D arrays (one tuple) should return an error (like
   scikit-learn's error when scoring 1D arrays)
   """
-  d = 100
-  u, v, mixin = identity_fit()
-  mixin.random_M()  # Dummy fit
-  n = 100
-  X = np.array([np.random.rand(d) for i in range(n)])
+  d, n, n_pairs= 100, 100, 1000
+  X, _, mixin = identity_fit(d=d, n=n, n_pairs=None, random=True)
   tuples = np.array(list(product(X, X)))
   assert mixin.score_pairs(tuples).shape == (tuples.shape[0],)
   context = make_context(mixin)
@@ -146,11 +156,7 @@ def test_score_pairs_dim():
 def test_check_scikitlearn_compatibility():
   """Check that the similarity returned by get_metric() is compatible with
   scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
-  d = 100
-  u, v, mixin = identity_fit(d)
-  mixin.random_M()  # Dummy fit
-
-  n = 100
-  X = np.array([np.random.rand(d) for i in range(n)])
+  d, n= 100, 100
+  X, _, mixin = identity_fit(d=d, n=n, n_pairs=None, random=True)
   clustering = DBSCAN(metric=mixin.get_metric())
   clustering.fit(X)
