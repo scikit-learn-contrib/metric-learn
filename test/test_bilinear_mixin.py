@@ -4,8 +4,8 @@ import numpy as np
 from numpy.testing import assert_array_almost_equal
 import pytest
 from metric_learn._util import make_context
-from sklearn import clone
 from sklearn.cluster import DBSCAN
+
 
 class IdentityBilinearMixin(BilinearMixin):
   """A simple Identity bilinear mixin that returns an identity matrix
@@ -54,6 +54,7 @@ def test_check_correctness_similarity():
   desired = [u_v, v_u]
   assert_array_almost_equal(dist1, desired)  # score_pairs
   assert_array_almost_equal(dist2, desired)  # get_metric
+
 
 def test_check_handmade_example():
   u = np.array([0, 1, 2])
@@ -104,8 +105,8 @@ def test_score_pairs_dim():
   assert mixin.score_pairs(tuples).shape == (tuples.shape[0],)
   context = make_context(mixin)
   msg = ("3D array of formed tuples expected{}. Found 2D array "
-      "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
-      .format(context, tuples[1]))
+         "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
+         .format(context, tuples[1]))
   with pytest.raises(ValueError) as raised_error:
     mixin.score_pairs(tuples[1])
   assert str(raised_error.value) == msg
