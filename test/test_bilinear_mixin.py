@@ -13,16 +13,17 @@ RNG = check_random_state(0)
 
 class IdentityBilinearMixin(BilinearMixin):
   """A simple Identity bilinear mixin that returns an identity matrix
-  M as learned. Can change M for a random matrix calling random_M.
-  Class for testing purposes.
+  M as learned. Can change M for a random matrix specifying random=True
+  at fit(). Class for testing purposes.
   """
   def __init__(self, preprocessor=None):
     super().__init__(preprocessor=preprocessor)
 
   def fit(self, X, y, random=False):
     """
-    Checks input's format. Sets M matrix to identity of shape (d,d)
-    where d is the dimension of the input.
+    Checks input's format. If random=False, sets M matrix to
+    identity of shape (d,d) where d is the dimension of the input.
+    Otherwise, a random (d,d) matrix is set.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     self.d = np.shape(X[0])[-1]
@@ -32,19 +33,14 @@ class IdentityBilinearMixin(BilinearMixin):
       self.components_ = np.identity(self.d)
     return self
 
-  def random_M(self):
-    """
-    Changes the matrix M for a random one of shape (d,d)
-    """
-    self.components_ = np.random.rand(self.d, self.d)
-
 
 def identity_fit(d=100, n=100, n_pairs=None, random=False):
   """
   Creates 'n' d-dimentional arrays. Also generates 'n_pairs'
   sampled from the 'n' arrays. Fits an IdentityBilinearMixin()
   and then returns the arrays, the pairs and the mixin. Only
-  generates the pairs if n_pairs is not None
+  generates the pairs if n_pairs is not None. If random=True,
+  the matrix M fitted will be random.
   """
   X = np.array([np.random.rand(d) for _ in range(n)])
   mixin = IdentityBilinearMixin()
@@ -107,7 +103,7 @@ def test_check_handmade_symmetric_example():
   """
   When the Bilinear matrix is the identity. The similarity
   between two arrays must be equal: S(u,v) = S(v,u). Also
-  checks the random case: when the matrix is pd and symetric.
+  checks the random case: when the matrix is spd and symetric.
   """
   # Random pairs for M = Identity
   d, n, n_pairs = 100, 100, 1000
@@ -128,8 +124,8 @@ def test_check_handmade_symmetric_example():
 def test_score_pairs_finite():
   """
   Checks for 'n' score_pairs() of 'd' dimentions, that all
-  similarities are finite numbers, not NaN, +inf or -inf.
-  Considering a random M for bilinear similarity.
+  similarities are finite numbers: not NaN, +inf or -inf.
+  Considers a random M for bilinear similarity.
   """
   d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
