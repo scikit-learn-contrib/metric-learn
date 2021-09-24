@@ -74,8 +74,6 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
 
         # Update components
         self.components_ = np.add(self.components_, tau_i * vi)
-        print(self.components_)
-
         i = i + 1
 
     return self
@@ -96,7 +94,7 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     """
     Loss function in a triplet
     """
-    S = self.score_pairs([[triplet[0], triplet[1]],
+    S = -1 * self.score_pairs([[triplet[0], triplet[1]],
                           [triplet[0], triplet[2]]])
     return np.maximum(0, 1 - S[0] + S[1])
 
@@ -124,7 +122,7 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     X: Unique points across all triplets.
 
     triplets: Triplets-shaped values that represent the indices of X.
-    Its guaranteed that shape(triplets) = shape(o_triplets)
+    Its guaranteed that shape(triplets) = shape(o_triplets[:-1])
     """
     shape = o_triplets.shape  # (n_triplets, 3, n_features)
     X, triplets = np.unique(np.vstack(o_triplets), return_inverse=True, axis=0)
