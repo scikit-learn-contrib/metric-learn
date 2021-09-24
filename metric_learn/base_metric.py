@@ -162,65 +162,98 @@ class MetricTransformer(metaclass=ABCMeta):
 
 
 class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
+  r"""Bilinear similarity learning algorithms.
+
+  Algorithm that learns a Bilinear (pseudo) similarity :math:`s_M(x, x')`,
+  defined between two column vectors :math:`x` and :math:`x'` by: :math:
+  `s_M(x, x') =  x M x'`, where :math:`M` is a learned matrix. This matrix
+  is not guaranteed to be symmetric nor positive semi-definite (PSD). Thus
+  it cannot be seen as learning a linear transformation of the original
+  space like Mahalanobis learning algorithms.
+
+  Attributes
+  ----------
+  components_ : `numpy.ndarray`, shape=(n_components, n_features)
+    The learned bilinear matrix ``M``.
+  """
 
   def score_pairs(self, pairs):
-      r"""
+    r"""Returns the learned Bilinear similarity between pairs.
+
+    This similarity is defined as: :math:`s_M(x, x') =  x M x'`
+    where ``M`` is the learned Bilinear matrix, for every pair of points
+    ``x`` and ``x'``.
+
+    Parameters
+    ----------
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to score, with each row corresponding to two points,
+      for 2D array of indices of pairs if the similarity learner uses a
+      preprocessor.
+
+    Returns
+    -------
+    scores : `numpy.ndarray` of shape=(n_pairs,)
+      The learned Bilinear similarity for every pair.
+
+    See Also
+    --------
+    get_metric : a method that returns a function to compute the similarity
+      between two points. The difference with `score_pairs` is that it works
+      on two 1D arrays and cannot use a preprocessor. Besides, the returned
+      function is independent of the similarity learner and hence is not
+      modified if the similarity learner is.
+
+    :ref:`Bilinear_similarity` : The section of the project documentation
+      that describes Bilinear similarity.
+    """
+    check_is_fitted(self, ['preprocessor_', 'components_'])
+    pairs = check_input(pairs, type_of_inputs='tuples',
+                        preprocessor=self.preprocessor_,
+                        estimator=self, tuple_size=2)
+    # Note: For bilinear order matters, dist(a,b) != dist(b,a)
+    # We always choose first pair first, then second pair
+    # (In contrast with Mahalanobis implementation)
+    return np.sum(np.dot(pairs[:, 0, :], self.components_) * pairs[:, 1, :],
+                  axis=-1)
+
+  def get_metric(self):
+    check_is_fitted(self, 'components_')
+    components = self.components_.copy()
+
+    def similarity_fun(u, v):
+      """This function computes the similarity between u and v, according to the
+      previously learned similarity.
+
       Parameters
       ----------
-      pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
-        3D Array of pairs to score, with each row corresponding to two points,
-        for 2D array of indices of pairs if the metric learner uses a
-        preprocessor.
+      u : array-like, shape=(n_features,)
+        The first point involved in the similarity computation.
+
+      v : array-like, shape=(n_features,)
+        The second point involved in the similarity computation.
 
       Returns
       -------
-      scores : `numpy.ndarray` of shape=(n_pairs,)
-        The learned Mahalanobis distance for every pair.
+      similarity : float
+        The similarity between u and v according to the new similarity.
       """
-      check_is_fitted(self, ['preprocessor_', 'components_'])
-      pairs = check_input(pairs, type_of_inputs='tuples',
-                          preprocessor=self.preprocessor_,
-                          estimator=self, tuple_size=2)
-      # Note: For bilinear order matters, dist(a,b) != dist(b,a)
-      # We always choose first pair first, then second pair
-      # (In contrast with Mahalanobis implementation)
-      # I dont know wich implementation performs better
-      return np.diagonal(np.dot(
-                      np.dot(pairs[:, 0, :], self.components_),
-                      pairs[:, 1, :].T))
-      return np.array([np.dot(np.dot(u.T, self.components_), v)
-                      for u, v in zip(pairs[:, 0, :], pairs[:, 1, :])])
+      u = validate_vector(u)
+      v = validate_vector(v)
+      return np.dot(np.dot(u.T, components), v)
 
-  def get_metric(self):
-      check_is_fitted(self, 'components_')
-      components = self.components_.copy()
-
-      def metric_fun(u, v):
-          """This function computes the metric between u and v, according to the
-          previously learned metric.
-
-          Parameters
-          ----------
-          u : array-like, shape=(n_features,)
-            The first point involved in the distance computation.
-
-          v : array-like, shape=(n_features,)
-            The second point involved in the distance computation.
-
-          Returns
-          -------
-          distance : float
-            The distance between u and v according to the new metric.
-          """
-          u = validate_vector(u)
-          v = validate_vector(v)
-          return np.dot(np.dot(u.T, components), v)
-
-      return metric_fun
+    return similarity_fun
 
   def get_bilinear_matrix(self):
-      check_is_fitted(self, 'components_')
-      return self.components_
+    """Returns a copy of the Bilinear matrix learned by the similarity learner.
+
+    Returns
+    -------
+    M : `numpy.ndarray`, shape=(n_features, n_features)
+      The copy of the learned Bilinear matrix.
+    """
+    check_is_fitted(self, 'components_')
+    return self.components_
 
 
 class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
