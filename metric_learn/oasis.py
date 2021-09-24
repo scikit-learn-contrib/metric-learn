@@ -95,7 +95,7 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     Loss function in a triplet
     """
     S = -1 * self.score_pairs([[triplet[0], triplet[1]],
-                          [triplet[0], triplet[2]]])
+                              [triplet[0], triplet[2]]])
     return np.maximum(0, 1 - S[0] + S[1])
 
   def _vi_matrix(self, triplet):

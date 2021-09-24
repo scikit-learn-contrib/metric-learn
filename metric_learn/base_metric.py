@@ -214,8 +214,8 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     # Note: For bilinear order matters, dist(a,b) != dist(b,a)
     # We always choose first pair first, then second pair
     # (In contrast with Mahalanobis implementation)
-    return -1 * np.sum(np.dot(pairs[:, 0, :], self.components_) * pairs[:, 1, :],
-                  axis=-1)
+    return -1 * np.sum(np.dot(pairs[:, 0, :], self.components_)*pairs[:, 1, :],
+                       axis=-1)
 
   def get_metric(self):
     check_is_fitted(self, 'components_')
