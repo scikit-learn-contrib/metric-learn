@@ -1,12 +1,16 @@
 from metric_learn.oasis import OASIS
 import numpy as np
 from sklearn.utils import check_random_state
-
+import pytest
 
 RNG = check_random_state(0)
 
 
 def test_sanity_check():
+  """
+  With M=I init. As the algorithm sees more triplets,
+  the score(triplet) should increse or maintain.
+  """
   triplets = np.array([[[0, 1], [2, 1], [0, 0]],
                        [[2, 1], [0, 1], [2, 0]],
                        [[0, 0], [2, 0], [0, 1]],
@@ -35,3 +39,41 @@ def test_sanity_check():
   assert a2 >= a1
   assert a3 >= a2
   assert a4 >= a3
+
+
+def test_score_zero():
+  """
+  The third triplet will give similarity 0, then the prediction
+  will be 0. But predict() must give results in {+1, -1}. This
+  tests forcing prediction 0 to be -1.
+  """
+  triplets = np.array([[[0, 1], [2, 1], [0, 0]],
+                       [[2, 1], [0, 1], [2, 0]],
+                       [[0, 0], [2, 0], [0, 1]],
+                       [[2, 0], [0, 0], [2, 1]]])
+
+  # Baseline, no M = Identity
+  oasis1 = OASIS(max_iter=0, c=0.24, random_state=RNG)
+  oasis1.fit(triplets)
+  predictions = oasis1.predict(triplets)
+  not_valid = [e for e in predictions if e not in [-1, 1]]
+  assert len(not_valid) == 0
+
+
+def test_divide_zero():
+  """
+  The thrid triplet willl force norm(V_i) to be zero, and
+  force a division by 0 when calculating tau = loss / norm(V_i).
+  No error should be experienced. A warning should show up.
+  """
+  triplets = np.array([[[0, 1], [2, 1], [0, 0]],
+                       [[2, 1], [0, 1], [2, 0]],
+                       [[0, 0], [2, 0], [0, 1]],
+                       [[2, 0], [0, 0], [2, 1]]])
+
+  # Baseline, no M = Identity
+  oasis1 = OASIS(max_iter=20, c=0.24, random_state=RNG)
+  msg = "divide by zero encountered in double_scalars"
+  with pytest.warns(RuntimeWarning) as raised_warning:
+    oasis1.fit(triplets)
+  assert msg == raised_warning[0].message.args[0]
