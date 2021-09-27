@@ -8,7 +8,7 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
   """
   Key params:
 
-  max_iter: Max number of iterations. If max_iter > n_triplets,
+  n_iter: Max number of iterations. If n_iter > n_triplets,
   a random sampling of seen triplets takes place to feed the model.
 
   c: Passive-agressive param. Controls trade-off bewteen remaining
@@ -22,14 +22,14 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
   def __init__(
           self,
           preprocessor=None,
-          max_iter=10,
+          n_iter=10,
           c=1e-6,
           random_state=None,
           ):
     super().__init__(preprocessor=preprocessor)
     self.components_ = None  # W matrix
     self.d = 0  # n_features
-    self.max_iter = max_iter  # Max iterations
+    self.n_iter = n_iter  # Max iterations
     self.c = c  # Trade-off param
     self.random_state = check_random_state(random_state)
 
@@ -40,7 +40,10 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
 
     Parameters
     ----------
-    X : (n x d) array of samples
+    triplets : (n x 3 x d) array of samples
+    shuffle : Whether the triplets should be suffled beforehand
+    random_sampling: Sample triplets, with repetition, uniform probability.
+    custom_order : User's custom order of triplets to feed oasis.
     """
     # Currently prepare_inputs makes triplets contain points and not indices
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
@@ -63,7 +66,7 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
       self.indices = self._check_custom_order(custom_order)
     else:
       self.indices = self._get_random_indices(self.n_triplets,
-                                              self.max_iter,
+                                              self.n_iter,
                                               self.shuffle,
                                               self.random_sampling)
 
@@ -71,7 +74,7 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
         self.d) if self.components_ is None else self.components_
 
     i = 0
-    while i < self.max_iter:
+    while i < self.n_iter:
         current_triplet = X[triplets[self.indices[i]]]
         loss = self._loss(current_triplet)
         vi = self._vi_matrix(current_triplet)
@@ -192,5 +195,5 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     return check_array(custom_order, ensure_2d=False,
                        allow_nd=True, copy=False,
                        force_all_finite=True, accept_sparse=True,
-                       dtype=None, ensure_min_features=self.max_iter,
+                       dtype=None, ensure_min_features=self.n_iter,
                        ensure_min_samples=0)
