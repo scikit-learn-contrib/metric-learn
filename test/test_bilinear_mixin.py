@@ -75,8 +75,8 @@ def test_check_correctness_similarity():
   """
   d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
-  dist1 = mixin.score_pairs(random_pairs)
-  dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
+  dist1 = -1*mixin.score_pairs(random_pairs)  # Temp -1
+  dist2 = [-1*mixin.get_metric()(p[0], p[1]) for p in random_pairs]
   desired = [np.dot(np.dot(p[0].T, mixin.components_), p[1])
              for p in random_pairs]
 
@@ -95,7 +95,7 @@ def test_check_handmade_example():
   mixin.fit([u, v], [0, 0])  # Identity fit
   c = np.array([[2, 4, 6], [6, 4, 2], [1, 2, 3]])
   mixin.components_ = c  # Force components_
-  dists = mixin.score_pairs([[u, v], [v, u]])
+  dists = -1*mixin.score_pairs([[u, v], [v, u]])  # Temp -1
   assert_array_almost_equal(dists, [96, 120])
 
 
