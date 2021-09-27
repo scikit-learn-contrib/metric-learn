@@ -1,6 +1,7 @@
 from .base_metric import BilinearMixin, _TripletsClassifierMixin
 import numpy as np
 from sklearn.utils import check_random_state
+from sklearn.utils import check_array
 
 
 class OASIS(BilinearMixin, _TripletsClassifierMixin):
@@ -24,15 +25,16 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
           max_iter=10,
           c=1e-6,
           random_state=None,
-          shuffle=False):
+          ):
     super().__init__(preprocessor=preprocessor)
     self.components_ = None  # W matrix
     self.d = 0  # n_features
     self.max_iter = max_iter  # Max iterations
     self.c = c  # Trade-off param
-    self.random_state = random_state  # RNG
+    self.random_state = check_random_state(random_state)
 
-  def fit(self, triplets):
+  def fit(self, triplets, shuffle=True, random_sampling=False,
+          custom_order=None):
     """
     Fit OASIS model
 
@@ -52,20 +54,25 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     triplets, X = self._to_index_points(triplets)
 
     self.d = X.shape[1]  # (n_triplets, d)
-    n_triplets = triplets.shape[0]  # (n_triplets, 3)
-    rng = check_random_state(self.random_state)
+    self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
+
+    self.shuffle = shuffle  # Shuffle the trilplets
+    self.random_sampling = random_sampling
+    # Get the order in wich the algoritm will be fed
+    if custom_order is not None:
+      self.indices = self._check_custom_order(custom_order)
+    else:
+      self.indices = self._get_random_indices(self.n_triplets,
+                                              self.max_iter,
+                                              self.shuffle,
+                                              self.random_sampling)
 
     self.components_ = np.identity(
         self.d) if self.components_ is None else self.components_
 
-    # Gen max_iter random indices
-    random_indices = rng.randint(
-        low=0, high=n_triplets, size=(
-            self.max_iter))
-
     i = 0
     while i < self.max_iter:
-        current_triplet = X[triplets[random_indices[i]]]
+        current_triplet = X[triplets[self.indices[i]]]
         loss = self._loss(current_triplet)
         vi = self._vi_matrix(current_triplet)
         fs = self._frobenius_squared(vi)
@@ -128,3 +135,62 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     X, triplets = np.unique(np.vstack(o_triplets), return_inverse=True, axis=0)
     triplets = triplets.reshape(shape[:2])  # (n_triplets, 3)
     return triplets, X
+
+  def _get_random_indices(self, n_triplets, n_iter, shuffle=True,
+                          random=False):
+    """
+    Generates n_iter indices in (0, n_triplets).
+
+    If not random:
+
+    If n_iter = n_triplets, then the resulting array will include
+    all values in range(0, n_triplets). If shuffle=True, then this
+    array is shuffled.
+
+    If n_iter > n_triplets, it will ensure that all values in
+    range(0, n_triplets) will be included. Then a random sampling
+    is executed to fill the gap. If shuffle=True, then the final
+    array is shuffled. The sampling may contain duplicates.
+
+    If n_iter < n_triplets, then a random sampling takes place.
+    The final array does not contains duplicates. The shuffle
+    param has no effect.
+
+    If random:
+
+    A random sampling is made in any case, generating n_iters values
+    that may include duplicates. The shuffle param has no effect.
+    """
+    rng = self.random_state
+    if random:
+      return rng.randint(low=0, high=n_triplets, size=n_iter)
+    else:
+      if n_iter < n_triplets:
+        return rng.choice(n_triplets, n_iter, replace=False)
+      else:
+        array = np.arange(n_triplets)  # All triplets will be included
+        if n_iter > n_triplets:
+          array = np.concatenate([array, rng.randint(low=0,
+                                 high=n_triplets,
+                                 size=(n_iter-n_triplets))])
+        if shuffle:
+          rng.shuffle(array)
+        return array
+
+  def get_indices(self):
+    """
+    Returns an array containing indices of triplets, the order in
+    which the algorithm was feed.
+    """
+    return self.indices
+
+  def _check_custom_order(self, custom_order):
+    """
+    Checks that the custom order is in fact a list or numpy array,
+    and has n_iter values in between (0, n_triplets)
+    """
+    return check_array(custom_order, ensure_2d=False,
+                       allow_nd=True, copy=False,
+                       force_all_finite=True, accept_sparse=True,
+                       dtype=None, ensure_min_features=self.max_iter,
+                       ensure_min_samples=0)
