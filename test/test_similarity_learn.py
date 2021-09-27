@@ -26,7 +26,7 @@ def test_sanity_check():
 
   msg = "divide by zero encountered in double_scalars"
   with pytest.warns(RuntimeWarning) as raised_warning:
-  # See 2/4 triplets
+    # See 2/4 triplets
     oasis2 = OASIS(n_iter=2, c=0.24, random_state=RNG)
     oasis2.fit(triplets)
     a2 = oasis2.score(triplets)
@@ -45,6 +45,7 @@ def test_sanity_check():
     assert a3 >= a2
     assert a4 >= a3
   assert msg == raised_warning[0].message.args[0]
+
 
 def test_score_zero():
   """

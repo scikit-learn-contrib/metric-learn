@@ -2,14 +2,14 @@ from .base_metric import BilinearMixin, _TripletsClassifierMixin
 import numpy as np
 from sklearn.utils import check_random_state
 from sklearn.utils import check_array
+from sklearn.datasets import make_spd_matrix
 
 
 class OASIS(BilinearMixin, _TripletsClassifierMixin):
   """
   Key params:
 
-  n_iter: Max number of iterations. If n_iter > n_triplets,
-  a random sampling of seen triplets takes place to feed the model.
+  n_iter: Number of iterations. May differ from n_triplets
 
   c: Passive-agressive param. Controls trade-off bewteen remaining
         close to previous W_i-1 OR minimizing loss of current triplet
@@ -25,13 +25,14 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
           n_iter=10,
           c=1e-6,
           random_state=None,
+          custom_M="identity"
           ):
     super().__init__(preprocessor=preprocessor)
-    self.components_ = None  # W matrix
     self.d = 0  # n_features
     self.n_iter = n_iter  # Max iterations
     self.c = c  # Trade-off param
     self.random_state = check_random_state(random_state)
+    self.custom_M = custom_M
 
   def fit(self, triplets, shuffle=True, random_sampling=False,
           custom_order=None):
@@ -59,6 +60,8 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     self.d = X.shape[1]  # (n_triplets, d)
     self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
 
+    self._init_M(self.custom_M)  # W matrix, needs self.d to check sanity
+
     self.shuffle = shuffle  # Shuffle the trilplets
     self.random_sampling = random_sampling
     # Get the order in wich the algoritm will be fed
@@ -69,9 +72,6 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
                                               self.n_iter,
                                               self.shuffle,
                                               self.random_sampling)
-
-    self.components_ = np.identity(
-        self.d) if self.components_ is None else self.components_
 
     i = 0
     while i < self.n_iter:
@@ -88,11 +88,17 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
 
     return self
 
-  def partial_fit(self, new_triplets):
+  def partial_fit(self, new_triplets, n_iter, shuffle=True,
+                  random_sampling=False, custom_order=None):
     """
-    self.components_ already defined, we reuse previous fit
+    Reuse previous fit, and feed the algorithm with new triplets. Shuffle,
+    random sampling and custom_order options are available.
+
+    A new n_iter param can be set for the new_triplets.
     """
-    self.fit(new_triplets)
+    self.n_iter = n_iter
+    self.fit(new_triplets, shuffle=shuffle, random_sampling=random_sampling,
+             custom_order=custom_order)
 
   def _frobenius_squared(self, v):
     """
@@ -197,3 +203,29 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
                        force_all_finite=True, accept_sparse=True,
                        dtype=None, ensure_min_features=self.n_iter,
                        ensure_min_samples=0)
+
+  def _init_M(self, custom_M=None):
+    """
+    Initiates the matrix M of the bilinear similarity to be learned.
+    A custom matrix M can be provided, otherwise an string can be
+    provided specifying an alternative: identity, random or spd.
+    """
+    if isinstance(custom_M, str):
+      if custom_M == "identity":
+        self.components_ = np.identity(self.d)
+      elif custom_M == "random":
+        self.components_ = np.random.rand(self.d, self.d)
+      elif custom_M == "spd":
+        self.components_ = make_spd_matrix(self.d,
+                                           random_state=self.random_state)
+      else:
+        raise ValueError("Invalid str custom_M for M initialization. "
+                         "Strategies availables: identity, random, psd."
+                         "Or you can provie a numpy custom matrix M")
+    else:
+      shape = np.shape(custom_M)
+      if shape != (self.d, self.d):
+        raise ValueError("The matrix M you provided has shape {}."
+                         "You need to provide a matrix with shape "
+                         "{}".format(shape, (self.d, self.d)))
+      self.components_ = custom_M
