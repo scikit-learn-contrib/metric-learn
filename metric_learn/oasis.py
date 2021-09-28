@@ -157,9 +157,9 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     array is shuffled.
 
     If n_iter > n_triplets, it will ensure that all values in
-    range(0, n_triplets) will be included. Then a random sampling
+    range(0, n_triplets) will be included once. Then a random sampling
     is executed to fill the gap. If shuffle=True, then the final
-    array is shuffled. The sampling may contain duplicates.
+    array is shuffled. The sampling may contain duplicates by its own.
 
     If n_iter < n_triplets, then a random sampling takes place.
     The final array does not contains duplicates. The shuffle
@@ -170,6 +170,11 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     A random sampling is made in any case, generating n_iters values
     that may include duplicates. The shuffle param has no effect.
     """
+    if n_triplets == 0:
+      raise ValueError("n_triplets cannot be 0")
+    if n_iter == 0:
+      raise ValueError("n_iter cannot be 0")
+
     rng = self.random_state
     if random:
       return rng.randint(low=0, high=n_triplets, size=n_iter)
