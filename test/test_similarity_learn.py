@@ -1,8 +1,10 @@
-from metric_learn.oasis import OASIS
+from metric_learn.oasis import OASIS, OASIS_Supervised
 import numpy as np
 from sklearn.utils import check_random_state
 import pytest
 from numpy.testing import assert_array_equal, assert_raises
+from sklearn.datasets import load_iris
+from sklearn.metrics import pairwise_distances
 
 SEED = 33
 RNG = check_random_state(SEED)
@@ -22,31 +24,32 @@ def test_sanity_check():
                        [[2, 0], [0, 0], [2, 1]]])
 
   # Baseline, no M = Identity
-  oasis1 = OASIS(n_iter=0, c=0.24, random_state=RNG)
-  oasis1.fit(triplets)
-  a1 = oasis1.score(triplets)
+  with pytest.raises(ValueError):
+    oasis1 = OASIS(n_iter=0, c=0.24, random_state=RNG)
+    oasis1.fit(triplets)
+    a1 = oasis1.score(triplets)
 
-  msg = "divide by zero encountered in double_scalars"
-  with pytest.warns(RuntimeWarning) as raised_warning:
-    # See 2/4 triplets
-    oasis2 = OASIS(n_iter=2, c=0.24, random_state=RNG)
-    oasis2.fit(triplets)
-    a2 = oasis2.score(triplets)
+    msg = "divide by zero encountered in double_scalars"
+    with pytest.warns(RuntimeWarning) as raised_warning:
+      # See 2/4 triplets
+      oasis2 = OASIS(n_iter=2, c=0.24, random_state=RNG)
+      oasis2.fit(triplets)
+      a2 = oasis2.score(triplets)
 
-    # See 3/4 triplets
-    oasis3 = OASIS(n_iter=3, c=0.24, random_state=RNG)
-    oasis3.fit(triplets)
-    a3 = oasis3.score(triplets)
+      # See 3/4 triplets
+      oasis3 = OASIS(n_iter=3, c=0.24, random_state=RNG)
+      oasis3.fit(triplets)
+      a3 = oasis3.score(triplets)
 
-    # See 5/4 triplets, one is seen again
-    oasis4 = OASIS(n_iter=6, c=0.24, random_state=RNG)
-    oasis4.fit(triplets)
-    a4 = oasis4.score(triplets)
+      # See 5/4 triplets, one is seen again
+      oasis4 = OASIS(n_iter=6, c=0.24, random_state=RNG)
+      oasis4.fit(triplets)
+      a4 = oasis4.score(triplets)
 
-    assert a2 >= a1
-    assert a3 >= a2
-    assert a4 >= a3
-  assert msg == raised_warning[0].message.args[0]
+      assert a2 >= a1
+      assert a3 >= a2
+      assert a4 >= a3
+    assert msg == raised_warning[0].message.args[0]
 
 
 def test_score_zero():
@@ -61,11 +64,12 @@ def test_score_zero():
                        [[2, 0], [0, 0], [2, 1]]])
 
   # Baseline, no M = Identity
-  oasis1 = OASIS(n_iter=0, c=0.24, random_state=RNG)
-  oasis1.fit(triplets)
-  predictions = oasis1.predict(triplets)
-  not_valid = [e for e in predictions if e not in [-1, 1]]
-  assert len(not_valid) == 0
+  with pytest.raises(ValueError):
+    oasis1 = OASIS(n_iter=0, c=0.24, random_state=RNG)
+    oasis1.fit(triplets)
+    predictions = oasis1.predict(triplets)
+    not_valid = [e for e in predictions if e not in [-1, 1]]
+    assert len(not_valid) == 0
 
 
 def test_divide_zero():
@@ -187,3 +191,39 @@ def test_indices_funct(n_triplets, n_iter):
   with pytest.raises(ValueError) as raised_error:
     oasis._get_random_indices(n_triplets=n_triplets, n_iter=0, random=True)
   assert msg == raised_error.value.args[0]
+
+
+def class_separation(X, labels, callable_metric):
+  unique_labels, label_inds = np.unique(labels, return_inverse=True)
+  ratio = 0
+  for li in range(len(unique_labels)):
+    Xc = X[label_inds == li]
+    Xnc = X[label_inds != li]
+    aux = pairwise_distances(Xc, metric=callable_metric).mean()
+    ratio += aux / pairwise_distances(Xc, Xnc, metric=callable_metric).mean()
+  return ratio / len(unique_labels)
+
+
+def test_iris_supervised():
+  """
+  Test a real use case: Using class separation as evaluation metric,
+  and the Iris dataset, this tests verifies that points of the same
+  class are closer now, using the learnt bilinear similarity at OASIS.
+
+  In contrast with Mahalanobis tests, we cant use transform(X) and
+  then use euclidean metric. Instead, we need to pass pairwise_distances
+  method from sklearn an explicit callable metric. Then we use
+  get_metric() for that purpose.
+  """
+
+  # Default bilinear similarity uses M = Identity
+  def bilinear_identity(u, v):
+    return - np.dot(np.dot(u.T, np.identity(np.shape(u)[0])), v)
+
+  X, y = load_iris(return_X_y=True)
+  prev = class_separation(X, y, bilinear_identity)
+
+  oasis = OASIS_Supervised(random_state=33, c=0.38)
+  oasis.fit(X, y)
+  now = class_separation(X, y, oasis.get_metric())
+  assert now < prev  # -0.0407866 vs 1.08 !
