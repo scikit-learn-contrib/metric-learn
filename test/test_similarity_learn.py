@@ -86,9 +86,10 @@ def test_divide_zero():
     oasis1.fit(triplets)
   assert msg == raised_warning[0].message.args[0]
 
+
 @pytest.mark.parametrize(('n_triplets', 'n_iter'),
-                           [(10, 10), (33, 70), (100, 67),
-                           (10000, 20000)])
+                         [(10, 10), (33, 70), (100, 67),
+                         (10000, 20000)])
 def test_indices_funct(n_triplets, n_iter):
   """
   This test verifies the behaviour of _get_random_indices. The
@@ -160,8 +161,8 @@ def test_indices_funct(n_triplets, n_iter):
     assert_array_equal(r_a, r_b)
 
   # Random case
-  # n_iter = n_triplets
-  r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter, random=True)
+  r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                                random=True)
   assert len(r) == n_iter  # Expected lenght
   for i in range(n_iter):
     if r[i] not in base:
