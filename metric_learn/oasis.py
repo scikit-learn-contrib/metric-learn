@@ -3,47 +3,50 @@ import numpy as np
 from sklearn.utils import check_random_state
 from sklearn.utils import check_array
 from sklearn.datasets import make_spd_matrix
+from .constraints import Constraints
 
 
-class OASIS(BilinearMixin, _TripletsClassifierMixin):
+class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
   """
   Key params:
 
   n_iter: Number of iterations. May differ from n_triplets
 
   c: Passive-agressive param. Controls trade-off bewteen remaining
-        close to previous W_i-1 OR minimizing loss of current triplet
+     close to previous W_i-1 OR minimizing loss of current triplet
 
-  seed: For random sampling
+  random_state: int or numpy.RandomState or None, optional (default=None)
+    A pseudo random number generator object or a seed for it if int.
 
-  shuffle: If True will shuffle the triplets given to fit.
+  shuffle : Whether the triplets should be shuffled beforehand
+
+  random_sampling: Sample triplets, with repetition, uniform probability.
   """
 
   def __init__(
           self,
           preprocessor=None,
-          n_iter=10,
-          c=1e-6,
+          n_iter=None,
+          c=0.0001,
           random_state=None,
-          custom_M="identity"
+          shuffle=True,
+          random_sampling=False,
           ):
     super().__init__(preprocessor=preprocessor)
     self.d = 0  # n_features
     self.n_iter = n_iter  # Max iterations
     self.c = c  # Trade-off param
     self.random_state = check_random_state(random_state)
-    self.custom_M = custom_M
+    self.shuffle = shuffle  # Shuffle the trilplets
+    self.random_sampling = random_sampling
 
-  def fit(self, triplets, shuffle=True, random_sampling=False,
-          custom_order=None):
+  def _fit(self, triplets, custom_M="identity", custom_order=None):
     """
     Fit OASIS model
 
     Parameters
     ----------
     triplets : (n x 3 x d) array of samples
-    shuffle : Whether the triplets should be suffled beforehand
-    random_sampling: Sample triplets, with repetition, uniform probability.
     custom_order : User's custom order of triplets to feed oasis.
     """
     # Currently prepare_inputs makes triplets contain points and not indices
@@ -60,10 +63,10 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     self.d = X.shape[1]  # (n_triplets, d)
     self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
 
-    self._init_M(self.custom_M)  # W matrix, needs self.d to check sanity
+    self.components_ = self._check_M(custom_M)  # W matrix, needs self.d
+    if self.n_iter is None:
+      self.n_iter = self.n_triplets
 
-    self.shuffle = shuffle  # Shuffle the trilplets
-    self.random_sampling = random_sampling
     # Get the order in wich the algoritm will be fed
     if custom_order is not None:
       self.indices = self._check_custom_order(custom_order)
@@ -203,13 +206,27 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     Checks that the custom order is in fact a list or numpy array,
     and has n_iter values in between (0, n_triplets)
     """
-    return check_array(custom_order, ensure_2d=False,
-                       allow_nd=True, copy=False,
-                       force_all_finite=True, accept_sparse=True,
-                       dtype=None, ensure_min_features=self.n_iter,
-                       ensure_min_samples=0)
 
-  def _init_M(self, custom_M=None):
+    custom_order = check_array(custom_order, ensure_2d=False,
+                               allow_nd=True, copy=False,
+                               force_all_finite=True, accept_sparse=True,
+                               dtype=None, ensure_min_features=self.n_iter,
+                               ensure_min_samples=0)
+    if len(custom_order) != self.n_iter:
+      raise ValueError('The leght of custom_order array ({}), must match '
+                       'the number of iterations ({}).'
+                       .format(len(custom_order), self.n_iter))
+
+    indices = np.arange(self.n_triplets)
+    for i in range(self.n_iter):
+      if custom_order[i] not in indices:
+        raise ValueError('Found the invalid value {} at index {}'
+                         'in custom_order. Use values only between'
+                         '0 and n_triplets ({})'
+                         .format(custom_order[i], i, self.n_triplets))
+    return custom_order
+
+  def _check_M(self, custom_M=None):
     """
     Initiates the matrix M of the bilinear similarity to be learned.
     A custom matrix M can be provided, otherwise an string can be
@@ -217,12 +234,11 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
     """
     if isinstance(custom_M, str):
       if custom_M == "identity":
-        self.components_ = np.identity(self.d)
+        return np.identity(self.d)
       elif custom_M == "random":
-        self.components_ = np.random.rand(self.d, self.d)
+        return np.random.rand(self.d, self.d)
       elif custom_M == "spd":
-        self.components_ = make_spd_matrix(self.d,
-                                           random_state=self.random_state)
+        return make_spd_matrix(self.d, random_state=self.random_state)
       else:
         raise ValueError("Invalid str custom_M for M initialization. "
                          "Strategies availables: identity, random, psd."
@@ -233,4 +249,37 @@ class OASIS(BilinearMixin, _TripletsClassifierMixin):
         raise ValueError("The matrix M you provided has shape {}."
                          "You need to provide a matrix with shape "
                          "{}".format(shape, (self.d, self.d)))
-      self.components_ = custom_M
+      return custom_M
+
+
+class OASIS(_BaseOASIS):
+
+  def __init__(self, preprocessor=None, n_iter=None, c=0.0001,
+               random_state=None, shuffle=True, random_sampling=False):
+      super().__init__(preprocessor=preprocessor, n_iter=n_iter, c=c,
+                       random_state=random_state, shuffle=shuffle,
+                       random_sampling=random_sampling)
+
+  def fit(self, triplets):
+    return self._fit(triplets)
+
+
+class OASIS_Supervised(OASIS):
+
+  def __init__(self, k_genuine=3, k_impostor=10,
+               preprocessor=None, n_iter=None, c=0.0001,
+               random_state=None, shuffle=True, random_sampling=False):
+    self.k_genuine = k_genuine
+    self.k_impostor = k_impostor
+    super().__init__(preprocessor=preprocessor, n_iter=n_iter, c=c,
+                     random_state=random_state, shuffle=shuffle,
+                     random_sampling=random_sampling)
+
+  def fit(self, X, y):
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
+    constraints = Constraints(y)
+    triplets = constraints.generate_knntriplets(X, self.k_genuine,
+                                                self.k_impostor)
+    triplets = X[triplets]
+
+    return self._fit(triplets)
