@@ -268,14 +268,14 @@ def test_random_state_in_suffling(custom_M, random_state):
 
   # Test different random states
   last_suffle = shuffle_b
-  for i in range(3,5):
+  for i in range(3, 5):
     oasis_a = OASIS(random_state=random_state+i, custom_M=custom_M)
     oasis_a.fit(triplets)
     shuffle_a = oasis_a.get_indices()
 
     with pytest.raises(AssertionError):
       assert_array_equal(last_suffle, shuffle_a)
-    
+
     last_suffle = shuffle_a
 
 
@@ -294,5 +294,24 @@ def test_general_results_random_state(custom_M, random_state):
   oasis_b = OASIS(random_state=random_state, custom_M=custom_M)
   oasis_b.fit(triplets)
   matrix_b = oasis_b.get_bilinear_matrix()
+
+  assert_array_equal(matrix_a, matrix_b)
+
+
+@pytest.mark.parametrize('custom_M', ["random", "spd"])
+@pytest.mark.parametrize('random_state', [6, 42])
+@pytest.mark.parametrize('d', [23, 27])
+def test_random_state_random_base_M(custom_M, random_state, d):
+  """
+  Tests that the function _check_M outputs the same matrix,
+  given the same random_state to OASIS instace, with a fixed d.
+  """
+  oasis_a = OASIS(random_state=random_state)
+  oasis_a.d = d
+  matrix_a = oasis_a._check_M(custom_M=custom_M)
+
+  oasis_b = OASIS(random_state=random_state)
+  oasis_b.d = d
+  matrix_b = oasis_b._check_M(custom_M=custom_M)
 
   assert_array_equal(matrix_a, matrix_b)
