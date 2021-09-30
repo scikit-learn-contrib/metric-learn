@@ -239,7 +239,9 @@ def test_iris_supervised():
   assert now < prev  # -0.0407866 vs 1.08 !
 
 
-def test_random_state_in_suffling():
+@pytest.mark.parametrize('custom_M', ["identity", "random", "spd"])
+@pytest.mark.parametrize('random_state', [33, 69, 112])
+def test_random_state_in_suffling(custom_M, random_state):
   """
   Tests that many instances of OASIS, with the same random_state,
   produce the same shuffling on the triplets given.
@@ -248,29 +250,26 @@ def test_random_state_in_suffling():
   produce different shuffling on the trilpets given.
 
   The triplets are produced with the Iris dataset.
+
+  Tested with all possible custom_M.
   """
   triplets = gen_iris_triplets()
-  n = 10
 
   # Test same random_state, then same shuffling
-  for i in range(n):
-    oasis_a = OASIS(random_state=i, custom_M="identity")
-    oasis_a.fit(triplets)
-    shuffle_a = oasis_a.get_indices()
+  oasis_a = OASIS(random_state=random_state, custom_M=custom_M)
+  oasis_a.fit(triplets)
+  shuffle_a = oasis_a.get_indices()
 
-    oasis_b = OASIS(random_state=i, custom_M="identity")
-    oasis_b.fit(triplets)
-    shuffle_b = oasis_b.get_indices()
+  oasis_b = OASIS(random_state=random_state, custom_M=custom_M)
+  oasis_b.fit(triplets)
+  shuffle_b = oasis_b.get_indices()
 
-    assert_array_equal(shuffle_a, shuffle_b)
+  assert_array_equal(shuffle_a, shuffle_b)
 
   # Test different random states
-  n = 10
-  oasis = OASIS(random_state=n, custom_M="identity")
-  oasis.fit(triplets)
-  last_suffle = oasis.get_indices()
-  for i in range(n):
-    oasis_a = OASIS(random_state=i, custom_M="identity")
+  last_suffle = shuffle_b
+  for i in range(3,5):
+    oasis_a = OASIS(random_state=random_state+i, custom_M=custom_M)
     oasis_a.fit(triplets)
     shuffle_a = oasis_a.get_indices()
 
@@ -278,3 +277,22 @@ def test_random_state_in_suffling():
       assert_array_equal(last_suffle, shuffle_a)
     
     last_suffle = shuffle_a
+
+
+@pytest.mark.parametrize('custom_M', ["identity", "random", "spd"])
+@pytest.mark.parametrize('random_state', [33, 69, 112])
+def test_general_results_random_state(custom_M, random_state):
+  """
+  With fixed triplets and random_state, two instances of OASIS
+  should produce the same output (matrix W)
+  """
+  triplets = gen_iris_triplets()
+  oasis_a = OASIS(random_state=random_state, custom_M=custom_M)
+  oasis_a.fit(triplets)
+  matrix_a = oasis_a.get_bilinear_matrix()
+
+  oasis_b = OASIS(random_state=random_state, custom_M=custom_M)
+  oasis_b.fit(triplets)
+  matrix_b = oasis_b.get_bilinear_matrix()
+
+  assert_array_equal(matrix_a, matrix_b)
