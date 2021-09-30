@@ -5,9 +5,19 @@ import pytest
 from numpy.testing import assert_array_equal, assert_raises
 from sklearn.datasets import load_iris
 from sklearn.metrics import pairwise_distances
+from metric_learn.constraints import Constraints
 
 SEED = 33
 RNG = check_random_state(SEED)
+
+
+def gen_iris_triplets():
+  X, y = load_iris(return_X_y=True)
+  constraints = Constraints(y)
+  k_geniuine = 3
+  k_impostor = 10
+  triplets = constraints.generate_knntriplets(X, k_geniuine, k_impostor)
+  return X[triplets]
 
 
 def test_sanity_check():
@@ -227,3 +237,44 @@ def test_iris_supervised():
   oasis.fit(X, y)
   now = class_separation(X, y, oasis.get_metric())
   assert now < prev  # -0.0407866 vs 1.08 !
+
+
+def test_random_state_in_suffling():
+  """
+  Tests that many instances of OASIS, with the same random_state,
+  produce the same shuffling on the triplets given.
+
+  Test that many instances of OASIS, with different random_state,
+  produce different shuffling on the trilpets given.
+
+  The triplets are produced with the Iris dataset.
+  """
+  triplets = gen_iris_triplets()
+  n = 10
+
+  # Test same random_state, then same shuffling
+  for i in range(n):
+    oasis_a = OASIS(random_state=i, custom_M="identity")
+    oasis_a.fit(triplets)
+    shuffle_a = oasis_a.get_indices()
+
+    oasis_b = OASIS(random_state=i, custom_M="identity")
+    oasis_b.fit(triplets)
+    shuffle_b = oasis_b.get_indices()
+
+    assert_array_equal(shuffle_a, shuffle_b)
+
+  # Test different random states
+  n = 10
+  oasis = OASIS(random_state=n, custom_M="identity")
+  oasis.fit(triplets)
+  last_suffle = oasis.get_indices()
+  for i in range(n):
+    oasis_a = OASIS(random_state=i, custom_M="identity")
+    oasis_a.fit(triplets)
+    shuffle_a = oasis_a.get_indices()
+
+    with pytest.raises(AssertionError):
+      assert_array_equal(last_suffle, shuffle_a)
+    
+    last_suffle = shuffle_a
