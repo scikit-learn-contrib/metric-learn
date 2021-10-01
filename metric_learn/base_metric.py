@@ -603,8 +603,8 @@ class _TripletsClassifierMixin(BaseMetricLearner):
       Predictions of the ordering of pairs, for each triplet.
     """
     return np.array([-1 if (t <= 0) else 1 for t in
-                   self.decision_function(triplets)])
-    #return np.sign(self.decision_function(triplets))
+                    self.decision_function(triplets)])
+    # return np.sign(self.decision_function(triplets))
 
   def decision_function(self, triplets):
     """Predicts differences between sample distances in input triplets.

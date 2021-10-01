@@ -8,6 +8,7 @@ from sklearn import clone
 import numpy as np
 from numpy.testing import assert_array_equal
 
+
 @pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', triplets_learners,
                          ids=ids_triplets_learners)
@@ -75,8 +76,8 @@ def test_no_zero_prediction(estimator, build_dataset):
   """
   # Dummy fit
   triplets, _, _, X = build_dataset(with_preprocessor=False)
-  # Force 3 dimentions only, to use cross product and get easy orthogonal vectors.
-  triplets = np.array([ [t[0][:3], t[1][:3], t[2][:3]] for t in triplets])
+  # Force 3 dimentions only, to use cross product and get easy orthogonal vec.
+  triplets = np.array([[t[0][:3], t[1][:3], t[2][:3]] for t in triplets])
   X = np.array([x[:3] for x in X])
   # Dummy fit
   estimator = clone(estimator)
@@ -102,8 +103,7 @@ def test_no_zero_prediction(estimator, build_dataset):
   triplets_test = np.array(  # Critical examples
     [[X[0], X[2], X[2]],
      [X[1], X[1], X[1]],
-     [X[1], x, y]
-    ])
+     [X[1], x, y]])
   # Predict
   predictions = estimator.predict(triplets_test)
   # Count non -1 or 1 values
