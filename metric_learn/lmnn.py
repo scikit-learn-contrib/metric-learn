@@ -5,6 +5,7 @@ import numpy as np
 from collections import Counter
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
+import warnings
 
 from ._util import _initialize_components, _check_n_components
 from .base_metric import MahalanobisMixin
@@ -99,6 +100,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     transformation. If ``init='pca'``, ``random_state`` is passed as an
     argument to PCA when initializing the transformation.
 
+  k : Renamed to n_neighbors. Will be deprecated in 0.7.0
+
   Attributes
   ----------
   n_iter_ : `int`
@@ -131,8 +134,15 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   def __init__(self, init='auto', n_neighbors=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
                verbose=False, preprocessor=None,
-               n_components=None, random_state=None):
+               n_components=None, random_state=None, k='deprecated'):
     self.init = init
+    if k != 'deprecated':
+      warnings.warn('"num_chunks" parameter has been renamed to'
+                    ' "n_chunks". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      n_neighbors = k
+    self.k = 'deprecated'  # To avoid no_attribute error
     self.n_neighbors = n_neighbors
     self.min_iter = min_iter
     self.max_iter = max_iter
