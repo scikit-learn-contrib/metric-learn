@@ -224,7 +224,8 @@ class Constraints(object):
     ab = np.array(list(ab)[:n_constraints], dtype=int)
     return known_label_idx[ab.T]
 
-  def chunks(self, n_chunks=100, chunk_size=2, random_state=None):
+  def chunks(self, n_chunks=100, chunk_size=2, random_state=None,
+             num_chunks='deprecated'):
     """
     Generates chunks from labeled data.
 
@@ -245,12 +246,20 @@ class Constraints(object):
     random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int.
 
+    num_chunks : Renamed to n_chunks. Will be deprecated in 0.7.0
+
     Returns
     -------
     chunks : array-like, shape=(n_samples,)
       1D array of chunk indicators, where -1 indicates that the point does not
       belong to any chunk.
     """
+    if num_chunks != 'deprecated':
+      warnings.warn('"num_chunks" parameter has been renamed to'
+                    ' "n_chunks". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      n_chunks = num_chunks
     random_state = check_random_state(random_state)
     chunks = -np.ones_like(self.partial_labels, dtype=int)
     uniq, lookup = np.unique(self.partial_labels, return_inverse=True)

@@ -156,6 +156,8 @@ class RCA_Supervised(RCA):
     A pseudo random number generator object or a seed for it if int.
     It is used to randomly sample constraints from labels.
 
+  num_chunks : Renamed to n_chunks. Will be deprecated in 0.7.0
+
   Examples
   --------
   >>> from metric_learn import RCA_Supervised
@@ -173,9 +175,17 @@ class RCA_Supervised(RCA):
   """
 
   def __init__(self, n_components=None, n_chunks=100, chunk_size=2,
-               preprocessor=None, random_state=None):
+               preprocessor=None, random_state=None,
+               num_chunks='deprecated'):
     """Initialize the supervised version of `RCA`."""
     RCA.__init__(self, n_components=n_components, preprocessor=preprocessor)
+    if num_chunks != 'deprecated':
+      warnings.warn('"num_chunks" parameter has been renamed to'
+                    ' "n_chunks". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      n_chunks = num_chunks
+    self.num_chunks = 'deprecated'  # To avoid no_attribute error
     self.n_chunks = n_chunks
     self.chunk_size = chunk_size
     self.random_state = random_state
