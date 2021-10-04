@@ -9,6 +9,7 @@ from sklearn.base import TransformerMixin
 from .base_metric import _QuadrupletsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints
 from ._util import components_from_metric, _initialize_metric_mahalanobis
+import warnings
 
 
 class _BaseLSML(MahalanobisMixin):
@@ -282,6 +283,8 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     prior. In any case, `random_state` is also used to randomly sample
     constraints from labels.
 
+  num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
+
   Examples
   --------
   >>> from metric_learn import LSML_Supervised
@@ -304,11 +307,21 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
 
   def __init__(self, tol=1e-3, max_iter=1000, prior='identity',
                n_constraints=None, weights=None,
-               verbose=False, preprocessor=None, random_state=None):
+               verbose=False, preprocessor=None, random_state=None,
+               num_constraints='deprecated'):
     _BaseLSML.__init__(self, tol=tol, max_iter=max_iter, prior=prior,
                        verbose=verbose, preprocessor=preprocessor,
                        random_state=random_state)
-    self.n_constraints = n_constraints
+    if num_constraints != 'deprecated':
+      warnings.warn('"num_constraints" parameter has been renamed to'
+                    ' "n_constraints". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      self.n_constraints = num_constraints
+    else:
+      self.n_constraints = n_constraints
+    # Avoid test get_params from failing (all params passed sholud be set)
+    self.num_constraints = 'deprecated'
     self.weights = weights
 
   def fit(self, X, y):

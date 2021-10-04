@@ -9,6 +9,7 @@ from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import components_from_metric, _initialize_metric_mahalanobis
+import warnings
 
 
 class _BaseITML(MahalanobisMixin):
@@ -302,6 +303,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     case, `random_state` is also used to randomly sample constraints from
     labels.
 
+  num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
 
   Attributes
   ----------
@@ -340,12 +342,22 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   def __init__(self, gamma=1.0, max_iter=1000, tol=1e-3,
                n_constraints=None, prior='identity',
-               verbose=False, preprocessor=None, random_state=None):
+               verbose=False, preprocessor=None, random_state=None,
+               num_constraints='deprecated'):
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        tol=tol,
                        prior=prior, verbose=verbose,
                        preprocessor=preprocessor, random_state=random_state)
-    self.n_constraints = n_constraints
+    if num_constraints != 'deprecated':
+      warnings.warn('"num_constraints" parameter has been renamed to'
+                    ' "n_constraints". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      self.n_constraints = num_constraints
+    else:
+      self.n_constraints = n_constraints
+    # Avoid test get_params from failing (all params passed sholud be set)
+    self.num_constraints = 'deprecated'
 
   def fit(self, X, y, bounds=None):
     """Create constraints from labels and learn the ITML model.

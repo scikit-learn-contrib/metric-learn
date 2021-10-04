@@ -6,6 +6,7 @@ from sklearn.utils.validation import assert_all_finite
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import components_from_metric, _initialize_metric_mahalanobis
+import warnings
 
 
 class _BaseMMC(MahalanobisMixin):
@@ -518,6 +519,8 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     Mahalanobis matrix.  In any case, `random_state` is also used to
     randomly sample constraints from labels.
 
+  num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
+
   Examples
   --------
   >>> from metric_learn import MMC_Supervised
@@ -541,13 +544,23 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   def __init__(self, max_iter=100, max_proj=10000, tol=1e-6,
                n_constraints=None, init='identity',
                diagonal=False, diagonal_c=1.0, verbose=False,
-               preprocessor=None, random_state=None):
+               preprocessor=None, random_state=None,
+               num_constraints='deprecated'):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       tol=tol,
                       init=init, diagonal=diagonal,
                       diagonal_c=diagonal_c, verbose=verbose,
                       preprocessor=preprocessor, random_state=random_state)
-    self.n_constraints = n_constraints
+    if num_constraints != 'deprecated':
+      warnings.warn('"num_constraints" parameter has been renamed to'
+                    ' "n_constraints". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      self.n_constraints = num_constraints
+    else:
+      self.n_constraints = n_constraints
+    # Avoid test get_params from failing (all params passed sholud be set)
+    self.num_constraints = 'deprecated'
 
   def fit(self, X, y):
     """Create constraints from labels and learn the MMC model.

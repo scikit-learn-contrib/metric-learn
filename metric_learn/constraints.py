@@ -6,7 +6,7 @@ import numpy as np
 import warnings
 from sklearn.utils import check_random_state
 from sklearn.neighbors import NearestNeighbors
-import warnings
+
 
 __all__ = ['Constraints']
 
@@ -56,7 +56,7 @@ class Constraints(object):
     random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int.
 
-    num_constraints : Renamed to n_constrains. Will be deprecated 0.7.0
+    num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
 
     Returns
     -------
@@ -72,12 +72,14 @@ class Constraints(object):
     d : array-like, shape=(n_constraints,)
       1D array of indicators for the right elements of negative pairs.
     """
-    if self.num_constraints != 'deprecated':
-      warnings.warn('"num_constraints" parameter has been renamed to '
-                    '"n_constraints". It has been deprecated in'
+    if num_constraints != 'deprecated':
+      warnings.warn('"num_constraints" parameter has been renamed to'
+                    ' "n_constraints". It has been deprecated in'
                     ' version 0.6.3 and will be removed in 0.7.0'
                     '', FutureWarning)
       self.n_constraints = num_constraints
+    else:
+      self.n_constraints = n_constraints
     random_state = check_random_state(random_state)
     a, b = self._pairs(n_constraints, same_label=True,
                        random_state=random_state)

@@ -182,7 +182,7 @@ class RCA_Supervised(RCA):
 
   def fit(self, X, y):
     """Create constraints from labels and learn the RCA model.
-    Needs n_constraints specified in constructor.
+    Needs n_constraints specified in constructor. (Not true?)
 
     Parameters
     ----------
