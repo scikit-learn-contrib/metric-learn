@@ -19,7 +19,15 @@ class _BaseITML(MahalanobisMixin):
 
   def __init__(self, gamma=1., max_iter=1000, tol=1e-3,
                prior='identity', verbose=False,
-               preprocessor=None, random_state=None):
+               preprocessor=None, random_state=None,
+               convergence_threshold='deprecated'):
+    if convergence_threshold != 'deprecated':
+      warnings.warn('"convergence_threshold" parameter has been '
+                    ' renamed to "tol". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      tol = convergence_threshold
+    self.convergence_threshold = 'deprecated'  # Avoid errors
     self.gamma = gamma
     self.max_iter = max_iter
     self.tol = tol
@@ -158,6 +166,8 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   random_state : int or numpy.RandomState or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If
     ``prior='random'``, ``random_state`` is used to set the prior.
+
+  convergence_threshold : Renamed to tol. Will be deprecated in 0.7.0
 
   Attributes
   ----------
@@ -305,6 +315,8 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
 
   num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
 
+  convergence_threshold : Renamed to tol. Will be deprecated in 0.7.0
+
   Attributes
   ----------
   bounds_ : `numpy.ndarray`, shape=(2,)
@@ -343,19 +355,21 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   def __init__(self, gamma=1.0, max_iter=1000, tol=1e-3,
                n_constraints=None, prior='identity',
                verbose=False, preprocessor=None, random_state=None,
-               num_constraints='deprecated'):
+               num_constraints='deprecated',
+               convergence_threshold='deprecated'):
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
                        tol=tol,
                        prior=prior, verbose=verbose,
-                       preprocessor=preprocessor, random_state=random_state)
+                       preprocessor=preprocessor,
+                       random_state=random_state,
+                       convergence_threshold=convergence_threshold)
     if num_constraints != 'deprecated':
       warnings.warn('"num_constraints" parameter has been renamed to'
                     ' "n_constraints". It has been deprecated in'
                     ' version 0.6.3 and will be removed in 0.7.0'
                     '', FutureWarning)
-      self.n_constraints = num_constraints
-    else:
-      self.n_constraints = n_constraints
+      n_constraints = num_constraints
+    self.n_constraints = n_constraints
     # Avoid test get_params from failing (all params passed sholud be set)
     self.num_constraints = 'deprecated'
 

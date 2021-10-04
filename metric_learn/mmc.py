@@ -16,7 +16,15 @@ class _BaseMMC(MahalanobisMixin):
   def __init__(self, max_iter=100, max_proj=10000, tol=1e-3,
                init='identity', diagonal=False,
                diagonal_c=1.0, verbose=False, preprocessor=None,
-               random_state=None):
+               random_state=None,
+               convergence_threshold='deprecated'):
+    if convergence_threshold != 'deprecated':
+      warnings.warn('"convergence_threshold" parameter has been '
+                    ' renamed to "tol". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      tol = convergence_threshold
+    self.convergence_threshold = 'deprecated'  # Avoid errors
     self.max_iter = max_iter
     self.max_proj = max_proj
     self.tol = tol
@@ -378,6 +386,8 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
     ``init='random'``, ``random_state`` is used to initialize the random
     transformation.
 
+  convergence_threshold : Renamed to tol. Will be deprecated in 0.7.0
+
   Attributes
   ----------
   n_iter_ : `int`
@@ -521,6 +531,8 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
 
   num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
 
+  convergence_threshold : Renamed to tol. Will be deprecated in 0.7.0
+
   Examples
   --------
   >>> from metric_learn import MMC_Supervised
@@ -545,12 +557,15 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
                n_constraints=None, init='identity',
                diagonal=False, diagonal_c=1.0, verbose=False,
                preprocessor=None, random_state=None,
-               num_constraints='deprecated'):
+               num_constraints='deprecated',
+               convergence_threshold='deprecated'):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
                       tol=tol,
                       init=init, diagonal=diagonal,
                       diagonal_c=diagonal_c, verbose=verbose,
-                      preprocessor=preprocessor, random_state=random_state)
+                      preprocessor=preprocessor,
+                      random_state=random_state,
+                      convergence_threshold=convergence_threshold)
     if num_constraints != 'deprecated':
       warnings.warn('"num_constraints" parameter has been renamed to'
                     ' "n_constraints". It has been deprecated in'
