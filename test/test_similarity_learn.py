@@ -6,6 +6,7 @@ from numpy.testing import assert_array_equal, assert_raises
 from sklearn.datasets import load_iris
 from sklearn.metrics import pairwise_distances
 from metric_learn.constraints import Constraints
+from metric_learn._util import _get_random_indices
 
 SEED = 33
 RNG = check_random_state(SEED)
@@ -110,20 +111,21 @@ def test_indices_funct(n_triplets, n_iter):
   method used inside OASIS that defines the order in which the
   triplets are given to the algorithm, in an online manner.
   """
-  oasis = OASIS(random_state=SEED)
   # Not random cases
   base = np.arange(n_triplets)
 
   # n_iter = n_triplets
   if n_iter == n_triplets:
-    r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                  shuffle=False, random=False)
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
     assert_array_equal(r, base)  # No shuffle
     assert len(r) == len(base)  # Same lenght
 
     # Shuffle
-    r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                  shuffle=True, random=False)
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=False,
+                            random_state=RNG)
     with assert_raises(AssertionError):  # Should be different
       assert_array_equal(r, base)
     # But contain the same elements
@@ -132,8 +134,9 @@ def test_indices_funct(n_triplets, n_iter):
 
   # n_iter > n_triplets
   if n_iter > n_triplets:
-    r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                  shuffle=False, random=False)
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
     assert_array_equal(r[:n_triplets], base)  # First n_triplets must match
     assert len(r) == n_iter  # Expected lenght
 
@@ -144,8 +147,9 @@ def test_indices_funct(n_triplets, n_iter):
         raise AssertionError("Sampling has values out of range")
 
     # Shuffle
-    r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                  shuffle=True, random=False)
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=False,
+                            random_state=RNG)
     assert len(r) == n_iter  # Expected lenght
 
     # Each triplet must be at least one time
@@ -164,8 +168,9 @@ def test_indices_funct(n_triplets, n_iter):
 
   # n_iter < n_triplets
   if n_iter < n_triplets:
-    r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                  shuffle=False, random=False)
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
     assert len(r) == n_iter  # Expected lenght
     u = np.unique(r)
     assert len(u) == len(r)  # No duplicates
@@ -180,15 +185,15 @@ def test_indices_funct(n_triplets, n_iter):
     def is_sorted(a):
       return np.all(a[:-1] <= a[1:])
 
-    oasis_a = OASIS(random_state=SEED)
-    r_a = oasis_a._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                      shuffle=False, random=False)
+    r_a = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                              shuffle=False, random=False,
+                              random_state=SEED)
     assert is_sorted(r_a)  # Its not shuffled
     values_r_a, counts_r_a = np.unique(r_a, return_counts=True)
 
-    oasis_b = OASIS(random_state=SEED)
-    r_b = oasis_b._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                      shuffle=True, random=False)
+    r_b = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                              shuffle=True, random=False,
+                              random_state=SEED)
 
     with assert_raises(AssertionError):
       assert is_sorted(r_b)  # This one should not besorted, but shuffled
@@ -200,31 +205,31 @@ def test_indices_funct(n_triplets, n_iter):
       assert_array_equal(r_a, r_b)  # Diferent order
 
   # Random case
-  r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                random=True)
+  r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                          random=True, random_state=RNG)
   assert len(r) == n_iter  # Expected lenght
   for i in range(n_iter):
     if r[i] not in base:
       raise AssertionError("Sampling has values out of range")
   # Shuffle has no effect
-  oasis_a = OASIS(random_state=SEED)
-  r_a = oasis_a._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                    shuffle=False, random=True)
+  r_a = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=True,
+                            random_state=SEED)
 
-  oasis_b = OASIS(random_state=SEED)
-  r_b = oasis_b._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                                    shuffle=True, random=True)
+  r_b = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=True,
+                            random_state=SEED)
   assert_array_equal(r_a, r_b)
 
   # n_triplets and n_iter cannot be 0
   msg = ("n_triplets cannot be 0")
   with pytest.raises(ValueError) as raised_error:
-    oasis._get_random_indices(n_triplets=0, n_iter=n_iter, random=True)
+    _get_random_indices(n_triplets=0, n_iter=n_iter, random=True)
   assert msg == raised_error.value.args[0]
 
   msg = ("n_iter cannot be 0")
   with pytest.raises(ValueError) as raised_error:
-    oasis._get_random_indices(n_triplets=n_triplets, n_iter=0, random=True)
+    _get_random_indices(n_triplets=n_triplets, n_iter=0, random=True)
   assert msg == raised_error.value.args[0]
 
 

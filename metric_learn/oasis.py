@@ -4,7 +4,7 @@ from sklearn.utils import check_random_state
 from sklearn.utils import check_array
 from sklearn.datasets import make_spd_matrix
 from .constraints import Constraints
-from ._util import _to_index_points
+from ._util import _to_index_points, _get_random_indices
 
 
 class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
@@ -56,14 +56,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     """
     # Currently prepare_inputs makes triplets contain points and not indices
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
-
-    # TODO: (Same as SCML)
-    # This algorithm is built to work with indices, but in order to be
-    # compliant with the current handling of inputs it is converted
-    # back to indices by the following fusnction. This should be improved
-    # in the future.
-    # Output: indices_to_X, X = unique(triplets)
-    triplets, X = _to_index_points(triplets)
+    triplets, X = _to_index_points(triplets)  # Work with indices
 
     self.d = X.shape[1]  # (n_triplets, d)
     self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
@@ -76,11 +69,9 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     if self.custom_order is not None:
       self.indices = self._check_custom_order(self.custom_order)
     else:
-      self.indices = self._get_random_indices(self.n_triplets,
-                                              self.n_iter,
-                                              self.shuffle,
-                                              self.random_sampling)
-
+      self.indices = _get_random_indices(self.n_triplets, self.n_iter,
+                                         self.shuffle, self.random_sampling,
+                                         random_state=self.random_state)
     i = 0
     while i < self.n_iter:
         current_triplet = X[triplets[self.indices[i]]]
@@ -135,64 +126,6 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
         result.append(v * diff)
 
     return np.array(result)  # Shape (d, d)
-
-
-  def _get_random_indices(self, n_triplets, n_iter, shuffle=True,
-                          random=False):
-    """
-    Generates n_iter indices in (0, n_triplets).
-
-    If not random:
-
-    If n_iter = n_triplets, then the resulting array will include
-    all values in range(0, n_triplets). If shuffle=True, then this
-    array is shuffled.
-
-    If n_iter > n_triplets, all values in range(0, n_triplets)
-    will be included at least ceil(n_iter / n_triplets) - 1 times.
-    The rest is filled with non-repeated values. If shuffle=True,
-    then the final array is shuffled, otherwise you get a sorted
-    array.
-
-    If n_iter < n_triplets, then a random sampling takes place.
-    The final array does not contains duplicates. If shuffle=True
-    the resulting array is not sorted, but shuffled.
-
-    If random:
-
-    A random sampling is made in any case, generating n_iters values
-    that may include duplicates. The shuffle param has no effect.
-    """
-    if n_triplets == 0:
-      raise ValueError("n_triplets cannot be 0")
-    if n_iter == 0:
-      raise ValueError("n_iter cannot be 0")
-
-    rng = self.random_state
-    if random:
-      return rng.randint(low=0, high=n_triplets, size=n_iter)
-    else:
-      if n_iter < n_triplets:
-        sample = rng.choice(n_triplets, n_iter, replace=False)
-        return sample if shuffle else np.sort(sample)
-      else:
-        array = np.arange(n_triplets)  # Unique triplets included
-
-        if n_iter == n_triplets:
-          if shuffle:
-            rng.shuffle(array)
-          return array
-
-        elif n_iter > n_triplets:
-          final = np.array([], dtype=int)  # Base
-          for _ in range(int(np.ceil(n_iter / n_triplets))):
-            if shuffle:
-              rng.shuffle(array)
-            final = np.concatenate([final, np.copy(array)])
-          final = final[:n_iter]  # Get only whats necessary
-          if shuffle:  # An additional shuffle at the end
-            rng.shuffle(final)
-          return final
 
   def get_indices(self):
     """
