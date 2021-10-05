@@ -177,7 +177,8 @@ def test_indices_funct(n_triplets, n_iter):
     # Shuffle must only sort elements
     # It takes two instances with same random_state, to show that only
     # the final order is mixed
-    is_sorted = lambda a: np.all(a[:-1] <= a[1:])
+    def is_sorted(a):
+      return np.all(a[:-1] <= a[1:])
 
     oasis_a = OASIS(random_state=SEED)
     r_a = oasis_a._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
@@ -188,7 +189,7 @@ def test_indices_funct(n_triplets, n_iter):
     oasis_b = OASIS(random_state=SEED)
     r_b = oasis_b._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
                                       shuffle=True, random=False)
-    
+
     with assert_raises(AssertionError):
       assert is_sorted(r_b)  # This one should not besorted, but shuffled
     values_r_b, counts_r_b = np.unique(r_b, return_counts=True)
