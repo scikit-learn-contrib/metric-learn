@@ -2,9 +2,9 @@ from .base_metric import BilinearMixin, _TripletsClassifierMixin
 import numpy as np
 from sklearn.utils import check_random_state
 from sklearn.utils import check_array
-from sklearn.datasets import make_spd_matrix
 from .constraints import Constraints
-from ._util import _to_index_points, _get_random_indices
+from ._util import _to_index_points, _get_random_indices, \
+                   _initialize_sim_bilinear
 
 
 class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
@@ -32,7 +32,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
           random_state=None,
           shuffle=True,
           random_sampling=False,
-          custom_M="identity",
+          init="identity",
           custom_order=None
           ):
     super().__init__(preprocessor=preprocessor)
@@ -42,7 +42,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     self.random_state = check_random_state(random_state)
     self.shuffle = shuffle  # Shuffle the trilplets
     self.random_sampling = random_sampling
-    self.custom_M = custom_M
+    self.init = init
     self.custom_order = custom_order
 
   def _fit(self, triplets):
@@ -61,7 +61,10 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     self.d = X.shape[1]  # (n_triplets, d)
     self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
 
-    self.components_ = self._check_M(self.custom_M)  # W matrix, needs self.d
+    # W matrix, needs self.d
+    self.components_ = _initialize_sim_bilinear(init=self.init,
+                                                n_features=self.d,
+                                                random_state=self.random_state)
     if self.n_iter is None:
       self.n_iter = self.n_triplets
 
@@ -159,41 +162,16 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
                          .format(custom_order[i], i, self.n_triplets))
     return custom_order
 
-  def _check_M(self, custom_M=None):
-    """
-    Initiates the matrix M of the bilinear similarity to be learned.
-    A custom matrix M can be provided, otherwise an string can be
-    provided specifying an alternative: identity, random or spd.
-    """
-    if isinstance(custom_M, str):
-      if custom_M == "identity":
-        return np.identity(self.d)
-      elif custom_M == "random":
-        return self.random_state.rand(self.d, self.d)
-      elif custom_M == "spd":
-        return make_spd_matrix(self.d, random_state=self.random_state)
-      else:
-        raise ValueError("Invalid str custom_M for M initialization. "
-                         "Strategies availables: identity, random, psd."
-                         "Or you can provie a numpy custom matrix M")
-    else:
-      shape = np.shape(custom_M)
-      if shape != (self.d, self.d):
-        raise ValueError("The matrix M you provided has shape {}."
-                         "You need to provide a matrix with shape "
-                         "{}".format(shape, (self.d, self.d)))
-      return custom_M
-
 
 class OASIS(_BaseOASIS):
 
   def __init__(self, preprocessor=None, n_iter=None, c=0.0001,
                random_state=None, shuffle=True, random_sampling=False,
-               custom_M="identity", custom_order=None):
+               init="identity", custom_order=None):
       super().__init__(preprocessor=preprocessor, n_iter=n_iter, c=c,
                        random_state=random_state, shuffle=shuffle,
                        random_sampling=random_sampling,
-                       custom_M=custom_M, custom_order=custom_order)
+                       init=init, custom_order=custom_order)
 
   def fit(self, triplets):
     return self._fit(triplets)
@@ -204,13 +182,13 @@ class OASIS_Supervised(OASIS):
   def __init__(self, k_genuine=3, k_impostor=10,
                preprocessor=None, n_iter=None, c=0.0001,
                random_state=None, shuffle=True, random_sampling=False,
-               custom_M="identity", custom_order=None):
+               init="identity", custom_order=None):
     self.k_genuine = k_genuine
     self.k_impostor = k_impostor
     super().__init__(preprocessor=preprocessor, n_iter=n_iter, c=c,
                      random_state=random_state, shuffle=shuffle,
                      random_sampling=random_sampling,
-                     custom_M=custom_M, custom_order=custom_order)
+                     init=init, custom_order=custom_order)
 
   def fit(self, X, y):
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)

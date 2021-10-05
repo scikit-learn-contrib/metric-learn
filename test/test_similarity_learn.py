@@ -6,7 +6,8 @@ from numpy.testing import assert_array_equal, assert_raises
 from sklearn.datasets import load_iris
 from sklearn.metrics import pairwise_distances
 from metric_learn.constraints import Constraints
-from metric_learn._util import _get_random_indices
+from metric_learn._util import _get_random_indices, \
+                               _initialize_sim_bilinear
 
 SEED = 33
 RNG = check_random_state(SEED)
@@ -269,9 +270,9 @@ def test_iris_supervised():
   assert now < prev  # -0.0407866 vs 1.08 !
 
 
-@pytest.mark.parametrize('custom_M', ["identity", "random", "spd"])
+@pytest.mark.parametrize('init', ["identity", "random", "spd"])
 @pytest.mark.parametrize('random_state', [33, 69, 112])
-def test_random_state_in_suffling(custom_M, random_state):
+def test_random_state_in_suffling(init, random_state):
   """
   Tests that many instances of OASIS, with the same random_state,
   produce the same shuffling on the triplets given.
@@ -281,16 +282,16 @@ def test_random_state_in_suffling(custom_M, random_state):
 
   The triplets are produced with the Iris dataset.
 
-  Tested with all possible custom_M.
+  Tested with all possible init.
   """
   triplets = gen_iris_triplets()
 
   # Test same random_state, then same shuffling
-  oasis_a = OASIS(random_state=random_state, custom_M=custom_M)
+  oasis_a = OASIS(random_state=random_state, init=init)
   oasis_a.fit(triplets)
   shuffle_a = oasis_a.get_indices()
 
-  oasis_b = OASIS(random_state=random_state, custom_M=custom_M)
+  oasis_b = OASIS(random_state=random_state, init=init)
   oasis_b.fit(triplets)
   shuffle_b = oasis_b.get_indices()
 
@@ -299,7 +300,7 @@ def test_random_state_in_suffling(custom_M, random_state):
   # Test different random states
   last_suffle = shuffle_b
   for i in range(3, 5):
-    oasis_a = OASIS(random_state=random_state+i, custom_M=custom_M)
+    oasis_a = OASIS(random_state=random_state+i, init=init)
     oasis_a.fit(triplets)
     shuffle_a = oasis_a.get_indices()
 
@@ -309,39 +310,36 @@ def test_random_state_in_suffling(custom_M, random_state):
     last_suffle = shuffle_a
 
 
-@pytest.mark.parametrize('custom_M', ["identity", "random", "spd"])
+@pytest.mark.parametrize('init', ["identity", "random", "spd"])
 @pytest.mark.parametrize('random_state', [33, 69, 112])
-def test_general_results_random_state(custom_M, random_state):
+def test_general_results_random_state(init, random_state):
   """
   With fixed triplets and random_state, two instances of OASIS
   should produce the same output (matrix W)
   """
   triplets = gen_iris_triplets()
-  oasis_a = OASIS(random_state=random_state, custom_M=custom_M)
+  oasis_a = OASIS(random_state=random_state, init=init)
   oasis_a.fit(triplets)
   matrix_a = oasis_a.get_bilinear_matrix()
 
-  oasis_b = OASIS(random_state=random_state, custom_M=custom_M)
+  oasis_b = OASIS(random_state=random_state, init=init)
   oasis_b.fit(triplets)
   matrix_b = oasis_b.get_bilinear_matrix()
 
   assert_array_equal(matrix_a, matrix_b)
 
 
-@pytest.mark.parametrize('custom_M', ["random", "spd"])
+@pytest.mark.parametrize('init', ["random", "spd"])
 @pytest.mark.parametrize('random_state', [6, 42])
 @pytest.mark.parametrize('d', [23, 27])
-def test_random_state_random_base_M(custom_M, random_state, d):
+def test_random_state_random_base_M(init, random_state, d):
   """
-  Tests that the function _check_M outputs the same matrix,
+  Tests that the function _initialize_sim_bilinear outputs the same matrix,
   given the same random_state to OASIS instace, with a fixed d.
   """
-  oasis_a = OASIS(random_state=random_state)
-  oasis_a.d = d
-  matrix_a = oasis_a._check_M(custom_M=custom_M)
-
-  oasis_b = OASIS(random_state=random_state)
-  oasis_b.d = d
-  matrix_b = oasis_b._check_M(custom_M=custom_M)
+  matrix_a = _initialize_sim_bilinear(init=init, n_features=d,
+                                      random_state=random_state)
+  matrix_b = _initialize_sim_bilinear(init=init, n_features=d,
+                                      random_state=random_state)
 
   assert_array_equal(matrix_a, matrix_b)

@@ -875,3 +875,31 @@ def _get_random_indices(n_triplets, n_iter, shuffle=True,
           if shuffle:  # An additional shuffle at the end
             rng.shuffle(final)
           return final
+
+
+def _initialize_sim_bilinear(init=None, n_features=None,
+                             random_state=None):
+  """
+  Initiates the matrix M of the bilinear similarity to be learned.
+  A custom matrix M can be provided, otherwise an string can be
+  provided specifying an alternative: identity, random or spd.
+  """
+  rng = check_random_state(random_state)
+  if isinstance(init, str):
+    if init == "identity":
+      return np.identity(n_features)
+    elif init == "random":
+      return rng.rand(n_features, n_features)
+    elif init == "spd":
+      return make_spd_matrix(n_features, random_state=rng)
+    else:
+      raise ValueError("Invalid str init for M initialization. "
+                       "Strategies availables: identity, random, psd."
+                       "Or you can provie a numpy custom matrix M")
+  else:
+    shape = np.shape(init)
+    if shape != (n_features, n_features):
+      raise ValueError("The matrix M you provided has shape {}."
+                       "You need to provide a matrix with shape "
+                       "{}".format(shape, (n_features, n_features)))
+    return init
