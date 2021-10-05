@@ -785,3 +785,26 @@ def _pseudo_inverse_from_eig(w, V, tol=None):
   w[~large] = 0
 
   return np.dot(V * w, np.conjugate(V).T)
+
+
+def _to_index_points(o_triplets):
+    """
+    Takes the origial triplets, and returns a mapping of the triplets
+    to an X array that has all unique point values.
+
+    Returns: (mapping_tr, X)
+
+    X: Unique points across all triplets.
+
+    mapping_tr: Triplets-shaped values that represent the indices of X.
+    Its guaranteed that shape(triplets) = shape(o_triplets[:-1]).
+
+    For instance the first element of mapping_tr could be [0, 43, 1].
+    That means the first original triplet is [X[0], X[43], X[1]].
+
+    X[mapping] restore the original input
+    """
+    shape = o_triplets.shape  # (n_triplets, 3, n_features)
+    X, mapping_tr = np.unique(np.vstack(o_triplets), return_inverse=True, axis=0)
+    mapping_tr = mapping_tr.reshape(shape[:2])  # (n_triplets, 3)
+    return mapping_tr, X

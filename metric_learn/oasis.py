@@ -4,6 +4,7 @@ from sklearn.utils import check_random_state
 from sklearn.utils import check_array
 from sklearn.datasets import make_spd_matrix
 from .constraints import Constraints
+from ._util import _to_index_points
 
 
 class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
@@ -62,7 +63,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     # back to indices by the following fusnction. This should be improved
     # in the future.
     # Output: indices_to_X, X = unique(triplets)
-    triplets, X = self._to_index_points(triplets)
+    triplets, X = _to_index_points(triplets)
 
     self.d = X.shape[1]  # (n_triplets, d)
     self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
@@ -135,22 +136,6 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
 
     return np.array(result)  # Shape (d, d)
 
-  def _to_index_points(self, o_triplets):
-    """
-    Takes the origial triplets, and returns a mapping of the triplets
-    to an X array that has all unique point values.
-
-    Returns:
-
-    X: Unique points across all triplets.
-
-    triplets: Triplets-shaped values that represent the indices of X.
-    Its guaranteed that shape(triplets) = shape(o_triplets[:-1])
-    """
-    shape = o_triplets.shape  # (n_triplets, 3, n_features)
-    X, triplets = np.unique(np.vstack(o_triplets), return_inverse=True, axis=0)
-    triplets = triplets.reshape(shape[:2])  # (n_triplets, 3)
-    return triplets, X
 
   def _get_random_indices(self, n_triplets, n_iter, shuffle=True,
                           random=False):

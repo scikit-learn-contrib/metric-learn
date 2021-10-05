@@ -14,6 +14,7 @@ from sklearn.cluster import KMeans
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.utils import check_array, check_random_state
 import warnings
+from ._util import _to_index_points
 
 
 class _BaseSCML(MahalanobisMixin):
@@ -65,7 +66,7 @@ class _BaseSCML(MahalanobisMixin):
     # compliant with the current handling of inputs it is converted
     # back to indices by the following function. This should be improved
     # in the future.
-    triplets, X = self._to_index_points(triplets)
+    triplets, X = _to_index_points(triplets)
 
     if basis is None:
       basis, n_basis = self._initialize_basis(triplets, X)
@@ -186,12 +187,6 @@ class _BaseSCML(MahalanobisMixin):
 
     else:   # if metric is full rank
       return components_from_metric(np.matmul(basis.T, w.T*basis))
-
-  def _to_index_points(self, triplets):
-    shape = triplets.shape
-    X, triplets = np.unique(np.vstack(triplets), return_inverse=True, axis=0)
-    triplets = triplets.reshape(shape[:2])
-    return triplets, X
 
   def _initialize_basis(self, triplets, X):
     """ Checks if the basis array is well constructed or constructs it based
