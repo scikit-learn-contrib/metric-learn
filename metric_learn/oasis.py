@@ -163,14 +163,15 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     all values in range(0, n_triplets). If shuffle=True, then this
     array is shuffled.
 
-    If n_iter > n_triplets, it will ensure that all values in
-    range(0, n_triplets) will be included once. Then a random sampling
-    is executed to fill the gap. If shuffle=True, then the final
-    array is shuffled. The sampling may contain duplicates by its own.
+    If n_iter > n_triplets, all values in range(0, n_triplets)
+    will be included at least ceil(n_iter / n_triplets) - 1 times.
+    The rest is filled with non-repeated values. If shuffle=True,
+    then the final array is shuffled, otherwise you get a sorted
+    array.
 
     If n_iter < n_triplets, then a random sampling takes place.
-    The final array does not contains duplicates. The shuffle
-    param has no effect.
+    The final array does not contains duplicates. If shuffle=True
+    the resulting array is not sorted, but shuffled.
 
     If random:
 
@@ -187,16 +188,26 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
       return rng.randint(low=0, high=n_triplets, size=n_iter)
     else:
       if n_iter < n_triplets:
-        return rng.choice(n_triplets, n_iter, replace=False)
+        sample = rng.choice(n_triplets, n_iter, replace=False)
+        return sample if shuffle else np.sort(sample)
       else:
-        array = np.arange(n_triplets)  # All triplets will be included
-        if n_iter > n_triplets:
-          array = np.concatenate([array, rng.randint(low=0,
-                                 high=n_triplets,
-                                 size=(n_iter-n_triplets))])
-        if shuffle:
-          rng.shuffle(array)
-        return array
+        array = np.arange(n_triplets)  # Unique triplets included
+
+        if n_iter == n_triplets:
+          if shuffle:
+            rng.shuffle(array)
+          return array
+
+        elif n_iter > n_triplets:
+          final = np.array([], dtype=int)  # Base
+          for _ in range(int(np.ceil(n_iter / n_triplets))):
+            if shuffle:
+              rng.shuffle(array)
+            final = np.concatenate([final, np.copy(array)])
+          final = final[:n_iter]  # Get only whats necessary
+          if shuffle:  # An additional shuffle at the end
+            rng.shuffle(final)
+          return final
 
   def get_indices(self):
     """

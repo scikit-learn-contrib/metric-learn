@@ -147,10 +147,20 @@ def test_indices_funct(n_triplets, n_iter):
     r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
                                   shuffle=True, random=False)
     assert len(r) == n_iter  # Expected lenght
+
     # Each triplet must be at least one time
     assert_array_equal(np.unique(r), np.unique(base))
     with assert_raises(AssertionError):  # First n_triplets should be different
       assert_array_equal(r[:n_triplets], base)
+
+    # Each index should appear at least ceil(n_iter/n_triplets) - 1 times
+    # But no more than ceil(n_iter/n_triplets)
+    min_times = int(np.ceil(n_iter / n_triplets)) - 1
+    _, counts = np.unique(r, return_counts=True)
+    a = len(counts[counts >= min_times])
+    b = len(counts[counts <= min_times + 1])
+    assert len(np.unique(r)) == a
+    assert n_triplets == b
 
   # n_iter < n_triplets
   if n_iter < n_triplets:
@@ -164,15 +174,29 @@ def test_indices_funct(n_triplets, n_iter):
       if r[i] not in base:
         raise AssertionError("Sampling has values out of range")
 
-    # Shuffle must have no efect
+    # Shuffle must only sort elements
+    # It takes two instances with same random_state, to show that only
+    # the final order is mixed
+    is_sorted = lambda a: np.all(a[:-1] <= a[1:])
+
     oasis_a = OASIS(random_state=SEED)
     r_a = oasis_a._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
                                       shuffle=False, random=False)
+    assert is_sorted(r_a)  # Its not shuffled
+    values_r_a, counts_r_a = np.unique(r_a, return_counts=True)
 
     oasis_b = OASIS(random_state=SEED)
     r_b = oasis_b._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
                                       shuffle=True, random=False)
-    assert_array_equal(r_a, r_b)
+    
+    with assert_raises(AssertionError):
+      assert is_sorted(r_b)  # This one should not besorted, but shuffled
+    values_r_b, counts_r_b = np.unique(r_b, return_counts=True)
+
+    assert_array_equal(values_r_a, values_r_b)  # Same elements
+    assert_array_equal(counts_r_a, counts_r_b)  # Same counts
+    with assert_raises(AssertionError):
+      assert_array_equal(r_a, r_b)  # Diferent order
 
   # Random case
   r = oasis._get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
