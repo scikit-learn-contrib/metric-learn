@@ -486,7 +486,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=self._tuple_size)
-    return - self.score_pairs(pairs)
+    return - self.pair_distance(pairs)
 
   def score(self, pairs, y):
     """Computes score of pairs similarity prediction.
@@ -756,8 +756,8 @@ class _TripletsClassifierMixin(BaseMetricLearner):
     triplets = check_input(triplets, type_of_inputs='tuples',
                            preprocessor=self.preprocessor_,
                            estimator=self, tuple_size=self._tuple_size)
-    return (self.score_pairs(triplets[:, [0, 2]]) -
-            self.score_pairs(triplets[:, :2]))
+    return (self.pair_distance(triplets[:, [0, 2]]) -
+            self.pair_distance(triplets[:, :2]))
 
   def score(self, triplets):
     """Computes score on input triplets.
@@ -841,8 +841,8 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)
-    return (self.score_pairs(quadruplets[:, 2:]) -
-            self.score_pairs(quadruplets[:, :2]))
+    return (self.pair_distance(quadruplets[:, 2:]) -
+            self.pair_distance(quadruplets[:, :2]))
 
   def score(self, quadruplets):
     """Computes score on input quadruplets
