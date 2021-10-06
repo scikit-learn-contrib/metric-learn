@@ -834,8 +834,8 @@ def test_error_message_tuple_size(estimator, _):
 
 @pytest.mark.parametrize('estimator, _', metric_learners,
                          ids=ids_metric_learners)
-def test_error_message_t_score_pairs(estimator, _):
-  """tests that if you want to score_pairs on triplets for instance, it returns
+def test_error_message_t_pair_distance(estimator, _):
+  """tests that if you want to pair_distance on triplets for instance, it returns
   the right error message
   """
   estimator = clone(estimator)
@@ -844,7 +844,7 @@ def test_error_message_t_score_pairs(estimator, _):
   triplets = np.array([[[1.3, 6.3], [3., 6.8], [6.5, 4.4]],
                        [[1.9, 5.3], [1., 7.8], [3.2, 1.2]]])
   with pytest.raises(ValueError) as raised_err:
-    estimator.score_pairs(triplets)
+    estimator.pair_distance(triplets)
   expected_msg = ("Tuples of 2 element(s) expected{}. Got tuples of 3 "
                   "element(s) instead (shape=(2, 3, 2)):\ninput={}.\n"
                   .format(make_context(estimator), triplets))
@@ -930,17 +930,17 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
                                         method)(formed_test)
       assert np.array(output_with_prep == output_with_prep_formed).all()
 
-  # test score_pairs
+  # test pair_distance
   idx1 = np.array([[0, 2], [5, 3]], dtype=int)
-  output_with_prep = estimator_with_preprocessor.score_pairs(
+  output_with_prep = estimator_with_preprocessor.pair_distance(
       indicators_to_transform[idx1])
-  output_without_prep = estimator_without_preprocessor.score_pairs(
+  output_without_prep = estimator_without_preprocessor.pair_distance(
       formed_points_to_transform[idx1])
   assert np.array(output_with_prep == output_without_prep).all()
 
-  output_with_prep = estimator_with_preprocessor.score_pairs(
+  output_with_prep = estimator_with_preprocessor.pair_distance(
       indicators_to_transform[idx1])
-  output_without_prep = estimator_with_prep_formed.score_pairs(
+  output_without_prep = estimator_with_prep_formed.pair_distance(
       formed_points_to_transform[idx1])
   assert np.array(output_with_prep == output_without_prep).all()
 
