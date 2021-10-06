@@ -239,11 +239,11 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
 
     Returns the learned Mahalanobis distance between pairs.
 
-    This distance is defined as: :math:`d_M(x, x') = \sqrt{(x-x')^T M (x-x')}`
+    This distance is defined as: :math:`d_M(x, x') = \\sqrt{(x-x')^T M (x-x')}`
     where ``M`` is the learned Mahalanobis matrix, for every pair of points
     ``x`` and ``x'``. This corresponds to the euclidean distance between
     embeddings of the points in a new space, obtained through a linear
-    transformation. Indeed, we have also: :math:`d_M(x, x') = \sqrt{(x_e -
+    transformation. Indeed, we have also: :math:`d_M(x, x') = \\sqrt{(x_e -
     x_e')^T (x_e- x_e')}`, with :math:`x_e = L x` (See
     :class:`MahalanobisMixin`).
 
@@ -309,11 +309,11 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
     """
     Returns the learned Mahalanobis distance between pairs.
 
-    This distance is defined as: :math:`d_M(x, x') = \sqrt{(x-x')^T M (x-x')}`
+    This distance is defined as: :math:`d_M(x, x') = \\sqrt{(x-x')^T M (x-x')}`
     where ``M`` is the learned Mahalanobis matrix, for every pair of points
     ``x`` and ``x'``. This corresponds to the euclidean distance between
     embeddings of the points in a new space, obtained through a linear
-    transformation. Indeed, we have also: :math:`d_M(x, x') = \sqrt{(x_e -
+    transformation. Indeed, we have also: :math:`d_M(x, x') = \\sqrt{(x_e -
     x_e')^T (x_e- x_e')}`, with :math:`x_e = L x` (See
     :class:`MahalanobisMixin`).
 
