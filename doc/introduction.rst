@@ -141,7 +141,7 @@ to the following resources:
 ..    :math:`D`-dimensional learned metric space :math:`X L^{\top}`,
 ..    in which standard Euclidean distances may be used.
 .. -  ``transform(X)``, which applies the aforementioned transformation.
-.. - ``score_pairs(pairs)`` which returns the distance between pairs of
+.. - ``pair_distance(pairs)`` which returns the distance between pairs of
 ..   points. ``pairs`` should be a 3D array-like of pairs of shape ``(n_pairs,
 ..   2, n_features)``, or it can be a 2D array-like of pairs indicators of
 ..   shape ``(n_pairs, 2)`` (see section :ref:`preprocessor_section` for more

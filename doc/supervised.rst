@@ -69,9 +69,9 @@ Also, as explained before, our metric learners has learn a distance between
 points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
-  `score_pairs` function:
+  `pair_distance` function:
 
->>> nca.score_pairs([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]]])
+>>> nca.pair_distance([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]]])
 array([0.49627072, 3.65287282])
 
 - Or you can return a function that will return the distance (in the new

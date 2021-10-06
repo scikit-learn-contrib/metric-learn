@@ -160,9 +160,9 @@ Also, as explained before, our metric learner has learned a distance between
 points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
-  `score_pairs` function:
+  `pair_distance` function:
 
->>> mmc.score_pairs([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
+>>> mmc.pair_distance([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
 ...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
 array([7.27607365, 0.88853014])
 
@@ -344,7 +344,7 @@ returns the `sklearn.metrics.roc_auc_score` (which is threshold-independent).
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
+   not specific to learning on pairs, like `transform`, `pair_distance`,
    `get_metric` and `get_mahalanobis_matrix`.
 
 Algorithms
@@ -691,7 +691,7 @@ of triplets that have the right predicted ordering.
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
+   not specific to learning on pairs, like `transform`, `pair_distance`,
    `get_metric` and `get_mahalanobis_matrix`.
 
 
@@ -859,7 +859,7 @@ of quadruplets have the right predicted ordering.
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
+   not specific to learning on pairs, like `transform`, `pair_distance`,
    `get_metric` and `get_mahalanobis_matrix`.
 
 
