@@ -128,13 +128,6 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
 
     return np.array(result)  # Shape (d, d)
 
-  def get_indices(self):
-    """
-    Returns an array containing indices of triplets, the order in
-    which the algorithm was feed.
-    """
-    return self.indices
-
 
 class OASIS(_BaseOASIS):
 

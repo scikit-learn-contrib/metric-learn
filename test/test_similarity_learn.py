@@ -290,11 +290,11 @@ def test_random_state_in_suffling(init, random_state):
   # Test same random_state, then same shuffling
   oasis_a = OASIS(random_state=random_state, init=init)
   oasis_a.fit(triplets)
-  shuffle_a = oasis_a.get_indices()
+  shuffle_a = oasis_a.indices
 
   oasis_b = OASIS(random_state=random_state, init=init)
   oasis_b.fit(triplets)
-  shuffle_b = oasis_b.get_indices()
+  shuffle_b = oasis_b.indices
 
   assert_array_equal(shuffle_a, shuffle_b)
 
@@ -303,7 +303,7 @@ def test_random_state_in_suffling(init, random_state):
   for i in range(3, 5):
     oasis_a = OASIS(random_state=random_state+i, init=init)
     oasis_a.fit(triplets)
-    shuffle_a = oasis_a.get_indices()
+    shuffle_a = oasis_a.indices
 
     with pytest.raises(AssertionError):
       assert_array_equal(last_suffle, shuffle_a)
