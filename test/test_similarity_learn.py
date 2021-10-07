@@ -7,7 +7,7 @@ from sklearn.datasets import load_iris
 from sklearn.metrics import pairwise_distances
 from metric_learn.constraints import Constraints
 from metric_learn._util import _get_random_indices, \
-                               _initialize_sim_bilinear
+                               _initialize_similarity_bilinear
 
 SEED = 33
 RNG = check_random_state(SEED)
@@ -270,7 +270,8 @@ def test_iris_supervised():
   assert now < prev  # -0.0407866 vs 1.08 !
 
 
-@pytest.mark.parametrize('init', ["identity", "random", "spd"])
+@pytest.mark.parametrize('init', ['random', 'random_spd',
+                         'covariance', 'identity'])
 @pytest.mark.parametrize('random_state', [33, 69, 112])
 def test_random_state_in_suffling(init, random_state):
   """
@@ -310,7 +311,8 @@ def test_random_state_in_suffling(init, random_state):
     last_suffle = shuffle_a
 
 
-@pytest.mark.parametrize('init', ["identity", "random", "spd"])
+@pytest.mark.parametrize('init', ['random', 'random_spd',
+                         'covariance', 'identity'])
 @pytest.mark.parametrize('random_state', [33, 69, 112])
 def test_general_results_random_state(init, random_state):
   """
@@ -329,17 +331,19 @@ def test_general_results_random_state(init, random_state):
   assert_array_equal(matrix_a, matrix_b)
 
 
-@pytest.mark.parametrize('init', ["random", "spd"])
+@pytest.mark.parametrize('init', ['random', 'random_spd',
+                         'covariance', 'identity'])
 @pytest.mark.parametrize('random_state', [6, 42])
 @pytest.mark.parametrize('d', [23, 27])
 def test_random_state_random_base_M(init, random_state, d):
   """
-  Tests that the function _initialize_sim_bilinear outputs the same matrix,
-  given the same random_state to OASIS instace, with a fixed d.
+  Tests that the function _initialize_similarity_bilinear
+  outputs the same matrix, given the same tuples and random_state
   """
-  matrix_a = _initialize_sim_bilinear(init=init, n_features=d,
-                                      random_state=random_state)
-  matrix_b = _initialize_sim_bilinear(init=init, n_features=d,
-                                      random_state=random_state)
+  triplets = gen_iris_triplets()
+  matrix_a = _initialize_similarity_bilinear(triplets, init=init,
+                                             random_state=random_state)
+  matrix_b = _initialize_similarity_bilinear(triplets, init=init,
+                                             random_state=random_state)
 
   assert_array_equal(matrix_a, matrix_b)

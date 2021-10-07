@@ -4,7 +4,7 @@ from sklearn.utils import check_random_state
 from sklearn.utils import check_array
 from .constraints import Constraints
 from ._util import _to_index_points, _get_random_indices, \
-                   _initialize_sim_bilinear
+                   _initialize_similarity_bilinear
 
 
 class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
@@ -36,7 +36,6 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
           custom_order=None
           ):
     super().__init__(preprocessor=preprocessor)
-    self.d = 0  # n_features
     self.n_iter = n_iter  # Max iterations
     self.c = c  # Trade-off param
     self.random_state = check_random_state(random_state)
@@ -58,13 +57,14 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
     triplets, X = _to_index_points(triplets)  # Work with indices
 
-    self.d = X.shape[1]  # (n_triplets, d)
     self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
 
-    # W matrix, needs self.d
-    self.components_ = _initialize_sim_bilinear(init=self.init,
-                                                n_features=self.d,
-                                                random_state=self.random_state)
+    M = _initialize_similarity_bilinear(X[triplets],
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
+
     if self.n_iter is None:
       self.n_iter = self.n_triplets
 

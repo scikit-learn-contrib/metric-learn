@@ -877,29 +877,61 @@ def _get_random_indices(n_triplets, n_iter, shuffle=True,
           return final
 
 
-def _initialize_sim_bilinear(init=None, n_features=None,
-                             random_state=None):
-  """
-  Initiates the matrix M of the bilinear similarity to be learned.
-  A custom matrix M can be provided, otherwise an string can be
-  provided specifying an alternative: identity, random or spd.
-  """
+def _initialize_similarity_bilinear(input, init='identity',
+                                    random_state=None,
+                                    strict_pd=False,
+                                    matrix_name='matrix'):
+  n_features = input.shape[-1]
+  if isinstance(init, np.ndarray):
+    # we copy the array, so that if we update the metric, we don't want to
+    # update the init
+    init = check_array(init, copy=True)
+
+    # Assert that init.shape[1] = (n_features, n_features)
+    if init.shape != (n_features,) * 2:
+      raise ValueError('The input dimensionality {} of the given '
+                       'similarity matrix `{}` must match the '
+                       'dimensionality of the given inputs ({}).'
+                       .format(init.shape, matrix_name, n_features))
+  elif init not in ['identity', 'random_spd', 'random', 'covariance']:
+    raise ValueError(
+        f"`{matrix_name}` must be 'identity', 'random_spd', 'random', \
+        covariance or a numpy array of shape (n_features, n_features).\
+        Not `{init}`.")
+
   rng = check_random_state(random_state)
-  if isinstance(init, str):
-    if init == "identity":
-      return np.identity(n_features)
-    elif init == "random":
-      return rng.rand(n_features, n_features)
-    elif init == "spd":
-      return make_spd_matrix(n_features, random_state=rng)
+  M = init
+  if isinstance(M, np.ndarray):
+    return M
+  elif init == "identity":
+    return np.identity(n_features)
+  elif init == "random":
+    return rng.rand(n_features, n_features)
+  elif init == "random_spd":
+    return make_spd_matrix(n_features, random_state=rng)
+  elif init == 'covariance':
+    if input.ndim == 3:
+      # if the input are tuples, we need to form an X by deduplication
+      X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
     else:
-      raise ValueError("Invalid str init for M initialization. "
-                       "Strategies availables: identity, random, psd."
-                       "Or you can provie a numpy custom matrix M")
-  else:
-    shape = np.shape(init)
-    if shape != (n_features, n_features):
-      raise ValueError("The matrix M you provided has shape {}."
-                       "You need to provide a matrix with shape "
-                       "{}".format(shape, (n_features, n_features)))
-    return init
+      X = input
+    # atleast2d is necessary to deal with scalar covariance matrices
+    M_inv = np.atleast_2d(np.cov(X, rowvar=False))
+    w, V = eigh(M_inv, check_finite=False)
+    cov_is_definite = _check_sdp_from_eigen(w)
+    if strict_pd and not cov_is_definite:
+      raise LinAlgError("Unable to get a true inverse of the covariance "
+                        "matrix since it is not definite. Try another "
+                        "`{}`, or an algorithm that does not "
+                        "require the `{}` to be strictly positive definite."
+                        .format(*((matrix_name,) * 2)))
+    elif not cov_is_definite:
+      warnings.warn('The covariance matrix is not invertible: '
+                    'using the pseudo-inverse instead.'
+                    'To make the covariance matrix invertible'
+                    ' you can remove any linearly dependent features and/or '
+                    'reduce the dimensionality of your input, '
+                    'for instance using `sklearn.decomposition.PCA` as a '
+                    'preprocessing step.')
+    M = _pseudo_inverse_from_eig(w, V)
+    return M
