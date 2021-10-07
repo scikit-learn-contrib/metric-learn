@@ -1,7 +1,6 @@
 from .base_metric import BilinearMixin, _TripletsClassifierMixin
 import numpy as np
 from sklearn.utils import check_random_state
-from sklearn.utils import check_array
 from .constraints import Constraints
 from ._util import _to_index_points, _get_random_indices, \
                    _initialize_similarity_bilinear
@@ -22,6 +21,8 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
   shuffle : Whether the triplets should be shuffled beforehand
 
   random_sampling: Sample triplets, with repetition, uniform probability.
+
+  custom_order : User's custom order of triplets to feed oasis.
   """
 
   def __init__(
@@ -51,13 +52,14 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     Parameters
     ----------
     triplets : (n x 3 x d) array of samples
-    custom_order : User's custom order of triplets to feed oasis.
     """
     # Currently prepare_inputs makes triplets contain points and not indices
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
     triplets, X = _to_index_points(triplets)  # Work with indices
 
     self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
+    if self.n_iter is None:
+      self.n_iter = self.n_triplets
 
     M = _initialize_similarity_bilinear(X[triplets],
                                         init=self.init,
@@ -65,16 +67,12 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
                                         random_state=self.random_state)
     self.components_ = M
 
-    if self.n_iter is None:
-      self.n_iter = self.n_triplets
-
-    # Get the order in wich the algoritm will be fed
-    if self.custom_order is not None:
-      self.indices = self._check_custom_order(self.custom_order)
-    else:
-      self.indices = _get_random_indices(self.n_triplets, self.n_iter,
-                                         self.shuffle, self.random_sampling,
-                                         random_state=self.random_state)
+    self.indices = _get_random_indices(self.n_triplets,
+                                       self.n_iter,
+                                       shuffle=self.shuffle,
+                                       random=self.random_sampling,
+                                       random_state=self.random_state,
+                                       custom=self.custom_order)
     i = 0
     while i < self.n_iter:
         current_triplet = X[triplets[self.indices[i]]]
@@ -136,31 +134,6 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     which the algorithm was feed.
     """
     return self.indices
-
-  def _check_custom_order(self, custom_order):
-    """
-    Checks that the custom order is in fact a list or numpy array,
-    and has n_iter values in between (0, n_triplets)
-    """
-
-    custom_order = check_array(custom_order, ensure_2d=False,
-                               allow_nd=True, copy=False,
-                               force_all_finite=True, accept_sparse=True,
-                               dtype=None, ensure_min_features=self.n_iter,
-                               ensure_min_samples=0)
-    if len(custom_order) != self.n_iter:
-      raise ValueError('The leght of custom_order array ({}), must match '
-                       'the number of iterations ({}).'
-                       .format(len(custom_order), self.n_iter))
-
-    indices = np.arange(self.n_triplets)
-    for i in range(self.n_iter):
-      if custom_order[i] not in indices:
-        raise ValueError('Found the invalid value {} at index {}'
-                         'in custom_order. Use values only between'
-                         '0 and n_triplets ({})'
-                         .format(custom_order[i], i, self.n_triplets))
-    return custom_order
 
 
 class OASIS(_BaseOASIS):
