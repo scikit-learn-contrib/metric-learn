@@ -756,7 +756,7 @@ class _TripletsClassifierMixin(BaseMetricLearner):
     triplets = check_input(triplets, type_of_inputs='tuples',
                            preprocessor=self.preprocessor_,
                            estimator=self, tuple_size=self._tuple_size)
-    return (self.pair_similarity(triplets[:, :2]) - 
+    return (self.pair_similarity(triplets[:, :2]) -
             self.pair_similarity(triplets[:, [0, 2]]))
 
   def score(self, triplets):
@@ -841,7 +841,7 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)
-    return (self.pair_similarity(quadruplets[:, :2]) - 
+    return (self.pair_similarity(quadruplets[:, :2]) -
             self.pair_similarity(quadruplets[:, 2:]))
 
   def score(self, quadruplets):
