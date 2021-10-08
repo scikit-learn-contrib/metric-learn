@@ -78,7 +78,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
         current_triplet = X[triplets[self.indices[i]]]
         loss = self._loss(current_triplet)
         vi = self._vi_matrix(current_triplet)
-        fs = self._frobenius_squared(vi)
+        fs = np.linalg.norm(vi, ord='fro') ** 2
         # Global GD or Adjust to tuple
         tau_i = np.minimum(self.c, loss / fs)
 
@@ -99,12 +99,6 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     self.n_iter = n_iter
     self.fit(new_triplets, shuffle=shuffle, random_sampling=random_sampling,
              custom_order=custom_order)
-
-  def _frobenius_squared(self, v):
-    """
-    Returns Frobenius norm of a point, squared
-    """
-    return np.trace(np.dot(v, v.T))
 
   def _loss(self, triplet):
     """
