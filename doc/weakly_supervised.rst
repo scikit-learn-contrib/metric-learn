@@ -175,6 +175,29 @@ array([7.27607365, 0.88853014])
 >>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
 7.276073646278203
 
+- Alternatively, you can use `pair_similarity` to return the **score** between
+  points, the more the **score**, the closer the pairs and vice-versa. For
+  Mahalanobis learners, it is equal to the inverse of the distance.
+
+>>> score = mmc.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+  This is useful because `pair_similarity` matches the **score** sematic of 
+  scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+  For instance, given a labeled data, you can pass the labels and the
+  **score** of your data to get the ROC curve.
+
+>>> from sklearn.metrics import roc_curve
+>>> fpr, tpr, thresholds = roc_curve(['dog', 'cat', 'dog'], score, pos_label='dog')
+>>> fpr
+array([0., 0., 1., 1.])
+>>> tpr
+array([0. , 0.5, 0.5, 1. ])
+>>> 
+>>> thresholds
+array([ 0.50372928, -0.49627072, -3.65287282, -6.06079877])
+
 .. note::
 
     If the metric learner that you use learns a :ref:`Mahalanobis distance
