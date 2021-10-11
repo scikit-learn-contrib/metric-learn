@@ -67,8 +67,7 @@ def test_no_zero_prediction(estimator, build_dataset):
   # Predict
   predictions = estimator.predict(triplets_test)
   # Check there are no zero values
-  not_valid = [e for e in predictions if e == 0]
-  assert len(not_valid) == 0
+  assert np.sum(predictions == 0) == 0
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
