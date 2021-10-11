@@ -62,7 +62,7 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   def pair_similarity(self, pairs):
     """
     .. versionadded:: 0.6.3 Compute the similarity score bewteen pairs
-   
+
     Returns the similarity score between pairs. Depending on the algorithm,
     this method can return the learned similarity score between pairs,
     or the inverse of the distance learned between two pairs. The more the
@@ -92,7 +92,7 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   def pair_distance(self, pairs):
     """
     .. versionadded:: 0.6.3 Compute the distance score between pairs
-    
+
     Returns the distance score between pairs. For Mahalanobis learners, it
     returns the pseudo-distance bewtween pairs. It is not available for
     learners that does not learn a distance or pseudo-distance, an error
@@ -206,15 +206,17 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
 
     See Also
     --------
-    pair_distance : a method that returns the distance score between several pairs
-      of points. Unlike `get_metric`, this is a method of the metric learner
-      and therefore can change if the metric learner changes. Besides, it can
-      use the metric learner's preprocessor, and works on concatenated arrays.
-    
-    pair_similarity : a method that returns the similarity score between several pairs
-      of points. Unlike `get_metric`, this is a method of the metric learner
-      and therefore can change if the metric learner changes. Besides, it can
-      use the metric learner's preprocessor, and works on concatenated arrays.
+    pair_distance : a method that returns the distance score between several
+      pairs of points. Unlike `get_metric`, this is a method of the metric
+      learner and therefore can change if the metric learner changes. Besides,
+      it can use the metric learner's preprocessor, and works on concatenated
+      arrays.
+
+    pair_similarity : a method that returns the similarity score between
+      several pairs of points. Unlike `get_metric`, this is a method of the
+      metric learner and therefore can change if the metric learner changes.
+      Besides, it can use the metric learner's preprocessor, and works on
+      concatenated arrays.
     """
 
 
@@ -261,7 +263,7 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
     .. deprecated:: 0.6.3
         This method is deprecated. Please use `pair_distance` instead.
 
-    .. warning:: 
+    .. warning::
         This method will be deleted in 0.6.4. Please refer to `pair_distance`
         or `pair_similarity`. This change will occur in order to add learners
         that don't necessarly learn a Mahalanobis distance.
@@ -298,7 +300,6 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
 
     :ref:`mahalanobis_distances` : The section of the project documentation
       that describes Mahalanobis Distances.
-    
     """
     dpr_msg = ("score_pairs will be deprecated in release 0.6.3. "
                "Use pair_similarity to compute similarities, or "
