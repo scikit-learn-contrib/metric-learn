@@ -55,13 +55,13 @@ def identity_fit(d=100, n=100, n_pairs=None, random=False):
 
 def test_same_similarity_with_two_methods():
   """"
-  Tests that score_pairs() and get_metric() give consistent results.
+  Tests that pair_similarity() and get_metric() give consistent results.
   In both cases, the results must match for the same input.
   Tests it for 'n_pairs' sampled from 'n' d-dimentional arrays.
   """
   d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
-  dist1 = mixin.score_pairs(random_pairs)
+  dist1 = mixin.pair_similarity(random_pairs)
   dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
 
   assert_array_almost_equal(dist1, dist2)
@@ -75,18 +75,18 @@ def test_check_correctness_similarity():
   """
   d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
-  dist1 = mixin.score_pairs(random_pairs)
+  dist1 = mixin.pair_similarity(random_pairs)
   dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
   desired = [np.dot(np.dot(p[0].T, mixin.components_), p[1])
              for p in random_pairs]
 
-  assert_array_almost_equal(dist1, desired)  # score_pairs
+  assert_array_almost_equal(dist1, desired)  # pair_similarity
   assert_array_almost_equal(dist2, desired)  # get_metric
 
 
 def test_check_handmade_example():
   """
-  Checks that score_pairs() result is correct comparing it with a
+  Checks that pair_similarity() result is correct comparing it with a
   handmade example.
   """
   u = np.array([0, 1, 2])
@@ -95,7 +95,7 @@ def test_check_handmade_example():
   mixin.fit([u, v], [0, 0])  # Identity fit
   c = np.array([[2, 4, 6], [6, 4, 2], [1, 2, 3]])
   mixin.components_ = c  # Force components_
-  dists = mixin.score_pairs([[u, v], [v, u]])
+  dists = mixin.pair_similarity([[u, v], [v, u]])
   assert_array_almost_equal(dists, [96, 120])
 
 
@@ -109,31 +109,31 @@ def test_check_handmade_symmetric_example():
   d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs)
   pairs_reverse = [[p[1], p[0]] for p in random_pairs]
-  dist1 = mixin.score_pairs(random_pairs)
-  dist2 = mixin.score_pairs(pairs_reverse)
+  dist1 = mixin.pair_similarity(random_pairs)
+  dist2 = mixin.pair_similarity(pairs_reverse)
   assert_array_almost_equal(dist1, dist2)
 
   # Random pairs for M = spd Matrix
   spd_matrix = make_spd_matrix(d, random_state=RNG)
   mixin.components_ = spd_matrix
-  dist1 = mixin.score_pairs(random_pairs)
-  dist2 = mixin.score_pairs(pairs_reverse)
+  dist1 = mixin.pair_similarity(random_pairs)
+  dist2 = mixin.pair_similarity(pairs_reverse)
   assert_array_almost_equal(dist1, dist2)
 
 
-def test_score_pairs_finite():
+def test_pair_similarity_finite():
   """
-  Checks for 'n' score_pairs() of 'd' dimentions, that all
+  Checks for 'n' pair_similarity() of 'd' dimentions, that all
   similarities are finite numbers: not NaN, +inf or -inf.
   Considers a random M for bilinear similarity.
   """
   d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
-  dist1 = mixin.score_pairs(random_pairs)
+  dist1 = mixin.pair_similarity(random_pairs)
   assert np.isfinite(dist1).all()
 
 
-def test_score_pairs_dim():
+def test_pair_similarity_dim():
   """
   Scoring of 3D arrays should return 1D array (several tuples),
   and scoring of 2D arrays (one tuple) should return an error (like
@@ -142,13 +142,13 @@ def test_score_pairs_dim():
   d, n = 100, 100
   X, _, mixin = identity_fit(d=d, n=n, n_pairs=None, random=True)
   tuples = np.array(list(product(X, X)))
-  assert mixin.score_pairs(tuples).shape == (tuples.shape[0],)
+  assert mixin.pair_similarity(tuples).shape == (tuples.shape[0],)
   context = make_context(mixin)
   msg = ("3D array of formed tuples expected{}. Found 2D array "
          "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
          .format(context, tuples[1]))
   with pytest.raises(ValueError) as raised_error:
-    mixin.score_pairs(tuples[1])
+    mixin.pair_similarity(tuples[1])
   assert str(raised_error.value) == msg
 
 

@@ -255,9 +255,27 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
   """
 
   def score_pairs(self, pairs):
+    dpr_msg = ("score_pairs will be deprecated in release 0.6.4. "
+               "Use pair_similarity to compute similarities, or "
+               "pair_distances to compute distances.")
+    warnings.warn(dpr_msg, category=FutureWarning)
+    return self.pair_similarity(pairs)
+
+  def pair_distance(self, pairs):
+    """
+    Returns an error, as bilinear similarity learners don't learn a
+    pseudo-distance nor a distance. In consecuence, the additive inverse
+    of the bilinear similarity cannot be used as distance by construction.
+    """
+    msg = ("Bilinear similarity learners don't learn a distance, thus ",
+           "this method is not implemented. Use pair_similarity to "
+           "compute similarity between pairs")
+    raise Exception(msg)
+
+  def pair_similarity(self, pairs):
     r"""Returns the learned Bilinear similarity between pairs.
 
-    This similarity is defined as: :math:`s_M(x, x') =  x M x'`
+    This similarity is defined as: :math:`s_M(x, x') =  x^T M x'`
     where ``M`` is the learned Bilinear matrix, for every pair of points
     ``x`` and ``x'``.
 
@@ -276,10 +294,10 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     See Also
     --------
     get_metric : a method that returns a function to compute the similarity
-      between two points. The difference with `score_pairs` is that it works
-      on two 1D arrays and cannot use a preprocessor. Besides, the returned
-      function is independent of the similarity learner and hence is not
-      modified if the similarity learner is.
+      between two points. The difference with `pair_similarity` is that it
+      works on two 1D arrays and cannot use a preprocessor. Besides, the
+      returned function is independent of the similarity learner and hence
+      is not modified if the similarity learner is.
 
     :ref:`Bilinear_similarity` : The section of the project documentation
       that describes Bilinear similarity.
