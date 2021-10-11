@@ -160,9 +160,9 @@ Also, as explained before, our metric learner has learned a distance between
 points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
-  `score_pairs` function:
+  `pair_distance` function:
 
->>> mmc.score_pairs([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
+>>> mmc.pair_distance([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
 ...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
 array([7.27607365, 0.88853014])
 
@@ -174,6 +174,29 @@ array([7.27607365, 0.88853014])
 >>> metric_fun = mmc.get_metric()
 >>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
 7.276073646278203
+
+- Alternatively, you can use `pair_similarity` to return the **score** between
+  points, the more the **score**, the closer the pairs and vice-versa. For
+  Mahalanobis learners, it is equal to the inverse of the distance.
+
+>>> score = mmc.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+  This is useful because `pair_similarity` matches the **score** sematic of 
+  scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+  For instance, given a labeled data, you can pass the labels and the
+  **score** of your data to get the ROC curve.
+
+>>> from sklearn.metrics import roc_curve
+>>> fpr, tpr, thresholds = roc_curve(['dog', 'cat', 'dog'], score, pos_label='dog')
+>>> fpr
+array([0., 0., 1., 1.])
+>>> tpr
+array([0. , 0.5, 0.5, 1. ])
+>>> 
+>>> thresholds
+array([ 0.50372928, -0.49627072, -3.65287282, -6.06079877])
 
 .. note::
 
@@ -344,7 +367,7 @@ returns the `sklearn.metrics.roc_auc_score` (which is threshold-independent).
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
+   not specific to learning on pairs, like `transform`, `pair_distance`,
    `get_metric` and `get_mahalanobis_matrix`.
 
 Algorithms
@@ -691,7 +714,7 @@ of triplets that have the right predicted ordering.
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
+   not specific to learning on pairs, like `transform`, `pair_distance`,
    `get_metric` and `get_mahalanobis_matrix`.
 
 
@@ -859,7 +882,7 @@ of quadruplets have the right predicted ordering.
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
+   not specific to learning on pairs, like `transform`, `pair_distance`,
    `get_metric` and `get_mahalanobis_matrix`.
 
 

@@ -69,10 +69,10 @@ Also, as explained before, our metric learners has learn a distance between
 points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
-  `score_pairs` function:
+  `pair_distance` function:
 
->>> nca.score_pairs([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]]])
-array([0.49627072, 3.65287282])
+>>> nca.pair_distance([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+array([0.49627072, 3.65287282, 6.06079877])
 
 - Or you can return a function that will return the distance (in the new
   space) between two 1D arrays (the coordinates of the points in the original
@@ -81,6 +81,29 @@ array([0.49627072, 3.65287282])
 >>> metric_fun = nca.get_metric()
 >>> metric_fun([3.5, 3.6], [5.6, 2.4])
 0.4962707194621285
+
+- Alternatively, you can use `pair_similarity` to return the **score** between
+  points, the more the **score**, the closer the pairs and vice-versa. For
+  Mahalanobis learners, it is equal to the inverse of the distance.
+
+>>> score = nca.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+  This is useful because `pair_similarity` matches the **score** sematic of 
+  scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+  For instance, given a labeled data, you can pass the labels and the
+  **score** of your data to get the ROC curve.
+
+>>> from sklearn.metrics import roc_curve
+>>> fpr, tpr, thresholds = roc_curve(['dog', 'cat', 'dog'], score, pos_label='dog')
+>>> fpr
+array([0., 0., 1., 1.])
+>>> tpr
+array([0. , 0.5, 0.5, 1. ])
+>>> 
+>>> thresholds
+array([ 0.50372928, -0.49627072, -3.65287282, -6.06079877])
 
 .. note::
 
@@ -105,6 +128,7 @@ All supervised algorithms are scikit-learn estimators
 scikit-learn model selection routines 
 (`sklearn.model_selection.cross_val_score`,
 `sklearn.model_selection.GridSearchCV`, etc).
+You can also use methods from `sklearn.metrics` that rely on y_scores.
 
 Algorithms
 ==========

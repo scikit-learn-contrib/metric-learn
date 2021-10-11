@@ -49,7 +49,7 @@ def test_predict_monotonous(estimator, build_dataset,
   pairs_train, pairs_test, y_train, y_test = train_test_split(input_data,
                                                               labels)
   estimator.fit(pairs_train, y_train)
-  distances = estimator.score_pairs(pairs_test)
+  distances = estimator.pair_distance(pairs_test)
   predictions = estimator.predict(pairs_test)
   min_dissimilar = np.min(distances[predictions == -1])
   max_similar = np.max(distances[predictions == 1])
@@ -65,7 +65,7 @@ def test_predict_monotonous(estimator, build_dataset,
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
   """Test that a NotFittedError is raised if someone tries to use
-  score_pairs, decision_function, get_metric, transform or
+  pair_distance, decision_function, get_metric, transform or
   get_mahalanobis_matrix on input data and the metric learner
   has not been fitted."""
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
@@ -73,7 +73,7 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   with pytest.raises(NotFittedError):
-    estimator.score_pairs(input_data)
+    estimator.pair_distance(input_data)
   with pytest.raises(NotFittedError):
     estimator.decision_function(input_data)
   with pytest.raises(NotFittedError):
