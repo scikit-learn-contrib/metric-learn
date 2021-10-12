@@ -602,7 +602,7 @@ class _TripletsClassifierMixin(BaseMetricLearner):
     prediction : `numpy.ndarray` of floats, shape=(n_constraints,)
       Predictions of the ordering of pairs, for each triplet.
     """
-    return np.sign(self.decision_function(triplets))
+    return 2 * (self.decision_function(triplets) > 0) - 1
 
   def decision_function(self, triplets):
     """Predicts differences between sample distances in input triplets.
