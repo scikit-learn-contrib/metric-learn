@@ -758,6 +758,77 @@ where :math:`[\cdot]_+` is the hinge loss.
          `Matlab implementation.<https://github.com/bellet/SCML>`_.
 
 
+.. _oasis:
+
+:py:class:`OASIS <metric_learn.OASIS>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Online Algorithm for Scalable Image Similarity
+(:py:class:`OASIS <metric_learn.OASIS>`)
+
+`OASIS` learns a bilinear similarity from triplet constraints with an online
+Passive-Agressive (PA) learning algorithm approach. The bilinear similarity
+between :math:`p_1` and :math:`p_2` is defined as :math:`p_{1}^{T} W p_2`
+where :math:`W` is the learned matrix by OASIS. This particular algorithm
+is fast as it scales linearly with the number of samples.
+
+The aim is to find a parametric similarity function :math:`S` such that all
+triplets of the form :math:`(p_i, p_{i}^{+}, p_{i}^{-})` obey
+:math:`S_W (p_i, p_{i}^{+}) > S_W (p_i, p_{i}^{-} + 1)`. Given the loss function:
+
+.. math::
+
+    l_W (p_i, p_{i}^{+}, p_{i}^{-}) = max(0, 1 - S_W (p_i, p_{i}^{+} + 1 + S_W (p_i, p_{i}^{-} + 1)
+
+The goal is to minimize a global loss :math:`L_W` that accumulates hinge
+losses over all possible triplets:
+
+.. math::
+
+    L_W = \sum_{(p_i, p_{i}^{+}, p_{i}^{-}) \in P} l_W (p_i, p_{i}^{+}, p_{i}^{-})
+
+In order to minimize this loss, an Passive-Aggressive algorithm is applied
+iteratively over triplets to optimize :math:`W`. First :math:`W` is initialized to
+some value :math:`W`^0. Then, at each training iteration i, a random triplet
+:math:`(p_i, p_{i}^{+}, p_{i}^{-})` is selected, and solve the following convex
+problem with soft margin:
+
+.. math::
+    
+    W^i = argmin \frac{1}{2} {\lVert W - W^{i-1} \rVert}_{Fro}^{2} + C\xi\\
+    s.t. l_W (p_i, p_{i}^{+}, p_{i}^{-}) and \xi \geq 0
+
+where :math:`{\lVert \dot \rVert}_{Fro}^{2}` is the Frobenius norm
+(point-wise :math:`L_2` norm). Therefore, at each iteration :math:`i`, :math:`W^i`
+is selected to optimize a trade-off between remaining close to the previous
+parameters :math:`W^{i-1}` and minimizing the loss on the current triplet
+:math:`l_W (p_i, p_{i}^{+}, p_{i}^{-})`. The aggressiveness parameter :math:`C`
+controls this trade-off.
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import OASIS
+
+    triplets = [[[1.2, 7.5], [1.3, 1.5], [6.2, 9.7]],
+                [[1.3, 4.5], [3.2, 4.6], [5.4, 5.4]],
+                [[3.2, 7.5], [3.3, 1.5], [8.2, 9.7]],
+                [[3.3, 4.5], [5.2, 4.6], [7.4, 5.4]]]
+
+    oasis = OASIS()
+    oasis.fit(triplets)
+
+.. topic:: References:
+
+  .. [1] Chechik, Gal and Sharma, Varun and Shalit, Uri and Bengio, Samy
+         `Large Scale Online Learning of Image Similarity Through Ranking.
+         <https://www.jmlr.org/papers/volume11/chechik10a/chechik10a.pdf>`_. \
+         , JMLR 2010.
+
+  .. [2] Adapted from original \
+         `Matlab implementation.<https://chechiklab.biu.ac.il/~gal/Research/OASIS/index.html>`_.
+
 .. _learning_on_quadruplets:
 
 Learning on quadruplets

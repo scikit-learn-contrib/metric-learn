@@ -1,3 +1,13 @@
+"""
+Importance of random state
+=============
+
+This example shows how important the random state is for
+some algorithms such as the online algorith OASIS. The random
+states has a direct impact in the order in wich the triplets
+are seen by the algorithm.
+"""
+
 from metric_learn.oasis import OASIS
 from sklearn.datasets import load_iris
 from sklearn.utils import check_random_state
@@ -23,7 +33,7 @@ triplets = X[triplets]
 rs = np.arange(30)
 folds = 6  # Cross-validations folds
 c = 0.006203576
-oasis = OASIS(c=c, custom_M="random")  # M init random
+oasis = OASIS(c=c, init="random")  # M init random
 
 
 def random_theory(plot=True, verbose=True, cv=5):

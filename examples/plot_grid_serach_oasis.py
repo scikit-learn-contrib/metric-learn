@@ -1,3 +1,10 @@
+"""
+Grid serach use case
+=============
+
+Grid search for parameter C in OASIS algorithm
+"""
+
 from metric_learn.oasis import OASIS
 from sklearn.datasets import load_iris
 from sklearn.utils import check_random_state
