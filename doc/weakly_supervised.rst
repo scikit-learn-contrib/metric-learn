@@ -602,6 +602,15 @@ one should provide the algorithm with `n_samples` triplets of points. The
 semantic of each triplet is that the first point should be closer to the
 second point than to the third one.
 
+If :math:`P` is the set of points, and :math:`p_i,  p_i^{+}, p_i^{-} \in P`
+are arbitrary points in :math:`P`, then a triplet of the form
+:math:`(p_i, p_i^{+}, p_i^{-})` suggests that
+:math:`S(p_i, p_i^{+}) > S(p_i, p_i^{-})` for a similarity function :math:`S`,
+or equivalently :math:`d(p_i, p_i^{+}) < d(p_i, p_i^{-})` for a pseudo-distance
+function :math:`d`.
+
+Some algorithms will learn :math:`S`, while others will learn :math:`d`.
+
 Fitting
 -------
 Here is an example for fitting on triplets (see :ref:`fit_ws` for more
@@ -767,18 +776,21 @@ Online Algorithm for Scalable Image Similarity
 (:py:class:`OASIS <metric_learn.OASIS>`)
 
 `OASIS` learns a bilinear similarity from triplet constraints with an online
-Passive-Agressive (PA) learning algorithm approach. The bilinear similarity
+Passive-Agressive (PA) algorithm approach. The bilinear similarity
 between :math:`p_1` and :math:`p_2` is defined as :math:`p_{1}^{T} W p_2`
 where :math:`W` is the learned matrix by OASIS. This particular algorithm
 is fast as it scales linearly with the number of samples.
 
 The aim is to find a parametric similarity function :math:`S` such that all
 triplets of the form :math:`(p_i, p_{i}^{+}, p_{i}^{-})` obey
-:math:`S_W (p_i, p_{i}^{+}) > S_W (p_i, p_{i}^{-} + 1)`. Given the loss function:
+:math:`S_W (p_i, p_{i}^{+}) > S_W (p_i, p_{i}^{-}) + 1`. Which means there
+must be a margin of :math:`1` when satisfiyng the triplet definition.
+
+Given the loss function:
 
 .. math::
 
-    l_W (p_i, p_{i}^{+}, p_{i}^{-}) = max(0, 1 - S_W (p_i, p_{i}^{+} + 1 + S_W (p_i, p_{i}^{-} + 1)
+    l_W (p_i, p_{i}^{+}, p_{i}^{-}) = max\{0, 1 - S_W (p_i, p_{i}^{+}) + S_W (p_i, p_{i}^{-})\}
 
 The goal is to minimize a global loss :math:`L_W` that accumulates hinge
 losses over all possible triplets:
@@ -787,23 +799,29 @@ losses over all possible triplets:
 
     L_W = \sum_{(p_i, p_{i}^{+}, p_{i}^{-}) \in P} l_W (p_i, p_{i}^{+}, p_{i}^{-})
 
-In order to minimize this loss, an Passive-Aggressive algorithm is applied
+In order to minimize this loss, a Passive-Aggressive algorithm is applied
 iteratively over triplets to optimize :math:`W`. First :math:`W` is initialized to
-some value :math:`W`^0. Then, at each training iteration i, a random triplet
+some value :math:`W^0`. Then, at each training iteration :math:`i`, a random triplet
 :math:`(p_i, p_{i}^{+}, p_{i}^{-})` is selected, and solve the following convex
 problem with soft margin:
 
 .. math::
     
     W^i = argmin \frac{1}{2} {\lVert W - W^{i-1} \rVert}_{Fro}^{2} + C\xi\\
-    s.t. l_W (p_i, p_{i}^{+}, p_{i}^{-}) and \xi \geq 0
+    s.t. \quad l_W (p_i, p_{i}^{+}, p_{i}^{-}) \quad and \quad \xi \geq 0
 
-where :math:`{\lVert \dot \rVert}_{Fro}^{2}` is the Frobenius norm
+where :math:`{\lVert \cdot \rVert}_{Fro}^{2}` is the Frobenius norm
 (point-wise :math:`L_2` norm). Therefore, at each iteration :math:`i`, :math:`W^i`
 is selected to optimize a trade-off between remaining close to the previous
 parameters :math:`W^{i-1}` and minimizing the loss on the current triplet
 :math:`l_W (p_i, p_{i}^{+}, p_{i}^{-})`. The aggressiveness parameter :math:`C`
 controls this trade-off.
+
+As this algorithm learns a bilinear similarity, the learned matrix :math:`W`
+is not guaranteed to be symmetric nor semi-positive definite (SPD). So it may
+happen that for any pair of points :math:`(x,y) \in P` with :math:`x \ne y` that
+:math:`S(x, y) \ne S(y,x)` and :math:`S(x,x) \ne 0`. Also notice that :math:`S(x, y) \in \mathbb{R}`
+for all :math:`x, y \in P`.
 
 .. topic:: Example Code:
 
