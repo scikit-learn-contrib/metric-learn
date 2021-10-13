@@ -53,40 +53,47 @@ def identity_fit(d=100, n=100, n_pairs=None, random=False):
   return X, random_pairs, mixin
 
 
-def test_same_similarity_with_two_methods():
+@pytest.mark.parametrize('d', [10, 300])
+@pytest.mark.parametrize('n', [10, 100])
+@pytest.mark.parametrize('n_pairs', [100, 1000])
+def test_same_similarity_with_two_methods(d, n, n_pairs):
   """"
-  Tests that score_pairs() and get_metric() give consistent results.
+  Tests that pair_similarity() and get_metric() give consistent results.
   In both cases, the results must match for the same input.
   Tests it for 'n_pairs' sampled from 'n' d-dimentional arrays.
   """
-  d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
-  dist1 = mixin.score_pairs(random_pairs)
+  dist1 = mixin.pair_similarity(random_pairs)
   dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
 
   assert_array_almost_equal(dist1, dist2)
 
 
-def test_check_correctness_similarity():
+@pytest.mark.parametrize('d', [10, 300])
+@pytest.mark.parametrize('n', [10, 100])
+@pytest.mark.parametrize('n_pairs', [100, 1000])
+def test_check_correctness_similarity(d, n, n_pairs):
   """
-  Tests the correctness of the results made from socre_paris() and
-  get_metric(). Results are compared with the real bilinear similarity
-  calculated in-place.
+  Tests the correctness of the results made from socre_paris(),
+  get_metric() and get_bilinear_matrix. Results are compared with
+  the real bilinear similarity calculated in-place.
   """
-  d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
-  dist1 = -1*mixin.score_pairs(random_pairs)  # Temp -1
-  dist2 = [-1*mixin.get_metric()(p[0], p[1]) for p in random_pairs]
+  dist1 = mixin.pair_similarity(random_pairs)
+  dist2 = [mixin.get_metric()(p[0], p[1]) for p in random_pairs]
+  dist3 = [np.dot(np.dot(p[0].T, mixin.get_bilinear_matrix()), p[1])
+           for p in random_pairs]
   desired = [np.dot(np.dot(p[0].T, mixin.components_), p[1])
              for p in random_pairs]
 
-  assert_array_almost_equal(dist1, desired)  # score_pairs
+  assert_array_almost_equal(dist1, desired)  # pair_similarity
   assert_array_almost_equal(dist2, desired)  # get_metric
+  assert_array_almost_equal(dist3, desired)  # get_metric
 
 
 def test_check_handmade_example():
   """
-  Checks that score_pairs() result is correct comparing it with a
+  Checks that pair_similarity() result is correct comparing it with a
   handmade example.
   """
   u = np.array([0, 1, 2])
@@ -95,67 +102,110 @@ def test_check_handmade_example():
   mixin.fit([u, v], [0, 0])  # Identity fit
   c = np.array([[2, 4, 6], [6, 4, 2], [1, 2, 3]])
   mixin.components_ = c  # Force components_
-  dists = -1*mixin.score_pairs([[u, v], [v, u]])  # Temp -1
+  dists = mixin.pair_similarity([[u, v], [v, u]])
   assert_array_almost_equal(dists, [96, 120])
 
 
-def test_check_handmade_symmetric_example():
+@pytest.mark.parametrize('d', [10, 300])
+@pytest.mark.parametrize('n', [10, 100])
+@pytest.mark.parametrize('n_pairs', [100, 1000])
+def test_check_handmade_symmetric_example(d, n, n_pairs):
   """
   When the Bilinear matrix is the identity. The similarity
   between two arrays must be equal: S(u,v) = S(v,u). Also
   checks the random case: when the matrix is spd and symetric.
   """
-  # Random pairs for M = Identity
-  d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs)
   pairs_reverse = [[p[1], p[0]] for p in random_pairs]
-  dist1 = mixin.score_pairs(random_pairs)
-  dist2 = mixin.score_pairs(pairs_reverse)
+  dist1 = mixin.pair_similarity(random_pairs)
+  dist2 = mixin.pair_similarity(pairs_reverse)
   assert_array_almost_equal(dist1, dist2)
 
   # Random pairs for M = spd Matrix
   spd_matrix = make_spd_matrix(d, random_state=RNG)
   mixin.components_ = spd_matrix
-  dist1 = mixin.score_pairs(random_pairs)
-  dist2 = mixin.score_pairs(pairs_reverse)
+  dist1 = mixin.pair_similarity(random_pairs)
+  dist2 = mixin.pair_similarity(pairs_reverse)
   assert_array_almost_equal(dist1, dist2)
 
 
-def test_score_pairs_finite():
+@pytest.mark.parametrize('d', [10, 300])
+@pytest.mark.parametrize('n', [10, 100])
+@pytest.mark.parametrize('n_pairs', [100, 1000])
+def test_pair_similarity_finite(d, n, n_pairs):
   """
-  Checks for 'n' score_pairs() of 'd' dimentions, that all
+  Checks for 'n' pair_similarity() of 'd' dimentions, that all
   similarities are finite numbers: not NaN, +inf or -inf.
   Considers a random M for bilinear similarity.
   """
-  d, n, n_pairs = 100, 100, 1000
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
-  dist1 = mixin.score_pairs(random_pairs)
+  dist1 = mixin.pair_similarity(random_pairs)
   assert np.isfinite(dist1).all()
 
 
-def test_score_pairs_dim():
+@pytest.mark.parametrize('d', [10, 300])
+@pytest.mark.parametrize('n', [10, 100])
+def test_pair_similarity_dim(d, n):
   """
   Scoring of 3D arrays should return 1D array (several tuples),
   and scoring of 2D arrays (one tuple) should return an error (like
   scikit-learn's error when scoring 1D arrays)
   """
-  d, n = 100, 100
   X, _, mixin = identity_fit(d=d, n=n, n_pairs=None, random=True)
   tuples = np.array(list(product(X, X)))
-  assert mixin.score_pairs(tuples).shape == (tuples.shape[0],)
+  assert mixin.pair_similarity(tuples).shape == (tuples.shape[0],)
   context = make_context(mixin)
   msg = ("3D array of formed tuples expected{}. Found 2D array "
          "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
          .format(context, tuples[1]))
   with pytest.raises(ValueError) as raised_error:
-    mixin.score_pairs(tuples[1])
+    mixin.pair_similarity(tuples[1])
   assert str(raised_error.value) == msg
 
 
-def test_check_scikitlearn_compatibility():
-  """Check that the similarity returned by get_metric() is compatible with
-  scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
-  d, n = 100, 100
+@pytest.mark.parametrize('d', [10, 300])
+@pytest.mark.parametrize('n', [10, 100])
+def test_check_scikitlearn_compatibility(d, n):
+  """
+  Check that the similarity returned by get_metric() is compatible with
+  scikit-learn's algorithms using a custom metric, DBSCAN for instance
+  """
   X, _, mixin = identity_fit(d=d, n=n, n_pairs=None, random=True)
   clustering = DBSCAN(metric=mixin.get_metric())
   clustering.fit(X)
+
+
+@pytest.mark.parametrize('d', [10, 300])
+@pytest.mark.parametrize('n', [10, 100])
+@pytest.mark.parametrize('n_pairs', [100, 1000])
+def test_check_score_pairs_deprecation_and_output(d, n, n_pairs):
+  """
+  Check that calling score_pairs shows a warning of deprecation, and also
+  that the output of score_pairs matches calling pair_similarity.
+  """
+  _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
+  dpr_msg = ("score_pairs will be deprecated in release 0.6.4. "
+             "Use pair_similarity to compute similarities, or "
+             "pair_distances to compute distances.")
+  with pytest.warns(FutureWarning) as raised_warnings:
+    s1 = mixin.score_pairs(random_pairs)
+    s2 = mixin.pair_similarity(random_pairs)
+    assert_array_almost_equal(s1, s2)
+  assert any(str(w.message) == dpr_msg for w in raised_warnings)
+
+
+@pytest.mark.parametrize('d', [10, 300])
+@pytest.mark.parametrize('n', [10, 100])
+@pytest.mark.parametrize('n_pairs', [100, 1000])
+def test_check_error_with_pair_distance(d, n, n_pairs):
+  """
+  Check that calling pair_distance is not possible with a Bilinear learner.
+  An Exception must be shown instead.
+  """
+  _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
+  msg = ("Bilinear similarity learners don't learn a distance, thus ",
+         "this method is not implemented. Use pair_similarity to "
+         "compute similarity between pairs")
+  with pytest.raises(Exception) as e:
+    _ = mixin.pair_distance(random_pairs)
+  assert e.value.args[0] == msg

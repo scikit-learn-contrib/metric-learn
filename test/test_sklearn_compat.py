@@ -148,7 +148,7 @@ def test_array_like_inputs(estimator, build_dataset, with_preprocessor):
   pairs = np.array([[X[0], X[1]], [X[0], X[2]]])
   pairs_variants, _ = generate_array_like(pairs)
   for pairs_variant in pairs_variants:
-    estimator.score_pairs(pairs_variant)
+    estimator.pair_distance(pairs_variant)
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])

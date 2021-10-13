@@ -115,7 +115,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     """
     Loss function in a triplet
     """
-    S = -1 * self.score_pairs([[triplet[0], triplet[1]],
+    S = self.pair_similarity([[triplet[0], triplet[1]],
                               [triplet[0], triplet[2]]])
     return np.maximum(0, 1 - S[0] + S[1])
 
@@ -319,7 +319,7 @@ class OASIS_Supervised(OASIS):
   >>> oasis.fit(X, Y)
   OASIS_Supervised(n_iter=4500,
                  random_state=RandomState(MT19937) at 0x7FE1B598FA40)
-  >>> oasis.score_pairs([[X[0], X[1]]])
+  >>> oasis.pair_similarity([[X[0], X[1]]])
   array([-21.14242072])
 
   References

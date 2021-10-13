@@ -79,12 +79,17 @@ class TestCovariance(MetricTestCase):
 class TestSCML(object):
   @pytest.mark.parametrize('basis', ('lda', 'triplet_diffs'))
   def test_iris(self, basis):
+    """
+    SCML applied to Iris dataset should give better results when
+    computing class separation.
+    """
     X, y = load_iris(return_X_y=True)
+    before = class_separation(X, y)
     scml = SCML_Supervised(basis=basis, n_basis=85, k_genuine=7, k_impostor=5,
                            random_state=42)
     scml.fit(X, y)
-    csep = class_separation(scml.transform(X), y)
-    assert csep < 0.26  # TODO: Check this test, it was 0.24 before
+    after = class_separation(scml.transform(X), y)
+    assert before > after + 0.03  # It's better by a margin of 0.03
 
   def test_big_n_features(self):
     X, y = make_classification(n_samples=100, n_classes=3, n_features=60,
