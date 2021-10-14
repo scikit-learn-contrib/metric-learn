@@ -361,6 +361,11 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
     The linear transformation ``L`` deduced from the learned Mahalanobis
     metric (See function `_components_from_basis_weights`.)
 
+  Methods
+  -------
+  fit:
+    Learn the SCML model.
+
   Examples
   --------
   >>> from metric_learn import SCML
@@ -470,6 +475,11 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
     The linear transformation ``L`` deduced from the learned Mahalanobis
     metric (See function `_components_from_basis_weights`.)
+
+  Methods
+  -------
+  fit:
+    Create constraints from labels and learn the SCML model.
 
   Examples
   --------

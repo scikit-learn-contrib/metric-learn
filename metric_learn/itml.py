@@ -181,6 +181,11 @@ class ITML(_BaseITML, _PairsClassifierMixin):
     points will be classified as similar, otherwise they will be
     classified as dissimilar.
 
+  Methods
+  -------
+  fit:
+    Learn the ITML model.
+
   Examples
   --------
   >>> from metric_learn import ITML
@@ -320,6 +325,11 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
     The linear transformation ``L`` deduced from the learned Mahalanobis
     metric (See function `components_from_metric`.)
+
+  Methods
+  -------
+  fit:
+    Create constraints from labels and learn the ITML model.
 
   Examples
   --------

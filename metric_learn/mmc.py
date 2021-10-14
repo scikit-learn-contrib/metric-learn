@@ -391,6 +391,11 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
     points will be classified as similar, otherwise they will be
     classified as dissimilar.
 
+  Methods
+  -------
+  fit:
+    Learn the MMC model.
+
   Examples
   --------
   >>> from metric_learn import MMC
@@ -517,6 +522,11 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     ``init='random'``, ``random_state`` is used to initialize the random
     Mahalanobis matrix.  In any case, `random_state` is also used to
     randomly sample constraints from labels.
+
+  Methods
+  -------
+  fit:
+    Create constraints from labels and learn the MMC model.
 
   Examples
   --------

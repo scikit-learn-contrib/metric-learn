@@ -39,7 +39,7 @@ html_static_path = ['_static']
 htmlhelp_basename = 'metric-learndoc'
 
 # Option to only need single backticks to refer to symbols
-#default_role = 'any'
+# default_role = 'any'
 
 # Option to hide doctests comments in the documentation (like # doctest:
 # +NORMALIZE_WHITESPACE for instance)
@@ -69,7 +69,7 @@ autosummary_generate = True
 
 # Switch to old behavior with html4, for a good display of references,
 # as described in https://github.com/sphinx-doc/sphinx/issues/6705
-#html4_writer = True
+# html4_writer = True
 
 
 # Temporary work-around for spacing problem between parameter and parameter

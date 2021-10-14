@@ -46,6 +46,11 @@ class RCA(MahalanobisMixin, TransformerMixin):
     The preprocessor to call to get tuples from indices. If array-like,
     tuples will be formed like this: X[indices].
 
+  Methods
+  -------
+  fit:
+    Learn the RCA model.
+
   Examples
   --------
   >>> from metric_learn import RCA
@@ -155,6 +160,12 @@ class RCA_Supervised(RCA):
   random_state : int or numpy.RandomState or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int.
     It is used to randomly sample constraints from labels.
+
+  Methods
+  -------
+  fit:
+    Create constraints from labels and learn the RCA model.
+    Needs num_constraints specified in constructor.
 
   Examples
   --------

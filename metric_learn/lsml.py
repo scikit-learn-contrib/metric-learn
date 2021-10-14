@@ -171,6 +171,11 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
     The linear transformation ``L`` deduced from the learned Mahalanobis
     metric (See function `components_from_metric`.)
 
+  Methods
+  -------
+  fit :
+    Learn the LSML model.
+
   Examples
   --------
   >>> from metric_learn import LSML
@@ -281,6 +286,11 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
     ``init='random'``, ``random_state`` is used to set the random
     prior. In any case, `random_state` is also used to randomly sample
     constraints from labels.
+
+  Methods
+  -------
+  fit :
+    Create constraints from labels and learn the LSML model.
 
   Examples
   --------

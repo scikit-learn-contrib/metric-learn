@@ -27,6 +27,11 @@ class Covariance(MahalanobisMixin, TransformerMixin):
       The linear transformation ``L`` deduced from the learned Mahalanobis
       metric (See function `components_from_metric`.)
 
+  Methods
+  -------
+  fit:
+    Calculates the covariance matrix of the input data.
+
   Examples
   --------
   >>> from metric_learn import Covariance

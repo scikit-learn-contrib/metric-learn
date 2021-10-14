@@ -90,6 +90,11 @@ class MLKR(MahalanobisMixin, TransformerMixin):
   components_ : `numpy.ndarray`, shape=(n_components, n_features)
     The learned linear transformation ``L``.
 
+  Methods
+  -------
+  fit:
+    Fit MLKR model.
+
   Examples
   --------
 

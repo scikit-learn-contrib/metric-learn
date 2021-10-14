@@ -90,6 +90,11 @@ class NCA(MahalanobisMixin, TransformerMixin):
     transformation. If ``init='pca'``, ``random_state`` is passed as an
     argument to PCA when initializing the transformation.
 
+  Methods
+  -------
+  fit:
+    Fit NCA model.
+
   Examples
   --------
 

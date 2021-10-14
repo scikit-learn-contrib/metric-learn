@@ -52,6 +52,11 @@ class LFDA(MahalanobisMixin, TransformerMixin):
   components_ : `numpy.ndarray`, shape=(n_components, n_features)
       The learned linear transformation ``L``.
 
+  Methods
+  -------
+  fit:
+    Fit the LFDA model.
+
   Examples
   --------
 
