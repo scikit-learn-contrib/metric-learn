@@ -63,6 +63,7 @@ in a tuple (2 for pairs, 3 for triplets for instance), and `n_features` is
 the number of features of each point.
 
 .. topic:: Example:
+
    Here is an artificial dataset of 4 pairs of 2 points of 3 features each:
 
 >>> import numpy as np
@@ -94,7 +95,9 @@ would be to keep the dataset of points `X` aside, and just represent tuples
 as a collection of tuples of *indices* from the points in `X`. Since we loose
 the feature dimension there, the resulting array is 2D.
 
-.. topic:: Example: An equivalent representation of the above pairs would be:
+.. topic:: Example:
+    
+    An equivalent representation of the above pairs would be:
 
 >>> X = np.array([[-0.12, -1.21, -0.20],
 >>>               [+0.05, -0.19, -0.05],
@@ -402,6 +405,8 @@ is the prior distance metric, set to identity matrix by default,
 
 .. topic:: Example Code:
 
+    A basic usage of this model with pairs:
+
 ::
 
     from metric_learn import ITML
@@ -460,6 +465,8 @@ is the off-diagonal L1 norm.
 
 .. topic:: Example Code:
 
+    A basic usage of this model with pairs:
+
 ::
 
     from metric_learn import SDML
@@ -488,7 +495,7 @@ is the off-diagonal L1 norm.
 .. _rca:
 
 :py:class:`RCA <metric_learn.RCA>`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Relative Components Analysis (:py:class:`RCA <metric_learn.RCA>`)
 
@@ -513,6 +520,8 @@ with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used
 as the Mahalanobis matrix.
 
 .. topic:: Example Code:
+
+    A basic usage of this model with pairs:
 
 ::
 
@@ -567,6 +576,8 @@ points, while constrains the sum of distances between dissimilar points:
       \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
 
 .. topic:: Example Code:
+
+    A basic usage of this model with pairs:
 
 ::
 
@@ -736,6 +747,8 @@ where :math:`[\cdot]_+` is the hinge loss.
  
 .. topic:: Example Code:
 
+    A basic usage of this model with triplets:
+
 ::
 
     from metric_learn import SCML
@@ -754,8 +767,8 @@ where :math:`[\cdot]_+` is the hinge loss.
          <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
          (AAAI), 2014.
 
-  .. [2] Adapted from original \
-         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+  .. [2] Adapted from original `Matlab implementation. \
+         <https://github.com/bellet/SCML>`_.
 
 
 .. _learning_on_quadruplets:
@@ -928,6 +941,8 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
     (\mathbf{M})
 
 .. topic:: Example Code:
+
+    A basic usage of this model with quadruplets:
 
 ::
 

@@ -142,6 +142,8 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different classes,
 
 .. topic:: Example Code:
 
+    A basic usage of this model with the Iris dataset from scikit-learn.
+
 ::
 
     import numpy as np
@@ -205,6 +207,8 @@ the sum of probability of being correctly classified:
       \mathbf{L} = \text{argmax}\sum_i p_i
 
 .. topic:: Example Code:
+
+    A basic usage of this model with the Iris dataset from scikit-learn.
 
 ::
 
@@ -278,6 +282,8 @@ different classes are separated from each other; far apart data pairs in the
 same class are not imposed to be close.
 
 .. topic:: Example Code:
+
+    A basic usage of this model with the Iris dataset from scikit-learn.
 
 ::
 
@@ -353,6 +359,8 @@ calculating a weighted average of all the training samples:
 
 .. topic:: Example Code:
 
+    A basic usage of this model with the Iris dataset from scikit-learn.
+
 ::
 
     from metric_learn import MLKR
@@ -406,6 +414,9 @@ class, and the two last points are from a different class (so indeed the two
 last points should be less similar than the two first points).
 
 .. topic:: Example Code:
+
+    A basic usage of supervied versions of weakly supervied algorithms
+    with the Iris dataset from scikit-learn.
 
 ::
 
