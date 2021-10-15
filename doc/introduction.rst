@@ -45,7 +45,7 @@ measuring the agreement with the training data.
 Mahalanobis Distances
 =====================
 
-In the metric-learn package, all algorithms currently implemented learn 
+In the metric-learn package, most algorithms currently implemented learn 
 so-called Mahalanobis distances. Given a real-valued parameter matrix
 :math:`L` of shape ``(num_dims, n_features)`` where ``n_features`` is the
 number features describing the data, the Mahalanobis distance associated with
@@ -78,6 +78,34 @@ necessarily the identity of indiscernibles.
   :math:`M=L^\top L` for some  :math:`L`, one can show that both
   parameterizations are equivalent. In practice, an algorithm may thus solve
   the metric learning problem with respect to either :math:`M` or :math:`L`.
+
+.. _bilinear_similarity:
+
+Bilinear Similarity
+===================
+
+Some algorithms in the package don't learn a distance or pseudo-distance, but
+a similarity. The idea is that two pairs are closer if their similarity value
+is high, and viceversa. Given a real-valued parameter matrix :math:`W` of shape
+``(n_features, n_features)`` where ``n_features`` is the number features
+describing the data, the Bilinear Similarity associated with :math:`W` is
+defined as follows:
+
+.. math:: S_W(x, x') = x^T W x'
+
+The matrix :math:`W` is not required to be positive semi-definite (PSD), so
+none of the distance properties are satisfied: nonnegativity, identity of
+indiscernibles, symmetry and triangle inequality.
+
+This allows some algorithms to optimize :math:`S_W` in an online manner using a
+simple and efficient procedure, and thus can be applied to problems with
+millions of training instances and achieves state-of-the-art performance
+on an image search task using :math:`k`-NN.
+
+It also allows to be applied in contexts where the triangle inequality is
+violated by visual judgements and the goal is to approximate perceptual
+similarity. For intance, a man and a horse are both similar to a centaur,
+but not to one another.
 
 .. _use_cases:
 
