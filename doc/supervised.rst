@@ -59,7 +59,6 @@ we fit the metric learner (example:`NCA`).
 NCA(init='auto', max_iter=100, n_components=None,
   preprocessor=None, random_state=42, tol=None, verbose=False)
 
-
 Now that the estimator is fitted, you can use it on new data for several
 purposes.
 
@@ -88,7 +87,8 @@ array([0.49627072, 3.65287282, 6.06079877])
 
 - Or you can return a function that will return the distance (in the new
   space) between two 1D arrays (the coordinates of the points in the original
-  space), similarly to distance functions in `scipy.spatial.distance`.
+  space), similarly to distance functions in `scipy.spatial.distance`. To
+  do that, use the `get_metric` method.
 
 >>> metric_fun = nca.get_metric()
 >>> metric_fun([3.5, 3.6], [5.6, 2.4])

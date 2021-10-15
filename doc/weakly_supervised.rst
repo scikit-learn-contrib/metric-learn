@@ -127,9 +127,16 @@ through the argument `preprocessor` (see below :ref:`fit_ws`)
 Fit, transform, and so on
 -------------------------
 
-The goal of weakly-supervised metric-learning algorithms is to transform
-points in a new space, in which the tuple-wise constraints between points
-are respected.
+Generally, the goal of weakly-supervised metric-learning algorithms is to
+transform points in a new space, in which the tuple-wise constraints between
+points are respected.
+
+But there are also some algorithms that learn a similarity, not a distance,
+thus the points cannot be transformed into a new space. But the goal is the
+same: respect the maximum number of constraints while learning the similarity.
+
+Weakly-supervised mahalanobis learners can transform points into a new space,
+and to do so, we fit the metric learner (example:`MMC`).
 
 >>> from metric_learn import MMC
 >>> mmc = MMC(random_state=42)
@@ -144,17 +151,22 @@ Or alternatively (using a preprocessor):
 >>> mmc = MMC(preprocessor=X, random_state=42)
 >>> mmc.fit(pairs_indice, y)
 
-
 Now that the estimator is fitted, you can use it on new data for several
 purposes.
 
-First, you can transform the data in the learned space, using `transform`:
-Here we transform two points in the new embedding space.
+First, your mahalanobis learner can transform the data in
+the learned space, using `transform`: Here we transform two points in
+the new embedding space.
 
 >>> X_new = np.array([[9.4, 4.1, 4.2], [2.1, 4.4, 2.3]])
 >>> mmc.transform(X_new)
 array([[-3.24667162e+01,  4.62622348e-07,  3.88325421e-08],
        [-3.61531114e+01,  4.86778289e-07,  2.12654397e-08]])
+
+.. warning::
+    
+    If you try to use `transform` with a similarity learner, an error will
+    appear, as you cannot transform the data using them.
 
 Also, as explained before, our metric learner has learned a distance between
 points. You can use this distance in two main ways:
@@ -166,27 +178,47 @@ points. You can use this distance in two main ways:
 ...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
 array([7.27607365, 0.88853014])
 
-- Or you can return a function that will return the distance
-  (in the new space) between two 1D arrays (the coordinates of the points in
-  the original space), similarly to distance functions in
-  `scipy.spatial.distance`. To do that, use the `get_metric` method.
+- Or you can return a function that will return the distance (in the new
+  space) between two 1D arrays (the coordinates of the points in the original
+  space), similarly to distance functions in `scipy.spatial.distance`. To
+  do that, use the `get_metric` method.
 
 >>> metric_fun = mmc.get_metric()
 >>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
 7.276073646278203
 
-- Alternatively, you can use `pair_similarity` to return the **score** between
-  points, the more the **score**, the closer the pairs and vice-versa. For
-  Mahalanobis learners, it is equal to the inverse of the distance.
+For similarity learners `pair_distance` is not available, as they don't learn
+a distance. Intead you use `pair_similarity` that has the same behaviour but
+for similarity.
+
+>>> algorithm.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+array([-0.2312, 705.23, -72.8])
+
+.. warning::
+    
+    If you try to use `pair_distance` with a similarity learner, an error
+    will appear, as they don't learn a distance nor a pseudo-distance.
+
+You can also call `get_metric` with similarity learners, and you will get
+a function that will return the similarity bewtween 1D arrays.
+
+>>> similarity_fun = algorithm.get_metric()
+>>> similarity_fun([3.5, 3.6], [5.6, 2.4])
+-0.04752
+
+For similarity learners and mahalanobis learners, `pair_similarity` is
+available. You can interpret that this function returns the **score**
+between points: the more the **score**, the closer the pairs and vice-versa.
+For mahalanobis learners, it is equal to the inverse of the distance.
 
 >>> score = mmc.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
 >>> score
 array([-0.49627072, -3.65287282, -6.06079877])
 
-  This is useful because `pair_similarity` matches the **score** sematic of 
-  scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
-  For instance, given a labeled data, you can pass the labels and the
-  **score** of your data to get the ROC curve.
+This is useful because `pair_similarity` matches the **score** sematic of 
+scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+For instance, given a labeled data, you can pass the labels and the
+**score** of your data to get the ROC curve.
 
 >>> from sklearn.metrics import roc_curve
 >>> fpr, tpr, thresholds = roc_curve(['dog', 'cat', 'dog'], score, pos_label='dog')
@@ -201,16 +233,21 @@ array([ 0.50372928, -0.49627072, -3.65287282, -6.06079877])
 .. note::
 
     If the metric learner that you use learns a :ref:`Mahalanobis distance
-    <mahalanobis_distances>` (like it is the case for all algorithms
-    currently in metric-learn), you can get the plain Mahalanobis matrix using
-    `get_mahalanobis_matrix`.
+    <mahalanobis_distances>`, you can get the plain learned Mahalanobis
+    matrix using `get_mahalanobis_matrix`.
 
->>> mmc.get_mahalanobis_matrix()
-array([[ 0.58603894, -5.69883982, -1.66614919],
-       [-5.69883982, 55.41743549, 16.20219519],
-       [-1.66614919, 16.20219519,  4.73697721]])
+    >>> mmc.get_mahalanobis_matrix()
+    array([[ 0.58603894, -5.69883982, -1.66614919],
+        [-5.69883982, 55.41743549, 16.20219519],
+        [-1.66614919, 16.20219519,  4.73697721]])
 
-.. TODO: remove the "like it is the case etc..." if it's not the case anymore
+    If the metric learner that you use learns a :ref:`Bilinear similarity
+    <bilinear_similarity>`, you can get the plain learned Bilinear
+    matrix using `get_bilinear_matrix`.
+
+    >>> algorithm.get_bilinear_matrix()
+    array([[-0.72680409, -0.153213],
+           [1.45542269, 7.8135546 ]])
 
 .. _sklearn_compat_ws:
 
