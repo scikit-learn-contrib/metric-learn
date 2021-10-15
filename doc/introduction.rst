@@ -131,6 +131,10 @@ examples (for code illustrating some of these use-cases, see the
   the data into a new embedding space before feeding it into another machine
   learning algorithm.
 
+The most common use-case of metric-learn would be to learn a Mahalanobis metric,
+then transform the data to the learned space, and then resolve one of the task
+above.
+
 The API of metric-learn is compatible with `scikit-learn
 <https://scikit-learn.org/>`_, the leading library for machine
 learning in Python. This allows to easily pipeline metric learners with other
