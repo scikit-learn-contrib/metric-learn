@@ -41,11 +41,17 @@ two numbers.
 
 Fit, transform, and so on
 -------------------------
-The goal of supervised metric-learning algorithms is to transform
+Generally, the goal of supervised metric-learning algorithms is to transform
 points in a new space, in which the distance between two points from the
 same class will be small, and the distance between two points from different
-classes will be large. To do so, we fit the metric learner (example:
-`NCA`).
+classes will be large.
+
+But there are also some algorithms that learn a similarity, not a distance,
+thus the points cannot be transformed into a new space. In this case, the
+utility comes at using the similarity bewtween points directly.
+
+Mahalanobis learners can transform points into a new space, and to do so,
+we fit the metric learner (example:`NCA`).
 
 >>> from metric_learn import NCA
 >>> nca = NCA(random_state=42)
@@ -53,20 +59,25 @@ classes will be large. To do so, we fit the metric learner (example:
 NCA(init='auto', max_iter=100, n_components=None,
   preprocessor=None, random_state=42, tol=None, verbose=False)
 
-
 Now that the estimator is fitted, you can use it on new data for several
 purposes.
 
-First, you can transform the data in the learned space, using `transform`:
-Here we transform two points in the new embedding space.
+First, your mahalanobis learner can transform the data in
+the learned space, using `transform`: Here we transform two points in
+the new embedding space.
 
 >>> X_new = np.array([[9.4, 4.1], [2.1, 4.4]])
 >>> nca.transform(X_new)
 array([[ 5.91884732, 10.25406973],
        [ 3.1545886 ,  6.80350083]])
 
-Also, as explained before, our metric learners has learn a distance between
-points. You can use this distance in two main ways:
+.. warning::
+    
+    If you try to use `transform` with a similarity learner, an error will
+    appear, as you cannot transform the data using them.
+
+Also, as explained before, mahalanobis metric learners learn a distance
+between points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
   `pair_distance` function:
@@ -76,24 +87,45 @@ array([0.49627072, 3.65287282, 6.06079877])
 
 - Or you can return a function that will return the distance (in the new
   space) between two 1D arrays (the coordinates of the points in the original
-  space), similarly to distance functions in `scipy.spatial.distance`.
+  space), similarly to distance functions in `scipy.spatial.distance`. To
+  do that, use the `get_metric` method.
 
 >>> metric_fun = nca.get_metric()
 >>> metric_fun([3.5, 3.6], [5.6, 2.4])
 0.4962707194621285
 
-- Alternatively, you can use `pair_similarity` to return the **score** between
-  points, the more the **score**, the closer the pairs and vice-versa. For
-  Mahalanobis learners, it is equal to the inverse of the distance.
+For similarity learners `pair_distance` is not available, as they don't learn
+a distance. Intead you use `pair_similarity` that has the same behaviour but
+for similarity.
+
+>>> algorithm.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+array([-0.2312, 705.23, -72.8])
+
+.. warning::
+    
+    If you try to use `pair_distance` with a similarity learner, an error
+    will appear, as they don't learn a distance nor a pseudo-distance.
+
+You can also call `get_metric` with similarity learners, and you will get
+a function that will return the similarity bewtween 1D arrays.
+
+>>> similarity_fun = algorithm.get_metric()
+>>> similarity_fun([3.5, 3.6], [5.6, 2.4])
+-0.04752
+
+For similarity learners and mahalanobis learners, `pair_similarity` is
+available. You can interpret that this function returns the **score**
+between points: the more the **score**, the closer the pairs and vice-versa.
+For mahalanobis learners, it is equal to the inverse of the distance.
 
 >>> score = nca.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
 >>> score
 array([-0.49627072, -3.65287282, -6.06079877])
 
-  This is useful because `pair_similarity` matches the **score** sematic of 
-  scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
-  For instance, given a labeled data, you can pass the labels and the
-  **score** of your data to get the ROC curve.
+This is useful because `pair_similarity` matches the **score** sematic of 
+scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+For instance, given a labeled data, you can pass the labels and the
+**score** of your data to get the ROC curve.
 
 >>> from sklearn.metrics import roc_curve
 >>> fpr, tpr, thresholds = roc_curve(['dog', 'cat', 'dog'], score, pos_label='dog')
@@ -108,15 +140,21 @@ array([ 0.50372928, -0.49627072, -3.65287282, -6.06079877])
 .. note::
 
     If the metric learner that you use learns a :ref:`Mahalanobis distance
-    <mahalanobis_distances>` (like it is the case for all algorithms
-    currently in metric-learn), you can get the plain learned Mahalanobis
+    <mahalanobis_distances>`, you can get the plain learned Mahalanobis
     matrix using `get_mahalanobis_matrix`.
 
     >>> nca.get_mahalanobis_matrix()
     array([[0.43680409, 0.89169412],
            [0.89169412, 1.9542479 ]])
 
-.. TODO: remove the "like it is the case etc..." if it's not the case anymore
+    If the metric learner that you use learns a :ref:`Bilinear similarity
+    <bilinear_similarity>`, you can get the plain learned Bilinear
+    matrix using `get_bilinear_matrix`.
+
+    >>> algorithm.get_bilinear_matrix()
+    array([[-0.72680409, -0.153213],
+           [1.45542269, 7.8135546 ]])
+
 
 Scikit-learn compatibility
 --------------------------
