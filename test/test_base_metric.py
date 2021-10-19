@@ -288,7 +288,7 @@ def test_score_pairs_warning(estimator, build_dataset):
   # points
   model.fit(*remove_y(model, input_data, labels))
 
-  msg = ("score_pairs will be deprecated in release 0.6.3. "
+  msg = ("score_pairs will be deprecated in release 0.7.0. "
          "Use pair_similarity to compute similarities, or "
          "pair_distances to compute distances.")
   with pytest.warns(FutureWarning) as raised_warning:

@@ -83,27 +83,17 @@ array([0.49627072, 3.65287282, 6.06079877])
 0.4962707194621285
 
 - Alternatively, you can use `pair_similarity` to return the **score** between
-  points, the more the **score**, the closer the pairs and vice-versa. For
-  Mahalanobis learners, it is equal to the inverse of the distance.
+  pairs of points, the larger the **score**, the more similar the pair
+  and vice-versa. For Mahalanobis learners, it is equal to the opposite
+  of the distance.
 
 >>> score = nca.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
 >>> score
 array([-0.49627072, -3.65287282, -6.06079877])
 
-  This is useful because `pair_similarity` matches the **score** sematic of 
-  scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
-  For instance, given a labeled data, you can pass the labels and the
-  **score** of your data to get the ROC curve.
-
->>> from sklearn.metrics import roc_curve
->>> fpr, tpr, thresholds = roc_curve(['dog', 'cat', 'dog'], score, pos_label='dog')
->>> fpr
-array([0., 0., 1., 1.])
->>> tpr
-array([0. , 0.5, 0.5, 1. ])
->>> 
->>> thresholds
-array([ 0.50372928, -0.49627072, -3.65287282, -6.06079877])
+  This is useful because `pair_similarity` matches the **score** semantic of 
+  scikit-learn's `Classification metrics
+  <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
 
 .. note::
 
@@ -116,7 +106,6 @@ array([ 0.50372928, -0.49627072, -3.65287282, -6.06079877])
     array([[0.43680409, 0.89169412],
            [0.89169412, 1.9542479 ]])
 
-.. TODO: remove the "like it is the case etc..." if it's not the case anymore
 
 Scikit-learn compatibility
 --------------------------
@@ -128,7 +117,7 @@ All supervised algorithms are scikit-learn estimators
 scikit-learn model selection routines 
 (`sklearn.model_selection.cross_val_score`,
 `sklearn.model_selection.GridSearchCV`, etc).
-You can also use methods from `sklearn.metrics` that rely on y_scores.
+You can also use some of the scoring functions from `sklearn.metrics`.
 
 Algorithms
 ==========

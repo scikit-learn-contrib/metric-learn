@@ -29,12 +29,12 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   @abstractmethod
   def score_pairs(self, pairs):
     """
-    .. deprecated:: 0.6.3 Refer to `pair_distance` and `pair_similarity`.
+    .. deprecated:: 0.7.0 Refer to `pair_distance` and `pair_similarity`.
 
     .. warning::
-        This method will be deleted in 0.6.4. Please refer to `pair_distance`
+        This method will be removed in 0.8.0. Please refer to `pair_distance`
         or `pair_similarity`. This change will occur in order to add learners
-        that don't necessarly learn a Mahalanobis distance.
+        that don't necessarily learn a Mahalanobis distance.
 
     Returns the score between pairs
     (can be a similarity, or a distance/metric depending on the algorithm)
@@ -61,7 +61,7 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   @abstractmethod
   def pair_similarity(self, pairs):
     """
-    .. versionadded:: 0.6.3 Compute the similarity score bewteen pairs
+    .. versionadded:: 0.7.0 Compute the similarity score between pairs
 
     Returns the similarity score between pairs. Depending on the algorithm,
     this method can return the learned similarity score between pairs,
@@ -91,10 +91,10 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   @abstractmethod
   def pair_distance(self, pairs):
     """
-    .. versionadded:: 0.6.3 Compute the distance score between pairs
+    .. versionadded:: 0.7.0 Compute the distance score between pairs
 
     Returns the distance score between pairs. For Mahalanobis learners, it
-    returns the pseudo-distance bewtween pairs. It is not available for
+    returns the pseudo-distance between pairs. It is not available for
     learners that does not learn a distance or pseudo-distance, an error
     will be shown instead.
 
@@ -260,13 +260,13 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
 
   def score_pairs(self, pairs):
     r"""
-    .. deprecated:: 0.6.3
+    .. deprecated:: 0.7.0
         This method is deprecated. Please use `pair_distance` instead.
 
     .. warning::
-        This method will be deleted in 0.6.4. Please refer to `pair_distance`
+        This method will be removed in 0.8.0. Please refer to `pair_distance`
         or `pair_similarity`. This change will occur in order to add learners
-        that don't necessarly learn a Mahalanobis distance.
+        that don't necessarily learn a Mahalanobis distance.
 
     Returns the learned Mahalanobis distance between pairs.
 
@@ -301,7 +301,7 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
     :ref:`mahalanobis_distances` : The section of the project documentation
       that describes Mahalanobis Distances.
     """
-    dpr_msg = ("score_pairs will be deprecated in release 0.6.3. "
+    dpr_msg = ("score_pairs will be deprecated in release 0.7.0. "
                "Use pair_similarity to compute similarities, or "
                "pair_distances to compute distances.")
     warnings.warn(dpr_msg, category=FutureWarning)
