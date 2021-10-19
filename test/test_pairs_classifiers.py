@@ -49,14 +49,14 @@ def test_predict_monotonous(estimator, build_dataset,
   pairs_train, pairs_test, y_train, y_test = train_test_split(input_data,
                                                               labels)
   estimator.fit(pairs_train, y_train)
-  distances = estimator.pair_distance(pairs_test)
+  scores = estimator.pair_score(pairs_test)
   predictions = estimator.predict(pairs_test)
-  min_dissimilar = np.min(distances[predictions == -1])
-  max_similar = np.max(distances[predictions == 1])
-  assert max_similar <= min_dissimilar
-  separator = np.mean([min_dissimilar, max_similar])
-  assert (predictions[distances > separator] == -1).all()
-  assert (predictions[distances < separator] == 1).all()
+  max_dissimilar = np.max(scores[predictions == -1])
+  min_similar = np.min(scores[predictions == 1])
+  assert max_dissimilar <= min_similar
+  separator = np.mean([max_dissimilar, min_similar])
+  assert (predictions[scores < separator] == -1).all()
+  assert (predictions[scores > separator] == 1).all()
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -65,15 +65,17 @@ def test_predict_monotonous(estimator, build_dataset,
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
   """Test that a NotFittedError is raised if someone tries to use
-  pair_distance, decision_function, get_metric, transform or
+  pair_score, score_pairs, decision_function, get_metric, transform or
   get_mahalanobis_matrix on input data and the metric learner
   has not been fitted."""
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
+  with pytest.raises(NotFittedError): # Remove in 0.8.0
+    estimator.score_pairs(input_data)
   with pytest.raises(NotFittedError):
-    estimator.pair_distance(input_data)
+    estimator.pair_score(input_data)
   with pytest.raises(NotFittedError):
     estimator.decision_function(input_data)
   with pytest.raises(NotFittedError):

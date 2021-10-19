@@ -284,12 +284,12 @@ def test_score_pairs_warning(estimator, build_dataset):
   model = clone(estimator)
   set_random_state(model)
 
-  # we fit the metric learner on it and then we call score_apirs on some
+  # We fit the metric learner on it and then we call score_pairs on some
   # points
   model.fit(*remove_y(model, input_data, labels))
 
   msg = ("score_pairs will be deprecated in release 0.7.0. "
-         "Use pair_similarity to compute similarities, or "
+         "Use pair_score to compute similarity scores, or "
          "pair_distances to compute distances.")
   with pytest.warns(FutureWarning) as raised_warning:
     score = model.score_pairs([[X[0], X[1]], ])

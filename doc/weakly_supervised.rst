@@ -175,16 +175,16 @@ array([7.27607365, 0.88853014])
 >>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
 7.276073646278203
 
-- Alternatively, you can use `pair_similarity` to return the **score** between
+- Alternatively, you can use `pair_score` to return the **score** between
   pairs of points, the larger the **score**, the more similar the pair
   and vice-versa. For Mahalanobis learners, it is equal to the opposite
   of the distance.
 
->>> score = mmc.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score = mmc.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
 >>> score
 array([-0.49627072, -3.65287282, -6.06079877])
 
-  This is useful because `pair_similarity` matches the **score** semantic of 
+  This is useful because `pair_score` matches the **score** semantic of 
   scikit-learn's `Classification metrics
   <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
 
@@ -356,7 +356,7 @@ returns the `sklearn.metrics.roc_auc_score` (which is threshold-independent).
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
    not specific to learning on pairs, like `transform`, `pair_distance`,
-   `pair_similarity`, `get_metric` and `get_mahalanobis_matrix`.
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 Algorithms
 ----------
@@ -703,7 +703,7 @@ of triplets that have the right predicted ordering.
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
    not specific to learning on pairs, like `transform`, `pair_distance`,
-   `pair_similarity`, `get_metric` and `get_mahalanobis_matrix`.
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 
 
@@ -871,7 +871,7 @@ of quadruplets have the right predicted ordering.
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
    not specific to learning on pairs, like `transform`, `pair_distance`,
-   `pair_similarity`, `get_metric` and `get_mahalanobis_matrix`.
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 
 
