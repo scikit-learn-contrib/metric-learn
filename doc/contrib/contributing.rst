@@ -282,27 +282,11 @@ complies with the following rules before marking a PR as ``[MRG]``. The
    good title.
 
 2. **Make sure your code passes the tests**. The whole test suite can be run
-   with `pytest`, but it is usually not recommended since it takes a long
-   time. It is often enough to only run the test related to your changes:
-   for example, if you changed something in
-   `sklearn/linear_model/logistic.py`, running the following commands will
-   usually be enough:
+   with `pytest`, if all tests pass, you are ready to push your changes,
+   otherwise the CI will detect some tests don't pass later on, you need
+   to avoid this.
 
-   - `pytest sklearn/linear_model/logistic.py` to make sure the doctest
-     examples are correct
-   - `pytest sklearn/linear_model/tests/test_logistic.py` to run the tests
-     specific to the file
-   - `pytest sklearn/linear_model` to test the whole
-     :mod:`~sklearn.linear_model` module
-   - `pytest doc/modules/linear_model.rst` to make sure the user guide
-     examples are correct.
-   - `pytest sklearn/tests/test_common.py -k LogisticRegression` to run all our
-     estimator checks (specifically for `LogisticRegression`, if that's the
-     estimator you changed).
-
-   There may be other failing tests, but they will be caught by the CI so
-   you don't need to run the whole test suite locally. For guidelines on how
-   to use ``pytest`` efficiently, see the :ref:`pytest_tips`.
+   Check the :ref:`testing_guidelines` for more details on testing.
 
 3. **Make sure your code is properly commented and documented**, and **make
    sure the documentation renders properly**. To build the documentation, please
@@ -327,3 +311,61 @@ complies with the following rules before marking a PR as ``[MRG]``. The
     git diff upstream/main -u -- "*.py" | flake8 --diff
 
    or `make flake8-diff` which should work on unix-like system.
+
+.. _testing_guidelines:
+
+Testing guidelines
+^^^^^^^^^^^^^^^^^^
+
+Follow these simple guidelines to test your new feature/module:
+
+1. Place all yout tests in the `test/` directory. All new tests
+   must be under a new file named `test_my_module_name.py`. Discuss
+   in your pull request where these new tests should be put in the
+   package later on.
+2. All test methods inside this file must start with the `test_`
+   prefix, so pytest can detect and execute them.
+3. Use a good naming for your tests that matches what it actually
+   does.
+4. Comment each test you develop, to know in more detail what it
+   is intended to do and check.
+5. Use pytest decorators. The most important one is `@pytest.mark.parametrize`.
+   That way you can test your method with different values without
+   hard-coding them.
+6. If you need to raise a `Warning`, do a test that verifies that
+   the warning is being shown. Same for `Errors`. Some examples might
+   be warnings about a default configuration, a wrong input, etc.
+
+Building the docs
+^^^^^^^^^^^^^^^^^
+
+To build the docs is always recommended to start with a fresh virtual
+environment, to make sure that nothing is interfering with the process.
+
+1. Create a new Python virtual environment named `venv`
+
+  .. code-block:: bash
+
+    python3 -m venv venv
+
+2. Install all dependencies needed to render the docs
+
+  .. code-block:: bash
+
+    pip3 install numpy scipy scikit-learn pytest matplotlib skggm sphinx shinx_rtd_theme sphinx-gallery numpydoc
+
+3. Install your local version of metric_learn into the virtual environment,
+   from the root directory.
+
+  .. code-block:: bash
+
+    pip3 install -e .
+
+5. Go to your doc directory and complies
+
+  .. code-block:: bash
+
+    cd doc
+    make html
+
+6. Open the `index.html` file inside `doc/_build/html`
