@@ -3,7 +3,7 @@ from itertools import product
 import pytest
 import numpy as np
 from numpy.linalg import LinAlgError
-from numpy.testing import assert_array_almost_equal, assert_allclose
+from numpy.testing import assert_array_almost_equal, assert_allclose, assert_array_equal
 from scipy.spatial.distance import pdist, squareform, mahalanobis
 from scipy.stats import ortho_group
 from sklearn import clone
@@ -24,6 +24,24 @@ from test.test_utils import (ids_metric_learners, metric_learners,
 
 RNG = check_random_state(0)
 
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
+  """
+  For Mahalanobis learners, pair_score should be equivalent to the
+  opposite of the pair_distance result.
+  """
+  input_data, labels, _, X = build_dataset()
+  n_samples = 20
+  X = X[:n_samples]
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(*remove_y(estimator, input_data, labels))
+
+  distances = model.pair_distance(np.array(list(product(X, X))))
+  scores_1 = -1 * model.pair_score(np.array(list(product(X, X))))
+  
+  assert_array_equal(distances, scores_1)
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
