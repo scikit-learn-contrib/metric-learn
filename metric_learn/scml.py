@@ -473,13 +473,18 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
 
   Examples
   --------
-  >>> from metric_learn import SCML
-  >>> triplets = np.array([[[1.2, 3.2], [2.3, 5.5], [2.1, 0.6]],
-  >>>                      [[4.5, 2.3], [2.1, 2.3], [7.3, 3.4]]])
-  >>> scml = SCML(random_state=42)
-  >>> scml.fit(triplets)
-  SCML(beta=1e-5, B=None, max_iter=100000, verbose=False,
-      preprocessor=None, random_state=None)
+  >>> from metric_learn import SCML_Supervised
+  >>> from sklearn.datasets import load_iris
+  >>> iris_data = load_iris()
+  >>> X = iris_data['data']
+  >>> Y = iris_data['target']
+  >>> scml = SCML_Supervised(random_state=33)
+  >>> scml.fit(X, Y)
+  SCML_Supervised(random_state=33)
+  >>> scml.score_pairs([[X[0], X[1]], [X[0], X[2]]])
+  array([1.84640733, 1.55984363])
+  >>> scml.get_metric()(X[0], X[1])
+  1.8464073327922157
 
   References
   ----------
