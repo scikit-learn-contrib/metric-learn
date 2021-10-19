@@ -147,17 +147,20 @@ def test_array_like_inputs(estimator, build_dataset, with_preprocessor):
 
   pairs = np.array([[X[0], X[1]], [X[0], X[2]]])
   pairs_variants, _ = generate_array_like(pairs)
-  msg = "" 
-  # Todo in 0.7.0: Change 'msg' for the message that says "This learner does 
-  # not have pair_distance"
-  for pairs_variant in pairs_variants:
-    estimator.pair_score(pairs_variant) # All learners have pair_score
-    # But all of them will have pair_distance
-    with pytest.raises(Exception) as raised_exception:
-      estimator.pair_distance(pairs_variant)
-    if raised_exception is not None:
-      assert msg == raised_exception.value.args[0]
 
+  not_implemented_msg = ""
+  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
+  # "This learner does not have pair_distance"
+
+  for pairs_variant in pairs_variants:
+    estimator.pair_score(pairs_variant)  # All learners have pair_score
+
+    # But not all of them will have pair_distance
+    try:
+      estimator.pair_distance(pairs_variant)
+
+    except Exception as raised_exception:
+      assert raised_exception.value.args[0] == not_implemented_msg
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])

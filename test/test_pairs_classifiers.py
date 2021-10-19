@@ -72,7 +72,7 @@ def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
-  with pytest.raises(NotFittedError): # Remove in 0.8.0
+  with pytest.raises(NotFittedError):  # Remove in 0.8.0
     estimator.score_pairs(input_data)
   with pytest.raises(NotFittedError):
     estimator.pair_score(input_data)

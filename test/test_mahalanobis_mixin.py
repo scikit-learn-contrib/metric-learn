@@ -3,7 +3,8 @@ from itertools import product
 import pytest
 import numpy as np
 from numpy.linalg import LinAlgError
-from numpy.testing import assert_array_almost_equal, assert_allclose, assert_array_equal
+from numpy.testing import assert_array_almost_equal, assert_allclose, \
+                          assert_array_equal
 from scipy.spatial.distance import pdist, squareform, mahalanobis
 from scipy.stats import ortho_group
 from sklearn import clone
@@ -24,6 +25,7 @@ from test.test_utils import (ids_metric_learners, metric_learners,
 
 RNG = check_random_state(0)
 
+
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
@@ -40,8 +42,9 @@ def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
 
   distances = model.pair_distance(np.array(list(product(X, X))))
   scores_1 = -1 * model.pair_score(np.array(list(product(X, X))))
-  
+
   assert_array_equal(distances, scores_1)
+
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
