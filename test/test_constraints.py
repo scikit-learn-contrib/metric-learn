@@ -1,4 +1,3 @@
-import warnings
 import pytest
 import numpy as np
 from sklearn.utils import shuffle
@@ -104,7 +103,7 @@ def test_generate_knntriplets_under_edge(k_genuine, k_impostor, T_test):
 
 
 @pytest.mark.parametrize("k_genuine, k_impostor,",
-                         [(3, 3), (2, 4), (3, 4), (10, 9), (144,33)])
+                         [(3, 3), (2, 4), (3, 4), (10, 9), (144, 33)])
 def test_generate_knntriplets(k_genuine, k_impostor):
   """Checks edge and over the edge cases of knn triplet construction with not
      enough neighbors"""
@@ -120,11 +119,11 @@ def test_generate_knntriplets(k_genuine, k_impostor):
   y = np.array([1, 1, 1, 2, 2, 2, -1])
 
   msg1 = ("The class 1 has 3 elements, which is not sufficient to "
-        f"generate {k_genuine+1} genuine neighbors "
-        "as specified by k_genuine" )
+          f"generate {k_genuine+1} genuine neighbors "
+          "as specified by k_genuine")
   msg2 = ("The class 2 has 3 elements, which is not sufficient to "
           f"generate {k_genuine+1} genuine neighbors "
-          "as specified by k_genuine" )
+          "as specified by k_genuine")
   msg3 = ("The class 1 has 3 elements of other classes, which is "
           f"not sufficient to generate {k_impostor} impostor "
           "neighbors as specified by k_impostor")
