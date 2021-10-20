@@ -224,7 +224,7 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
     n_splits = 3
     kfold = KFold(shuffle=False, n_splits=n_splits)
     n_samples = input_data.shape[0]
-    fold_sizes = (n_samples // n_splits) * np.ones(n_splits, dtype=np.int)
+    fold_sizes = (n_samples // n_splits) * np.ones(n_splits, dtype=np.int64)
     fold_sizes[:n_samples % n_splits] += 1
     current = 0
     scores, predictions = [], np.zeros(input_data.shape[0])

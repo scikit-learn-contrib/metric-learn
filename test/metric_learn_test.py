@@ -1143,9 +1143,10 @@ def test_convergence_warning(dataset, algo_class):
     X, y = dataset
     model = algo_class(max_iter=2, verbose=True)
     cls_name = model.__class__.__name__
-    assert_warns_message(ConvergenceWarning,
-                         '[{}] {} did not converge'.format(cls_name, cls_name),
-                         model.fit, X, y)
+    msg = '[{}] {} did not converge'.format(cls_name, cls_name)
+    with pytest.warns(Warning) as raised_warning:
+      model.fit(X, y)
+    assert msg in str(raised_warning[0].message)
 
 
 if __name__ == '__main__':
