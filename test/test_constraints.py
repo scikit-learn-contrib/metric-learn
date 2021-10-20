@@ -133,8 +133,8 @@ def test_generate_knntriplets(k_genuine, k_impostor):
   msgs = [msg1, msg2, msg3, msg4]
   with pytest.warns(UserWarning) as user_warning:
     T = Constraints(y).generate_knntriplets(X, k_genuine, k_impostor)
-  for warn in user_warning:
-    assert np.any([msg in str(warn.message) for msg in msgs])
+  assert np.any(np.any([[msg in str(warn.message) for msg in msgs]
+         for warn in user_warning]))
   assert np.array_equal(sorted(T.tolist()), T_test)
 
 
