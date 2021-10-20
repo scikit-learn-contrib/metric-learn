@@ -54,10 +54,10 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
     See Also
     --------
     get_metric : a method that returns a function to compute the metric between
-      two points. The difference between `pair_score` and `pair_distance` is
-      that it works on two 1D arrays and cannot use a preprocessor. Besides,
-      the returned function is independent of the metric learner and hence is
-      not modified if the metric learner is.
+      two points. The difference between `score_pairs` is that it works on two
+      1D arrays and cannot use a preprocessor. Besides, the returned function
+      is independent of the metric learner and hence is not modified if the
+      metric learner is.
     """
 
   @abstractmethod
@@ -65,11 +65,10 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
     """
     .. versionadded:: 0.7.0 Compute the similarity score between pairs
 
-    Returns the similarity score between pairs of points. Depending on the
-    algorithm, this method can return the learned similarity score between
-    pairs, or the opposite of the distance learned between pairs. The larger
-    the score, the more similar the pair. All learners have access to this
-    method.
+    Returns the similarity score between pairs of points (the larger the score,
+    the more similar the pair). For metric learners that learn a distance,
+    the score is simply the opposite of the distance between pairs. All learners
+    have access to this method.
 
     Parameters
     ----------
@@ -104,14 +103,14 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
     Parameters
     ----------
     pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
-      3D Array of pairs to score, with each row corresponding to two points,
-      for 2D array of indices of pairs if the metric learner uses a
-      preprocessor.
+      3D Array of pairs for which to compute the distance, with each
+      row corresponding to two points, for 2D array of indices of pairs
+      if the metric learner uses a preprocessor.
 
     Returns
     -------
     scores : `numpy.ndarray` of shape=(n_pairs,)
-      The score of every pair.
+      The distance between every pair.
 
     See Also
     --------
@@ -177,8 +176,8 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   def get_metric(self):
     """Returns a function that takes as input two 1D arrays and outputs
     the value of the learned metric on these two points. Depending on the
-    algorithm, it can return a distance or a score function between pairs.
-    It always returns what the specific algorithm learns.
+    algorithm, it can return a distance or a similarity function between
+    pairs.
 
     This function will be independent from the metric learner that learned it
     (it will not be modified if the initial metric learner is modified),

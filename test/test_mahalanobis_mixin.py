@@ -41,9 +41,9 @@ def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
   model.fit(*remove_y(estimator, input_data, labels))
 
   distances = model.pair_distance(np.array(list(product(X, X))))
-  scores_1 = -1 * model.pair_score(np.array(list(product(X, X))))
+  scores = model.pair_score(np.array(list(product(X, X))))
 
-  assert_array_equal(distances, scores_1)
+  assert_array_equal(distances, -1 * scores)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,

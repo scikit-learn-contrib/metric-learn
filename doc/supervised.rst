@@ -83,9 +83,8 @@ array([0.49627072, 3.65287282, 6.06079877])
 0.4962707194621285
 
 - Alternatively, you can use `pair_score` to return the **score** between
-  pairs of points, the larger the **score**, the more similar the pair
-  and vice-versa. For Mahalanobis learners, it is equal to the opposite
-  of the distance.
+  pairs of points (the larger the score, the more similar the pair).
+  For Mahalanobis learners, it is equal to the opposite of the distance.
 
 >>> score = nca.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
 >>> score
