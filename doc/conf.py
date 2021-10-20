@@ -39,7 +39,7 @@ html_static_path = ['_static']
 htmlhelp_basename = 'metric-learndoc'
 
 # Option to only need single backticks to refer to symbols
-default_role = 'any'
+# default_role = 'any'
 
 # Option to hide doctests comments in the documentation (like # doctest:
 # +NORMALIZE_WHITESPACE for instance)
@@ -69,7 +69,7 @@ autosummary_generate = True
 
 # Switch to old behavior with html4, for a good display of references,
 # as described in https://github.com/sphinx-doc/sphinx/issues/6705
-html4_writer = True
+# html4_writer = True
 
 
 # Temporary work-around for spacing problem between parameter and parameter
@@ -79,8 +79,8 @@ html4_writer = True
 # In an ideal world, this would get fixed in this PR:
 # https://github.com/readthedocs/sphinx_rtd_theme/pull/747/files
 def setup(app):
-    app.add_javascript('js/copybutton.js')
-    app.add_stylesheet("basic.css")
+#    app.add_javascript('js/copybutton.js')
+    app.add_css_file("css/custom.css")
 
 
 # Remove matplotlib agg warnings from generated doc when using plt.show
