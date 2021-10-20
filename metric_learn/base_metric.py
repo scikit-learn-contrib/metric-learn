@@ -67,8 +67,8 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
 
     Returns the similarity score between pairs of points (the larger the score,
     the more similar the pair). For metric learners that learn a distance,
-    the score is simply the opposite of the distance between pairs. All learners
-    have access to this method.
+    the score is simply the opposite of the distance between pairs. All
+    learners have access to this method.
 
     Parameters
     ----------
