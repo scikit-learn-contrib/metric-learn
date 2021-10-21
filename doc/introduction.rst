@@ -155,26 +155,3 @@ to the following resources:
   Survey <http://dx.doi.org/10.1561/2200000019>`_ (2012)
 - **Book:** `Metric Learning
   <http://dx.doi.org/10.2200/S00626ED1V01Y201501AIM030>`_ (2015)
-
-.. Methods [TO MOVE TO SUPERVISED/WEAK SECTIONS]
-.. =============================================
-
-.. Currently, each metric learning algorithm supports the following methods:
-
-.. -  ``fit(...)``, which learns the model.
-.. -  ``get_mahalanobis_matrix()``, which returns a Mahalanobis matrix
-.. -  ``get_metric()``, which returns a function that takes as input two 1D
-      arrays and outputs the learned metric score on these two points
-..    :math:`M = L^{\top}L` such that distance between vectors ``x`` and
-..    ``y`` can be computed as :math:`\sqrt{\left(x-y\right)M\left(x-y\right)}`.
-.. -  ``components_from_metric(metric)``, which returns a transformation matrix
-..    :math:`L \in \mathbb{R}^{D \times d}`, which can be used to convert a
-..    data matrix :math:`X \in \mathbb{R}^{n \times d}` to the
-..    :math:`D`-dimensional learned metric space :math:`X L^{\top}`,
-..    in which standard Euclidean distances may be used.
-.. -  ``transform(X)``, which applies the aforementioned transformation.
-.. - ``pair_distance(pairs)`` which returns the distance between pairs of
-..   points. ``pairs`` should be a 3D array-like of pairs of shape ``(n_pairs,
-..   2, n_features)``, or it can be a 2D array-like of pairs indicators of
-..   shape ``(n_pairs, 2)`` (see section :ref:`preprocessor_section` for more
-..   details).

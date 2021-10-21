@@ -3,7 +3,8 @@ from itertools import product
 import pytest
 import numpy as np
 from numpy.linalg import LinAlgError
-from numpy.testing import assert_array_almost_equal, assert_allclose
+from numpy.testing import assert_array_almost_equal, assert_allclose, \
+                          assert_array_equal
 from scipy.spatial.distance import pdist, squareform, mahalanobis
 from scipy.stats import ortho_group
 from sklearn import clone
@@ -23,6 +24,26 @@ from test.test_utils import (ids_metric_learners, metric_learners,
                              remove_y, ids_classifiers)
 
 RNG = check_random_state(0)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
+  """
+  For Mahalanobis learners, pair_score should be equivalent to the
+  opposite of the pair_distance result.
+  """
+  input_data, labels, _, X = build_dataset()
+  n_samples = 20
+  X = X[:n_samples]
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(*remove_y(estimator, input_data, labels))
+
+  distances = model.pair_distance(np.array(list(product(X, X))))
+  scores = model.pair_score(np.array(list(product(X, X))))
+
+  assert_array_equal(distances, -1 * scores)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
@@ -625,7 +646,7 @@ def test_singular_covariance_init_of_non_strict_pd(estimator, build_dataset):
            'preprocessing step.')
     with pytest.warns(UserWarning) as raised_warning:
       model.fit(input_data, labels)
-    assert np.any([str(warning.message) == msg for warning in raised_warning])
+    assert any([str(warning.message) == msg for warning in raised_warning])
     M, _ = _initialize_metric_mahalanobis(X, init='covariance',
                                           random_state=RNG,
                                           return_inverse=True,
