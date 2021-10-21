@@ -200,10 +200,10 @@ array([-0.49627072, -3.65287282, -6.06079877])
   <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
 
 For similarity learners `pair_distance` is not available, as they don't learn
-a distance. Intead you use `pair_similarity` that has the same behaviour but
+a distance. Intead you use `pair_score` that has the same behaviour but
 for similarity.
 
->>> algorithm.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> algorithm.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
 array([-0.2312, 705.23, -72.8])
 
 .. warning::
@@ -218,7 +218,7 @@ a function that will return the similarity bewtween 1D arrays.
 >>> similarity_fun([3.5, 3.6], [5.6, 2.4])
 -0.04752
 
-For similarity learners and mahalanobis learners, `pair_similarity` is
+For similarity learners and mahalanobis learners, `pair_score` is
 available. You can interpret that this function returns the **score**
 between points: the more the **score**, the closer the pairs and vice-versa.
 For mahalanobis learners, it is equal to the inverse of the distance.

@@ -29,11 +29,11 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   @abstractmethod
   def score_pairs(self, pairs):
     """
-    .. deprecated:: 0.7.0 Refer to `pair_distance` and `pair_similarity`.
+    .. deprecated:: 0.7.0 Refer to `pair_distance` and `pair_score`.
 
     .. warning::
         This method will be removed in 0.8.0. Please refer to `pair_distance`
-        or `pair_similarity`. This change will occur in order to add learners
+        or `pair_score`. This change will occur in order to add learners
         that don't necessarily learn a Mahalanobis distance.
 
     Returns the score between pairs
@@ -260,10 +260,10 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
 
   def score_pairs(self, pairs):
     dpr_msg = ("score_pairs will be deprecated in release 0.6.4. "
-               "Use pair_similarity to compute similarities, or "
+               "Use pair_score to compute similarities, or "
                "pair_distances to compute distances.")
     warnings.warn(dpr_msg, category=FutureWarning)
-    return self.pair_similarity(pairs)
+    return self.pair_score(pairs)
 
   def pair_distance(self, pairs):
     """
@@ -272,11 +272,11 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     of the bilinear similarity cannot be used as distance by construction.
     """
     msg = ("Bilinear similarity learners don't learn a distance, thus ",
-           "this method is not implemented. Use pair_similarity to "
+           "this method is not implemented. Use pair_score to "
            "compute similarity between pairs")
     raise Exception(msg)
 
-  def pair_similarity(self, pairs):
+  def pair_score(self, pairs):
     r"""Returns the learned Bilinear similarity between pairs.
 
     This similarity is defined as: :math:`s_M(x, x') =  x^T M x'`
@@ -298,7 +298,7 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     See Also
     --------
     get_metric : a method that returns a function to compute the similarity
-      between two points. The difference with `pair_similarity` is that it
+      between two points. The difference with `pair_score` is that it
       works on two 1D arrays and cannot use a preprocessor. Besides, the
       returned function is independent of the similarity learner and hence
       is not modified if the similarity learner is.
