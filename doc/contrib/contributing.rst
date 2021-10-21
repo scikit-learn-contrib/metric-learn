@@ -12,8 +12,7 @@ is laid out in the governance document: :ref:`governance`.
 
 Metric-learn is somewhat selective when it comes to adding new
 algorithms, and the best way to contribute and to help the project
-is to start working on known issues. See Issues for New Contributors
-to get started.
+is to start working on known issues.
 
 In case you experience issues using this package, do not hesitate to
 submit a ticket to the `GitHub issue tracker
@@ -132,6 +131,8 @@ to provide you with good feedback:
   in appropriate code blocks. See `Creating and highlighting code
   blocks <https://docs.github.com/en/github/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks>`_
   for more details.
+
+.. _contrib-code::
 
 Contributing code
 =================
@@ -306,11 +307,18 @@ complies with the following rules before marking a PR as ``[MRG]``. The
    code that you changed, you can run the following command (see
    :ref:`above <upstream>` to set up the ``upstream`` remote):
 
-  .. code-block:: bash
+   .. code-block:: bash
 
     git diff upstream/main -u -- "*.py" | flake8 --diff
 
    or `make flake8-diff` which should work on unix-like system.
+
+   You can also run the following code while you develop, to check your that
+   the coding style is correct:
+
+   .. code-block:: bash
+
+    flake8 --extend-ignore=E111,E114 --show-source --exclude=venv
 
 .. _testing_guidelines:
 

@@ -1,9 +1,9 @@
 .. title:: Contributing: contents
 
-.. _contributing:
+.. _dev-contrib:
 
 ============
-Contributing
+Developer contributions
 ============
 
 .. toctree::
@@ -15,6 +15,16 @@ Contributing
   :maxdepth: 2
   
   governance
+
+.. toctree::
+  :maxdepth: 2
+
+  algorithm
+
+.. toctree::
+  :maxdepth: 2
+
+  api
 
 .. toctree::
   :maxdepth: 2
