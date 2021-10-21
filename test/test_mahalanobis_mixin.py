@@ -625,7 +625,7 @@ def test_singular_covariance_init_of_non_strict_pd(estimator, build_dataset):
            'preprocessing step.')
     with pytest.warns(UserWarning) as raised_warning:
       model.fit(input_data, labels)
-    assert np.any([str(warning.message) == msg for warning in raised_warning])
+    assert any([str(warning.message) == msg for warning in raised_warning])
     M, _ = _initialize_metric_mahalanobis(X, init='covariance',
                                           random_state=RNG,
                                           return_inverse=True,
