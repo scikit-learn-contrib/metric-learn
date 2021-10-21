@@ -295,7 +295,7 @@ def test_score_pairs_warning(estimator, build_dataset):
     score = model.score_pairs([[X[0], X[1]], ])
     dist = model.pair_distance([[X[0], X[1]], ])
     assert array_equal(score, dist)
-  assert np.any([str(warning.message) == msg for warning in raised_warning])
+  assert any([str(warning.message) == msg for warning in raised_warning])
 
 
 if __name__ == '__main__':

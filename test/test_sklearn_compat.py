@@ -158,7 +158,6 @@ def test_array_like_inputs(estimator, build_dataset, with_preprocessor):
     # But not all of them will have pair_distance
     try:
       estimator.pair_distance(pairs_variant)
-
     except Exception as raised_exception:
       assert raised_exception.value.args[0] == not_implemented_msg
 
