@@ -112,7 +112,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
     # Fisher Linear Discriminant projection
     if dim < X.shape[1]:
       total_cov = np.cov(X[chunk_mask], rowvar=0)
-      tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
+      tmp = np.linalg.lstsq(total_cov, inner_cov, rcond=None)[0]
       vals, vecs = np.linalg.eig(tmp)
       inds = np.argsort(vals)[:dim]
       A = vecs[:, inds]

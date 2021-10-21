@@ -704,7 +704,7 @@ def _initialize_metric_mahalanobis(input, init='identity', random_state=None,
   elif init == 'covariance':
     if input.ndim == 3:
       # if the input are tuples, we need to form an X by deduplication
-      X = np.vstack({tuple(row) for row in input.reshape(-1, n_features)})
+      X = np.unique(np.vstack(input), axis=0)
     else:
       X = input
     # atleast2d is necessary to deal with scalar covariance matrices

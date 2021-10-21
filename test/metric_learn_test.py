@@ -9,7 +9,6 @@ from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
                            assert_allclose)
-from metric_learn.sklearn_shims import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
@@ -1143,9 +1142,10 @@ def test_convergence_warning(dataset, algo_class):
     X, y = dataset
     model = algo_class(max_iter=2, verbose=True)
     cls_name = model.__class__.__name__
-    assert_warns_message(ConvergenceWarning,
-                         '[{}] {} did not converge'.format(cls_name, cls_name),
-                         model.fit, X, y)
+    msg = '[{}] {} did not converge'.format(cls_name, cls_name)
+    with pytest.warns(Warning) as raised_warning:
+      model.fit(X, y)
+    assert any([msg in str(warn.message) for warn in raised_warning])
 
 
 if __name__ == '__main__':
