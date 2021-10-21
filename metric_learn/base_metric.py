@@ -29,11 +29,11 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   @abstractmethod
   def score_pairs(self, pairs):
     """
-    .. deprecated:: 0.7.0 Refer to `pair_distance` and `pair_similarity`.
+    .. deprecated:: 0.7.0 Refer to `pair_distance` and `pair_score`.
 
     .. warning::
         This method will be removed in 0.8.0. Please refer to `pair_distance`
-        or `pair_similarity`. This change will occur in order to add learners
+        or `pair_score`. This change will occur in order to add learners
         that don't necessarily learn a Mahalanobis distance.
 
     Returns the score between pairs
