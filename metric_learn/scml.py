@@ -615,10 +615,10 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     k_class = np.vstack((np.minimum(class_count, scales[0]),
                          np.minimum(class_count, scales[1])))
 
-    idx_set = [np.zeros((n_clusters, sum(k_class[0, :])), dtype=np.int),
-               np.zeros((n_clusters, sum(k_class[1, :])), dtype=np.int)]
+    idx_set = [np.zeros((n_clusters, sum(k_class[0, :])), dtype=np.int64),
+               np.zeros((n_clusters, sum(k_class[1, :])), dtype=np.int64)]
 
-    start_finish_indices = np.hstack((np.zeros((2, 1), np.int),
+    start_finish_indices = np.hstack((np.zeros((2, 1), np.int64),
                                      k_class)).cumsum(axis=1)
 
     neigh = NearestNeighbors()
