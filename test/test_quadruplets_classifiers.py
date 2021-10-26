@@ -1,3 +1,7 @@
+"""
+Tests all functionality for QuadrupletsClassifiers. Methods, warrnings,
+correctness, use cases, etc.
+"""
 import pytest
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split

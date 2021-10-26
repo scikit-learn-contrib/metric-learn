@@ -1,3 +1,7 @@
+"""
+Tests all functionality for Bilinear learners. Correctness, use cases,
+warnings, etc.
+"""
 from itertools import product
 from metric_learn.base_metric import BilinearMixin
 import numpy as np
@@ -10,11 +14,9 @@ from sklearn.utils import check_random_state
 
 RNG = check_random_state(0)
 
-
-class IdentityBilinearMixin(BilinearMixin):
-  """A simple Identity bilinear mixin that returns an identity matrix
-  M as learned. Can change M for a random matrix specifying random=True
-  at fit(). Class for testing purposes.
+class RadomBilinearMixin(BilinearMixin):
+  """A simple Random bilinear mixin that returns an random matrix
+  M as learned. Class for testing purposes.
   """
   def __init__(self, preprocessor=None):
     super().__init__(preprocessor=preprocessor)
@@ -27,10 +29,26 @@ class IdentityBilinearMixin(BilinearMixin):
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     self.d = np.shape(X[0])[-1]
-    if random:
-      self.components_ = np.random.rand(self.d, self.d)
-    else:
-      self.components_ = np.identity(self.d)
+    self.components_ = np.random.rand(self.d, self.d)
+    return self
+
+
+class IdentityBilinearMixin(BilinearMixin):
+  """A simple Identity bilinear mixin that returns an identity matrix
+  M as learned. Class for testing purposes.
+  """
+  def __init__(self, preprocessor=None):
+    super().__init__(preprocessor=preprocessor)
+
+  def fit(self, X, y, random=False):
+    """
+    Checks input's format. If random=False, sets M matrix to
+    identity of shape (d,d) where d is the dimension of the input.
+    Otherwise, a random (d,d) matrix is set.
+    """
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
+    self.d = np.shape(X[0])[-1]
+    self.components_ = np.identity(self.d)
     return self
 
 
@@ -44,7 +62,7 @@ def identity_fit(d=100, n=100, n_pairs=None, random=False):
   """
   X = np.array([np.random.rand(d) for _ in range(n)])
   mixin = IdentityBilinearMixin()
-  mixin.fit(X, [0 for _ in range(n)], random=random)
+  mixin.fit(X, [0 for _ in range(n)])
   if n_pairs is not None:
     random_pairs = [[X[RNG.randint(0, n)], X[RNG.randint(0, n)]]
                     for _ in range(n_pairs)]
@@ -203,9 +221,8 @@ def test_check_error_with_pair_distance(d, n, n_pairs):
   An Exception must be shown instead.
   """
   _, random_pairs, mixin = identity_fit(d=d, n=n, n_pairs=n_pairs, random=True)
-  msg = ("Bilinear similarity learners don't learn a distance, thus ",
-         "this method is not implemented. Use pair_score to "
-         "compute similarity between pairs")
+  msg = ("This learner doesn't learn a distance, thus ",
+         "this method is not implemented. Use pair_score instead")
   with pytest.raises(Exception) as e:
     _ = mixin.pair_distance(random_pairs)
   assert e.value.args[0] == msg

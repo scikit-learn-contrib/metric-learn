@@ -1,3 +1,7 @@
+"""
+Tests all functionality for Mahalanobis Learners. Correctness, use cases,
+warnings, distance properties, transform, dimentions, init, etc.
+"""
 from itertools import product
 
 import pytest
@@ -51,7 +55,8 @@ def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_pair_distance_pairwise(estimator, build_dataset):
-  # Computing pairwise scores should return a euclidean distance matrix.
+  """Computing pairwise scores should return a euclidean distance
+  matrix."""
   input_data, labels, _, X = build_dataset()
   n_samples = 20
   X = X[:n_samples]
@@ -75,7 +80,7 @@ def test_pair_distance_pairwise(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_pair_distance_toy_example(estimator, build_dataset):
-    # Checks that pair_distance works on a toy example
+    """Checks that `pair_distance` works on a toy example."""
     input_data, labels, _, X = build_dataset()
     n_samples = 20
     X = X[:n_samples]
@@ -93,7 +98,7 @@ def test_pair_distance_toy_example(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_pair_distance_finite(estimator, build_dataset):
-  # tests that the score is finite
+  """Tests that the distance from `pair_distance` is finite"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -105,9 +110,10 @@ def test_pair_distance_finite(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_pair_distance_dim(estimator, build_dataset):
-  # scoring of 3D arrays should return 1D array (several tuples),
-  # and scoring of 2D arrays (one tuple) should return an error (like
-  # scikit-learn's error when scoring 1D arrays)
+  """Calling `pair_distance` with 3D arrays should return 1D array
+  (several tuples), and calling `pair_distance` with 2D arrays
+  (one tuple) should return an error (like scikit-learn's error when
+  scoring 1D arrays)"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -124,6 +130,8 @@ def test_pair_distance_dim(estimator, build_dataset):
 
 
 def check_is_distance_matrix(pairwise):
+  """Returns True if the matrix is positive, symmetrc, the diagonal is zero,
+  and if it fullfills the triangular inequality for all pairs"""
   assert (pairwise >= 0).all()  # positivity
   assert np.array_equal(pairwise, pairwise.T)  # symmetry
   assert (pairwise.diagonal() == 0).all()  # identity
@@ -136,7 +144,8 @@ def check_is_distance_matrix(pairwise):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_embed_toy_example(estimator, build_dataset):
-    # Checks that embed works on a toy example
+    """Checks that embed works on a toy example. That using `transform`
+    is equivalent to manually multiplying Lx"""
     input_data, labels, _, X = build_dataset()
     n_samples = 20
     X = X[:n_samples]
@@ -150,7 +159,7 @@ def test_embed_toy_example(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_embed_dim(estimator, build_dataset):
-  # Checks that the the dimension of the output space is as expected
+  """Checks that the the dimension of the output space is as expected"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -179,7 +188,7 @@ def test_embed_dim(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_embed_finite(estimator, build_dataset):
-  # Checks that embed returns vectors with finite values
+  """Checks that embed (transform) returns vectors with finite values"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -190,7 +199,8 @@ def test_embed_finite(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_embed_is_linear(estimator, build_dataset):
-  # Checks that the embedding is linear
+  """Checks that the embedding is linear, i.e. linear properties of
+  using `tranform`"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -247,19 +257,6 @@ def test_get_metric_is_pseudo_metric(estimator, build_dataset):
     # triangular inequality
     assert (metric(a, c) < metric(a, b) + metric(b, c) or
             np.isclose(metric(a, c), metric(a, b) + metric(b, c), rtol=1e-20))
-
-
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
-def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
-  """Check that the metric returned by get_metric is compatible with
-  scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
-  input_data, labels, _, X = build_dataset()
-  model = clone(estimator)
-  set_random_state(model)
-  model.fit(*remove_y(estimator, input_data, labels))
-  clustering = DBSCAN(metric=model.get_metric())
-  clustering.fit(X)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,

@@ -148,18 +148,16 @@ def test_array_like_inputs(estimator, build_dataset, with_preprocessor):
   pairs = np.array([[X[0], X[1]], [X[0], X[2]]])
   pairs_variants, _ = generate_array_like(pairs)
 
-  not_implemented_msg = ""
-  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
-  # "This learner does not have pair_distance"
+  msg = ("This learner doesn't learn a distance, thus ",
+         "this method is not implemented. Use pair_score instead")
 
+  # Test pair_score and pair_distance when available
   for pairs_variant in pairs_variants:
-    estimator.pair_score(pairs_variant)  # All learners have pair_score
-
-    # But not all of them will have pair_distance
+    estimator.pair_score(pairs_variant)
     try:
       estimator.pair_distance(pairs_variant)
     except Exception as raised_exception:
-      assert raised_exception.value.args[0] == not_implemented_msg
+      assert raised_exception.value.args[0] == msg
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -456,6 +454,19 @@ def test_dont_overwrite_parameters(estimator, build_dataset,
       " to change attributes started"
       " or ended with _, but"
       " %s changed" % ', '.join(attrs_changed_by_fit))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
+  """Check that the metric returned by get_metric is compatible with
+  scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(*remove_y(estimator, input_data, labels))
+  clustering = DBSCAN(metric=model.get_metric())
+  clustering.fit(X)
 
 
 if __name__ == '__main__':

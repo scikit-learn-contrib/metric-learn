@@ -1,3 +1,7 @@
+"""
+Test Contrains generation for positive_negative_pairs and knn_triplets.
+Also tests warnings.
+"""
 import pytest
 import numpy as np
 from sklearn.utils import shuffle

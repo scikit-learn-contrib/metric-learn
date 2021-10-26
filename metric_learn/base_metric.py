@@ -271,9 +271,8 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     pseudo-distance nor a distance. In consecuence, the additive inverse
     of the bilinear similarity cannot be used as distance by construction.
     """
-    msg = ("Bilinear similarity learners don't learn a distance, thus ",
-           "this method is not implemented. Use pair_score to "
-           "compute similarity between pairs")
+    msg = ("This learner doesn't learn a distance, thus ",
+           "this method is not implemented. Use pair_score instead")
     raise Exception(msg)
 
   def pair_score(self, pairs):

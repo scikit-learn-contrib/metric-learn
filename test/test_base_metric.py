@@ -1,3 +1,7 @@
+"""
+Tests general things from the API: String parsing, methods like get_metric,
+and deprecation warnings.
+"""
 from numpy.core.numeric import array_equal
 import pytest
 import re

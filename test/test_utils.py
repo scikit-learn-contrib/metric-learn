@@ -1,3 +1,8 @@
+"""
+Tests preprocesor, warnings, errors. Also made util functions to build datasets
+in a general way for each learner. Here is also the list of learners of each kind
+that are used as a parameters in tests in other files. Util functions.
+"""
 import pytest
 from scipy.linalg import eigh, pinvh
 from collections import namedtuple
@@ -28,6 +33,8 @@ from sklearn.datasets import make_regression, make_blobs, load_iris
 SEED = 42
 RNG = check_random_state(SEED)
 
+# ------------------ Building dummy data for learners ------------------
+
 Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 # Data and target are what we will fit on. Preprocessor is the additional
 # data if we use a preprocessor (which should be the default ArrayIndexer),
@@ -35,7 +42,16 @@ Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 
 
 def build_classification(with_preprocessor=False):
-  """Basic array for testing when using a preprocessor"""
+  """
+  Basic array 'X, y' for testing when using a preprocessor, for instance,
+  fir clustering.
+
+  If no preprocesor: 'data' are raw points, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+  
+  If preprocessor: 'data' are point indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   X, y = shuffle(*make_blobs(random_state=SEED),
                  random_state=SEED)
   indices = shuffle(np.arange(X.shape[0]), random_state=SEED).astype(int)
@@ -46,7 +62,15 @@ def build_classification(with_preprocessor=False):
 
 
 def build_regression(with_preprocessor=False):
-  """Basic array for testing when using a preprocessor"""
+  """
+  Basic array 'X, y' for testing when using a preprocessor, for regression.
+  
+  If no preprocesor: 'data' are raw points, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+  
+  If preprocessor: 'data' are point indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   X, y = shuffle(*make_regression(n_samples=100, n_features=5,
                                   random_state=SEED),
                  random_state=SEED)
@@ -58,6 +82,8 @@ def build_regression(with_preprocessor=False):
 
 
 def build_data():
+  """Aux function: Returns 'X, pairs' taken from the iris dataset, where
+  pairs are positive and negative pairs for PairClassifiers."""
   input_data, labels = load_iris(return_X_y=True)
   X, y = shuffle(input_data, labels, random_state=SEED)
   num_constraints = 50
@@ -70,7 +96,17 @@ def build_data():
 
 
 def build_pairs(with_preprocessor=False):
-  # builds a toy pairs problem
+  """
+  For all pair learners.
+
+  Returns: data, target, preprocessor, to_transform.
+  
+  If no preprocesor: 'data' are raw pairs, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+  
+  If preprocessor: 'data' are pair indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   X, indices = build_data()
   c = np.vstack([np.column_stack(indices[:2]), np.column_stack(indices[2:])])
   target = np.concatenate([np.ones(indices[0].shape[0]),
@@ -85,6 +121,17 @@ def build_pairs(with_preprocessor=False):
 
 
 def build_triplets(with_preprocessor=False):
+  """
+  For all triplet learners.
+  
+  Returns: data, target, preprocessor, to_transform.
+  
+  If no preprocesor: 'data' are raw triplets, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+  
+  If preprocessor: 'data' are triplets indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   input_data, labels = load_iris(return_X_y=True)
   X, y = shuffle(input_data, labels, random_state=SEED)
   constraints = Constraints(y)
@@ -98,7 +145,17 @@ def build_triplets(with_preprocessor=False):
 
 
 def build_quadruplets(with_preprocessor=False):
-  # builds a toy quadruplets problem
+  """
+  For all Quadruplets learners.
+  
+  Returns: data, target, preprocessor, to_transform.
+  
+  If no preprocesor: 'data' are raw quadruplets, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+  
+  If preprocessor: 'data' are quadruplets indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   X, indices = build_data()
   c = np.column_stack(indices)
   target = np.ones(c.shape[0])  # quadruplets targets are not used
@@ -111,6 +168,7 @@ def build_quadruplets(with_preprocessor=False):
     # if not, we build a 3D array of quadruplets of samples
     return Dataset(X[c], target, None, X[c[:, 0]])
 
+# ------------- List of learners, separating them by kind -------------
 
 quadruplets_learners = [(LSML(), build_quadruplets)]
 ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
@@ -166,6 +224,7 @@ ids_metric_learners = ids_tuples_learners + ids_supervised_learners
 metric_learners_pipeline = pairs_learners + supervised_learners
 ids_metric_learners_pipeline = ids_pairs_learners + ids_supervised_learners
 
+# ------------- Useful methods -------------
 
 def remove_y(estimator, X, y):
   """Quadruplets and triplets learners have no y in fit, but to write test for
@@ -850,15 +909,14 @@ def test_error_message_t_pair_distance_or_score(estimator, _):
                   .format(make_context(estimator), triplets))
   assert str(raised_err.value) == expected_msg
 
-  not_implemented_msg = ""
-  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
-  # "This learner does not have pair_distance"
+  msg = ("This learner doesn't learn a distance, thus ",
+         "this method is not implemented. Use pair_score instead")
 
   # One exception will trigger for sure
   with pytest.raises(Exception) as raised_exception:
       estimator.pair_distance(triplets)
   err_value = raised_exception.value.args[0]
-  assert err_value == expected_msg or err_value == not_implemented_msg
+  assert err_value == expected_msg or err_value == msg
 
 
 def test_preprocess_tuples_simple_example():
@@ -926,7 +984,7 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   estimator_with_prep_formed.set_params(preprocessor=X)
   estimator_with_prep_formed.fit(*remove_y(estimator, indices_train, y_train))
 
-  # test prediction methods
+  # Test prediction methods
   for method in ["predict", "decision_function"]:
     if hasattr(estimator, method):
       output_with_prep = getattr(estimator_with_preprocessor,
@@ -940,8 +998,9 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
                                         method)(formed_test)
       assert np.array(output_with_prep == output_with_prep_formed).all()
 
+  idx1 = np.array([[0, 2], [5, 3]], dtype=int)  # Sample
+  
   # Test pair_score, all learners have it.
-  idx1 = np.array([[0, 2], [5, 3]], dtype=int)
   output_with_prep = estimator_with_preprocessor.pair_score(
       indicators_to_transform[idx1])
   output_without_prep = estimator_without_preprocessor.pair_score(
@@ -974,11 +1033,26 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   except Exception as raised_exception:
     assert raised_exception.value.args[0] == not_implemented_msg
 
+  # TODO: Delete in 0.8.0
+  msg = ("score_pairs will be deprecated in release 0.7.0. "
+         "Use pair_score to compute similarity scores, or "
+         "pair_distances to compute distances.")
+  with pytest.warns(FutureWarning) as raised_warning:
+    output_with_prep = estimator_with_preprocessor.score_pairs(
+        indicators_to_transform[idx1])
+    output_without_prep = estimator_without_preprocessor.score_pairs(
+        formed_points_to_transform[idx1])
+    assert np.array(output_with_prep == output_without_prep).all()
+
+    output_with_prep = estimator_with_preprocessor.score_pairs(
+        indicators_to_transform[idx1])
+    output_without_prep = estimator_with_prep_formed.score_pairs(
+        formed_points_to_transform[idx1])
+    assert np.array(output_with_prep == output_without_prep).all()
+  assert any([str(warning.message) == msg for warning in raised_warning])
+
   # Test transform
-  not_implemented_msg = ""
-  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
-  # "This learner does not have transform"
-  try:
+  if hasattr(estimator, "transform"):
     output_with_prep = estimator_with_preprocessor.transform(
         indicators_to_transform)
     output_without_prep = estimator_without_preprocessor.transform(
@@ -990,9 +1064,6 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
     output_without_prep = estimator_with_prep_formed.transform(
         formed_points_to_transform)
     assert np.array(output_with_prep == output_without_prep).all()
-
-  except Exception as raised_exception:
-    assert raised_exception.value.args[0] == not_implemented_msg
 
 
 def test_check_collapsed_pairs_raises_no_error():

@@ -1,3 +1,7 @@
+"""
+Tests all functionality for PairClassifiers. Methods, threshold, calibration,
+warnings, correctness, use cases, etc.
+"""
 from functools import partial
 
 import pytest
