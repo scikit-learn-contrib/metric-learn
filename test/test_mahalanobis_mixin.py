@@ -21,7 +21,9 @@ from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
 from metric_learn.exceptions import NonPSDError
 
 from test.test_utils import (ids_metric_learners, metric_learners,
-                             remove_y, ids_classifiers)
+                             remove_y, ids_classifiers,
+                             pairs_learners, ids_pairs_learners)
+from sklearn.exceptions import NotFittedError
 
 RNG = check_random_state(0)
 
@@ -750,3 +752,35 @@ def test_deterministic_initialization(estimator, build_dataset):
   model2 = model2.fit(*remove_y(model, input_data, labels))
   np.testing.assert_allclose(model1.get_mahalanobis_matrix(),
                              model2.get_mahalanobis_matrix())
+
+
+@pytest.mark.parametrize('with_preprocessor', [True, False])
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
+                         ids=ids_pairs_learners)
+def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
+                                              with_preprocessor):
+  """Test that a NotFittedError is raised if someone tries to use
+  pair_score, pair_distance, score_pairs, get_metric, transform or
+  get_mahalanobis_matrix on input data and the metric learner
+  has not been fitted."""
+  input_data, _, preprocessor, _ = build_dataset(with_preprocessor)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  with pytest.raises(NotFittedError):  # TODO: Remove in 0.8.0
+    msg = ("score_pairs will be deprecated in release 0.7.0. "
+           "Use pair_score to compute similarity scores, or "
+           "pair_distances to compute distances.")
+    with pytest.warns(FutureWarning) as raised_warning:
+      estimator.score_pairs(input_data)
+    assert any([str(warning.message) == msg for warning in raised_warning])
+  with pytest.raises(NotFittedError):
+    estimator.pair_score(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.pair_distance(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.get_metric()
+  with pytest.raises(NotFittedError):
+    estimator.get_mahalanobis_matrix()
+  with pytest.raises(NotFittedError):
+    estimator.transform(input_data)

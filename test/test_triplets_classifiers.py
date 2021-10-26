@@ -88,14 +88,19 @@ def test_no_zero_prediction(estimator, build_dataset):
                          ids=ids_triplets_learners)
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
-  """Test that a NotFittedError is raised if someone tries to predict and
-  the metric learner has not been fitted."""
+  """Test that a NotFittedError is raised if someone tries to use the
+  methods: predict, decision_function and score when the metric learner
+  has not been fitted."""
   input_data, _, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   with pytest.raises(NotFittedError):
     estimator.predict(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.decision_function(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.score(input_data)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', triplets_learners,
