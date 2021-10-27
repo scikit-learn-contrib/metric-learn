@@ -1,7 +1,7 @@
 """
 Tests preprocesor, warnings, errors. Also made util functions to build datasets
-in a general way for each learner. Here is also the list of learners of each kind
-that are used as a parameters in tests in other files. Util functions.
+in a general way for each learner. Here is also the list of learners of each
+kind that are used as a parameters in tests in other files. Util functions.
 """
 import pytest
 from scipy.linalg import eigh, pinvh
@@ -22,6 +22,9 @@ from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
                           SCML, SCML_Supervised, Constraints)
+from test.test_bilinear_mixin import RandomBilinearLearner, \
+  IdentityBilinearLearner, MockPairIdentityBilinearLearner, \
+  MockTripletsIdentityBilinearLearner, MockQuadrpletsIdentityBilinearLearner
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
                                       _PairsClassifierMixin,
                                       _TripletsClassifierMixin,
@@ -44,11 +47,11 @@ Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 def build_classification(with_preprocessor=False):
   """
   Basic array 'X, y' for testing when using a preprocessor, for instance,
-  fir clustering.
+  for clustering. For supervised learners.
 
   If no preprocesor: 'data' are raw points, 'target' are dummy labels,
   'preprocesor' is None, and 'to_transform' are points.
-  
+
   If preprocessor: 'data' are point indices, 'target' are dummy labels,
   'preprocessor' are unique points, 'to_transform' are points.
   """
@@ -64,10 +67,11 @@ def build_classification(with_preprocessor=False):
 def build_regression(with_preprocessor=False):
   """
   Basic array 'X, y' for testing when using a preprocessor, for regression.
-  
+  For supervised learners.
+
   If no preprocesor: 'data' are raw points, 'target' are dummy labels,
   'preprocesor' is None, and 'to_transform' are points.
-  
+
   If preprocessor: 'data' are point indices, 'target' are dummy labels,
   'preprocessor' are unique points, 'to_transform' are points.
   """
@@ -97,13 +101,13 @@ def build_data():
 
 def build_pairs(with_preprocessor=False):
   """
-  For all pair learners.
+  For all pair weakly-supervised learners.
 
   Returns: data, target, preprocessor, to_transform.
-  
+
   If no preprocesor: 'data' are raw pairs, 'target' are dummy labels,
   'preprocesor' is None, and 'to_transform' are points.
-  
+
   If preprocessor: 'data' are pair indices, 'target' are dummy labels,
   'preprocessor' are unique points, 'to_transform' are points.
   """
@@ -122,13 +126,13 @@ def build_pairs(with_preprocessor=False):
 
 def build_triplets(with_preprocessor=False):
   """
-  For all triplet learners.
-  
+  For all triplet weakly-supervised learners.
+
   Returns: data, target, preprocessor, to_transform.
-  
+
   If no preprocesor: 'data' are raw triplets, 'target' are dummy labels,
   'preprocesor' is None, and 'to_transform' are points.
-  
+
   If preprocessor: 'data' are triplets indices, 'target' are dummy labels,
   'preprocessor' are unique points, 'to_transform' are points.
   """
@@ -146,13 +150,13 @@ def build_triplets(with_preprocessor=False):
 
 def build_quadruplets(with_preprocessor=False):
   """
-  For all Quadruplets learners.
-  
+  For all Quadruplets weakly-supervised learners.
+
   Returns: data, target, preprocessor, to_transform.
-  
+
   If no preprocesor: 'data' are raw quadruplets, 'target' are dummy labels,
   'preprocesor' is None, and 'to_transform' are points.
-  
+
   If preprocessor: 'data' are quadruplets indices, 'target' are dummy labels,
   'preprocessor' are unique points, 'to_transform' are points.
   """
@@ -168,63 +172,132 @@ def build_quadruplets(with_preprocessor=False):
     # if not, we build a 3D array of quadruplets of samples
     return Dataset(X[c], target, None, X[c[:, 0]])
 
+
 # ------------- List of learners, separating them by kind -------------
 
-quadruplets_learners = [(LSML(), build_quadruplets)]
-ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
+# Mahalanobis learners
+# -- Weakly Supervised
+quadruplets_learners_m = [(LSML(), build_quadruplets)]
+ids_quadruplets_learners_m = list(map(lambda x: x.__class__.__name__,
+                                      [learner for (learner, _) in
+                                       quadruplets_learners_m]))
+
+triplets_learners_m = [(SCML(), build_triplets)]
+ids_triplets_learners_m = list(map(lambda x: x.__class__.__name__,
+                                   [learner for (learner, _) in
+                                    triplets_learners_m]))
+
+pairs_learners_m = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be faster
+                    (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster
+                    (SDML(prior='identity', balance_param=1e-5), build_pairs)]
+ids_pairs_learners_m = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
-                                 quadruplets_learners]))
+                                 pairs_learners_m]))
 
-triplets_learners = [(SCML(), build_triplets)]
-ids_triplets_learners = list(map(lambda x: x.__class__.__name__,
+# -- Supervised
+classifiers_m = [(Covariance(), build_classification),
+                 (LFDA(), build_classification),
+                 (LMNN(), build_classification),
+                 (NCA(), build_classification),
+                 (RCA(), build_classification),
+                 (ITML_Supervised(max_iter=5), build_classification),
+                 (LSML_Supervised(), build_classification),
+                 (MMC_Supervised(max_iter=5), build_classification),
+                 (RCA_Supervised(num_chunks=5), build_classification),
+                 (SDML_Supervised(prior='identity', balance_param=1e-5),
+                 build_classification),
+                 (SCML_Supervised(), build_classification)]
+ids_classifiers_m = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
-                              triplets_learners]))
+                              classifiers_m]))
 
-pairs_learners = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be faster
-                  (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster
-                  (SDML(prior='identity', balance_param=1e-5), build_pairs)]
-ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
-                              [learner for (learner, _) in
-                               pairs_learners]))
+regressors_m = [(MLKR(init='pca'), build_regression)]
+ids_regressors_m = list(map(lambda x: x.__class__.__name__,
+                            [learner for (learner, _) in regressors_m]))
+# -- Mahalanobis sets
+tuples_learners_m = pairs_learners_m + triplets_learners_m + \
+                  quadruplets_learners_m
+ids_tuples_learners_m = ids_pairs_learners_m + ids_triplets_learners_m \
+                      + ids_quadruplets_learners_m
 
-classifiers = [(Covariance(), build_classification),
-               (LFDA(), build_classification),
-               (LMNN(), build_classification),
-               (NCA(), build_classification),
-               (RCA(), build_classification),
-               (ITML_Supervised(max_iter=5), build_classification),
-               (LSML_Supervised(), build_classification),
-               (MMC_Supervised(max_iter=5), build_classification),
-               (RCA_Supervised(num_chunks=5), build_classification),
-               (SDML_Supervised(prior='identity', balance_param=1e-5),
-               build_classification),
-               (SCML_Supervised(), build_classification)]
-ids_classifiers = list(map(lambda x: x.__class__.__name__,
-                           [learner for (learner, _) in
-                            classifiers]))
+supervised_learners_m = classifiers_m + regressors_m
+ids_supervised_learners_m = ids_classifiers_m + ids_regressors_m
 
-regressors = [(MLKR(init='pca'), build_regression)]
-ids_regressors = list(map(lambda x: x.__class__.__name__,
-                          [learner for (learner, _) in regressors]))
+metric_learners_m = tuples_learners_m + supervised_learners_m
+ids_metric_learners_m = ids_tuples_learners_m + ids_supervised_learners_m
 
+# Bilinear learners
+# -- Weakly Supervised
+quadruplets_learners_b = [(MockQuadrpletsIdentityBilinearLearner(),
+                          build_quadruplets)]
+ids_quadruplets_learners_b = list(map(lambda x: x.__class__.__name__,
+                                  [learner for (learner, _) in
+                                   quadruplets_learners_b]))
+
+triplets_learners_b = [(MockTripletsIdentityBilinearLearner(), build_triplets)]
+ids_triplets_learners_b = list(map(lambda x: x.__class__.__name__,
+                                   [learner for (learner, _) in
+                                    triplets_learners_b]))
+
+pairs_learners_b = [(MockPairIdentityBilinearLearner(), build_pairs)]
+ids_pairs_learners_b = list(map(lambda x: x.__class__.__name__,
+                                [learner for (learner, _) in
+                                 pairs_learners_b]))
+# -- Supervised
+classifiers_b = [(RandomBilinearLearner(), build_classification),
+                 (IdentityBilinearLearner(), build_classification)]
+
+ids_classifiers_b = list(map(lambda x: x.__class__.__name__,
+                             [learner for (learner, _) in
+                              classifiers_b]))
+# -- Bilinear sets
+tuples_learners_b = pairs_learners_b + triplets_learners_b + \
+                  quadruplets_learners_b
+ids_tuples_learners_b = ids_pairs_learners_b + ids_triplets_learners_b \
+                      + ids_quadruplets_learners_b
+
+supervised_learners_b = classifiers_b
+ids_supervised_learners_b = ids_classifiers_b
+
+metric_learners_b = tuples_learners_b + supervised_learners_b
+ids_metric_learners_b = ids_tuples_learners_b + ids_supervised_learners_b
+
+# General sets (Mahalanobis + Bilinear)
+# -- Weakly Supervised learners individually
+pairs_learners = pairs_learners_m + pairs_learners_b
+ids_pairs_learners = ids_pairs_learners_m + ids_pairs_learners_b
+triplets_learners = triplets_learners_m + triplets_learners_b
+ids_triplets_learners = ids_triplets_learners_m + ids_triplets_learners_b
+quadruplets_learners = quadruplets_learners_m + quadruplets_learners_b
+ids_quadruplets_learners = ids_quadruplets_learners_m + \
+                         ids_quadruplets_learners_b
+
+# -- All weakly supervised learners
+tuples_learners = tuples_learners_m + tuples_learners_b
+ids_tuples_learners = ids_tuples_learners_m + ids_tuples_learners_b
+
+# -- Supervised learners
+supervised_learners = supervised_learners_m + supervised_learners_b
+ids_supervised_learners = ids_supervised_learners_m + ids_supervised_learners_b
+
+# -- Weakly Supervised + Supervised learners
+metric_learners = metric_learners_m + metric_learners_b
+ids_metric_learners = ids_metric_learners_m + ids_metric_learners_b
+
+# -- For sklearn pipeline: Pair + Supervised learners
+metric_learners_pipeline = pairs_learners_m + pairs_learners_b + \
+                         supervised_learners_m + supervised_learners_b
+ids_metric_learners_pipeline = ids_pairs_learners_m + ids_pairs_learners_b +\
+                             ids_supervised_learners_m + \
+                             ids_supervised_learners_b
+
+# Not used
 WeaklySupervisedClasses = (_PairsClassifierMixin,
                            _TripletsClassifierMixin,
                            _QuadrupletsClassifierMixin)
 
-tuples_learners = pairs_learners + triplets_learners + quadruplets_learners
-ids_tuples_learners = ids_pairs_learners + ids_triplets_learners \
-                      + ids_quadruplets_learners
-
-supervised_learners = classifiers + regressors
-ids_supervised_learners = ids_classifiers + ids_regressors
-
-metric_learners = tuples_learners + supervised_learners
-ids_metric_learners = ids_tuples_learners + ids_supervised_learners
-
-metric_learners_pipeline = pairs_learners + supervised_learners
-ids_metric_learners_pipeline = ids_pairs_learners + ids_supervised_learners
-
 # ------------- Useful methods -------------
+
 
 def remove_y(estimator, X, y):
   """Quadruplets and triplets learners have no y in fit, but to write test for
@@ -951,11 +1024,75 @@ def test_preprocess_points_simple_example():
   assert (preprocess_points(array, fun) == expected_result).all()
 
 
+# TODO: Find a better way to run this test and the next one, to avoid
+# duplicated code.
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
+def test_same_with_or_without_preprocessor_mahalanobis(estimator,
+                                                       build_dataset):
+  """Test that Mahalanobis algorithms using a preprocessor behave
+  consistently with their no-preprocessor equivalent. Methods
+  `pair_distance` and `transform`.
+  """
+  dataset_indices = build_dataset(with_preprocessor=True)
+  dataset_formed = build_dataset(with_preprocessor=False)
+  X = dataset_indices.preprocessor
+  indicators_to_transform = dataset_indices.to_transform
+  formed_points_to_transform = dataset_formed.to_transform
+  (indices_train, indices_test, y_train, y_test, formed_train,
+   formed_test) = train_test_split(dataset_indices.data,
+                                   dataset_indices.target,
+                                   dataset_formed.data,
+                                   random_state=SEED)
+  estimator_with_preprocessor = clone(estimator)
+  set_random_state(estimator_with_preprocessor)
+  estimator_with_preprocessor.set_params(preprocessor=X)
+  estimator_with_preprocessor.fit(*remove_y(estimator, indices_train, y_train))
+
+  estimator_without_preprocessor = clone(estimator)
+  set_random_state(estimator_without_preprocessor)
+  estimator_without_preprocessor.set_params(preprocessor=None)
+  estimator_without_preprocessor.fit(*remove_y(estimator, formed_train,
+                                               y_train))
+  estimator_with_prep_formed = clone(estimator)
+  set_random_state(estimator_with_prep_formed)
+  estimator_with_prep_formed.set_params(preprocessor=X)
+  estimator_with_prep_formed.fit(*remove_y(estimator, indices_train, y_train))
+  idx1 = np.array([[0, 2], [5, 3]], dtype=int)  # Sample
+
+  # Pair distance
+  output_with_prep = estimator_with_preprocessor.pair_distance(
+      indicators_to_transform[idx1])
+  output_without_prep = estimator_without_preprocessor.pair_distance(
+      formed_points_to_transform[idx1])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  output_with_prep = estimator_with_preprocessor.pair_distance(
+      indicators_to_transform[idx1])
+  output_without_prep = estimator_with_prep_formed.pair_distance(
+      formed_points_to_transform[idx1])
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  # Transform
+  output_with_prep = estimator_with_preprocessor.transform(
+      indicators_to_transform)
+  output_without_prep = estimator_without_preprocessor.transform(
+      formed_points_to_transform)
+  assert np.array(output_with_prep == output_without_prep).all()
+
+  output_with_prep = estimator_with_preprocessor.transform(
+      indicators_to_transform)
+  output_without_prep = estimator_with_prep_formed.transform(
+      formed_points_to_transform)
+  assert np.array(output_with_prep == output_without_prep).all()
+
+
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_same_with_or_without_preprocessor(estimator, build_dataset):
   """Test that algorithms using a preprocessor behave consistently
-# with their no-preprocessor equivalent
+  with their no-preprocessor equivalent. Methods `pair_score`,
+  `score_pairs` (deprecated), `predict` and `decision_function`.
   """
   dataset_indices = build_dataset(with_preprocessor=True)
   dataset_formed = build_dataset(with_preprocessor=False)
@@ -984,7 +1121,7 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   estimator_with_prep_formed.set_params(preprocessor=X)
   estimator_with_prep_formed.fit(*remove_y(estimator, indices_train, y_train))
 
-  # Test prediction methods
+  # Test prediction methods for Weakly supervised algorithms.
   for method in ["predict", "decision_function"]:
     if hasattr(estimator, method):
       output_with_prep = getattr(estimator_with_preprocessor,
@@ -999,8 +1136,8 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
       assert np.array(output_with_prep == output_with_prep_formed).all()
 
   idx1 = np.array([[0, 2], [5, 3]], dtype=int)  # Sample
-  
-  # Test pair_score, all learners have it.
+
+  # Pair score
   output_with_prep = estimator_with_preprocessor.pair_score(
       indicators_to_transform[idx1])
   output_without_prep = estimator_without_preprocessor.pair_score(
@@ -1013,27 +1150,7 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
       formed_points_to_transform[idx1])
   assert np.array(output_with_prep == output_without_prep).all()
 
-  # Test pair_distance
-  not_implemented_msg = ""
-  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
-  # "This learner does not have pair_distance"
-  try:
-    output_with_prep = estimator_with_preprocessor.pair_distance(
-        indicators_to_transform[idx1])
-    output_without_prep = estimator_without_preprocessor.pair_distance(
-        formed_points_to_transform[idx1])
-    assert np.array(output_with_prep == output_without_prep).all()
-
-    output_with_prep = estimator_with_preprocessor.pair_distance(
-        indicators_to_transform[idx1])
-    output_without_prep = estimator_with_prep_formed.pair_distance(
-        formed_points_to_transform[idx1])
-    assert np.array(output_with_prep == output_without_prep).all()
-
-  except Exception as raised_exception:
-    assert raised_exception.value.args[0] == not_implemented_msg
-
-  # TODO: Delete in 0.8.0
+  # Score pairs. TODO: Delete in 0.8.0
   msg = ("score_pairs will be deprecated in release 0.7.0. "
          "Use pair_score to compute similarity scores, or "
          "pair_distances to compute distances.")
@@ -1050,20 +1167,6 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
         formed_points_to_transform[idx1])
     assert np.array(output_with_prep == output_without_prep).all()
   assert any([str(warning.message) == msg for warning in raised_warning])
-
-  # Test transform
-  if hasattr(estimator, "transform"):
-    output_with_prep = estimator_with_preprocessor.transform(
-        indicators_to_transform)
-    output_without_prep = estimator_without_preprocessor.transform(
-        formed_points_to_transform)
-    assert np.array(output_with_prep == output_without_prep).all()
-
-    output_with_prep = estimator_with_preprocessor.transform(
-        indicators_to_transform)
-    output_without_prep = estimator_with_prep_formed.transform(
-        formed_points_to_transform)
-    assert np.array(output_with_prep == output_without_prep).all()
 
 
 def test_check_collapsed_pairs_raises_no_error():

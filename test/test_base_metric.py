@@ -2,7 +2,6 @@
 Tests general things from the API: String parsing, methods like get_metric,
 and deprecation warnings.
 """
-from numpy.core.numeric import array_equal
 import pytest
 import re
 import unittest
@@ -282,23 +281,18 @@ def test_n_components(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_score_pairs_warning(estimator, build_dataset):
-  """Tests that score_pairs returns a FutureWarning regarding deprecation.
-  Also that score_pairs and pair_distance have the same behaviour"""
+  """Tests that score_pairs returns a FutureWarning regarding
+  deprecation for all learners"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-
-  # We fit the metric learner on it and then we call score_pairs on some
-  # points
   model.fit(*remove_y(model, input_data, labels))
 
   msg = ("score_pairs will be deprecated in release 0.7.0. "
          "Use pair_score to compute similarity scores, or "
          "pair_distances to compute distances.")
   with pytest.warns(FutureWarning) as raised_warning:
-    score = model.score_pairs([[X[0], X[1]], ])
-    dist = model.pair_distance([[X[0], X[1]], ])
-    assert array_equal(score, dist)
+    _ = model.score_pairs([[X[0], X[1]], ])
   assert any([str(warning.message) == msg for warning in raised_warning])
 
 

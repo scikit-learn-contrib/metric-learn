@@ -259,8 +259,8 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
   """
 
   def score_pairs(self, pairs):
-    dpr_msg = ("score_pairs will be deprecated in release 0.6.4. "
-               "Use pair_score to compute similarities, or "
+    dpr_msg = ("score_pairs will be deprecated in release 0.7.0. "
+               "Use pair_score to compute similarity scores, or "
                "pair_distances to compute distances.")
     warnings.warn(dpr_msg, category=FutureWarning)
     return self.pair_score(pairs)
@@ -305,7 +305,7 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     :ref:`Bilinear_similarity` : The section of the project documentation
       that describes Bilinear similarity.
     """
-    check_is_fitted(self, ['preprocessor_', 'components_'])
+    check_is_fitted(self, ['preprocessor_'])
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=2)

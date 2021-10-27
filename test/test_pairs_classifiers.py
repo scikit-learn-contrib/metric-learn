@@ -14,7 +14,8 @@ from sklearn.metrics import (f1_score, accuracy_score, fbeta_score,
                              precision_score)
 from sklearn.model_selection import train_test_split
 
-from test.test_utils import pairs_learners, ids_pairs_learners
+from test.test_utils import pairs_learners, ids_pairs_learners, \
+  pairs_learners_m, ids_pairs_learners_m
 from metric_learn.sklearn_shims import set_random_state
 from sklearn import clone
 import numpy as np
@@ -519,11 +520,12 @@ def test_validate_calibration_params_invalid_parameters_error_before__fit(
   assert str(raised_error.value) == expected_msg
 
 
-@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
-                         ids=ids_pairs_learners)
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners_m,
+                         ids=ids_pairs_learners_m)
 def test_accuracy_toy_example(estimator, build_dataset):
   """Test that the accuracy works on some toy example (hence that the
-  prediction is OK)"""
+  prediction is OK). This test is designed for Mahalanobis learners only,
+  as the toy example uses the notion of distance."""
   input_data, labels, preprocessor, X = build_dataset(with_preprocessor=False)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
