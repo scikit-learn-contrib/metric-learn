@@ -35,22 +35,25 @@ RNG = check_random_state(0)
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
                          ids=ids_metric_learners_m)
 def test_deprecated_score_pairs_same_result(estimator, build_dataset):
-  """Test that `pair_distance` and the deprecated function `score_pairs`
+  """
+  Test that `pair_distance` and the deprecated function `score_pairs`
   give the same result, while checking that the deprecation warning is
-  being shown"""
+  being shown.
+  """
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
   model.fit(*remove_y(model, input_data, labels))
+  random_pairs = np.array(list(product(X, X)))
 
   msg = ("score_pairs will be deprecated in release 0.7.0. "
          "Use pair_score to compute similarity scores, or "
          "pair_distances to compute distances.")
   with pytest.warns(FutureWarning) as raised_warning:
-    score = model.score_pairs([[X[0], X[1]], ])
-    dist = model.pair_distance([[X[0], X[1]], ])
+    score = model.score_pairs(random_pairs)
+    dist = model.pair_distance(random_pairs)
     assert array_equal(score, dist)
-  assert any([str(warning.message) == msg for warning in raised_warning])
+  assert any([str(w.message) == msg for w in raised_warning])
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,

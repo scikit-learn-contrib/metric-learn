@@ -22,10 +22,8 @@ from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
                           SCML, SCML_Supervised, Constraints)
-from test.test_bilinear_mixin import RandomBilinearLearner, \
-  IdentityBilinearLearner, MockPairIdentityBilinearLearner, \
-  MockTripletsIdentityBilinearLearner, MockQuadrpletsIdentityBilinearLearner
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
+                                      BilinearMixin,
                                       _PairsClassifierMixin,
                                       _TripletsClassifierMixin,
                                       _QuadrupletsClassifierMixin)
@@ -35,6 +33,90 @@ from sklearn.datasets import make_regression, make_blobs, load_iris
 
 SEED = 42
 RNG = check_random_state(SEED)
+
+
+# -------------------- Mock classes for testing ------------------------
+
+
+class RandomBilinearLearner(BilinearMixin):
+  """A simple Random bilinear mixin that returns an random matrix
+  M as learned. Class for testing purposes.
+  """
+  def __init__(self, preprocessor=None, random_state=33):
+    super().__init__(preprocessor=preprocessor)
+    self.random_state = random_state
+
+  def fit(self, X, y):
+    """
+    Checks input's format. A random (d,d) matrix is set.
+    """
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
+    self.d_ = np.shape(X[0])[-1]
+    rng = check_random_state(self.random_state)
+    self.components_ = rng.rand(self.d_, self.d_)
+    return self
+
+
+class IdentityBilinearLearner(BilinearMixin):
+  """A simple Identity bilinear mixin that returns an identity matrix
+  M as learned. Class for testing purposes.
+  """
+  def __init__(self, preprocessor=None):
+    super().__init__(preprocessor=preprocessor)
+
+  def fit(self, X, y):
+    """
+    Checks input's format. Sets M matrix to identity of shape (d,d)
+    where d is the dimension of the input.
+    """
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
+    self.d_ = np.shape(X[0])[-1]
+    self.components_ = np.identity(self.d_)
+    return self
+
+
+class MockPairIdentityBilinearLearner(BilinearMixin,
+                                      _PairsClassifierMixin):
+
+  def __init__(self, preprocessor=None):
+      super().__init__(preprocessor=preprocessor)
+
+  def fit(self, pairs, y, calibration_params=None):
+    calibration_params = (calibration_params if calibration_params is not
+                          None else dict())
+    self._validate_calibration_params(**calibration_params)
+    pairs = self._prepare_inputs(pairs, type_of_inputs='tuples')
+    self.d_ = np.shape(pairs[0][0])[-1]
+    self.components_ = np.identity(self.d_)
+    self.calibrate_threshold(pairs, y, **calibration_params)
+    return self
+
+
+class MockTripletsIdentityBilinearLearner(BilinearMixin,
+                                          _TripletsClassifierMixin):
+
+  def __init__(self, preprocessor=None):
+      super().__init__(preprocessor=preprocessor)
+
+  def fit(self, triplets):
+    triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
+    self.d_ = np.shape(triplets[0][0])[-1]
+    self.components_ = np.identity(self.d_)
+    return self
+
+
+class MockQuadrpletsIdentityBilinearLearner(BilinearMixin,
+                                            _QuadrupletsClassifierMixin):
+
+  def __init__(self, preprocessor=None):
+      super().__init__(preprocessor=preprocessor)
+
+  def fit(self, quadruplets):
+    quadruplets = self._prepare_inputs(quadruplets, type_of_inputs='tuples')
+    self.d_ = np.shape(quadruplets[0][0])[-1]
+    self.components_ = np.identity(self.d_)
+    return self
+
 
 # ------------------ Building dummy data for learners ------------------
 
