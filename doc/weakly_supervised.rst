@@ -160,9 +160,9 @@ Also, as explained before, our metric learner has learned a distance between
 points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
-  `score_pairs` function:
+  `pair_distance` function:
 
->>> mmc.score_pairs([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
+>>> mmc.pair_distance([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
 ...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
 array([7.27607365, 0.88853014])
 
@@ -175,6 +175,18 @@ array([7.27607365, 0.88853014])
 >>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
 7.276073646278203
 
+- Alternatively, you can use `pair_score` to return the **score** between
+  pairs of points (the larger the score, the more similar the pair).
+  For Mahalanobis learners, it is equal to the opposite of the distance.
+
+>>> score = mmc.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+  This is useful because `pair_score` matches the **score** semantic of 
+  scikit-learn's `Classification metrics
+  <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+
 .. note::
 
     If the metric learner that you use learns a :ref:`Mahalanobis distance
@@ -186,8 +198,6 @@ array([7.27607365, 0.88853014])
 array([[ 0.58603894, -5.69883982, -1.66614919],
        [-5.69883982, 55.41743549, 16.20219519],
        [-1.66614919, 16.20219519,  4.73697721]])
-
-.. TODO: remove the "like it is the case etc..." if it's not the case anymore
 
 .. _sklearn_compat_ws:
 
@@ -344,8 +354,8 @@ returns the `sklearn.metrics.roc_auc_score` (which is threshold-independent).
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
-   `get_metric` and `get_mahalanobis_matrix`.
+   not specific to learning on pairs, like `transform`, `pair_distance`,
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 Algorithms
 ----------
@@ -691,8 +701,8 @@ of triplets that have the right predicted ordering.
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
-   `get_metric` and `get_mahalanobis_matrix`.
+   not specific to learning on pairs, like `transform`, `pair_distance`,
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 
 
@@ -859,8 +869,8 @@ of quadruplets have the right predicted ordering.
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
-   `get_metric` and `get_mahalanobis_matrix`.
+   not specific to learning on pairs, like `transform`, `pair_distance`,
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 
 

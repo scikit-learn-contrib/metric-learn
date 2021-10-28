@@ -1,4 +1,4 @@
-|Travis-CI Build Status| |License| |PyPI version| |Code coverage|
+|GitHub Actions Build Status| |License| |PyPI version| |Code coverage|
 
 metric-learn: Metric Learning in Python
 =======================================
@@ -22,7 +22,7 @@ metric-learn contains efficient Python implementations of several popular superv
 
 -  Python 3.6+ (the last version supporting Python 2 and Python 3.5 was
    `v0.5.0 <https://pypi.org/project/metric-learn/0.5.0/>`_)
--  numpy, scipy, scikit-learn>=0.20.3
+-  numpy>= 1.11.0, scipy>= 0.17.0, scikit-learn>=0.21.3
 
 **Optional dependencies**
 
@@ -67,8 +67,8 @@ Bibtex entry::
 
 .. _sphinx documentation: http://contrib.scikit-learn.org/metric-learn/
 
-.. |Travis-CI Build Status| image:: https://api.travis-ci.org/scikit-learn-contrib/metric-learn.svg?branch=master
-   :target: https://travis-ci.org/scikit-learn-contrib/metric-learn
+.. |GitHub Actions Build Status| image:: https://github.com/scikit-learn-contrib/metric-learn/workflows/CI/badge.svg
+   :target: https://github.com/scikit-learn-contrib/metric-learn/actions?query=event%3Apush+branch%3Amaster
 .. |License| image:: http://img.shields.io/:license-mit-blue.svg?style=flat
    :target: http://badges.mit-license.org
 .. |PyPI version| image:: https://badge.fury.io/py/metric-learn.svg

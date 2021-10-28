@@ -9,7 +9,6 @@ from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
                            assert_allclose)
-from metric_learn.sklearn_shims import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
@@ -79,12 +78,17 @@ class TestCovariance(MetricTestCase):
 class TestSCML(object):
   @pytest.mark.parametrize('basis', ('lda', 'triplet_diffs'))
   def test_iris(self, basis):
+    """
+    SCML applied to Iris dataset should give better results when
+    computing class separation.
+    """
     X, y = load_iris(return_X_y=True)
+    before = class_separation(X, y)
     scml = SCML_Supervised(basis=basis, n_basis=85, k_genuine=7, k_impostor=5,
                            random_state=42)
     scml.fit(X, y)
-    csep = class_separation(scml.transform(X), y)
-    assert csep < 0.24
+    after = class_separation(scml.transform(X), y)
+    assert before > after + 0.03  # It's better by a margin of 0.03
 
   def test_big_n_features(self):
     X, y = make_classification(n_samples=100, n_classes=3, n_features=60,
@@ -929,7 +933,7 @@ class TestNCA(MetricTestCase):
       X = X[[ind_0[0], ind_1[0], ind_2[0]]]
       y = y[[ind_0[0], ind_1[0], ind_2[0]]]
 
-      A = make_spd_matrix(X.shape[1], X.shape[1])
+      A = make_spd_matrix(n_dim=X.shape[1], random_state=X.shape[1])
       nca = NCA(init=A, max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.components_, A)
@@ -940,7 +944,7 @@ class TestNCA(MetricTestCase):
       X = self.iris_points[self.iris_labels == 0]
       y = self.iris_labels[self.iris_labels == 0]
 
-      A = make_spd_matrix(X.shape[1], X.shape[1])
+      A = make_spd_matrix(n_dim=X.shape[1], random_state=X.shape[1])
       nca = NCA(init=A, max_iter=30, n_components=X.shape[1])
       nca.fit(X, y)
       assert_array_equal(nca.components_, A)
@@ -1138,9 +1142,10 @@ def test_convergence_warning(dataset, algo_class):
     X, y = dataset
     model = algo_class(max_iter=2, verbose=True)
     cls_name = model.__class__.__name__
-    assert_warns_message(ConvergenceWarning,
-                         '[{}] {} did not converge'.format(cls_name, cls_name),
-                         model.fit, X, y)
+    msg = '[{}] {} did not converge'.format(cls_name, cls_name)
+    with pytest.warns(Warning) as raised_warning:
+      model.fit(X, y)
+    assert any([msg in str(warn.message) for warn in raised_warning])
 
 
 if __name__ == '__main__':

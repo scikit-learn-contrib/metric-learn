@@ -19,7 +19,7 @@ metric-learn can be installed in either of the following ways:
 
 - Python 3.6+ (the last version supporting Python 2 and Python 3.5 was
   `v0.5.0 <https://pypi.org/project/metric-learn/0.5.0/>`_)
-- numpy, scipy, scikit-learn>=0.20.3
+- numpy>= 1.11.0, scipy>= 0.17.0, scikit-learn>=0.21.3
 
 **Optional dependencies**
 
