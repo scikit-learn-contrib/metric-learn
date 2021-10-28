@@ -117,7 +117,7 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
                                  quadruplets_learners]))
 
-triplets_learners = [(SCML(), build_triplets)]
+triplets_learners = [(SCML(n_basis=320), build_triplets)]
 ids_triplets_learners = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
                               triplets_learners]))
@@ -140,7 +140,7 @@ classifiers = [(Covariance(), build_classification),
                (RCA_Supervised(num_chunks=5), build_classification),
                (SDML_Supervised(prior='identity', balance_param=1e-5),
                build_classification),
-               (SCML_Supervised(), build_classification)]
+               (SCML_Supervised(n_basis=80), build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
