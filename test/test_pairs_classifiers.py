@@ -203,6 +203,10 @@ def test_set_wrong_type_threshold(value):
   assert model.threshold_ == 1.0
   model.set_threshold(0.1)  # Float
   assert model.threshold_ == 0.1
+  model.set_threshold(True)  # Boolean permissive
+  assert model.threshold_ == 1.0
+  model.set_threshold(False)  # Boolean permissive
+  assert model.threshold_ == 0.0
 
 
 def test_f_beta_1_is_f_1():
