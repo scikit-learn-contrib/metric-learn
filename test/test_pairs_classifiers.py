@@ -182,8 +182,7 @@ def test_set_threshold():
 
 @pytest.mark.parametrize('value', ["ABC", None, [1, 2, 3], {'key': None},
                          (1, 2), set(),
-                         np.array([[[0.], [1.]], [[1.], [3.]]]),
-                         np.array([0.5]), np.array([[[0.5]]])])
+                         np.array([[[0.], [1.]], [[1.], [3.]]])])
 def test_set_wrong_type_threshold(value):
   """
   Test that `set_threshold` indeed sets the threshold
@@ -198,15 +197,6 @@ def test_set_wrong_type_threshold(value):
   with pytest.raises(ValueError) as e:  # String
     model.set_threshold(value)
   assert str(e.value).startswith(msg)
-
-  model.set_threshold(1)  # Integer
-  assert model.threshold_ == 1.0
-  model.set_threshold(0.1)  # Float
-  assert model.threshold_ == 0.1
-  model.set_threshold(True)  # Boolean permissive
-  assert model.threshold_ == 1.0
-  model.set_threshold(False)  # Boolean permissive
-  assert model.threshold_ == 0.0
 
 
 def test_f_beta_1_is_f_1():
