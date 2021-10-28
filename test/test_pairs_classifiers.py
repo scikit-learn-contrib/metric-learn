@@ -180,34 +180,29 @@ def test_set_threshold():
   assert identity_pairs_classifier.threshold_ == 0.5
 
 
-def test_set_wrong_type_threshold():
-  # test that set_threshold indeed sets the threshold
-  # and cannot accept nothing but float or integers
-  identity_pairs_classifier = IdentityPairsClassifier()
-  pairs = np.array([[[0.], [1.]], [[1.], [3.]], [[2.], [5.]], [[3.], [7.]]])
-  y = np.array([1, 1, -1, -1])
-  identity_pairs_classifier.fit(pairs, y)
-  with pytest.raises(ValueError):
-    identity_pairs_classifier.set_threshold("ABC")      # String
-  with pytest.raises(ValueError):
-    identity_pairs_classifier.set_threshold(True)       # Bool
-  with pytest.raises(TypeError):
-    identity_pairs_classifier.set_threshold(None)       # None
-  with pytest.raises(TypeError):
-    identity_pairs_classifier.set_threshold([1, 2, 3])  # List
-  with pytest.raises(TypeError):
-    identity_pairs_classifier.set_threshold({'key': None})  # Dict
-  with pytest.raises(TypeError):
-    identity_pairs_classifier.set_threshold((1, 2))     # Tuple
-  with pytest.raises(TypeError):
-    identity_pairs_classifier.set_threshold(set())      # Set
-  with pytest.raises(TypeError):
-    identity_pairs_classifier.set_threshold(pairs)      # np.array
-  identity_pairs_classifier.set_threshold(1)            # Integer
-  identity_pairs_classifier.set_threshold(0.1)          # Float
-  identity_pairs_classifier.set_threshold(np.array([0.5]))  # 1D np.array
-  identity_pairs_classifier.set_threshold(np.array([[[0.5]]]))  # 1D* np.array
-  assert identity_pairs_classifier.threshold_ == 0.5
+@pytest.mark.parametrize('value', ["ABC", None, [1, 2, 3], {'key': None},
+                         (1, 2), set(),
+                         np.array([[[0.], [1.]], [[1.], [3.]]]),
+                         np.array([0.5]), np.array([[[0.5]]])])
+def test_set_wrong_type_threshold(value):
+  """
+  Test that `set_threshold` indeed sets the threshold
+  and cannot accept nothing but float or integers, but
+  being permissive with boolean True=1.0 and False=0.0
+  """
+  model = IdentityPairsClassifier()
+  model.fit(np.array([[[0.], [1.]]]), np.array([1]))
+  msg = ('Parameter threshold must be a real number. '
+         'Got {} instead.'.format(type(value)))
+
+  with pytest.raises(ValueError) as e:  # String
+    model.set_threshold(value)
+  assert str(e.value).startswith(msg)
+
+  model.set_threshold(1)  # Integer
+  assert model.threshold_ == 1.0
+  model.set_threshold(0.1)  # Float
+  assert model.threshold_ == 0.1
 
 
 def test_f_beta_1_is_f_1():
