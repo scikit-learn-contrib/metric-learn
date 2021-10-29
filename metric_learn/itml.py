@@ -32,7 +32,7 @@ class _BaseITML(MahalanobisMixin):
                                     type_of_inputs='tuples')
     # init bounds
     if bounds is None:
-      X = np.vstack({tuple(row) for row in pairs.reshape(-1, pairs.shape[2])})
+      X = np.unique(np.vstack(pairs), axis=0)
       self.bounds_ = np.percentile(pairwise_distances(X), (5, 95))
     else:
       bounds = check_array(bounds, allow_nd=False, ensure_min_samples=0,

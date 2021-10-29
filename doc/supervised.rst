@@ -69,10 +69,10 @@ Also, as explained before, our metric learners has learn a distance between
 points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
-  `score_pairs` function:
+  `pair_distance` function:
 
->>> nca.score_pairs([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]]])
-array([0.49627072, 3.65287282])
+>>> nca.pair_distance([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+array([0.49627072, 3.65287282, 6.06079877])
 
 - Or you can return a function that will return the distance (in the new
   space) between two 1D arrays (the coordinates of the points in the original
@@ -81,6 +81,18 @@ array([0.49627072, 3.65287282])
 >>> metric_fun = nca.get_metric()
 >>> metric_fun([3.5, 3.6], [5.6, 2.4])
 0.4962707194621285
+
+- Alternatively, you can use `pair_score` to return the **score** between
+  pairs of points (the larger the score, the more similar the pair).
+  For Mahalanobis learners, it is equal to the opposite of the distance.
+
+>>> score = nca.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+This is useful because `pair_score` matches the **score** semantic of 
+scikit-learn's `Classification metrics
+<https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
 
 .. note::
 
@@ -93,7 +105,6 @@ array([0.49627072, 3.65287282])
     array([[0.43680409, 0.89169412],
            [0.89169412, 1.9542479 ]])
 
-.. TODO: remove the "like it is the case etc..." if it's not the case anymore
 
 Scikit-learn compatibility
 --------------------------
@@ -105,6 +116,7 @@ All supervised algorithms are scikit-learn estimators
 scikit-learn model selection routines 
 (`sklearn.model_selection.cross_val_score`,
 `sklearn.model_selection.GridSearchCV`, etc).
+You can also use some of the scoring functions from `sklearn.metrics`.
 
 Algorithms
 ==========

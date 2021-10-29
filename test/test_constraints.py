@@ -103,7 +103,7 @@ def test_generate_knntriplets_under_edge(k_genuine, k_impostor, T_test):
 
 
 @pytest.mark.parametrize("k_genuine, k_impostor,",
-                         [(2, 3), (3, 3), (2, 4), (3, 4)])
+                         [(3, 3), (2, 4), (3, 4), (10, 9), (144, 33)])
 def test_generate_knntriplets(k_genuine, k_impostor):
   """Checks edge and over the edge cases of knn triplet construction with not
      enough neighbors"""
@@ -118,8 +118,23 @@ def test_generate_knntriplets(k_genuine, k_impostor):
   X = np.array([[0, 0], [2, 2], [4, 4], [8, 8], [16, 16], [32, 32], [33, 33]])
   y = np.array([1, 1, 1, 2, 2, 2, -1])
 
-  T = Constraints(y).generate_knntriplets(X, k_genuine, k_impostor)
-
+  msg1 = ("The class 1 has 3 elements, which is not sufficient to "
+          f"generate {k_genuine+1} genuine neighbors "
+          "as specified by k_genuine")
+  msg2 = ("The class 2 has 3 elements, which is not sufficient to "
+          f"generate {k_genuine+1} genuine neighbors "
+          "as specified by k_genuine")
+  msg3 = ("The class 1 has 3 elements of other classes, which is "
+          f"not sufficient to generate {k_impostor} impostor "
+          "neighbors as specified by k_impostor")
+  msg4 = ("The class 2 has 3 elements of other classes, which is "
+          f"not sufficient to generate {k_impostor} impostor "
+          "neighbors as specified by k_impostor")
+  msgs = [msg1, msg2, msg3, msg4]
+  with pytest.warns(UserWarning) as user_warning:
+    T = Constraints(y).generate_knntriplets(X, k_genuine, k_impostor)
+  assert any([[msg in str(warn.message) for msg in msgs]
+             for warn in user_warning])
   assert np.array_equal(sorted(T.tolist()), T_test)
 
 

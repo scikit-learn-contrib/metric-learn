@@ -3,7 +3,8 @@ from itertools import product
 import pytest
 import numpy as np
 from numpy.linalg import LinAlgError
-from numpy.testing import assert_array_almost_equal, assert_allclose
+from numpy.testing import assert_array_almost_equal, assert_allclose, \
+                          assert_array_equal
 from scipy.spatial.distance import pdist, squareform, mahalanobis
 from scipy.stats import ortho_group
 from sklearn import clone
@@ -27,7 +28,27 @@ RNG = check_random_state(0)
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
-def test_score_pairs_pairwise(estimator, build_dataset):
+def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
+  """
+  For Mahalanobis learners, pair_score should be equivalent to the
+  opposite of the pair_distance result.
+  """
+  input_data, labels, _, X = build_dataset()
+  n_samples = 20
+  X = X[:n_samples]
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(*remove_y(estimator, input_data, labels))
+
+  distances = model.pair_distance(np.array(list(product(X, X))))
+  scores = model.pair_score(np.array(list(product(X, X))))
+
+  assert_array_equal(distances, -1 * scores)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_pair_distance_pairwise(estimator, build_dataset):
   # Computing pairwise scores should return a euclidean distance matrix.
   input_data, labels, _, X = build_dataset()
   n_samples = 20
@@ -36,7 +57,7 @@ def test_score_pairs_pairwise(estimator, build_dataset):
   set_random_state(model)
   model.fit(*remove_y(estimator, input_data, labels))
 
-  pairwise = model.score_pairs(np.array(list(product(X, X))))\
+  pairwise = model.pair_distance(np.array(list(product(X, X))))\
       .reshape(n_samples, n_samples)
 
   check_is_distance_matrix(pairwise)
@@ -51,8 +72,8 @@ def test_score_pairs_pairwise(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
-def test_score_pairs_toy_example(estimator, build_dataset):
-    # Checks that score_pairs works on a toy example
+def test_pair_distance_toy_example(estimator, build_dataset):
+    # Checks that pair_distance works on a toy example
     input_data, labels, _, X = build_dataset()
     n_samples = 20
     X = X[:n_samples]
@@ -64,24 +85,24 @@ def test_score_pairs_toy_example(estimator, build_dataset):
     distances = np.sqrt(np.sum((embedded_pairs[:, 1] -
                                 embedded_pairs[:, 0])**2,
                                axis=-1))
-    assert_array_almost_equal(model.score_pairs(pairs), distances)
+    assert_array_almost_equal(model.pair_distance(pairs), distances)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
-def test_score_pairs_finite(estimator, build_dataset):
+def test_pair_distance_finite(estimator, build_dataset):
   # tests that the score is finite
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
   model.fit(*remove_y(estimator, input_data, labels))
   pairs = np.array(list(product(X, X)))
-  assert np.isfinite(model.score_pairs(pairs)).all()
+  assert np.isfinite(model.pair_distance(pairs)).all()
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
-def test_score_pairs_dim(estimator, build_dataset):
+def test_pair_distance_dim(estimator, build_dataset):
   # scoring of 3D arrays should return 1D array (several tuples),
   # and scoring of 2D arrays (one tuple) should return an error (like
   # scikit-learn's error when scoring 1D arrays)
@@ -90,13 +111,13 @@ def test_score_pairs_dim(estimator, build_dataset):
   set_random_state(model)
   model.fit(*remove_y(estimator, input_data, labels))
   tuples = np.array(list(product(X, X)))
-  assert model.score_pairs(tuples).shape == (tuples.shape[0],)
+  assert model.pair_distance(tuples).shape == (tuples.shape[0],)
   context = make_context(estimator)
   msg = ("3D array of formed tuples expected{}. Found 2D array "
          "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
          .format(context, tuples[1]))
   with pytest.raises(ValueError) as raised_error:
-    model.score_pairs(tuples[1])
+    model.pair_distance(tuples[1])
   assert str(raised_error.value) == msg
 
 
@@ -140,7 +161,7 @@ def test_embed_dim(estimator, build_dataset):
              "instead:\ninput={}. Reshape your data and/or use a "
              "preprocessor.\n".format(context, X[0]))
   with pytest.raises(ValueError) as raised_error:
-    model.score_pairs(model.transform(X[0, :]))
+    model.pair_distance(model.transform(X[0, :]))
   assert str(raised_error.value) == err_msg
   # we test that the shape is also OK when doing dimensionality reduction
   if hasattr(model, 'n_components'):
@@ -625,7 +646,7 @@ def test_singular_covariance_init_of_non_strict_pd(estimator, build_dataset):
            'preprocessing step.')
     with pytest.warns(UserWarning) as raised_warning:
       model.fit(input_data, labels)
-    assert np.any([str(warning.message) == msg for warning in raised_warning])
+    assert any([str(warning.message) == msg for warning in raised_warning])
     M, _ = _initialize_metric_mahalanobis(X, init='covariance',
                                           random_state=RNG,
                                           return_inverse=True,
