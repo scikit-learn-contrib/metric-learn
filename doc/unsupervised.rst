@@ -20,9 +20,9 @@ It can be used for ZCA whitening of the data (see the Wikipedia page of
 `whitening transformation <https://en.wikipedia.org/wiki/\
 Whitening_transformation>`_).
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
-    A basic usage of this model with the Iris dataset from scikit-learn.
+A basic usage of this model with the Iris dataset from scikit-learn.
 
 ::
 
@@ -34,6 +34,9 @@ Whitening_transformation>`_).
     cov = Covariance().fit(iris)
     x = cov.transform(iris)
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936
+
+.. container:: hatnote hatnote-gray
+
+      - On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936.

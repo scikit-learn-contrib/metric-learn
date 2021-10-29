@@ -203,7 +203,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   ----------
   .. [1] Jason V. Davis, et al. `Information-theoretic Metric Learning
          <http://www.prateekjain.org/publications/all_papers\
-          /DavisKJSD07_ICML.pdf>`_. ICML 2007.
+         /DavisKJSD07_ICML.pdf>`_. ICML 2007.
   """
 
   def fit(self, pairs, y, bounds=None, calibration_params=None):

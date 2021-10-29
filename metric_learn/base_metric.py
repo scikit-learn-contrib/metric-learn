@@ -676,7 +676,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
            evaluation tool in clinical medicine, MH Zweig, G Campbell -
            Clinical chemistry, 1993
 
-    .. [2] most of the code of this function is from scikit-learn's PR #10117
+    .. [2] Most of the code of this function is from scikit-learn's PR #10117
 
     See Also
     --------

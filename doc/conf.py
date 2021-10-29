@@ -81,6 +81,7 @@ autosummary_generate = True
 def setup(app):
    app.add_js_file('js/copybutton.js')
    app.add_css_file("basic.css")
+   app.add_css_file("css/styles.css")
 
 
 # Remove matplotlib agg warnings from generated doc when using plt.show

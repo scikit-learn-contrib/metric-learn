@@ -152,9 +152,9 @@ neighbors (with same labels) of :math:`\mathbf{x}_{i}`, :math:`y_{ij}=0`
 indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different classes, 
 :math:`[\cdot]_+=\max(0, \cdot)` is the Hinge loss.
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
-    A basic usage of this model with the Iris dataset from scikit-learn.
+A basic usage of this model with the Iris dataset from scikit-learn.
 
 ::
 
@@ -169,15 +169,15 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different classes,
     lmnn = LMNN(k=5, learn_rate=1e-6)
     lmnn.fit(X, Y, verbose=False)
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] Weinberger et al. `Distance Metric Learning for Large Margin
-       Nearest Neighbor Classification
-       <http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf>`_.
-       JMLR 2009
 
-    .. [2] `Wikipedia entry on Large Margin Nearest Neighbor <https://en.wikipedia.org/wiki/Large_margin_nearest_neighbor>`_
-       
+.. container:: hatnote hatnote-gray
+
+  - Weinberger et al. `Distance Metric Learning for Large Margin Nearest Neighbor Classification <http://jmlr.csail.mit.edu/papers/volume10/weinberger09a/weinberger09a.pdf>`_. JMLR 2009.
+
+  - `Wikipedia entry on Large Margin Nearest Neighbor <https://en.wikipedia.org/wiki/Large_margin_nearest_neighbor>`_.
+             
 
 .. _nca:
 
@@ -218,9 +218,9 @@ the sum of probability of being correctly classified:
 
       \mathbf{L} = \text{argmax}\sum_i p_i
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
-    A basic usage of this model with the Iris dataset from scikit-learn.
+A basic usage of this model with the Iris dataset from scikit-learn.
 
 ::
 
@@ -235,13 +235,14 @@ the sum of probability of being correctly classified:
     nca = NCA(max_iter=1000)
     nca.fit(X, Y)
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] Goldberger et al.
-       `Neighbourhood Components Analysis <https://papers.nips.cc/paper/2566-neighbourhood-components-analysis.pdf>`_.
-       NIPS 2005
 
-    .. [2] `Wikipedia entry on Neighborhood Components Analysis <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_
+.. container:: hatnote hatnote-gray
+
+      - Goldberger et al. `Neighbourhood Components Analysis <https://papers.nips.cc/paper/2566-neighbourhood-components-analysis.pdf>`_. NIPS 2005.
+
+      - `Wikipedia entry on Neighborhood Components Analysis <https://en.wikipedia.org/wiki/Neighbourhood_components_analysis>`_.
        
 
 .. _lfda:
@@ -293,9 +294,9 @@ nearby data pairs in the same class are made close and the data pairs in
 different classes are separated from each other; far apart data pairs in the 
 same class are not imposed to be close.
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
-    A basic usage of this model with the Iris dataset from scikit-learn.
+A basic usage of this model with the Iris dataset from scikit-learn.
 
 ::
 
@@ -315,15 +316,14 @@ same class are not imposed to be close.
     
     To work around this, fit instances of this class to data once, then keep the instance around to do transformations.
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] Sugiyama. `Dimensionality Reduction of Multimodal Labeled Data by Local
-       Fisher Discriminant Analysis <http://www.jmlr.org/papers/volume8/sugiyama07b/sugiyama07b.pdf>`_.
-       JMLR 2007
 
-    .. [2] Tang. `Local Fisher Discriminant Analysis on Beer Style Clustering
-       <https://gastrograph.com/resources/whitepapers/local-fisher
-       -discriminant-analysis-on-beer-style-clustering.html#>`_.
+.. container:: hatnote hatnote-gray
+
+      - Sugiyama. `Dimensionality Reduction of Multimodal Labeled Data by Local Fisher Discriminant Analysis <http://www.jmlr.org/papers/volume8/sugiyama07b/sugiyama07b.pdf>`_. JMLR 2007.
+
+      - Tang. `Local Fisher Discriminant Analysis on Beer Style Clustering <https://gastrograph.com/resources/whitepapers/local-fisher-discriminant-analysis-on-beer-style-clustering.html#>`_.
 
 .. _mlkr:
 
@@ -369,9 +369,9 @@ calculating a weighted average of all the training samples:
 
     \hat{y}_i = \frac{\sum_{j\neq i}y_jk_{ij}}{\sum_{j\neq i}k_{ij}}
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
-    A basic usage of this model with the Iris dataset from scikit-learn.
+A basic usage of this model with the Iris dataset from scikit-learn.
 
 ::
 
@@ -385,10 +385,12 @@ calculating a weighted average of all the training samples:
     mlkr = MLKR()
     mlkr.fit(X, Y)
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] Weinberger et al. `Metric Learning for Kernel Regression <http://proceedings.mlr.
-       press/v2/weinberger07a/weinberger07a.pdf>`_. AISTATS 2007
+
+.. container:: hatnote hatnote-gray
+
+      - Weinberger et al. `Metric Learning for Kernel Regression <http://proceedings.mlr.press/v2/weinberger07a/weinberger07a.pdf>`_. AISTATS 2007.
 
 
 .. _supervised_version:
@@ -425,10 +427,9 @@ quadruplets, where for each quadruplet the two first points are from the same
 class, and the two last points are from a different class (so indeed the two
 last points should be less similar than the two first points).
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
-    A basic usage of supervied versions of weakly supervied algorithms
-    with the Iris dataset from scikit-learn.
+A basic usage of supervied versions of weakly supervied algorithms with the Iris dataset from scikit-learn.
 
 ::
 
