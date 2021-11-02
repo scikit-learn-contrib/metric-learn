@@ -32,6 +32,34 @@ class Covariance(MahalanobisMixin, TransformerMixin):
   fit:
     Calculates the covariance matrix of the input data.
 
+  fit_transform:
+    Fit to data, then transform it.
+
+  get_mahalanobis_matrix:
+    Returns a copy of the Mahalanobis matrix learned by the metric learner.
+
+  get_metric:
+    Returns a function that takes as input two 1D arrays and outputs the
+    learned metric score on these two points.
+
+  get_params:
+    Get parameters for this estimator.
+
+  pair_distance:
+      Returns the (pseudo) distance between pairs, when available.
+
+  pair_score:
+    Returns the similarity score between pairs of points.
+
+  score_pairs:
+    Deprecated. Returns the learned Mahalanobis distance between pairs.
+
+  set_params:
+    Set the parameters of this estimator.
+
+  transform:
+    Embeds data points in the learned linear embedding space.
+
   Examples
   --------
   >>> from metric_learn import Covariance
@@ -47,6 +75,10 @@ class Covariance(MahalanobisMixin, TransformerMixin):
 
   def fit(self, X, y=None):
     """
+    Calculates the covariance matrix of the input data.
+
+    Parameters
+    ----------
     X : data matrix, (n x d)
     y : unused
     """

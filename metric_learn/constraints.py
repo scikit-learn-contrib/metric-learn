@@ -28,14 +28,14 @@ class Constraints(object):
 
   Methods
   -------
-  positive_negative_pairs:
-    Generates positive pairs and negative pairs from labeled data.
+  chunks:
+    Generates chunks from labeled data.
 
   generate_knntriplets:
     Generates triplets from labeled data.
 
-  chunks:
-    Generates chunks from labeled data.
+  positive_negative_pairs:
+    Generates positive pairs and negative pairs from labeled data.
   """
 
   def __init__(self, partial_labels):

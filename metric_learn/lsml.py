@@ -173,8 +173,42 @@ class LSML(_BaseLSML, _QuadrupletsClassifierMixin):
 
   Methods
   -------
-  fit :
+  decision_function:
+    Predicts differences between sample distances in input quadruplets.
+
+  fit:
     Learn the LSML model.
+
+  get_mahalanobis_matrix:
+    Returns a copy of the Mahalanobis matrix learned by the metric learner.
+
+  get_metric:
+    Returns a function that takes as input two 1D arrays and outputs the
+    learned metric score on these two points.
+
+  get_params:
+    Get parameters for this estimator.
+
+  pair_distance:
+    Returns the (pseudo) distance between pairs, when available.
+
+  pair_score:
+    Returns the similarity score between pairs of points.
+
+  predict:
+    Predicts the ordering between sample distances in input quadruplets.
+
+  score:
+    Computes score on input quadruplets.
+
+  score_pairs:
+    Deprecated. Returns the learned Mahalanobis distance between pairs.
+
+  set_params:
+    Set the parameters of this estimator.
+
+  transform:
+    Embeds data points in the learned linear embedding space.
 
   Examples
   --------
@@ -291,6 +325,34 @@ class LSML_Supervised(_BaseLSML, TransformerMixin):
   -------
   fit :
     Create constraints from labels and learn the LSML model.
+
+  fit_transform:
+    Fit to data, then transform it.
+
+  get_mahalanobis_matrix:
+    Returns a copy of the Mahalanobis matrix learned by the metric learner.
+
+  get_metric:
+    Returns a function that takes as input two 1D arrays and outputs the
+    learned metric score on these two points.
+
+  get_params:
+    Get parameters for this estimator.
+
+  pair_distance:
+      Returns the (pseudo) distance between pairs, when available.
+
+  pair_score:
+    Returns the similarity score between pairs of points.
+
+  score_pairs:
+    Deprecated. Returns the learned Mahalanobis distance between pairs.
+
+  set_params:
+    Set the parameters of this estimator.
+
+  transform:
+    Embeds data points in the learned linear embedding space.
 
   Examples
   --------

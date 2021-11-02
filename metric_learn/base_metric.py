@@ -24,12 +24,24 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
 
   Methods
   -------
-  score_pairs:
-    Returns the score between pairs.
-
   get_metric:
     Returns a function that takes as input two 1D arrays and outputs the
     learned metric score on these two points.
+
+  get_params:
+    Get parameters for this estimator.
+
+  pair_distance:
+    Returns the (pseudo) distance between pairs, when available.
+
+  pair_score:
+    Returns the similarity score between pairs of points.
+
+  score_pairs:
+    Deprecated. Returns the score between pairs.
+
+  set_params:
+    Set the parameters of this estimator.
   """
 
   def __init__(self, preprocessor=None):
@@ -280,18 +292,30 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
 
   Methods
   -------
-  score_pairs:
-    Returns the learned Mahalanobis distance between pairs.
-
-  transform:
-    Embeds data points in the learned linear embedding space.
+  get_mahalanobis_matrix:
+    Returns a copy of the Mahalanobis matrix learned by the metric learner.
 
   get_metric:
     Returns a function that takes as input two 1D arrays and outputs the
     learned metric score on these two points.
 
-  get_mahalanobis_matrix:
-    Returns a copy of the Mahalanobis matrix learned by the metric learner.
+  get_params:
+    Get parameters for this estimator.
+
+  pair_distance:
+    Returns the (pseudo) distance between pairs, when available.
+
+  pair_score:
+    Returns the similarity score between pairs of points.
+
+  score_pairs:
+    Deprecated. Returns the learned Mahalanobis distance between pairs.
+
+  set_params:
+    Set the parameters of this estimator.
+
+  transform:
+    Embeds data points in the learned linear embedding space.
   """
 
   def score_pairs(self, pairs):
@@ -500,21 +524,40 @@ class _PairsClassifierMixin(BaseMetricLearner):
 
   Methods
   -------
-  predict:
-    Predicts the learned metric between input pairs. (For now it just
-    calls decision function).
+  calibrate_threshold:
+    Decision threshold calibration for pairwise binary classification.\
 
   decision_function:
     Returns the decision function used to classify the pairs.
 
+  get_metric:
+    Returns a function that takes as input two 1D arrays and outputs the
+    learned metric score on these two points.
+
+  get_params:
+    Get parameters for this estimator.
+
+  pair_distance:
+    Returns the (pseudo) distance between pairs, when available.
+
+  pair_score:
+    Returns the similarity score between pairs of points.
+
+  predict:
+    Predicts the learned metric between input pairs. (For now it just
+    calls decision function).
+
   score:
     Computes score of pairs similarity prediction.
 
+  score_pairs:
+    Deprecated. Returns the score between pairs.
+
+  set_params:
+    Set the parameters of this estimator.
+
   set_threshold:
     Sets the threshold of the metric learner to the given value `threshold`.
-
-  calibrate_threshold:
-    Decision threshold calibration for pairwise binary classification.
   """
 
   _tuple_size = 2  # number of points in a tuple, 2 for pairs
@@ -794,14 +837,33 @@ class _TripletsClassifierMixin(BaseMetricLearner):
 
   Methods
   -------
-  predict:
-    Predicts the ordering between sample distances in input triplets.
-
   decision_function:
     Predicts differences between sample distances in input triplets.
 
+  get_metric:
+    Returns a function that takes as input two 1D arrays and outputs the
+    learned metric score on these two points.
+
+  get_params:
+    Get parameters for this estimator.
+
+  pair_distance:
+    Returns the (pseudo) distance between pairs, when available.
+
+  pair_score:
+    Returns the similarity score between pairs of points.
+
+  predict:
+    Predicts the ordering between sample distances in input triplets.
+
   score:
     Computes score on input triplets.
+
+  score_pairs:
+    Deprecated. Returns the score between pairs.
+
+  set_params:
+    Set the parameters of this estimator.
   """
 
   _tuple_size = 3  # number of points in a tuple, 3 for triplets
@@ -890,14 +952,33 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
 
   Methods
   -------
-  predict:
-    Predicts the ordering between sample distances in input quadruplets.
-
   decision_function:
     Predicts differences between sample distances in input quadruplets.
 
+  get_metric:
+    Returns a function that takes as input two 1D arrays and outputs the
+    learned metric score on these two points.
+
+  get_params:
+    Get parameters for this estimator.
+
+  pair_distance:
+    Returns the (pseudo) distance between pairs, when available.
+
+  pair_score:
+    Returns the similarity score between pairs of points.
+
+  predict:
+    Predicts the ordering between sample distances in input quadruplets.
+
   score:
     Computes score on input quadruplets.
+
+  score_pairs:
+    Deprecated. Returns the score between pairs.
+
+  set_params:
+    Set the parameters of this estimator.
   """
 
   _tuple_size = 4  # number of points in a tuple, 4 for quadruplets
