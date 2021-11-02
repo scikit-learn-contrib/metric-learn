@@ -79,7 +79,10 @@ class TestSklearnCompat(unittest.TestCase):
     check_estimator(Stable_RCA_Supervised())
 
   def test_scml(self):
-    check_estimator(SCML_Supervised())
+    msg = "As no value for `n_basis` was selected, "
+    with pytest.warns(UserWarning) as raised_warning:
+      check_estimator(SCML_Supervised())
+    assert msg in str(raised_warning[0].message)
 
 
 RNG = check_random_state(0)
