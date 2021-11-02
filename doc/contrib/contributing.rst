@@ -26,7 +26,7 @@ We are a community based on openness and friendly, didactic, discussions.
 
 We aspire to treat everybody equally, and value their contributions. We
 are particularly seeking people from underrepresented backgrounds in Open
-Source Software and scikit-learn in particular to participate and contribute
+Source Software and metric-learn in particular to participate and contribute
 their expertise and experience.
 
 Decisions are made based on technical merit and consensus.
@@ -153,11 +153,11 @@ Contributing code
 How to contribute
 ^^^^^^^^^^^^^^^^^
 
-The preferred way to contribute to scikit-learn is to fork the `main
+The preferred way to contribute to metric-learn is to fork the `main
 repository <https://github.com/scikit-learn-contrib/metric-learn>`_
 on GitHub, then submit a “pull request” (PR).
 
-In the first few steps, we explain how to locally install scikit-learn,
+In the first few steps, we explain how to locally install metric-learn,
 and how to set up your git repository:
 
 1. `Create an account on GitHub <https://github.com/join>`_ if
@@ -173,8 +173,8 @@ and how to set up your git repository:
 
   .. code-block:: bash
 
-    git clone git@github.com:YourLogin/scikit-learn.git  # add --depth 1 if your connection is slow
-    cd scikit-learn
+    git clone git@github.com:YourLogin/metric-learn.git  # add --depth 1 if your connection is slow
+    cd metric-learn
 
 4. Install the development dependencies:
 
