@@ -344,6 +344,8 @@ Follow these simple guidelines to test your new feature/module:
    the warning is being shown. Same for `Errors`. Some examples might
    be warnings about a default configuration, a wrong input, etc.
 
+.. _building-the-docs:
+
 Building the docs
 ^^^^^^^^^^^^^^^^^
 

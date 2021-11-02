@@ -79,8 +79,8 @@ autosummary_generate = True
 # In an ideal world, this would get fixed in this PR:
 # https://github.com/readthedocs/sphinx_rtd_theme/pull/747/files
 def setup(app):
-#    app.add_javascript('js/copybutton.js')
-    app.add_css_file("css/custom.css")
+  app.add_css_file("css/custom.css")
+# app.add_javascript('js/copybutton.js')
 
 
 # Remove matplotlib agg warnings from generated doc when using plt.show

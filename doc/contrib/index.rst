@@ -28,5 +28,10 @@ Developer contributions
 
 .. toctree::
   :maxdepth: 2
+
+  release
+
+.. toctree::
+  :maxdepth: 2
   
   mlep
