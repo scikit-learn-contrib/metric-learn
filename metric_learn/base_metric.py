@@ -571,7 +571,10 @@ class _PairsClassifierMixin(BaseMetricLearner):
     check_is_fitted(self, 'preprocessor_')
     try:
       self.threshold_ = float(threshold)
-    except Exception:
+    except TypeError:
+      raise ValueError('Parameter threshold must be a real number. '
+                       'Got {} instead.'.format(type(threshold)))
+    except ValueError:
       raise ValueError('Parameter threshold must be a real number. '
                        'Got {} instead.'.format(type(threshold)))
     return self
