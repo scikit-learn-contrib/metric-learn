@@ -1,3 +1,6 @@
+"""
+Tests that are specific for each learner.
+"""
 import unittest
 import re
 import pytest
@@ -9,7 +12,6 @@ from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
                            assert_allclose)
-from metric_learn.sklearn_shims import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
@@ -96,7 +98,7 @@ class TestSCML(object):
                                n_informative=60, n_redundant=0, n_repeated=0,
                                random_state=42)
     X = StandardScaler().fit_transform(X)
-    scml = SCML_Supervised(random_state=42)
+    scml = SCML_Supervised(random_state=42, n_basis=399)
     scml.fit(X, y)
     csep = class_separation(scml.transform(X), y)
     assert csep < 0.7
@@ -107,7 +109,7 @@ class TestSCML(object):
                                                          [2, 0], [2, 1]]),
                                                np.array([1, 0, 1, 0])))])
   def test_bad_basis(self, estimator, data):
-    model = estimator(basis='bad_basis')
+    model = estimator(basis='bad_basis', n_basis=33)  # n_basis doesn't matter
     msg = ("`basis` must be one of the options '{}' or an array of shape "
            "(n_basis, n_features)."
            .format("', '".join(model._authorized_basis)))
@@ -239,16 +241,23 @@ class TestSCML(object):
   @pytest.mark.parametrize('n_features', [10, 50, 100])
   @pytest.mark.parametrize('n_classes', [5, 10, 15])
   def test_triplet_diffs(self, n_samples, n_features, n_classes):
+    """
+    Test that the correct value of n_basis is being generated with
+    different triplet constraints.
+    """
     X, y = make_classification(n_samples=n_samples, n_classes=n_classes,
                                n_features=n_features, n_informative=n_features,
                                n_redundant=0, n_repeated=0)
     X = StandardScaler().fit_transform(X)
-
-    model = SCML_Supervised()
+    model = SCML_Supervised(n_basis=None)  # Explicit n_basis=None
     constraints = Constraints(y)
     triplets = constraints.generate_knntriplets(X, model.k_genuine,
                                                 model.k_impostor)
-    basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+
+    msg = "As no value for `n_basis` was selected, "
+    with pytest.warns(UserWarning) as raised_warning:
+      basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+    assert msg in str(raised_warning[0].message)
 
     expected_n_basis = n_features * 80
     assert n_basis == expected_n_basis
@@ -258,13 +267,21 @@ class TestSCML(object):
   @pytest.mark.parametrize('n_features', [10, 50, 100])
   @pytest.mark.parametrize('n_classes', [5, 10, 15])
   def test_lda(self, n_samples, n_features, n_classes):
+    """
+    Test that when n_basis=None, the correct n_basis is generated,
+    for SCML_Supervised and different values of n_samples, n_features
+    and n_classes.
+    """
     X, y = make_classification(n_samples=n_samples, n_classes=n_classes,
                                n_features=n_features, n_informative=n_features,
                                n_redundant=0, n_repeated=0)
     X = StandardScaler().fit_transform(X)
 
-    model = SCML_Supervised()
-    basis, n_basis = model._generate_bases_LDA(X, y)
+    msg = "As no value for `n_basis` was selected, "
+    with pytest.warns(UserWarning) as raised_warning:
+      model = SCML_Supervised(n_basis=None)  # Explicit n_basis=None
+      basis, n_basis = model._generate_bases_LDA(X, y)
+    assert msg in str(raised_warning[0].message)
 
     num_eig = min(n_classes - 1, n_features)
     expected_n_basis = min(20 * n_features, n_samples * 2 * num_eig - 1)
@@ -300,7 +317,7 @@ class TestSCML(object):
     assert msg == raised_error.value.args[0]
 
   def test_large_output_iter(self):
-    scml = SCML(max_iter=1, output_iter=2)
+    scml = SCML(max_iter=1, output_iter=2, n_basis=33)  # n_basis don't matter
     triplets = np.array([[[0, 1], [2, 1], [0, 0]]])
     msg = ("The value of output_iter must be equal or smaller than"
            " max_iter.")
@@ -1143,9 +1160,10 @@ def test_convergence_warning(dataset, algo_class):
     X, y = dataset
     model = algo_class(max_iter=2, verbose=True)
     cls_name = model.__class__.__name__
-    assert_warns_message(ConvergenceWarning,
-                         '[{}] {} did not converge'.format(cls_name, cls_name),
-                         model.fit, X, y)
+    msg = '[{}] {} did not converge'.format(cls_name, cls_name)
+    with pytest.warns(Warning) as raised_warning:
+      model.fit(X, y)
+    assert any([msg in str(warn.message) for warn in raised_warning])
 
 
 if __name__ == '__main__':

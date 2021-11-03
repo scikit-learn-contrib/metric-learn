@@ -1,3 +1,7 @@
+"""
+Tests all functionality for PairClassifiers. Methods, threshold, calibration,
+warnings, correctness, use cases, etc.
+"""
 from functools import partial
 
 import pytest
@@ -10,7 +14,8 @@ from sklearn.metrics import (f1_score, accuracy_score, fbeta_score,
                              precision_score)
 from sklearn.model_selection import train_test_split
 
-from test.test_utils import pairs_learners, ids_pairs_learners
+from test.test_utils import pairs_learners, ids_pairs_learners, \
+  pairs_learners_m, ids_pairs_learners_m
 from metric_learn.sklearn_shims import set_random_state
 from sklearn import clone
 import numpy as np
@@ -40,7 +45,7 @@ def test_predict_only_one_or_minus_one(estimator, build_dataset,
                          ids=ids_pairs_learners)
 def test_predict_monotonous(estimator, build_dataset,
                             with_preprocessor):
-  """Test that there is a threshold distance separating points labeled as
+  """Test that there is a threshold value separating points labeled as
   similar and points labeled as dissimilar """
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
@@ -49,14 +54,14 @@ def test_predict_monotonous(estimator, build_dataset,
   pairs_train, pairs_test, y_train, y_test = train_test_split(input_data,
                                                               labels)
   estimator.fit(pairs_train, y_train)
-  distances = estimator.pair_distance(pairs_test)
+  scores = estimator.pair_score(pairs_test)
   predictions = estimator.predict(pairs_test)
-  min_dissimilar = np.min(distances[predictions == -1])
-  max_similar = np.max(distances[predictions == 1])
-  assert max_similar <= min_dissimilar
-  separator = np.mean([min_dissimilar, max_similar])
-  assert (predictions[distances > separator] == -1).all()
-  assert (predictions[distances < separator] == 1).all()
+  max_dissimilar = np.max(scores[predictions == -1])
+  min_similar = np.min(scores[predictions == 1])
+  assert max_dissimilar <= min_similar
+  separator = np.mean([max_dissimilar, min_similar])
+  assert (predictions[scores < separator] == -1).all()
+  assert (predictions[scores > separator] == 1).all()
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -65,30 +70,22 @@ def test_predict_monotonous(estimator, build_dataset,
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
   """Test that a NotFittedError is raised if someone tries to use
-  pair_distance, decision_function, get_metric, transform or
-  get_mahalanobis_matrix on input data and the metric learner
-  has not been fitted."""
+  decision_function, calibrate_threshold, set_threshold, predict
+  on input data and the metric learner has not been fitted."""
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   with pytest.raises(NotFittedError):
-    estimator.pair_distance(input_data)
+    estimator.predict(input_data)
   with pytest.raises(NotFittedError):
     estimator.decision_function(input_data)
   with pytest.raises(NotFittedError):
-    estimator.get_metric()
-  with pytest.raises(NotFittedError):
-    estimator.transform(input_data)
-  with pytest.raises(NotFittedError):
-    estimator.get_mahalanobis_matrix()
-  with pytest.raises(NotFittedError):
-    estimator.calibrate_threshold(input_data, labels)
-
+    estimator.score(input_data, labels)
   with pytest.raises(NotFittedError):
     estimator.set_threshold(0.5)
   with pytest.raises(NotFittedError):
-    estimator.predict(input_data)
+    estimator.calibrate_threshold(input_data, labels)
 
 
 @pytest.mark.parametrize('calibration_params',
@@ -128,7 +125,7 @@ def test_fit_with_valid_threshold_params(estimator, build_dataset,
                          ids=ids_pairs_learners)
 def test_threshold_different_scores_is_finite(estimator, build_dataset,
                                               with_preprocessor, kwargs):
-  # test that calibrating the threshold works for every metric learner
+  """Test that calibrating the threshold works for every metric learner"""
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
@@ -169,7 +166,7 @@ def test_unset_threshold():
 
 
 def test_set_threshold():
-  # test that set_threshold indeed sets the threshold
+  """Test that set_threshold indeed sets the threshold"""
   identity_pairs_classifier = IdentityPairsClassifier()
   pairs = np.array([[[0.], [1.]], [[1.], [3.]], [[2.], [5.]], [[3.], [7.]]])
   y = np.array([1, 1, -1, -1])
@@ -178,9 +175,28 @@ def test_set_threshold():
   assert identity_pairs_classifier.threshold_ == 0.5
 
 
+@pytest.mark.parametrize('value', ["ABC", None, [1, 2, 3], {'key': None},
+                         (1, 2), set(),
+                         np.array([[[0.], [1.]], [[1.], [3.]]])])
+def test_set_wrong_type_threshold(value):
+  """
+  Test that `set_threshold` indeed sets the threshold
+  and cannot accept nothing but float or integers, but
+  being permissive with boolean True=1.0 and False=0.0
+  """
+  model = IdentityPairsClassifier()
+  model.fit(np.array([[[0.], [1.]]]), np.array([1]))
+  msg = ('Parameter threshold must be a real number. '
+         'Got {} instead.'.format(type(value)))
+
+  with pytest.raises(ValueError) as e:  # String
+    model.set_threshold(value)
+  assert str(e.value).startswith(msg)
+
+
 def test_f_beta_1_is_f_1():
-  # test that putting beta to 1 indeed finds the best threshold to optimize
-  # the f1_score
+  """Test that putting beta to 1 indeed finds the best threshold to optimize
+  the f1_score"""
   rng = np.random.RandomState(42)
   n_samples = 100
   pairs, y = rng.randn(n_samples, 2, 5), rng.choice([-1, 1], size=n_samples)
@@ -245,8 +261,8 @@ def tnr_threshold(y_true, y_pred, tpr_threshold=0.):
                           for t in [0., 0.1, 0.5, 0.8, 1.]],
                          )
 def test_found_score_is_best_score(kwargs, scoring):
-  # test that when we use calibrate threshold, it will indeed be the
-  # threshold that have the best score
+  """Test that when we use calibrate threshold, it will indeed be the
+  threshold that have the best score"""
   rng = np.random.RandomState(42)
   n_samples = 50
   pairs, y = rng.randn(n_samples, 2, 5), rng.choice([-1, 1], size=n_samples)
@@ -284,11 +300,11 @@ def test_found_score_is_best_score(kwargs, scoring):
                           for t in [0., 0.1, 0.5, 0.8, 1.]]
                          )
 def test_found_score_is_best_score_duplicates(kwargs, scoring):
-  # test that when we use calibrate threshold, it will indeed be the
-  # threshold that have the best score. It's the same as the previous test
-  # except this time we test that the scores are coherent even if there are
-  # duplicates (i.e. points that have the same score returned by
-  # `decision_function`).
+  """Test that when we use calibrate threshold, it will indeed be the
+  threshold that have the best score. It's the same as the previous test
+  except this time we test that the scores are coherent even if there are
+  duplicates (i.e. points that have the same score returned by
+  `decision_function`)."""
   rng = np.random.RandomState(42)
   n_samples = 50
   pairs, y = rng.randn(n_samples, 2, 5), rng.choice([-1, 1], size=n_samples)
@@ -332,8 +348,8 @@ def test_found_score_is_best_score_duplicates(kwargs, scoring):
                          )
 def test_calibrate_threshold_invalid_parameters_right_error(invalid_args,
                                                             expected_msg):
-  # test that the right error message is returned if invalid arguments are
-  # given to calibrate_threshold
+  """Test that the right error message is returned if invalid arguments are
+  given to `calibrate_threshold`"""
   rng = np.random.RandomState(42)
   pairs, y = rng.randn(20, 2, 5), rng.choice([-1, 1], size=20)
   pairs_learner = IdentityPairsClassifier()
@@ -356,8 +372,8 @@ def test_calibrate_threshold_invalid_parameters_right_error(invalid_args,
                          # to do that)
                          )
 def test_calibrate_threshold_valid_parameters(valid_args):
-  # test that no warning message is returned if valid arguments are given to
-  # calibrate threshold
+  """Test that no warning message is returned if valid arguments are given to
+  `calibrate threshold`"""
   rng = np.random.RandomState(42)
   pairs, y = rng.randn(20, 2, 5), rng.choice([-1, 1], size=20)
   pairs_learner = IdentityPairsClassifier()
@@ -369,8 +385,7 @@ def test_calibrate_threshold_valid_parameters(valid_args):
 
 def test_calibrate_threshold_extreme():
   """Test that in the (rare) case where we should accept all points or
-  reject all points, this is effectively what
-  is done"""
+  reject all points, this is effectively what is done"""
 
   class MockBadPairsClassifier(MahalanobisMixin, _PairsClassifierMixin):
     """A pairs classifier that returns bad scores (i.e. in the inverse order
@@ -468,9 +483,9 @@ def test_calibrate_threshold_extreme():
                          )
 def test_validate_calibration_params_invalid_parameters_right_error(
         estimator, _, invalid_args, expected_msg):
-  # test that the right error message is returned if invalid arguments are
-  # given to _validate_calibration_params, for all pairs metric learners as
-  # well as a mocking general identity pairs classifier and the class itself
+  """Test that the right error message is returned if invalid arguments are
+  given to `_validate_calibration_params`, for all pairs metric learners as
+  well as a mocking general identity pairs classifier and the class itself"""
   with pytest.raises(ValueError) as raised_error:
     estimator._validate_calibration_params(**invalid_args)
   assert str(raised_error.value) == expected_msg
@@ -494,9 +509,9 @@ def test_validate_calibration_params_invalid_parameters_right_error(
                          )
 def test_validate_calibration_params_valid_parameters(
         estimator, _, valid_args):
-  # test that no warning message is returned if valid arguments are given to
-  # _validate_calibration_params for all pairs metric learners, as well as
-  # a mocking example, and the class itself
+  """Test that no warning message is returned if valid arguments are given to
+  `_validate_calibration_params` for all pairs metric learners, as well as
+  a mocking example, and the class itself"""
   with pytest.warns(None) as record:
     estimator._validate_calibration_params(**valid_args)
   assert len(record) == 0
@@ -507,7 +522,7 @@ def test_validate_calibration_params_valid_parameters(
                          ids=ids_pairs_learners)
 def test_validate_calibration_params_invalid_parameters_error_before__fit(
         estimator, build_dataset):
-  """For all pairs metric learners (which currently all have a _fit method),
+  """For all pairs metric learners (which currently all have a `_fit` method),
   make sure that calibration parameters are validated before fitting"""
   estimator = clone(estimator)
   input_data, labels, _, _ = build_dataset()
@@ -524,11 +539,12 @@ def test_validate_calibration_params_invalid_parameters_error_before__fit(
   assert str(raised_error.value) == expected_msg
 
 
-@pytest.mark.parametrize('estimator, build_dataset', pairs_learners,
-                         ids=ids_pairs_learners)
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners_m,
+                         ids=ids_pairs_learners_m)
 def test_accuracy_toy_example(estimator, build_dataset):
   """Test that the accuracy works on some toy example (hence that the
-  prediction is OK)"""
+  prediction is OK). This test is designed for Mahalanobis learners only,
+  as the toy example uses the notion of distance."""
   input_data, labels, preprocessor, X = build_dataset(with_preprocessor=False)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)

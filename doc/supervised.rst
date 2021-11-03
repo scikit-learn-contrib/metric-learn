@@ -94,11 +94,23 @@ array([0.49627072, 3.65287282, 6.06079877])
 >>> metric_fun([3.5, 3.6], [5.6, 2.4])
 0.4962707194621285
 
+- Alternatively, you can use `pair_score` to return the **score** between
+  pairs of points (the larger the score, the more similar the pair).
+  For Mahalanobis learners, it is equal to the opposite of the distance.
+
+>>> score = nca.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+This is useful because `pair_score` matches the **score** semantic of 
+scikit-learn's `Classification metrics
+<https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+
 For similarity learners `pair_distance` is not available, as they don't learn
-a distance. Intead you use `pair_similarity` that has the same behaviour but
+a distance. Intead you use `pair_score` that has the same behaviour but
 for similarity.
 
->>> algorithm.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> algorithm.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
 array([-0.2312, 705.23, -72.8])
 
 .. warning::
@@ -113,29 +125,10 @@ a function that will return the similarity bewtween 1D arrays.
 >>> similarity_fun([3.5, 3.6], [5.6, 2.4])
 -0.04752
 
-For similarity learners and mahalanobis learners, `pair_similarity` is
+For similarity learners and mahalanobis learners, `pair_score` is
 available. You can interpret that this function returns the **score**
 between points: the more the **score**, the closer the pairs and vice-versa.
 For mahalanobis learners, it is equal to the inverse of the distance.
-
->>> score = nca.pair_similarity([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
->>> score
-array([-0.49627072, -3.65287282, -6.06079877])
-
-This is useful because `pair_similarity` matches the **score** sematic of 
-scikit-learn's `Classification matrics <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
-For instance, given a labeled data, you can pass the labels and the
-**score** of your data to get the ROC curve.
-
->>> from sklearn.metrics import roc_curve
->>> fpr, tpr, thresholds = roc_curve(['dog', 'cat', 'dog'], score, pos_label='dog')
->>> fpr
-array([0., 0., 1., 1.])
->>> tpr
-array([0. , 0.5, 0.5, 1. ])
->>> 
->>> thresholds
-array([ 0.50372928, -0.49627072, -3.65287282, -6.06079877])
 
 .. note::
 
@@ -166,7 +159,7 @@ All supervised algorithms are scikit-learn estimators
 scikit-learn model selection routines 
 (`sklearn.model_selection.cross_val_score`,
 `sklearn.model_selection.GridSearchCV`, etc).
-You can also use methods from `sklearn.metrics` that rely on y_scores.
+You can also use some of the scoring functions from `sklearn.metrics`.
 
 Algorithms
 ==========

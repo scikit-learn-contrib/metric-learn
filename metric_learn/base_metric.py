@@ -29,20 +29,22 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   @abstractmethod
   def score_pairs(self, pairs):
     """
-    .. deprecated:: 0.6.3 Refer to `pair_distance` and `pair_similarity`.
+    .. deprecated:: 0.7.0 Refer to `pair_distance` and `pair_score`.
 
     .. warning::
-        This method will be deleted in 0.6.4. Please refer to `pair_distance`
-        or `pair_similarity`. This change will occur in order to add learners
-        that don't necessarly learn a Mahalanobis distance.
+        This method will be removed in 0.8.0. Please refer to `pair_distance`
+        or `pair_score`. This change will occur in order to add learners
+        that don't necessarily learn a Mahalanobis distance.
 
     Returns the score between pairs
     (can be a similarity, or a distance/metric depending on the algorithm)
 
     Parameters
     ----------
-    pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
-      3D array of pairs.
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to score, with each row corresponding to two points,
+      for 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
 
     Returns
     -------
@@ -52,27 +54,28 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
     See Also
     --------
     get_metric : a method that returns a function to compute the metric between
-      two points. The difference with `score_pairs` is that it works on two
+      two points. The difference between `score_pairs` is that it works on two
       1D arrays and cannot use a preprocessor. Besides, the returned function
-      is independent of the metric learner and hence is  not modified if the
+      is independent of the metric learner and hence is not modified if the
       metric learner is.
     """
 
   @abstractmethod
-  def pair_similarity(self, pairs):
+  def pair_score(self, pairs):
     """
-    .. versionadded:: 0.6.3 Compute the similarity score bewteen pairs
+    .. versionadded:: 0.7.0 Compute the similarity score between pairs
 
-    Returns the similarity score between pairs. Depending on the algorithm,
-    this method can return the learned similarity score between pairs,
-    or the inverse of the distance learned between two pairs. The more the
-    score, the more similar the pairs. All learners have access to this
-    method.
+    Returns the similarity score between pairs of points (the larger the score,
+    the more similar the pair). For metric learners that learn a distance,
+    the score is simply the opposite of the distance between pairs. All
+    learners have access to this method.
 
     Parameters
     ----------
-    pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
-      3D array of pairs.
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to score, with each row corresponding to two points,
+      for 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
 
     Returns
     -------
@@ -82,7 +85,7 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
     See Also
     --------
     get_metric : a method that returns a function to compute the metric between
-      two points. The difference with `pair_similarity` is that it works on two
+      two points. The difference with `pair_score` is that it works on two
       1D arrays and cannot use a preprocessor. Besides, the returned function
       is independent of the metric learner and hence is not modified if the
       metric learner is.
@@ -91,22 +94,23 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   @abstractmethod
   def pair_distance(self, pairs):
     """
-    .. versionadded:: 0.6.3 Compute the distance score between pairs
+    .. versionadded:: 0.7.0 Compute the distance between pairs
 
-    Returns the distance score between pairs. For Mahalanobis learners, it
-    returns the pseudo-distance bewtween pairs. It is not available for
-    learners that does not learn a distance or pseudo-distance, an error
-    will be shown instead.
+    Returns the (pseudo) distance between pairs, when available. For metric
+    learners that do not learn a (pseudo) distance, an error is thrown
+    instead.
 
     Parameters
     ----------
-    pairs : `numpy.ndarray`, shape=(n_samples, 2, n_features)
-      3D array of pairs.
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs for which to compute the distance, with each
+      row corresponding to two points, for 2D array of indices of pairs
+      if the metric learner uses a preprocessor.
 
     Returns
     -------
     scores : `numpy.ndarray` of shape=(n_pairs,)
-      The score of every pair.
+      The distance between every pair.
 
     See Also
     --------
@@ -170,10 +174,10 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
 
   @abstractmethod
   def get_metric(self):
-    """Returns a function that takes as input two 1D arrays and outputs the
-    learned metric score on these two points. Depending on the algorithm, it
-    can return the distance or similarity function between pairs. It always
-    returns what the specific algorithm learns.
+    """Returns a function that takes as input two 1D arrays and outputs
+    the value of the learned metric on these two points. Depending on the
+    algorithm, it can return a distance or a similarity function between
+    pairs.
 
     This function will be independent from the metric learner that learned it
     (it will not be modified if the initial metric learner is modified),
@@ -206,13 +210,13 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
 
     See Also
     --------
-    pair_distance : a method that returns the distance score between several
+    pair_distance : a method that returns the distance between several
       pairs of points. Unlike `get_metric`, this is a method of the metric
       learner and therefore can change if the metric learner changes. Besides,
       it can use the metric learner's preprocessor, and works on concatenated
       arrays.
 
-    pair_similarity : a method that returns the similarity score between
+    pair_score : a method that returns the similarity score between
       several pairs of points. Unlike `get_metric`, this is a method of the
       metric learner and therefore can change if the metric learner changes.
       Besides, it can use the metric learner's preprocessor, and works on
@@ -255,11 +259,11 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
   """
 
   def score_pairs(self, pairs):
-    dpr_msg = ("score_pairs will be deprecated in release 0.6.4. "
-               "Use pair_similarity to compute similarities, or "
+    dpr_msg = ("score_pairs will be deprecated in release 0.7.0. "
+               "Use pair_score to compute similarity scores, or "
                "pair_distances to compute distances.")
     warnings.warn(dpr_msg, category=FutureWarning)
-    return self.pair_similarity(pairs)
+    return self.pair_score(pairs)
 
   def pair_distance(self, pairs):
     """
@@ -267,12 +271,11 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     pseudo-distance nor a distance. In consecuence, the additive inverse
     of the bilinear similarity cannot be used as distance by construction.
     """
-    msg = ("Bilinear similarity learners don't learn a distance, thus ",
-           "this method is not implemented. Use pair_similarity to "
-           "compute similarity between pairs")
+    msg = ("This learner doesn't learn a distance, thus ",
+           "this method is not implemented. Use pair_score instead")
     raise Exception(msg)
 
-  def pair_similarity(self, pairs):
+  def pair_score(self, pairs):
     r"""Returns the learned Bilinear similarity between pairs.
 
     This similarity is defined as: :math:`s_M(x, x') =  x^T M x'`
@@ -294,7 +297,7 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     See Also
     --------
     get_metric : a method that returns a function to compute the similarity
-      between two points. The difference with `pair_similarity` is that it
+      between two points. The difference with `pair_score` is that it
       works on two 1D arrays and cannot use a preprocessor. Besides, the
       returned function is independent of the similarity learner and hence
       is not modified if the similarity learner is.
@@ -302,7 +305,7 @@ class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
     :ref:`Bilinear_similarity` : The section of the project documentation
       that describes Bilinear similarity.
     """
-    check_is_fitted(self, ['preprocessor_', 'components_'])
+    check_is_fitted(self, ['preprocessor_'])
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=2)
@@ -373,13 +376,13 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
 
   def score_pairs(self, pairs):
     r"""
-    .. deprecated:: 0.6.3
+    .. deprecated:: 0.7.0
         This method is deprecated. Please use `pair_distance` instead.
 
     .. warning::
-        This method will be deleted in 0.6.4. Please refer to `pair_distance`
-        or `pair_similarity`. This change will occur in order to add learners
-        that don't necessarly learn a Mahalanobis distance.
+        This method will be removed in 0.8.0. Please refer to `pair_distance`
+        or `pair_score`. This change will occur in order to add learners
+        that don't necessarily learn a Mahalanobis distance.
 
     Returns the learned Mahalanobis distance between pairs.
 
@@ -414,15 +417,15 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
     :ref:`mahalanobis_distances` : The section of the project documentation
       that describes Mahalanobis Distances.
     """
-    dpr_msg = ("score_pairs will be deprecated in release 0.6.3. "
-               "Use pair_similarity to compute similarities, or "
+    dpr_msg = ("score_pairs will be deprecated in release 0.7.0. "
+               "Use pair_score to compute similarity scores, or "
                "pair_distances to compute distances.")
     warnings.warn(dpr_msg, category=FutureWarning)
     return self.pair_distance(pairs)
 
-  def pair_similarity(self, pairs):
+  def pair_score(self, pairs):
     """
-    Returns the inverse of the learned Mahalanobis distance between pairs.
+    Returns the opposite of the learned Mahalanobis distance between pairs.
 
     Parameters
     ----------
@@ -434,12 +437,12 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
     Returns
     -------
     scores : `numpy.ndarray` of shape=(n_pairs,)
-      The inverse of the learned Mahalanobis distance for every pair.
+      The opposite of the learned Mahalanobis distance for every pair.
 
     See Also
     --------
     get_metric : a method that returns a function to compute the metric between
-      two points. The difference with `pair_similarity` is that it works on two
+      two points. The difference with `pair_score` is that it works on two
       1D arrays and cannot use a preprocessor. Besides, the returned function
       is independent of the metric learner and hence is not modified if the
       metric learner is.
@@ -630,7 +633,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     pairs = check_input(pairs, type_of_inputs='tuples',
                         preprocessor=self.preprocessor_,
                         estimator=self, tuple_size=self._tuple_size)
-    return self.pair_similarity(pairs)
+    return self.pair_score(pairs)
 
   def score(self, pairs, y):
     """Computes score of pairs similarity prediction.
@@ -678,8 +681,14 @@ class _PairsClassifierMixin(BaseMetricLearner):
       The pairs classifier with the new threshold set.
     """
     check_is_fitted(self, 'preprocessor_')
-
-    self.threshold_ = threshold
+    try:
+      self.threshold_ = float(threshold)
+    except TypeError:
+      raise ValueError('Parameter threshold must be a real number. '
+                       'Got {} instead.'.format(type(threshold)))
+    except ValueError:
+      raise ValueError('Parameter threshold must be a real number. '
+                       'Got {} instead.'.format(type(threshold)))
     return self
 
   def calibrate_threshold(self, pairs_valid, y_valid, strategy='accuracy',
@@ -900,8 +909,8 @@ class _TripletsClassifierMixin(BaseMetricLearner):
     triplets = check_input(triplets, type_of_inputs='tuples',
                            preprocessor=self.preprocessor_,
                            estimator=self, tuple_size=self._tuple_size)
-    return (self.pair_similarity(triplets[:, :2]) -
-            self.pair_similarity(triplets[:, [0, 2]]))
+    return (self.pair_score(triplets[:, :2]) -
+            self.pair_score(triplets[:, [0, 2]]))
 
   def score(self, triplets):
     """Computes score on input triplets.
@@ -985,8 +994,8 @@ class _QuadrupletsClassifierMixin(BaseMetricLearner):
     quadruplets = check_input(quadruplets, type_of_inputs='tuples',
                               preprocessor=self.preprocessor_,
                               estimator=self, tuple_size=self._tuple_size)
-    return (self.pair_similarity(quadruplets[:, :2]) -
-            self.pair_similarity(quadruplets[:, 2:]))
+    return (self.pair_score(quadruplets[:, :2]) -
+            self.pair_score(quadruplets[:, 2:]))
 
   def score(self, quadruplets):
     """Computes score on input quadruplets
