@@ -19,8 +19,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
           random_state=None,
           shuffle=True,
           random_sampling=False,
-          init="identity",
-          custom_order=None
+          init="identity"
           ):
     super().__init__(preprocessor=preprocessor)
     self.n_iter = n_iter  # Max iterations
@@ -29,7 +28,6 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     self.shuffle = shuffle  # Shuffle the trilplets
     self.random_sampling = random_sampling
     self.init = init
-    self.custom_order = custom_order
 
   def _fit(self, triplets):
     """
@@ -57,25 +55,23 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
                                        self.n_iter,
                                        shuffle=self.shuffle,
                                        random=self.random_sampling,
-                                       random_state=self.random_state,
-                                       custom=self.custom_order)
+                                       random_state=self.random_state)
     i = 0
     while i < self.n_iter:
-        current_triplet = X[triplets[self.indices[i]]]
-        loss = self._loss(current_triplet)
-        vi = self._vi_matrix(current_triplet)
-        fs = np.linalg.norm(vi, ord='fro') ** 2
-        # Global GD or Adjust to tuple
-        tau_i = np.minimum(self.c, loss / fs)
-
-        # Update components
-        self.components_ = np.add(self.components_, tau_i * vi)
-        i = i + 1
+      t = X[triplets[self.indices[i]]]  # t = Current triplet
+      delta = t[1] - t[2]
+      loss = 1 - np.dot(np.dot(t[0], self.components_), delta)
+      if loss > 0:
+        vi = np.outer(t[0], delta)  # V_i matrix
+        fs = np.linalg.norm(vi, ord='fro') ** 2  # Frobenius norm ** 2
+        tau_i = np.minimum(self.c, loss / fs)  # Global GD or fit tuple
+        self.components_ = np.add(self.components_, tau_i * vi)  # Update
+      i = i + 1
 
     return self
 
   def partial_fit(self, new_triplets, n_iter, shuffle=True,
-                  random_sampling=False, custom_order=None):
+                  random_sampling=False):
     """
     Reuse previous fit, and feed the algorithm with new triplets.
     A new n_iter can be set for these new triplets.
@@ -102,36 +98,9 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
       the input. This sample can contain duplicates. It does not
       matter if n_iter is lower, equal or greater than the number
       of triplets. The sampling uses uniform distribution.
-
-    custom_order : array-like, optinal (default = None)
-      User's custom order of triplets to feed oasis. Might be useful when
-      trying to put a bias in the resulting similarity matrix.
     """
     self.n_iter = n_iter
-    self.fit(new_triplets, shuffle=shuffle, random_sampling=random_sampling,
-             custom_order=custom_order)
-
-  def _loss(self, triplet):
-    """
-    Loss function in a triplet
-    """
-    S = self.pair_similarity([[triplet[0], triplet[1]],
-                              [triplet[0], triplet[2]]])
-    return np.maximum(0, 1 - S[0] + S[1])
-
-  def _vi_matrix(self, triplet):
-    """
-    Computes V_i, the gradient matrix in a triplet
-    """
-    # (pi+ - pi-)
-    diff = np.subtract(triplet[1], triplet[2])  # Shape (, d)
-    result = []
-
-    # For each scalar in first triplet, multiply by the diff of pi+ and pi-
-    for v in triplet[0]:
-        result.append(v * diff)
-
-    return np.array(result)  # Shape (d, d)
+    self.fit(new_triplets, shuffle=shuffle, random_sampling=random_sampling)
 
 
 class OASIS(_BaseOASIS):
@@ -181,10 +150,6 @@ class OASIS(_BaseOASIS):
   random_state : int or numpy.RandomState or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int.
 
-  custom_order : array-like, optinal (default = None)
-    User's custom order of triplets to feed oasis. Might be useful when
-    trying to put a bias in the resulting similarity matrix.
-
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
@@ -225,11 +190,11 @@ class OASIS(_BaseOASIS):
 
   def __init__(self, preprocessor=None, n_iter=None, c=0.0001,
                random_state=None, shuffle=True, random_sampling=False,
-               init="identity", custom_order=None):
-      super().__init__(preprocessor=preprocessor, n_iter=n_iter, c=c,
-                       random_state=random_state, shuffle=shuffle,
-                       random_sampling=random_sampling,
-                       init=init, custom_order=custom_order)
+               init="identity"):
+    super().__init__(preprocessor=preprocessor, n_iter=n_iter, c=c,
+                     random_state=random_state, shuffle=shuffle,
+                     random_sampling=random_sampling,
+                     init=init)
 
   def fit(self, triplets):
     """Learn the OASIS model.
@@ -295,10 +260,6 @@ class OASIS_Supervised(OASIS):
   random_state : int or numpy.RandomState or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int.
 
-  custom_order : array-like, optinal (default = None)
-    User's custom order of triplets to feed oasis. Might be useful when
-    trying to put a bias in the resulting similarity matrix.
-
   Attributes
   ----------
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
@@ -319,7 +280,7 @@ class OASIS_Supervised(OASIS):
   >>> oasis.fit(X, Y)
   OASIS_Supervised(n_iter=4500,
                  random_state=RandomState(MT19937) at 0x7FE1B598FA40)
-  >>> oasis.pair_similarity([[X[0], X[1]]])
+  >>> oasis.pair_score([[X[0], X[1]]])
   array([-21.14242072])
 
   References
@@ -342,13 +303,13 @@ class OASIS_Supervised(OASIS):
   def __init__(self, k_genuine=3, k_impostor=10,
                preprocessor=None, n_iter=None, c=0.0001,
                random_state=None, shuffle=True, random_sampling=False,
-               init="identity", custom_order=None):
+               init="identity"):
     self.k_genuine = k_genuine
     self.k_impostor = k_impostor
     super().__init__(preprocessor=preprocessor, n_iter=n_iter, c=c,
                      random_state=random_state, shuffle=shuffle,
                      random_sampling=random_sampling,
-                     init=init, custom_order=custom_order)
+                     init=init)
 
   def fit(self, X, y):
     """Create constraints from labels and learn the OASIS model.

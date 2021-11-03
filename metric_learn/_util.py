@@ -819,8 +819,7 @@ def _to_index_points(o_triplets):
 
 
 def _get_random_indices(n_triplets, n_iter, shuffle=True,
-                        random=False, random_state=None,
-                        custom=None):
+                        random=False, random_state=None):
     """
     Generates n_iter indices in (0, n_triplets).
 
@@ -844,36 +843,7 @@ def _get_random_indices(n_triplets, n_iter, shuffle=True,
 
     A random sampling is made in any case, generating n_iters values
     that may include duplicates. The shuffle param has no effect.
-
-    custom: A custom order provided by the user. It mnust match the
-    number of iterations specified, and the values must be in the
-    range [0, n_triplets - 1]. The type can be a list, np.array or
-    even a tuple.
     """
-    # If the user provided an specified order
-    if custom is not None:
-      # Check type, and at least 1 element
-      custom_order = check_array(custom, ensure_2d=False,
-                                 allow_nd=False, copy=False,
-                                 force_all_finite=True, accept_sparse=True,
-                                 dtype='numeric',
-                                 ensure_min_samples=1)
-      # Check that n_iter == len(custom)
-      if n_iter != len(custom_order):
-        raise ValueError('The custom order provided has length {}'
-                         ' but you specified {} number of iterations.'
-                         ' Provide a custom order that matches the'
-                         ' amount of iterations.'
-                         .format(len(custom_order), n_iter))
-      # Check that the indices provided are not out of range
-      for i in range(n_iter):
-        if not 0 <= custom_order[i] < n_triplets:
-          raise ValueError('Found an invalid index value of {} at index {}'
-                           'in custom_order. Use values only between'
-                           '0 and {} - 1, (the n_triplets)'
-                           .format(custom_order[i], i, n_triplets))
-      return np.array(custom)
-
     rng = check_random_state(random_state)
 
     if n_triplets == 0:
