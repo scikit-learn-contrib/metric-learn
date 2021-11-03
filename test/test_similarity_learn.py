@@ -2,24 +2,14 @@ from metric_learn.oasis import OASIS, OASIS_Supervised
 import numpy as np
 from sklearn.utils import check_random_state
 import pytest
-from numpy.testing import assert_array_equal, assert_raises
+from numpy.testing import assert_array_equal
 from sklearn.datasets import load_iris
 from sklearn.metrics import pairwise_distances
-from metric_learn.constraints import Constraints
-from metric_learn._util import _get_random_indices, \
-                               _initialize_similarity_bilinear
+from test.test_utils import build_triplets
+
 
 SEED = 33
 RNG = check_random_state(SEED)
-
-
-def gen_iris_triplets():
-  X, y = load_iris(return_X_y=True)
-  constraints = Constraints(y)
-  k_geniuine = 3
-  k_impostor = 10
-  triplets = constraints.generate_knntriplets(X, k_geniuine, k_impostor)
-  return X[triplets]
 
 
 def test_sanity_check():
@@ -33,35 +23,33 @@ def test_sanity_check():
   triplets = np.array([[[0, 1], [2, 1], [0, 0]],
                        [[2, 1], [0, 1], [2, 0]],
                        [[0, 0], [2, 0], [0, 1]],
-                       [[2, 0], [0, 0], [2, 1]]])
+                       [[2, 0], [0, 0], [2, 1]],
+                       [[2, 1], [-1, -1], [33, 21]]])
 
   # Baseline, no M = Identity
-  with pytest.raises(ValueError):
-    oasis1 = OASIS(n_iter=0, c=0.24, random_state=RNG)
-    oasis1.fit(triplets)
-    a1 = oasis1.score(triplets)
+  oasis = OASIS(n_iter=1, c=0.24, random_state=RNG, init='identity')
+  # See 1/5 triplets
+  oasis.fit(triplets[:1])
+  a1 = oasis.score(triplets)
 
-    msg = "divide by zero encountered in double_scalars"
-    with pytest.warns(RuntimeWarning) as raised_warning:
-      # See 2/4 triplets
-      oasis2 = OASIS(n_iter=2, c=0.24, random_state=RNG)
-      oasis2.fit(triplets)
-      a2 = oasis2.score(triplets)
+  msg = "divide by zero encountered in double_scalars"
+  with pytest.warns(RuntimeWarning) as raised_warning:
+    # See 2/5 triplets
+    oasis.partial_fit(triplets[1:2], n_iter=2)
+    a2 = oasis.score(triplets)
 
-      # See 3/4 triplets
-      oasis3 = OASIS(n_iter=3, c=0.24, random_state=RNG)
-      oasis3.fit(triplets)
-      a3 = oasis3.score(triplets)
+    # See 4/5 triplets
+    oasis.partial_fit(triplets[2:4], n_iter=3)
+    a3 = oasis.score(triplets)
 
-      # See 5/4 triplets, one is seen again
-      oasis4 = OASIS(n_iter=6, c=0.24, random_state=RNG)
-      oasis4.fit(triplets)
-      a4 = oasis4.score(triplets)
+    # See 5/5 triplets, one is seen again
+    oasis.partial_fit(triplets[4:5], n_iter=1)
+    a4 = oasis.score(triplets)
 
-      assert a2 >= a1
-      assert a3 >= a2
-      assert a4 >= a3
-    assert msg == raised_warning[0].message.args[0]
+    assert a2 >= a1
+    assert a3 >= a2
+    assert a4 >= a3
+  assert msg == raised_warning[0].message.args[0]
 
 
 def test_score_zero():
@@ -101,137 +89,6 @@ def test_divide_zero():
   with pytest.warns(RuntimeWarning) as raised_warning:
     oasis1.fit(triplets)
   assert msg == raised_warning[0].message.args[0]
-
-
-@pytest.mark.parametrize(('n_triplets', 'n_iter'),
-                         [(10, 10), (33, 70), (100, 67),
-                         (10000, 20000)])
-def test_indices_funct(n_triplets, n_iter):
-  """
-  This test verifies the behaviour of _get_random_indices. The
-  method used inside OASIS that defines the order in which the
-  triplets are given to the algorithm, in an online manner.
-  """
-  # Not random cases
-  base = np.arange(n_triplets)
-
-  # n_iter = n_triplets
-  if n_iter == n_triplets:
-    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                            shuffle=False, random=False,
-                            random_state=RNG)
-    assert_array_equal(r, base)  # No shuffle
-    assert len(r) == len(base)  # Same lenght
-
-    # Shuffle
-    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                            shuffle=True, random=False,
-                            random_state=RNG)
-    with assert_raises(AssertionError):  # Should be different
-      assert_array_equal(r, base)
-    # But contain the same elements
-    assert_array_equal(np.unique(r), np.unique(base))
-    assert len(r) == len(base)  # Same lenght
-
-  # n_iter > n_triplets
-  if n_iter > n_triplets:
-    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                            shuffle=False, random=False,
-                            random_state=RNG)
-    assert_array_equal(r[:n_triplets], base)  # First n_triplets must match
-    assert len(r) == n_iter  # Expected lenght
-
-    # Next n_iter-n_triplets must be in range(n_triplets)
-    sample = r[n_triplets:]
-    for i in range(n_iter - n_triplets):
-      if sample[i] not in base:
-        raise AssertionError("Sampling has values out of range")
-
-    # Shuffle
-    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                            shuffle=True, random=False,
-                            random_state=RNG)
-    assert len(r) == n_iter  # Expected lenght
-
-    # Each triplet must be at least one time
-    assert_array_equal(np.unique(r), np.unique(base))
-    with assert_raises(AssertionError):  # First n_triplets should be different
-      assert_array_equal(r[:n_triplets], base)
-
-    # Each index should appear at least ceil(n_iter/n_triplets) - 1 times
-    # But no more than ceil(n_iter/n_triplets)
-    min_times = int(np.ceil(n_iter / n_triplets)) - 1
-    _, counts = np.unique(r, return_counts=True)
-    a = len(counts[counts >= min_times])
-    b = len(counts[counts <= min_times + 1])
-    assert len(np.unique(r)) == a
-    assert n_triplets == b
-
-  # n_iter < n_triplets
-  if n_iter < n_triplets:
-    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                            shuffle=False, random=False,
-                            random_state=RNG)
-    assert len(r) == n_iter  # Expected lenght
-    u = np.unique(r)
-    assert len(u) == len(r)  # No duplicates
-    # Final array must cointain only elements in range(n_triplets)
-    for i in range(n_iter):
-      if r[i] not in base:
-        raise AssertionError("Sampling has values out of range")
-
-    # Shuffle must only sort elements
-    # It takes two instances with same random_state, to show that only
-    # the final order is mixed
-    def is_sorted(a):
-      return np.all(a[:-1] <= a[1:])
-
-    r_a = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                              shuffle=False, random=False,
-                              random_state=SEED)
-    assert is_sorted(r_a)  # Its not shuffled
-    values_r_a, counts_r_a = np.unique(r_a, return_counts=True)
-
-    r_b = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                              shuffle=True, random=False,
-                              random_state=SEED)
-
-    with assert_raises(AssertionError):
-      assert is_sorted(r_b)  # This one should not besorted, but shuffled
-    values_r_b, counts_r_b = np.unique(r_b, return_counts=True)
-
-    assert_array_equal(values_r_a, values_r_b)  # Same elements
-    assert_array_equal(counts_r_a, counts_r_b)  # Same counts
-    with assert_raises(AssertionError):
-      assert_array_equal(r_a, r_b)  # Diferent order
-
-  # Random case
-  r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                          random=True, random_state=RNG)
-  assert len(r) == n_iter  # Expected lenght
-  for i in range(n_iter):
-    if r[i] not in base:
-      raise AssertionError("Sampling has values out of range")
-  # Shuffle has no effect
-  r_a = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                            shuffle=False, random=True,
-                            random_state=SEED)
-
-  r_b = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
-                            shuffle=True, random=True,
-                            random_state=SEED)
-  assert_array_equal(r_a, r_b)
-
-  # n_triplets and n_iter cannot be 0
-  msg = ("n_triplets cannot be 0")
-  with pytest.raises(ValueError) as raised_error:
-    _get_random_indices(n_triplets=0, n_iter=n_iter, random=True)
-  assert msg == raised_error.value.args[0]
-
-  msg = ("n_iter cannot be 0")
-  with pytest.raises(ValueError) as raised_error:
-    _get_random_indices(n_triplets=n_triplets, n_iter=0, random=True)
-  assert msg == raised_error.value.args[0]
 
 
 def class_separation(X, labels, callable_metric):
@@ -285,7 +142,7 @@ def test_random_state_in_suffling(init, random_state):
 
   Tested with all possible init.
   """
-  triplets = gen_iris_triplets()
+  triplets, _, _, _ = build_triplets()
 
   # Test same random_state, then same shuffling
   oasis_a = OASIS(random_state=random_state, init=init)
@@ -319,7 +176,7 @@ def test_general_results_random_state(init, random_state):
   With fixed triplets and random_state, two instances of OASIS
   should produce the same output (matrix W)
   """
-  triplets = gen_iris_triplets()
+  triplets, _, _, _ = build_triplets()
   oasis_a = OASIS(random_state=random_state, init=init)
   oasis_a.fit(triplets)
   matrix_a = oasis_a.get_bilinear_matrix()
@@ -327,23 +184,5 @@ def test_general_results_random_state(init, random_state):
   oasis_b = OASIS(random_state=random_state, init=init)
   oasis_b.fit(triplets)
   matrix_b = oasis_b.get_bilinear_matrix()
-
-  assert_array_equal(matrix_a, matrix_b)
-
-
-@pytest.mark.parametrize('init', ['random', 'random_spd',
-                         'covariance', 'identity'])
-@pytest.mark.parametrize('random_state', [6, 42])
-@pytest.mark.parametrize('d', [23, 27])
-def test_random_state_random_base_M(init, random_state, d):
-  """
-  Tests that the function _initialize_similarity_bilinear
-  outputs the same matrix, given the same tuples and random_state
-  """
-  triplets = gen_iris_triplets()
-  matrix_a = _initialize_similarity_bilinear(triplets, init=init,
-                                             random_state=random_state)
-  matrix_b = _initialize_similarity_bilinear(triplets, init=init,
-                                             random_state=random_state)
 
   assert_array_equal(matrix_a, matrix_b)

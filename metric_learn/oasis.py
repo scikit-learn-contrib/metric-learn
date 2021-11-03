@@ -100,7 +100,9 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
       of triplets. The sampling uses uniform distribution.
     """
     self.n_iter = n_iter
-    self.fit(new_triplets, shuffle=shuffle, random_sampling=random_sampling)
+    self.shuffle = shuffle  # Shuffle the trilplets
+    self.random_sampling = random_sampling
+    self.fit(new_triplets)
 
 
 class OASIS(_BaseOASIS):

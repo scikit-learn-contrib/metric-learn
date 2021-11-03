@@ -3,16 +3,20 @@ Tests all functionality for Bilinear learners. Correctness, use cases,
 warnings, etc.
 """
 from itertools import product
+from scipy.linalg import eigh
 import numpy as np
-from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+from numpy.linalg import LinAlgError
 import pytest
-from metric_learn._util import make_context
+from metric_learn._util import (make_context,
+                                _initialize_similarity_bilinear,
+                                _check_sdp_from_eigen)
 from sklearn import clone
 from sklearn.datasets import make_spd_matrix
 from sklearn.utils import check_random_state
 from metric_learn.sklearn_shims import set_random_state
 from test.test_utils import metric_learners_b, ids_metric_learners_b, \
-  remove_y, IdentityBilinearLearner, build_classification
+  remove_y, IdentityBilinearLearner, build_classification, build_triplets
 
 RNG = check_random_state(0)
 
@@ -200,3 +204,97 @@ def test_check_error_with_pair_distance(estimator, build_dataset):
   with pytest.raises(Exception) as e:
     _ = model.pair_distance(random_pairs)
   assert e.value.args[0] == msg
+
+
+@pytest.mark.parametrize('init', ['random', 'random_spd',
+                         'covariance', 'identity'])
+@pytest.mark.parametrize('random_state', [6, 42])
+def test_random_state_random_base_M(init, random_state):
+  """
+  Tests that the function _initialize_similarity_bilinear
+  outputs the same matrix, given the same tuples and random_state
+  """
+  triplets, _, _, _ = build_triplets()
+  matrix_a = _initialize_similarity_bilinear(triplets, init=init,
+                                             random_state=random_state)
+  matrix_b = _initialize_similarity_bilinear(triplets, init=init,
+                                             random_state=random_state)
+
+  assert_array_equal(matrix_a, matrix_b)
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_b,
+                         ids=ids_metric_learners_b)
+def test_bilinear_init(estimator, build_dataset):
+  """
+  Test the general functionality of _initialize_similarity_bilinear
+  """
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  d = input_data.shape[-1]
+
+  # Test that a custom matrix is accepted as init
+  my_M = RNG.rand(d, d)
+  M = _initialize_similarity_bilinear(X, init=my_M,
+                                      random_state=RNG)
+  assert_array_equal(my_M, M)
+
+  # Test that an error is raised if the init is not allowed
+  msg = "`matrix` must be 'identity', 'random_spd', 'random', \
+        covariance or a numpy array of shape (n_features, n_features).\
+        Not `random_string`."
+  with pytest.raises(ValueError) as e:
+    M = _initialize_similarity_bilinear(X, init="random_string",
+                                        random_state=RNG)
+  assert str(e.value) == msg
+
+  # Test identity init
+  expected = np.identity(d)
+  M = _initialize_similarity_bilinear(X, init="identity",
+                                      random_state=RNG)
+  assert_array_equal(M, expected)
+
+  # Test random init
+  M = _initialize_similarity_bilinear(X, init="random",
+                                      random_state=RNG)
+  assert np.isfinite(M).all()  # Check that all values are finite
+
+  # Test random spd init
+  M = _initialize_similarity_bilinear(X, init="random_spd",
+                                      random_state=RNG)
+  w, V = eigh(M, check_finite=False)
+  assert _check_sdp_from_eigen(w)  # Check strictly positive definite
+  assert np.isfinite(M).all()
+
+  # Test covariance warning when its not invertible
+
+  # We create a feature that is a linear combination of the first two
+  # features:
+  input_data = np.concatenate([input_data, input_data[:, ..., :2].dot([[2],
+                                                                      [3]])],
+                              axis=-1)
+  model.set_params(init='covariance')
+  msg = ('The covariance matrix is not invertible: '
+         'using the pseudo-inverse instead.'
+         'To make the covariance matrix invertible'
+         ' you can remove any linearly dependent features and/or '
+         'reduce the dimensionality of your input, '
+         'for instance using `sklearn.decomposition.PCA` as a '
+         'preprocessing step.')
+  with pytest.warns(UserWarning) as raised_warning:
+    model.fit(*remove_y(model, input_data, labels))
+  assert any([str(warning.message) == msg for warning in raised_warning])
+  assert np.isfinite(M).all()
+
+  # Test warning triggered by strict_pd=True
+  msg = ("Unable to get a true inverse of the covariance "
+         "matrix since it is not definite. Try another "
+         "`matrix`, or an algorithm that does not "
+         "require the `matrix` to be strictly positive definite.")
+  with pytest.raises(LinAlgError) as raised_err:
+    M = _initialize_similarity_bilinear(input_data, init="covariance",
+                                        strict_pd=True,
+                                        random_state=RNG)
+  assert str(raised_err.value) == msg
+  assert np.isfinite(M).all()

@@ -7,7 +7,7 @@ import pytest
 from scipy.linalg import eigh, pinvh
 from collections import namedtuple
 import numpy as np
-from numpy.testing import assert_array_equal, assert_equal
+from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from sklearn.model_selection import train_test_split
 from sklearn.utils import check_random_state, shuffle
 from metric_learn.sklearn_shims import set_random_state
@@ -17,7 +17,9 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 check_collapsed_pairs, validate_vector,
                                 _check_sdp_from_eigen, _check_n_components,
                                 check_y_valid_values_for_pairs,
-                                _auto_select_init, _pseudo_inverse_from_eig)
+                                _auto_select_init, _pseudo_inverse_from_eig,
+                                _get_random_indices,
+                                _initialize_similarity_bilinear)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
@@ -42,8 +44,9 @@ class RandomBilinearLearner(BilinearMixin):
   """A simple Random bilinear mixin that returns an random matrix
   M as learned. Class for testing purposes.
   """
-  def __init__(self, preprocessor=None, random_state=33):
+  def __init__(self, init='random', preprocessor=None, random_state=33):
     super().__init__(preprocessor=preprocessor)
+    self.init = init
     self.random_state = random_state
 
   def fit(self, X, y):
@@ -52,8 +55,11 @@ class RandomBilinearLearner(BilinearMixin):
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     self.d_ = np.shape(X[0])[-1]
-    rng = check_random_state(self.random_state)
-    self.components_ = rng.rand(self.d_, self.d_)
+    M = _initialize_similarity_bilinear(X,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
     return self
 
 
@@ -61,8 +67,10 @@ class IdentityBilinearLearner(BilinearMixin):
   """A simple Identity bilinear mixin that returns an identity matrix
   M as learned. Class for testing purposes.
   """
-  def __init__(self, preprocessor=None):
+  def __init__(self, init='identity', preprocessor=None, random_state=33):
     super().__init__(preprocessor=preprocessor)
+    self.init = init
+    self.random_state = random_state
 
   def fit(self, X, y):
     """
@@ -71,15 +79,21 @@ class IdentityBilinearLearner(BilinearMixin):
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
     self.d_ = np.shape(X[0])[-1]
-    self.components_ = np.identity(self.d_)
+    M = _initialize_similarity_bilinear(X,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
     return self
 
 
 class MockPairIdentityBilinearLearner(BilinearMixin,
                                       _PairsClassifierMixin):
 
-  def __init__(self, preprocessor=None):
+  def __init__(self, init='identity', preprocessor=None, random_state=33):
       super().__init__(preprocessor=preprocessor)
+      self.init = init
+      self.random_state = random_state
 
   def fit(self, pairs, y, calibration_params=None):
     calibration_params = (calibration_params if calibration_params is not
@@ -87,7 +101,11 @@ class MockPairIdentityBilinearLearner(BilinearMixin,
     self._validate_calibration_params(**calibration_params)
     pairs = self._prepare_inputs(pairs, type_of_inputs='tuples')
     self.d_ = np.shape(pairs[0][0])[-1]
-    self.components_ = np.identity(self.d_)
+    M = _initialize_similarity_bilinear(pairs,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
     self.calibrate_threshold(pairs, y, **calibration_params)
     return self
 
@@ -95,26 +113,38 @@ class MockPairIdentityBilinearLearner(BilinearMixin,
 class MockTripletsIdentityBilinearLearner(BilinearMixin,
                                           _TripletsClassifierMixin):
 
-  def __init__(self, preprocessor=None):
+  def __init__(self, init='identity', preprocessor=None, random_state=33):
       super().__init__(preprocessor=preprocessor)
+      self.init = init
+      self.random_state = random_state
 
   def fit(self, triplets):
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
     self.d_ = np.shape(triplets[0][0])[-1]
-    self.components_ = np.identity(self.d_)
+    M = _initialize_similarity_bilinear(triplets,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
     return self
 
 
 class MockQuadrpletsIdentityBilinearLearner(BilinearMixin,
                                             _QuadrupletsClassifierMixin):
 
-  def __init__(self, preprocessor=None):
+  def __init__(self, init='identity', preprocessor=None, random_state=33):
       super().__init__(preprocessor=preprocessor)
+      self.init = init
+      self.random_state = random_state
 
   def fit(self, quadruplets):
     quadruplets = self._prepare_inputs(quadruplets, type_of_inputs='tuples')
     self.d_ = np.shape(quadruplets[0][0])[-1]
-    self.components_ = np.identity(self.d_)
+    M = _initialize_similarity_bilinear(quadruplets,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
     return self
 
 
@@ -1526,3 +1556,134 @@ def test_pseudo_inverse_from_eig_and_pinvh_nonsingular():
   A = A + A.T
   w, V = eigh(A, check_finite=False)
   np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A))
+
+
+@pytest.mark.parametrize(('n_triplets', 'n_iter'),
+                         [(10, 10), (33, 70), (100, 67),
+                         (10000, 20000)])
+def test_indices_funct(n_triplets, n_iter):
+  """
+  This test verifies the behaviour of _get_random_indices. The
+  method used inside OASIS that defines the order in which the
+  triplets are given to the algorithm, in an online manner.
+  """
+  # Not random cases
+  base = np.arange(n_triplets)
+
+  # n_iter = n_triplets
+  if n_iter == n_triplets:
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
+    assert_array_equal(r, base)  # No shuffle
+    assert len(r) == len(base)  # Same lenght
+
+    # Shuffle
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=False,
+                            random_state=RNG)
+    with assert_raises(AssertionError):  # Should be different
+      assert_array_equal(r, base)
+    # But contain the same elements
+    assert_array_equal(np.unique(r), np.unique(base))
+    assert len(r) == len(base)  # Same lenght
+
+  # n_iter > n_triplets
+  if n_iter > n_triplets:
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
+    assert_array_equal(r[:n_triplets], base)  # First n_triplets must match
+    assert len(r) == n_iter  # Expected lenght
+
+    # Next n_iter-n_triplets must be in range(n_triplets)
+    sample = r[n_triplets:]
+    for i in range(n_iter - n_triplets):
+      if sample[i] not in base:
+        raise AssertionError("Sampling has values out of range")
+
+    # Shuffle
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=False,
+                            random_state=RNG)
+    assert len(r) == n_iter  # Expected lenght
+
+    # Each triplet must be at least one time
+    assert_array_equal(np.unique(r), np.unique(base))
+    with assert_raises(AssertionError):  # First n_triplets should be different
+      assert_array_equal(r[:n_triplets], base)
+
+    # Each index should appear at least ceil(n_iter/n_triplets) - 1 times
+    # But no more than ceil(n_iter/n_triplets)
+    min_times = int(np.ceil(n_iter / n_triplets)) - 1
+    _, counts = np.unique(r, return_counts=True)
+    a = len(counts[counts >= min_times])
+    b = len(counts[counts <= min_times + 1])
+    assert len(np.unique(r)) == a
+    assert n_triplets == b
+
+  # n_iter < n_triplets
+  if n_iter < n_triplets:
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
+    assert len(r) == n_iter  # Expected lenght
+    u = np.unique(r)
+    assert len(u) == len(r)  # No duplicates
+    # Final array must cointain only elements in range(n_triplets)
+    for i in range(n_iter):
+      if r[i] not in base:
+        raise AssertionError("Sampling has values out of range")
+
+    # Shuffle must only sort elements
+    # It takes two instances with same random_state, to show that only
+    # the final order is mixed
+    def is_sorted(a):
+      return np.all(a[:-1] <= a[1:])
+
+    r_a = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                              shuffle=False, random=False,
+                              random_state=SEED)
+    assert is_sorted(r_a)  # Its not shuffled
+    values_r_a, counts_r_a = np.unique(r_a, return_counts=True)
+
+    r_b = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                              shuffle=True, random=False,
+                              random_state=SEED)
+
+    with assert_raises(AssertionError):
+      assert is_sorted(r_b)  # This one should not besorted, but shuffled
+    values_r_b, counts_r_b = np.unique(r_b, return_counts=True)
+
+    assert_array_equal(values_r_a, values_r_b)  # Same elements
+    assert_array_equal(counts_r_a, counts_r_b)  # Same counts
+    with assert_raises(AssertionError):
+      assert_array_equal(r_a, r_b)  # Diferent order
+
+  # Random case
+  r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                          random=True, random_state=RNG)
+  assert len(r) == n_iter  # Expected lenght
+  for i in range(n_iter):
+    if r[i] not in base:
+      raise AssertionError("Sampling has values out of range")
+  # Shuffle has no effect
+  r_a = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=True,
+                            random_state=SEED)
+
+  r_b = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=True,
+                            random_state=SEED)
+  assert_array_equal(r_a, r_b)
+
+  # n_triplets and n_iter cannot be 0
+  msg = ("n_triplets cannot be 0")
+  with pytest.raises(ValueError) as raised_error:
+    _get_random_indices(n_triplets=0, n_iter=n_iter, random=True)
+  assert msg == raised_error.value.args[0]
+
+  msg = ("n_iter cannot be 0")
+  with pytest.raises(ValueError) as raised_error:
+    _get_random_indices(n_triplets=n_triplets, n_iter=0, random=True)
+  assert msg == raised_error.value.args[0]
