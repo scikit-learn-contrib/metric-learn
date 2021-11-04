@@ -64,6 +64,7 @@ sphinx_gallery_conf = {
 # generate autosummary even if no references
 autosummary_generate = True
 
+
 # Temporary work-around for spacing problem between parameter and parameter
 # type in the doc, see https://github.com/numpy/numpydoc/issues/215. The bug
 # has been fixed in sphinx (https://github.com/sphinx-doc/sphinx/pull/5976) but
@@ -71,8 +72,8 @@ autosummary_generate = True
 # In an ideal world, this would get fixed in this PR:
 # https://github.com/readthedocs/sphinx_rtd_theme/pull/747/files
 def setup(app):
-   app.add_js_file('js/copybutton.js')
-   app.add_css_file('css/styles.css')
+  app.add_js_file('js/copybutton.js')
+  app.add_css_file('css/styles.css')
 
 
 # Remove matplotlib agg warnings from generated doc when using plt.show
