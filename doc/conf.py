@@ -38,9 +38,6 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 htmlhelp_basename = 'metric-learndoc'
 
-# Option to only need single backticks to refer to symbols
-# default_role = 'any'
-
 # Option to hide doctests comments in the documentation (like # doctest:
 # +NORMALIZE_WHITESPACE for instance)
 trim_doctest_flags = True
@@ -67,11 +64,6 @@ sphinx_gallery_conf = {
 # generate autosummary even if no references
 autosummary_generate = True
 
-# Switch to old behavior with html4, for a good display of references,
-# as described in https://github.com/sphinx-doc/sphinx/issues/6705
-# html4_writer = True
-
-
 # Temporary work-around for spacing problem between parameter and parameter
 # type in the doc, see https://github.com/numpy/numpydoc/issues/215. The bug
 # has been fixed in sphinx (https://github.com/sphinx-doc/sphinx/pull/5976) but
@@ -80,8 +72,7 @@ autosummary_generate = True
 # https://github.com/readthedocs/sphinx_rtd_theme/pull/747/files
 def setup(app):
    app.add_js_file('js/copybutton.js')
-   app.add_css_file("basic.css")
-   app.add_css_file("css/styles.css")
+   app.add_css_file('css/styles.css')
 
 
 # Remove matplotlib agg warnings from generated doc when using plt.show
