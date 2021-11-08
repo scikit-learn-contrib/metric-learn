@@ -267,8 +267,14 @@ def test_bilinear_init(estimator, build_dataset):
   assert _check_sdp_from_eigen(w)  # Check strictly positive definite
   assert np.isfinite(M).all()
 
-  # Test covariance warning when its not invertible
+  # Test that (X * Cov^-1).T * X == (X*L).T * (X*L) where Cov^-1 = L.T * L
+  C_m = np.linalg.inv(np.cov(X, rowvar=False))
+  L = np.linalg.cholesky(C_m)
+  X1 = X[0, :].dot(C_m).T.dot(X[7, :])  # Take 2 points to test
+  X2 = X[0, :].dot(L).T.dot(X[7, :].dot(L))
+  assert_array_almost_equal(X1, X2)
 
+  # Test covariance warning when its not invertible:
   # We create a feature that is a linear combination of the first two
   # features:
   input_data = np.concatenate([input_data, input_data[:, ..., :2].dot([[2],

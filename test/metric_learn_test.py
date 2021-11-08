@@ -85,6 +85,7 @@ class TestCovariance(MetricTestCase):
     assert_allclose(pseudo_inverse.dot(cov_matrix).dot(pseudo_inverse),
                     pseudo_inverse)
 
+
 class TestOASIS(object):
   def test_sanity_check(self):
     """
@@ -125,7 +126,6 @@ class TestOASIS(object):
       assert a4 >= a3
     assert msg == raised_warning[0].message.args[0]
 
-
   def test_score_zero(self):
     """
     The third triplet will give similarity 0, then the prediction
@@ -145,7 +145,6 @@ class TestOASIS(object):
       not_valid = [e for e in predictions if e not in [-1, 1]]
       assert len(not_valid) == 0
 
-
   def test_divide_zero(self):
     """
     The thrid triplet willl force norm(V_i) to be zero, and
@@ -163,7 +162,6 @@ class TestOASIS(object):
     with pytest.warns(RuntimeWarning) as raised_warning:
       oasis1.fit(triplets)
     assert msg == raised_warning[0].message.args[0]
-
 
   def test_iris_supervised(self):
     """
@@ -189,9 +187,8 @@ class TestOASIS(object):
     now = class_separation(X, y, oasis.get_metric())
     assert now < prev  # -0.0407866 vs 1.08 !
 
-
   @pytest.mark.parametrize('init', ['random', 'random_spd',
-                          'covariance', 'identity'])
+                           'covariance', 'identity'])
   @pytest.mark.parametrize('random_state', [33, 69, 112])
   def test_random_state_in_suffling(self, init, random_state):
     """
@@ -230,9 +227,8 @@ class TestOASIS(object):
 
       last_suffle = shuffle_a
 
-
   @pytest.mark.parametrize('init', ['random', 'random_spd',
-                          'covariance', 'identity'])
+                           'covariance', 'identity'])
   @pytest.mark.parametrize('random_state', [33, 69, 112])
   def test_general_results_random_state(self, init, random_state):
     """

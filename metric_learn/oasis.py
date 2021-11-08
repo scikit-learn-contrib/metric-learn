@@ -53,10 +53,10 @@ class _BaseOASIS(BilinearMixin):
     self.components_ = M
 
     self.indices_ = _get_random_indices(n_triplets,
-                                       n_iter,
-                                       shuffle=self.shuffle,
-                                       random=self.random_sampling,
-                                       random_state=rng)
+                                        n_iter,
+                                        shuffle=self.shuffle,
+                                        random=self.random_sampling,
+                                        random_state=rng)
     i = 0
     while i < n_iter:
       t = X[triplets[self.indices_[i]]]  # t = Current triplet
