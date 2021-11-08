@@ -127,16 +127,12 @@ through the argument `preprocessor` (see below :ref:`fit_ws`)
 Fit, transform, and so on
 -------------------------
 
-Generally, the goal of weakly-supervised metric-learning algorithms is to
-transform points in a new space, in which the tuple-wise constraints between
-points are respected.
+The goal of weakly supervised metric learning algorithms is to learn a (distance
+or similarity) metric such that the tuple-wise constraints between points are
+respected.
 
-But there are also some algorithms that learn a similarity, not a distance,
-thus the points cannot be transformed into a new space. But the goal is the
-same: respect the maximum number of constraints while learning the similarity.
-
-Weakly-supervised mahalanobis learners can transform points into a new space,
-and to do so, we fit the metric learner (example:`MMC`).
+To do so, we first need to fit the weakly supervised metric learner on a dataset
+of tuples, as in the example below with ``MMC``.
 
 >>> from metric_learn import MMC
 >>> mmc = MMC(random_state=42)
@@ -154,9 +150,48 @@ Or alternatively (using a preprocessor):
 Now that the estimator is fitted, you can use it on new data for several
 purposes.
 
-First, your mahalanobis learner can transform the data in
-the learned space, using `transform`: Here we transform two points in
-the new embedding space.
+We can now use the learned metric to **score** new pairs of points with ``pair_score``
+(the larger the score, the more similar the pair). For Mahalanobis learners,
+it is equal to the opposite of the distance.
+
+>>> score = mmc.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+This is useful because ``pair_score`` matches the **score** semantic of 
+scikit-learn's `Classification metrics
+<https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+
+For metric learners that learn a distance metric, there is also the ``pair_distance``
+method.
+
+>>> mmc.pair_distance([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
+...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
+array([7.27607365, 0.88853014])
+
+.. warning::
+    
+    If you try to use ``pair_distance`` with a bilinear similarity learner, an error
+    will be thrown, as it does not learn a distance.
+
+You can also return a function that will return the metric learned. It can
+compute the metric between two 1D arrays, similarly to distance functions in
+`scipy.spatial.distance`. To do that, use the ``get_metric`` method.
+
+>>> metric_fun = mmc.get_metric()
+>>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
+7.276073646278203
+
+You can also call ``get_metric``` with bilinear similarity learners, and you will get
+a function that will return the similarity bewtween 1D arrays.
+
+>>> similarity_fun = algorithm.get_metric()
+>>> similarity_fun([3.5, 3.6], [5.6, 2.4])
+-0.04752
+
+Finally, as explained in :ref:`mahalanobis_distances`, these are equivalent to the Euclidean
+distance in a transformed space, and can thus be used to transform data points in
+a new embedding space. You can use ``transform`` to do so.
 
 >>> X_new = np.array([[9.4, 4.1, 4.2], [2.1, 4.4, 2.3]])
 >>> mmc.transform(X_new)
@@ -165,78 +200,23 @@ array([[-3.24667162e+01,  4.62622348e-07,  3.88325421e-08],
 
 .. warning::
     
-    If you try to use `transform` with a similarity learner, an error will
-    appear, as you cannot transform the data using them.
-
-Also, as explained before, our metric learner has learned a distance between
-points. You can use this distance in two main ways:
-
-- You can either return the distance between pairs of points using the
-  `pair_distance` function:
-
->>> mmc.pair_distance([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
-...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
-array([7.27607365, 0.88853014])
-
-- Or you can return a function that will return the distance (in the new
-  space) between two 1D arrays (the coordinates of the points in the original
-  space), similarly to distance functions in `scipy.spatial.distance`. To
-  do that, use the `get_metric` method.
-
->>> metric_fun = mmc.get_metric()
->>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
-7.276073646278203
-
-- Alternatively, you can use `pair_score` to return the **score** between
-  pairs of points (the larger the score, the more similar the pair).
-  For Mahalanobis learners, it is equal to the opposite of the distance.
-
->>> score = mmc.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
->>> score
-array([-0.49627072, -3.65287282, -6.06079877])
-
-  This is useful because `pair_score` matches the **score** semantic of 
-  scikit-learn's `Classification metrics
-  <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
-
-For similarity learners `pair_distance` is not available, as they don't learn
-a distance. Intead you use `pair_score` that has the same behaviour but
-for similarity.
-
->>> algorithm.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
-array([-0.2312, 705.23, -72.8])
-
-.. warning::
-    
-    If you try to use `pair_distance` with a similarity learner, an error
-    will appear, as they don't learn a distance nor a pseudo-distance.
-
-You can also call `get_metric` with similarity learners, and you will get
-a function that will return the similarity bewtween 1D arrays.
-
->>> similarity_fun = algorithm.get_metric()
->>> similarity_fun([3.5, 3.6], [5.6, 2.4])
--0.04752
-
-For similarity learners and mahalanobis learners, `pair_score` is
-available. You can interpret that this function returns the **score**
-between points: the more the **score**, the closer the pairs and vice-versa.
-For mahalanobis learners, it is equal to the inverse of the distance.
+    If you try to use ``transform`` with a bilinear similarity learner, an error will
+    be thrown, as you cannot transform the data using them.
 
 .. note::
 
     If the metric learner that you use learns a :ref:`Mahalanobis distance
     <mahalanobis_distances>`, you can get the plain learned Mahalanobis
-    matrix using `get_mahalanobis_matrix`.
+    matrix :math:`M` using `get_mahalanobis_matrix`.
 
     >>> mmc.get_mahalanobis_matrix()
     array([[ 0.58603894, -5.69883982, -1.66614919],
         [-5.69883982, 55.41743549, 16.20219519],
         [-1.66614919, 16.20219519,  4.73697721]])
 
-    If the metric learner that you use learns a :ref:`Bilinear similarity
-    <bilinear_similarity>`, you can get the plain learned Bilinear
-    matrix using `get_bilinear_matrix`.
+    If the metric learner that you use learns a :ref:`bilinear similarity
+    <bilinear_similarity>`, you can get the learned Bilinear
+    matrix :math:`W` using `get_bilinear_matrix`.
 
     >>> algorithm.get_bilinear_matrix()
     array([[-0.72680409, -0.153213],
