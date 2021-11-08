@@ -10,7 +10,7 @@ from ._util import _to_index_points, _get_random_indices, \
                    _initialize_similarity_bilinear
 
 
-class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
+class _BaseOASIS(BilinearMixin):
   def __init__(
           self,
           preprocessor=None,
@@ -24,7 +24,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     super().__init__(preprocessor=preprocessor)
     self.n_iter = n_iter  # Max iterations
     self.c = c  # Trade-off param
-    self.random_state = check_random_state(random_state)
+    self.random_state = random_state
     self.shuffle = shuffle  # Shuffle the trilplets
     self.random_sampling = random_sampling
     self.init = init
@@ -41,24 +41,25 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
     triplets, X = _to_index_points(triplets)  # Work with indices
 
-    self.n_triplets = triplets.shape[0]  # (n_triplets, 3)
-    if self.n_iter is None:
-      self.n_iter = self.n_triplets
+    n_triplets = triplets.shape[0]  # (n_triplets, 3)
+    n_iter = n_triplets if self.n_iter is None else self.n_iter
+
+    rng = check_random_state(self.random_state)
 
     M = _initialize_similarity_bilinear(X[triplets],
                                         init=self.init,
                                         strict_pd=False,
-                                        random_state=self.random_state)
+                                        random_state=rng)
     self.components_ = M
 
-    self.indices = _get_random_indices(self.n_triplets,
-                                       self.n_iter,
+    self.indices_ = _get_random_indices(n_triplets,
+                                       n_iter,
                                        shuffle=self.shuffle,
                                        random=self.random_sampling,
-                                       random_state=self.random_state)
+                                       random_state=rng)
     i = 0
-    while i < self.n_iter:
-      t = X[triplets[self.indices[i]]]  # t = Current triplet
+    while i < n_iter:
+      t = X[triplets[self.indices_[i]]]  # t = Current triplet
       delta = t[1] - t[2]
       loss = 1 - np.dot(np.dot(t[0], self.components_), delta)
       if loss > 0:
@@ -105,7 +106,7 @@ class _BaseOASIS(BilinearMixin, _TripletsClassifierMixin):
     self.fit(new_triplets)
 
 
-class OASIS(_BaseOASIS):
+class OASIS(_BaseOASIS, _TripletsClassifierMixin):
   """Online Algorithm for Scalable Image Similarity (OASIS)
 
   `OASIS` learns a bilinear similarity from triplet constraints with an online
@@ -217,7 +218,7 @@ class OASIS(_BaseOASIS):
     return self._fit(triplets)
 
 
-class OASIS_Supervised(OASIS):
+class OASIS_Supervised(_BaseOASIS):
   """Online Algorithm for Scalable Image Similarity (OASIS)
 
   `OASIS_Supervised` creates triplets by taking `k_genuine` neighbours

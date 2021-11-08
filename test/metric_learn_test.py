@@ -210,11 +210,11 @@ class TestOASIS(object):
     # Test same random_state, then same shuffling
     oasis_a = OASIS(random_state=random_state, init=init)
     oasis_a.fit(triplets)
-    shuffle_a = oasis_a.indices
+    shuffle_a = oasis_a.indices_
 
     oasis_b = OASIS(random_state=random_state, init=init)
     oasis_b.fit(triplets)
-    shuffle_b = oasis_b.indices
+    shuffle_b = oasis_b.indices_
 
     assert_array_equal(shuffle_a, shuffle_b)
 
@@ -223,7 +223,7 @@ class TestOASIS(object):
     for i in range(3, 5):
       oasis_a = OASIS(random_state=random_state+i, init=init)
       oasis_a.fit(triplets)
-      shuffle_a = oasis_a.indices
+      shuffle_a = oasis_a.indices_
 
       with pytest.raises(AssertionError):
         assert_array_equal(last_suffle, shuffle_a)

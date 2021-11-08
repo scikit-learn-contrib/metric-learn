@@ -23,7 +23,8 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
-                          SCML, SCML_Supervised, Constraints)
+                          SCML, SCML_Supervised, OASIS, OASIS_Supervised,
+                          Constraints)
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
                                       BilinearMixin,
                                       _PairsClassifierMixin,
@@ -346,7 +347,8 @@ ids_quadruplets_learners_b = list(map(lambda x: x.__class__.__name__,
                                   [learner for (learner, _) in
                                    quadruplets_learners_b]))
 
-triplets_learners_b = [(MockTripletsIdentityBilinearLearner(), build_triplets)]
+triplets_learners_b = [(MockTripletsIdentityBilinearLearner(), build_triplets),
+                       (OASIS(), build_triplets)]
 ids_triplets_learners_b = list(map(lambda x: x.__class__.__name__,
                                    [learner for (learner, _) in
                                     triplets_learners_b]))
@@ -357,7 +359,8 @@ ids_pairs_learners_b = list(map(lambda x: x.__class__.__name__,
                                  pairs_learners_b]))
 # -- Supervised
 classifiers_b = [(RandomBilinearLearner(), build_classification),
-                 (IdentityBilinearLearner(), build_classification)]
+                 (IdentityBilinearLearner(), build_classification),
+                 (OASIS_Supervised(), build_classification)]
 
 ids_classifiers_b = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
