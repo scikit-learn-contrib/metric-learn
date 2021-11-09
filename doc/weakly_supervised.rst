@@ -439,9 +439,9 @@ A basic usage of this model with pairs:
 
 .. container:: hatnote hatnote-gray
 
-      - Jason V. Davis, et al. `Information-theoretic Metric Learning <https://icml.cc/imls/conferences/2007/proceedings/papers/404.pdf>`_. ICML 2007.
+      [1]. Jason V. Davis, et al. `Information-theoretic Metric Learning <https://icml.cc/imls/conferences/2007/proceedings/papers/404.pdf>`_. ICML 2007.
 
-      - Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/ .
+      [2]. Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/ .
 
 
 .. _sdml:
@@ -501,9 +501,9 @@ A basic usage of this model with pairs:
 
 .. container:: hatnote hatnote-gray
 
-      - Qi et al. `An efficient sparse metric learning in high-dimensional space via L1-penalized log-determinant regularization <https://icml.cc/Conferences/2009/papers/46.pdf>`_. ICML 2009.
+      [1]. Qi et al. `An efficient sparse metric learning in high-dimensional space via L1-penalized log-determinant regularization <https://icml.cc/Conferences/2009/papers/46.pdf>`_. ICML 2009.
 
-      - Code adapted from https://gist.github.com/kcarnold/5439945 .
+      [2]. Code adapted from https://gist.github.com/kcarnold/5439945 .
 
 .. _rca:
 
@@ -554,11 +554,11 @@ A basic usage of this model with pairs:
 
 .. container:: hatnote hatnote-gray
 
-      - Shental et al. `Adjustment learning and relevant component analysis <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871 &rep=rep1&type=pdf>`_. ECCV 2002.
+      [1]. Shental et al. `Adjustment learning and relevant component analysis <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871 &rep=rep1&type=pdf>`_. ECCV 2002.
 
-      - Bar-Hillel et al. `Learning distance functions using equivalence relations <https://aaai.org/Papers/ICML/2003/ICML03-005.pdf>`_. ICML 2003.
+      [2]. Bar-Hillel et al. `Learning distance functions using equivalence relations <https://aaai.org/Papers/ICML/2003/ICML03-005.pdf>`_. ICML 2003.
 
-      - Bar-Hillel et al. `Learning a Mahalanobis metric from equivalence constraints <http://www.jmlr.org/papers/volume6/bar-hillel05a/bar-hillel05a.pdf>`_. JMLR 2005.
+      [3]. Bar-Hillel et al. `Learning a Mahalanobis metric from equivalence constraints <http://www.jmlr.org/papers/volume6/bar-hillel05a/bar-hillel05a.pdf>`_. JMLR 2005.
 
 .. _mmc:
 
@@ -614,9 +614,9 @@ A basic usage of this model with pairs:
 
 .. container:: hatnote hatnote-gray
 
-    - Xing et al. `Distance metric learning with application to clustering with side-information <http://papers.nips .cc/paper/2164-distance-metric-learning-with-application-to-clustering-with-side-information.pdf>`_. NIPS 2002.
+    [1]. Xing et al. `Distance metric learning with application to clustering with side-information <http://papers.nips .cc/paper/2164-distance-metric-learning-with-application-to-clustering-with-side-information.pdf>`_. NIPS 2002.
     
-    - Adapted from Matlab code http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz .
+    [2]. Adapted from Matlab code http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz .
 
 .. _learning_on_triplets:
 
@@ -781,9 +781,9 @@ A basic usage of this model with triplets:
 
 .. container:: hatnote hatnote-gray
 
-    - Y. Shi, A. Bellet and F. Sha. `Sparse Compositional Metric Learning. <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. (AAAI), 2014.
+    [1]. Y. Shi, A. Bellet and F. Sha. `Sparse Compositional Metric Learning. <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. (AAAI), 2014.
 
-    - Adapted from original `Matlab implementation. <https://github.com/bellet/SCML>`_.
+    [2]. Adapted from original `Matlab implementation. <https://github.com/bellet/SCML>`_.
 
 
 .. _learning_on_quadruplets:
@@ -979,8 +979,8 @@ A basic usage of this model with quadruplets:
 
 .. container:: hatnote hatnote-gray
 
-      - Liu et al. `Metric Learning from Relative Comparisons by Minimizing Squared Residual <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012.
+      [1]. Liu et al. `Metric Learning from Relative Comparisons by Minimizing Squared Residual <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012.
 
-      - Code adapted from https://gist.github.com/kcarnold/5439917 .
+      [2]. Code adapted from https://gist.github.com/kcarnold/5439917 .
 
 

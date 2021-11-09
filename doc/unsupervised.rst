@@ -39,4 +39,4 @@ A basic usage of this model with the Iris dataset from scikit-learn.
 
 .. container:: hatnote hatnote-gray
 
-      - On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936.
+      [1]. On the Generalized Distance in Statistics, P.C.Mahalanobis, 1936.
