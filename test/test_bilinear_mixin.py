@@ -6,7 +6,6 @@ from itertools import product
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 import pytest
-from metric_learn._util import make_context
 from sklearn import clone
 from sklearn.datasets import make_spd_matrix
 from sklearn.utils import check_random_state
@@ -131,55 +130,6 @@ def test_pair_score_finite(estimator, build_dataset):
   random_pairs = np.array(list(product(X, X)))
   dist1 = model.pair_score(random_pairs)
   assert np.isfinite(dist1).all()
-
-
-# TODO: This exact test is also in test_mahalanobis_mixin.py. Refactor needed.
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners_b,
-                         ids=ids_metric_learners_b)
-def test_pair_score_dim(estimator, build_dataset):
-  """
-  Scoring of 3D arrays should return 1D array (several tuples),
-  and scoring of 2D arrays (one tuple) should return an error (like
-  scikit-learn's error when scoring 1D arrays)
-  """
-  input_data, labels, _, X = build_dataset()
-  model = clone(estimator)
-  set_random_state(model)
-  model.fit(*remove_y(estimator, input_data, labels))
-  tuples = np.array(list(product(X, X)))
-  assert model.pair_score(tuples).shape == (tuples.shape[0],)
-  context = make_context(model)
-  msg = ("3D array of formed tuples expected{}. Found 2D array "
-         "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
-         .format(context, tuples[1]))
-  with pytest.raises(ValueError) as raised_error:
-    model.pair_score(tuples[1])
-  assert str(raised_error.value) == msg
-
-
-# Note: Same test in test_mahalanobis_mixin.py, but wuth `pair_distance` there
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners_b,
-                         ids=ids_metric_learners_b)
-def test_deprecated_score_pairs_same_result(estimator, build_dataset):
-  """
-  Test that `pair_distance` and the deprecated function `score_pairs`
-  give the same result, while checking that the deprecation warning is
-  being shown.
-  """
-  input_data, labels, _, X = build_dataset()
-  model = clone(estimator)
-  set_random_state(model)
-  model.fit(*remove_y(model, input_data, labels))
-  random_pairs = np.array(list(product(X, X)))
-
-  msg = ("score_pairs will be deprecated in release 0.7.0. "
-         "Use pair_score to compute similarity scores, or "
-         "pair_distances to compute distances.")
-  with pytest.warns(FutureWarning) as raised_warnings:
-    s1 = model.score_pairs(random_pairs)
-    s2 = model.pair_score(random_pairs)
-    assert_array_almost_equal(s1, s2)
-  assert any(str(w.message) == msg for w in raised_warnings)
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners_b,

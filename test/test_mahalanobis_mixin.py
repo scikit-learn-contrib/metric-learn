@@ -9,7 +9,6 @@ import numpy as np
 from numpy.linalg import LinAlgError
 from numpy.testing import assert_array_almost_equal, assert_allclose, \
                           assert_array_equal
-from numpy.core.numeric import array_equal
 from scipy.spatial.distance import pdist, squareform, mahalanobis
 from scipy.stats import ortho_group
 from sklearn import clone
@@ -30,30 +29,6 @@ from test.test_utils import (ids_metric_learners_m, metric_learners_m,
 from sklearn.exceptions import NotFittedError
 
 RNG = check_random_state(0)
-
-
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
-                         ids=ids_metric_learners_m)
-def test_deprecated_score_pairs_same_result(estimator, build_dataset):
-  """
-  Test that `pair_distance` and the deprecated function `score_pairs`
-  give the same result, while checking that the deprecation warning is
-  being shown.
-  """
-  input_data, labels, _, X = build_dataset()
-  model = clone(estimator)
-  set_random_state(model)
-  model.fit(*remove_y(model, input_data, labels))
-  random_pairs = np.array(list(product(X, X)))
-
-  msg = ("score_pairs will be deprecated in release 0.7.0. "
-         "Use pair_score to compute similarity scores, or "
-         "pair_distances to compute distances.")
-  with pytest.warns(FutureWarning) as raised_warning:
-    score = model.score_pairs(random_pairs)
-    dist = model.pair_distance(random_pairs)
-    assert array_equal(score, dist)
-  assert any([str(w.message) == msg for w in raised_warning])
 
 
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
@@ -129,28 +104,6 @@ def test_pair_distance_finite(estimator, build_dataset):
   model.fit(*remove_y(estimator, input_data, labels))
   pairs = np.array(list(product(X, X)))
   assert np.isfinite(model.pair_distance(pairs)).all()
-
-
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
-                         ids=ids_metric_learners_m)
-def test_pair_distance_dim(estimator, build_dataset):
-  """Calling `pair_distance` with 3D arrays should return 1D array
-  (several tuples), and calling `pair_distance` with 2D arrays
-  (one tuple) should return an error (like scikit-learn's error when
-  scoring 1D arrays)"""
-  input_data, labels, _, X = build_dataset()
-  model = clone(estimator)
-  set_random_state(model)
-  model.fit(*remove_y(estimator, input_data, labels))
-  tuples = np.array(list(product(X, X)))
-  assert model.pair_distance(tuples).shape == (tuples.shape[0],)
-  context = make_context(estimator)
-  msg = ("3D array of formed tuples expected{}. Found 2D array "
-         "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
-         .format(context, tuples[1]))
-  with pytest.raises(ValueError) as raised_error:
-    model.pair_distance(tuples[1])
-  assert str(raised_error.value) == msg
 
 
 def check_is_distance_matrix(pairwise):
