@@ -90,7 +90,7 @@ compute the metric between two 1D arrays, similarly to distance functions in
 0.4962707194621285
 
 You can also call ``get_metric`` with bilinear similarity learners, and you will get
-a function that will return the similarity bewtween 1D arrays.
+a function that will return the similarity between 1D arrays.
 
 >>> similarity_fun = algorithm.get_metric()
 >>> similarity_fun([3.5, 3.6], [5.6, 2.4])
@@ -139,7 +139,7 @@ All supervised algorithms are scikit-learn estimators
 scikit-learn model selection routines 
 (`sklearn.model_selection.cross_val_score`,
 `sklearn.model_selection.GridSearchCV`, etc).
-You can also use some of the scoring functions from `sklearn.metrics`.
+You can also use some scoring functions from `sklearn.metrics`.
 
 Algorithms
 ==========
@@ -271,12 +271,12 @@ the sum of probability of being correctly classified:
 Local Fisher Discriminant Analysis (:py:class:`LFDA <metric_learn.LFDA>`)
 
 `LFDA` is a linear supervised dimensionality reduction method which effectively combines the ideas of `Linear Discriminant Analysis <https://en.wikipedia.org/wiki/Linear_discriminant_analysis>` and Locality-Preserving Projection . It is
-particularly useful when dealing with multi-modality, where one ore more classes
+particularly useful when dealing with multi-modality, where one or more classes
 consist of separate clusters in input space. The core optimization problem of
 LFDA is solved as a generalized eigenvalue problem.
 
 
-The algorithm define the Fisher local within-/between-class scatter matrix 
+The algorithm defines the Fisher local within-/between-class scatter matrix 
 :math:`\mathbf{S}^{(w)}/ \mathbf{S}^{(b)}` in a pairwise fashion:
 
 .. math::
@@ -431,7 +431,7 @@ method will look at all the samples from a different class and sample randomly
 a pair among them. The method will try to build `num_constraints` positive
 pairs and `num_constraints` negative pairs, but sometimes it cannot find enough
 of one of those, so forcing `same_length=True` will return both times the
-minimum of the two lenghts.
+minimum of the two lengths.
 
 For using quadruplets learners (see :ref:`learning_on_quadruplets`) in a
 supervised way, positive and negative pairs are sampled as above and

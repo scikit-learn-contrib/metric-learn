@@ -79,11 +79,13 @@ the number of features of each point.
 >>>                     [-2.16, +0.11, -0.02]]])  # same as tuples[1, 0, :]
 >>> y = np.array([-1, 1, 1, -1])
 
-.. warning:: This way of specifying pairs is not recommended for a large number
-   of tuples, as it is redundant (see the comments in the example) and hence
-   takes a lot of memory. Indeed each feature vector of a point will be
-   replicated as many times as a point is involved in a tuple. The second way
-   to specify pairs is more efficient
+.. warning::
+
+    This way of specifying pairs is not recommended for a large number
+    of tuples, as it is redundant (see the comments in the example) and hence
+    takes a lot of memory. Indeed, each feature vector of a point will be
+    replicated as many times as a point is involved in a tuple. The second way
+    to specify pairs is more efficient
 
 
 2D array of indicators + preprocessor
@@ -145,7 +147,7 @@ Or alternatively (using a preprocessor):
 
 >>> from metric_learn import MMC
 >>> mmc = MMC(preprocessor=X, random_state=42)
->>> mmc.fit(pairs_indice, y)
+>>> mmc.fit(pairs_indices, y)
 
 Now that the estimator is fitted, you can use it on new data for several
 purposes.
@@ -183,7 +185,7 @@ compute the metric between two 1D arrays, similarly to distance functions in
 7.276073646278203
 
 You can also call ``get_metric``` with bilinear similarity learners, and you will get
-a function that will return the similarity bewtween 1D arrays.
+a function that will return the similarity between 1D arrays.
 
 >>> similarity_fun = algorithm.get_metric()
 >>> similarity_fun([3.5, 3.6], [5.6, 2.4])
@@ -474,7 +476,7 @@ Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between
 or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
 covariance matrix).
 
-The formulated optimization on the semidefinite matrix :math:`\mathbf{M}` 
+The formulated optimization on the semi-definite matrix :math:`\mathbf{M}` 
 is convex:
 
 .. math::
