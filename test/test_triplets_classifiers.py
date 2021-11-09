@@ -1,7 +1,6 @@
 import pytest
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
-import metric_learn
 
 from test.test_utils import triplets_learners, ids_triplets_learners
 from metric_learn.sklearn_shims import set_random_state
@@ -21,13 +20,7 @@ def test_predict_only_one_or_minus_one(estimator, build_dataset,
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   triplets_train, triplets_test = train_test_split(input_data)
-  if isinstance(estimator, metric_learn.SCML):
-    msg = "As no value for `n_basis` was selected, "
-    with pytest.warns(UserWarning) as raised_warning:
-      estimator.fit(triplets_train)
-    assert msg in str(raised_warning[0].message)
-  else:
-    estimator.fit(triplets_train)
+  estimator.fit(triplets_train)
   predictions = estimator.predict(triplets_test)
 
   not_valid = [e for e in predictions if e not in [-1, 1]]
@@ -49,13 +42,7 @@ def test_no_zero_prediction(estimator, build_dataset):
   # Dummy fit
   estimator = clone(estimator)
   set_random_state(estimator)
-  if isinstance(estimator, metric_learn.SCML):
-    msg = "As no value for `n_basis` was selected, "
-    with pytest.warns(UserWarning) as raised_warning:
-      estimator.fit(triplets)
-    assert msg in str(raised_warning[0].message)
-  else:
-    estimator.fit(triplets)
+  estimator.fit(triplets)
   # We force the transformation to be identity, to force euclidean distance
   estimator.components_ = np.eye(X.shape[1])
 
@@ -106,13 +93,7 @@ def test_accuracy_toy_example(estimator, build_dataset):
   triplets, _, _, X = build_dataset(with_preprocessor=False)
   estimator = clone(estimator)
   set_random_state(estimator)
-  if isinstance(estimator, metric_learn.SCML):
-    msg = "As no value for `n_basis` was selected, "
-    with pytest.warns(UserWarning) as raised_warning:
-      estimator.fit(triplets)
-    assert msg in str(raised_warning[0].message)
-  else:
-    estimator.fit(triplets)
+  estimator.fit(triplets)
   # We take the two first points and we build 4 regularly spaced points on the
   # line they define, so that it's easy to build triplets of different
   # similarities.
