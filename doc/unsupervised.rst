@@ -22,8 +22,6 @@ Whitening_transformation>`_).
 
 .. rubric:: Example Code
 
-A basic usage of this model with the Iris dataset from scikit-learn.
-
 ::
 
     from metric_learn import Covariance

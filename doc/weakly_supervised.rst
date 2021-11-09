@@ -415,8 +415,6 @@ is the prior distance metric, set to identity matrix by default,
 
 .. rubric:: Example Code
 
-A basic usage of this model with pairs:
-
 ::
 
     from metric_learn import ITML
@@ -478,8 +476,6 @@ is the off-diagonal L1 norm.
 
 .. rubric:: Example Code
 
-A basic usage of this model with pairs:
-
 ::
 
     from metric_learn import SDML
@@ -533,8 +529,6 @@ with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used
 as the Mahalanobis matrix.
 
 .. rubric:: Example Code
-
-A basic usage of this model with pairs:
 
 ::
 
@@ -590,8 +584,6 @@ points, while constrains the sum of distances between dissimilar points:
       \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
 
 .. rubric:: Example Code
-
-A basic usage of this model with pairs:
 
 ::
 
@@ -761,8 +753,6 @@ is added to yield a sparse combination. The formulation is the following:
 where :math:`[\cdot]_+` is the hinge loss. 
  
 .. rubric:: Example Code
-
-A basic usage of this model with triplets:
 
 ::
 
@@ -956,8 +946,6 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
     (\mathbf{M})
 
 .. rubric:: Example Code
-
-A basic usage of this model with quadruplets:
 
 ::
 
