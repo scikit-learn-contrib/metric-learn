@@ -79,7 +79,10 @@ class TestSklearnCompat(unittest.TestCase):
     check_estimator(Stable_RCA_Supervised())
 
   def test_scml(self):
-    check_estimator(SCML_Supervised())
+    msg = "As no value for `n_basis` was selected, "
+    with pytest.warns(UserWarning) as raised_warning:
+      check_estimator(SCML_Supervised())
+    assert msg in str(raised_warning[0].message)
 
 
 RNG = check_random_state(0)
@@ -147,8 +150,19 @@ def test_array_like_inputs(estimator, build_dataset, with_preprocessor):
 
   pairs = np.array([[X[0], X[1]], [X[0], X[2]]])
   pairs_variants, _ = generate_array_like(pairs)
+
+  not_implemented_msg = ""
+  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
+  # "This learner does not have pair_distance"
+
   for pairs_variant in pairs_variants:
-    estimator.score_pairs(pairs_variant)
+    estimator.pair_score(pairs_variant)  # All learners have pair_score
+
+    # But not all of them will have pair_distance
+    try:
+      estimator.pair_distance(pairs_variant)
+    except Exception as raised_exception:
+      assert raised_exception.value.args[0] == not_implemented_msg
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -224,7 +238,7 @@ def test_cross_validation_manual_vs_scikit(estimator, build_dataset,
     n_splits = 3
     kfold = KFold(shuffle=False, n_splits=n_splits)
     n_samples = input_data.shape[0]
-    fold_sizes = (n_samples // n_splits) * np.ones(n_splits, dtype=np.int)
+    fold_sizes = (n_samples // n_splits) * np.ones(n_splits, dtype=np.int64)
     fold_sizes[:n_samples % n_splits] += 1
     current = 0
     scores, predictions = [], np.zeros(input_data.shape[0])

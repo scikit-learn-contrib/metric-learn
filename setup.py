@@ -63,9 +63,9 @@ setup(name='metric-learn',
       ],
       packages=['metric_learn'],
       install_requires=[
-          'numpy',
-          'scipy',
-          'scikit-learn>=0.20.3',
+          'numpy>= 1.11.0',
+          'scipy>= 0.17.0',
+          'scikit-learn>=0.21.3',
       ],
       extras_require=dict(
           docs=['sphinx', 'shinx_rtd_theme', 'numpydoc'],
