@@ -41,17 +41,13 @@ two numbers.
 
 Fit, transform, and so on
 -------------------------
-Generally, the goal of supervised metric-learning algorithms is to transform
-points in a new space, in which the distance between two points from the
-same class will be small, and the distance between two points from different
-classes will be large.
+The goal of supervised metric learning algorithms is to learn a (distance or
+similarity) metric such that two points from the same class will be similar
+(e.g., have small distance) and points from different classes will be dissimilar
+(e.g., have large distance).
 
-But there are also some algorithms that learn a similarity, not a distance,
-thus the points cannot be transformed into a new space. In this case, the
-utility comes at using the similarity bewtween points directly.
-
-Mahalanobis learners can transform points into a new space, and to do so,
-we fit the metric learner (example:`NCA`).
+To do so, we first need to fit the supervised metric learner on a labeled dataset,
+as in the example below with ``NCA``.
 
 >>> from metric_learn import NCA
 >>> nca = NCA(random_state=42)
@@ -62,9 +58,47 @@ NCA(init='auto', max_iter=100, n_components=None,
 Now that the estimator is fitted, you can use it on new data for several
 purposes.
 
-First, your mahalanobis learner can transform the data in
-the learned space, using `transform`: Here we transform two points in
-the new embedding space.
+We can now use the learned metric to **score** new pairs of points with ``pair_score``
+(the larger the score, the more similar the pair). For Mahalanobis learners,
+it is equal to the opposite of the distance.
+
+>>> score = nca.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+This is useful because ``pair_score`` matches the **score** semantic of 
+scikit-learn's `Classification metrics
+<https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+
+For metric learners that learn a distance metric, there is also the ``pair_distance``
+method.
+
+>>> nca.pair_distance([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+array([0.49627072, 3.65287282, 6.06079877])
+
+.. warning::
+    
+    If you try to use ``pair_distance`` with a bilinear similarity learner, an error
+    will be thrown, as it does not learn a distance.
+
+You can also return a function that will return the metric learned. It can
+compute the metric between two 1D arrays, similarly to distance functions in
+`scipy.spatial.distance`. To do that, use the ``get_metric`` method.
+
+>>> metric_fun = nca.get_metric()
+>>> metric_fun([3.5, 3.6], [5.6, 2.4])
+0.4962707194621285
+
+You can also call ``get_metric`` with bilinear similarity learners, and you will get
+a function that will return the similarity between 1D arrays.
+
+>>> similarity_fun = algorithm.get_metric()
+>>> similarity_fun([3.5, 3.6], [5.6, 2.4])
+-0.04752
+
+Finally, as explained in :ref:`mahalanobis_distances`, these are equivalent to the Euclidean
+distance in a transformed space, and can thus be used to transform data points in
+a new embedding space. You can use ``transform`` to do so.
 
 >>> X_new = np.array([[9.4, 4.1], [2.1, 4.4]])
 >>> nca.transform(X_new)
@@ -73,76 +107,22 @@ array([[ 5.91884732, 10.25406973],
 
 .. warning::
     
-    If you try to use `transform` with a similarity learner, an error will
-    appear, as you cannot transform the data using them.
-
-Also, as explained before, mahalanobis metric learners learn a distance
-between points. You can use this distance in two main ways:
-
-- You can either return the distance between pairs of points using the
-  `pair_distance` function:
-
->>> nca.pair_distance([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
-array([0.49627072, 3.65287282, 6.06079877])
-
-- Or you can return a function that will return the distance (in the new
-  space) between two 1D arrays (the coordinates of the points in the original
-  space), similarly to distance functions in `scipy.spatial.distance`. To
-  do that, use the `get_metric` method.
-
->>> metric_fun = nca.get_metric()
->>> metric_fun([3.5, 3.6], [5.6, 2.4])
-0.4962707194621285
-
-- Alternatively, you can use `pair_score` to return the **score** between
-  pairs of points (the larger the score, the more similar the pair).
-  For Mahalanobis learners, it is equal to the opposite of the distance.
-
->>> score = nca.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
->>> score
-array([-0.49627072, -3.65287282, -6.06079877])
-
-This is useful because `pair_score` matches the **score** semantic of 
-scikit-learn's `Classification metrics
-<https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
-
-For similarity learners `pair_distance` is not available, as they don't learn
-a distance. Intead you use `pair_score` that has the same behaviour but
-for similarity.
-
->>> algorithm.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
-array([-0.2312, 705.23, -72.8])
-
-.. warning::
-    
-    If you try to use `pair_distance` with a similarity learner, an error
-    will appear, as they don't learn a distance nor a pseudo-distance.
-
-You can also call `get_metric` with similarity learners, and you will get
-a function that will return the similarity bewtween 1D arrays.
-
->>> similarity_fun = algorithm.get_metric()
->>> similarity_fun([3.5, 3.6], [5.6, 2.4])
--0.04752
-
-For similarity learners and mahalanobis learners, `pair_score` is
-available. You can interpret that this function returns the **score**
-between points: the more the **score**, the closer the pairs and vice-versa.
-For mahalanobis learners, it is equal to the inverse of the distance.
+    If you try to use ``transform`` with a bilinear similarity learner, an error will
+    be thrown, as you cannot transform the data using them.
 
 .. note::
 
     If the metric learner that you use learns a :ref:`Mahalanobis distance
-    <mahalanobis_distances>`, you can get the plain learned Mahalanobis
-    matrix using `get_mahalanobis_matrix`.
+    <mahalanobis_distances>`, you can get the learned Mahalanobis
+    matrix :math:`M` using `get_mahalanobis_matrix`.
 
     >>> nca.get_mahalanobis_matrix()
     array([[0.43680409, 0.89169412],
            [0.89169412, 1.9542479 ]])
 
-    If the metric learner that you use learns a :ref:`Bilinear similarity
+    If the metric learner that you use learns a :ref:`bilinear similarity
     <bilinear_similarity>`, you can get the plain learned Bilinear
-    matrix using `get_bilinear_matrix`.
+    matrix :math:`W` using `get_bilinear_matrix`.
 
     >>> algorithm.get_bilinear_matrix()
     array([[-0.72680409, -0.153213],
@@ -159,7 +139,7 @@ All supervised algorithms are scikit-learn estimators
 scikit-learn model selection routines 
 (`sklearn.model_selection.cross_val_score`,
 `sklearn.model_selection.GridSearchCV`, etc).
-You can also use some of the scoring functions from `sklearn.metrics`.
+You can also use some scoring functions from `sklearn.metrics`.
 
 Algorithms
 ==========
@@ -291,12 +271,12 @@ the sum of probability of being correctly classified:
 Local Fisher Discriminant Analysis (:py:class:`LFDA <metric_learn.LFDA>`)
 
 `LFDA` is a linear supervised dimensionality reduction method which effectively combines the ideas of `Linear Discriminant Analysis <https://en.wikipedia.org/wiki/Linear_discriminant_analysis>` and Locality-Preserving Projection . It is
-particularly useful when dealing with multi-modality, where one ore more classes
+particularly useful when dealing with multi-modality, where one or more classes
 consist of separate clusters in input space. The core optimization problem of
 LFDA is solved as a generalized eigenvalue problem.
 
 
-The algorithm define the Fisher local within-/between-class scatter matrix 
+The algorithm defines the Fisher local within-/between-class scatter matrix 
 :math:`\mathbf{S}^{(w)}/ \mathbf{S}^{(b)}` in a pairwise fashion:
 
 .. math::
@@ -451,7 +431,7 @@ method will look at all the samples from a different class and sample randomly
 a pair among them. The method will try to build `num_constraints` positive
 pairs and `num_constraints` negative pairs, but sometimes it cannot find enough
 of one of those, so forcing `same_length=True` will return both times the
-minimum of the two lenghts.
+minimum of the two lengths.
 
 For using quadruplets learners (see :ref:`learning_on_quadruplets`) in a
 supervised way, positive and negative pairs are sampled as above and
