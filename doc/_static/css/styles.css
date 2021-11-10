@@ -21,3 +21,16 @@
   margin-left: 0px !important;
   margin-bottom: 0px !important;
 }
+.deprecated {
+  color: #b94a48;
+  background-color: #F3E5E5;
+  border-color: #eed3d7;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.deprecated p {
+  margin-bottom: 0 !important;
+}

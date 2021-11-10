@@ -29,15 +29,16 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
   @abstractmethod
   def score_pairs(self, pairs):
     """
-    .. deprecated:: 0.7.0 Refer to `pair_distance` and `pair_score`.
+    Returns the score between pairs
+    (can be a similarity, or a distance/metric depending on the algorithm)
+
+    .. deprecated:: 0.7.0
+        Refer to `pair_distance` and `pair_score`.
 
     .. warning::
         This method will be removed in 0.8.0. Please refer to `pair_distance`
         or `pair_score`. This change will occur in order to add learners
         that don't necessarily learn a Mahalanobis distance.
-
-    Returns the score between pairs
-    (can be a similarity, or a distance/metric depending on the algorithm)
 
     Parameters
     ----------
@@ -267,14 +268,6 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
 
   def score_pairs(self, pairs):
     r"""
-    .. deprecated:: 0.7.0
-        This method is deprecated. Please use `pair_distance` instead.
-
-    .. warning::
-        This method will be removed in 0.8.0. Please refer to `pair_distance`
-        or `pair_score`. This change will occur in order to add learners
-        that don't necessarily learn a Mahalanobis distance.
-
     Returns the learned Mahalanobis distance between pairs.
 
     This distance is defined as: :math:`d_M(x, x') = \\sqrt{(x-x')^T M (x-x')}`
@@ -284,6 +277,14 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
     transformation. Indeed, we have also: :math:`d_M(x, x') = \\sqrt{(x_e -
     x_e')^T (x_e- x_e')}`, with :math:`x_e = L x` (See
     :class:`MahalanobisMixin`).
+
+    .. deprecated:: 0.7.0
+        Please use `pair_distance` instead.
+
+    .. warning::
+        This method will be removed in 0.8.0. Please refer to `pair_distance`
+        or `pair_score`. This change will occur in order to add learners
+        that don't necessarily learn a Mahalanobis distance.
 
     Parameters
     ----------
