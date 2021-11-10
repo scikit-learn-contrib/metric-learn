@@ -361,45 +361,6 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
     The linear transformation ``L`` deduced from the learned Mahalanobis
     metric (See function `_components_from_basis_weights`.)
 
-  Methods
-  -------
-  decision_function:
-    Predicts differences between sample distances in input triplets.
-
-  fit:
-    Learn the SCML model.
-
-  get_mahalanobis_matrix:
-    Returns a copy of the Mahalanobis matrix learned by the metric learner.
-
-  get_metric:
-    Returns a function that takes as input two 1D arrays and outputs the
-    learned metric score on these two points.
-
-  get_params:
-    Get parameters for this estimator.
-
-  pair_distance:
-    Returns the (pseudo) distance between pairs, when available.
-
-  pair_score:
-    Returns the similarity score between pairs of points.
-
-  predict:
-    Predicts the ordering between sample distances in input triplets.
-
-  score:
-    Computes score on input triplets.
-
-  score_pairs:
-    Deprecated. Returns the learned Mahalanobis distance between pairs.
-
-  set_params:
-    Set the parameters of this estimator.
-
-  transform:
-    Embeds data points in the learned linear embedding space.
-
   Examples
   --------
   >>> from metric_learn import SCML
@@ -509,39 +470,6 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
   components_ : `numpy.ndarray`, shape=(n_features, n_features)
     The linear transformation ``L`` deduced from the learned Mahalanobis
     metric (See function `_components_from_basis_weights`.)
-
-  Methods
-  -------
-  fit:
-    Create constraints from labels and learn the SCML model.
-
-  fit_transform:
-    Fit to data, then transform it.
-
-  get_mahalanobis_matrix:
-    Returns a copy of the Mahalanobis matrix learned by the metric learner.
-
-  get_metric:
-    Returns a function that takes as input two 1D arrays and outputs the
-    learned metric score on these two points.
-
-  get_params:
-    Get parameters for this estimator.
-
-  pair_distance:
-      Returns the (pseudo) distance between pairs, when available.
-
-  pair_score:
-    Returns the similarity score between pairs of points.
-
-  score_pairs:
-    Deprecated. Returns the learned Mahalanobis distance between pairs.
-
-  set_params:
-    Set the parameters of this estimator.
-
-  transform:
-    Embeds data points in the learned linear embedding space.
 
   Examples
   --------

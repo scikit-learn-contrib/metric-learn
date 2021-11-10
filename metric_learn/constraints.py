@@ -25,17 +25,6 @@ class Constraints(object):
   ----------
   partial_labels : `numpy.ndarray` of ints, shape=(n_samples,)
     Array of labels, with -1 indicating unknown label.
-
-  Methods
-  -------
-  chunks:
-    Generates chunks from labeled data.
-
-  generate_knntriplets:
-    Generates triplets from labeled data.
-
-  positive_negative_pairs:
-    Generates positive pairs and negative pairs from labeled data.
   """
 
   def __init__(self, partial_labels):

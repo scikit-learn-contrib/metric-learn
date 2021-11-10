@@ -391,52 +391,6 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
     points will be classified as similar, otherwise they will be
     classified as dissimilar.
 
-  Methods
-  -------
-  calibrate_threshold:
-    Decision threshold calibration for pairwise binary classification.
-
-  decision_function:
-    Returns the decision function used to classify the pairs.
-
-  fit:
-    Learn the MMC model.
-
-  get_mahalanobis_matrix:
-    Returns a copy of the Mahalanobis matrix learned by the metric learner.
-
-  get_metric:
-    Returns a function that takes as input two 1D arrays and outputs the
-    learned metric score on these two points.
-
-  get_params:
-    Get parameters for this estimator.
-
-  pair_distance:
-    Returns the (pseudo) distance between pairs, when available.
-
-  pair_score:
-    Returns the similarity score between pairs of points.
-
-  predict:
-    Predicts the learned metric between input pairs. (For now it just
-    calls decision function).
-
-  score:
-    Computes score of pairs similarity prediction.
-
-  score_pairs:
-    Deprecated. Returns the learned Mahalanobis distance between pairs.
-
-  set_params:
-    Set the parameters of this estimator.
-
-  set_threshold:
-    Sets the threshold of the metric learner to the given value `threshold`.
-
-  transform:
-    Embeds data points in the learned linear embedding space.
-
   Examples
   --------
   >>> from metric_learn import MMC
@@ -563,39 +517,6 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     ``init='random'``, ``random_state`` is used to initialize the random
     Mahalanobis matrix.  In any case, `random_state` is also used to
     randomly sample constraints from labels.
-
-  Methods
-  -------
-  fit:
-    Create constraints from labels and learn the MMC model.
-
-  fit_transform:
-    Fit to data, then transform it.
-
-  get_mahalanobis_matrix:
-    Returns a copy of the Mahalanobis matrix learned by the metric learner.
-
-  get_metric:
-    Returns a function that takes as input two 1D arrays and outputs the
-    learned metric score on these two points.
-
-  get_params:
-    Get parameters for this estimator.
-
-  pair_distance:
-      Returns the (pseudo) distance between pairs, when available.
-
-  pair_score:
-    Returns the similarity score between pairs of points.
-
-  score_pairs:
-    Deprecated. Returns the learned Mahalanobis distance between pairs.
-
-  set_params:
-    Set the parameters of this estimator.
-
-  transform:
-    Embeds data points in the learned linear embedding space.
 
   Examples
   --------
