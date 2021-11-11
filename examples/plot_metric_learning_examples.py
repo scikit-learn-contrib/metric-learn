@@ -15,7 +15,11 @@ to achieve.
 ######################################################################
 # Imports
 # ^^^^^^^
+# .. note::
 #
+#     In order to show the charts of the examples you need a graphical
+#     ``matplotlib`` backend installed. For intance, use ``pip install pyqt5``
+#     to get Qt graphical interface or use your favorite one.
 
 from sklearn.manifold import TSNE
 

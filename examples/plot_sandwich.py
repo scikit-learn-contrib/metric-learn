@@ -6,6 +6,13 @@ Sandwich demo
 Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 """
 
+######################################################################
+# .. note::
+#
+#     In order to show the charts of the examples you need a graphical
+#     ``matplotlib`` backend installed. For intance, use ``pip install pyqt5``
+#     to get Qt graphical interface or use your favorite one.
+
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.metrics import pairwise_distances
