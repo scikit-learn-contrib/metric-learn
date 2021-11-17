@@ -58,7 +58,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
   >>> rca.fit(X, chunks)
 
   References
-  ------------------
+  ----------
   .. [1] Noam Shental, et al. `Adjustment learning and relevant component
          analysis <http://citeseerx.ist.\
          psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ .

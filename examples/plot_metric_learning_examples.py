@@ -39,9 +39,9 @@ np.random.seed(42)
 # We will be using a synthetic dataset to illustrate the plotting,
 # using the function `sklearn.datasets.make_classification` from
 # scikit-learn. The dataset will contain:
-#   - 100 points in 3 classes with 2 clusters per class
-#   - 5 features, among which 3 are informative (correlated with the class
-#     labels) and two are random noise with large magnitude
+# - 100 points in 3 classes with 2 clusters per class
+# - 5 features, among which 3 are informative (correlated with the class
+# labels) and two are random noise with large magnitude
 
 X, y = make_classification(n_samples=100, n_classes=3, n_clusters_per_class=2,
                            n_informative=3, class_sep=4., n_features=5,

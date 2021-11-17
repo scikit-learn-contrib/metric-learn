@@ -65,7 +65,7 @@ class LFDA(MahalanobisMixin, TransformerMixin):
   >>> lfda.fit(X, Y)
 
   References
-  ------------------
+  ----------
   .. [1] Masashi Sugiyama. `Dimensionality Reduction of Multimodal Labeled
          Data by Local Fisher Discriminant Analysis
          <http://www.ms.k.u-tokyo.ac.jp/2007/LFDA.pdf>`_. JMLR 2007.

@@ -95,12 +95,14 @@ class Constraints(object):
 
     Parameters
     ----------
-      X : (n x d) matrix
-        Input data, where each row corresponds to a single instance.
-      k_genuine : int
-        Number of neighbors of the same class to be taken into account.
-      k_impostor : int
-        Number of neighbors of different classes to be taken into account.
+    X : (n x d) matrix
+      Input data, where each row corresponds to a single instance.
+
+    k_genuine : int
+      Number of neighbors of the same class to be taken into account.
+
+    k_impostor : int
+      Number of neighbors of different classes to be taken into account.
 
     Returns
     -------

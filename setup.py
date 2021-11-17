@@ -68,7 +68,8 @@ setup(name='metric-learn',
           'scikit-learn>=0.21.3',
       ],
       extras_require=dict(
-          docs=['sphinx', 'shinx_rtd_theme', 'numpydoc'],
+          docs=['sphinx', 'sphinx_rtd_theme', 'numpydoc', 'sphinx-gallery',
+                'matplotlib'],
           demo=['matplotlib'],
           sdml=['skggm>=0.2.9']
       ),

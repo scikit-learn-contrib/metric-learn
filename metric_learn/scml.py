@@ -377,8 +377,8 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
          <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
          (AAAI), 2014.
 
-  .. [2] Adapted from original \
-         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+  .. [2] Adapted from original `Matlab implementation. \
+         <https://github.com/bellet/SCML>`_.
 
   See Also
   --------
@@ -492,8 +492,8 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
          <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
          (AAAI), 2014.
 
-  .. [2] Adapted from original \
-         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+  .. [2] Adapted from original `Matlab implementation. \
+         <https://github.com/bellet/SCML>`_.
 
   See Also
   --------
