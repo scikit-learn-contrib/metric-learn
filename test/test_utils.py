@@ -1064,7 +1064,7 @@ def test_error_message_t_pair_distance_or_score(estimator, _):
                   .format(make_context(estimator), triplets))
   assert str(raised_err.value) == expected_msg
 
-  msg = ("This learner doesn't learn a distance, thus ",
+  msg = ("This learner does not learn a distance, thus ",
          "this method is not implemented. Use pair_score instead")
 
   # One exception will trigger for sure

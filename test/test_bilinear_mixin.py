@@ -88,7 +88,7 @@ def test_check_handmade_example():
 # the matrix can be non-symmetric.
 def test_check_handmade_symmetric_example():
   """
-  When the Bilinear matrix is the identity. The similarity
+  When the bilinear matrix is the identity. The similarity
   between two arrays must be equal: S(u,v) = S(v,u). Also
   checks the random case: when the matrix is spd and symetric.
   """
@@ -145,7 +145,7 @@ def test_check_error_with_pair_distance(estimator, build_dataset):
   model.fit(*remove_y(model, input_data, labels))
   random_pairs = np.array(list(product(X, X)))
 
-  msg = ("This learner doesn't learn a distance, thus ",
+  msg = ("This learner does not learn a distance, thus ",
          "this method is not implemented. Use pair_score instead")
   with pytest.raises(Exception) as e:
     _ = model.pair_distance(random_pairs)

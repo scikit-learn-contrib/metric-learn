@@ -78,7 +78,7 @@ necessarily the identity of indiscernibles.
   parameterizations are equivalent. In practice, an algorithm may thus solve
   the metric learning problem with respect to either :math:`M` or :math:`L`.
 
-.. _bilinear_similarity:
+.. __bilinear_similarities:
 
 Bilinear Similarities
 =====================

@@ -217,7 +217,7 @@ array([[-3.24667162e+01,  4.62622348e-07,  3.88325421e-08],
         [-1.66614919, 16.20219519,  4.73697721]])
 
     If the metric learner that you use learns a :ref:`bilinear similarity
-    <bilinear_similarity>`, you can get the learned Bilinear
+    <_bilinear_similarities>`, you can get the learned bilinear
     matrix :math:`W` using `get_bilinear_matrix`.
 
     >>> algorithm.get_bilinear_matrix()
