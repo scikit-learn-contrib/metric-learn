@@ -58,7 +58,7 @@ NCA(init='auto', max_iter=100, n_components=None,
 Now that the estimator is fitted, you can use it on new data for several
 purposes.
 
-We can now use the learned metric to **score** new pairs of points with ``pair_score``
+We can use the learned metric to **score** new pairs of points with ``pair_score``
 (the larger the score, the more similar the pair). For Mahalanobis learners,
 it is equal to the opposite of the distance.
 

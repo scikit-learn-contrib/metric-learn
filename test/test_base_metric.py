@@ -327,8 +327,8 @@ def test_pair_score_dim(estimator, build_dataset):
                          ids=ids_metric_learners)
 def test_deprecated_score_pairs_same_result(estimator, build_dataset):
   """
-  Test that `pari_distance` gives the same result as `score_pairs` for
-  Mahalanobis learnes, and the same for `pair_score` and `score_paris`
+  Test that `pair_distance` gives the same result as `score_pairs` for
+  Mahalanobis learnes, and the same for `pair_score` and `score_pairs`
   for Bilinear learners. It also checks that the deprecation warning of
   `score_pairs` is being shown.
   """

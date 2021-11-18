@@ -10,10 +10,10 @@ between data points. Traditionally, practitioners would choose a standard metric
 domain. However, it is often difficult to design metrics that are well-suited
 to the particular data and task of interest.
 
-Metric learning (or simply, metric learning) aims at automatically constructing
-task-specific metrics from (weakly) supervised data, in a machine learning manner.
-The learned metric can then be used to perform various tasks (e.g.,
-k-NN classification, clustering, information retrieval).
+Metric learning aims at automatically constructing task-specific metrics from
+(weakly) supervised data, in a machine learning manner. The learned metric can
+then be used to perform various tasks (e.g., k-NN classification, clustering,
+information retrieval).
 
 Problem Setting
 ===============
@@ -36,7 +36,7 @@ of supervision available about the training data:
 
 Based on the above (weakly) supervised data, the metric learning problem is
 generally formulated as an optimization problem where one seeks to find the
-parameters of a function that optimize some objective function
+parameters of a metric that optimize some objective function
 measuring the agreement with the training data.
 
 .. _mahalanobis_distances:
@@ -59,8 +59,8 @@ Mahalanobis distance metric learning can thus be seen as learning a new
 embedding space of dimension ``num_dims``. Note that when ``num_dims`` is
 smaller than ``n_features``, this achieves dimensionality reduction.
 
-Strictly speaking, Mahalanobis distances are "pseudo-metrics": they satisfy
-three of the `properties of a metric <https://en.wikipedia.org/wiki/Metric_
+Strictly speaking, Mahalanobis distances are "pseudo-distances": they satisfy
+three of the `properties of a distance <https://en.wikipedia.org/wiki/Metric_
 (mathematics)>`_ (non-negativity, symmetry, triangle inequality) but not
 necessarily the identity of indiscernibles.
 
