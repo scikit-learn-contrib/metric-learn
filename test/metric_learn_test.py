@@ -323,6 +323,22 @@ class TestSCML(object):
       scml.fit(triplets)
     assert msg == raised_error.value.args[0]
 
+  @pytest.mark.parametrize("basis", ("lda", "triplet_diffs"))
+  def test_warm_start(self, basis):
+    X, y = load_iris(return_X_y=True)
+    # Should work with warm_start=True even with first fit
+    scml = SCML_Supervised(basis=basis, n_basis=85, k_genuine=7, k_impostor=5,
+                           random_state=42, warm_start=True)
+    scml.fit(X, y)
+    # Re-fitting should continue from previous fit
+    before = class_separation(scml.transform(X), y)
+    scml.fit(X, y)
+    # We used the whole same dataset, so it can led to overfitting
+    after = class_separation(scml.transform(X), y)
+    if basis == "lda":
+      assert before > after + 0.05  # For lda, it's better by a margin of 0.05
+    else:
+      assert before < after  # For triplet_diffs, it overfits
 
 class TestLSML(MetricTestCase):
   def test_iris(self):
