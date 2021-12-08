@@ -84,8 +84,6 @@ class _BaseSCML(MahalanobisMixin):
         # l2 norm in time of all obj gradients wrt weights
         self.ada_grad_w_ = np.zeros((1, n_basis))
 
-    # l2 norm in time of all obj gradients wrt weights
-    ada_grad_w = np.zeros((1, n_basis))
     # slack for not dividing by zero
     delta = 0.001
 
@@ -104,7 +102,7 @@ class _BaseSCML(MahalanobisMixin):
       grad_w = np.sum(dist_diff[idx[slack_mask], :],
                       axis=0, keepdims=True)/self.batch_size
 
-      self.avg_grad_w_ = (iter * self.avg_grad_w_ + grad_w) / (iter + 1)
+      self.avg_grad_w_ = (iter * self.avg_grad_w_ + grad_w) / (iter+1)
 
       self.ada_grad_w_ = np.sqrt(np.square(self.ada_grad_w_) + np.square(grad_w))
 
