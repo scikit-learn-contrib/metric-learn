@@ -336,9 +336,9 @@ class TestSCML(object):
     # We used the whole same dataset, so it can led to overfitting
     after = class_separation(scml.transform(X), y)
     if basis == "lda":
-      assert before > after + 0.05  # For lda, it's better by a margin of 0.05
+      assert before > after  # For lda, class separation improved with re-fit
     else:
-      assert before < after  # For triplet_diffs, it overfits
+      assert before < after  # For triplet_diffs, it got worse
 
 class TestLSML(MetricTestCase):
   def test_iris(self):
