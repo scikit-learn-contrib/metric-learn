@@ -338,7 +338,7 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
   gamma: float (default = 5e-3)
     Learning rate for the optimization algorithm.
 
-  max_iter : int (default = 100000)
+  max_iter : int (default = 10000)
     Number of iterations for the algorithm.
 
   output_iter : int (default = 5000)
