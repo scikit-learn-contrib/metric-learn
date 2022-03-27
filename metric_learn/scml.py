@@ -261,11 +261,13 @@ class _BaseSCML(MahalanobisMixin):
     start = 0
     finish = 0
 
+    replace = n_features > n_triplets
+
     while(finish != n_basis):
 
       # Select triplets to yield diff
 
-      select_triplet = rng.choice(n_triplets, size=n_features, replace=False)
+      select_triplet = rng.choice(n_triplets, size=n_features, replace=replace)
 
       # select n_features positive differences
       d_pos = diff_pos[select_triplet, :]
