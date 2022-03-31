@@ -1,3 +1,7 @@
+"""
+Tests all functionality for Mahalanobis Learners. Correctness, use cases,
+warnings, distance properties, transform, dimentions, init, etc.
+"""
 from itertools import product
 
 import pytest
@@ -8,7 +12,6 @@ from numpy.testing import assert_array_almost_equal, assert_allclose, \
 from scipy.spatial.distance import pdist, squareform, mahalanobis
 from scipy.stats import ortho_group
 from sklearn import clone
-from sklearn.cluster import DBSCAN
 from sklearn.datasets import make_spd_matrix, make_blobs
 from sklearn.utils import check_random_state, shuffle
 from sklearn.utils.multiclass import type_of_target
@@ -20,14 +23,16 @@ from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
                                       _PairsClassifierMixin)
 from metric_learn.exceptions import NonPSDError
 
-from test.test_utils import (ids_metric_learners, metric_learners,
-                             remove_y, ids_classifiers)
+from test.test_utils import (ids_metric_learners_m, metric_learners_m,
+                             remove_y, ids_classifiers_m,
+                             pairs_learners_m, ids_pairs_learners_m)
+from sklearn.exceptions import NotFittedError
 
 RNG = check_random_state(0)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
   """
   For Mahalanobis learners, pair_score should be equivalent to the
@@ -46,10 +51,11 @@ def test_pair_distance_pair_score_equivalent(estimator, build_dataset):
   assert_array_equal(distances, -1 * scores)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_pair_distance_pairwise(estimator, build_dataset):
-  # Computing pairwise scores should return a euclidean distance matrix.
+  """Computing pairwise scores should return a euclidean distance
+  matrix."""
   input_data, labels, _, X = build_dataset()
   n_samples = 20
   X = X[:n_samples]
@@ -70,10 +76,10 @@ def test_pair_distance_pairwise(estimator, build_dataset):
   assert_array_almost_equal(squareform(pairwise), pdist(model.transform(X)))
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_pair_distance_toy_example(estimator, build_dataset):
-    # Checks that pair_distance works on a toy example
+    """Checks that `pair_distance` works on a toy example."""
     input_data, labels, _, X = build_dataset()
     n_samples = 20
     X = X[:n_samples]
@@ -88,10 +94,10 @@ def test_pair_distance_toy_example(estimator, build_dataset):
     assert_array_almost_equal(model.pair_distance(pairs), distances)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_pair_distance_finite(estimator, build_dataset):
-  # tests that the score is finite
+  """Tests that the distance from `pair_distance` is finite"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -100,28 +106,9 @@ def test_pair_distance_finite(estimator, build_dataset):
   assert np.isfinite(model.pair_distance(pairs)).all()
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
-def test_pair_distance_dim(estimator, build_dataset):
-  # scoring of 3D arrays should return 1D array (several tuples),
-  # and scoring of 2D arrays (one tuple) should return an error (like
-  # scikit-learn's error when scoring 1D arrays)
-  input_data, labels, _, X = build_dataset()
-  model = clone(estimator)
-  set_random_state(model)
-  model.fit(*remove_y(estimator, input_data, labels))
-  tuples = np.array(list(product(X, X)))
-  assert model.pair_distance(tuples).shape == (tuples.shape[0],)
-  context = make_context(estimator)
-  msg = ("3D array of formed tuples expected{}. Found 2D array "
-         "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
-         .format(context, tuples[1]))
-  with pytest.raises(ValueError) as raised_error:
-    model.pair_distance(tuples[1])
-  assert str(raised_error.value) == msg
-
-
 def check_is_distance_matrix(pairwise):
+  """Returns True if the matrix is positive, symmetrc, the diagonal is zero,
+  and if it fullfills the triangular inequality for all pairs"""
   assert (pairwise >= 0).all()  # positivity
   assert np.array_equal(pairwise, pairwise.T)  # symmetry
   assert (pairwise.diagonal() == 0).all()  # identity
@@ -131,10 +118,11 @@ def check_is_distance_matrix(pairwise):
           pairwise[:, np.newaxis, :] + tol).all()
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_embed_toy_example(estimator, build_dataset):
-    # Checks that embed works on a toy example
+    """Checks that embed works on a toy example. That using `transform`
+    is equivalent to manually multiplying Lx"""
     input_data, labels, _, X = build_dataset()
     n_samples = 20
     X = X[:n_samples]
@@ -145,10 +133,10 @@ def test_embed_toy_example(estimator, build_dataset):
     assert_array_almost_equal(model.transform(X), embedded_points)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_embed_dim(estimator, build_dataset):
-  # Checks that the the dimension of the output space is as expected
+  """Checks that the the dimension of the output space is as expected"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -174,10 +162,10 @@ def test_embed_dim(estimator, build_dataset):
     assert str(raised_error.value) == err_msg
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_embed_finite(estimator, build_dataset):
-  # Checks that embed returns vectors with finite values
+  """Checks that embed (transform) returns vectors with finite values"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -185,10 +173,11 @@ def test_embed_finite(estimator, build_dataset):
   assert np.isfinite(model.transform(X)).all()
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_embed_is_linear(estimator, build_dataset):
-  # Checks that the embedding is linear
+  """Checks that the embedding is linear, i.e. linear properties of
+  using `tranform`"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
@@ -200,8 +189,8 @@ def test_embed_is_linear(estimator, build_dataset):
                             5 * model.transform(X[:10]))
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_get_metric_equivalent_to_explicit_mahalanobis(estimator,
                                                        build_dataset):
   """Tests that using the get_metric method of mahalanobis metric learners is
@@ -220,8 +209,8 @@ def test_get_metric_equivalent_to_explicit_mahalanobis(estimator,
   assert_allclose(metric(a, b), expected_dist, rtol=1e-13)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_get_metric_is_pseudo_metric(estimator, build_dataset):
   """Tests that the get_metric method of mahalanobis metric learners returns a
   pseudo-metric (metric but without one side of the equivalence of
@@ -247,21 +236,8 @@ def test_get_metric_is_pseudo_metric(estimator, build_dataset):
             np.isclose(metric(a, c), metric(a, b) + metric(b, c), rtol=1e-20))
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
-def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
-  """Check that the metric returned by get_metric is compatible with
-  scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
-  input_data, labels, _, X = build_dataset()
-  model = clone(estimator)
-  set_random_state(model)
-  model.fit(*remove_y(estimator, input_data, labels))
-  clustering = DBSCAN(metric=model.get_metric())
-  clustering.fit(X)
-
-
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_get_squared_metric(estimator, build_dataset):
   """Test that the squared metric returned is indeed the square of the
   metric"""
@@ -280,8 +256,8 @@ def test_get_squared_metric(estimator, build_dataset):
                     rtol=1e-15)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_components_is_2D(estimator, build_dataset):
   """Tests that the transformation matrix of metric learners is 2D"""
   input_data, labels, _, X = build_dataset()
@@ -318,13 +294,13 @@ def test_components_is_2D(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
-                          in zip(ids_metric_learners,
-                                 metric_learners)
+                          in zip(ids_metric_learners_m,
+                                 metric_learners_m)
                           if hasattr(ml, 'n_components') and
                           hasattr(ml, 'init')],
                          ids=[idml for idml, (ml, _)
-                              in zip(ids_metric_learners,
-                                     metric_learners)
+                              in zip(ids_metric_learners_m,
+                                     metric_learners_m)
                               if hasattr(ml, 'n_components') and
                               hasattr(ml, 'init')])
 def test_init_transformation(estimator, build_dataset):
@@ -411,13 +387,13 @@ def test_init_transformation(estimator, build_dataset):
 @pytest.mark.parametrize('n_components', [3, 5, 7, 11])
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
-                          in zip(ids_metric_learners,
-                                 metric_learners)
+                          in zip(ids_metric_learners_m,
+                                 metric_learners_m)
                           if hasattr(ml, 'n_components') and
                           hasattr(ml, 'init')],
                          ids=[idml for idml, (ml, _)
-                              in zip(ids_metric_learners,
-                                     metric_learners)
+                              in zip(ids_metric_learners_m,
+                                     metric_learners_m)
                               if hasattr(ml, 'n_components') and
                               hasattr(ml, 'init')])
 def test_auto_init_transformation(n_samples, n_features, n_classes,
@@ -460,7 +436,7 @@ def test_auto_init_transformation(n_samples, n_features, n_classes,
       input_data = input_data[:n_samples, ..., :n_features]
       assert input_data.shape[0] == n_samples
       assert input_data.shape[-1] == n_features
-      has_classes = model_base.__class__.__name__ in ids_classifiers
+      has_classes = model_base.__class__.__name__ in ids_classifiers_m
       if has_classes:
         labels = np.tile(range(n_classes), n_samples //
                          n_classes + 1)[:n_samples]
@@ -481,13 +457,13 @@ def test_auto_init_transformation(n_samples, n_features, n_classes,
 
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
-                          in zip(ids_metric_learners,
-                                 metric_learners)
+                          in zip(ids_metric_learners_m,
+                                 metric_learners_m)
                           if not hasattr(ml, 'n_components') and
                           hasattr(ml, 'init')],
                          ids=[idml for idml, (ml, _)
-                              in zip(ids_metric_learners,
-                                     metric_learners)
+                              in zip(ids_metric_learners_m,
+                                     metric_learners_m)
                               if not hasattr(ml, 'n_components') and
                               hasattr(ml, 'init')])
 def test_init_mahalanobis(estimator, build_dataset):
@@ -571,12 +547,12 @@ def test_init_mahalanobis(estimator, build_dataset):
 
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
-                          in zip(ids_metric_learners,
-                                 metric_learners)
+                          in zip(ids_metric_learners_m,
+                                 metric_learners_m)
                           if idml[:4] in ['ITML', 'SDML', 'LSML']],
                          ids=[idml for idml, (ml, _)
-                              in zip(ids_metric_learners,
-                                     metric_learners)
+                              in zip(ids_metric_learners_m,
+                                     metric_learners_m)
                               if idml[:4] in ['ITML', 'SDML', 'LSML']])
 def test_singular_covariance_init_or_prior_strictpd(estimator, build_dataset):
     """Tests that when using the 'covariance' init or prior, it returns the
@@ -615,12 +591,12 @@ def test_singular_covariance_init_or_prior_strictpd(estimator, build_dataset):
 @pytest.mark.integration
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
-                          in zip(ids_metric_learners,
-                                 metric_learners)
+                          in zip(ids_metric_learners_m,
+                                 metric_learners_m)
                           if idml[:3] in ['MMC']],
                          ids=[idml for idml, (ml, _)
-                              in zip(ids_metric_learners,
-                                     metric_learners)
+                              in zip(ids_metric_learners_m,
+                                     metric_learners_m)
                               if idml[:3] in ['MMC']])
 def test_singular_covariance_init_of_non_strict_pd(estimator, build_dataset):
     """Tests that when using the 'covariance' init or prior, it returns the
@@ -657,12 +633,12 @@ def test_singular_covariance_init_of_non_strict_pd(estimator, build_dataset):
 @pytest.mark.integration
 @pytest.mark.parametrize('estimator, build_dataset',
                          [(ml, bd) for idml, (ml, bd)
-                          in zip(ids_metric_learners,
-                                 metric_learners)
+                          in zip(ids_metric_learners_m,
+                                 metric_learners_m)
                           if idml[:4] in ['ITML', 'SDML', 'LSML']],
                          ids=[idml for idml, (ml, _)
-                              in zip(ids_metric_learners,
-                                     metric_learners)
+                              in zip(ids_metric_learners_m,
+                                     metric_learners_m)
                               if idml[:4] in ['ITML', 'SDML', 'LSML']])
 @pytest.mark.parametrize('w0', [1e-20, 0., -1e-20])
 def test_singular_array_init_or_prior_strictpd(estimator, build_dataset, w0):
@@ -731,8 +707,8 @@ def test_singular_array_init_of_non_strict_pd(w0):
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
-                         ids=ids_metric_learners)
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
 def test_deterministic_initialization(estimator, build_dataset):
   """Test that estimators that have a prior or an init are deterministic
   when it is set to to random and when the random_state is fixed."""
@@ -750,3 +726,35 @@ def test_deterministic_initialization(estimator, build_dataset):
   model2 = model2.fit(*remove_y(model, input_data, labels))
   np.testing.assert_allclose(model1.get_mahalanobis_matrix(),
                              model2.get_mahalanobis_matrix())
+
+
+@pytest.mark.parametrize('with_preprocessor', [True, False])
+@pytest.mark.parametrize('estimator, build_dataset', pairs_learners_m,
+                         ids=ids_pairs_learners_m)
+def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
+                                              with_preprocessor):
+  """Test that a NotFittedError is raised if someone tries to use
+  pair_score, pair_distance, score_pairs, get_metric, transform or
+  get_mahalanobis_matrix on input data and the metric learner
+  has not been fitted."""
+  input_data, _, preprocessor, _ = build_dataset(with_preprocessor)
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  with pytest.raises(NotFittedError):  # TODO: Remove in 0.8.0
+    msg = ("score_pairs will be deprecated in release 0.7.0. "
+           "Use pair_score to compute similarity scores, or "
+           "pair_distances to compute distances.")
+    with pytest.warns(FutureWarning) as raised_warning:
+      estimator.score_pairs(input_data)
+    assert any([str(warning.message) == msg for warning in raised_warning])
+  with pytest.raises(NotFittedError):
+    estimator.pair_score(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.pair_distance(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.get_metric()
+  with pytest.raises(NotFittedError):
+    estimator.get_mahalanobis_matrix()
+  with pytest.raises(NotFittedError):
+    estimator.transform(input_data)

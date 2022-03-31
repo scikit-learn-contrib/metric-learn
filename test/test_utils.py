@@ -1,8 +1,13 @@
+"""
+Tests preprocesor, warnings, errors. Also made util functions to build datasets
+in a general way for each learner. Here is also the list of learners of each
+kind that are used as a parameters in tests in other files. Util functions.
+"""
 import pytest
 from scipy.linalg import eigh, pinvh
 from collections import namedtuple
 import numpy as np
-from numpy.testing import assert_array_equal, assert_equal
+from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from sklearn.model_selection import train_test_split
 from sklearn.utils import check_random_state, shuffle
 from metric_learn.sklearn_shims import set_random_state
@@ -12,12 +17,16 @@ from metric_learn._util import (check_input, make_context, preprocess_tuples,
                                 check_collapsed_pairs, validate_vector,
                                 _check_sdp_from_eigen, _check_n_components,
                                 check_y_valid_values_for_pairs,
-                                _auto_select_init, _pseudo_inverse_from_eig)
+                                _auto_select_init, _pseudo_inverse_from_eig,
+                                _get_random_indices,
+                                _initialize_similarity_bilinear)
 from metric_learn import (ITML, LSML, MMC, RCA, SDML, Covariance, LFDA,
                           LMNN, MLKR, NCA, ITML_Supervised, LSML_Supervised,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
-                          SCML, SCML_Supervised, Constraints)
+                          SCML, SCML_Supervised, OASIS, OASIS_Supervised,
+                          Constraints)
 from metric_learn.base_metric import (ArrayIndexer, MahalanobisMixin,
+                                      BilinearMixin,
                                       _PairsClassifierMixin,
                                       _TripletsClassifierMixin,
                                       _QuadrupletsClassifierMixin)
@@ -28,6 +37,120 @@ from sklearn.datasets import make_regression, make_blobs, load_iris
 SEED = 42
 RNG = check_random_state(SEED)
 
+
+# -------------------- Mock classes for testing ------------------------
+
+
+class RandomBilinearLearner(BilinearMixin):
+  """A simple Random bilinear mixin that returns an random matrix
+  M as learned. Class for testing purposes.
+  """
+  def __init__(self, init='random', preprocessor=None, random_state=33):
+    super().__init__(preprocessor=preprocessor)
+    self.init = init
+    self.random_state = random_state
+
+  def fit(self, X, y):
+    """
+    Checks input's format. A random (d,d) matrix is set.
+    """
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
+    self.d_ = np.shape(X[0])[-1]
+    M = _initialize_similarity_bilinear(X,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
+    return self
+
+
+class IdentityBilinearLearner(BilinearMixin):
+  """A simple Identity bilinear mixin that returns an identity matrix
+  M as learned. Class for testing purposes.
+  """
+  def __init__(self, init='identity', preprocessor=None, random_state=33):
+    super().__init__(preprocessor=preprocessor)
+    self.init = init
+    self.random_state = random_state
+
+  def fit(self, X, y):
+    """
+    Checks input's format. Sets M matrix to identity of shape (d,d)
+    where d is the dimension of the input.
+    """
+    X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
+    self.d_ = np.shape(X[0])[-1]
+    M = _initialize_similarity_bilinear(X,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
+    return self
+
+
+class MockPairIdentityBilinearLearner(BilinearMixin,
+                                      _PairsClassifierMixin):
+
+  def __init__(self, init='identity', preprocessor=None, random_state=33):
+      super().__init__(preprocessor=preprocessor)
+      self.init = init
+      self.random_state = random_state
+
+  def fit(self, pairs, y, calibration_params=None):
+    calibration_params = (calibration_params if calibration_params is not
+                          None else dict())
+    self._validate_calibration_params(**calibration_params)
+    pairs = self._prepare_inputs(pairs, type_of_inputs='tuples')
+    self.d_ = np.shape(pairs[0][0])[-1]
+    M = _initialize_similarity_bilinear(pairs,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
+    self.calibrate_threshold(pairs, y, **calibration_params)
+    return self
+
+
+class MockTripletsIdentityBilinearLearner(BilinearMixin,
+                                          _TripletsClassifierMixin):
+
+  def __init__(self, init='identity', preprocessor=None, random_state=33):
+      super().__init__(preprocessor=preprocessor)
+      self.init = init
+      self.random_state = random_state
+
+  def fit(self, triplets):
+    triplets = self._prepare_inputs(triplets, type_of_inputs='tuples')
+    self.d_ = np.shape(triplets[0][0])[-1]
+    M = _initialize_similarity_bilinear(triplets,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
+    return self
+
+
+class MockQuadrpletsIdentityBilinearLearner(BilinearMixin,
+                                            _QuadrupletsClassifierMixin):
+
+  def __init__(self, init='identity', preprocessor=None, random_state=33):
+      super().__init__(preprocessor=preprocessor)
+      self.init = init
+      self.random_state = random_state
+
+  def fit(self, quadruplets):
+    quadruplets = self._prepare_inputs(quadruplets, type_of_inputs='tuples')
+    self.d_ = np.shape(quadruplets[0][0])[-1]
+    M = _initialize_similarity_bilinear(quadruplets,
+                                        init=self.init,
+                                        strict_pd=False,
+                                        random_state=self.random_state)
+    self.components_ = M
+    return self
+
+
+# ------------------ Building dummy data for learners ------------------
+
 Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 # Data and target are what we will fit on. Preprocessor is the additional
 # data if we use a preprocessor (which should be the default ArrayIndexer),
@@ -35,7 +158,16 @@ Dataset = namedtuple('Dataset', ('data target preprocessor to_transform'))
 
 
 def build_classification(with_preprocessor=False):
-  """Basic array for testing when using a preprocessor"""
+  """
+  Basic array 'X, y' for testing when using a preprocessor, for instance,
+  for clustering. For supervised learners.
+
+  If no preprocesor: 'data' are raw points, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+
+  If preprocessor: 'data' are point indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   X, y = shuffle(*make_blobs(random_state=SEED),
                  random_state=SEED)
   indices = shuffle(np.arange(X.shape[0]), random_state=SEED).astype(int)
@@ -46,7 +178,16 @@ def build_classification(with_preprocessor=False):
 
 
 def build_regression(with_preprocessor=False):
-  """Basic array for testing when using a preprocessor"""
+  """
+  Basic array 'X, y' for testing when using a preprocessor, for regression.
+  For supervised learners.
+
+  If no preprocesor: 'data' are raw points, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+
+  If preprocessor: 'data' are point indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   X, y = shuffle(*make_regression(n_samples=100, n_features=5,
                                   random_state=SEED),
                  random_state=SEED)
@@ -58,6 +199,8 @@ def build_regression(with_preprocessor=False):
 
 
 def build_data():
+  """Aux function: Returns 'X, pairs' taken from the iris dataset, where
+  pairs are positive and negative pairs for PairClassifiers."""
   input_data, labels = load_iris(return_X_y=True)
   X, y = shuffle(input_data, labels, random_state=SEED)
   num_constraints = 50
@@ -70,7 +213,17 @@ def build_data():
 
 
 def build_pairs(with_preprocessor=False):
-  # builds a toy pairs problem
+  """
+  For all pair weakly-supervised learners.
+
+  Returns: data, target, preprocessor, to_transform.
+
+  If no preprocesor: 'data' are raw pairs, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+
+  If preprocessor: 'data' are pair indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   X, indices = build_data()
   c = np.vstack([np.column_stack(indices[:2]), np.column_stack(indices[2:])])
   target = np.concatenate([np.ones(indices[0].shape[0]),
@@ -85,6 +238,17 @@ def build_pairs(with_preprocessor=False):
 
 
 def build_triplets(with_preprocessor=False):
+  """
+  For all triplet weakly-supervised learners.
+
+  Returns: data, target, preprocessor, to_transform.
+
+  If no preprocesor: 'data' are raw triplets, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+
+  If preprocessor: 'data' are triplets indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   input_data, labels = load_iris(return_X_y=True)
   X, y = shuffle(input_data, labels, random_state=SEED)
   constraints = Constraints(y)
@@ -98,7 +262,17 @@ def build_triplets(with_preprocessor=False):
 
 
 def build_quadruplets(with_preprocessor=False):
-  # builds a toy quadruplets problem
+  """
+  For all Quadruplets weakly-supervised learners.
+
+  Returns: data, target, preprocessor, to_transform.
+
+  If no preprocesor: 'data' are raw quadruplets, 'target' are dummy labels,
+  'preprocesor' is None, and 'to_transform' are points.
+
+  If preprocessor: 'data' are quadruplets indices, 'target' are dummy labels,
+  'preprocessor' are unique points, 'to_transform' are points.
+  """
   X, indices = build_data()
   c = np.column_stack(indices)
   target = np.ones(c.shape[0])  # quadruplets targets are not used
@@ -112,59 +286,132 @@ def build_quadruplets(with_preprocessor=False):
     return Dataset(X[c], target, None, X[c[:, 0]])
 
 
-quadruplets_learners = [(LSML(), build_quadruplets)]
-ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
+# ------------- List of learners, separating them by kind -------------
+
+# Mahalanobis learners
+# -- Weakly Supervised
+quadruplets_learners_m = [(LSML(), build_quadruplets)]
+ids_quadruplets_learners_m = list(map(lambda x: x.__class__.__name__,
+                                      [learner for (learner, _) in
+                                       quadruplets_learners_m]))
+
+triplets_learners_m = [(SCML(n_basis=320), build_triplets)]
+ids_triplets_learners_m = list(map(lambda x: x.__class__.__name__,
+                                   [learner for (learner, _) in
+                                    triplets_learners_m]))
+
+pairs_learners_m = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be faster
+                    (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster
+                    (SDML(prior='identity', balance_param=1e-5), build_pairs)]
+ids_pairs_learners_m = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
-                                 quadruplets_learners]))
+                                 pairs_learners_m]))
 
-triplets_learners = [(SCML(n_basis=320), build_triplets)]
-ids_triplets_learners = list(map(lambda x: x.__class__.__name__,
+# -- Supervised
+classifiers_m = [(Covariance(), build_classification),
+                 (LFDA(), build_classification),
+                 (LMNN(), build_classification),
+                 (NCA(), build_classification),
+                 (RCA(), build_classification),
+                 (ITML_Supervised(max_iter=5), build_classification),
+                 (LSML_Supervised(), build_classification),
+                 (MMC_Supervised(max_iter=5), build_classification),
+                 (RCA_Supervised(num_chunks=5), build_classification),
+                 (SDML_Supervised(prior='identity', balance_param=1e-5),
+                 build_classification),
+                 (SCML_Supervised(n_basis=80), build_classification)]
+ids_classifiers_m = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
-                              triplets_learners]))
+                              classifiers_m]))
 
-pairs_learners = [(ITML(max_iter=2), build_pairs),  # max_iter=2 to be faster
-                  (MMC(max_iter=2), build_pairs),  # max_iter=2 to be faster
-                  (SDML(prior='identity', balance_param=1e-5), build_pairs)]
-ids_pairs_learners = list(map(lambda x: x.__class__.__name__,
-                              [learner for (learner, _) in
-                               pairs_learners]))
+regressors_m = [(MLKR(init='pca'), build_regression)]
+ids_regressors_m = list(map(lambda x: x.__class__.__name__,
+                            [learner for (learner, _) in regressors_m]))
+# -- Mahalanobis sets
+tuples_learners_m = pairs_learners_m + triplets_learners_m + \
+                  quadruplets_learners_m
+ids_tuples_learners_m = ids_pairs_learners_m + ids_triplets_learners_m \
+                      + ids_quadruplets_learners_m
 
-classifiers = [(Covariance(), build_classification),
-               (LFDA(), build_classification),
-               (LMNN(), build_classification),
-               (NCA(), build_classification),
-               (RCA(), build_classification),
-               (ITML_Supervised(max_iter=5), build_classification),
-               (LSML_Supervised(), build_classification),
-               (MMC_Supervised(max_iter=5), build_classification),
-               (RCA_Supervised(num_chunks=5), build_classification),
-               (SDML_Supervised(prior='identity', balance_param=1e-5),
-               build_classification),
-               (SCML_Supervised(n_basis=80), build_classification)]
-ids_classifiers = list(map(lambda x: x.__class__.__name__,
-                           [learner for (learner, _) in
-                            classifiers]))
+supervised_learners_m = classifiers_m + regressors_m
+ids_supervised_learners_m = ids_classifiers_m + ids_regressors_m
 
-regressors = [(MLKR(init='pca'), build_regression)]
-ids_regressors = list(map(lambda x: x.__class__.__name__,
-                          [learner for (learner, _) in regressors]))
+metric_learners_m = tuples_learners_m + supervised_learners_m
+ids_metric_learners_m = ids_tuples_learners_m + ids_supervised_learners_m
 
+# Bilinear learners
+# -- Weakly Supervised
+quadruplets_learners_b = [(MockQuadrpletsIdentityBilinearLearner(),
+                          build_quadruplets)]
+ids_quadruplets_learners_b = list(map(lambda x: x.__class__.__name__,
+                                  [learner for (learner, _) in
+                                   quadruplets_learners_b]))
+
+triplets_learners_b = [(MockTripletsIdentityBilinearLearner(), build_triplets),
+                       (OASIS(), build_triplets)]
+ids_triplets_learners_b = list(map(lambda x: x.__class__.__name__,
+                                   [learner for (learner, _) in
+                                    triplets_learners_b]))
+
+pairs_learners_b = [(MockPairIdentityBilinearLearner(), build_pairs)]
+ids_pairs_learners_b = list(map(lambda x: x.__class__.__name__,
+                                [learner for (learner, _) in
+                                 pairs_learners_b]))
+# -- Supervised
+classifiers_b = [(RandomBilinearLearner(), build_classification),
+                 (IdentityBilinearLearner(), build_classification),
+                 (OASIS_Supervised(), build_classification)]
+
+ids_classifiers_b = list(map(lambda x: x.__class__.__name__,
+                             [learner for (learner, _) in
+                              classifiers_b]))
+# -- Bilinear sets
+tuples_learners_b = pairs_learners_b + triplets_learners_b + \
+                  quadruplets_learners_b
+ids_tuples_learners_b = ids_pairs_learners_b + ids_triplets_learners_b \
+                      + ids_quadruplets_learners_b
+
+supervised_learners_b = classifiers_b
+ids_supervised_learners_b = ids_classifiers_b
+
+metric_learners_b = tuples_learners_b + supervised_learners_b
+ids_metric_learners_b = ids_tuples_learners_b + ids_supervised_learners_b
+
+# General sets (Mahalanobis + Bilinear)
+# -- Weakly Supervised learners individually
+pairs_learners = pairs_learners_m + pairs_learners_b
+ids_pairs_learners = ids_pairs_learners_m + ids_pairs_learners_b
+triplets_learners = triplets_learners_m + triplets_learners_b
+ids_triplets_learners = ids_triplets_learners_m + ids_triplets_learners_b
+quadruplets_learners = quadruplets_learners_m + quadruplets_learners_b
+ids_quadruplets_learners = ids_quadruplets_learners_m + \
+                         ids_quadruplets_learners_b
+
+# -- All weakly supervised learners
+tuples_learners = tuples_learners_m + tuples_learners_b
+ids_tuples_learners = ids_tuples_learners_m + ids_tuples_learners_b
+
+# -- Supervised learners
+supervised_learners = supervised_learners_m + supervised_learners_b
+ids_supervised_learners = ids_supervised_learners_m + ids_supervised_learners_b
+
+# -- Weakly Supervised + Supervised learners
+metric_learners = metric_learners_m + metric_learners_b
+ids_metric_learners = ids_metric_learners_m + ids_metric_learners_b
+
+# -- For sklearn pipeline: Pair + Supervised learners
+metric_learners_pipeline = pairs_learners_m + pairs_learners_b + \
+                         supervised_learners_m + supervised_learners_b
+ids_metric_learners_pipeline = ids_pairs_learners_m + ids_pairs_learners_b +\
+                             ids_supervised_learners_m + \
+                             ids_supervised_learners_b
+
+# Not used
 WeaklySupervisedClasses = (_PairsClassifierMixin,
                            _TripletsClassifierMixin,
                            _QuadrupletsClassifierMixin)
 
-tuples_learners = pairs_learners + triplets_learners + quadruplets_learners
-ids_tuples_learners = ids_pairs_learners + ids_triplets_learners \
-                      + ids_quadruplets_learners
-
-supervised_learners = classifiers + regressors
-ids_supervised_learners = ids_classifiers + ids_regressors
-
-metric_learners = tuples_learners + supervised_learners
-ids_metric_learners = ids_tuples_learners + ids_supervised_learners
-
-metric_learners_pipeline = pairs_learners + supervised_learners
-ids_metric_learners_pipeline = ids_pairs_learners + ids_supervised_learners
+# ------------- Useful methods -------------
 
 
 def remove_y(estimator, X, y):
@@ -850,15 +1097,14 @@ def test_error_message_t_pair_distance_or_score(estimator, _):
                   .format(make_context(estimator), triplets))
   assert str(raised_err.value) == expected_msg
 
-  not_implemented_msg = ""
-  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
-  # "This learner does not have pair_distance"
+  msg = ("This learner doesn't learn a distance, thus ",
+         "this method is not implemented. Use pair_score instead")
 
   # One exception will trigger for sure
   with pytest.raises(Exception) as raised_exception:
       estimator.pair_distance(triplets)
   err_value = raised_exception.value.args[0]
-  assert err_value == expected_msg or err_value == not_implemented_msg
+  assert err_value == expected_msg or err_value == msg
 
 
 def test_preprocess_tuples_simple_example():
@@ -897,7 +1143,8 @@ def test_preprocess_points_simple_example():
                          ids=ids_metric_learners)
 def test_same_with_or_without_preprocessor(estimator, build_dataset):
   """Test that algorithms using a preprocessor behave consistently
-# with their no-preprocessor equivalent
+  with their no-preprocessor equivalent. Methods `pair_score`,
+  `score_pairs` (deprecated), `predict` and `decision_function`.
   """
   dataset_indices = build_dataset(with_preprocessor=True)
   dataset_formed = build_dataset(with_preprocessor=False)
@@ -926,7 +1173,7 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
   estimator_with_prep_formed.set_params(preprocessor=X)
   estimator_with_prep_formed.fit(*remove_y(estimator, indices_train, y_train))
 
-  # test prediction methods
+  # Test prediction methods for Weakly supervised algorithms.
   for method in ["predict", "decision_function"]:
     if hasattr(estimator, method):
       output_with_prep = getattr(estimator_with_preprocessor,
@@ -940,8 +1187,9 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
                                         method)(formed_test)
       assert np.array(output_with_prep == output_with_prep_formed).all()
 
-  # Test pair_score, all learners have it.
-  idx1 = np.array([[0, 2], [5, 3]], dtype=int)
+  idx1 = np.array([[0, 2], [5, 3]], dtype=int)  # Sample
+
+  # Pair score
   output_with_prep = estimator_with_preprocessor.pair_score(
       indicators_to_transform[idx1])
   output_without_prep = estimator_without_preprocessor.pair_score(
@@ -954,11 +1202,26 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
       formed_points_to_transform[idx1])
   assert np.array(output_with_prep == output_without_prep).all()
 
-  # Test pair_distance
-  not_implemented_msg = ""
-  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
-  # "This learner does not have pair_distance"
-  try:
+  # Score pairs. TODO: Delete in 0.8.0
+  msg = ("score_pairs will be deprecated in release 0.7.0. "
+         "Use pair_score to compute similarity scores, or "
+         "pair_distances to compute distances.")
+  with pytest.warns(FutureWarning) as raised_warning:
+    output_with_prep = estimator_with_preprocessor.score_pairs(
+        indicators_to_transform[idx1])
+    output_without_prep = estimator_without_preprocessor.score_pairs(
+        formed_points_to_transform[idx1])
+    assert np.array(output_with_prep == output_without_prep).all()
+
+    output_with_prep = estimator_with_preprocessor.score_pairs(
+        indicators_to_transform[idx1])
+    output_without_prep = estimator_with_prep_formed.score_pairs(
+        formed_points_to_transform[idx1])
+    assert np.array(output_with_prep == output_without_prep).all()
+  assert any([str(warning.message) == msg for warning in raised_warning])
+
+  if isinstance(estimator, MahalanobisMixin):
+    # Pair distance
     output_with_prep = estimator_with_preprocessor.pair_distance(
         indicators_to_transform[idx1])
     output_without_prep = estimator_without_preprocessor.pair_distance(
@@ -971,14 +1234,7 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
         formed_points_to_transform[idx1])
     assert np.array(output_with_prep == output_without_prep).all()
 
-  except Exception as raised_exception:
-    assert raised_exception.value.args[0] == not_implemented_msg
-
-  # Test transform
-  not_implemented_msg = ""
-  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
-  # "This learner does not have transform"
-  try:
+    # Transform
     output_with_prep = estimator_with_preprocessor.transform(
         indicators_to_transform)
     output_without_prep = estimator_without_preprocessor.transform(
@@ -990,9 +1246,6 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
     output_without_prep = estimator_with_prep_formed.transform(
         formed_points_to_transform)
     assert np.array(output_with_prep == output_without_prep).all()
-
-  except Exception as raised_exception:
-    assert raised_exception.value.args[0] == not_implemented_msg
 
 
 def test_check_collapsed_pairs_raises_no_error():
@@ -1270,3 +1523,134 @@ def test_pseudo_inverse_from_eig_and_pinvh_nonsingular():
   A = A + A.T
   w, V = eigh(A, check_finite=False)
   np.testing.assert_allclose(_pseudo_inverse_from_eig(w, V), pinvh(A))
+
+
+@pytest.mark.parametrize(('n_triplets', 'n_iter'),
+                         [(10, 10), (33, 70), (100, 67),
+                         (10000, 20000)])
+def test_indices_funct(n_triplets, n_iter):
+  """
+  This test verifies the behaviour of _get_random_indices. The
+  method used inside OASIS that defines the order in which the
+  triplets are given to the algorithm, in an online manner.
+  """
+  # Not random cases
+  base = np.arange(n_triplets)
+
+  # n_iter = n_triplets
+  if n_iter == n_triplets:
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
+    assert_array_equal(r, base)  # No shuffle
+    assert len(r) == len(base)  # Same lenght
+
+    # Shuffle
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=False,
+                            random_state=RNG)
+    with assert_raises(AssertionError):  # Should be different
+      assert_array_equal(r, base)
+    # But contain the same elements
+    assert_array_equal(np.unique(r), np.unique(base))
+    assert len(r) == len(base)  # Same lenght
+
+  # n_iter > n_triplets
+  if n_iter > n_triplets:
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
+    assert_array_equal(r[:n_triplets], base)  # First n_triplets must match
+    assert len(r) == n_iter  # Expected lenght
+
+    # Next n_iter-n_triplets must be in range(n_triplets)
+    sample = r[n_triplets:]
+    for i in range(n_iter - n_triplets):
+      if sample[i] not in base:
+        raise AssertionError("Sampling has values out of range")
+
+    # Shuffle
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=False,
+                            random_state=RNG)
+    assert len(r) == n_iter  # Expected lenght
+
+    # Each triplet must be at least one time
+    assert_array_equal(np.unique(r), np.unique(base))
+    with assert_raises(AssertionError):  # First n_triplets should be different
+      assert_array_equal(r[:n_triplets], base)
+
+    # Each index should appear at least ceil(n_iter/n_triplets) - 1 times
+    # But no more than ceil(n_iter/n_triplets)
+    min_times = int(np.ceil(n_iter / n_triplets)) - 1
+    _, counts = np.unique(r, return_counts=True)
+    a = len(counts[counts >= min_times])
+    b = len(counts[counts <= min_times + 1])
+    assert len(np.unique(r)) == a
+    assert n_triplets == b
+
+  # n_iter < n_triplets
+  if n_iter < n_triplets:
+    r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=False,
+                            random_state=RNG)
+    assert len(r) == n_iter  # Expected lenght
+    u = np.unique(r)
+    assert len(u) == len(r)  # No duplicates
+    # Final array must cointain only elements in range(n_triplets)
+    for i in range(n_iter):
+      if r[i] not in base:
+        raise AssertionError("Sampling has values out of range")
+
+    # Shuffle must only sort elements
+    # It takes two instances with same random_state, to show that only
+    # the final order is mixed
+    def is_sorted(a):
+      return np.all(a[:-1] <= a[1:])
+
+    r_a = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                              shuffle=False, random=False,
+                              random_state=SEED)
+    assert is_sorted(r_a)  # Its not shuffled
+    values_r_a, counts_r_a = np.unique(r_a, return_counts=True)
+
+    r_b = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                              shuffle=True, random=False,
+                              random_state=SEED)
+
+    with assert_raises(AssertionError):
+      assert is_sorted(r_b)  # This one should not besorted, but shuffled
+    values_r_b, counts_r_b = np.unique(r_b, return_counts=True)
+
+    assert_array_equal(values_r_a, values_r_b)  # Same elements
+    assert_array_equal(counts_r_a, counts_r_b)  # Same counts
+    with assert_raises(AssertionError):
+      assert_array_equal(r_a, r_b)  # Diferent order
+
+  # Random case
+  r = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                          random=True, random_state=RNG)
+  assert len(r) == n_iter  # Expected lenght
+  for i in range(n_iter):
+    if r[i] not in base:
+      raise AssertionError("Sampling has values out of range")
+  # Shuffle has no effect
+  r_a = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=False, random=True,
+                            random_state=SEED)
+
+  r_b = _get_random_indices(n_triplets=n_triplets, n_iter=n_iter,
+                            shuffle=True, random=True,
+                            random_state=SEED)
+  assert_array_equal(r_a, r_b)
+
+  # n_triplets and n_iter cannot be 0
+  msg = ("n_triplets cannot be 0")
+  with pytest.raises(ValueError) as raised_error:
+    _get_random_indices(n_triplets=0, n_iter=n_iter, random=True)
+  assert msg == raised_error.value.args[0]
+
+  msg = ("n_iter cannot be 0")
+  with pytest.raises(ValueError) as raised_error:
+    _get_random_indices(n_triplets=n_triplets, n_iter=0, random=True)
+  assert msg == raised_error.value.args[0]

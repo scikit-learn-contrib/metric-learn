@@ -80,11 +80,13 @@ Here is an artificial dataset of 4 pairs of 2 points of 3 features each:
 >>>                     [-2.16, +0.11, -0.02]]])  # same as tuples[1, 0, :]
 >>> y = np.array([-1, 1, 1, -1])
 
-.. warning:: This way of specifying pairs is not recommended for a large number
-   of tuples, as it is redundant (see the comments in the example) and hence
-   takes a lot of memory. Indeed each feature vector of a point will be
-   replicated as many times as a point is involved in a tuple. The second way
-   to specify pairs is more efficient
+.. warning::
+
+    This way of specifying pairs is not recommended for a large number
+    of tuples, as it is redundant (see the comments in the example) and hence
+    takes a lot of memory. Indeed, each feature vector of a point will be
+    replicated as many times as a point is involved in a tuple. The second way
+    to specify pairs is more efficient
 
 
 2D array of indicators + preprocessor
@@ -130,9 +132,12 @@ through the argument `preprocessor` (see below :ref:`fit_ws`)
 Fit, transform, and so on
 -------------------------
 
-The goal of weakly-supervised metric-learning algorithms is to transform
-points in a new space, in which the tuple-wise constraints between points
-are respected.
+The goal of weakly supervised metric learning algorithms is to learn a (distance
+or similarity) metric such that the tuple-wise constraints between points are
+respected.
+
+To do so, we first need to fit the weakly supervised metric learner on a dataset
+of tuples, as in the example below with ``MMC``.
 
 >>> from metric_learn import MMC
 >>> mmc = MMC(random_state=42)
@@ -145,62 +150,82 @@ Or alternatively (using a preprocessor):
 
 >>> from metric_learn import MMC
 >>> mmc = MMC(preprocessor=X, random_state=42)
->>> mmc.fit(pairs_indice, y)
-
+>>> mmc.fit(pairs_indices, y)
 
 Now that the estimator is fitted, you can use it on new data for several
 purposes.
 
-First, you can transform the data in the learned space, using `transform`:
-Here we transform two points in the new embedding space.
+We can now use the learned metric to **score** new pairs of points with ``pair_score``
+(the larger the score, the more similar the pair). For Mahalanobis learners,
+it is equal to the opposite of the distance.
+
+>>> score = mmc.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+This is useful because ``pair_score`` matches the **score** semantic of 
+scikit-learn's `Classification metrics
+<https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+
+For metric learners that learn a distance metric, there is also the ``pair_distance``
+method.
+
+>>> mmc.pair_distance([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
+...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
+array([7.27607365, 0.88853014])
+
+.. warning::
+    
+    If you try to use ``pair_distance`` with a bilinear similarity learner, an error
+    will be thrown, as it does not learn a distance.
+
+You can also return a function that will return the metric learned. It can
+compute the metric between two 1D arrays, similarly to distance functions in
+`scipy.spatial.distance`. To do that, use the ``get_metric`` method.
+
+>>> metric_fun = mmc.get_metric()
+>>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
+7.276073646278203
+
+You can also call ``get_metric``` with bilinear similarity learners, and you will get
+a function that will return the similarity between 1D arrays.
+
+>>> similarity_fun = algorithm.get_metric()
+>>> similarity_fun([3.5, 3.6], [5.6, 2.4])
+-0.04752
+
+Finally, as explained in :ref:`mahalanobis_distances`, these are equivalent to the Euclidean
+distance in a transformed space, and can thus be used to transform data points in
+a new embedding space. You can use ``transform`` to do so.
 
 >>> X_new = np.array([[9.4, 4.1, 4.2], [2.1, 4.4, 2.3]])
 >>> mmc.transform(X_new)
 array([[-3.24667162e+01,  4.62622348e-07,  3.88325421e-08],
        [-3.61531114e+01,  4.86778289e-07,  2.12654397e-08]])
 
-Also, as explained before, our metric learner has learned a distance between
-points. You can use this distance in two main ways:
-
-- You can either return the distance between pairs of points using the
-  `pair_distance` function:
-
->>> mmc.pair_distance([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
-...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
-array([7.27607365, 0.88853014])
-
-- Or you can return a function that will return the distance
-  (in the new space) between two 1D arrays (the coordinates of the points in
-  the original space), similarly to distance functions in
-  `scipy.spatial.distance`. To do that, use the `get_metric` method.
-
->>> metric_fun = mmc.get_metric()
->>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
-7.276073646278203
-
-- Alternatively, you can use `pair_score` to return the **score** between
-  pairs of points (the larger the score, the more similar the pair).
-  For Mahalanobis learners, it is equal to the opposite of the distance.
-
->>> score = mmc.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
->>> score
-array([-0.49627072, -3.65287282, -6.06079877])
-
-  This is useful because `pair_score` matches the **score** semantic of 
-  scikit-learn's `Classification metrics
-  <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+.. warning::
+    
+    If you try to use ``transform`` with a bilinear similarity learner, an error will
+    be thrown, as you cannot transform the data using them.
 
 .. note::
 
     If the metric learner that you use learns a :ref:`Mahalanobis distance
-    <mahalanobis_distances>` (like it is the case for all algorithms
-    currently in metric-learn), you can get the plain Mahalanobis matrix using
-    `get_mahalanobis_matrix`.
+    <mahalanobis_distances>`, you can get the plain learned Mahalanobis
+    matrix :math:`M` using `get_mahalanobis_matrix`.
 
->>> mmc.get_mahalanobis_matrix()
-array([[ 0.58603894, -5.69883982, -1.66614919],
-       [-5.69883982, 55.41743549, 16.20219519],
-       [-1.66614919, 16.20219519,  4.73697721]])
+    >>> mmc.get_mahalanobis_matrix()
+    array([[ 0.58603894, -5.69883982, -1.66614919],
+        [-5.69883982, 55.41743549, 16.20219519],
+        [-1.66614919, 16.20219519,  4.73697721]])
+
+    If the metric learner that you use learns a :ref:`bilinear similarity
+    <bilinear_similarity>`, you can get the learned Bilinear
+    matrix :math:`W` using `get_bilinear_matrix`.
+
+    >>> algorithm.get_bilinear_matrix()
+    array([[-0.72680409, -0.153213],
+           [1.45542269, 7.8135546 ]])
 
 .. _sklearn_compat_ws:
 
@@ -457,7 +482,7 @@ Mahalanobis matrix :math:`\mathbf{M}`, and a log-determinant divergence between
 or :math:`\mathbf{\Omega}^{-1}`, where :math:`\mathbf{\Omega}` is the 
 covariance matrix).
 
-The formulated optimization on the semidefinite matrix :math:`\mathbf{M}` 
+The formulated optimization on the semi-definite matrix :math:`\mathbf{M}` 
 is convex:
 
 .. math::
@@ -620,6 +645,15 @@ one should provide the algorithm with `n_samples` triplets of points. The
 semantic of each triplet is that the first point should be closer to the
 second point than to the third one.
 
+If :math:`P` is the set of points, and :math:`p_i,  p_i^{+}, p_i^{-} \in P`
+are arbitrary points in :math:`P`, then a triplet of the form
+:math:`(p_i, p_i^{+}, p_i^{-})` suggests that
+:math:`S(p_i, p_i^{+}) > S(p_i, p_i^{-})` for a similarity function :math:`S`,
+or equivalently :math:`d(p_i, p_i^{+}) < d(p_i, p_i^{-})` for a pseudo-distance
+function :math:`d`.
+
+Some algorithms will learn :math:`S`, while others will learn :math:`d`.
+
 Fitting
 -------
 Here is an example for fitting on triplets (see :ref:`fit_ws` for more
@@ -775,6 +809,86 @@ where :math:`[\cdot]_+` is the hinge loss.
 
     [2]. Adapted from original `Matlab implementation. <https://github.com/bellet/SCML>`_.
 
+
+.. _oasis:
+
+:py:class:`OASIS <metric_learn.OASIS>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Online Algorithm for Scalable Image Similarity
+(:py:class:`OASIS <metric_learn.OASIS>`)
+
+`OASIS` learns a bilinear similarity from triplet constraints with an online
+Passive-Agressive (PA) algorithm approach. The bilinear similarity
+between :math:`p_1` and :math:`p_2` is defined as :math:`p_{1}^{T} W p_2`
+where :math:`W` is the learned matrix by OASIS. This particular algorithm
+is fast as it scales linearly with the number of samples.
+
+The aim is to find a parametric similarity function :math:`S` such that all
+triplets of the form :math:`(p_i, p_{i}^{+}, p_{i}^{-})` obey
+:math:`S_W (p_i, p_{i}^{+}) > S_W (p_i, p_{i}^{-}) + 1`. Which means there
+must be a margin of :math:`1` when satisfiyng the triplet definition.
+
+Given the loss function:
+
+.. math::
+
+    l_W (p_i, p_{i}^{+}, p_{i}^{-}) = max\{0, 1 - S_W (p_i, p_{i}^{+}) + S_W (p_i, p_{i}^{-})\}
+
+The goal is to minimize a global loss :math:`L_W` that accumulates hinge
+losses over all possible triplets:
+
+.. math::
+
+    L_W = \sum_{(p_i, p_{i}^{+}, p_{i}^{-}) \in P} l_W (p_i, p_{i}^{+}, p_{i}^{-})
+
+In order to minimize this loss, a Passive-Aggressive algorithm is applied
+iteratively over triplets to optimize :math:`W`. First :math:`W` is initialized to
+some value :math:`W^0`. Then, at each training iteration :math:`i`, a random triplet
+:math:`(p_i, p_{i}^{+}, p_{i}^{-})` is selected, and solve the following convex
+problem with soft margin:
+
+.. math::
+    
+    W^i = argmin \frac{1}{2} {\lVert W - W^{i-1} \rVert}_{Fro}^{2} + C\xi\\
+    s.t. \quad l_W (p_i, p_{i}^{+}, p_{i}^{-}) \quad and \quad \xi \geq 0
+
+where :math:`{\lVert \cdot \rVert}_{Fro}^{2}` is the Frobenius norm
+(point-wise :math:`L_2` norm). Therefore, at each iteration :math:`i`, :math:`W^i`
+is selected to optimize a trade-off between remaining close to the previous
+parameters :math:`W^{i-1}` and minimizing the loss on the current triplet
+:math:`l_W (p_i, p_{i}^{+}, p_{i}^{-})`. The aggressiveness parameter :math:`C`
+controls this trade-off.
+
+As this algorithm learns a bilinear similarity, the learned matrix :math:`W`
+is not guaranteed to be symmetric nor semi-positive definite (SPD). So it may
+happen that for any pair of points :math:`(x,y) \in P` with :math:`x \ne y` that
+:math:`S(x, y) \ne S(y,x)` and :math:`S(x,x) \ne 0`. Also notice that :math:`S(x, y) \in \mathbb{R}`
+for all :math:`x, y \in P`.
+
+.. topic:: Example Code:
+
+::
+
+    from metric_learn import OASIS
+
+    triplets = [[[1.2, 7.5], [1.3, 1.5], [6.2, 9.7]],
+                [[1.3, 4.5], [3.2, 4.6], [5.4, 5.4]],
+                [[3.2, 7.5], [3.3, 1.5], [8.2, 9.7]],
+                [[3.3, 4.5], [5.2, 4.6], [7.4, 5.4]]]
+
+    oasis = OASIS()
+    oasis.fit(triplets)
+
+.. topic:: References:
+
+  .. [1] Chechik, Gal and Sharma, Varun and Shalit, Uri and Bengio, Samy
+         `Large Scale Online Learning of Image Similarity Through Ranking.
+         <https://www.jmlr.org/papers/volume11/chechik10a/chechik10a.pdf>`_. \
+         , JMLR 2010.
+
+  .. [2] Adapted from original \
+         `Matlab implementation.<https://chechiklab.biu.ac.il/~gal/Research/OASIS/index.html>`_.
 
 .. _learning_on_quadruplets:
 

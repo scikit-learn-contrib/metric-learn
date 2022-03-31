@@ -17,6 +17,7 @@ metric-learn contains efficient Python implementations of several popular superv
 -  Relative Components Analysis (RCA)
 -  Metric Learning for Kernel Regression (MLKR)
 -  Mahalanobis Metric for Clustering (MMC)
+-  Online Algorithm for Scalable Image Similarity (OASIS)
 
 **Dependencies**
 

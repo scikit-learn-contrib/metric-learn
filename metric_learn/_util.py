@@ -785,3 +785,153 @@ def _pseudo_inverse_from_eig(w, V, tol=None):
   w[~large] = 0
 
   return np.dot(V * w, np.conjugate(V).T)
+
+
+def _to_index_points(o_triplets):
+    """
+    Takes the origial triplets, and returns a mapping of the triplets
+    to an X array that has all unique point values.
+
+    Returns: (mapping_tr, X)
+
+    X: Unique points across all triplets.
+
+    mapping_tr: Output: indices_to_X, X = unique(triplets)
+
+    Triplets-shaped values that represent the indices of X.
+    Its guaranteed that shape(triplets) = shape(o_triplets[:-1]).
+
+    For instance the first element of mapping_tr could be [0, 43, 1].
+    That means the first original triplet is [X[0], X[43], X[1]].
+
+    X[mapping] restore the original input
+
+    For algorithms built to work with indices, but in order to be
+    compliant with the current handling of inputs it is converted
+    back to indices by the following fusnction. This should be improved
+    in the future.
+    """
+    shape = o_triplets.shape  # (n_triplets, 3, n_features)
+    X, mapping_tr = np.unique(np.vstack(o_triplets), return_inverse=True,
+                              axis=0)
+    mapping_tr = mapping_tr.reshape(shape[:2])  # (n_triplets, 3)
+    return mapping_tr, X
+
+
+def _get_random_indices(n_triplets, n_iter, shuffle=True,
+                        random=False, random_state=None):
+    """
+    Generates n_iter indices in (0, n_triplets).
+
+    If not random:
+
+    If n_iter = n_triplets, then the resulting array will include
+    all values in range(0, n_triplets). If shuffle=True, then this
+    array is shuffled.
+
+    If n_iter > n_triplets, all values in range(0, n_triplets)
+    will be included at least ceil(n_iter / n_triplets) - 1 times.
+    The rest is filled with non-repeated values. If shuffle=True,
+    then the final array is shuffled, otherwise you get a sorted
+    array.
+
+    If n_iter < n_triplets, then a random sampling takes place.
+    The final array does not contains duplicates. If shuffle=True
+    the resulting array is not sorted, but shuffled.
+
+    If random:
+
+    A random sampling is made in any case, generating n_iters values
+    that may include duplicates. The shuffle param has no effect.
+    """
+    rng = check_random_state(random_state)
+
+    if n_triplets == 0:
+      raise ValueError("n_triplets cannot be 0")
+    if n_iter == 0:
+      raise ValueError("n_iter cannot be 0")
+
+    if random:
+      return rng.randint(low=0, high=n_triplets, size=n_iter)
+    else:
+      if n_iter < n_triplets:
+        sample = rng.choice(n_triplets, n_iter, replace=False)
+        return sample if shuffle else np.sort(sample)
+      else:
+        array = np.arange(n_triplets)  # Unique triplets included
+
+        if n_iter == n_triplets:
+          if shuffle:
+            rng.shuffle(array)
+          return array
+
+        elif n_iter > n_triplets:
+          final = np.array([], dtype=int)  # Base
+          for _ in range(int(np.ceil(n_iter / n_triplets))):
+            if shuffle:
+              rng.shuffle(array)
+            final = np.concatenate([final, np.copy(array)])
+          final = final[:n_iter]  # Get only whats necessary
+          if shuffle:  # An additional shuffle at the end
+            rng.shuffle(final)
+          return final
+
+
+def _initialize_similarity_bilinear(input, init='identity',
+                                    random_state=None,
+                                    strict_pd=False,
+                                    matrix_name='matrix'):
+  n_features = input.shape[-1]
+  if isinstance(init, np.ndarray):
+    # we copy the array, so that if we update the metric, we don't want to
+    # update the init
+    init = check_array(init, copy=True)
+
+    # Assert that init.shape[1] = (n_features, n_features)
+    if init.shape != (n_features,) * 2:
+      raise ValueError('The input dimensionality {} of the given '
+                       'similarity matrix `{}` must match the '
+                       'dimensionality of the given inputs ({}).'
+                       .format(init.shape, matrix_name, n_features))
+  elif init not in ['identity', 'random_spd', 'random', 'covariance']:
+    raise ValueError(
+        f"`{matrix_name}` must be 'identity', 'random_spd', 'random', \
+        covariance or a numpy array of shape (n_features, n_features).\
+        Not `{init}`.")
+
+  rng = check_random_state(random_state)
+  M = init
+  if isinstance(M, np.ndarray):
+    return M
+  elif init == "identity":
+    return np.identity(n_features)
+  elif init == "random":
+    return rng.rand(n_features, n_features)
+  elif init == "random_spd":
+    return make_spd_matrix(n_features, random_state=rng)
+  elif init == 'covariance':
+    if input.ndim == 3:
+      # if the input are tuples, we need to form an X by deduplication
+      X = np.unique(np.vstack(input), axis=0)
+    else:
+      X = input
+    # atleast2d is necessary to deal with scalar covariance matrices
+    M_inv = np.atleast_2d(np.cov(X, rowvar=False))
+    w, V = eigh(M_inv, check_finite=False)
+    cov_is_definite = _check_sdp_from_eigen(w)
+    if strict_pd and not cov_is_definite:
+      raise LinAlgError("Unable to get a true inverse of the covariance "
+                        "matrix since it is not definite. Try another "
+                        "`{}`, or an algorithm that does not "
+                        "require the `{}` to be strictly positive definite."
+                        .format(*((matrix_name,) * 2)))
+    elif not cov_is_definite:
+      warnings.warn('The covariance matrix is not invertible: '
+                    'using the pseudo-inverse instead.'
+                    'To make the covariance matrix invertible'
+                    ' you can remove any linearly dependent features and/or '
+                    'reduce the dimensionality of your input, '
+                    'for instance using `sklearn.decomposition.PCA` as a '
+                    'preprocessing step.')
+    M = _pseudo_inverse_from_eig(w, V)
+    return M

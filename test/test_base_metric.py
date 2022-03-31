@@ -1,12 +1,19 @@
-from numpy.core.numeric import array_equal
+"""
+Tests general things from the API: String parsing, methods like get_metric,
+and deprecation warnings.
+"""
 import pytest
 import re
 import unittest
 import metric_learn
 import numpy as np
+from numpy.testing import assert_array_equal
+from itertools import product
 from sklearn import clone
 from test.test_utils import ids_metric_learners, metric_learners, remove_y
 from metric_learn.sklearn_shims import set_random_state, SKLEARN_AT_LEAST_0_22
+from metric_learn._util import make_context
+from metric_learn.base_metric import MahalanobisMixin, BilinearMixin
 
 
 def remove_spaces(s):
@@ -278,24 +285,70 @@ def test_n_components(estimator, build_dataset):
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
                          ids=ids_metric_learners)
 def test_score_pairs_warning(estimator, build_dataset):
-  """Tests that score_pairs returns a FutureWarning regarding deprecation.
-  Also that score_pairs and pair_distance have the same behaviour"""
+  """Tests that score_pairs returns a FutureWarning regarding
+  deprecation for all learners"""
   input_data, labels, _, X = build_dataset()
   model = clone(estimator)
   set_random_state(model)
-
-  # We fit the metric learner on it and then we call score_pairs on some
-  # points
   model.fit(*remove_y(model, input_data, labels))
 
   msg = ("score_pairs will be deprecated in release 0.7.0. "
          "Use pair_score to compute similarity scores, or "
          "pair_distances to compute distances.")
   with pytest.warns(FutureWarning) as raised_warning:
-    score = model.score_pairs([[X[0], X[1]], ])
-    dist = model.pair_distance([[X[0], X[1]], ])
-    assert array_equal(score, dist)
+    _ = model.score_pairs([[X[0], X[1]], ])
   assert any([str(warning.message) == msg for warning in raised_warning])
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_pair_score_dim(estimator, build_dataset):
+  """
+  Scoring of 3D arrays should return 1D array (several tuples),
+  and scoring of 2D arrays (one tuple) should return an error (like
+  scikit-learn's error when scoring 1D arrays)
+  """
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(*remove_y(estimator, input_data, labels))
+  tuples = np.array(list(product(X, X)))
+  assert model.pair_score(tuples).shape == (tuples.shape[0],)
+  context = make_context(model)
+  msg = ("3D array of formed tuples expected{}. Found 2D array "
+         "instead:\ninput={}. Reshape your data and/or use a preprocessor.\n"
+         .format(context, tuples[1]))
+  with pytest.raises(ValueError) as raised_error:
+    model.pair_score(tuples[1])
+  assert str(raised_error.value) == msg
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_deprecated_score_pairs_same_result(estimator, build_dataset):
+  """
+  Test that `pari_distance` gives the same result as `score_pairs` for
+  Mahalanobis learnes, and the same for `pair_score` and `score_paris`
+  for Bilinear learners. It also checks that the deprecation warning of
+  `score_pairs` is being shown.
+  """
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(*remove_y(model, input_data, labels))
+  random_pairs = np.array(list(product(X, X)))
+
+  msg = ("score_pairs will be deprecated in release 0.7.0. "
+         "Use pair_score to compute similarity scores, or "
+         "pair_distances to compute distances.")
+  with pytest.warns(FutureWarning) as raised_warnings:
+    s1 = model.score_pairs(random_pairs)
+    if isinstance(model, BilinearMixin):
+      s2 = model.pair_score(random_pairs)
+    elif isinstance(model, MahalanobisMixin):
+      s2 = model.pair_distance(random_pairs)
+    assert_array_equal(s1, s2)
+  assert any(str(w.message) == msg for w in raised_warnings)
 
 
 if __name__ == '__main__':
