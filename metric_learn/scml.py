@@ -240,6 +240,12 @@ class _BaseSCML(MahalanobisMixin):
       raise ValueError("n_basis should be an integer, instead it is of type %s"
                        % type(self.n_basis))
 
+    if n_features > n_triplets:
+      raise ValueError(
+        "Number of features (%s) is greater than the number of triplets(%s).\n"
+        "Consider using dimensionality reduction or using another basis "
+        "generation scheme." % (n_features, n_triplets))
+
     basis = np.zeros((n_basis, n_features))
 
     # get all positive and negative pairs with lowest index first
