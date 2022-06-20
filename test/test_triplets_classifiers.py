@@ -2,7 +2,12 @@ import pytest
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
 
-from test.test_utils import triplets_learners, ids_triplets_learners
+from metric_learn import SCML
+from test.test_utils import (
+  triplets_learners,
+  ids_triplets_learners,
+  build_triplets
+)
 from metric_learn.sklearn_shims import set_random_state
 from sklearn import clone
 import numpy as np
@@ -107,3 +112,16 @@ def test_accuracy_toy_example(estimator, build_dataset):
   # we force the transformation to be identity so that we control what it does
   estimator.components_ = np.eye(X.shape[1])
   assert estimator.score(triplets_test) == 0.25
+
+
+def test_raise_big_number_of_features():
+  triplets, _, _, X = build_triplets(with_preprocessor=False)
+  triplets = triplets[:3, :, :]
+  estimator = SCML(n_basis=320)
+  set_random_state(estimator)
+  with pytest.raises(ValueError) as exc_info:
+    estimator.fit(triplets)
+  assert exc_info.value.args[0] == \
+         "Number of features (4) is greater than the number of triplets(3)." \
+         "\nConsider using dimensionality reduction or using another basis " \
+         "generation scheme."
