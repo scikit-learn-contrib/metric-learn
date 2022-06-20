@@ -166,12 +166,16 @@ class BaseMetricLearner(BaseEstimator, metaclass=ABCMeta):
     self._check_preprocessor()
 
     check_is_fitted(self, ['preprocessor_'])
-    return check_input(X, y,
+    outs = check_input(X, y,
                        type_of_inputs=type_of_inputs,
                        preprocessor=self.preprocessor_,
                        estimator=self,
                        tuple_size=getattr(self, '_tuple_size', None),
                        **kwargs)
+    # Conform to SLEP010
+    if not hasattr(self, 'n_features_in_'):
+      self.n_features_in_ = (outs if y is None else outs[0]).shape[1]
+    return outs
 
   @abstractmethod
   def get_metric(self):
