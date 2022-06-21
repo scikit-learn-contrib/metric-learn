@@ -172,11 +172,11 @@ def build_data():
   pairs are positive and negative pairs for PairClassifiers."""
   input_data, labels = load_iris(return_X_y=True)
   X, y = shuffle(input_data, labels, random_state=SEED)
-  num_constraints = 50
+  n_constraints = 50
   constraints = Constraints(y)
   pairs = (
       constraints
-      .positive_negative_pairs(num_constraints, same_length=True,
+      .positive_negative_pairs(n_constraints, same_length=True,
                                random_state=check_random_state(SEED)))
   return X, pairs
 
@@ -285,7 +285,7 @@ classifiers_m = [(Covariance(), build_classification),
                  (ITML_Supervised(max_iter=5), build_classification),
                  (LSML_Supervised(), build_classification),
                  (MMC_Supervised(max_iter=5), build_classification),
-                 (RCA_Supervised(num_chunks=5), build_classification),
+                 (RCA_Supervised(n_chunks=5), build_classification),
                  (SDML_Supervised(prior='identity', balance_param=1e-5),
                  build_classification),
                  (SCML_Supervised(n_basis=80), build_classification)]
@@ -296,6 +296,7 @@ ids_classifiers_m = list(map(lambda x: x.__class__.__name__,
 regressors_m = [(MLKR(init='pca'), build_regression)]
 ids_regressors_m = list(map(lambda x: x.__class__.__name__,
                             [learner for (learner, _) in regressors_m]))
+
 # -- Mahalanobis sets
 tuples_learners_m = pairs_learners_m + triplets_learners_m + \
                   quadruplets_learners_m
@@ -328,7 +329,6 @@ ids_pairs_learners_b = list(map(lambda x: x.__class__.__name__,
 # -- Supervised
 classifiers_b = [(RandomBilinearLearner(), build_classification),
                  (IdentityBilinearLearner(), build_classification)]
-
 ids_classifiers_b = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
                               classifiers_b]))

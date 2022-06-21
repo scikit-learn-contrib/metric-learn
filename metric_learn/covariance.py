@@ -42,6 +42,10 @@ class Covariance(MahalanobisMixin, TransformerMixin):
 
   def fit(self, X, y=None):
     """
+    Calculates the covariance matrix of the input data.
+
+    Parameters
+    ----------
     X : data matrix, (n x d)
     y : unused
     """

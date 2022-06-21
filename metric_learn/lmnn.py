@@ -5,6 +5,7 @@ import numpy as np
 from collections import Counter
 from sklearn.metrics import euclidean_distances
 from sklearn.base import TransformerMixin
+import warnings
 
 from ._util import _initialize_components, _check_n_components
 from .base_metric import MahalanobisMixin
@@ -63,7 +64,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
       :meth:`fit` and n_features_a must be less than or equal to that.
       If ``n_components`` is not None, n_features_a must match it.
 
-  k : int, optional (default=3)
+  n_neighbors : int, optional (default=3)
     Number of neighbors to consider, not including self-edges.
 
   min_iter : int, optional (default=50)
@@ -99,6 +100,8 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     transformation. If ``init='pca'``, ``random_state`` is passed as an
     argument to PCA when initializing the transformation.
 
+  k : Renamed to n_neighbors. Will be deprecated in 0.7.0
+
   Attributes
   ----------
   n_iter_ : `int`
@@ -116,7 +119,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> lmnn = LMNN(k=5, learn_rate=1e-6)
+  >>> lmnn = LMNN(n_neighbors=5, learn_rate=1e-6)
   >>> lmnn.fit(X, Y, verbose=False)
 
   References
@@ -128,12 +131,19 @@ class LMNN(MahalanobisMixin, TransformerMixin):
          2005.
   """
 
-  def __init__(self, init='auto', k=3, min_iter=50, max_iter=1000,
+  def __init__(self, init='auto', n_neighbors=3, min_iter=50, max_iter=1000,
                learn_rate=1e-7, regularization=0.5, convergence_tol=0.001,
                verbose=False, preprocessor=None,
-               n_components=None, random_state=None):
+               n_components=None, random_state=None, k='deprecated'):
     self.init = init
-    self.k = k
+    if k != 'deprecated':
+      warnings.warn('"num_chunks" parameter has been renamed to'
+                    ' "n_chunks". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      n_neighbors = k
+    self.k = 'deprecated'  # To avoid no_attribute error
+    self.n_neighbors = n_neighbors
     self.min_iter = min_iter
     self.max_iter = max_iter
     self.learn_rate = learn_rate
@@ -145,7 +155,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     super(LMNN, self).__init__(preprocessor)
 
   def fit(self, X, y):
-    k = self.k
+    k = self.n_neighbors
     reg = self.regularization
     learn_rate = self.learn_rate
 
@@ -162,7 +172,7 @@ class LMNN(MahalanobisMixin, TransformerMixin):
                                               self.verbose,
                                               random_state=self.random_state)
     required_k = np.bincount(label_inds).min()
-    if self.k > required_k:
+    if self.n_neighbors > required_k:
       raise ValueError('not enough class labels for specified k'
                        ' (smallest class has %d)' % required_k)
 
@@ -275,12 +285,12 @@ class LMNN(MahalanobisMixin, TransformerMixin):
     return 2 * G, objective, total_active
 
   def _select_targets(self, X, label_inds):
-    target_neighbors = np.empty((X.shape[0], self.k), dtype=int)
+    target_neighbors = np.empty((X.shape[0], self.n_neighbors), dtype=int)
     for label in self.labels_:
       inds, = np.nonzero(label_inds == label)
       dd = euclidean_distances(X[inds], squared=True)
       np.fill_diagonal(dd, np.inf)
-      nn = np.argsort(dd)[..., :self.k]
+      nn = np.argsort(dd)[..., :self.n_neighbors]
       target_neighbors[inds] = inds[nn]
     return target_neighbors
 

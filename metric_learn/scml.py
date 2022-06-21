@@ -240,6 +240,12 @@ class _BaseSCML(MahalanobisMixin):
       raise ValueError("n_basis should be an integer, instead it is of type %s"
                        % type(self.n_basis))
 
+    if n_features > n_triplets:
+      raise ValueError(
+        "Number of features (%s) is greater than the number of triplets(%s).\n"
+        "Consider using dimensionality reduction or using another basis "
+        "generation scheme." % (n_features, n_triplets))
+
     basis = np.zeros((n_basis, n_features))
 
     # get all positive and negative pairs with lowest index first
@@ -338,7 +344,7 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
   gamma: float (default = 5e-3)
     Learning rate for the optimization algorithm.
 
-  max_iter : int (default = 100000)
+  max_iter : int (default = 10000)
     Number of iterations for the algorithm.
 
   output_iter : int (default = 5000)
@@ -377,8 +383,8 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
          <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
          (AAAI), 2014.
 
-  .. [2] Adapted from original \
-         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+  .. [2] Adapted from original `Matlab implementation. \
+         <https://github.com/bellet/SCML>`_.
 
   See Also
   --------
@@ -492,8 +498,8 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
          <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
          (AAAI), 2014.
 
-  .. [2] Adapted from original \
-         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+  .. [2] Adapted from original `Matlab implementation. \
+         <https://github.com/bellet/SCML>`_.
 
   See Also
   --------

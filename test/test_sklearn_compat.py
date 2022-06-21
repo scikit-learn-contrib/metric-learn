@@ -31,7 +31,7 @@ class Stable_RCA_Supervised(RCA_Supervised):
                chunk_size=2, preprocessor=None, random_state=None):
     # this init makes RCA stable for scikit-learn examples.
     super(Stable_RCA_Supervised, self).__init__(
-        num_chunks=2, n_components=n_components,
+        n_chunks=2, n_components=n_components,
         chunk_size=chunk_size, preprocessor=preprocessor,
         random_state=random_state)
 
@@ -39,12 +39,12 @@ class Stable_RCA_Supervised(RCA_Supervised):
 class Stable_SDML_Supervised(SDML_Supervised):
 
   def __init__(self, sparsity_param=0.01,
-               num_constraints=None, verbose=False, preprocessor=None,
+               n_constraints=None, verbose=False, preprocessor=None,
                random_state=None):
     # this init makes SDML stable for scikit-learn examples.
     super(Stable_SDML_Supervised, self).__init__(
         sparsity_param=sparsity_param,
-        num_constraints=num_constraints, verbose=verbose,
+        n_constraints=n_constraints, verbose=verbose,
         preprocessor=preprocessor, balance_param=1e-5, prior='identity',
         random_state=random_state)
 

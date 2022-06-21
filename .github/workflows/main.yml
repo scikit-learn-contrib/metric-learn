@@ -35,13 +35,13 @@ jobs:
           pytest test --cov
           bash <(curl -s https://codecov.io/bash)
           
-  # Run normal testing with the latests versions of all dependencies
+  # Run normal testing with the latest versions of all dependencies
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.6', '3.7', '3.8', '3.9']
+        python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python

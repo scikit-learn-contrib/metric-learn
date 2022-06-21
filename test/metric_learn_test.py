@@ -329,7 +329,7 @@ class TestSCML(object):
 
 class TestLSML(MetricTestCase):
   def test_iris(self):
-    lsml = LSML_Supervised(num_constraints=200)
+    lsml = LSML_Supervised(n_constraints=200)
     lsml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(lsml.transform(self.iris_points), self.iris_labels)
@@ -338,7 +338,7 @@ class TestLSML(MetricTestCase):
 
 class TestITML(MetricTestCase):
   def test_iris(self):
-    itml = ITML_Supervised(num_constraints=200)
+    itml = ITML_Supervised(n_constraints=200)
     itml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(itml.transform(self.iris_points), self.iris_labels)
@@ -384,7 +384,7 @@ def test_bounds_parameters_invalid(bounds):
 
 class TestLMNN(MetricTestCase):
   def test_iris(self):
-    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6, verbose=False)
     lmnn.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(lmnn.transform(self.iris_points),
@@ -401,7 +401,7 @@ class TestLMNN(MetricTestCase):
     L = rng.randn(rng.randint(1, X.shape[1] + 1), X.shape[1])
     lmnn = LMNN()
 
-    k = lmnn.k
+    k = lmnn.n_neighbors
     reg = lmnn.regularization
 
     X, y = lmnn._prepare_inputs(X, y, dtype=float,
@@ -577,9 +577,9 @@ def test_loss_func(capsys):
 def test_toy_ex_lmnn(X, y, loss):
   """Test that the loss give the right result on a toy example"""
   L = np.array([[1]])
-  lmnn = LMNN(k=1, regularization=0.5)
+  lmnn = LMNN(n_neighbors=1, regularization=0.5)
 
-  k = lmnn.k
+  k = lmnn.n_neighbors
   reg = lmnn.regularization
 
   X, y = lmnn._prepare_inputs(X, y, dtype=float,
@@ -753,7 +753,7 @@ class TestSDML(MetricTestCase):
     # TODO: un-flake it!
     rs = np.random.RandomState(5555)
 
-    sdml = SDML_Supervised(num_constraints=1500, prior='identity',
+    sdml = SDML_Supervised(n_constraints=1500, prior='identity',
                            balance_param=5e-5, random_state=rs)
     sdml.fit(self.iris_points, self.iris_labels)
     csep = class_separation(sdml.transform(self.iris_points),
@@ -982,7 +982,7 @@ class TestLFDA(MetricTestCase):
 
 class TestRCA(MetricTestCase):
   def test_iris(self):
-    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, n_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.29)
@@ -1008,15 +1008,15 @@ class TestRCA(MetricTestCase):
 
   def test_unknown_labels(self):
     n = 200
-    num_chunks = 50
+    n_chunks = 50
     X, y = make_classification(random_state=42, n_samples=2 * n,
                                n_features=6, n_informative=6, n_redundant=0)
     y2 = np.concatenate((y[:n], -np.ones(n)))
 
-    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     rca.fit(X[:n], y[:n])
 
-    rca2 = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca2 = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     rca2.fit(X, y2)
 
     assert not np.any(np.isnan(rca.components_))
@@ -1026,11 +1026,11 @@ class TestRCA(MetricTestCase):
 
   def test_bad_parameters(self):
     n = 200
-    num_chunks = 3
+    n_chunks = 3
     X, y = make_classification(random_state=42, n_samples=n,
                                n_features=6, n_informative=6, n_redundant=0)
 
-    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     msg = ('Due to the parameters of RCA_Supervised, '
            'the inner covariance matrix is not invertible, '
            'so the transformation matrix will contain Nan values. '
@@ -1084,7 +1084,7 @@ class TestMMC(MetricTestCase):
 
     # Full metric
     n_features = self.iris_points.shape[1]
-    mmc = MMC(convergence_threshold=0.01, init=np.eye(n_features) / 10)
+    mmc = MMC(tol=0.01, init=np.eye(n_features) / 10)
     mmc.fit(*wrap_pairs(self.iris_points, [a, b, c, d]))
     expected = [[+0.000514, +0.000868, -0.001195, -0.001703],
                 [+0.000868, +0.001468, -0.002021, -0.002879],

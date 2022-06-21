@@ -33,27 +33,27 @@ class TestTransformerMetricConversion(unittest.TestCase):
 
   def test_lsml_supervised(self):
     seed = np.random.RandomState(1234)
-    lsml = LSML_Supervised(num_constraints=200, random_state=seed)
+    lsml = LSML_Supervised(n_constraints=200, random_state=seed)
     lsml.fit(self.X, self.y)
     L = lsml.components_
     assert_array_almost_equal(L.T.dot(L), lsml.get_mahalanobis_matrix())
 
   def test_itml_supervised(self):
     seed = np.random.RandomState(1234)
-    itml = ITML_Supervised(num_constraints=200, random_state=seed)
+    itml = ITML_Supervised(n_constraints=200, random_state=seed)
     itml.fit(self.X, self.y)
     L = itml.components_
     assert_array_almost_equal(L.T.dot(L), itml.get_mahalanobis_matrix())
 
   def test_lmnn(self):
-    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6, verbose=False)
     lmnn.fit(self.X, self.y)
     L = lmnn.components_
     assert_array_almost_equal(L.T.dot(L), lmnn.get_mahalanobis_matrix())
 
   def test_sdml_supervised(self):
     seed = np.random.RandomState(1234)
-    sdml = SDML_Supervised(num_constraints=1500, prior='identity',
+    sdml = SDML_Supervised(n_constraints=1500, prior='identity',
                            balance_param=1e-5, random_state=seed)
     sdml.fit(self.X, self.y)
     L = sdml.components_
@@ -73,7 +73,7 @@ class TestTransformerMetricConversion(unittest.TestCase):
     assert_array_almost_equal(L.T.dot(L), lfda.get_mahalanobis_matrix())
 
   def test_rca_supervised(self):
-    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, n_chunks=30, chunk_size=2)
     rca.fit(self.X, self.y)
     L = rca.components_
     assert_array_almost_equal(L.T.dot(L), rca.get_mahalanobis_matrix())

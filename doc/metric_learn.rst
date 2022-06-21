@@ -13,6 +13,8 @@ Base Classes
 
     metric_learn.Constraints
     metric_learn.base_metric.BaseMetricLearner
+    metric_learn.base_metric.MetricTransformer
+    metric_learn.base_metric.MahalanobisMixin
     metric_learn.base_metric._PairsClassifierMixin
     metric_learn.base_metric._TripletsClassifierMixin
     metric_learn.base_metric._QuadrupletsClassifierMixin

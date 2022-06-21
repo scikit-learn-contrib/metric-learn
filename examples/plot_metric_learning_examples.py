@@ -15,7 +15,11 @@ to achieve.
 ######################################################################
 # Imports
 # ^^^^^^^
+# .. note::
 #
+#     In order to show the charts of the examples you need a graphical
+#     ``matplotlib`` backend installed. For intance, use ``pip install pyqt5``
+#     to get Qt graphical interface or use your favorite one.
 
 from sklearn.manifold import TSNE
 
@@ -35,9 +39,9 @@ np.random.seed(42)
 # We will be using a synthetic dataset to illustrate the plotting,
 # using the function `sklearn.datasets.make_classification` from
 # scikit-learn. The dataset will contain:
-#   - 100 points in 3 classes with 2 clusters per class
-#   - 5 features, among which 3 are informative (correlated with the class
-#     labels) and two are random noise with large magnitude
+# - 100 points in 3 classes with 2 clusters per class
+# - 5 features, among which 3 are informative (correlated with the class
+# labels) and two are random noise with large magnitude
 
 X, y = make_classification(n_samples=100, n_classes=3, n_clusters_per_class=2,
                            n_informative=3, class_sep=4., n_features=5,
@@ -139,7 +143,7 @@ plot_tsne(X, y)
 #
 
 # setting up LMNN
-lmnn = metric_learn.LMNN(k=5, learn_rate=1e-6)
+lmnn = metric_learn.LMNN(n_neighbors=5, learn_rate=1e-6)
 
 # fit the data!
 lmnn.fit(X, y)
@@ -310,7 +314,7 @@ plot_tsne(X_lfda, y)
 # - See more in the documentation of the class :py:class:`RCA
 #   <metric_learn.RCA>`
 
-rca = metric_learn.RCA_Supervised(num_chunks=30, chunk_size=2)
+rca = metric_learn.RCA_Supervised(n_chunks=30, chunk_size=2)
 X_rca = rca.fit_transform(X, y)
 
 plot_tsne(X_rca, y)
