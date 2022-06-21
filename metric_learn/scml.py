@@ -328,9 +328,10 @@ class SCML(_BaseSCML, _TripletsClassifierMixin):
     'triplet_diffs', and an array-like of shape (n_basis, n_features).
 
     'triplet_diffs'
-      The basis set is constructed from the differences between points of
-      `n_basis` positive or negative pairs taken from the triplets
-      constrains.
+      The basis set is constructed iteratively from differences between points
+      of `n_features` positive or negative pairs randomly sampled from the
+      triplets constraints. Requires the number of training triplets to be
+      great or equal to `n_features`.
 
     array-like
         A matrix of shape (n_basis, n_features), that will be used as
