@@ -13,13 +13,13 @@ from .constraints import Constraints
 
 # mean center each chunklet separately
 def _chunk_mean_centering(data, chunks):
-  num_chunks = chunks.max() + 1
+  n_chunks = chunks.max() + 1
   chunk_mask = chunks != -1
   # We need to ensure the data is float so that we can substract the
   # mean on it
   chunk_data = data[chunk_mask].astype(float, copy=False)
   chunk_labels = chunks[chunk_mask]
-  for c in range(num_chunks):
+  for c in range(n_chunks):
     mask = chunk_labels == c
     chunk_data[mask] -= chunk_data[mask].mean(axis=0)
 
@@ -58,7 +58,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
   >>> rca.fit(X, chunks)
 
   References
-  ------------------
+  ----------
   .. [1] Noam Shental, et al. `Adjustment learning and relevant component
          analysis <http://citeseerx.ist.\
          psu.edu/viewdoc/download?doi=10.1.1.19.2871&rep=rep1&type=pdf>`_ .
@@ -112,7 +112,7 @@ class RCA(MahalanobisMixin, TransformerMixin):
     # Fisher Linear Discriminant projection
     if dim < X.shape[1]:
       total_cov = np.cov(X[chunk_mask], rowvar=0)
-      tmp = np.linalg.lstsq(total_cov, inner_cov)[0]
+      tmp = np.linalg.lstsq(total_cov, inner_cov, rcond=None)[0]
       vals, vecs = np.linalg.eig(tmp)
       inds = np.argsort(vals)[:dim]
       A = vecs[:, inds]
@@ -135,14 +135,14 @@ class RCA_Supervised(RCA):
 
   `RCA_Supervised` creates chunks of similar points by first sampling a
   class, taking `chunk_size` elements in it, and repeating the process
-  `num_chunks` times.
+  `n_chunks` times.
 
   Parameters
   ----------
   n_components : int or None, optional (default=None)
     Dimensionality of reduced space (if None, defaults to dimension of X).
 
-  num_chunks: int, optional (default=100)
+  n_chunks: int, optional (default=100)
     Number of chunks to generate.
 
   chunk_size: int, optional (default=2)
@@ -156,6 +156,8 @@ class RCA_Supervised(RCA):
     A pseudo random number generator object or a seed for it if int.
     It is used to randomly sample constraints from labels.
 
+  num_chunks : Renamed to n_chunks. Will be deprecated in 0.7.0
+
   Examples
   --------
   >>> from metric_learn import RCA_Supervised
@@ -163,7 +165,7 @@ class RCA_Supervised(RCA):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> rca = RCA_Supervised(num_chunks=30, chunk_size=2)
+  >>> rca = RCA_Supervised(n_chunks=30, chunk_size=2)
   >>> rca.fit(X, Y)
 
   Attributes
@@ -172,17 +174,25 @@ class RCA_Supervised(RCA):
     The learned linear transformation ``L``.
   """
 
-  def __init__(self, n_components=None, num_chunks=100, chunk_size=2,
-               preprocessor=None, random_state=None):
+  def __init__(self, n_components=None, n_chunks=100, chunk_size=2,
+               preprocessor=None, random_state=None,
+               num_chunks='deprecated'):
     """Initialize the supervised version of `RCA`."""
     RCA.__init__(self, n_components=n_components, preprocessor=preprocessor)
-    self.num_chunks = num_chunks
+    if num_chunks != 'deprecated':
+      warnings.warn('"num_chunks" parameter has been renamed to'
+                    ' "n_chunks". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      n_chunks = num_chunks
+    self.num_chunks = 'deprecated'  # To avoid no_attribute error
+    self.n_chunks = n_chunks
     self.chunk_size = chunk_size
     self.random_state = random_state
 
   def fit(self, X, y):
     """Create constraints from labels and learn the RCA model.
-    Needs num_constraints specified in constructor.
+    Needs n_constraints specified in constructor. (Not true?)
 
     Parameters
     ----------
@@ -192,11 +202,11 @@ class RCA_Supervised(RCA):
     y : (n) data labels
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
-    chunks = Constraints(y).chunks(num_chunks=self.num_chunks,
+    chunks = Constraints(y).chunks(n_chunks=self.n_chunks,
                                    chunk_size=self.chunk_size,
                                    random_state=self.random_state)
 
-    if self.num_chunks * (self.chunk_size - 1) < X.shape[1]:
+    if self.n_chunks * (self.chunk_size - 1) < X.shape[1]:
       warnings.warn('Due to the parameters of RCA_Supervised, '
                     'the inner covariance matrix is not invertible, '
                     'so the transformation matrix will contain Nan values. '

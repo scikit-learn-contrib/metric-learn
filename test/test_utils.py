@@ -60,11 +60,11 @@ def build_regression(with_preprocessor=False):
 def build_data():
   input_data, labels = load_iris(return_X_y=True)
   X, y = shuffle(input_data, labels, random_state=SEED)
-  num_constraints = 50
+  n_constraints = 50
   constraints = Constraints(y)
   pairs = (
       constraints
-      .positive_negative_pairs(num_constraints, same_length=True,
+      .positive_negative_pairs(n_constraints, same_length=True,
                                random_state=check_random_state(SEED)))
   return X, pairs
 
@@ -117,7 +117,7 @@ ids_quadruplets_learners = list(map(lambda x: x.__class__.__name__,
                                 [learner for (learner, _) in
                                  quadruplets_learners]))
 
-triplets_learners = [(SCML(), build_triplets)]
+triplets_learners = [(SCML(n_basis=320), build_triplets)]
 ids_triplets_learners = list(map(lambda x: x.__class__.__name__,
                              [learner for (learner, _) in
                               triplets_learners]))
@@ -137,10 +137,10 @@ classifiers = [(Covariance(), build_classification),
                (ITML_Supervised(max_iter=5), build_classification),
                (LSML_Supervised(), build_classification),
                (MMC_Supervised(max_iter=5), build_classification),
-               (RCA_Supervised(num_chunks=5), build_classification),
+               (RCA_Supervised(n_chunks=5), build_classification),
                (SDML_Supervised(prior='identity', balance_param=1e-5),
                build_classification),
-               (SCML_Supervised(), build_classification)]
+               (SCML_Supervised(n_basis=80), build_classification)]
 ids_classifiers = list(map(lambda x: x.__class__.__name__,
                            [learner for (learner, _) in
                             classifiers]))
@@ -834,9 +834,9 @@ def test_error_message_tuple_size(estimator, _):
 
 @pytest.mark.parametrize('estimator, _', metric_learners,
                          ids=ids_metric_learners)
-def test_error_message_t_score_pairs(estimator, _):
-  """tests that if you want to score_pairs on triplets for instance, it returns
-  the right error message
+def test_error_message_t_pair_distance_or_score(estimator, _):
+  """Tests that if you want to pair_distance or pair_score on triplets
+  for instance, it returns the right error message
   """
   estimator = clone(estimator)
   set_random_state(estimator)
@@ -844,11 +844,21 @@ def test_error_message_t_score_pairs(estimator, _):
   triplets = np.array([[[1.3, 6.3], [3., 6.8], [6.5, 4.4]],
                        [[1.9, 5.3], [1., 7.8], [3.2, 1.2]]])
   with pytest.raises(ValueError) as raised_err:
-    estimator.score_pairs(triplets)
+    estimator.pair_score(triplets)
   expected_msg = ("Tuples of 2 element(s) expected{}. Got tuples of 3 "
                   "element(s) instead (shape=(2, 3, 2)):\ninput={}.\n"
                   .format(make_context(estimator), triplets))
   assert str(raised_err.value) == expected_msg
+
+  not_implemented_msg = ""
+  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
+  # "This learner does not have pair_distance"
+
+  # One exception will trigger for sure
+  with pytest.raises(Exception) as raised_exception:
+      estimator.pair_distance(triplets)
+  err_value = raised_exception.value.args[0]
+  assert err_value == expected_msg or err_value == not_implemented_msg
 
 
 def test_preprocess_tuples_simple_example():
@@ -930,32 +940,59 @@ def test_same_with_or_without_preprocessor(estimator, build_dataset):
                                         method)(formed_test)
       assert np.array(output_with_prep == output_with_prep_formed).all()
 
-  # test score_pairs
+  # Test pair_score, all learners have it.
   idx1 = np.array([[0, 2], [5, 3]], dtype=int)
-  output_with_prep = estimator_with_preprocessor.score_pairs(
+  output_with_prep = estimator_with_preprocessor.pair_score(
       indicators_to_transform[idx1])
-  output_without_prep = estimator_without_preprocessor.score_pairs(
+  output_without_prep = estimator_without_preprocessor.pair_score(
       formed_points_to_transform[idx1])
   assert np.array(output_with_prep == output_without_prep).all()
 
-  output_with_prep = estimator_with_preprocessor.score_pairs(
+  output_with_prep = estimator_with_preprocessor.pair_score(
       indicators_to_transform[idx1])
-  output_without_prep = estimator_with_prep_formed.score_pairs(
+  output_without_prep = estimator_with_prep_formed.pair_score(
       formed_points_to_transform[idx1])
   assert np.array(output_with_prep == output_without_prep).all()
 
-  # test transform
-  output_with_prep = estimator_with_preprocessor.transform(
-      indicators_to_transform)
-  output_without_prep = estimator_without_preprocessor.transform(
-      formed_points_to_transform)
-  assert np.array(output_with_prep == output_without_prep).all()
+  # Test pair_distance
+  not_implemented_msg = ""
+  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
+  # "This learner does not have pair_distance"
+  try:
+    output_with_prep = estimator_with_preprocessor.pair_distance(
+        indicators_to_transform[idx1])
+    output_without_prep = estimator_without_preprocessor.pair_distance(
+        formed_points_to_transform[idx1])
+    assert np.array(output_with_prep == output_without_prep).all()
 
-  output_with_prep = estimator_with_preprocessor.transform(
-      indicators_to_transform)
-  output_without_prep = estimator_with_prep_formed.transform(
-      formed_points_to_transform)
-  assert np.array(output_with_prep == output_without_prep).all()
+    output_with_prep = estimator_with_preprocessor.pair_distance(
+        indicators_to_transform[idx1])
+    output_without_prep = estimator_with_prep_formed.pair_distance(
+        formed_points_to_transform[idx1])
+    assert np.array(output_with_prep == output_without_prep).all()
+
+  except Exception as raised_exception:
+    assert raised_exception.value.args[0] == not_implemented_msg
+
+  # Test transform
+  not_implemented_msg = ""
+  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
+  # "This learner does not have transform"
+  try:
+    output_with_prep = estimator_with_preprocessor.transform(
+        indicators_to_transform)
+    output_without_prep = estimator_without_preprocessor.transform(
+        formed_points_to_transform)
+    assert np.array(output_with_prep == output_without_prep).all()
+
+    output_with_prep = estimator_with_preprocessor.transform(
+        indicators_to_transform)
+    output_without_prep = estimator_with_prep_formed.transform(
+        formed_points_to_transform)
+    assert np.array(output_with_prep == output_without_prep).all()
+
+  except Exception as raised_exception:
+    assert raised_exception.value.args[0] == not_implemented_msg
 
 
 def test_check_collapsed_pairs_raises_no_error():

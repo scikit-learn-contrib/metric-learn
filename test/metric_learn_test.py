@@ -9,7 +9,6 @@ from sklearn.datasets import (load_iris, make_classification, make_regression,
                               make_spd_matrix)
 from numpy.testing import (assert_array_almost_equal, assert_array_equal,
                            assert_allclose)
-from metric_learn.sklearn_shims import assert_warns_message
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
@@ -96,7 +95,7 @@ class TestSCML(object):
                                n_informative=60, n_redundant=0, n_repeated=0,
                                random_state=42)
     X = StandardScaler().fit_transform(X)
-    scml = SCML_Supervised(random_state=42)
+    scml = SCML_Supervised(random_state=42, n_basis=399)
     scml.fit(X, y)
     csep = class_separation(scml.transform(X), y)
     assert csep < 0.7
@@ -107,7 +106,7 @@ class TestSCML(object):
                                                          [2, 0], [2, 1]]),
                                                np.array([1, 0, 1, 0])))])
   def test_bad_basis(self, estimator, data):
-    model = estimator(basis='bad_basis')
+    model = estimator(basis='bad_basis', n_basis=33)  # n_basis doesn't matter
     msg = ("`basis` must be one of the options '{}' or an array of shape "
            "(n_basis, n_features)."
            .format("', '".join(model._authorized_basis)))
@@ -239,16 +238,23 @@ class TestSCML(object):
   @pytest.mark.parametrize('n_features', [10, 50, 100])
   @pytest.mark.parametrize('n_classes', [5, 10, 15])
   def test_triplet_diffs(self, n_samples, n_features, n_classes):
+    """
+    Test that the correct value of n_basis is being generated with
+    different triplet constraints.
+    """
     X, y = make_classification(n_samples=n_samples, n_classes=n_classes,
                                n_features=n_features, n_informative=n_features,
                                n_redundant=0, n_repeated=0)
     X = StandardScaler().fit_transform(X)
-
-    model = SCML_Supervised()
+    model = SCML_Supervised(n_basis=None)  # Explicit n_basis=None
     constraints = Constraints(y)
     triplets = constraints.generate_knntriplets(X, model.k_genuine,
                                                 model.k_impostor)
-    basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+
+    msg = "As no value for `n_basis` was selected, "
+    with pytest.warns(UserWarning) as raised_warning:
+      basis, n_basis = model._generate_bases_dist_diff(triplets, X)
+    assert msg in str(raised_warning[0].message)
 
     expected_n_basis = n_features * 80
     assert n_basis == expected_n_basis
@@ -258,13 +264,21 @@ class TestSCML(object):
   @pytest.mark.parametrize('n_features', [10, 50, 100])
   @pytest.mark.parametrize('n_classes', [5, 10, 15])
   def test_lda(self, n_samples, n_features, n_classes):
+    """
+    Test that when n_basis=None, the correct n_basis is generated,
+    for SCML_Supervised and different values of n_samples, n_features
+    and n_classes.
+    """
     X, y = make_classification(n_samples=n_samples, n_classes=n_classes,
                                n_features=n_features, n_informative=n_features,
                                n_redundant=0, n_repeated=0)
     X = StandardScaler().fit_transform(X)
 
-    model = SCML_Supervised()
-    basis, n_basis = model._generate_bases_LDA(X, y)
+    msg = "As no value for `n_basis` was selected, "
+    with pytest.warns(UserWarning) as raised_warning:
+      model = SCML_Supervised(n_basis=None)  # Explicit n_basis=None
+      basis, n_basis = model._generate_bases_LDA(X, y)
+    assert msg in str(raised_warning[0].message)
 
     num_eig = min(n_classes - 1, n_features)
     expected_n_basis = min(20 * n_features, n_samples * 2 * num_eig - 1)
@@ -300,7 +314,7 @@ class TestSCML(object):
     assert msg == raised_error.value.args[0]
 
   def test_large_output_iter(self):
-    scml = SCML(max_iter=1, output_iter=2)
+    scml = SCML(max_iter=1, output_iter=2, n_basis=33)  # n_basis don't matter
     triplets = np.array([[[0, 1], [2, 1], [0, 0]]])
     msg = ("The value of output_iter must be equal or smaller than"
            " max_iter.")
@@ -312,7 +326,7 @@ class TestSCML(object):
 
 class TestLSML(MetricTestCase):
   def test_iris(self):
-    lsml = LSML_Supervised(num_constraints=200)
+    lsml = LSML_Supervised(n_constraints=200)
     lsml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(lsml.transform(self.iris_points), self.iris_labels)
@@ -321,7 +335,7 @@ class TestLSML(MetricTestCase):
 
 class TestITML(MetricTestCase):
   def test_iris(self):
-    itml = ITML_Supervised(num_constraints=200)
+    itml = ITML_Supervised(n_constraints=200)
     itml.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(itml.transform(self.iris_points), self.iris_labels)
@@ -367,7 +381,7 @@ def test_bounds_parameters_invalid(bounds):
 
 class TestLMNN(MetricTestCase):
   def test_iris(self):
-    lmnn = LMNN(k=5, learn_rate=1e-6, verbose=False)
+    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6, verbose=False)
     lmnn.fit(self.iris_points, self.iris_labels)
 
     csep = class_separation(lmnn.transform(self.iris_points),
@@ -384,7 +398,7 @@ class TestLMNN(MetricTestCase):
     L = rng.randn(rng.randint(1, X.shape[1] + 1), X.shape[1])
     lmnn = LMNN()
 
-    k = lmnn.k
+    k = lmnn.n_neighbors
     reg = lmnn.regularization
 
     X, y = lmnn._prepare_inputs(X, y, dtype=float,
@@ -560,9 +574,9 @@ def test_loss_func(capsys):
 def test_toy_ex_lmnn(X, y, loss):
   """Test that the loss give the right result on a toy example"""
   L = np.array([[1]])
-  lmnn = LMNN(k=1, regularization=0.5)
+  lmnn = LMNN(n_neighbors=1, regularization=0.5)
 
-  k = lmnn.k
+  k = lmnn.n_neighbors
   reg = lmnn.regularization
 
   X, y = lmnn._prepare_inputs(X, y, dtype=float,
@@ -736,7 +750,7 @@ class TestSDML(MetricTestCase):
     # TODO: un-flake it!
     rs = np.random.RandomState(5555)
 
-    sdml = SDML_Supervised(num_constraints=1500, prior='identity',
+    sdml = SDML_Supervised(n_constraints=1500, prior='identity',
                            balance_param=5e-5, random_state=rs)
     sdml.fit(self.iris_points, self.iris_labels)
     csep = class_separation(sdml.transform(self.iris_points),
@@ -965,7 +979,7 @@ class TestLFDA(MetricTestCase):
 
 class TestRCA(MetricTestCase):
   def test_iris(self):
-    rca = RCA_Supervised(n_components=2, num_chunks=30, chunk_size=2)
+    rca = RCA_Supervised(n_components=2, n_chunks=30, chunk_size=2)
     rca.fit(self.iris_points, self.iris_labels)
     csep = class_separation(rca.transform(self.iris_points), self.iris_labels)
     self.assertLess(csep, 0.29)
@@ -991,15 +1005,15 @@ class TestRCA(MetricTestCase):
 
   def test_unknown_labels(self):
     n = 200
-    num_chunks = 50
+    n_chunks = 50
     X, y = make_classification(random_state=42, n_samples=2 * n,
                                n_features=6, n_informative=6, n_redundant=0)
     y2 = np.concatenate((y[:n], -np.ones(n)))
 
-    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     rca.fit(X[:n], y[:n])
 
-    rca2 = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca2 = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     rca2.fit(X, y2)
 
     assert not np.any(np.isnan(rca.components_))
@@ -1009,11 +1023,11 @@ class TestRCA(MetricTestCase):
 
   def test_bad_parameters(self):
     n = 200
-    num_chunks = 3
+    n_chunks = 3
     X, y = make_classification(random_state=42, n_samples=n,
                                n_features=6, n_informative=6, n_redundant=0)
 
-    rca = RCA_Supervised(num_chunks=num_chunks, random_state=42)
+    rca = RCA_Supervised(n_chunks=n_chunks, random_state=42)
     msg = ('Due to the parameters of RCA_Supervised, '
            'the inner covariance matrix is not invertible, '
            'so the transformation matrix will contain Nan values. '
@@ -1067,7 +1081,7 @@ class TestMMC(MetricTestCase):
 
     # Full metric
     n_features = self.iris_points.shape[1]
-    mmc = MMC(convergence_threshold=0.01, init=np.eye(n_features) / 10)
+    mmc = MMC(tol=0.01, init=np.eye(n_features) / 10)
     mmc.fit(*wrap_pairs(self.iris_points, [a, b, c, d]))
     expected = [[+0.000514, +0.000868, -0.001195, -0.001703],
                 [+0.000868, +0.001468, -0.002021, -0.002879],
@@ -1143,9 +1157,10 @@ def test_convergence_warning(dataset, algo_class):
     X, y = dataset
     model = algo_class(max_iter=2, verbose=True)
     cls_name = model.__class__.__name__
-    assert_warns_message(ConvergenceWarning,
-                         '[{}] {} did not converge'.format(cls_name, cls_name),
-                         model.fit, X, y)
+    msg = '[{}] {} did not converge'.format(cls_name, cls_name)
+    with pytest.warns(Warning) as raised_warning:
+      model.fit(X, y)
+    assert any([msg in str(warn.message) for warn in raised_warning])
 
 
 if __name__ == '__main__':
