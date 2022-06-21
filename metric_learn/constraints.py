@@ -7,6 +7,7 @@ import warnings
 from sklearn.utils import check_random_state
 from sklearn.neighbors import NearestNeighbors
 
+
 __all__ = ['Constraints']
 
 
@@ -31,21 +32,21 @@ class Constraints(object):
     partial_labels = np.asanyarray(partial_labels, dtype=int)
     self.partial_labels = partial_labels
 
-  def positive_negative_pairs(self, num_constraints, same_length=False,
-                              random_state=None):
+  def positive_negative_pairs(self, n_constraints, same_length=False,
+                              random_state=None, num_constraints='deprecated'):
     """
     Generates positive pairs and negative pairs from labeled data.
 
-    Positive pairs are formed by randomly drawing ``num_constraints`` pairs of
+    Positive pairs are formed by randomly drawing ``n_constraints`` pairs of
     points with the same label. Negative pairs are formed by randomly drawing
-    ``num_constraints`` pairs of points with different label.
+    ``n_constraints`` pairs of points with different label.
 
     In the case where it is not possible to generate enough positive or
     negative pairs, a smaller number of pairs will be returned with a warning.
 
     Parameters
     ----------
-    num_constraints : int
+    n_constraints : int
       Number of positive and negative constraints to generate.
 
     same_length : bool, optional (default=False)
@@ -54,6 +55,8 @@ class Constraints(object):
 
     random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int.
+
+    num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
 
     Returns
     -------
@@ -69,10 +72,18 @@ class Constraints(object):
     d : array-like, shape=(n_constraints,)
       1D array of indicators for the right elements of negative pairs.
     """
+    if num_constraints != 'deprecated':
+      warnings.warn('"num_constraints" parameter has been renamed to'
+                    ' "n_constraints". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      self.n_constraints = num_constraints
+    else:
+      self.n_constraints = n_constraints
     random_state = check_random_state(random_state)
-    a, b = self._pairs(num_constraints, same_label=True,
+    a, b = self._pairs(n_constraints, same_label=True,
                        random_state=random_state)
-    c, d = self._pairs(num_constraints, same_label=False,
+    c, d = self._pairs(n_constraints, same_label=False,
                        random_state=random_state)
     if same_length and len(a) != len(c):
       n = min(len(a), len(c))
@@ -190,15 +201,15 @@ class Constraints(object):
 
     return triplets
 
-  def _pairs(self, num_constraints, same_label=True, max_iter=10,
+  def _pairs(self, n_constraints, same_label=True, max_iter=10,
              random_state=np.random):
     known_label_idx, = np.where(self.partial_labels >= 0)
     known_labels = self.partial_labels[known_label_idx]
     num_labels = len(known_labels)
     ab = set()
     it = 0
-    while it < max_iter and len(ab) < num_constraints:
-      nc = num_constraints - len(ab)
+    while it < max_iter and len(ab) < n_constraints:
+      nc = n_constraints - len(ab)
       for aidx in random_state.randint(num_labels, size=nc):
         if same_label:
           mask = known_labels[aidx] == known_labels
@@ -209,25 +220,26 @@ class Constraints(object):
         if len(b_choices) > 0:
           ab.add((aidx, random_state.choice(b_choices)))
       it += 1
-    if len(ab) < num_constraints:
+    if len(ab) < n_constraints:
       warnings.warn("Only generated %d %s constraints (requested %d)" % (
-          len(ab), 'positive' if same_label else 'negative', num_constraints))
-    ab = np.array(list(ab)[:num_constraints], dtype=int)
+          len(ab), 'positive' if same_label else 'negative', n_constraints))
+    ab = np.array(list(ab)[:n_constraints], dtype=int)
     return known_label_idx[ab.T]
 
-  def chunks(self, num_chunks=100, chunk_size=2, random_state=None):
+  def chunks(self, n_chunks=100, chunk_size=2, random_state=None,
+             num_chunks='deprecated'):
     """
     Generates chunks from labeled data.
 
-    Each of ``num_chunks`` chunks is composed of ``chunk_size`` points from
+    Each of ``n_chunks`` chunks is composed of ``chunk_size`` points from
     the same class drawn at random. Each point can belong to at most 1 chunk.
 
-    In the case where there is not enough points to generate ``num_chunks``
+    In the case where there is not enough points to generate ``n_chunks``
     chunks of size ``chunk_size``, a ValueError will be raised.
 
     Parameters
     ----------
-    num_chunks : int, optional (default=100)
+    n_chunks : int, optional (default=100)
       Number of chunks to generate.
 
     chunk_size : int, optional (default=2)
@@ -236,12 +248,20 @@ class Constraints(object):
     random_state : int or numpy.RandomState or None, optional (default=None)
       A pseudo random number generator object or a seed for it if int.
 
+    num_chunks : Renamed to n_chunks. Will be deprecated in 0.7.0
+
     Returns
     -------
     chunks : array-like, shape=(n_samples,)
       1D array of chunk indicators, where -1 indicates that the point does not
       belong to any chunk.
     """
+    if num_chunks != 'deprecated':
+      warnings.warn('"num_chunks" parameter has been renamed to'
+                    ' "n_chunks". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      n_chunks = num_chunks
     random_state = check_random_state(random_state)
     chunks = -np.ones_like(self.partial_labels, dtype=int)
     uniq, lookup = np.unique(self.partial_labels, return_inverse=True)
@@ -249,13 +269,13 @@ class Constraints(object):
     all_inds = [set(np.where(lookup == c)[0]) for c in range(len(uniq))
                 if c not in unknown_uniq]
     max_chunks = int(np.sum([len(s) // chunk_size for s in all_inds]))
-    if max_chunks < num_chunks:
+    if max_chunks < n_chunks:
       raise ValueError(('Not enough possible chunks of %d elements in each'
                         ' class to form expected %d chunks - maximum number'
                         ' of chunks is %d'
-                        ) % (chunk_size, num_chunks, max_chunks))
+                        ) % (chunk_size, n_chunks, max_chunks))
     idx = 0
-    while idx < num_chunks and all_inds:
+    while idx < n_chunks and all_inds:
       if len(all_inds) == 1:
         c = 0
       else:

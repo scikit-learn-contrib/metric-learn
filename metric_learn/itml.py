@@ -9,6 +9,7 @@ from sklearn.base import TransformerMixin
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import components_from_metric, _initialize_metric_mahalanobis
+import warnings
 
 
 class _BaseITML(MahalanobisMixin):
@@ -16,12 +17,20 @@ class _BaseITML(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, gamma=1., max_iter=1000, convergence_threshold=1e-3,
+  def __init__(self, gamma=1., max_iter=1000, tol=1e-3,
                prior='identity', verbose=False,
-               preprocessor=None, random_state=None):
+               preprocessor=None, random_state=None,
+               convergence_threshold='deprecated'):
+    if convergence_threshold != 'deprecated':
+      warnings.warn('"convergence_threshold" parameter has been '
+                    ' renamed to "tol". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      tol = convergence_threshold
+    self.convergence_threshold = 'deprecated'  # Avoid errors
     self.gamma = gamma
     self.max_iter = max_iter
-    self.convergence_threshold = convergence_threshold
+    self.tol = tol
     self.prior = prior
     self.verbose = verbose
     self.random_state = random_state
@@ -86,7 +95,7 @@ class _BaseITML(MahalanobisMixin):
         conv = np.inf
         break
       conv = np.abs(lambdaold - _lambda).sum() / normsum
-      if conv < self.convergence_threshold:
+      if conv < self.tol:
         break
       lambdaold = _lambda.copy()
       if self.verbose:
@@ -122,7 +131,7 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   max_iter : int, optional (default=1000)
     Maximum number of iteration of the optimization procedure.
 
-  convergence_threshold : float, optional (default=1e-3)
+  tol : float, optional (default=1e-3)
     Convergence tolerance.
 
   prior : string or numpy array, optional (default='identity')
@@ -157,6 +166,8 @@ class ITML(_BaseITML, _PairsClassifierMixin):
   random_state : int or numpy.RandomState or None, optional (default=None)
     A pseudo random number generator object or a seed for it if int. If
     ``prior='random'``, ``random_state`` is used to set the prior.
+
+  convergence_threshold : Renamed to tol. Will be deprecated in 0.7.0
 
   Attributes
   ----------
@@ -260,10 +271,10 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   max_iter : int, optional (default=1000)
     Maximum number of iterations of the optimization procedure.
 
-  convergence_threshold : float, optional (default=1e-3)
+  tol : float, optional (default=1e-3)
     Tolerance of the optimization procedure.
 
-  num_constraints : int, optional (default=None)
+  n_constraints : int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
 
@@ -302,6 +313,9 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     case, `random_state` is also used to randomly sample constraints from
     labels.
 
+  num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
+
+  convergence_threshold : Renamed to tol. Will be deprecated in 0.7.0
 
   Attributes
   ----------
@@ -328,7 +342,7 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> itml = ITML_Supervised(num_constraints=200)
+  >>> itml = ITML_Supervised(n_constraints=200)
   >>> itml.fit(X, Y)
 
   See Also
@@ -338,14 +352,26 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
     that describes the supervised version of weakly supervised estimators.
   """
 
-  def __init__(self, gamma=1.0, max_iter=1000, convergence_threshold=1e-3,
-               num_constraints=None, prior='identity',
-               verbose=False, preprocessor=None, random_state=None):
+  def __init__(self, gamma=1.0, max_iter=1000, tol=1e-3,
+               n_constraints=None, prior='identity',
+               verbose=False, preprocessor=None, random_state=None,
+               num_constraints='deprecated',
+               convergence_threshold='deprecated'):
     _BaseITML.__init__(self, gamma=gamma, max_iter=max_iter,
-                       convergence_threshold=convergence_threshold,
+                       tol=tol,
                        prior=prior, verbose=verbose,
-                       preprocessor=preprocessor, random_state=random_state)
-    self.num_constraints = num_constraints
+                       preprocessor=preprocessor,
+                       random_state=random_state,
+                       convergence_threshold=convergence_threshold)
+    if num_constraints != 'deprecated':
+      warnings.warn('"num_constraints" parameter has been renamed to'
+                    ' "n_constraints". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      n_constraints = num_constraints
+    self.n_constraints = n_constraints
+    # Avoid test get_params from failing (all params passed sholud be set)
+    self.num_constraints = 'deprecated'
 
   def fit(self, X, y, bounds=None):
     """Create constraints from labels and learn the ITML model.
@@ -369,13 +395,13 @@ class ITML_Supervised(_BaseITML, TransformerMixin):
       points in the training data `X`.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
-    num_constraints = self.num_constraints
-    if num_constraints is None:
+    n_constraints = self.n_constraints
+    if n_constraints is None:
       num_classes = len(np.unique(y))
-      num_constraints = 20 * num_classes**2
+      n_constraints = 20 * num_classes**2
 
     c = Constraints(y)
-    pos_neg = c.positive_negative_pairs(num_constraints,
+    pos_neg = c.positive_negative_pairs(n_constraints,
                                         random_state=self.random_state)
     pairs, y = wrap_pairs(X, pos_neg)
     return _BaseITML._fit(self, pairs, y, bounds=bounds)

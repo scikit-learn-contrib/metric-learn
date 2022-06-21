@@ -164,7 +164,7 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different classes,
     X = iris_data['data']
     Y = iris_data['target']
 
-    lmnn = LMNN(k=5, learn_rate=1e-6)
+    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6)
     lmnn.fit(X, Y, verbose=False)
 
 .. rubric:: References
@@ -407,8 +407,8 @@ are similar (+1) or dissimilar (-1)), are sampled with the function
 (of label +1), this method will look at all the samples from the same label and
 sample randomly a pair among them. To sample negative pairs (of label -1), this
 method will look at all the samples from a different class and sample randomly
-a pair among them. The method will try to build `num_constraints` positive
-pairs and `num_constraints` negative pairs, but sometimes it cannot find enough
+a pair among them. The method will try to build `n_constraints` positive
+pairs and `n_constraints` negative pairs, but sometimes it cannot find enough
 of one of those, so forcing `same_length=True` will return both times the
 minimum of the two lenghts.
 
@@ -430,5 +430,5 @@ last points should be less similar than the two first points).
     X = iris_data['data']
     Y = iris_data['target']
 
-    mmc = MMC_Supervised(num_constraints=200)
+    mmc = MMC_Supervised(n_constraints=200)
     mmc.fit(X, Y)

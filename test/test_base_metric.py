@@ -37,15 +37,16 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces(f"Covariance({merged_kwargs})"))
 
   def test_lmnn(self):
-    def_kwargs = {'convergence_tol': 0.001, 'init': 'auto', 'k': 3,
+    def_kwargs = {'convergence_tol': 0.001, 'init': 'auto', 'n_neighbors': 3,
                   'learn_rate': 1e-07, 'max_iter': 1000, 'min_iter': 50,
                   'n_components': None, 'preprocessor': None,
                   'random_state': None, 'regularization': 0.5,
                   'verbose': False}
-    nndef_kwargs = {'convergence_tol': 0.01, 'k': 6}
+    nndef_kwargs = {'convergence_tol': 0.01, 'n_neighbors': 6}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(
-        remove_spaces(str(metric_learn.LMNN(convergence_tol=0.01, k=6))),
+        remove_spaces(str(metric_learn.LMNN(convergence_tol=0.01,
+                                            n_neighbors=6))),
         remove_spaces(f"LMNN({merged_kwargs})"))
 
   def test_nca(self):
@@ -66,21 +67,21 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces(f"LFDA({merged_kwargs})"))
 
   def test_itml(self):
-    def_kwargs = {'convergence_threshold': 0.001, 'gamma': 1.0,
+    def_kwargs = {'tol': 0.001, 'gamma': 1.0,
                   'max_iter': 1000, 'preprocessor': None,
                   'prior': 'identity', 'random_state': None, 'verbose': False}
     nndef_kwargs = {'gamma': 0.5}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(remove_spaces(str(metric_learn.ITML(gamma=0.5))),
                      remove_spaces(f"ITML({merged_kwargs})"))
-    def_kwargs = {'convergence_threshold': 0.001, 'gamma': 1.0,
-                  'max_iter': 1000, 'num_constraints': None,
+    def_kwargs = {'tol': 0.001, 'gamma': 1.0,
+                  'max_iter': 1000, 'n_constraints': None,
                   'preprocessor': None, 'prior': 'identity',
                   'random_state': None, 'verbose': False}
-    nndef_kwargs = {'num_constraints': 7}
+    nndef_kwargs = {'n_constraints': 7}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(
-        remove_spaces(str(metric_learn.ITML_Supervised(num_constraints=7))),
+        remove_spaces(str(metric_learn.ITML_Supervised(n_constraints=7))),
         remove_spaces(f"ITML_Supervised({merged_kwargs})"))
 
   def test_lsml(self):
@@ -90,7 +91,7 @@ class TestStringRepr(unittest.TestCase):
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(remove_spaces(str(metric_learn.LSML(tol=0.1))),
                      remove_spaces(f"LSML({merged_kwargs})"))
-    def_kwargs = {'max_iter': 1000, 'num_constraints': None,
+    def_kwargs = {'max_iter': 1000, 'n_constraints': None,
                   'preprocessor': None, 'prior': 'identity',
                   'random_state': None, 'tol': 0.001, 'verbose': False,
                   'weights': None}
@@ -108,7 +109,7 @@ class TestStringRepr(unittest.TestCase):
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(remove_spaces(str(metric_learn.SDML(verbose=True))),
                      remove_spaces(f"SDML({merged_kwargs})"))
-    def_kwargs = {'balance_param': 0.5, 'num_constraints': None,
+    def_kwargs = {'balance_param': 0.5, 'n_constraints': None,
                   'preprocessor': None, 'prior': 'identity',
                   'random_state': None, 'sparsity_param': 0.01,
                   'verbose': False}
@@ -124,12 +125,12 @@ class TestStringRepr(unittest.TestCase):
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(remove_spaces(str(metric_learn.RCA(n_components=3))),
                      remove_spaces(f"RCA({merged_kwargs})"))
-    def_kwargs = {'chunk_size': 2, 'n_components': None, 'num_chunks': 100,
+    def_kwargs = {'chunk_size': 2, 'n_components': None, 'n_chunks': 100,
                   'preprocessor': None, 'random_state': None}
-    nndef_kwargs = {'num_chunks': 5}
+    nndef_kwargs = {'n_chunks': 5}
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(
-        remove_spaces(str(metric_learn.RCA_Supervised(num_chunks=5))),
+        remove_spaces(str(metric_learn.RCA_Supervised(n_chunks=5))),
         remove_spaces(f"RCA_Supervised({merged_kwargs})"))
 
   def test_mlkr(self):
@@ -142,7 +143,7 @@ class TestStringRepr(unittest.TestCase):
                      remove_spaces(f"MLKR({merged_kwargs})"))
 
   def test_mmc(self):
-    def_kwargs = {'convergence_threshold': 0.001, 'diagonal': False,
+    def_kwargs = {'tol': 0.001, 'diagonal': False,
                   'diagonal_c': 1.0, 'init': 'identity', 'max_iter': 100,
                   'max_proj': 10000, 'preprocessor': None,
                   'random_state': None, 'verbose': False}
@@ -150,9 +151,9 @@ class TestStringRepr(unittest.TestCase):
     merged_kwargs = sk_repr_kwargs(def_kwargs, nndef_kwargs)
     self.assertEqual(remove_spaces(str(metric_learn.MMC(diagonal=True))),
                      remove_spaces(f"MMC({merged_kwargs})"))
-    def_kwargs = {'convergence_threshold': 1e-06, 'diagonal': False,
+    def_kwargs = {'tol': 1e-06, 'diagonal': False,
                   'diagonal_c': 1.0, 'init': 'identity', 'max_iter': 100,
-                  'max_proj': 10000, 'num_constraints': None,
+                  'max_proj': 10000, 'n_constraints': None,
                   'preprocessor': None, 'random_state': None,
                   'verbose': False}
     nndef_kwargs = {'max_iter': 1}

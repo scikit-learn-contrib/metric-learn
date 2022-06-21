@@ -6,19 +6,28 @@ from sklearn.utils.validation import assert_all_finite
 from .base_metric import _PairsClassifierMixin, MahalanobisMixin
 from .constraints import Constraints, wrap_pairs
 from ._util import components_from_metric, _initialize_metric_mahalanobis
+import warnings
 
 
 class _BaseMMC(MahalanobisMixin):
 
   _tuple_size = 2  # constraints are pairs
 
-  def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-3,
+  def __init__(self, max_iter=100, max_proj=10000, tol=1e-3,
                init='identity', diagonal=False,
                diagonal_c=1.0, verbose=False, preprocessor=None,
-               random_state=None):
+               random_state=None,
+               convergence_threshold='deprecated'):
+    if convergence_threshold != 'deprecated':
+      warnings.warn('"convergence_threshold" parameter has been '
+                    ' renamed to "tol". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      tol = convergence_threshold
+    self.convergence_threshold = 'deprecated'  # Avoid errors
     self.max_iter = max_iter
     self.max_proj = max_proj
-    self.convergence_threshold = convergence_threshold
+    self.tol = tol
     self.init = init
     self.diagonal = diagonal
     self.diagonal_c = diagonal_c
@@ -145,13 +154,13 @@ class _BaseMMC(MahalanobisMixin):
         A[:] = A_old + alpha * M
 
       delta = np.linalg.norm(alpha * M) / np.linalg.norm(A_old)
-      if delta < self.convergence_threshold:
+      if delta < self.tol:
         break
       if self.verbose:
         print('mmc iter: %d, conv = %f, projections = %d' %
               (cycle, delta, it + 1))
 
-    if delta > self.convergence_threshold:
+    if delta > self.tol:
       self.converged_ = False
       if self.verbose:
         print('mmc did not converge, conv = %f' % (delta,))
@@ -185,7 +194,7 @@ class _BaseMMC(MahalanobisMixin):
     reduction = 2.0
     w = np.diag(self.A_).copy()
 
-    while error > self.convergence_threshold and it < self.max_iter:
+    while error > self.tol and it < self.max_iter:
 
       fD0, fD_1st_d, fD_2nd_d = self._D_constraint(neg_pairs, w)
       obj_initial = np.dot(s_sum, w) + self.diagonal_c * fD0
@@ -332,7 +341,7 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
   max_proj : int, optional (default=10000)
     Maximum number of projection steps.
 
-  convergence_threshold : float, optional (default=1e-3)
+  tol : float, optional (default=1e-3)
     Convergence threshold for the optimization procedure.
 
   init : string or numpy array, optional (default='identity')
@@ -376,6 +385,8 @@ class MMC(_BaseMMC, _PairsClassifierMixin):
     A pseudo random number generator object or a seed for it if int. If
     ``init='random'``, ``random_state`` is used to initialize the random
     transformation.
+
+  convergence_threshold : Renamed to tol. Will be deprecated in 0.7.0
 
   Attributes
   ----------
@@ -469,10 +480,10 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   max_proj : int, optional (default=10000)
     Maximum number of projection steps.
 
-  convergence_threshold : float, optional (default=1e-3)
+  tol : float, optional (default=1e-3)
     Convergence threshold for the optimization procedure.
 
-  num_constraints: int, optional (default=None)
+  n_constraints: int, optional (default=None)
     Number of constraints to generate. If None, default to `20 *
     num_classes**2`.
 
@@ -518,6 +529,10 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     Mahalanobis matrix.  In any case, `random_state` is also used to
     randomly sample constraints from labels.
 
+  num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0
+
+  convergence_threshold : Renamed to tol. Will be deprecated in 0.7.0
+
   Examples
   --------
   >>> from metric_learn import MMC_Supervised
@@ -525,7 +540,7 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
   >>> iris_data = load_iris()
   >>> X = iris_data['data']
   >>> Y = iris_data['target']
-  >>> mmc = MMC_Supervised(num_constraints=200)
+  >>> mmc = MMC_Supervised(n_constraints=200)
   >>> mmc.fit(X, Y)
 
   Attributes
@@ -538,16 +553,29 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
     metric (See function `components_from_metric`.)
   """
 
-  def __init__(self, max_iter=100, max_proj=10000, convergence_threshold=1e-6,
-               num_constraints=None, init='identity',
+  def __init__(self, max_iter=100, max_proj=10000, tol=1e-6,
+               n_constraints=None, init='identity',
                diagonal=False, diagonal_c=1.0, verbose=False,
-               preprocessor=None, random_state=None):
+               preprocessor=None, random_state=None,
+               num_constraints='deprecated',
+               convergence_threshold='deprecated'):
     _BaseMMC.__init__(self, max_iter=max_iter, max_proj=max_proj,
-                      convergence_threshold=convergence_threshold,
+                      tol=tol,
                       init=init, diagonal=diagonal,
                       diagonal_c=diagonal_c, verbose=verbose,
-                      preprocessor=preprocessor, random_state=random_state)
-    self.num_constraints = num_constraints
+                      preprocessor=preprocessor,
+                      random_state=random_state,
+                      convergence_threshold=convergence_threshold)
+    if num_constraints != 'deprecated':
+      warnings.warn('"num_constraints" parameter has been renamed to'
+                    ' "n_constraints". It has been deprecated in'
+                    ' version 0.6.3 and will be removed in 0.7.0'
+                    '', FutureWarning)
+      self.n_constraints = num_constraints
+    else:
+      self.n_constraints = n_constraints
+    # Avoid test get_params from failing (all params passed sholud be set)
+    self.num_constraints = 'deprecated'
 
   def fit(self, X, y):
     """Create constraints from labels and learn the MMC model.
@@ -561,13 +589,13 @@ class MMC_Supervised(_BaseMMC, TransformerMixin):
       Data labels.
     """
     X, y = self._prepare_inputs(X, y, ensure_min_samples=2)
-    num_constraints = self.num_constraints
-    if num_constraints is None:
+    n_constraints = self.n_constraints
+    if n_constraints is None:
       num_classes = len(np.unique(y))
-      num_constraints = 20 * num_classes**2
+      n_constraints = 20 * num_classes**2
 
     c = Constraints(y)
-    pos_neg = c.positive_negative_pairs(num_constraints,
+    pos_neg = c.positive_negative_pairs(n_constraints,
                                         random_state=self.random_state)
     pairs, y = wrap_pairs(X, pos_neg)
     return _BaseMMC._fit(self, pairs, y)

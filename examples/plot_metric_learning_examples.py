@@ -143,7 +143,7 @@ plot_tsne(X, y)
 #
 
 # setting up LMNN
-lmnn = metric_learn.LMNN(k=5, learn_rate=1e-6)
+lmnn = metric_learn.LMNN(n_neighbors=5, learn_rate=1e-6)
 
 # fit the data!
 lmnn.fit(X, y)
@@ -314,7 +314,7 @@ plot_tsne(X_lfda, y)
 # - See more in the documentation of the class :py:class:`RCA
 #   <metric_learn.RCA>`
 
-rca = metric_learn.RCA_Supervised(num_chunks=30, chunk_size=2)
+rca = metric_learn.RCA_Supervised(n_chunks=30, chunk_size=2)
 X_rca = rca.fit_transform(X, y)
 
 plot_tsne(X_rca, y)

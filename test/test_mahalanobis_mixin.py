@@ -438,7 +438,7 @@ def test_auto_init_transformation(n_samples, n_features, n_classes,
                           random_state=rng)
     # To make the test work for LMNN:
     if 'LMNN' in model_base.__class__.__name__:
-      model_base.set_params(k=1)
+      model_base.set_params(n_neighbors=1)
     # To make the test faster for estimators that have a max_iter:
     if hasattr(model_base, 'max_iter'):
       model_base.set_params(max_iter=1)
