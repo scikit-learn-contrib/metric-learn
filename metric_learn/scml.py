@@ -76,10 +76,10 @@ class _BaseSCML(MahalanobisMixin):
 
     n_triplets = triplets.shape[0]
 
-    if self.warm_start is False or not hasattr(self, "w_"):
+    if not self.warm_start or not hasattr(self, "w_"):
         # weight vector
         self.w_ = np.zeros((1, n_basis))
-        # avarage obj gradient wrt weights
+        # average obj gradient wrt weights
         self.avg_grad_w_ = np.zeros((1, n_basis))
         # l2 norm in time of all obj gradients wrt weights
         self.ada_grad_w_ = np.zeros((1, n_basis))
