@@ -464,6 +464,156 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
     return self.components_.T.dot(self.components_)
 
 
+class BilinearMixin(BaseMetricLearner, metaclass=ABCMeta):
+  r"""Bilinear similarity learning algorithms.
+
+  Algorithm that learns a bilinear similarity :math:`s_W(x, x')`,
+  defined between two column vectors :math:`x` and :math:`x'` by: :math:
+  `s_W(x, x') =  x W x'`, where :math:`W` is a learned matrix. This matrix
+  is not guaranteed to be symmetric nor positive semi-definite (PSD). Thus
+  it cannot be seen as learning a linear transformation of the original
+  space like Mahalanobis learning algorithms.
+
+  Attributes
+  ----------
+  components_ : `numpy.ndarray`, shape=(n_components, n_features)
+    The learned bilinear matrix ``W``.
+  """
+
+  def score_pairs(self, pairs):
+    r"""
+    .. deprecated:: 0.7.0
+        This method is deprecated.
+
+    .. warning::
+        This method will be removed in 0.8.0. Please refer to `pair_distance`
+        or `pair_score`. This change will occur in order to add learners
+        that don't necessarily learn a Mahalanobis distance.
+
+    Returns the learned bilinear similarity between pairs.
+
+    This similarity is defined as: :math:`s_W(x, x') =  x^T W x'`
+    where ``W`` is the learned bilinear matrix, for every pair of points
+    ``x`` and ``x'``.
+
+    Parameters
+    ----------
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to score, with each row corresponding to two points,
+      for 2D array of indices of pairs if the metric learner uses a
+      preprocessor.
+
+    Returns
+    -------
+    scores : `numpy.ndarray` of shape=(n_pairs,)
+      The learned bilinear similarity for every pair.
+
+    See Also
+    --------
+    get_metric : a method that returns a function to compute the similarity
+      between two points. The difference with `pair_score` is that it
+      works on two 1D arrays and cannot use a preprocessor. Besides, the
+      returned function is independent of the similarity learner and hence
+      is not modified if the similarity learner is.
+
+    :ref:`_bilinear_similarities` : The section of the project documentation
+      that describes bilinear similarity.
+    """
+    dpr_msg = ("score_pairs will be deprecated in release 0.7.0. "
+               "Use pair_score to compute similarity scores, or "
+               "pair_distances to compute distances.")
+    warnings.warn(dpr_msg, category=FutureWarning)
+    return self.pair_score(pairs)
+
+  def pair_distance(self, pairs):
+    """
+    Returns an error, as bilinear similarity learners do not learn a
+    pseudo-distance nor a distance. In consecuence, the additive inverse
+    of the bilinear similarity cannot be used as distance by construction.
+    """
+    msg = ("This learner does not learn a distance, thus ",
+           "this method is not implemented. Use pair_score instead")
+    raise Exception(msg)
+
+  def pair_score(self, pairs):
+    r"""Returns the learned bilinear similarity between pairs.
+
+    This similarity is defined as: :math:`s_W(x, x') =  x^T W x'`
+    where ``W`` is the learned bilinear matrix, for every pair of points
+    ``x`` and ``x'``.
+
+    Parameters
+    ----------
+    pairs : array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)
+      3D Array of pairs to score, with each row corresponding to two points,
+      for 2D array of indices of pairs if the similarity learner uses a
+      preprocessor.
+
+    Returns
+    -------
+    scores : `numpy.ndarray` of shape=(n_pairs,)
+      The learned bilinear similarity for every pair.
+
+    See Also
+    --------
+    get_metric : a method that returns a function to compute the similarity
+      between two points. The difference with `pair_score` is that it
+      works on two 1D arrays and cannot use a preprocessor. Besides, the
+      returned function is independent of the similarity learner and hence
+      is not modified if the similarity learner is.
+
+    :ref:`_bilinear_similarities` : The section of the project documentation
+      that describes bilinear similarity.
+    """
+    check_is_fitted(self, ['preprocessor_'])
+    pairs = check_input(pairs, type_of_inputs='tuples',
+                        preprocessor=self.preprocessor_,
+                        estimator=self, tuple_size=2)
+    # Note: For bilinear order matters, dist(a,b) != dist(b,a)
+    # We always choose first pair first, then second pair
+    # (In contrast with Mahalanobis implementation)
+    return np.sum(np.dot(pairs[:, 0, :], self.components_) * pairs[:, 1, :],
+                  axis=-1)
+
+  def get_metric(self):
+    check_is_fitted(self, 'components_')
+    components = self.components_.copy()
+
+    def similarity_fun(u, v):
+      """This function computes the bilinear similarity between u and v,
+      according to the previously learned bilinear similarity.
+
+      Parameters
+      ----------
+      u : array-like, shape=(n_features,)
+        The first point involved in the similarity computation.
+
+      v : array-like, shape=(n_features,)
+        The second point involved in the similarity computation.
+
+      Returns
+      -------
+      similarity : float
+        The similarity between u and v according to the new similarity.
+      """
+      u = validate_vector(u)
+      v = validate_vector(v)
+      return np.dot(np.dot(u.T, components), v)
+
+    return similarity_fun
+
+  def get_bilinear_matrix(self):
+    """Returns a copy of the bilinear matrix learned by the similarity learner.
+
+    Returns
+    -------
+    M : `numpy.ndarray`, shape=(n_features, n_features)
+      The copy of the learned bilinear matrix.
+    """
+    check_is_fitted(self, 'components_')
+    return self.components_
+
+
 class _PairsClassifierMixin(BaseMetricLearner):
   """Base class for pairs learners.
 

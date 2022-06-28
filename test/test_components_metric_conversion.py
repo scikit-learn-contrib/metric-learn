@@ -1,3 +1,7 @@
+"""
+Tests for Mahalanobis learners, that the transormation matrix (L) squared
+is equivalent to the Mahalanobis matrix, even in edge cases.
+"""
 import unittest
 import numpy as np
 import pytest

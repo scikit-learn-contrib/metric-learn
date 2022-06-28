@@ -1,3 +1,7 @@
+"""
+For each lerner that has `fit` and `transform`, checks that calling them
+sequeatially is the same as calling fit_transform from scikit-learn.
+"""
 import unittest
 import numpy as np
 from sklearn.datasets import load_iris

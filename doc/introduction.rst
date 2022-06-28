@@ -4,15 +4,14 @@
 What is Metric Learning?
 ========================
 
-Many approaches in machine learning require a measure of distance between data
-points. Traditionally, practitioners would choose a standard distance metric
+Many approaches in machine learning require a measure of distance (or similarity)
+between data points. Traditionally, practitioners would choose a standard metric
 (Euclidean, City-Block, Cosine, etc.) using a priori knowledge of the
 domain. However, it is often difficult to design metrics that are well-suited
 to the particular data and task of interest.
 
-Distance metric learning (or simply, metric learning) aims at
-automatically constructing task-specific distance metrics from (weakly)
-supervised data, in a machine learning manner. The learned distance metric can
+Metric learning aims at automatically constructing task-specific metrics from
+(weakly) supervised data, in a machine learning manner. The learned metric can
 then be used to perform various tasks (e.g., k-NN classification, clustering,
 information retrieval).
 
@@ -25,19 +24,19 @@ of supervision available about the training data:
 - :doc:`Supervised learning <supervised>`: the algorithm has access to
   a set of data points, each of them belonging to a class (label) as in a
   standard classification problem.
-  Broadly speaking, the goal in this setting is to learn a distance metric
+  Broadly speaking, the goal in this setting is to learn a metric
   that puts points with the same label close together while pushing away
   points with different labels.
 - :doc:`Weakly supervised learning <weakly_supervised>`: the
   algorithm has access to a set of data points with supervision only
   at the tuple level (typically pairs, triplets, or quadruplets of
   data points). A classic example of such weaker supervision is a set of
-  positive and negative pairs: in this case, the goal is to learn a distance
+  positive and negative pairs: in this case, the goal is to learn a
   metric that puts positive pairs close together and negative pairs far away.
 
 Based on the above (weakly) supervised data, the metric learning problem is
 generally formulated as an optimization problem where one seeks to find the
-parameters of a distance function that optimize some objective function
+parameters of a metric that optimize some objective function
 measuring the agreement with the training data.
 
 .. _mahalanobis_distances:
@@ -45,7 +44,7 @@ measuring the agreement with the training data.
 Mahalanobis Distances
 =====================
 
-In the metric-learn package, all algorithms currently implemented learn 
+In the metric-learn package, most algorithms currently implemented learn 
 so-called Mahalanobis distances. Given a real-valued parameter matrix
 :math:`L` of shape ``(num_dims, n_features)`` where ``n_features`` is the
 number features describing the data, the Mahalanobis distance associated with
@@ -60,8 +59,8 @@ Mahalanobis distance metric learning can thus be seen as learning a new
 embedding space of dimension ``num_dims``. Note that when ``num_dims`` is
 smaller than ``n_features``, this achieves dimensionality reduction.
 
-Strictly speaking, Mahalanobis distances are "pseudo-metrics": they satisfy
-three of the `properties of a metric <https://en.wikipedia.org/wiki/Metric_
+Strictly speaking, Mahalanobis distances are "pseudo-distances": they satisfy
+three of the `properties of a distance <https://en.wikipedia.org/wiki/Metric_
 (mathematics)>`_ (non-negativity, symmetry, triangle inequality) but not
 necessarily the identity of indiscernibles.
 
@@ -78,6 +77,35 @@ necessarily the identity of indiscernibles.
   :math:`M=L^\top L` for some  :math:`L`, one can show that both
   parameterizations are equivalent. In practice, an algorithm may thus solve
   the metric learning problem with respect to either :math:`M` or :math:`L`.
+
+.. __bilinear_similarities:
+
+Bilinear Similarities
+=====================
+
+Some algorithms in the package learn bilinear similarity functions. These
+similarity functions are not pseudo-distances: they simply output real values
+such that the larger the similarity value, the more similar the two examples.
+Given a real-valued parameter matrix :math:`W` of shape
+``(n_features, n_features)`` where ``n_features`` is the number features
+describing the data, the bilinear similarity associated with :math:`W` is
+defined as follows:
+
+.. math:: S_W(x, x') = x^\top W x'
+
+The matrix :math:`W` is not required to be positive semi-definite (PSD) or
+even symmetric, so the distance properties (nonnegativity, identity of
+indiscernibles, symmetry and triangle inequality) do not hold in general.
+
+This allows some algorithms to optimize :math:`S_W` in an online manner using a
+simple and efficient procedure, and thus can be applied to problems with
+millions of training instances and achieves state-of-the-art performance
+on an image search task using :math:`k`-NN.
+
+The absence of PSD constraint can enable the design of more efficient
+algorithms. It is also relevant in applications where the underlying notion
+of similarity does not satisfy the triangle inequality, as known to be the
+case for visual judgments.
 
 .. _use_cases:
 
@@ -99,9 +127,9 @@ examples (for code illustrating some of these use-cases, see the
   elements of a database that are semantically closest to a query element.
 - Dimensionality reduction: metric learning may be seen as a way to reduce the
   data dimension in a (weakly) supervised setting.
-- More generally, the learned transformation :math:`L` can be used to project
-  the data into a new embedding space before feeding it into another machine
-  learning algorithm.
+- More generally with Mahalanobis distances, the learned transformation :math:`L`
+  can be used to project the data into a new embedding space before feeding it
+  into another machine learning algorithm.
 
 The API of metric-learn is compatible with `scikit-learn
 <https://scikit-learn.org/>`_, the leading library for machine

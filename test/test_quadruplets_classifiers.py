@@ -1,8 +1,13 @@
+"""
+Tests all functionality for QuadrupletsClassifiers. Methods, warrnings,
+correctness, use cases, etc.
+"""
 import pytest
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
 
-from test.test_utils import quadruplets_learners, ids_quadruplets_learners
+from test.test_utils import quadruplets_learners, ids_quadruplets_learners, \
+  quadruplets_learners_m, ids_quadruplets_learners_m
 from metric_learn.sklearn_shims import set_random_state
 from sklearn import clone
 import numpy as np
@@ -31,21 +36,27 @@ def test_predict_only_one_or_minus_one(estimator, build_dataset,
                          ids=ids_quadruplets_learners)
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
-  """Test that a NotFittedError is raised if someone tries to predict and
-  the metric learner has not been fitted."""
+  """Test that a NotFittedError is raised if someone tries to use the
+  methods: predict, decision_function and score when the metric learner
+  has not been fitted."""
   input_data, labels, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   with pytest.raises(NotFittedError):
     estimator.predict(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.decision_function(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.score(input_data)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', quadruplets_learners,
-                         ids=ids_quadruplets_learners)
+@pytest.mark.parametrize('estimator, build_dataset', quadruplets_learners_m,
+                         ids=ids_quadruplets_learners_m)
 def test_accuracy_toy_example(estimator, build_dataset):
   """Test that the default scoring for quadruplets (accuracy) works on some
-  toy example"""
+  toy example. This test is designed for Mahalanobis learners only,
+  as the toy example uses the notion of distance."""
   input_data, labels, preprocessor, X = build_dataset(with_preprocessor=False)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)

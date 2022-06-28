@@ -12,10 +12,12 @@ from metric_learn import (Covariance, LFDA, LMNN, MLKR, NCA,
                           MMC_Supervised, RCA_Supervised, SDML_Supervised,
                           SCML_Supervised)
 from sklearn import clone
+from sklearn.cluster import DBSCAN
 import numpy as np
 from sklearn.model_selection import (cross_val_score, cross_val_predict,
                                      train_test_split, KFold)
 from test.test_utils import (metric_learners, ids_metric_learners,
+                             metric_learners_m, ids_metric_learners_m,
                              mock_preprocessor, tuples_learners,
                              ids_tuples_learners, pairs_learners,
                              ids_pairs_learners, remove_y,
@@ -110,6 +112,54 @@ def generate_array_like(input_data, labels=None):
   return input_data_changed, labels_changed
 
 
+# TODO: Find a better way to run this test and the next one, to avoid
+# duplicated code.
+@pytest.mark.parametrize('with_preprocessor', [True, False])
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners_m,
+                         ids=ids_metric_learners_m)
+def test_array_like_inputs_mahalanobis(estimator, build_dataset,
+                                       with_preprocessor):
+  """Test that metric-learners can have as input any array-like object.
+  This in particular tests `transform` and `pair_distance` for Mahalanobis
+  learners."""
+  input_data, labels, preprocessor, X = build_dataset(with_preprocessor)
+  # we subsample the data for the test to be more efficient
+  input_data, _, labels, _ = train_test_split(input_data, labels,
+                                              train_size=40,
+                                              random_state=42)
+  X = X[:10]
+
+  estimator = clone(estimator)
+  estimator.set_params(preprocessor=preprocessor)
+  set_random_state(estimator)
+  input_variants, label_variants = generate_array_like(input_data, labels)
+  for input_variant in input_variants:
+    for label_variant in label_variants:
+      estimator.fit(*remove_y(estimator, input_variant, label_variant))
+    if hasattr(estimator, "predict"):
+      estimator.predict(input_variant)
+    if hasattr(estimator, "predict_proba"):
+      estimator.predict_proba(input_variant)  # anticipation in case some
+      # time we have that, or if ppl want to contribute with new algorithms
+      # it will be checked automatically
+    if hasattr(estimator, "decision_function"):
+      estimator.decision_function(input_variant)
+    if hasattr(estimator, "score"):
+      for label_variant in label_variants:
+        estimator.score(*remove_y(estimator, input_variant, label_variant))
+
+  # Transform
+  X_variants, _ = generate_array_like(X)
+  for X_variant in X_variants:
+    estimator.transform(X_variant)
+
+  # Pair distance
+  pairs = np.array([[X[0], X[1]], [X[0], X[2]]])
+  pairs_variants, _ = generate_array_like(pairs)
+  for pairs_variant in pairs_variants:
+    estimator.pair_distance(pairs_variant)
+
+
 @pytest.mark.integration
 @pytest.mark.parametrize('with_preprocessor', [True, False])
 @pytest.mark.parametrize('estimator, build_dataset', metric_learners,
@@ -144,25 +194,12 @@ def test_array_like_inputs(estimator, build_dataset, with_preprocessor):
       for label_variant in label_variants:
         estimator.score(*remove_y(estimator, input_variant, label_variant))
 
-  X_variants, _ = generate_array_like(X)
-  for X_variant in X_variants:
-    estimator.transform(X_variant)
-
   pairs = np.array([[X[0], X[1]], [X[0], X[2]]])
   pairs_variants, _ = generate_array_like(pairs)
 
-  not_implemented_msg = ""
-  # Todo in 0.7.0: Change 'not_implemented_msg' for the message that says
-  # "This learner does not have pair_distance"
-
+  # Pair score
   for pairs_variant in pairs_variants:
-    estimator.pair_score(pairs_variant)  # All learners have pair_score
-
-    # But not all of them will have pair_distance
-    try:
-      estimator.pair_distance(pairs_variant)
-    except Exception as raised_exception:
-      assert raised_exception.value.args[0] == not_implemented_msg
+    estimator.pair_score(pairs_variant)
 
 
 @pytest.mark.parametrize('with_preprocessor', [True, False])
@@ -459,6 +496,19 @@ def test_dont_overwrite_parameters(estimator, build_dataset,
       " to change attributes started"
       " or ended with _, but"
       " %s changed" % ', '.join(attrs_changed_by_fit))
+
+
+@pytest.mark.parametrize('estimator, build_dataset', metric_learners,
+                         ids=ids_metric_learners)
+def test_get_metric_compatible_with_scikit_learn(estimator, build_dataset):
+  """Check that the metric returned by get_metric is compatible with
+  scikit-learn's algorithms using a custom metric, DBSCAN for instance"""
+  input_data, labels, _, X = build_dataset()
+  model = clone(estimator)
+  set_random_state(model)
+  model.fit(*remove_y(estimator, input_data, labels))
+  clustering = DBSCAN(metric=model.get_metric())
+  clustering.fit(X)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,7 @@
+"""
+Tests all functionality for TripletsClassifiers. Methods, warrnings,
+correctness, use cases, etc.
+"""
 import pytest
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
@@ -5,7 +9,9 @@ from sklearn.model_selection import train_test_split
 from metric_learn import SCML
 from test.test_utils import (
   triplets_learners,
+  triplets_learners_m,
   ids_triplets_learners,
+  ids_triplets_learners_m,
   build_triplets
 )
 from metric_learn.sklearn_shims import set_random_state
@@ -32,13 +38,14 @@ def test_predict_only_one_or_minus_one(estimator, build_dataset,
   assert len(not_valid) == 0
 
 
-@pytest.mark.parametrize('estimator, build_dataset', triplets_learners,
-                         ids=ids_triplets_learners)
+@pytest.mark.parametrize('estimator, build_dataset', triplets_learners_m,
+                         ids=ids_triplets_learners_m)
 def test_no_zero_prediction(estimator, build_dataset):
   """
   Test that all predicted values are not zero, even when the
   distance d(x,y) and d(x,z) is the same for a triplet of the
-  form (x, y, z). i.e border cases.
+  form (x, y, z). i.e border cases for Mahalanobis distance
+  learners.
   """
   triplets, _, _, X = build_dataset(with_preprocessor=False)
   # Force 3 dimentions only, to use cross product and get easy orthogonal vec.
@@ -61,7 +68,7 @@ def test_no_zero_prediction(estimator, build_dataset):
     assert_array_equal(X[1], x)
   with pytest.raises(AssertionError):
     assert_array_equal(X[1], y)
-  # Assert the distance is the same for both
+  # Assert the distance is the same for both -> Wont work for b. similarity
   assert estimator.get_metric()(X[1], x) == estimator.get_metric()(X[1], y)
 
   # Form the three scenarios where predict() gives 0 with numpy.sign
@@ -80,21 +87,27 @@ def test_no_zero_prediction(estimator, build_dataset):
                          ids=ids_triplets_learners)
 def test_raise_not_fitted_error_if_not_fitted(estimator, build_dataset,
                                               with_preprocessor):
-  """Test that a NotFittedError is raised if someone tries to predict and
-  the metric learner has not been fitted."""
+  """Test that a NotFittedError is raised if someone tries to use the
+  methods: predict, decision_function and score when the metric learner
+  has not been fitted."""
   input_data, _, preprocessor, _ = build_dataset(with_preprocessor)
   estimator = clone(estimator)
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   with pytest.raises(NotFittedError):
     estimator.predict(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.decision_function(input_data)
+  with pytest.raises(NotFittedError):
+    estimator.score(input_data)
 
 
-@pytest.mark.parametrize('estimator, build_dataset', triplets_learners,
-                         ids=ids_triplets_learners)
+@pytest.mark.parametrize('estimator, build_dataset', triplets_learners_m,
+                         ids=ids_triplets_learners_m)
 def test_accuracy_toy_example(estimator, build_dataset):
   """Test that the default scoring for triplets (accuracy) works on some
-  toy example"""
+  toy example. This test is designed for Mahalanobis learners only,
+  as the toy example uses the notion of distance."""
   triplets, _, _, X = build_dataset(with_preprocessor=False)
   estimator = clone(estimator)
   set_random_state(estimator)
