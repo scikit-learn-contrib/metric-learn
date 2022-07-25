@@ -104,7 +104,8 @@ class _BaseSCML(MahalanobisMixin):
 
       self.avg_grad_w_ = (iter * self.avg_grad_w_ + grad_w) / (iter+1)
 
-      self.ada_grad_w_ = np.sqrt(np.square(self.ada_grad_w_) + np.square(grad_w))
+      self.ada_grad_w_ = np.sqrt(np.square(self.ada_grad_w_) +
+                                 np.square(grad_w))
 
       scale_f = -(iter+1) / (self.gamma * (delta + self.ada_grad_w_))
 
