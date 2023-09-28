@@ -43,6 +43,9 @@ class _BaseSDML(MahalanobisMixin):
         print("SDML will use skggm's graphical lasso solver.")
     pairs, y = self._prepare_inputs(pairs, y,
                                     type_of_inputs='tuples')
+    n_features = pairs.shape[2]
+    if n_features < 2:
+      raise ValueError(f"Cannot fit SDML with {n_features} feature(s)")
 
     # set up (the inverse of) the prior M
     # if the prior is the default (None), we raise a warning
@@ -83,6 +86,7 @@ class _BaseSDML(MahalanobisMixin):
       w_mahalanobis, _ = np.linalg.eigh(M)
       not_spd = any(w_mahalanobis < 0.)
       not_finite = not np.isfinite(M).all()
+    # TODO: Narrow this to the specific exceptions we expect.
     except Exception as e:
       raised_error = e
       not_spd = False  # not_spd not applicable here so we set to False

@@ -2,7 +2,7 @@
 Base module.
 """
 
-from sklearn.base import BaseEstimator
+from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils.extmath import stable_cumsum
 from sklearn.utils.validation import _is_arraylike, check_is_fitted
 from sklearn.metrics import roc_auc_score, roc_curve, precision_recall_curve
@@ -464,7 +464,7 @@ class MahalanobisMixin(BaseMetricLearner, MetricTransformer,
     return self.components_.T.dot(self.components_)
 
 
-class _PairsClassifierMixin(BaseMetricLearner):
+class _PairsClassifierMixin(BaseMetricLearner, ClassifierMixin):
   """Base class for pairs learners.
 
   Attributes
@@ -475,6 +475,7 @@ class _PairsClassifierMixin(BaseMetricLearner):
     classified as dissimilar.
   """
 
+  classes_ = np.array([0, 1])
   _tuple_size = 2  # number of points in a tuple, 2 for pairs
 
   def predict(self, pairs):
@@ -752,11 +753,12 @@ class _PairsClassifierMixin(BaseMetricLearner):
                          'Got {} instead.'.format(type(beta)))
 
 
-class _TripletsClassifierMixin(BaseMetricLearner):
+class _TripletsClassifierMixin(BaseMetricLearner, ClassifierMixin):
   """
   Base class for triplets learners.
   """
 
+  classes_ = np.array([0, 1])
   _tuple_size = 3  # number of points in a tuple, 3 for triplets
 
   def predict(self, triplets):
@@ -837,11 +839,12 @@ class _TripletsClassifierMixin(BaseMetricLearner):
     return self.predict(triplets).mean() / 2 + 0.5
 
 
-class _QuadrupletsClassifierMixin(BaseMetricLearner):
+class _QuadrupletsClassifierMixin(BaseMetricLearner, ClassifierMixin):
   """
   Base class for quadruplets learners.
   """
 
+  classes_ = np.array([0, 1])
   _tuple_size = 4  # number of points in a tuple, 4 for quadruplets
 
   def predict(self, quadruplets):
