@@ -558,7 +558,7 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
     case one is selected.
     """
 
-    if self.basis == 'lda':
+    if isinstance(self.basis, str) and self.basis == 'lda':
       basis, n_basis = self._generate_bases_LDA(X, y)
     else:
       basis, n_basis = None, None
@@ -606,8 +606,8 @@ class SCML_Supervised(_BaseSCML, TransformerMixin):
                        "should be smaller than %d" %
                        (n_basis, X.shape[0]*2*num_eig))
 
-    kmeans = KMeans(n_clusters=n_clusters, random_state=self.random_state,
-                    algorithm='elkan').fit(X)
+    kmeans = KMeans(n_clusters=n_clusters, n_init=10,
+                    random_state=self.random_state, algorithm='elkan').fit(X)
     cX = kmeans.cluster_centers_
 
     n_scales = 2
