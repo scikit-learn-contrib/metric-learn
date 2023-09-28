@@ -14,7 +14,7 @@ from sklearn.utils.validation import check_X_y
 from sklearn.preprocessing import StandardScaler
 try:
   from inverse_covariance import quic
-  assert(quic)
+  assert quic
 except ImportError:
   HAS_SKGGM = False
 else:

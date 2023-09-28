@@ -53,7 +53,7 @@ class _BaseSCML(MahalanobisMixin):
       raise ValueError("batch_size should be an integer, instead it is of type"
                        " %s" % type(self.batch_size))
 
-    if(self.output_iter > self.max_iter):
+    if self.output_iter > self.max_iter:
       raise ValueError("The value of output_iter must be equal or smaller than"
                        " max_iter.")
 
@@ -266,11 +266,8 @@ class _BaseSCML(MahalanobisMixin):
 
     start = 0
     finish = 0
-
-    while(finish != n_basis):
-
+    while finish != n_basis:
       # Select triplets to yield diff
-
       select_triplet = rng.choice(n_triplets, size=n_features, replace=False)
 
       # select n_features positive differences
