@@ -215,8 +215,7 @@ def test_get_metric_equivalent_to_explicit_mahalanobis(estimator,
   metric = model.get_metric()
   n_features = X.shape[1]
   a, b = (rng.randn(n_features), rng.randn(n_features))
-  expected_dist = mahalanobis(a[None], b[None],
-                              VI=model.get_mahalanobis_matrix())
+  expected_dist = mahalanobis(a, b, VI=model.get_mahalanobis_matrix())
   assert_allclose(metric(a, b), expected_dist, rtol=1e-13)
 
 
