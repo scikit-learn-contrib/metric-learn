@@ -15,6 +15,7 @@ from sklearn.utils.multiclass import type_of_target
 from metric_learn.sklearn_shims import set_random_state
 
 from metric_learn._util import make_context, _initialize_metric_mahalanobis
+from metric_learn.sdml import _BaseSDML
 from metric_learn.base_metric import (_QuadrupletsClassifierMixin,
                                       _TripletsClassifierMixin,
                                       _PairsClassifierMixin)
@@ -290,7 +291,11 @@ def test_components_is_2D(estimator, build_dataset):
   model.fit(*remove_y(estimator, input_data, labels))
   assert model.components_.shape == (X.shape[1], X.shape[1])
 
-  # test that it works for 1 feature. Use 2nd dimention, to avoid border cases
+  if isinstance(estimator, _BaseSDML):
+    # SDML doesn't support running on a single feature.
+    return
+
+  # test that it works for 1 feature. Use 2nd dimension, to avoid border cases
   trunc_data = input_data[..., 1:2]
   # we drop duplicates that might have been formed, i.e. of the form
   # aabc or abcc or aabb for quadruplets, and aa for pairs.
