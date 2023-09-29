@@ -21,12 +21,12 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'metric-learn'
-copyright = (u'2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien '
+copyright = (u'2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien '
              u'Bellet and Nathalie Vauquier')
 author = (u'CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and '
           u'Nathalie Vauquier')
-version = '0.6.2'
-release = '0.6.2'
+version = '0.7.0'
+release = '0.7.0'
 language = 'en'
 
 exclude_patterns = ['_build']
