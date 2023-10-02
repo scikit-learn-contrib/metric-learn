@@ -55,6 +55,11 @@ Documentation outline
 
    auto_examples/index
 
+.. toctree::
+   :maxdepth: 2
+
+   contrib/index
+
 :ref:`genindex` | :ref:`search`
 
 .. |GitHub Actions Build Status| image:: https://github.com/scikit-learn-contrib/metric-learn/workflows/CI/badge.svg
