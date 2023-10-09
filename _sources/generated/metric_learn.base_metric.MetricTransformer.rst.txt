@@ -1,0 +1,16 @@
+﻿:mod:`metric_learn.base_metric`.MetricTransformer
+========================================================
+
+.. currentmodule:: metric_learn.base_metric
+
+.. autoclass:: MetricTransformer
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :special-members: __init__
+
+.. include:: metric_learn.base_metric.MetricTransformer.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

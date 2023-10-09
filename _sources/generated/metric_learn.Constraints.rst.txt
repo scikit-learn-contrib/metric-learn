@@ -1,4 +1,4 @@
-:mod:`metric_learn`.Constraints
+﻿:mod:`metric_learn`.Constraints
 ======================================
 
 .. currentmodule:: metric_learn

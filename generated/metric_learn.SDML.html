@@ -1,97 +1,57 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>metric_learn.SDML &mdash; metric-learn 0.6.2 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metric_learn.SDML &mdash; metric-learn 0.7.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/styles.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/js/copybutton.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="metric_learn.SCML" href="metric_learn.SCML.html" />
     <link rel="prev" title="metric_learn.MMC" href="metric_learn.MMC.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            metric-learn
           </a>
-
-          
-            
-            
               <div class="version">
-                0.6.2
+                0.7.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 </ul>
@@ -107,7 +67,11 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.ITML.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.ITML</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.LSML.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.LSML</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.MMC.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.MMC</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.SDML</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.SDML</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metric_learn.SDML"><code class="docutils literal notranslate"><span class="pre">SDML</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples-using-metric-learn-sdml">Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.SDML</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.SCML.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.SCML</a></li>
 </ul>
 </li>
@@ -119,76 +83,36 @@
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">metric-learn</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../metric_learn.html">metric_learn package</a> &raquo;</li>
-        
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.SDML</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../metric_learn.html">metric_learn package</a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.SDML</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/generated/metric_learn.SDML.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="metric-learn-sdml">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.SDML<a class="headerlink" href="#metric-learn-sdml" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="metric-learn-sdml">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.SDML<a class="headerlink" href="#metric-learn-sdml" title="Link to this heading"></a></h1>
 <dl class="py class">
-<dt id="metric_learn.SDML">
-<em class="property">class </em><code class="descclassname">metric_learn.</code><code class="descname">SDML</code><span class="sig-paren">(</span><em><span class="n">balance_param</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em><span class="n">sparsity_param</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em><span class="n">prior</span><span class="o">=</span><span class="default_value">'identity'</span></em>, <em><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/sdml.html#SDML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.SDML" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.SDML">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metric_learn.</span></span><span class="sig-name descname"><span class="pre">SDML</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">balance_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparsity_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'identity'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/sdml.html#SDML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.SDML" title="Link to this definition"></a></dt>
 <dd><p>Sparse Distance Metric Learning (SDML)</p>
 <p>SDML is an efficient sparse metric learning in high-dimensional space via
 double regularization: an L1-penalization on the off-diagonal elements of the
@@ -197,11 +121,9 @@ between <span class="math notranslate nohighlight">\(\mathbf{M}\)</span> and <sp
 <span class="math notranslate nohighlight">\(\mathbf{I}\)</span> or <span class="math notranslate nohighlight">\(\mathbf{\Omega}^{-1}\)</span>, where
 <span class="math notranslate nohighlight">\(\mathbf{\Omega}\)</span> is the covariance matrix).</p>
 <p>Read more in the <a class="reference internal" href="../weakly_supervised.html#sdml"><span class="std std-ref">User Guide</span></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
 <dt><strong>balance_param</strong><span class="classifier">float, optional (default=0.5)</span></dt><dd><p>Trade off between sparsity and M0 prior.</p>
 </dd>
 <dt><strong>sparsity_param</strong><span class="classifier">float, optional  (default=0.01)</span></dt><dd><p>Trade off between optimizer and sparseness (see graph_lasso).</p>
@@ -210,14 +132,14 @@ between <span class="math notranslate nohighlight">\(\mathbf{M}\)</span> and <sp
 ‘identity’, ‘covariance’, ‘random’, and a numpy array of
 shape (n_features, n_features). For SDML, the prior should be strictly
 positive definite (PD).</p>
-<dl class="docutils">
+<dl class="simple">
 <dt>‘identity’</dt><dd><p>An identity matrix of shape (n_features, n_features).</p>
 </dd>
 <dt>‘covariance’</dt><dd><p>The inverse covariance matrix.</p>
 </dd>
 <dt>‘random’</dt><dd><p>The prior will be a random positive definite (PD) matrix of shape
-<code class="xref any docutils literal notranslate"><span class="pre">(n_features,</span> <span class="pre">n_features)</span></code>, generated using
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_spd_matrix.html#sklearn.datasets.make_spd_matrix" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_spd_matrix</span></code></a>.</p>
+<cite>(n_features, n_features)</cite>, generated using
+<cite>sklearn.datasets.make_spd_matrix</cite>.</p>
 </dd>
 <dt>numpy array</dt><dd><p>A positive definite (PD) matrix of shape
 (n_features, n_features), that will be used as such to set the
@@ -234,133 +156,139 @@ tuples will be gotten like this: X[indices].</p>
 <code class="docutils literal notranslate"><span class="pre">prior='random'</span></code>, <code class="docutils literal notranslate"><span class="pre">random_state</span></code> is used to set the prior.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="rf8f41cf07229-1" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[1]</td><td>Qi et al. <a class="reference external" href="http://www.machinelearning.org/archive/icml2009/papers/46.pdf">An efficient sparse metric learning in high-dimensional
+<div role="list" class="citation-list">
+<div class="citation" id="rf8f41cf07229-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Qi et al. <a class="reference external" href="http://www.machinelearning.org/archive/icml2009/papers/46.pdf">An efficient sparse metric learning in high-dimensional
 space via L1-penalized log-determinant regularization</a>.
-ICML 2009.</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="rf8f41cf07229-2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[2]</td><td>Code adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439945">https://gist.github.com/kcarnold/5439945</a></td></tr>
-</tbody>
-</table>
+ICML 2009.</p>
+</div>
+<div class="citation" id="rf8f41cf07229-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<p>Code adapted from <a class="reference external" href="https://gist.github.com/kcarnold/5439945">https://gist.github.com/kcarnold/5439945</a></p>
+</div>
+</div>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">SDML_Supervised</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sdml</span> <span class="o">=</span> <span class="n">SDML_Supervised</span><span class="p">(</span><span class="n">num_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sdml</span> <span class="o">=</span> <span class="n">SDML_Supervised</span><span class="p">(</span><span class="n">n_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sdml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>components_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt><dd><p>The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
-metric (See function <code class="xref any docutils literal notranslate"><span class="pre">components_from_metric</span></code>.)</p>
+<dl class="field-list">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>components_</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_features, n_features)</span></dt><dd><p>The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
+metric (See function <cite>components_from_metric</cite>.)</p>
 </dd>
-<dt><strong>threshold_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><code class="xref any docutils literal notranslate"><span class="pre">float</span></code></a></span></dt><dd><p>If the distance metric between two points is lower than this threshold,
+<dt><strong>threshold_</strong><span class="classifier"><cite>float</cite></span></dt><dd><p>If the distance metric between two points is lower than this threshold,
 points will be classified as similar, otherwise they will be
 classified as dissimilar.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils align-default">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.calibrate_threshold" title="metric_learn.SDML.calibrate_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a>(pairs_valid,&nbsp;y_valid[,&nbsp;…])</td>
-<td>Decision threshold calibration for pairwise binary classification</td>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.calibrate_threshold" title="metric_learn.SDML.calibrate_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a>(pairs_valid, y_valid[, ...])</p></td>
+<td><p>Decision threshold calibration for pairwise binary classification</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.decision_function" title="metric_learn.SDML.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(pairs)</td>
-<td>Returns the decision function used to classify the pairs.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.decision_function" title="metric_learn.SDML.decision_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decision_function</span></code></a>(pairs)</p></td>
+<td><p>Returns the decision function used to classify the pairs.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.fit" title="metric_learn.SDML.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(pairs,&nbsp;y[,&nbsp;calibration_params])</td>
-<td>Learn the SDML model.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.fit" title="metric_learn.SDML.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(pairs, y[, calibration_params])</p></td>
+<td><p>Learn the SDML model.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_mahalanobis_matrix" title="metric_learn.SDML.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
-<td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.get_mahalanobis_matrix" title="metric_learn.SDML.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</p></td>
+<td><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
-<td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.get_metadata_routing" title="metric_learn.SDML.get_metadata_routing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata_routing</span></code></a>()</p></td>
+<td><p>Get metadata routing of this object.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.get_params" title="metric_learn.SDML.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
-<td>Get parameters for this estimator.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</p></td>
+<td><p>Returns a function that takes as input two 1D arrays and outputs the value of the learned metric on these two points.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.predict" title="metric_learn.SDML.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(pairs)</td>
-<td>Predicts the learned metric between input pairs.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.get_params" title="metric_learn.SDML.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.score" title="metric_learn.SDML.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(pairs,&nbsp;y)</td>
-<td>Computes score of pairs similarity prediction.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.pair_distance" title="metric_learn.SDML.pair_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_distance</span></code></a>(pairs)</p></td>
+<td><p>Returns the learned Mahalanobis distance between pairs.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.score_pairs" title="metric_learn.SDML.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
-<td>Returns the learned Mahalanobis distance between pairs.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.pair_score" title="metric_learn.SDML.pair_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_score</span></code></a>(pairs)</p></td>
+<td><p>Returns the opposite of the learned Mahalanobis distance between pairs.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.set_params" title="metric_learn.SDML.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
-<td>Set the parameters of this estimator.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.predict" title="metric_learn.SDML.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(pairs)</p></td>
+<td><p>Predicts the learned metric between input pairs.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.SDML.set_threshold" title="metric_learn.SDML.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(threshold)</td>
-<td>Sets the threshold of the metric learner to the given value <code class="xref any docutils literal notranslate"><span class="pre">threshold</span></code>.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.score" title="metric_learn.SDML.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(pairs, y)</p></td>
+<td><p>Computes score of pairs similarity prediction.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.SDML.transform" title="metric_learn.SDML.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
-<td>Embeds data points in the learned linear embedding space.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.score_pairs" title="metric_learn.SDML.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</p></td>
+<td><p>Returns the learned Mahalanobis distance between pairs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.set_decision_function_request" title="metric_learn.SDML.set_decision_function_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_decision_function_request</span></code></a>(*[, pairs])</p></td>
+<td><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">decision_function</span></code> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.set_fit_request" title="metric_learn.SDML.set_fit_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_fit_request</span></code></a>(*[, calibration_params, pairs])</p></td>
+<td><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.set_params" title="metric_learn.SDML.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.set_predict_request" title="metric_learn.SDML.set_predict_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_predict_request</span></code></a>(*[, pairs])</p></td>
+<td><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.set_score_request" title="metric_learn.SDML.set_score_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_score_request</span></code></a>(*[, pairs])</p></td>
+<td><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">score</span></code> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.SDML.set_threshold" title="metric_learn.SDML.set_threshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_threshold</span></code></a>(threshold)</p></td>
+<td><p>Sets the threshold of the metric learner to the given value <cite>threshold</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.SDML.transform" title="metric_learn.SDML.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
+<td><p>Embeds data points in the learned linear embedding space.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="metric_learn.SDML.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">balance_param</span><span class="o">=</span><span class="default_value">0.5</span></em>, <em><span class="n">sparsity_param</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em><span class="n">prior</span><span class="o">=</span><span class="default_value">'identity'</span></em>, <em><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
+<dt class="sig sig-object py" id="metric_learn.SDML.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">balance_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparsity_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'identity'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.SDML.calibrate_threshold">
-<code class="descname">calibrate_threshold</code><span class="sig-paren">(</span><em><span class="n">pairs_valid</span></em>, <em><span class="n">y_valid</span></em>, <em><span class="n">strategy</span><span class="o">=</span><span class="default_value">'accuracy'</span></em>, <em><span class="n">min_rate</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">beta</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.calibrate_threshold" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.SDML.calibrate_threshold">
+<span class="sig-name descname"><span class="pre">calibrate_threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs_valid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_valid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'accuracy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.calibrate_threshold" title="Link to this definition"></a></dt>
 <dd><p>Decision threshold calibration for pairwise binary classification</p>
 <p>Method that calibrates the decision threshold (cutoff point) of the metric
 learner. This threshold will then be used when calling the method
-<a class="reference internal" href="#metric_learn.SDML.predict" title="metric_learn.SDML.predict"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">predict</span></code></a>. The methods for picking cutoff points make use of traditional
+<cite>predict</cite>. The methods for picking cutoff points make use of traditional
 binary classification evaluation statistics such as the true positive and
 true negative rates and F-scores. The threshold will be found to maximize
 the chosen score on the validation set <code class="docutils literal notranslate"><span class="pre">(pairs_valid,</span> <span class="pre">y_valid)</span></code>.</p>
 <p>See more in the <a class="reference internal" href="../weakly_supervised.html#calibration"><span class="std std-ref">User Guide</span></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
 <dt><strong>strategy</strong><span class="classifier">str, optional (default=’accuracy’)</span></dt><dd><p>The strategy to use for choosing the cutoff threshold.</p>
-<dl class="docutils">
+<dl class="simple">
 <dt>‘accuracy’</dt><dd><p>Selects a decision threshold that maximizes the accuracy.</p>
 </dd>
 <dt>‘f_beta’</dt><dd><p>Selects a decision threshold that maximizes the f_beta score,
-with beta given by the parameter <code class="xref any docutils literal notranslate"><span class="pre">beta</span></code>.</p>
+with beta given by the parameter <cite>beta</cite>.</p>
 </dd>
 <dt>‘max_tpr’</dt><dd><p>Selects a decision threshold that yields the highest true positive
 rate with true negative rate at least equal to the value of the
-parameter <code class="xref any docutils literal notranslate"><span class="pre">min_rate</span></code>.</p>
+parameter <cite>min_rate</cite>.</p>
 </dd>
 <dt>‘max_tnr’</dt><dd><p>Selects a decision threshold that yields the highest true negative
 rate with true positive rate at least equal to the value of the
-parameter <code class="xref any docutils literal notranslate"><span class="pre">min_rate</span></code>.</p>
+parameter <cite>min_rate</cite>.</p>
 </dd>
 </dl>
 </dd>
@@ -376,145 +304,153 @@ rate respectively that needs to be achieved.</p>
 threshold. They must be +1 for positive pairs and -1 for negative pairs.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v0.23)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a></dt><dd>scikit-learn’s module for calibrating classifiers</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference external" href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.calibration" title="(in scikit-learn v1.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.calibration</span></code></a></dt><dd><p>scikit-learn’s module for calibrating classifiers</p>
+</dd>
 </dl>
 </div>
 <p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="r640b5f1b19c6-1" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[1]</td><td>Receiver-operating characteristic (ROC) plots: a fundamental
+<div role="list" class="citation-list">
+<div class="citation" id="r640b5f1b19c6-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Receiver-operating characteristic (ROC) plots: a fundamental
 evaluation tool in clinical medicine, MH Zweig, G Campbell -
-Clinical chemistry, 1993</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="r640b5f1b19c6-2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[2]</td><td>most of the code of this function is from scikit-learn’s PR #10117</td></tr>
-</tbody>
-</table>
+Clinical chemistry, 1993</p>
+</div>
+<div class="citation" id="r640b5f1b19c6-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<p>Most of the code of this function is from scikit-learn’s PR #10117</p>
+</div>
+</div>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metric_learn.SDML.classes_">
+<span class="sig-name descname"><span class="pre">classes_</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">array([0,</span> <span class="pre">1])</span></em><a class="headerlink" href="#metric_learn.SDML.classes_" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
-<dt id="metric_learn.SDML.decision_function">
-<code class="descname">decision_function</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.decision_function" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.SDML.decision_function">
+<span class="sig-name descname"><span class="pre">decision_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.decision_function" title="Link to this definition"></a></dt>
 <dd><p>Returns the decision function used to classify the pairs.</p>
 <p>Returns the opposite of the learned metric value between samples in every
 pair, to be consistent with scikit-learn conventions. Hence it should
 ideally be low for dissimilar samples and high for similar samples.
 This is the decision function that is used to classify pairs as similar
 (+1), or dissimilar (-1).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to predict, with each row corresponding to two
 points, or 2D array of indices of pairs if the metric learner uses a
 preprocessor.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y_predicted</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt><dd><p>The predicted decision function value for each pair.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>y_predicted</strong><span class="classifier"><cite>numpy.ndarray</cite> of floats, shape=(n_constraints,)</span></dt><dd><p>The predicted decision function value for each pair.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.SDML.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em>, <em><span class="n">y</span></em>, <em><span class="n">calibration_params</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/sdml.html#SDML.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.SDML.fit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.SDML.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/sdml.html#SDML.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.SDML.fit" title="Link to this definition"></a></dt>
 <dd><p>Learn the SDML model.</p>
 <p>The threshold will be calibrated on the trainset using the parameters
-<code class="xref any docutils literal notranslate"><span class="pre">calibration_params</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<cite>calibration_params</cite>.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
 <dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_constraints, 2, n_features) or            (n_constraints, 2)</span></dt><dd><p>3D Array of pairs with each row corresponding to two points,
 or 2D array of indices of pairs if the metric learner uses a
 preprocessor.</p>
 </dd>
 <dt><strong>y</strong><span class="classifier">array-like, of shape (n_constraints,)</span></dt><dd><p>Labels of constraints. Should be -1 for dissimilar pair, 1 for similar.</p>
 </dd>
-<dt><strong>calibration_params</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><code class="xref any docutils literal notranslate"><span class="pre">dict</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref any docutils literal notranslate"><span class="pre">None</span></code></a></span></dt><dd><p>Dictionary of parameters to give to <a class="reference internal" href="#metric_learn.SDML.calibrate_threshold" title="metric_learn.SDML.calibrate_threshold"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a> for the
-threshold calibration step done at the end of <a class="reference internal" href="#metric_learn.SDML.fit" title="metric_learn.SDML.fit"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">fit</span></code></a>. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref any docutils literal notranslate"><span class="pre">None</span></code></a> is
-given, <a class="reference internal" href="#metric_learn.SDML.calibrate_threshold" title="metric_learn.SDML.calibrate_threshold"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">calibrate_threshold</span></code></a> will use the default parameters.</p>
+<dt><strong>calibration_params</strong><span class="classifier"><cite>dict</cite> or <cite>None</cite></span></dt><dd><p>Dictionary of parameters to give to <cite>calibrate_threshold</cite> for the
+threshold calibration step done at the end of <cite>fit</cite>. If <cite>None</cite> is
+given, <cite>calibrate_threshold</cite> will use the default parameters.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>Returns the instance.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py method">
-<dt id="metric_learn.SDML.get_mahalanobis_matrix">
-<code class="descname">get_mahalanobis_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_mahalanobis_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>M</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt><dd><p>The copy of the learned Mahalanobis matrix.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.SDML.get_metric">
-<code class="descname">get_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_metric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a function that takes as input two 1D arrays and outputs the
-learned metric score on these two points.</p>
+<dt class="sig sig-object py" id="metric_learn.SDML.get_mahalanobis_matrix">
+<span class="sig-name descname"><span class="pre">get_mahalanobis_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_mahalanobis_matrix" title="Link to this definition"></a></dt>
+<dd><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>M</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_features, n_features)</span></dt><dd><p>The copy of the learned Mahalanobis matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_metadata_routing" title="Link to this definition"></a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.get_metric">
+<span class="sig-name descname"><span class="pre">get_metric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_metric" title="Link to this definition"></a></dt>
+<dd><p>Returns a function that takes as input two 1D arrays and outputs
+the value of the learned metric on these two points. Depending on the
+algorithm, it can return a distance or a similarity function between
+pairs.</p>
 <p>This function will be independent from the metric learner that learned it
 (it will not be modified if the initial metric learner is modified),
-and it can be directly plugged into the <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-metric" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">metric</span></code></a> argument of
+and it can be directly plugged into the <cite>metric</cite> argument of
 scikit-learn’s estimators.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>metric_fun</strong><span class="classifier">function</span></dt><dd><p>The function described above.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#metric_learn.SDML.score_pairs" title="metric_learn.SDML.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a></dt><dd>a method that returns the metric score between several pairs of points. Unlike <a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.SDML.pair_distance" title="metric_learn.SDML.pair_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_distance</span></code></a></dt><dd><p>a method that returns the distance between several pairs of points. Unlike <cite>get_metric</cite>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</p>
+</dd>
+<dt><a class="reference internal" href="#metric_learn.SDML.pair_score" title="metric_learn.SDML.pair_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_score</span></code></a></dt><dd><p>a method that returns the similarity score between several pairs of points. Unlike <cite>get_metric</cite>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</p>
+</dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">()</span>
@@ -532,96 +468,29 @@ scikit-learn’s estimators.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.SDML.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_params" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.SDML.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.get_params" title="Link to this definition"></a></dt>
 <dd><p>Get parameters for this estimator.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
 contained subobjects that are estimators.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>params</strong><span class="classifier">mapping of string to any</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.SDML.predict">
-<code class="descname">predict</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Predicts the learned metric between input pairs. (For now it just
-calls decision function).</p>
-<p>Returns the learned metric value between samples in every pair. It should
-ideally be low for similar samples and high for dissimilar samples.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to predict, with each row corresponding to two
-points, or 2D array of indices of pairs if the metric learner uses a
-preprocessor.</p>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>y_predicted</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of floats, shape=(n_constraints,)</span></dt><dd><p>The predicted learned metric value between samples in every pair.</p>
-</dd>
-</dl>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py method">
-<dt id="metric_learn.SDML.score">
-<code class="descname">score</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em>, <em><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.score" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes score of pairs similarity prediction.</p>
-<p>Returns the <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> score of the fitted metric learner. It is
-computed in the following way: for every value of a threshold
-<code class="docutils literal notranslate"><span class="pre">t</span></code> we classify all pairs of samples where the predicted distance is
-inferior to <code class="docutils literal notranslate"><span class="pre">t</span></code> as belonging to the “similar” class, and the other as
-belonging to the “dissimilar” class, and we count false positive and
-true positives as in a classical <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> curve.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs, with each row corresponding to two points,
-or 2D array of indices of pairs if the metric learner uses a
-preprocessor.</p>
-</dd>
-<dt><strong>y</strong><span class="classifier">array-like, shape=(n_constraints,)</span></dt><dd><p>The corresponding labels.</p>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>score</strong><span class="classifier">float</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> score.</p>
-</dd>
-</dl>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py method">
-<dt id="metric_learn.SDML.score_pairs">
-<code class="descname">score_pairs</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.score_pairs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.SDML.pair_distance">
+<span class="sig-name descname"><span class="pre">pair_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.pair_distance" title="Link to this definition"></a></dt>
 <dd><p>Returns the learned Mahalanobis distance between pairs.</p>
 <p>This distance is defined as: <span class="math notranslate nohighlight">\(d_M(x, x') = \sqrt{(x-x')^T M (x-x')}\)</span>
 where <code class="docutils literal notranslate"><span class="pre">M</span></code> is the learned Mahalanobis matrix, for every pair of points
@@ -630,176 +499,450 @@ embeddings of the points in a new space, obtained through a linear
 transformation. Indeed, we have also: <span class="math notranslate nohighlight">\(d_M(x, x') = \sqrt{(x_e -
 x_e')^T (x_e- x_e')}\)</span>, with <span class="math notranslate nohighlight">\(x_e = L x\)</span> (See
 <code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code>).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
 for 2D array of indices of pairs if the metric learner uses a
 preprocessor.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>scores</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of shape=(n_pairs,)</span></dt><dd><p>The learned Mahalanobis distance for every pair.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The learned Mahalanobis distance for every pair.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd>a method that returns a function to compute the metric between two points. The difference with <a class="reference internal" href="#metric_learn.SDML.score_pairs" title="metric_learn.SDML.score_pairs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">score_pairs</span></code></a> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</dd>
-<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd>The section of the project documentation that describes Mahalanobis Distances.</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>pair_distance</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is  not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.SDML.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the parameters of this estimator.</p>
-<p>The method works on simple estimators as well as on nested objects
-(such as pipelines). The latter have parameters of the form
-<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
-component of a nested object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+<dt class="sig sig-object py" id="metric_learn.SDML.pair_score">
+<span class="sig-name descname"><span class="pre">pair_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.pair_score" title="Link to this definition"></a></dt>
+<dd><p>Returns the opposite of the learned Mahalanobis distance between pairs.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>Estimator instance.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The opposite of the learned Mahalanobis distance for every pair.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>pair_score</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
+</dl>
+</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.SDML.set_threshold">
-<code class="descname">set_threshold</code><span class="sig-paren">(</span><em><span class="n">threshold</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.set_threshold" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the threshold of the metric learner to the given value <code class="xref any docutils literal notranslate"><span class="pre">threshold</span></code>.</p>
+<dt class="sig sig-object py" id="metric_learn.SDML.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.predict" title="Link to this definition"></a></dt>
+<dd><p>Predicts the learned metric between input pairs. (For now it just
+calls decision function).</p>
+<p>Returns the learned metric value between samples in every pair. It should
+ideally be low for similar samples and high for dissimilar samples.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to predict, with each row corresponding to two
+points, or 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>y_predicted</strong><span class="classifier"><cite>numpy.ndarray</cite> of floats, shape=(n_constraints,)</span></dt><dd><p>The predicted learned metric value between samples in every pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.score">
+<span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.score" title="Link to this definition"></a></dt>
+<dd><p>Computes score of pairs similarity prediction.</p>
+<p>Returns the <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> score of the fitted metric learner. It is
+computed in the following way: for every value of a threshold
+<code class="docutils literal notranslate"><span class="pre">t</span></code> we classify all pairs of samples where the predicted distance is
+inferior to <code class="docutils literal notranslate"><span class="pre">t</span></code> as belonging to the “similar” class, and the other as
+belonging to the “dissimilar” class, and we count false positive and
+true positives as in a classical <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> curve.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs, with each row corresponding to two points,
+or 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">array-like, shape=(n_constraints,)</span></dt><dd><p>The corresponding labels.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>score</strong><span class="classifier">float</span></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> score.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.score_pairs">
+<span class="sig-name descname"><span class="pre">score_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.score_pairs" title="Link to this definition"></a></dt>
+<dd><p>Returns the learned Mahalanobis distance between pairs.</p>
+<p>This distance is defined as: <span class="math notranslate nohighlight">\(d_M(x, x') = \\sqrt{(x-x')^T M (x-x')}\)</span>
+where <code class="docutils literal notranslate"><span class="pre">M</span></code> is the learned Mahalanobis matrix, for every pair of points
+<code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">x'</span></code>. This corresponds to the euclidean distance between
+embeddings of the points in a new space, obtained through a linear
+transformation. Indeed, we have also: <span class="math notranslate nohighlight">\(d_M(x, x') = \\sqrt{(x_e -
+x_e')^T (x_e- x_e')}\)</span>, with <span class="math notranslate nohighlight">\(x_e = L x\)</span> (See
+<code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code>).</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>Please use <cite>pair_distance</cite> instead.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method will be removed in 0.8.0. Please refer to <cite>pair_distance</cite>
+or <cite>pair_score</cite>. This change will occur in order to add learners
+that don’t necessarily learn a Mahalanobis distance.</p>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The learned Mahalanobis distance for every pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.SDML.get_metric" title="metric_learn.SDML.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>score_pairs</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is  not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.set_decision_function_request">
+<span class="sig-name descname"><span class="pre">set_decision_function_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metric_learn.SDML" title="metric_learn.sdml.SDML"><span class="pre">SDML</span></a></span></span><a class="headerlink" href="#metric_learn.SDML.set_decision_function_request" title="Link to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">decision_function</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.set_config.html#sklearn.set_config" title="(in scikit-learn v1.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code></a>).
+Please see <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">decision_function</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">decision_function</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">pairs</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">decision_function</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>The updated object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.set_fit_request">
+<span class="sig-name descname"><span class="pre">set_fit_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibration_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metric_learn.SDML" title="metric_learn.sdml.SDML"><span class="pre">SDML</span></a></span></span><a class="headerlink" href="#metric_learn.SDML.set_fit_request" title="Link to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.set_config.html#sklearn.set_config" title="(in scikit-learn v1.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code></a>).
+Please see <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>calibration_params</strong><span class="classifier">str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">calibration_params</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+</dd>
+<dt><strong>pairs</strong><span class="classifier">str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">pairs</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>The updated object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.set_params" title="Link to this definition"></a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.set_predict_request">
+<span class="sig-name descname"><span class="pre">set_predict_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metric_learn.SDML" title="metric_learn.sdml.SDML"><span class="pre">SDML</span></a></span></span><a class="headerlink" href="#metric_learn.SDML.set_predict_request" title="Link to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">predict</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.set_config.html#sklearn.set_config" title="(in scikit-learn v1.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code></a>).
+Please see <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">predict</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">predict</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">pairs</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">predict</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>The updated object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.set_score_request">
+<span class="sig-name descname"><span class="pre">set_score_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metric_learn.SDML" title="metric_learn.sdml.SDML"><span class="pre">SDML</span></a></span></span><a class="headerlink" href="#metric_learn.SDML.set_score_request" title="Link to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">score</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.set_config.html#sklearn.set_config" title="(in scikit-learn v1.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code></a>).
+Please see <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">score</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">score</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">pairs</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">score</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>The updated object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.SDML.set_threshold">
+<span class="sig-name descname"><span class="pre">set_threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.set_threshold" title="Link to this definition"></a></dt>
+<dd><p>Sets the threshold of the metric learner to the given value <cite>threshold</cite>.</p>
 <p>See more in the <a class="reference internal" href="../weakly_supervised.html#calibration"><span class="std std-ref">User Guide</span></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>threshold</strong><span class="classifier">float</span></dt><dd><p>The threshold value we want to set. It is the value to which the
 predicted distance for test pairs will be compared. If they are superior
 to the threshold they will be classified as similar (+1),
 and dissimilar (-1) if not.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>self</strong><span class="classifier"><code class="xref any docutils literal notranslate"><span class="pre">_PairsClassifier</span></code></span></dt><dd><p>The pairs classifier with the new threshold set.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>self</strong><span class="classifier"><cite>_PairsClassifier</cite></span></dt><dd><p>The pairs classifier with the new threshold set.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.SDML.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.SDML.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.SDML.transform" title="Link to this definition"></a></dt>
 <dd><p>Embeds data points in the learned linear embedding space.</p>
 <p>Transforms samples in <code class="docutils literal notranslate"><span class="pre">X</span></code> into <code class="docutils literal notranslate"><span class="pre">X_embedded</span></code>, samples inside a new
 embedding space such that: <code class="docutils literal notranslate"><span class="pre">X_embedded</span> <span class="pre">=</span> <span class="pre">X.dot(L.T)</span></code>, where <code class="docutils literal notranslate"><span class="pre">L</span></code> is
 the learned linear transformation (See <code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code>).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt><dd><p>The data points to embed.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_samples, n_features)</span></dt><dd><p>The data points to embed.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>X_embedded</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt><dd><p>The embedded data points.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>X_embedded</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_samples, n_components)</span></dt><dd><p>The embedded data points.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<div style='clear:both'></div></div>
+<section id="examples-using-metric-learn-sdml">
+<h2>Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.SDML</span></code><a class="headerlink" href="#examples-using-metric-learn-sdml" title="Link to this heading"></a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This is a small walkthrough which illustrates most of the Metric Learning algorithms implemente..."><img alt="" src="../_images/sphx_glr_plot_metric_learning_examples_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_metric_learning_examples.html#sphx-glr-auto-examples-plot-metric-learning-examples-py"><span class="std std-ref">Algorithms walkthrough</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Algorithms walkthrough</div>
+</div></div><div style='clear:both'></div></section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="metric_learn.SCML.html" class="btn btn-neutral float-right" title="metric_learn.SCML" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="metric_learn.MMC.html" class="btn btn-neutral float-left" title="metric_learn.MMC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metric_learn.MMC.html" class="btn btn-neutral float-left" title="metric_learn.MMC" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="metric_learn.SCML.html" class="btn btn-neutral float-right" title="metric_learn.SCML" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
-
-    </p>
+    <p>&#169; Copyright 2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

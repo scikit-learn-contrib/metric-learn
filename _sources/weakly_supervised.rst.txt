@@ -62,8 +62,9 @@ The most intuitive way to represent tuples is to provide the algorithm with a
 in a tuple (2 for pairs, 3 for triplets for instance), and `n_features` is
 the number of features of each point.
 
-.. topic:: Example:
-   Here is an artificial dataset of 4 pairs of 2 points of 3 features each:
+.. rubric:: Example Code
+
+Here is an artificial dataset of 4 pairs of 2 points of 3 features each:
 
 >>> import numpy as np
 >>> tuples = np.array([[[-0.12, -1.21, -0.20],
@@ -94,7 +95,9 @@ would be to keep the dataset of points `X` aside, and just represent tuples
 as a collection of tuples of *indices* from the points in `X`. Since we loose
 the feature dimension there, the resulting array is 2D.
 
-.. topic:: Example: An equivalent representation of the above pairs would be:
+.. rubric:: Example Code
+    
+An equivalent representation of the above pairs would be:
 
 >>> X = np.array([[-0.12, -1.21, -0.20],
 >>>               [+0.05, -0.19, -0.05],
@@ -134,7 +137,7 @@ are respected.
 >>> from metric_learn import MMC
 >>> mmc = MMC(random_state=42)
 >>> mmc.fit(tuples, y)
-MMC(A0='deprecated', convergence_threshold=0.001, diagonal=False,
+MMC(A0='deprecated', tol=0.001, diagonal=False,
   diagonal_c=1.0, init='auto', max_iter=100, max_proj=10000,
   preprocessor=None, random_state=42, verbose=False)
 
@@ -160,9 +163,9 @@ Also, as explained before, our metric learner has learned a distance between
 points. You can use this distance in two main ways:
 
 - You can either return the distance between pairs of points using the
-  `score_pairs` function:
+  `pair_distance` function:
 
->>> mmc.score_pairs([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
+>>> mmc.pair_distance([[[3.5, 3.6, 5.2], [5.6, 2.4, 6.7]],
 ...                  [[1.2, 4.2, 7.7], [2.1, 6.4, 0.9]]])
 array([7.27607365, 0.88853014])
 
@@ -175,6 +178,18 @@ array([7.27607365, 0.88853014])
 >>> metric_fun([3.5, 3.6, 5.2], [5.6, 2.4, 6.7])
 7.276073646278203
 
+- Alternatively, you can use `pair_score` to return the **score** between
+  pairs of points (the larger the score, the more similar the pair).
+  For Mahalanobis learners, it is equal to the opposite of the distance.
+
+>>> score = mmc.pair_score([[[3.5, 3.6], [5.6, 2.4]], [[1.2, 4.2], [2.1, 6.4]], [[3.3, 7.8], [10.9, 0.1]]])
+>>> score
+array([-0.49627072, -3.65287282, -6.06079877])
+
+  This is useful because `pair_score` matches the **score** semantic of 
+  scikit-learn's `Classification metrics
+  <https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics>`_.
+
 .. note::
 
     If the metric learner that you use learns a :ref:`Mahalanobis distance
@@ -186,8 +201,6 @@ array([7.27607365, 0.88853014])
 array([[ 0.58603894, -5.69883982, -1.66614919],
        [-5.69883982, 55.41743549, 16.20219519],
        [-1.66614919, 16.20219519,  4.73697721]])
-
-.. TODO: remove the "like it is the case etc..." if it's not the case anymore
 
 .. _sklearn_compat_ws:
 
@@ -250,7 +263,7 @@ tuples).
 >>> y_pairs = np.array([1, -1])
 >>> mmc = MMC(random_state=42)
 >>> mmc.fit(pairs, y_pairs)
-MMC(convergence_threshold=0.001, diagonal=False,
+MMC(tol=0.001, diagonal=False,
     diagonal_c=1.0, init='auto', max_iter=100, max_proj=10000, preprocessor=None,
     random_state=42, verbose=False)
 
@@ -344,8 +357,8 @@ returns the `sklearn.metrics.roc_auc_score` (which is threshold-independent).
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
-   `get_metric` and `get_mahalanobis_matrix`.
+   not specific to learning on pairs, like `transform`, `pair_distance`,
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 Algorithms
 ----------
@@ -400,7 +413,7 @@ for similar and dissimilar pairs respectively, and :math:`\mathbf{M}_0`
 is the prior distance metric, set to identity matrix by default, 
 :math:`D_{\ell \mathrm{d}}(\cdot)` is the log determinant.
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
 ::
 
@@ -419,11 +432,14 @@ is the prior distance metric, set to identity matrix by default,
     itml = ITML()
     itml.fit(pairs, y)
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] Jason V. Davis, et al. `Information-theoretic Metric Learning <https://icml.cc/imls/conferences/2007/proceedings/papers/404.pdf>`_. ICML 2007
 
-    .. [2] Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/
+.. container:: hatnote hatnote-gray
+
+      [1]. Jason V. Davis, et al. `Information-theoretic Metric Learning <https://icml.cc/imls/conferences/2007/proceedings/papers/404.pdf>`_. ICML 2007.
+
+      [2]. Adapted from Matlab code at http://www.cs.utexas.edu/users/pjain/itml/ .
 
 
 .. _sdml:
@@ -458,7 +474,7 @@ the sums of the row elements of :math:`\mathbf{K}`., :math:`||\cdot||_{1, off}`
 is the off-diagonal L1 norm.
 
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
 ::
 
@@ -476,19 +492,19 @@ is the off-diagonal L1 norm.
     sdml = SDML()
     sdml.fit(pairs, y)
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] Qi et al.
-       `An efficient sparse metric learning in high-dimensional space via
-       L1-penalized log-determinant regularization <https://icml.cc/Conferences/2009/papers/46.pdf>`_.
-       ICML 2009.
 
-    .. [2] Code adapted from https://gist.github.com/kcarnold/5439945
+.. container:: hatnote hatnote-gray
+
+      [1]. Qi et al. `An efficient sparse metric learning in high-dimensional space via L1-penalized log-determinant regularization <https://icml.cc/Conferences/2009/papers/46.pdf>`_. ICML 2009.
+
+      [2]. Code adapted from https://gist.github.com/kcarnold/5439945 .
 
 .. _rca:
 
 :py:class:`RCA <metric_learn.RCA>`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Relative Components Analysis (:py:class:`RCA <metric_learn.RCA>`)
 
@@ -512,7 +528,7 @@ where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}`
 with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used 
 as the Mahalanobis matrix.
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
 ::
 
@@ -527,15 +543,16 @@ as the Mahalanobis matrix.
     rca = RCA()
     rca.fit(X, chunks)
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] Shental et al. `Adjustment learning and relevant component analysis
-       <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871
-       &rep=rep1&type=pdf>`_. ECCV 2002
 
-    .. [2] Bar-Hillel et al. `Learning distance functions using equivalence relations <https://aaai.org/Papers/ICML/2003/ICML03-005.pdf>`_. ICML 2003
+.. container:: hatnote hatnote-gray
 
-    .. [3] Bar-Hillel et al. `Learning a Mahalanobis metric from equivalence constraints <http://www.jmlr.org/papers/volume6/bar-hillel05a/bar-hillel05a.pdf>`_. JMLR 2005
+      [1]. Shental et al. `Adjustment learning and relevant component analysis <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871 &rep=rep1&type=pdf>`_. ECCV 2002.
+
+      [2]. Bar-Hillel et al. `Learning distance functions using equivalence relations <https://aaai.org/Papers/ICML/2003/ICML03-005.pdf>`_. ICML 2003.
+
+      [3]. Bar-Hillel et al. `Learning a Mahalanobis metric from equivalence constraints <http://www.jmlr.org/papers/volume6/bar-hillel05a/bar-hillel05a.pdf>`_. JMLR 2005.
 
 .. _mmc:
 
@@ -566,7 +583,7 @@ points, while constrains the sum of distances between dissimilar points:
       \qquad \qquad \text{s.t.} \qquad \sum_{(\mathbf{x}_i, \mathbf{x}_j)
       \in D} d^2_{\mathbf{M}}(\mathbf{x}_i, \mathbf{x}_j) \geq 1
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
 ::
 
@@ -584,13 +601,14 @@ points, while constrains the sum of distances between dissimilar points:
     mmc = MMC()
     mmc.fit(pairs, y)
 
-.. topic:: References:
+.. rubric:: References
 
-  .. [1] Xing et al. `Distance metric learning with application to clustering with
-        side-information <http://papers.nips
-        .cc/paper/2164-distance-metric-learning-with-application-to-clustering
-        -with-side-information.pdf>`_. NIPS 2002
-  .. [2] Adapted from Matlab code http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz
+
+.. container:: hatnote hatnote-gray
+
+    [1]. Xing et al. `Distance metric learning with application to clustering with side-information <http://papers.nips .cc/paper/2164-distance-metric-learning-with-application-to-clustering-with-side-information.pdf>`_. NIPS 2002.
+    
+    [2]. Adapted from Matlab code http://www.cs.cmu.edu/%7Eepxing/papers/Old_papers/code_Metric_online.tar.gz .
 
 .. _learning_on_triplets:
 
@@ -691,8 +709,8 @@ of triplets that have the right predicted ordering.
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
-   `get_metric` and `get_mahalanobis_matrix`.
+   not specific to learning on pairs, like `transform`, `pair_distance`,
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 
 
@@ -734,7 +752,7 @@ is added to yield a sparse combination. The formulation is the following:
 
 where :math:`[\cdot]_+` is the hinge loss. 
  
-.. topic:: Example Code:
+.. rubric:: Example Code
 
 ::
 
@@ -748,14 +766,14 @@ where :math:`[\cdot]_+` is the hinge loss.
     scml = SCML()
     scml.fit(triplets)
 
-.. topic:: References:
+.. rubric:: References
 
-  .. [1] Y. Shi, A. Bellet and F. Sha. `Sparse Compositional Metric Learning.
-         <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. \
-         (AAAI), 2014.
 
-  .. [2] Adapted from original \
-         `Matlab implementation.<https://github.com/bellet/SCML>`_.
+.. container:: hatnote hatnote-gray
+
+    [1]. Y. Shi, A. Bellet and F. Sha. `Sparse Compositional Metric Learning. <http://researchers.lille.inria.fr/abellet/papers/aaai14.pdf>`_. (AAAI), 2014.
+
+    [2]. Adapted from original `Matlab implementation. <https://github.com/bellet/SCML>`_.
 
 
 .. _learning_on_quadruplets:
@@ -859,8 +877,8 @@ of quadruplets have the right predicted ordering.
 
 .. note::
    See :ref:`fit_ws` for more details on metric learners functions that are
-   not specific to learning on pairs, like `transform`, `score_pairs`,
-   `get_metric` and `get_mahalanobis_matrix`.
+   not specific to learning on pairs, like `transform`, `pair_distance`,
+   `pair_score`, `get_metric` and `get_mahalanobis_matrix`.
 
 
 
@@ -927,7 +945,7 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
     D_{ld}(\mathbf{M, M_0}) = \text{tr}(\mathbf{MM_0}) − \text{logdet}
     (\mathbf{M})
 
-.. topic:: Example Code:
+.. rubric:: Example Code
 
 ::
 
@@ -944,12 +962,13 @@ by default, :math:`D_{ld}(\mathbf{\cdot, \cdot})` is the LogDet divergence:
     lsml = LSML()
     lsml.fit(quadruplets)
 
-.. topic:: References:
+.. rubric:: References
 
-    .. [1] Liu et al.
-       `Metric Learning from Relative Comparisons by Minimizing Squared
-       Residual <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012
 
-    .. [2] Code adapted from https://gist.github.com/kcarnold/5439917
+.. container:: hatnote hatnote-gray
+
+      [1]. Liu et al. `Metric Learning from Relative Comparisons by Minimizing Squared Residual <http://www.cs.ucla.edu/~weiwang/paper/ICDM12.pdf>`_. ICDM 2012.
+
+      [2]. Code adapted from https://gist.github.com/kcarnold/5439917 .
 
 

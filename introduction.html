@@ -1,97 +1,57 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>1. What is Metric Learning? &mdash; metric-learn 0.6.2 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1. What is Metric Learning? &mdash; metric-learn 0.7.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/styles.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=fe7df9b0"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/js/copybutton.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="2. Supervised Metric Learning" href="supervised.html" />
     <link rel="prev" title="User Guide" href="user_guide.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            metric-learn
           </a>
-
-          
-            
-            
               <div class="version">
-                0.6.2
+                0.7.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 </ul>
@@ -118,73 +78,33 @@
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">metric-learn</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="user_guide.html">User Guide</a> &raquo;</li>
-        
-      <li><span class="section-number">1. </span>What is Metric Learning?</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">1. </span>What is Metric Learning?</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="what-is-metric-learning">
-<span id="intro-metric-learning"></span><h1><span class="section-number">1. </span>What is Metric Learning?<a class="headerlink" href="#what-is-metric-learning" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="what-is-metric-learning">
+<span id="intro-metric-learning"></span><h1><span class="section-number">1. </span>What is Metric Learning?<a class="headerlink" href="#what-is-metric-learning" title="Link to this heading"></a></h1>
 <p>Many approaches in machine learning require a measure of distance between data
 points. Traditionally, practitioners would choose a standard distance metric
 (Euclidean, City-Block, Cosine, etc.) using a priori knowledge of the
@@ -195,31 +115,31 @@ automatically constructing task-specific distance metrics from (weakly)
 supervised data, in a machine learning manner. The learned distance metric can
 then be used to perform various tasks (e.g., k-NN classification, clustering,
 information retrieval).</p>
-<div class="section" id="problem-setting">
-<h2><span class="section-number">1.1. </span>Problem Setting<a class="headerlink" href="#problem-setting" title="Permalink to this headline">¶</a></h2>
+<section id="problem-setting">
+<h2><span class="section-number">1.1. </span>Problem Setting<a class="headerlink" href="#problem-setting" title="Link to this heading"></a></h2>
 <p>Metric learning problems fall into two main categories depending on the type
 of supervision available about the training data:</p>
 <ul class="simple">
-<li><a class="reference internal" href="supervised.html"><span class="doc">Supervised learning</span></a>: the algorithm has access to
+<li><p><a class="reference internal" href="supervised.html"><span class="doc">Supervised learning</span></a>: the algorithm has access to
 a set of data points, each of them belonging to a class (label) as in a
 standard classification problem.
 Broadly speaking, the goal in this setting is to learn a distance metric
 that puts points with the same label close together while pushing away
-points with different labels.</li>
-<li><a class="reference internal" href="weakly_supervised.html"><span class="doc">Weakly supervised learning</span></a>: the
+points with different labels.</p></li>
+<li><p><a class="reference internal" href="weakly_supervised.html"><span class="doc">Weakly supervised learning</span></a>: the
 algorithm has access to a set of data points with supervision only
 at the tuple level (typically pairs, triplets, or quadruplets of
 data points). A classic example of such weaker supervision is a set of
 positive and negative pairs: in this case, the goal is to learn a distance
-metric that puts positive pairs close together and negative pairs far away.</li>
+metric that puts positive pairs close together and negative pairs far away.</p></li>
 </ul>
 <p>Based on the above (weakly) supervised data, the metric learning problem is
 generally formulated as an optimization problem where one seeks to find the
 parameters of a distance function that optimize some objective function
 measuring the agreement with the training data.</p>
-</div>
-<div class="section" id="mahalanobis-distances">
-<span id="id1"></span><h2><span class="section-number">1.2. </span>Mahalanobis Distances<a class="headerlink" href="#mahalanobis-distances" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="mahalanobis-distances">
+<span id="id1"></span><h2><span class="section-number">1.2. </span>Mahalanobis Distances<a class="headerlink" href="#mahalanobis-distances" title="Link to this heading"></a></h2>
 <p>In the metric-learn package, all algorithms currently implemented learn
 so-called Mahalanobis distances. Given a real-valued parameter matrix
 <span class="math notranslate nohighlight">\(L\)</span> of shape <code class="docutils literal notranslate"><span class="pre">(num_dims,</span> <span class="pre">n_features)</span></code> where <code class="docutils literal notranslate"><span class="pre">n_features</span></code> is the
@@ -237,112 +157,87 @@ smaller than <code class="docutils literal notranslate"><span class="pre">n_feat
 three of the <a class="reference external" href="https://en.wikipedia.org/wiki/Metric_(mathematics)">properties of a metric</a> (non-negativity, symmetry, triangle inequality) but not
 necessarily the identity of indiscernibles.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>Mahalanobis distances can also be parameterized by a <a class="reference external" href="https://en.wikipedia.org/wiki/Positive-definite_matrix#Positive_semidefinite">positive semi-definite
 (PSD) matrix</a>
 <span class="math notranslate nohighlight">\(M\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[D(x, x') = \sqrt{(x-x')^\top M(x-x')}\]</div>
-<p class="last">Using the fact that a PSD matrix <span class="math notranslate nohighlight">\(M\)</span> can always be decomposed as
+<p>Using the fact that a PSD matrix <span class="math notranslate nohighlight">\(M\)</span> can always be decomposed as
 <span class="math notranslate nohighlight">\(M=L^\top L\)</span> for some  <span class="math notranslate nohighlight">\(L\)</span>, one can show that both
 parameterizations are equivalent. In practice, an algorithm may thus solve
 the metric learning problem with respect to either <span class="math notranslate nohighlight">\(M\)</span> or <span class="math notranslate nohighlight">\(L\)</span>.</p>
 </div>
-</div>
-<div class="section" id="use-cases">
-<span id="id2"></span><h2><span class="section-number">1.3. </span>Use-cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="use-cases">
+<span id="id2"></span><h2><span class="section-number">1.3. </span>Use-cases<a class="headerlink" href="#use-cases" title="Link to this heading"></a></h2>
 <p>There are many use-cases for metric learning. We list here a few popular
 examples (for code illustrating some of these use-cases, see the
 <a class="reference internal" href="auto_examples/index.html"><span class="doc">examples</span></a> section of the documentation):</p>
 <ul class="simple">
-<li><a class="reference external" href="https://scikit-learn.org/stable/modules/neighbors.html">Nearest neighbors models</a>: the learned
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/neighbors.html">Nearest neighbors models</a>: the learned
 metric can be used to improve nearest neighbors learning models for
-classification, regression, anomaly detection…</li>
-<li><a class="reference external" href="https://scikit-learn.org/stable/modules/clustering.html">Clustering</a>:
+classification, regression, anomaly detection…</p></li>
+<li><p><a class="reference external" href="https://scikit-learn.org/stable/modules/clustering.html">Clustering</a>:
 metric learning provides a way to bias the clusters found by algorithms like
-K-Means towards the intended semantics.</li>
-<li>Information retrieval: the learned metric can be used to retrieve the
-elements of a database that are semantically closest to a query element.</li>
-<li>Dimensionality reduction: metric learning may be seen as a way to reduce the
-data dimension in a (weakly) supervised setting.</li>
-<li>More generally, the learned transformation <span class="math notranslate nohighlight">\(L\)</span> can be used to project
+K-Means towards the intended semantics.</p></li>
+<li><p>Information retrieval: the learned metric can be used to retrieve the
+elements of a database that are semantically closest to a query element.</p></li>
+<li><p>Dimensionality reduction: metric learning may be seen as a way to reduce the
+data dimension in a (weakly) supervised setting.</p></li>
+<li><p>More generally, the learned transformation <span class="math notranslate nohighlight">\(L\)</span> can be used to project
 the data into a new embedding space before feeding it into another machine
-learning algorithm.</li>
+learning algorithm.</p></li>
 </ul>
 <p>The API of metric-learn is compatible with <a class="reference external" href="https://scikit-learn.org/">scikit-learn</a>, the leading library for machine
 learning in Python. This allows to easily pipeline metric learners with other
 scikit-learn estimators to realize the above use-cases, to perform joint
 hyperparameter tuning, etc.</p>
-</div>
-<div class="section" id="further-reading">
-<h2><span class="section-number">1.4. </span>Further reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="further-reading">
+<h2><span class="section-number">1.4. </span>Further reading<a class="headerlink" href="#further-reading" title="Link to this heading"></a></h2>
 <p>For more information about metric learning and its applications, one can refer
 to the following resources:</p>
 <ul class="simple">
-<li><strong>Tutorial:</strong> <a class="reference external" href="http://researchers.lille.inria.fr/abellet/talks/metric_learning_tutorial_ECML_PKDD.pdf">Similarity and Distance Metric Learning with Applications to
-Computer Vision</a> (2015)</li>
-<li><strong>Surveys:</strong> <a class="reference external" href="https://arxiv.org/pdf/1306.6709.pdf">A Survey on Metric Learning for Feature Vectors and Structured
+<li><p><strong>Tutorial:</strong> <a class="reference external" href="http://researchers.lille.inria.fr/abellet/talks/metric_learning_tutorial_ECML_PKDD.pdf">Similarity and Distance Metric Learning with Applications to
+Computer Vision</a> (2015)</p></li>
+<li><p><strong>Surveys:</strong> <a class="reference external" href="https://arxiv.org/pdf/1306.6709.pdf">A Survey on Metric Learning for Feature Vectors and Structured
 Data</a> (2013), <a class="reference external" href="http://dx.doi.org/10.1561/2200000019">Metric Learning: A
-Survey</a> (2012)</li>
-<li><strong>Book:</strong> <a class="reference external" href="http://dx.doi.org/10.2200/S00626ED1V01Y201501AIM030">Metric Learning</a> (2015)</li>
+Survey</a> (2012)</p></li>
+<li><p><strong>Book:</strong> <a class="reference external" href="http://dx.doi.org/10.2200/S00626ED1V01Y201501AIM030">Metric Learning</a> (2015)</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="supervised.html" class="btn btn-neutral float-right" title="2. Supervised Metric Learning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="user_guide.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="user_guide.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="supervised.html" class="btn btn-neutral float-right" title="2. Supervised Metric Learning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
-
-    </p>
+    <p>&#169; Copyright 2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

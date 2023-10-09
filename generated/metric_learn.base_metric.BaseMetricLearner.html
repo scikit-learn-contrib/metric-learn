@@ -1,97 +1,56 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>metric_learn.base_metric.BaseMetricLearner &mdash; metric-learn 0.6.2 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metric_learn.base_metric.BaseMetricLearner &mdash; metric-learn 0.7.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/styles.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/js/copybutton.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="metric_learn.base_metric._PairsClassifierMixin" href="metric_learn.base_metric._PairsClassifierMixin.html" />
+    <link rel="next" title="metric_learn.base_metric.MetricTransformer" href="metric_learn.base_metric.MetricTransformer.html" />
     <link rel="prev" title="metric_learn.Constraints" href="metric_learn.Constraints.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            metric-learn
           </a>
-
-          
-            
-            
               <div class="version">
-                0.6.2
+                0.7.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 </ul>
@@ -104,9 +63,12 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../metric_learn.html#base-classes">Base Classes</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.Constraints.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner"><code class="docutils literal notranslate"><span class="pre">BaseMetricLearner</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples-using-metric-learn-base-metric-basemetriclearner">Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.MetricTransformer.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.MetricTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.MahalanobisMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.MahalanobisMixin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._PairsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._TripletsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._TripletsClassifierMixin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._QuadrupletsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._QuadrupletsClassifierMixin</a></li>
@@ -122,146 +84,130 @@
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">metric-learn</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../metric_learn.html">metric_learn package</a> &raquo;</li>
-        
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../metric_learn.html">metric_learn package</a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/generated/metric_learn.base_metric.BaseMetricLearner.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="metric-learn-base-metric-basemetriclearner">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner<a class="headerlink" href="#metric-learn-base-metric-basemetriclearner" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="metric-learn-base-metric-basemetriclearner">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner<a class="headerlink" href="#metric-learn-base-metric-basemetriclearner" title="Link to this heading"></a></h1>
 <dl class="py class">
-<dt id="metric_learn.base_metric.BaseMetricLearner">
-<em class="property">class </em><code class="descclassname">metric_learn.base_metric.</code><code class="descname">BaseMetricLearner</code><span class="sig-paren">(</span><em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metric_learn.base_metric.</span></span><span class="sig-name descname"><span class="pre">BaseMetricLearner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preprocessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner" title="Link to this definition"></a></dt>
 <dd><p>Base class for all metric-learners.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>preprocessor</strong><span class="classifier">array-like, shape=(n_samples, n_features) or callable</span></dt><dd><p>The preprocessor to call to get tuples from indices. If array-like,
 tuples will be gotten like this: X[indices].</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils align-default">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="metric_learn.base_metric.BaseMetricLearner.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
-<td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_metadata_routing" title="metric_learn.base_metric.BaseMetricLearner.get_metadata_routing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata_routing</span></code></a>()</p></td>
+<td><p>Get metadata routing of this object.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_params" title="metric_learn.base_metric.BaseMetricLearner.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
-<td>Get parameters for this estimator.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="metric_learn.base_metric.BaseMetricLearner.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</p></td>
+<td><p>Returns a function that takes as input two 1D arrays and outputs the value of the learned metric on these two points.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.score_pairs" title="metric_learn.base_metric.BaseMetricLearner.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
-<td>Returns the score between pairs (can be a similarity, or a distance/metric depending on the algorithm)</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_params" title="metric_learn.base_metric.BaseMetricLearner.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.set_params" title="metric_learn.base_metric.BaseMetricLearner.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
-<td>Set the parameters of this estimator.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.pair_distance" title="metric_learn.base_metric.BaseMetricLearner.pair_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_distance</span></code></a>(pairs)</p></td>
+<td><p><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.7.0: </span>Compute the distance between pairs</p>
+</div>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.pair_score" title="metric_learn.base_metric.BaseMetricLearner.pair_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_score</span></code></a>(pairs)</p></td>
+<td><p><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.7.0: </span>Compute the similarity score between pairs</p>
+</div>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.score_pairs" title="metric_learn.base_metric.BaseMetricLearner.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</p></td>
+<td><p>Returns the score between pairs (can be a similarity, or a distance/metric depending on the algorithm)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.set_params" title="metric_learn.base_metric.BaseMetricLearner.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="metric_learn.base_metric.BaseMetricLearner.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preprocessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.get_metadata_routing" title="Link to this definition"></a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.base_metric.BaseMetricLearner.get_metric">
-<em class="property">abstract </em><code class="descname">get_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner.get_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a function that takes as input two 1D arrays and outputs the
-learned metric score on these two points.</p>
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner.get_metric">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_metric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner.get_metric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="Link to this definition"></a></dt>
+<dd><p>Returns a function that takes as input two 1D arrays and outputs
+the value of the learned metric on these two points. Depending on the
+algorithm, it can return a distance or a similarity function between
+pairs.</p>
 <p>This function will be independent from the metric learner that learned it
 (it will not be modified if the initial metric learner is modified),
-and it can be directly plugged into the <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-metric" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">metric</span></code></a> argument of
+and it can be directly plugged into the <cite>metric</cite> argument of
 scikit-learn’s estimators.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>metric_fun</strong><span class="classifier">function</span></dt><dd><p>The function described above.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.score_pairs" title="metric_learn.base_metric.BaseMetricLearner.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a></dt><dd>a method that returns the metric score between several pairs of points. Unlike <a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="metric_learn.base_metric.BaseMetricLearner.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.pair_distance" title="metric_learn.base_metric.BaseMetricLearner.pair_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_distance</span></code></a></dt><dd><p>a method that returns the distance between several pairs of points. Unlike <cite>get_metric</cite>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</p>
+</dd>
+<dt><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.pair_score" title="metric_learn.base_metric.BaseMetricLearner.pair_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_score</span></code></a></dt><dd><p>a method that returns the similarity score between several pairs of points. Unlike <cite>get_metric</cite>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</p>
+</dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">()</span>
@@ -279,158 +225,200 @@ scikit-learn’s estimators.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.base_metric.BaseMetricLearner.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.get_params" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.get_params" title="Link to this definition"></a></dt>
 <dd><p>Get parameters for this estimator.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
 contained subobjects that are estimators.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>params</strong><span class="classifier">mapping of string to any</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.base_metric.BaseMetricLearner.score_pairs">
-<em class="property">abstract </em><code class="descname">score_pairs</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner.score_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.score_pairs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the score between pairs
-(can be a similarity, or a distance/metric depending on the algorithm)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>pairs</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, 2, n_features)</span></dt><dd><p>3D array of pairs.</p>
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner.pair_distance">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pair_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner.pair_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.pair_distance" title="Link to this definition"></a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.7.0: </span>Compute the distance between pairs</p>
+</div>
+<p>Returns the (pseudo) distance between pairs, when available. For metric
+learners that do not learn a (pseudo) distance, an error is thrown
+instead.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs for which to compute the distance, with each
+row corresponding to two points, for 2D array of indices of pairs
+if the metric learner uses a preprocessor.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>scores</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of shape=(n_pairs,)</span></dt><dd><p>The score of every pair.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The distance between every pair.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="metric_learn.base_metric.BaseMetricLearner.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd>a method that returns a function to compute the metric between two points. The difference with <a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.score_pairs" title="metric_learn.base_metric.BaseMetricLearner.score_pairs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">score_pairs</span></code></a> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="metric_learn.base_metric.BaseMetricLearner.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>pair_distance</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is  not modified if the metric learner is.</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.base_metric.BaseMetricLearner.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.set_params" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner.pair_score">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pair_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner.pair_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.pair_score" title="Link to this definition"></a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 0.7.0: </span>Compute the similarity score between pairs</p>
+</div>
+<p>Returns the similarity score between pairs of points (the larger the score,
+the more similar the pair). For metric learners that learn a distance,
+the score is simply the opposite of the distance between pairs. All
+learners have access to this method.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The score of every pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="metric_learn.base_metric.BaseMetricLearner.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>pair_score</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner.score_pairs">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">score_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#BaseMetricLearner.score_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.score_pairs" title="Link to this definition"></a></dt>
+<dd><p>Returns the score between pairs
+(can be a similarity, or a distance/metric depending on the algorithm)</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>Refer to <cite>pair_distance</cite> and <cite>pair_score</cite>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method will be removed in 0.8.0. Please refer to <cite>pair_distance</cite>
+or <cite>pair_score</cite>. This change will occur in order to add learners
+that don’t necessarily learn a Mahalanobis distance.</p>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The score of every pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.base_metric.BaseMetricLearner.get_metric" title="metric_learn.base_metric.BaseMetricLearner.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference between <cite>score_pairs</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.BaseMetricLearner.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.BaseMetricLearner.set_params" title="Link to this definition"></a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
-(such as pipelines). The latter have parameters of the form
-<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
-component of a nested object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+(such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>Estimator instance.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<div class="section" id="examples-using-metric-learn-base-metric-basemetriclearner">
-<h2>Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code><a class="headerlink" href="#examples-using-metric-learn-base-metric-basemetriclearner" title="Permalink to this headline">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Sandwich demo based on code from http://nbviewer.ipython.org/6576096"><div class="figure align-default" id="id1">
-<img alt="Sandwich demo" src="../_images/sphx_glr_plot_sandwich_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_sandwich.html#sphx-glr-auto-examples-plot-sandwich-py"><span class="std std-ref">Sandwich demo</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This is a small walkthrough which illustrates most of the Metric Learning algorithms implemente..."><div class="figure align-default" id="id2">
-<img alt="Algorithms walkthrough" src="../_images/sphx_glr_plot_metric_learning_examples_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_metric_learning_examples.html#sphx-glr-auto-examples-plot-metric-learning-examples-py"><span class="std std-ref">Algorithms walkthrough</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
-</div><div style='clear:both'></div></div>
-</div>
+<section id="examples-using-metric-learn-base-metric-basemetriclearner">
+<h2>Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric.BaseMetricLearner</span></code><a class="headerlink" href="#examples-using-metric-learn-base-metric-basemetriclearner" title="Link to this heading"></a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Sandwich demo based on code from http://nbviewer.ipython.org/6576096"><img alt="" src="../_images/sphx_glr_plot_sandwich_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_sandwich.html#sphx-glr-auto-examples-plot-sandwich-py"><span class="std std-ref">Sandwich demo</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Sandwich demo</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This is a small walkthrough which illustrates most of the Metric Learning algorithms implemente..."><img alt="" src="../_images/sphx_glr_plot_metric_learning_examples_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_metric_learning_examples.html#sphx-glr-auto-examples-plot-metric-learning-examples-py"><span class="std std-ref">Algorithms walkthrough</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Algorithms walkthrough</div>
+</div></div><div style='clear:both'></div></section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="metric_learn.base_metric._PairsClassifierMixin.html" class="btn btn-neutral float-right" title="metric_learn.base_metric._PairsClassifierMixin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="metric_learn.Constraints.html" class="btn btn-neutral float-left" title="metric_learn.Constraints" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metric_learn.Constraints.html" class="btn btn-neutral float-left" title="metric_learn.Constraints" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="metric_learn.base_metric.MetricTransformer.html" class="btn btn-neutral float-right" title="metric_learn.base_metric.MetricTransformer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
-
-    </p>
+    <p>&#169; Copyright 2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,95 +1,53 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>metric_learn.constraints &mdash; metric-learn 0.6.2 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metric_learn.constraints &mdash; metric-learn 0.7.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/styles.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=fe7df9b0"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../../_static/js/copybutton.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            metric-learn
           </a>
-
-          
-            
-            
               <div class="version">
-                0.6.2
+                0.7.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
 </ul>
@@ -103,67 +61,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">metric-learn</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>metric_learn.constraints</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">metric_learn.constraints</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for metric_learn.constraints</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Helper module for generating different types of constraints</span>
@@ -174,11 +95,14 @@
 <span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
 
+
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Constraints&#39;</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="Constraints"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints">[docs]</a><span class="k">class</span> <span class="nc">Constraints</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-  <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Constraints">
+<a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints">[docs]</a>
+<span class="k">class</span> <span class="nc">Constraints</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">  Class to build constraints from labeled data.</span>
 
 <span class="sd">  See more in the :ref:`User Guide &lt;supervised_version&gt;`.</span>
@@ -194,25 +118,30 @@
 <span class="sd">    Array of labels, with -1 indicating unknown label.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Constraints.__init__"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.__init__">[docs]</a>  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partial_labels</span><span class="p">):</span>
+<div class="viewcode-block" id="Constraints.__init__">
+<a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.__init__">[docs]</a>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partial_labels</span><span class="p">):</span>
     <span class="n">partial_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">partial_labels</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span> <span class="o">=</span> <span class="n">partial_labels</span></div>
 
-<div class="viewcode-block" id="Constraints.positive_negative_pairs"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.positive_negative_pairs">[docs]</a>  <span class="k">def</span> <span class="nf">positive_negative_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                              <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Constraints.positive_negative_pairs">
+<a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.positive_negative_pairs">[docs]</a>
+  <span class="k">def</span> <span class="nf">positive_negative_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_constraints</span><span class="p">,</span> <span class="n">same_length</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_constraints</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates positive pairs and negative pairs from labeled data.</span>
 
-<span class="sd">    Positive pairs are formed by randomly drawing ``num_constraints`` pairs of</span>
+<span class="sd">    Positive pairs are formed by randomly drawing ``n_constraints`` pairs of</span>
 <span class="sd">    points with the same label. Negative pairs are formed by randomly drawing</span>
-<span class="sd">    ``num_constraints`` pairs of points with different label.</span>
+<span class="sd">    ``n_constraints`` pairs of points with different label.</span>
 
 <span class="sd">    In the case where it is not possible to generate enough positive or</span>
 <span class="sd">    negative pairs, a smaller number of pairs will be returned with a warning.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    num_constraints : int</span>
+<span class="sd">    n_constraints : int</span>
 <span class="sd">      Number of positive and negative constraints to generate.</span>
 
 <span class="sd">    same_length : bool, optional (default=False)</span>
@@ -221,6 +150,8 @@
 
 <span class="sd">    random_state : int or numpy.RandomState or None, optional (default=None)</span>
 <span class="sd">      A pseudo random number generator object or a seed for it if int.</span>
+
+<span class="sd">    num_constraints : Renamed to n_constraints. Will be deprecated in 0.7.0</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -236,18 +167,29 @@
 <span class="sd">    d : array-like, shape=(n_constraints,)</span>
 <span class="sd">      1D array of indicators for the right elements of negative pairs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">num_constraints</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_constraints&quot; parameter has been renamed to&#39;</span>
+                    <span class="s1">&#39; &quot;n_constraints&quot;. It has been deprecated in&#39;</span>
+                    <span class="s1">&#39; version 0.6.3 and will be removed in 0.7.0&#39;</span>
+                    <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="ne">FutureWarning</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">n_constraints</span> <span class="o">=</span> <span class="n">num_constraints</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">n_constraints</span> <span class="o">=</span> <span class="n">n_constraints</span>
     <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairs</span><span class="p">(</span><span class="n">num_constraints</span><span class="p">,</span> <span class="n">same_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairs</span><span class="p">(</span><span class="n">n_constraints</span><span class="p">,</span> <span class="n">same_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
-    <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairs</span><span class="p">(</span><span class="n">num_constraints</span><span class="p">,</span> <span class="n">same_label</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pairs</span><span class="p">(</span><span class="n">n_constraints</span><span class="p">,</span> <span class="n">same_label</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                        <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">same_length</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
       <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
       <span class="k">return</span> <span class="n">a</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">b</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">c</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">d</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span></div>
 
-<div class="viewcode-block" id="Constraints.generate_knntriplets"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.generate_knntriplets">[docs]</a>  <span class="k">def</span> <span class="nf">generate_knntriplets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">k_genuine</span><span class="p">,</span> <span class="n">k_impostor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Constraints.generate_knntriplets">
+<a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.generate_knntriplets">[docs]</a>
+  <span class="k">def</span> <span class="nf">generate_knntriplets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">k_genuine</span><span class="p">,</span> <span class="n">k_impostor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates triplets from labeled data.</span>
 
 <span class="sd">    For every point (X_a) the triplets (X_a, X_b, X_c) are constructed from all</span>
@@ -262,12 +204,14 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">      X : (n x d) matrix</span>
-<span class="sd">        Input data, where each row corresponds to a single instance.</span>
-<span class="sd">      k_genuine : int</span>
-<span class="sd">        Number of neighbors of the same class to be taken into account.</span>
-<span class="sd">      k_impostor : int</span>
-<span class="sd">        Number of neighbors of different classes to be taken into account.</span>
+<span class="sd">    X : (n x d) matrix</span>
+<span class="sd">      Input data, where each row corresponds to a single instance.</span>
+
+<span class="sd">    k_genuine : int</span>
+<span class="sd">      Number of neighbors of the same class to be taken into account.</span>
+
+<span class="sd">    k_impostor : int</span>
+<span class="sd">      Number of neighbors of different classes to be taken into account.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -355,15 +299,16 @@
 
     <span class="k">return</span> <span class="n">triplets</span></div>
 
-  <span class="k">def</span> <span class="nf">_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">,</span> <span class="n">same_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+
+  <span class="k">def</span> <span class="nf">_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_constraints</span><span class="p">,</span> <span class="n">same_label</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
              <span class="n">random_state</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="p">):</span>
     <span class="n">known_label_idx</span><span class="p">,</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">known_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span><span class="p">[</span><span class="n">known_label_idx</span><span class="p">]</span>
     <span class="n">num_labels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">known_labels</span><span class="p">)</span>
     <span class="n">ab</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="n">max_iter</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_constraints</span><span class="p">:</span>
-      <span class="n">nc</span> <span class="o">=</span> <span class="n">num_constraints</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="n">max_iter</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_constraints</span><span class="p">:</span>
+      <span class="n">nc</span> <span class="o">=</span> <span class="n">n_constraints</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span>
       <span class="k">for</span> <span class="n">aidx</span> <span class="ow">in</span> <span class="n">random_state</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">num_labels</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nc</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">same_label</span><span class="p">:</span>
           <span class="n">mask</span> <span class="o">=</span> <span class="n">known_labels</span><span class="p">[</span><span class="n">aidx</span><span class="p">]</span> <span class="o">==</span> <span class="n">known_labels</span>
@@ -374,25 +319,28 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b_choices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
           <span class="n">ab</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">aidx</span><span class="p">,</span> <span class="n">random_state</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">b_choices</span><span class="p">)))</span>
       <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_constraints</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_constraints</span><span class="p">:</span>
       <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Only generated </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> constraints (requested </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span>
-          <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">),</span> <span class="s1">&#39;positive&#39;</span> <span class="k">if</span> <span class="n">same_label</span> <span class="k">else</span> <span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="n">num_constraints</span><span class="p">))</span>
-    <span class="n">ab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ab</span><span class="p">)[:</span><span class="n">num_constraints</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+          <span class="nb">len</span><span class="p">(</span><span class="n">ab</span><span class="p">),</span> <span class="s1">&#39;positive&#39;</span> <span class="k">if</span> <span class="n">same_label</span> <span class="k">else</span> <span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="n">n_constraints</span><span class="p">))</span>
+    <span class="n">ab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ab</span><span class="p">)[:</span><span class="n">n_constraints</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">known_label_idx</span><span class="p">[</span><span class="n">ab</span><span class="o">.</span><span class="n">T</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Constraints.chunks"><a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.chunks">[docs]</a>  <span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Constraints.chunks">
+<a class="viewcode-back" href="../../generated/metric_learn.Constraints.html#metric_learn.Constraints.chunks">[docs]</a>
+  <span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_chunks</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">num_chunks</span><span class="o">=</span><span class="s1">&#39;deprecated&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates chunks from labeled data.</span>
 
-<span class="sd">    Each of ``num_chunks`` chunks is composed of ``chunk_size`` points from</span>
+<span class="sd">    Each of ``n_chunks`` chunks is composed of ``chunk_size`` points from</span>
 <span class="sd">    the same class drawn at random. Each point can belong to at most 1 chunk.</span>
 
-<span class="sd">    In the case where there is not enough points to generate ``num_chunks``</span>
+<span class="sd">    In the case where there is not enough points to generate ``n_chunks``</span>
 <span class="sd">    chunks of size ``chunk_size``, a ValueError will be raised.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    num_chunks : int, optional (default=100)</span>
+<span class="sd">    n_chunks : int, optional (default=100)</span>
 <span class="sd">      Number of chunks to generate.</span>
 
 <span class="sd">    chunk_size : int, optional (default=2)</span>
@@ -401,12 +349,20 @@
 <span class="sd">    random_state : int or numpy.RandomState or None, optional (default=None)</span>
 <span class="sd">      A pseudo random number generator object or a seed for it if int.</span>
 
+<span class="sd">    num_chunks : Renamed to n_chunks. Will be deprecated in 0.7.0</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    chunks : array-like, shape=(n_samples,)</span>
 <span class="sd">      1D array of chunk indicators, where -1 indicates that the point does not</span>
 <span class="sd">      belong to any chunk.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">num_chunks</span> <span class="o">!=</span> <span class="s1">&#39;deprecated&#39;</span><span class="p">:</span>
+      <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&quot;num_chunks&quot; parameter has been renamed to&#39;</span>
+                    <span class="s1">&#39; &quot;n_chunks&quot;. It has been deprecated in&#39;</span>
+                    <span class="s1">&#39; version 0.6.3 and will be removed in 0.7.0&#39;</span>
+                    <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="ne">FutureWarning</span><span class="p">)</span>
+      <span class="n">n_chunks</span> <span class="o">=</span> <span class="n">num_chunks</span>
     <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
     <span class="n">chunks</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">uniq</span><span class="p">,</span> <span class="n">lookup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partial_labels</span><span class="p">,</span> <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -414,13 +370,13 @@
     <span class="n">all_inds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lookup</span> <span class="o">==</span> <span class="n">c</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uniq</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unknown_uniq</span><span class="p">]</span>
     <span class="n">max_chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">//</span> <span class="n">chunk_size</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">all_inds</span><span class="p">]))</span>
-    <span class="k">if</span> <span class="n">max_chunks</span> <span class="o">&lt;</span> <span class="n">num_chunks</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">max_chunks</span> <span class="o">&lt;</span> <span class="n">n_chunks</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s1">&#39;Not enough possible chunks of </span><span class="si">%d</span><span class="s1"> elements in each&#39;</span>
                         <span class="s1">&#39; class to form expected </span><span class="si">%d</span><span class="s1"> chunks - maximum number&#39;</span>
                         <span class="s1">&#39; of chunks is </span><span class="si">%d</span><span class="s1">&#39;</span>
-                        <span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">,</span> <span class="n">max_chunks</span><span class="p">))</span>
+                        <span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">chunk_size</span><span class="p">,</span> <span class="n">n_chunks</span><span class="p">,</span> <span class="n">max_chunks</span><span class="p">))</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">while</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">num_chunks</span> <span class="ow">and</span> <span class="n">all_inds</span><span class="p">:</span>
+    <span class="k">while</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">n_chunks</span> <span class="ow">and</span> <span class="n">all_inds</span><span class="p">:</span>
       <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_inds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
       <span class="k">else</span><span class="p">:</span>
@@ -433,7 +389,9 @@
       <span class="n">inds</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
       <span class="n">chunks</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
       <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">chunks</span></div></div>
+    <span class="k">return</span> <span class="n">chunks</span></div>
+</div>
+
 
 
 <span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">sizeB</span><span class="p">,</span> <span class="n">sizeC</span><span class="p">):</span>
@@ -457,49 +415,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
-
-    </p>
+    <p>&#169; Copyright 2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

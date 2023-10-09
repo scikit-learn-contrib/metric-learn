@@ -1,4 +1,4 @@
-:mod:`metric_learn`.NCA
+﻿:mod:`metric_learn`.NCA
 ==============================
 
 .. currentmodule:: metric_learn

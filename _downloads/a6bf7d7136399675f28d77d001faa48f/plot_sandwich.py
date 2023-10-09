@@ -6,6 +6,13 @@ Sandwich demo
 Sandwich demo based on code from http://nbviewer.ipython.org/6576096
 """
 
+######################################################################
+# .. note::
+#
+#     In order to show the charts of the examples you need a graphical
+#     ``matplotlib`` backend installed. For intance, use ``pip install pyqt5``
+#     to get Qt graphical interface or use your favorite one.
+
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.metrics import pairwise_distances
@@ -28,9 +35,9 @@ def sandwich_demo():
 
   mls = [
       LMNN(),
-      ITML_Supervised(num_constraints=200),
-      SDML_Supervised(num_constraints=200, balance_param=0.001),
-      LSML_Supervised(num_constraints=200),
+      ITML_Supervised(n_constraints=200),
+      SDML_Supervised(n_constraints=200, balance_param=0.001),
+      LSML_Supervised(n_constraints=200),
   ]
 
   for ax_num, ml in enumerate(mls, start=3):

@@ -1,4 +1,4 @@
-:mod:`metric_learn`.MMC_Supervised
+﻿:mod:`metric_learn`.MMC_Supervised
 =========================================
 
 .. currentmodule:: metric_learn
