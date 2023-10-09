@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metric_learn.base_metric.MahalanobisMixin &mdash; metric-learn 0.7.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/styles.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/js/copybutton.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="metric_learn.base_metric._PairsClassifierMixin" href="metric_learn.base_metric._PairsClassifierMixin.html" />
+    <link rel="prev" title="metric_learn.base_metric.MetricTransformer" href="metric_learn.base_metric.MetricTransformer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            metric-learn
+          </a>
+              <div class="version">
+                0.7.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide.html">User Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../metric_learn.html">Package Contents</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../metric_learn.html#module-contents">Module Contents</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../metric_learn.html#base-classes">Base Classes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.Constraints.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.BaseMetricLearner.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.MetricTransformer.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.MetricTransformer</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.MahalanobisMixin</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin"><code class="docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples-using-metric-learn-base-metric-mahalanobismixin">Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric.MahalanobisMixin</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._PairsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._TripletsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._TripletsClassifierMixin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._QuadrupletsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._QuadrupletsClassifierMixin</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../metric_learn.html#supervised-learning-algorithms">Supervised Learning Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metric_learn.html#weakly-supervised-learning-algorithms">Weakly Supervised Learning Algorithms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../metric_learn.html#unsupervised-learning-algorithms">Unsupervised Learning Algorithms</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">metric-learn</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../metric_learn.html">metric_learn package</a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.MahalanobisMixin</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/metric_learn.base_metric.MahalanobisMixin.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="metric-learn-base-metric-mahalanobismixin">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.MahalanobisMixin<a class="headerlink" href="#metric-learn-base-metric-mahalanobismixin" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metric_learn.base_metric.</span></span><span class="sig-name descname"><span class="pre">MahalanobisMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preprocessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#MahalanobisMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin" title="Link to this definition"></a></dt>
+<dd><p>Mahalanobis metric learning algorithms.</p>
+<p>Algorithm that learns a Mahalanobis (pseudo) distance <span class="math notranslate nohighlight">\(d_M(x, x')\)</span>,
+defined between two column vectors <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(x'\)</span> by: <span class="math notranslate nohighlight">\(d_M(x,
+x') = \sqrt{(x-x')^T M (x-x')}\)</span>, where <span class="math notranslate nohighlight">\(M\)</span> is a learned symmetric
+positive semi-definite (PSD) matrix. The metric between points can then be
+expressed as the euclidean distance between points embedded in a new space
+through a linear transformation. Indeed, the above matrix can be decomposed
+into the product of two transpose matrices (through SVD or Cholesky
+decomposition): <span class="math notranslate nohighlight">\(d_M(x, x')^2 = (x-x')^T M (x-x') = (x-x')^T L^T L
+(x-x') = (L x - L x')^T (L x- L x')\)</span></p>
+<dl class="field-list">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>components_</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_components, n_features)</span></dt><dd><p>The learned linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.get_mahalanobis_matrix" title="metric_learn.base_metric.MahalanobisMixin.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</p></td>
+<td><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.get_metadata_routing" title="metric_learn.base_metric.MahalanobisMixin.get_metadata_routing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata_routing</span></code></a>()</p></td>
+<td><p>Get metadata routing of this object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.get_metric" title="metric_learn.base_metric.MahalanobisMixin.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</p></td>
+<td><p>Returns a function that takes as input two 1D arrays and outputs the value of the learned metric on these two points.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.get_params" title="metric_learn.base_metric.MahalanobisMixin.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.pair_distance" title="metric_learn.base_metric.MahalanobisMixin.pair_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_distance</span></code></a>(pairs)</p></td>
+<td><p>Returns the learned Mahalanobis distance between pairs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.pair_score" title="metric_learn.base_metric.MahalanobisMixin.pair_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_score</span></code></a>(pairs)</p></td>
+<td><p>Returns the opposite of the learned Mahalanobis distance between pairs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.score_pairs" title="metric_learn.base_metric.MahalanobisMixin.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</p></td>
+<td><p>Returns the learned Mahalanobis distance between pairs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.set_params" title="metric_learn.base_metric.MahalanobisMixin.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.transform" title="metric_learn.base_metric.MahalanobisMixin.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
+<td><p>Embeds data points in the learned linear embedding space.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preprocessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.get_mahalanobis_matrix">
+<span class="sig-name descname"><span class="pre">get_mahalanobis_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#MahalanobisMixin.get_mahalanobis_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.get_mahalanobis_matrix" title="Link to this definition"></a></dt>
+<dd><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>M</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_features, n_features)</span></dt><dd><p>The copy of the learned Mahalanobis matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.get_metadata_routing" title="Link to this definition"></a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.get_metric">
+<span class="sig-name descname"><span class="pre">get_metric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#MahalanobisMixin.get_metric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.get_metric" title="Link to this definition"></a></dt>
+<dd><p>Returns a function that takes as input two 1D arrays and outputs
+the value of the learned metric on these two points. Depending on the
+algorithm, it can return a distance or a similarity function between
+pairs.</p>
+<p>This function will be independent from the metric learner that learned it
+(it will not be modified if the initial metric learner is modified),
+and it can be directly plugged into the <cite>metric</cite> argument of
+scikit-learn’s estimators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>metric_fun</strong><span class="classifier">function</span></dt><dd><p>The function described above.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.pair_distance" title="metric_learn.base_metric.MahalanobisMixin.pair_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_distance</span></code></a></dt><dd><p>a method that returns the distance between several pairs of points. Unlike <cite>get_metric</cite>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</p>
+</dd>
+<dt><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.pair_score" title="metric_learn.base_metric.MahalanobisMixin.pair_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_score</span></code></a></dt><dd><p>a method that returns the similarity score between several pairs of points. Unlike <cite>get_metric</cite>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_classification</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">knn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="n">nca</span><span class="o">.</span><span class="n">get_metric</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">knn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> 
+<span class="go">KNeighborsClassifier(algorithm=&#39;auto&#39;, leaf_size=30,</span>
+<span class="go">  metric=&lt;function MahalanobisMixin.get_metric.&lt;locals&gt;.metric_fun</span>
+<span class="go">          at 0x...&gt;,</span>
+<span class="go">  metric_params=None, n_jobs=None, n_neighbors=5, p=2,</span>
+<span class="go">  weights=&#39;uniform&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.get_params" title="Link to this definition"></a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.pair_distance">
+<span class="sig-name descname"><span class="pre">pair_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#MahalanobisMixin.pair_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.pair_distance" title="Link to this definition"></a></dt>
+<dd><p>Returns the learned Mahalanobis distance between pairs.</p>
+<p>This distance is defined as: <span class="math notranslate nohighlight">\(d_M(x, x') = \sqrt{(x-x')^T M (x-x')}\)</span>
+where <code class="docutils literal notranslate"><span class="pre">M</span></code> is the learned Mahalanobis matrix, for every pair of points
+<code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">x'</span></code>. This corresponds to the euclidean distance between
+embeddings of the points in a new space, obtained through a linear
+transformation. Indeed, we have also: <span class="math notranslate nohighlight">\(d_M(x, x') = \sqrt{(x_e -
+x_e')^T (x_e- x_e')}\)</span>, with <span class="math notranslate nohighlight">\(x_e = L x\)</span> (See
+<a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin" title="metric_learn.base_metric.MahalanobisMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code></a>).</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The learned Mahalanobis distance for every pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.get_metric" title="metric_learn.base_metric.MahalanobisMixin.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>pair_distance</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is  not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.pair_score">
+<span class="sig-name descname"><span class="pre">pair_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#MahalanobisMixin.pair_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.pair_score" title="Link to this definition"></a></dt>
+<dd><p>Returns the opposite of the learned Mahalanobis distance between pairs.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The opposite of the learned Mahalanobis distance for every pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.get_metric" title="metric_learn.base_metric.MahalanobisMixin.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>pair_score</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.score_pairs">
+<span class="sig-name descname"><span class="pre">score_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#MahalanobisMixin.score_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.score_pairs" title="Link to this definition"></a></dt>
+<dd><p>Returns the learned Mahalanobis distance between pairs.</p>
+<p>This distance is defined as: <span class="math notranslate nohighlight">\(d_M(x, x') = \\sqrt{(x-x')^T M (x-x')}\)</span>
+where <code class="docutils literal notranslate"><span class="pre">M</span></code> is the learned Mahalanobis matrix, for every pair of points
+<code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">x'</span></code>. This corresponds to the euclidean distance between
+embeddings of the points in a new space, obtained through a linear
+transformation. Indeed, we have also: <span class="math notranslate nohighlight">\(d_M(x, x') = \\sqrt{(x_e -
+x_e')^T (x_e- x_e')}\)</span>, with <span class="math notranslate nohighlight">\(x_e = L x\)</span> (See
+<a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin" title="metric_learn.base_metric.MahalanobisMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code></a>).</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>Please use <cite>pair_distance</cite> instead.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method will be removed in 0.8.0. Please refer to <cite>pair_distance</cite>
+or <cite>pair_score</cite>. This change will occur in order to add learners
+that don’t necessarily learn a Mahalanobis distance.</p>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The learned Mahalanobis distance for every pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin.get_metric" title="metric_learn.base_metric.MahalanobisMixin.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>score_pairs</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is  not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.set_params" title="Link to this definition"></a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.base_metric.MahalanobisMixin.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/base_metric.html#MahalanobisMixin.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.base_metric.MahalanobisMixin.transform" title="Link to this definition"></a></dt>
+<dd><p>Embeds data points in the learned linear embedding space.</p>
+<p>Transforms samples in <code class="docutils literal notranslate"><span class="pre">X</span></code> into <code class="docutils literal notranslate"><span class="pre">X_embedded</span></code>, samples inside a new
+embedding space such that: <code class="docutils literal notranslate"><span class="pre">X_embedded</span> <span class="pre">=</span> <span class="pre">X.dot(L.T)</span></code>, where <code class="docutils literal notranslate"><span class="pre">L</span></code> is
+the learned linear transformation (See <a class="reference internal" href="#metric_learn.base_metric.MahalanobisMixin" title="metric_learn.base_metric.MahalanobisMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code></a>).</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_samples, n_features)</span></dt><dd><p>The data points to embed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>X_embedded</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_samples, n_components)</span></dt><dd><p>The embedded data points.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="examples-using-metric-learn-base-metric-mahalanobismixin">
+<h2>Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.base_metric.MahalanobisMixin</span></code><a class="headerlink" href="#examples-using-metric-learn-base-metric-mahalanobismixin" title="Link to this heading"></a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Sandwich demo based on code from http://nbviewer.ipython.org/6576096"><img alt="" src="../_images/sphx_glr_plot_sandwich_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_sandwich.html#sphx-glr-auto-examples-plot-sandwich-py"><span class="std std-ref">Sandwich demo</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Sandwich demo</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This is a small walkthrough which illustrates most of the Metric Learning algorithms implemente..."><img alt="" src="../_images/sphx_glr_plot_metric_learning_examples_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_metric_learning_examples.html#sphx-glr-auto-examples-plot-metric-learning-examples-py"><span class="std std-ref">Algorithms walkthrough</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Algorithms walkthrough</div>
+</div></div><div style='clear:both'></div></section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metric_learn.base_metric.MetricTransformer.html" class="btn btn-neutral float-left" title="metric_learn.base_metric.MetricTransformer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="metric_learn.base_metric._PairsClassifierMixin.html" class="btn btn-neutral float-right" title="metric_learn.base_metric._PairsClassifierMixin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

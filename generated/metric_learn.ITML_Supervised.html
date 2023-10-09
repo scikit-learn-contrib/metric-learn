@@ -1,97 +1,57 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>metric_learn.ITML_Supervised &mdash; metric-learn 0.6.2 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metric_learn.ITML_Supervised &mdash; metric-learn 0.7.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/styles.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/js/copybutton.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="metric_learn.LSML_Supervised" href="metric_learn.LSML_Supervised.html" />
     <link rel="prev" title="metric_learn.RCA" href="metric_learn.RCA.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            metric-learn
           </a>
-
-          
-            
-            
               <div class="version">
-                0.6.2
+                0.7.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 </ul>
@@ -109,6 +69,7 @@
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.NCA.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.NCA</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.RCA.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.RCA</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.ITML_Supervised</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metric_learn.ITML_Supervised"><code class="docutils literal notranslate"><span class="pre">ITML_Supervised</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#examples-using-metric-learn-itml-supervised">Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.ITML_Supervised</span></code></a></li>
 </ul>
 </li>
@@ -128,106 +89,64 @@
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">metric-learn</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../metric_learn.html">metric_learn package</a> &raquo;</li>
-        
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.ITML_Supervised</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../metric_learn.html">metric_learn package</a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.ITML_Supervised</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/generated/metric_learn.ITML_Supervised.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="metric-learn-itml-supervised">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.ITML_Supervised<a class="headerlink" href="#metric-learn-itml-supervised" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="metric-learn-itml-supervised">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.ITML_Supervised<a class="headerlink" href="#metric-learn-itml-supervised" title="Link to this heading"></a></h1>
 <dl class="py class">
-<dt id="metric_learn.ITML_Supervised">
-<em class="property">class </em><code class="descclassname">metric_learn.</code><code class="descname">ITML_Supervised</code><span class="sig-paren">(</span><em><span class="n">gamma</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em><span class="n">convergence_threshold</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em><span class="n">num_constraints</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">prior</span><span class="o">=</span><span class="default_value">'identity'</span></em>, <em><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/itml.html#ITML_Supervised"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.ITML_Supervised" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metric_learn.</span></span><span class="sig-name descname"><span class="pre">ITML_Supervised</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'identity'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deprecated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deprecated'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/itml.html#ITML_Supervised"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.ITML_Supervised" title="Link to this definition"></a></dt>
 <dd><p>Supervised version of Information Theoretic Metric Learning (ITML)</p>
-<p><a class="reference internal" href="#metric_learn.ITML_Supervised" title="metric_learn.ITML_Supervised"><code class="xref any py py-class docutils literal notranslate"><span class="pre">ITML_Supervised</span></code></a> creates pairs of similar sample by taking same class
+<p><cite>ITML_Supervised</cite> creates pairs of similar sample by taking same class
 samples, and pairs of dissimilar samples by taking different class
-samples. It then passes these pairs to <a class="reference internal" href="../weakly_supervised.html#itml"><span class="std std-ref">ITML</span></a> for training.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+samples. It then passes these pairs to <cite>ITML</cite> for training.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
 <dt><strong>gamma</strong><span class="classifier">float, optional (default=1.0)</span></dt><dd><p>Value for slack variables</p>
 </dd>
 <dt><strong>max_iter</strong><span class="classifier">int, optional (default=1000)</span></dt><dd><p>Maximum number of iterations of the optimization procedure.</p>
 </dd>
-<dt><strong>convergence_threshold</strong><span class="classifier">float, optional (default=1e-3)</span></dt><dd><p>Tolerance of the optimization procedure.</p>
+<dt><strong>tol</strong><span class="classifier">float, optional (default=1e-3)</span></dt><dd><p>Tolerance of the optimization procedure.</p>
 </dd>
-<dt><strong>num_constraints</strong><span class="classifier">int, optional (default=None)</span></dt><dd><p>Number of constraints to generate. If None, default to <code class="xref any docutils literal notranslate"><span class="pre">20</span> <span class="pre">*</span>
-<span class="pre">num_classes**2</span></code>.</p>
+<dt><strong>n_constraints</strong><span class="classifier">int, optional (default=None)</span></dt><dd><p>Number of constraints to generate. If None, default to <cite>20 *
+num_classes**2</cite>.</p>
 </dd>
 <dt><strong>prior</strong><span class="classifier">string or numpy array, optional (default=’identity’)</span></dt><dd><p>Initialization of the Mahalanobis matrix. Possible options are
 ‘identity’, ‘covariance’, ‘random’, and a numpy array of shape
 (n_features, n_features). For ITML, the prior should be strictly
 positive definite (PD).</p>
-<dl class="docutils">
+<dl class="simple">
 <dt>‘identity’</dt><dd><p>An identity matrix of shape (n_features, n_features).</p>
 </dd>
 <dt>‘covariance’</dt><dd><p>The inverse covariance matrix.</p>
 </dd>
 <dt>‘random’</dt><dd><p>The prior will be a random SPD matrix of shape
-<code class="xref any docutils literal notranslate"><span class="pre">(n_features,</span> <span class="pre">n_features)</span></code>, generated using
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_spd_matrix.html#sklearn.datasets.make_spd_matrix" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">sklearn.datasets.make_spd_matrix</span></code></a>.</p>
+<cite>(n_features, n_features)</cite>, generated using
+<cite>sklearn.datasets.make_spd_matrix</cite>.</p>
 </dd>
 <dt>numpy array</dt><dd><p>A positive definite (PD) matrix of shape
 (n_features, n_features), that will be used as such to set the
@@ -242,19 +161,21 @@ tuples will be formed like this: X[indices].</p>
 </dd>
 <dt><strong>random_state</strong><span class="classifier">int or numpy.RandomState or None, optional (default=None)</span></dt><dd><p>A pseudo random number generator object or a seed for it if int. If
 <code class="docutils literal notranslate"><span class="pre">prior='random'</span></code>, <code class="docutils literal notranslate"><span class="pre">random_state</span></code> is used to set the prior. In any
-case, <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-random-state" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">random_state</span></code></a> is also used to randomly sample constraints from
+case, <cite>random_state</cite> is also used to randomly sample constraints from
 labels.</p>
 </dd>
+<dt><strong>num_constraints</strong><span class="classifier">Renamed to n_constraints. Will be deprecated in 0.7.0</span></dt><dd></dd>
+<dt><strong>convergence_threshold</strong><span class="classifier">Renamed to tol. Will be deprecated in 0.7.0</span></dt><dd></dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="metric_learn.ITML.html#metric_learn.ITML" title="metric_learn.ITML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.ITML</span></code></a></dt><dd>The original weakly-supervised algorithm</dd>
-<dt><a class="reference internal" href="../supervised.html#supervised-version"><span class="std std-ref">Supervised versions of weakly-supervised algorithms</span></a></dt><dd>The section of the project documentation that describes the supervised version of weakly supervised estimators.</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="metric_learn.ITML.html#metric_learn.ITML" title="metric_learn.ITML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metric_learn.ITML</span></code></a></dt><dd><p>The original weakly-supervised algorithm</p>
+</dd>
+<dt><a class="reference internal" href="../supervised.html#supervised-version"><span class="std std-ref">Supervised versions of weakly-supervised algorithms</span></a></dt><dd><p>The section of the project documentation that describes the supervised version of weakly supervised estimators.</p>
+</dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
@@ -263,81 +184,85 @@ labels.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Y</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">itml</span> <span class="o">=</span> <span class="n">ITML_Supervised</span><span class="p">(</span><span class="n">num_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">itml</span> <span class="o">=</span> <span class="n">ITML_Supervised</span><span class="p">(</span><span class="n">n_constraints</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">itml</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>bounds_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(2,)</span></dt><dd><p>Bounds on similarity, aside slack variables, s.t.
+<dl class="field-list">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>bounds_</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(2,)</span></dt><dd><p>Bounds on similarity, aside slack variables, s.t.
 <code class="docutils literal notranslate"><span class="pre">d(a,</span> <span class="pre">b)</span> <span class="pre">&lt;</span> <span class="pre">bounds_[0]</span></code> for all given pairs of similar points <code class="docutils literal notranslate"><span class="pre">a</span></code>
 and <code class="docutils literal notranslate"><span class="pre">b</span></code>, and <code class="docutils literal notranslate"><span class="pre">d(c,</span> <span class="pre">d)</span> <span class="pre">&gt;</span> <span class="pre">bounds_[1]</span></code> for all given pairs of
 dissimilar points <code class="docutils literal notranslate"><span class="pre">c</span></code> and <code class="docutils literal notranslate"><span class="pre">d</span></code>, with <code class="docutils literal notranslate"><span class="pre">d</span></code> the learned distance.
 If not provided at initialization, bounds_[0] and bounds_[1] are set at
 train time to the 5th and 95th percentile of the pairwise distances
-among all points in the training data <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>.</p>
+among all points in the training data <cite>X</cite>.</p>
 </dd>
-<dt><strong>n_iter_</strong><span class="classifier"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a></span></dt><dd><p>The number of iterations the solver has run.</p>
+<dt><strong>n_iter_</strong><span class="classifier"><cite>int</cite></span></dt><dd><p>The number of iterations the solver has run.</p>
 </dd>
-<dt><strong>components_</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt><dd><p>The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
-metric (See function <code class="xref any docutils literal notranslate"><span class="pre">components_from_metric</span></code>.)</p>
+<dt><strong>components_</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_features, n_features)</span></dt><dd><p>The linear transformation <code class="docutils literal notranslate"><span class="pre">L</span></code> deduced from the learned Mahalanobis
+metric (See function <cite>components_from_metric</cite>.)</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils align-default">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.ITML_Supervised.fit" title="metric_learn.ITML_Supervised.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X,&nbsp;y[,&nbsp;bounds])</td>
-<td>Create constraints from labels and learn the ITML model.</td>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.fit" title="metric_learn.ITML_Supervised.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y[, bounds])</p></td>
+<td><p>Create constraints from labels and learn the ITML model.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.ITML_Supervised.fit_transform" title="metric_learn.ITML_Supervised.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[,&nbsp;y])</td>
-<td>Fit to data, then transform it.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.fit_transform" title="metric_learn.ITML_Supervised.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X[, y])</p></td>
+<td><p>Fit to data, then transform it.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.ITML_Supervised.get_mahalanobis_matrix" title="metric_learn.ITML_Supervised.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</td>
-<td>Returns a copy of the Mahalanobis matrix learned by the metric learner.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.get_mahalanobis_matrix" title="metric_learn.ITML_Supervised.get_mahalanobis_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mahalanobis_matrix</span></code></a>()</p></td>
+<td><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.ITML_Supervised.get_metric" title="metric_learn.ITML_Supervised.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</td>
-<td>Returns a function that takes as input two 1D arrays and outputs the learned metric score on these two points.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.get_metadata_routing" title="metric_learn.ITML_Supervised.get_metadata_routing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata_routing</span></code></a>()</p></td>
+<td><p>Get metadata routing of this object.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.ITML_Supervised.get_params" title="metric_learn.ITML_Supervised.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</td>
-<td>Get parameters for this estimator.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.get_metric" title="metric_learn.ITML_Supervised.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a>()</p></td>
+<td><p>Returns a function that takes as input two 1D arrays and outputs the value of the learned metric on these two points.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.ITML_Supervised.score_pairs" title="metric_learn.ITML_Supervised.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</td>
-<td>Returns the learned Mahalanobis distance between pairs.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.get_params" title="metric_learn.ITML_Supervised.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.ITML_Supervised.set_params" title="metric_learn.ITML_Supervised.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</td>
-<td>Set the parameters of this estimator.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.pair_distance" title="metric_learn.ITML_Supervised.pair_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_distance</span></code></a>(pairs)</p></td>
+<td><p>Returns the learned Mahalanobis distance between pairs.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.ITML_Supervised.transform" title="metric_learn.ITML_Supervised.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</td>
-<td>Embeds data points in the learned linear embedding space.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.pair_score" title="metric_learn.ITML_Supervised.pair_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_score</span></code></a>(pairs)</p></td>
+<td><p>Returns the opposite of the learned Mahalanobis distance between pairs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.score_pairs" title="metric_learn.ITML_Supervised.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a>(pairs)</p></td>
+<td><p>Returns the learned Mahalanobis distance between pairs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.set_fit_request" title="metric_learn.ITML_Supervised.set_fit_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_fit_request</span></code></a>(*[, bounds])</p></td>
+<td><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.set_output" title="metric_learn.ITML_Supervised.set_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_output</span></code></a>(*[, transform])</p></td>
+<td><p>Set output container.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.set_params" title="metric_learn.ITML_Supervised.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.ITML_Supervised.transform" title="metric_learn.ITML_Supervised.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
+<td><p>Embeds data points in the learned linear embedding space.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="metric_learn.ITML_Supervised.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">gamma</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em><span class="n">convergence_threshold</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em><span class="n">num_constraints</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">prior</span><span class="o">=</span><span class="default_value">'identity'</span></em>, <em><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">preprocessor</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/itml.html#ITML_Supervised.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.ITML_Supervised.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'identity'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deprecated'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deprecated'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/itml.html#ITML_Supervised.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.ITML_Supervised.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.ITML_Supervised.fit">
-<code class="descname">fit</code><span class="sig-paren">(</span><em><span class="n">X</span></em>, <em><span class="n">y</span></em>, <em><span class="n">bounds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/itml.html#ITML_Supervised.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.ITML_Supervised.fit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/itml.html#ITML_Supervised.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.ITML_Supervised.fit" title="Link to this definition"></a></dt>
 <dd><p>Create constraints from labels and learn the ITML model.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>X</strong><span class="classifier">(n x d) matrix</span></dt><dd><p>Input data, where each row corresponds to a single instance.</p>
 </dd>
 <dt><strong>y</strong><span class="classifier">(n) array-like</span></dt><dd><p>Data labels.</p>
@@ -348,91 +273,100 @@ and <code class="docutils literal notranslate"><span class="pre">b</span></code>
 dissimilar points <code class="docutils literal notranslate"><span class="pre">c</span></code> and <code class="docutils literal notranslate"><span class="pre">d</span></code>, with <code class="docutils literal notranslate"><span class="pre">d</span></code> the learned distance.
 If not provided at initialization, bounds_[0] and bounds_[1] will be
 set to the 5th and 95th percentile of the pairwise distances among all
-points in the training data <code class="xref any docutils literal notranslate"><span class="pre">X</span></code>.</p>
+points in the training data <cite>X</cite>.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.ITML_Supervised.fit_transform">
-<code class="descname">fit_transform</code><span class="sig-paren">(</span><em><span class="n">X</span></em>, <em><span class="n">y</span><span class="o">=</span><span class="default_value">None</span></em>, <em><span class="o">**</span><span class="n">fit_params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">fit_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.fit_transform" title="Link to this definition"></a></dt>
 <dd><p>Fit to data, then transform it.</p>
-<p>Fits transformer to X and y with optional parameters fit_params
-and returns a transformed version of X.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong><span class="classifier">{array-like, sparse matrix, dataframe} of shape                 (n_samples, n_features)</span></dt><dd></dd>
-<dt><strong>y</strong><span class="classifier">ndarray of shape (n_samples,), default=None</span></dt><dd><p>Target values.</p>
+<p>Fits transformer to <cite>X</cite> and <cite>y</cite> with optional parameters <cite>fit_params</cite>
+and returns a transformed version of <cite>X</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">array-like of shape (n_samples, n_features)</span></dt><dd><p>Input samples.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">array-like of shape (n_samples,) or (n_samples, n_outputs),                 default=None</span></dt><dd><p>Target values (None for unsupervised transformations).</p>
 </dd>
 <dt><strong>**fit_params</strong><span class="classifier">dict</span></dt><dd><p>Additional fit parameters.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>X_new</strong><span class="classifier">ndarray array of shape (n_samples, n_features_new)</span></dt><dd><p>Transformed array.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="py method">
-<dt id="metric_learn.ITML_Supervised.get_mahalanobis_matrix">
-<code class="descname">get_mahalanobis_matrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.get_mahalanobis_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>M</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_features, n_features)</span></dt><dd><p>The copy of the learned Mahalanobis matrix.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.ITML_Supervised.get_metric">
-<code class="descname">get_metric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.get_metric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a function that takes as input two 1D arrays and outputs the
-learned metric score on these two points.</p>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.get_mahalanobis_matrix">
+<span class="sig-name descname"><span class="pre">get_mahalanobis_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.get_mahalanobis_matrix" title="Link to this definition"></a></dt>
+<dd><p>Returns a copy of the Mahalanobis matrix learned by the metric learner.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>M</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_features, n_features)</span></dt><dd><p>The copy of the learned Mahalanobis matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.get_metadata_routing" title="Link to this definition"></a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.get_metric">
+<span class="sig-name descname"><span class="pre">get_metric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.get_metric" title="Link to this definition"></a></dt>
+<dd><p>Returns a function that takes as input two 1D arrays and outputs
+the value of the learned metric on these two points. Depending on the
+algorithm, it can return a distance or a similarity function between
+pairs.</p>
 <p>This function will be independent from the metric learner that learned it
 (it will not be modified if the initial metric learner is modified),
-and it can be directly plugged into the <a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-metric" title="(in scikit-learn v0.23)"><code class="xref any docutils literal notranslate"><span class="pre">metric</span></code></a> argument of
+and it can be directly plugged into the <cite>metric</cite> argument of
 scikit-learn’s estimators.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>metric_fun</strong><span class="classifier">function</span></dt><dd><p>The function described above.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#metric_learn.ITML_Supervised.score_pairs" title="metric_learn.ITML_Supervised.score_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_pairs</span></code></a></dt><dd>a method that returns the metric score between several pairs of points. Unlike <a class="reference internal" href="#metric_learn.ITML_Supervised.get_metric" title="metric_learn.ITML_Supervised.get_metric"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">get_metric</span></code></a>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.ITML_Supervised.pair_distance" title="metric_learn.ITML_Supervised.pair_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_distance</span></code></a></dt><dd><p>a method that returns the distance between several pairs of points. Unlike <cite>get_metric</cite>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</p>
+</dd>
+<dt><a class="reference internal" href="#metric_learn.ITML_Supervised.pair_score" title="metric_learn.ITML_Supervised.pair_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_score</span></code></a></dt><dd><p>a method that returns the similarity score between several pairs of points. Unlike <cite>get_metric</cite>, this is a method of the metric learner and therefore can change if the metric learner changes. Besides, it can use the metric learner’s preprocessor, and works on concatenated arrays.</p>
+</dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-pycon3 notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_classification</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">()</span>
@@ -450,33 +384,29 @@ scikit-learn’s estimators.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.ITML_Supervised.get_params">
-<code class="descname">get_params</code><span class="sig-paren">(</span><em><span class="n">deep</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.get_params" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.get_params" title="Link to this definition"></a></dt>
 <dd><p>Get parameters for this estimator.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
 contained subobjects that are estimators.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>params</strong><span class="classifier">mapping of string to any</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.ITML_Supervised.score_pairs">
-<code class="descname">score_pairs</code><span class="sig-paren">(</span><em><span class="n">pairs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.score_pairs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.pair_distance">
+<span class="sig-name descname"><span class="pre">pair_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.pair_distance" title="Link to this definition"></a></dt>
 <dd><p>Returns the learned Mahalanobis distance between pairs.</p>
 <p>This distance is defined as: <span class="math notranslate nohighlight">\(d_M(x, x') = \sqrt{(x-x')^T M (x-x')}\)</span>
 where <code class="docutils literal notranslate"><span class="pre">M</span></code> is the learned Mahalanobis matrix, for every pair of points
@@ -485,159 +415,270 @@ embeddings of the points in a new space, obtained through a linear
 transformation. Indeed, we have also: <span class="math notranslate nohighlight">\(d_M(x, x') = \sqrt{(x_e -
 x_e')^T (x_e- x_e')}\)</span>, with <span class="math notranslate nohighlight">\(x_e = L x\)</span> (See
 <code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code>).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
 for 2D array of indices of pairs if the metric learner uses a
 preprocessor.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>scores</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of shape=(n_pairs,)</span></dt><dd><p>The learned Mahalanobis distance for every pair.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The learned Mahalanobis distance for every pair.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#metric_learn.ITML_Supervised.get_metric" title="metric_learn.ITML_Supervised.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd>a method that returns a function to compute the metric between two points. The difference with <a class="reference internal" href="#metric_learn.ITML_Supervised.score_pairs" title="metric_learn.ITML_Supervised.score_pairs"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">score_pairs</span></code></a> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</dd>
-<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd>The section of the project documentation that describes Mahalanobis Distances.</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.ITML_Supervised.get_metric" title="metric_learn.ITML_Supervised.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>pair_distance</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is  not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.ITML_Supervised.set_params">
-<code class="descname">set_params</code><span class="sig-paren">(</span><em><span class="o">**</span><span class="n">params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the parameters of this estimator.</p>
-<p>The method works on simple estimators as well as on nested objects
-(such as pipelines). The latter have parameters of the form
-<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
-component of a nested object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.pair_score">
+<span class="sig-name descname"><span class="pre">pair_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.pair_score" title="Link to this definition"></a></dt>
+<dd><p>Returns the opposite of the learned Mahalanobis distance between pairs.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>Estimator instance.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The opposite of the learned Mahalanobis distance for every pair.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.ITML_Supervised.get_metric" title="metric_learn.ITML_Supervised.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>pair_score</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
+</dl>
+</div>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.ITML_Supervised.transform">
-<code class="descname">transform</code><span class="sig-paren">(</span><em><span class="n">X</span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.score_pairs">
+<span class="sig-name descname"><span class="pre">score_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pairs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.score_pairs" title="Link to this definition"></a></dt>
+<dd><p>Returns the learned Mahalanobis distance between pairs.</p>
+<p>This distance is defined as: <span class="math notranslate nohighlight">\(d_M(x, x') = \\sqrt{(x-x')^T M (x-x')}\)</span>
+where <code class="docutils literal notranslate"><span class="pre">M</span></code> is the learned Mahalanobis matrix, for every pair of points
+<code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">x'</span></code>. This corresponds to the euclidean distance between
+embeddings of the points in a new space, obtained through a linear
+transformation. Indeed, we have also: <span class="math notranslate nohighlight">\(d_M(x, x') = \\sqrt{(x_e -
+x_e')^T (x_e- x_e')}\)</span>, with <span class="math notranslate nohighlight">\(x_e = L x\)</span> (See
+<code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code>).</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.7.0: </span>Please use <cite>pair_distance</cite> instead.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This method will be removed in 0.8.0. Please refer to <cite>pair_distance</cite>
+or <cite>pair_score</cite>. This change will occur in order to add learners
+that don’t necessarily learn a Mahalanobis distance.</p>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">array-like, shape=(n_pairs, 2, n_features) or (n_pairs, 2)</span></dt><dd><p>3D Array of pairs to score, with each row corresponding to two points,
+for 2D array of indices of pairs if the metric learner uses a
+preprocessor.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>scores</strong><span class="classifier"><cite>numpy.ndarray</cite> of shape=(n_pairs,)</span></dt><dd><p>The learned Mahalanobis distance for every pair.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#metric_learn.ITML_Supervised.get_metric" title="metric_learn.ITML_Supervised.get_metric"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metric</span></code></a></dt><dd><p>a method that returns a function to compute the metric between two points. The difference with <cite>score_pairs</cite> is that it works on two 1D arrays and cannot use a preprocessor. Besides, the returned function is independent of the metric learner and hence is  not modified if the metric learner is.</p>
+</dd>
+<dt><a class="reference internal" href="../introduction.html#mahalanobis-distances"><span class="std std-ref">Mahalanobis Distances</span></a></dt><dd><p>The section of the project documentation that describes Mahalanobis Distances.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.set_fit_request">
+<span class="sig-name descname"><span class="pre">set_fit_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'$UNCHANGED$'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#metric_learn.ITML_Supervised" title="metric_learn.itml.ITML_Supervised"><span class="pre">ITML_Supervised</span></a></span></span><a class="headerlink" href="#metric_learn.ITML_Supervised.set_fit_request" title="Link to this definition"></a></dt>
+<dd><p>Request metadata passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p>
+<p>Note that this method is only relevant if
+<code class="docutils literal notranslate"><span class="pre">enable_metadata_routing=True</span></code> (see <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.set_config.html#sklearn.set_config" title="(in scikit-learn v1.3)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sklearn.set_config()</span></code></a>).
+Please see <a class="reference external" href="https://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.3)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<p>The options for each parameter are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code>: metadata is requested, and passed to <code class="docutils literal notranslate"><span class="pre">fit</span></code> if provided. The request is ignored if metadata is not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code>: metadata is not requested and the meta-estimator will not pass it to <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: metadata is not requested, and the meta-estimator will raise an error if the user provides it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: metadata should be passed to the meta-estimator with this given alias instead of the original name.</p></li>
+</ul>
+<p>The default (<code class="docutils literal notranslate"><span class="pre">sklearn.utils.metadata_routing.UNCHANGED</span></code>) retains the
+existing request. This allows you to change the request for some
+parameters and not others.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 1.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method is only relevant if this estimator is used as a
+sub-estimator of a meta-estimator, e.g. used inside a
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>. Otherwise it has no effect.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>bounds</strong><span class="classifier">str, True, False, or None,                     default=sklearn.utils.metadata_routing.UNCHANGED</span></dt><dd><p>Metadata routing for <code class="docutils literal notranslate"><span class="pre">bounds</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">fit</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">object</span></dt><dd><p>The updated object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.set_output">
+<span class="sig-name descname"><span class="pre">set_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.set_output" title="Link to this definition"></a></dt>
+<dd><p>Set output container.</p>
+<p>See <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/miscellaneous/plot_set_output.html#sphx-glr-auto-examples-miscellaneous-plot-set-output-py" title="(in scikit-learn v1.3)"><span>Introducing the set_output API</span></a>
+for an example on how to use the API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>transform</strong><span class="classifier">{“default”, “pandas”}, default=None</span></dt><dd><p>Configure output of <cite>transform</cite> and <cite>fit_transform</cite>.</p>
+<ul class="simple">
+<li><p><cite>“default”</cite>: Default output format of a transformer</p></li>
+<li><p><cite>“pandas”</cite>: DataFrame output</p></li>
+<li><p><cite>None</cite>: Transform configuration is unchanged</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.set_params" title="Link to this definition"></a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metric_learn.ITML_Supervised.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metric_learn.ITML_Supervised.transform" title="Link to this definition"></a></dt>
 <dd><p>Embeds data points in the learned linear embedding space.</p>
 <p>Transforms samples in <code class="docutils literal notranslate"><span class="pre">X</span></code> into <code class="docutils literal notranslate"><span class="pre">X_embedded</span></code>, samples inside a new
 embedding space such that: <code class="docutils literal notranslate"><span class="pre">X_embedded</span> <span class="pre">=</span> <span class="pre">X.dot(L.T)</span></code>, where <code class="docutils literal notranslate"><span class="pre">L</span></code> is
 the learned linear transformation (See <code class="xref py py-class docutils literal notranslate"><span class="pre">MahalanobisMixin</span></code>).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_features)</span></dt><dd><p>The data points to embed.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>X</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_samples, n_features)</span></dt><dd><p>The data points to embed.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>X_embedded</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, shape=(n_samples, n_components)</span></dt><dd><p>The embedded data points.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>X_embedded</strong><span class="classifier"><cite>numpy.ndarray</cite>, shape=(n_samples, n_components)</span></dt><dd><p>The embedded data points.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<div class="section" id="examples-using-metric-learn-itml-supervised">
-<h2>Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.ITML_Supervised</span></code><a class="headerlink" href="#examples-using-metric-learn-itml-supervised" title="Permalink to this headline">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Sandwich demo based on code from http://nbviewer.ipython.org/6576096"><div class="figure align-default" id="id1">
-<img alt="Sandwich demo" src="../_images/sphx_glr_plot_sandwich_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_sandwich.html#sphx-glr-auto-examples-plot-sandwich-py"><span class="std std-ref">Sandwich demo</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This is a small walkthrough which illustrates most of the Metric Learning algorithms implemente..."><div class="figure align-default" id="id2">
-<img alt="Algorithms walkthrough" src="../_images/sphx_glr_plot_metric_learning_examples_thumb.png" />
-<p class="caption"><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_metric_learning_examples.html#sphx-glr-auto-examples-plot-metric-learning-examples-py"><span class="std std-ref">Algorithms walkthrough</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
-</div><div style='clear:both'></div></div>
-</div>
+<section id="examples-using-metric-learn-itml-supervised">
+<h2>Examples using <code class="docutils literal notranslate"><span class="pre">metric_learn.ITML_Supervised</span></code><a class="headerlink" href="#examples-using-metric-learn-itml-supervised" title="Link to this heading"></a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Sandwich demo based on code from http://nbviewer.ipython.org/6576096"><img alt="" src="../_images/sphx_glr_plot_sandwich_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_sandwich.html#sphx-glr-auto-examples-plot-sandwich-py"><span class="std std-ref">Sandwich demo</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Sandwich demo</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This is a small walkthrough which illustrates most of the Metric Learning algorithms implemente..."><img alt="" src="../_images/sphx_glr_plot_metric_learning_examples_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_metric_learning_examples.html#sphx-glr-auto-examples-plot-metric-learning-examples-py"><span class="std std-ref">Algorithms walkthrough</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Algorithms walkthrough</div>
+</div></div><div style='clear:both'></div></section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="metric_learn.LSML_Supervised.html" class="btn btn-neutral float-right" title="metric_learn.LSML_Supervised" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="metric_learn.RCA.html" class="btn btn-neutral float-left" title="metric_learn.RCA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metric_learn.RCA.html" class="btn btn-neutral float-left" title="metric_learn.RCA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="metric_learn.LSML_Supervised.html" class="btn btn-neutral float-right" title="metric_learn.LSML_Supervised" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
-
-    </p>
+    <p>&#169; Copyright 2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

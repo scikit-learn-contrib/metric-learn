@@ -1,4 +1,4 @@
-:mod:`metric_learn`.RCA
+﻿:mod:`metric_learn`.RCA
 ==============================
 
 .. currentmodule:: metric_learn

@@ -1,4 +1,4 @@
-:mod:`metric_learn.base_metric`._QuadrupletsClassifierMixin
+﻿:mod:`metric_learn.base_metric`._QuadrupletsClassifierMixin
 ==================================================================
 
 .. currentmodule:: metric_learn.base_metric

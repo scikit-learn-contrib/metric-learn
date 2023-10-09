@@ -1,97 +1,56 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>5. Preprocessor &mdash; metric-learn 0.6.2 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/basic.css" type="text/css" />
-  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>5. Preprocessor &mdash; metric-learn 0.7.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/styles.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=fe7df9b0"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/js/copybutton.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="metric_learn package" href="metric_learn.html" />
     <link rel="prev" title="4. Unsupervised Metric Learning" href="unsupervised.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            metric-learn
           </a>
-
-          
-            
-            
               <div class="version">
-                0.6.2
+                0.7.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 </ul>
@@ -116,73 +75,33 @@
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">metric-learn</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="user_guide.html">User Guide</a> &raquo;</li>
-        
-      <li><span class="section-number">5. </span>Preprocessor</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="user_guide.html">User Guide</a></li>
+      <li class="breadcrumb-item active"><span class="section-number">5. </span>Preprocessor</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/preprocessor.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="preprocessor">
-<span id="preprocessor-section"></span><h1><span class="section-number">5. </span>Preprocessor<a class="headerlink" href="#preprocessor" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="preprocessor">
+<span id="preprocessor-section"></span><h1><span class="section-number">5. </span>Preprocessor<a class="headerlink" href="#preprocessor" title="Link to this heading"></a></h1>
 <p>Estimators in metric-learn all have a <code class="docutils literal notranslate"><span class="pre">preprocessor</span></code> option at instantiation.
 Filling this argument allows them to take more compact input representation
 when fitting, predicting etc…</p>
@@ -191,21 +110,21 @@ provide the classical representation to the fit/predict/score/etc… methods of
 the estimators (see the documentation of the particular estimator to know the
 type of input it accepts). Otherwise, two types of objects can be put in this
 argument:</p>
-<div class="section" id="array-like">
-<h2><span class="section-number">5.1. </span>Array-like<a class="headerlink" href="#array-like" title="Permalink to this headline">¶</a></h2>
+<section id="array-like">
+<h2><span class="section-number">5.1. </span>Array-like<a class="headerlink" href="#array-like" title="Link to this heading"></a></h2>
 <p>You can specify <code class="docutils literal notranslate"><span class="pre">preprocessor=X</span></code> where <code class="docutils literal notranslate"><span class="pre">X</span></code> is an array-like containing the
 dataset of points. In this case, the fit/predict/score/etc… methods of the
 estimator will be able to take as inputs an array-like of indices, replacing
 under the hood each index by the corresponding sample.</p>
 <p>Example with a supervised metric learner:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">NCA</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.7</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.23</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span><span class="o">-</span><span class="mf">0.43</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.49</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span> <span class="mf">0.14</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.37</span><span class="p">]])</span>  <span class="c1"># array of 3 samples of 2 features</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">points_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">(</span><span class="n">preprocessor</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">points_indices</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># under the hood the algorithm will create</span>
@@ -222,7 +141,7 @@ under the hood each index by the corresponding sample.</p>
 <span class="gp">&gt;&gt;&gt; </span>              <span class="p">[</span> <span class="mf">0.14</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.37</span><span class="p">]])</span>  <span class="c1"># array of 3 samples of 2 features</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pairs_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span> <span class="o">=</span> <span class="n">MMC</span><span class="p">(</span><span class="n">preprocessor</span><span class="o">=</span><span class="n">X</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs_indices</span><span class="p">,</span> <span class="n">y_pairs</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># under the hood the algorithm will create</span>
@@ -230,9 +149,9 @@ under the hood each index by the corresponding sample.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1">#                    [[-0.43, -0.49], [-0.7 , -0.23]]]) and fit on it</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="callable">
-<h2><span class="section-number">5.2. </span>Callable<a class="headerlink" href="#callable" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="callable">
+<h2><span class="section-number">5.2. </span>Callable<a class="headerlink" href="#callable" title="Link to this heading"></a></h2>
 <p>Alternatively, you can provide a callable as <code class="docutils literal notranslate"><span class="pre">preprocessor</span></code>. Then the
 estimator will accept indicators of points instead of points. Under the hood,
 the estimator will call this callable on the indicators you provide as input
@@ -246,7 +165,7 @@ each column of the 2D array of tuples.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">find_images</span><span class="p">(</span><span class="n">file_paths</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="c1"># each file contains a small image to use as an input datapoint</span>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">row_stack</span><span class="p">([</span><span class="n">imread</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_paths</span><span class="p">])</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">(</span><span class="n">preprocessor</span><span class="o">=</span><span class="n">find_images</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nca</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="s1">&#39;img01.png&#39;</span><span class="p">,</span> <span class="s1">&#39;img00.png&#39;</span><span class="p">,</span> <span class="s1">&#39;img02.png&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># under the hood preprocessor(indicators) will be called</span>
@@ -256,7 +175,7 @@ each column of the 2D array of tuples.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pairs_images_paths</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;img02.png&#39;</span><span class="p">,</span> <span class="s1">&#39;img00.png&#39;</span><span class="p">],</span>
 <span class="gp">&gt;&gt;&gt; </span>                      <span class="p">[</span><span class="s1">&#39;img01.png&#39;</span><span class="p">,</span> <span class="s1">&#39;img00.png&#39;</span><span class="p">]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span> <span class="o">=</span> <span class="n">NCA</span><span class="p">(</span><span class="n">preprocessor</span><span class="o">=</span><span class="n">find_images</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs_images_paths</span><span class="p">,</span> <span class="n">y_pairs</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># under the hood preprocessor(pairs_indicators[i]) will be called for each</span>
@@ -264,83 +183,58 @@ each column of the 2D array of tuples.</p>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>Note that when you fill the <code class="docutils literal notranslate"><span class="pre">preprocessor</span></code> option, it allows you
 to give more compact inputs, but the classical way of providing inputs
 stays valid (2D array-like for supervised learners and 3D array-like of
 tuples for weakly supervised learners). If a classical input
 is provided, the metric learner will not use the preprocessor.</p>
 <p>Example: This will work:</p>
-<div class="doctest last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MMC</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">metric_learn</span> <span class="kn">import</span> <span class="n">MMC</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">preprocessor_wip</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>   <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This preprocessor does nothing yet.&quot;</span><span class="p">)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span> <span class="mf">0.14</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.37</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.7</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.23</span><span class="p">]],</span>
 <span class="gp">&gt;&gt;&gt; </span>                  <span class="p">[[</span><span class="o">-</span><span class="mf">0.43</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.49</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.7</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.23</span><span class="p">]]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span> <span class="o">=</span> <span class="n">MMC</span><span class="p">(</span><span class="n">preprocessor</span><span class="o">=</span><span class="n">preprocessor_wip</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mmc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">y_pairs</span><span class="p">)</span>  <span class="c1"># preprocessor_wip will not be called here</span>
 </pre></div>
 </div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="metric_learn.html" class="btn btn-neutral float-right" title="metric_learn package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="unsupervised.html" class="btn btn-neutral float-left" title="4. Unsupervised Metric Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="unsupervised.html" class="btn btn-neutral float-left" title="4. Unsupervised Metric Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="metric_learn.html" class="btn btn-neutral float-right" title="metric_learn package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
-
-    </p>
+    <p>&#169; Copyright 2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

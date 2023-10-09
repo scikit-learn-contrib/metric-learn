@@ -1,4 +1,4 @@
-:mod:`metric_learn`.SCML_Supervised
+﻿:mod:`metric_learn`.SCML_Supervised
 ==========================================
 
 .. currentmodule:: metric_learn

@@ -1,4 +1,4 @@
-:mod:`metric_learn`.LFDA
+﻿:mod:`metric_learn`.LFDA
 ===============================
 
 .. currentmodule:: metric_learn

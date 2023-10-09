@@ -1,97 +1,56 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html4" lang="en" >
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>metric_learn.Constraints &mdash; metric-learn 0.6.2 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
-
-  
-  
-  
-  
-
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metric_learn.Constraints &mdash; metric-learn 0.7.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/styles.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=fe7df9b0"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/js/copybutton.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="metric_learn.base_metric.BaseMetricLearner" href="metric_learn.base_metric.BaseMetricLearner.html" />
     <link rel="prev" title="metric_learn package" href="../metric_learn.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> metric-learn
           
-
-          
+          <a href="../index.html" class="icon icon-home">
+            metric-learn
           </a>
-
-          
-            
-            
               <div class="version">
-                0.6.2
+                0.7.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
 </ul>
@@ -102,8 +61,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../metric_learn.html">Package Contents</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../metric_learn.html#module-contents">Module Contents</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../metric_learn.html#base-classes">Base Classes</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metric_learn.Constraints"><code class="docutils literal notranslate"><span class="pre">Constraints</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.BaseMetricLearner.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.BaseMetricLearner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.MetricTransformer.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.MetricTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric.MahalanobisMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>.MahalanobisMixin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._PairsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._PairsClassifierMixin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._TripletsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._TripletsClassifierMixin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="metric_learn.base_metric._QuadrupletsClassifierMixin.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn.base_metric</span></code>._QuadrupletsClassifierMixin</a></li>
@@ -119,218 +83,157 @@
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">metric-learn</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../metric_learn.html">metric_learn package</a> &raquo;</li>
-        
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</li>
-    
-    
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../metric_learn.html">metric_learn package</a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="../_sources/generated/metric_learn.Constraints.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="metric-learn-constraints">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints<a class="headerlink" href="#metric-learn-constraints" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="metric-learn-constraints">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">metric_learn</span></code>.Constraints<a class="headerlink" href="#metric-learn-constraints" title="Link to this heading"></a></h1>
 <dl class="py class">
-<dt id="metric_learn.Constraints">
-<em class="property">class </em><code class="descclassname">metric_learn.</code><code class="descname">Constraints</code><span class="sig-paren">(</span><em><span class="n">partial_labels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.Constraints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metric_learn.</span></span><span class="sig-name descname"><span class="pre">Constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partial_labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.Constraints" title="Link to this definition"></a></dt>
 <dd><p>Class to build constraints from labeled data.</p>
 <p>See more in the <a class="reference internal" href="../supervised.html#supervised-version"><span class="std std-ref">User Guide</span></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>partial_labels</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of ints, shape=(n_samples,)</span></dt><dd><p>Array of labels, with -1 indicating unknown label.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>partial_labels</strong><span class="classifier"><cite>numpy.ndarray</cite> of ints, shape=(n_samples,)</span></dt><dd><p>Array of labels, with -1 indicating unknown label.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>partial_labels</strong><span class="classifier"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref any docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of ints, shape=(n_samples,)</span></dt><dd><p>Array of labels, with -1 indicating unknown label.</p>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>partial_labels</strong><span class="classifier"><cite>numpy.ndarray</cite> of ints, shape=(n_samples,)</span></dt><dd><p>Array of labels, with -1 indicating unknown label.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils align-default">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Constraints.chunks" title="metric_learn.Constraints.chunks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chunks</span></code></a>([num_chunks,&nbsp;chunk_size,&nbsp;random_state])</td>
-<td>Generates chunks from labeled data.</td>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.Constraints.chunks" title="metric_learn.Constraints.chunks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chunks</span></code></a>([n_chunks, chunk_size, random_state, ...])</p></td>
+<td><p>Generates chunks from labeled data.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#metric_learn.Constraints.generate_knntriplets" title="metric_learn.Constraints.generate_knntriplets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_knntriplets</span></code></a>(X,&nbsp;k_genuine,&nbsp;k_impostor)</td>
-<td>Generates triplets from labeled data.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#metric_learn.Constraints.generate_knntriplets" title="metric_learn.Constraints.generate_knntriplets"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_knntriplets</span></code></a>(X, k_genuine, k_impostor)</p></td>
+<td><p>Generates triplets from labeled data.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#metric_learn.Constraints.positive_negative_pairs" title="metric_learn.Constraints.positive_negative_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">positive_negative_pairs</span></code></a>(num_constraints[,&nbsp;…])</td>
-<td>Generates positive pairs and negative pairs from labeled data.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#metric_learn.Constraints.positive_negative_pairs" title="metric_learn.Constraints.positive_negative_pairs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">positive_negative_pairs</span></code></a>(n_constraints[, ...])</p></td>
+<td><p>Generates positive pairs and negative pairs from labeled data.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="metric_learn.Constraints.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em><span class="n">partial_labels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
+<dt class="sig sig-object py" id="metric_learn.Constraints.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partial_labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.Constraints.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.Constraints.chunks">
-<code class="descname">chunks</code><span class="sig-paren">(</span><em><span class="n">num_chunks</span><span class="o">=</span><span class="default_value">100</span></em>, <em><span class="n">chunk_size</span><span class="o">=</span><span class="default_value">2</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.chunks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.chunks" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.Constraints.chunks">
+<span class="sig-name descname"><span class="pre">chunks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chunks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deprecated'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.chunks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.Constraints.chunks" title="Link to this definition"></a></dt>
 <dd><p>Generates chunks from labeled data.</p>
-<p>Each of <code class="docutils literal notranslate"><span class="pre">num_chunks</span></code> chunks is composed of <code class="docutils literal notranslate"><span class="pre">chunk_size</span></code> points from
+<p>Each of <code class="docutils literal notranslate"><span class="pre">n_chunks</span></code> chunks is composed of <code class="docutils literal notranslate"><span class="pre">chunk_size</span></code> points from
 the same class drawn at random. Each point can belong to at most 1 chunk.</p>
-<p>In the case where there is not enough points to generate <code class="docutils literal notranslate"><span class="pre">num_chunks</span></code>
+<p>In the case where there is not enough points to generate <code class="docutils literal notranslate"><span class="pre">n_chunks</span></code>
 chunks of size <code class="docutils literal notranslate"><span class="pre">chunk_size</span></code>, a ValueError will be raised.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>num_chunks</strong><span class="classifier">int, optional (default=100)</span></dt><dd><p>Number of chunks to generate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_chunks</strong><span class="classifier">int, optional (default=100)</span></dt><dd><p>Number of chunks to generate.</p>
 </dd>
 <dt><strong>chunk_size</strong><span class="classifier">int, optional (default=2)</span></dt><dd><p>Number of points in each chunk.</p>
 </dd>
 <dt><strong>random_state</strong><span class="classifier">int or numpy.RandomState or None, optional (default=None)</span></dt><dd><p>A pseudo random number generator object or a seed for it if int.</p>
 </dd>
+<dt><strong>num_chunks</strong><span class="classifier">Renamed to n_chunks. Will be deprecated in 0.7.0</span></dt><dd></dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>chunks</strong><span class="classifier">array-like, shape=(n_samples,)</span></dt><dd><p>1D array of chunk indicators, where -1 indicates that the point does not
 belong to any chunk.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.Constraints.generate_knntriplets">
-<code class="descname">generate_knntriplets</code><span class="sig-paren">(</span><em><span class="n">X</span></em>, <em><span class="n">k_genuine</span></em>, <em><span class="n">k_impostor</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.generate_knntriplets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.generate_knntriplets" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.Constraints.generate_knntriplets">
+<span class="sig-name descname"><span class="pre">generate_knntriplets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_genuine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_impostor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.generate_knntriplets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.Constraints.generate_knntriplets" title="Link to this definition"></a></dt>
 <dd><p>Generates triplets from labeled data.</p>
 <p>For every point (X_a) the triplets (X_a, X_b, X_c) are constructed from all
-the combinations of taking one of its <code class="xref any docutils literal notranslate"><span class="pre">k_genuine</span></code>-nearest neighbors of the
-same class (X_b) and taking one of its <code class="xref any docutils literal notranslate"><span class="pre">k_impostor</span></code>-nearest neighbors of
+the combinations of taking one of its <cite>k_genuine</cite>-nearest neighbors of the
+same class (X_b) and taking one of its <cite>k_impostor</cite>-nearest neighbors of
 other classes (X_c).</p>
 <p>In the case a class doesn’t have enough points in the same class (other
-classes) to yield <code class="xref any docutils literal notranslate"><span class="pre">k_genuine</span></code> (<code class="xref any docutils literal notranslate"><span class="pre">k_impostor</span></code>) neighbors a warning will be
+classes) to yield <cite>k_genuine</cite> (<cite>k_impostor</cite>) neighbors a warning will be
 raised and the maximum value of genuine (impostor) neighbors will be used
 for that class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>X</strong><span class="classifier">(n x d) matrix</span></dt><dd><blockquote>
-<div><p>Input data, where each row corresponds to a single instance.</p>
-</div></blockquote>
-<dl class="docutils">
-<dt>k_genuine<span class="classifier">int</span></dt><dd><p>Number of neighbors of the same class to be taken into account.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">(n x d) matrix</span></dt><dd><p>Input data, where each row corresponds to a single instance.</p>
 </dd>
-<dt>k_impostor<span class="classifier">int</span></dt><dd><p>Number of neighbors of different classes to be taken into account.</p>
+<dt><strong>k_genuine</strong><span class="classifier">int</span></dt><dd><p>Number of neighbors of the same class to be taken into account.</p>
+</dd>
+<dt><strong>k_impostor</strong><span class="classifier">int</span></dt><dd><p>Number of neighbors of different classes to be taken into account.</p>
 </dd>
 </dl>
 </dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>triplets</strong><span class="classifier">array-like, shape=(n_constraints, 3)</span></dt><dd><p>2D array of triplets of indicators.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="metric_learn.Constraints.positive_negative_pairs">
-<code class="descname">positive_negative_pairs</code><span class="sig-paren">(</span><em><span class="n">num_constraints</span></em>, <em><span class="n">same_length</span><span class="o">=</span><span class="default_value">False</span></em>, <em><span class="n">random_state</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.positive_negative_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#metric_learn.Constraints.positive_negative_pairs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="metric_learn.Constraints.positive_negative_pairs">
+<span class="sig-name descname"><span class="pre">positive_negative_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'deprecated'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/metric_learn/constraints.html#Constraints.positive_negative_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metric_learn.Constraints.positive_negative_pairs" title="Link to this definition"></a></dt>
 <dd><p>Generates positive pairs and negative pairs from labeled data.</p>
-<p>Positive pairs are formed by randomly drawing <code class="docutils literal notranslate"><span class="pre">num_constraints</span></code> pairs of
+<p>Positive pairs are formed by randomly drawing <code class="docutils literal notranslate"><span class="pre">n_constraints</span></code> pairs of
 points with the same label. Negative pairs are formed by randomly drawing
-<code class="docutils literal notranslate"><span class="pre">num_constraints</span></code> pairs of points with different label.</p>
+<code class="docutils literal notranslate"><span class="pre">n_constraints</span></code> pairs of points with different label.</p>
 <p>In the case where it is not possible to generate enough positive or
 negative pairs, a smaller number of pairs will be returned with a warning.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>num_constraints</strong><span class="classifier">int</span></dt><dd><p>Number of positive and negative constraints to generate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_constraints</strong><span class="classifier">int</span></dt><dd><p>Number of positive and negative constraints to generate.</p>
 </dd>
 <dt><strong>same_length</strong><span class="classifier">bool, optional (default=False)</span></dt><dd><p>If True, forces the number of positive and negative pairs to be
 equal by ignoring some pairs from the larger set.</p>
 </dd>
 <dt><strong>random_state</strong><span class="classifier">int or numpy.RandomState or None, optional (default=None)</span></dt><dd><p>A pseudo random number generator object or a seed for it if int.</p>
 </dd>
+<dt><strong>num_constraints</strong><span class="classifier">Renamed to n_constraints. Will be deprecated in 0.7.0</span></dt><dd></dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>a</strong><span class="classifier">array-like, shape=(n_constraints,)</span></dt><dd><p>1D array of indicators for the left elements of positive pairs.</p>
 </dd>
 <dt><strong>b</strong><span class="classifier">array-like, shape=(n_constraints,)</span></dt><dd><p>1D array of indicators for the right elements of positive pairs.</p>
@@ -340,70 +243,43 @@ equal by ignoring some pairs from the larger set.</p>
 <dt><strong>d</strong><span class="classifier">array-like, shape=(n_constraints,)</span></dt><dd><p>1D array of indicators for the right elements of negative pairs.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-<div style='clear:both'></div></div>
+<div style='clear:both'></div></section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="metric_learn.base_metric.BaseMetricLearner.html" class="btn btn-neutral float-right" title="metric_learn.base_metric.BaseMetricLearner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../metric_learn.html" class="btn btn-neutral float-left" title="metric_learn package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../metric_learn.html" class="btn btn-neutral float-left" title="metric_learn package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="metric_learn.base_metric.BaseMetricLearner.html" class="btn btn-neutral float-right" title="metric_learn.base_metric.BaseMetricLearner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        
-        &copy; Copyright 2015-2020, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier
-
-    </p>
+    <p>&#169; Copyright 2015-2023, CJ Carey, Yuan Tang, William de Vazelhes, Aurélien Bellet and Nathalie Vauquier.</p>
   </div>
-    
-    
-    
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

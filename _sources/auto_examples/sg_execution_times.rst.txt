@@ -3,12 +3,13 @@
 
 .. _sphx_glr_auto_examples_sg_execution_times:
 
+
 Computation times
 =================
-**03:24.243** total execution time for **auto_examples** files:
+**00:35.715** total execution time for **auto_examples** files:
 
 +-------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_metric_learning_examples.py` (``plot_metric_learning_examples.py``) | 03:15.600 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_metric_learning_examples.py` (``plot_metric_learning_examples.py``) | 00:32.400 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_sandwich.py` (``plot_sandwich.py``)                                 | 00:08.643 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_sandwich.py` (``plot_sandwich.py``)                                 | 00:03.314 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------+-----------+--------+

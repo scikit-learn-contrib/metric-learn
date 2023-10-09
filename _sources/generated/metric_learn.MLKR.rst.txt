@@ -1,4 +1,4 @@
-:mod:`metric_learn`.MLKR
+﻿:mod:`metric_learn`.MLKR
 ===============================
 
 .. currentmodule:: metric_learn

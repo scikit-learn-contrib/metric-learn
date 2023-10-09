@@ -1,4 +1,4 @@
-:mod:`metric_learn.base_metric`._PairsClassifierMixin
+﻿:mod:`metric_learn.base_metric`._PairsClassifierMixin
 ============================================================
 
 .. currentmodule:: metric_learn.base_metric
