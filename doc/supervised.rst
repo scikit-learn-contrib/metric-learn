@@ -164,8 +164,8 @@ indicates :math:`\mathbf{x}_{i}, \mathbf{x}_{j}` belong to different classes,
     X = iris_data['data']
     Y = iris_data['target']
 
-    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6)
-    lmnn.fit(X, Y, verbose=False)
+    lmnn = LMNN(n_neighbors=5, learn_rate=1e-6, verbose=False)
+    lmnn.fit(X, Y)
 
 .. rubric:: References
 
