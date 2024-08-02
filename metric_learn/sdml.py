@@ -86,8 +86,8 @@ class _BaseSDML(MahalanobisMixin):
                                 Theta0=theta0, Sigma0=sigma0)
       else:
         _, M, *_ = graphical_lasso(emp_cov, alpha=self.sparsity_param,
-                               verbose=self.verbose,
-                               cov_init=sigma0)
+                                   verbose=self.verbose,
+                                   cov_init=sigma0)
       raised_error = None
       w_mahalanobis, _ = np.linalg.eigh(M)
       not_spd = any(w_mahalanobis < 0.)
