@@ -1,5 +1,6 @@
 from functools import partial
 
+import warnings
 import pytest
 from numpy.testing import assert_array_equal
 from scipy.spatial.distance import euclidean
@@ -136,7 +137,7 @@ def test_threshold_different_scores_is_finite(estimator, build_dataset,
   estimator.set_params(preprocessor=preprocessor)
   set_random_state(estimator)
   estimator.fit(input_data, labels)
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     estimator.calibrate_threshold(input_data, labels, **kwargs)
   assert len(record) == 0
 
@@ -383,7 +384,7 @@ def test_calibrate_threshold_valid_parameters(valid_args):
   pairs, y = rng.randn(20, 2, 5), rng.choice([-1, 1], size=20)
   pairs_learner = IdentityPairsClassifier()
   pairs_learner.fit(pairs, y)
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     pairs_learner.calibrate_threshold(pairs, y, **valid_args)
   assert len(record) == 0
 
@@ -518,7 +519,7 @@ def test_validate_calibration_params_valid_parameters(
   # test that no warning message is returned if valid arguments are given to
   # _validate_calibration_params for all pairs metric learners, as well as
   # a mocking example, and the class itself
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     estimator._validate_calibration_params(**valid_args)
   assert len(record) == 0
 

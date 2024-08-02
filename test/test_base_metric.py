@@ -1,4 +1,5 @@
 from numpy.core.numeric import array_equal
+import warnings
 import pytest
 import re
 import unittest
@@ -226,7 +227,7 @@ def test_get_metric_works_does_not_raise(estimator, build_dataset):
                                        (X[0][None], X[1][None])]
 
   for u, v in list_test_get_metric_doesnt_raise:
-    with pytest.warns(None) as record:
+    with warnings.catch_warnings(record=True) as record:
       metric(u, v)
     assert len(record) == 0
 
@@ -234,7 +235,7 @@ def test_get_metric_works_does_not_raise(estimator, build_dataset):
   model.components_ = np.array([3.1])
   metric = model.get_metric()
   for u, v in [(5, 6.7), ([5], [6.7]), ([[5]], [[6.7]])]:
-    with pytest.warns(None) as record:
+    with warnings.catch_warnings(record=True) as record:
       metric(u, v)
     assert len(record) == 0
 

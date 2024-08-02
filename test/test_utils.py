@@ -1,3 +1,4 @@
+import warnings
 import pytest
 from scipy.linalg import eigh, pinvh
 from collections import namedtuple
@@ -353,7 +354,7 @@ def test_check_tuples_valid_tuple_size(tuple_size):
   checks that checking the number of tuples (pairs, quadruplets, etc) raises
   no warning if there is the right number of points in a tuple.
   """
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     check_input(tuples_prep(), type_of_inputs='tuples',
                 preprocessor=mock_preprocessor, tuple_size=tuple_size)
     check_input(tuples_no_prep(), type_of_inputs='tuples', preprocessor=None,
@@ -378,7 +379,7 @@ def test_check_tuples_valid_tuple_size(tuple_size):
                                     [[2.6, 2.3], [3.4, 5.0]]])])
 def test_check_tuples_valid_with_preprocessor(tuples):
   """Test that valid inputs when using a preprocessor raises no warning"""
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     check_input(tuples, type_of_inputs='tuples',
                 preprocessor=mock_preprocessor)
   assert len(record) == 0
@@ -399,7 +400,7 @@ def test_check_tuples_valid_with_preprocessor(tuples):
                            ((3, 1), (4, 4), (29, 4)))])
 def test_check_tuples_valid_without_preprocessor(tuples):
   """Test that valid inputs when using no preprocessor raises no warning"""
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     check_input(tuples, type_of_inputs='tuples', preprocessor=None)
   assert len(record) == 0
 
@@ -408,12 +409,12 @@ def test_check_tuples_behaviour_auto_dtype():
   """Checks that check_tuples allows by default every type if using a
   preprocessor, and numeric types if using no preprocessor"""
   tuples_prep = [['img1.png', 'img2.png'], ['img3.png', 'img5.png']]
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     check_input(tuples_prep, type_of_inputs='tuples',
                 preprocessor=mock_preprocessor)
   assert len(record) == 0
 
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
       check_input(tuples_no_prep(), type_of_inputs='tuples')  # numeric type
   assert len(record) == 0
 
@@ -549,7 +550,7 @@ def test_check_classic_invalid_dtype_not_convertible(preprocessor, points):
                                     [2.6, 2.3]])])
 def test_check_classic_valid_with_preprocessor(points):
   """Test that valid inputs when using a preprocessor raises no warning"""
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     check_input(points, type_of_inputs='classic',
                 preprocessor=mock_preprocessor)
   assert len(record) == 0
@@ -570,7 +571,7 @@ def test_check_classic_valid_with_preprocessor(points):
                            (3, 1, 4, 4, 29, 4))])
 def test_check_classic_valid_without_preprocessor(points):
   """Test that valid inputs when using no preprocessor raises no warning"""
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     check_input(points, type_of_inputs='classic', preprocessor=None)
   assert len(record) == 0
 
@@ -585,12 +586,12 @@ def test_check_classic_behaviour_auto_dtype():
   """Checks that check_input (for points) allows by default every type if
   using a preprocessor, and numeric types if using no preprocessor"""
   points_prep = ['img1.png', 'img2.png', 'img3.png', 'img5.png']
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
     check_input(points_prep, type_of_inputs='classic',
                 preprocessor=mock_preprocessor)
   assert len(record) == 0
 
-  with pytest.warns(None) as record:
+  with warnings.catch_warnings(record=True) as record:
       check_input(points_no_prep(), type_of_inputs='classic')  # numeric type
   assert len(record) == 0
 
