@@ -6,7 +6,11 @@ import warnings
 import numpy as np
 from sklearn.base import TransformerMixin
 from scipy.linalg import pinvh
-from sklearn.covariance import graphical_lasso
+try:
+  from sklearn.covariance import _graphical_lasso as graphical_lasso
+except ImportError:
+  from sklearn.covariance import graphical_lasso
+
 from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
