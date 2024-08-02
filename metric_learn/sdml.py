@@ -7,7 +7,9 @@ import numpy as np
 from sklearn.base import TransformerMixin
 from scipy.linalg import pinvh
 try:
-  from sklearn.covariance import _graphical_lasso as graphical_lasso
+  from sklearn.covariance._graph_lasso import (
+    _graphical_lasso as graphical_lasso
+  )
 except ImportError:
   from sklearn.covariance import graphical_lasso
 
@@ -83,7 +85,7 @@ class _BaseSDML(MahalanobisMixin):
                                 msg=self.verbose,
                                 Theta0=theta0, Sigma0=sigma0)
       else:
-        _, M = graphical_lasso(emp_cov, alpha=self.sparsity_param,
+        _, M, *_ = graphical_lasso(emp_cov, alpha=self.sparsity_param,
                                verbose=self.verbose,
                                cov_init=sigma0)
       raised_error = None
