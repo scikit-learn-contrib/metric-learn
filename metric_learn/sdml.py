@@ -6,7 +6,13 @@ import warnings
 import numpy as np
 from sklearn.base import TransformerMixin
 from scipy.linalg import pinvh
-from sklearn.covariance import graphical_lasso
+try:
+  from sklearn.covariance._graph_lasso import (
+    _graphical_lasso as graphical_lasso
+  )
+except ImportError:
+  from sklearn.covariance import graphical_lasso
+
 from sklearn.exceptions import ConvergenceWarning
 
 from .base_metric import MahalanobisMixin, _PairsClassifierMixin
@@ -79,9 +85,9 @@ class _BaseSDML(MahalanobisMixin):
                                 msg=self.verbose,
                                 Theta0=theta0, Sigma0=sigma0)
       else:
-        _, M = graphical_lasso(emp_cov, alpha=self.sparsity_param,
-                               verbose=self.verbose,
-                               cov_init=sigma0)
+        _, M, *_ = graphical_lasso(emp_cov, alpha=self.sparsity_param,
+                                   verbose=self.verbose,
+                                   cov_init=sigma0)
       raised_error = None
       w_mahalanobis, _ = np.linalg.eigh(M)
       not_spd = any(w_mahalanobis < 0.)

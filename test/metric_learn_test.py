@@ -1,3 +1,4 @@
+import warnings
 import unittest
 import re
 import pytest
@@ -734,12 +735,12 @@ class TestSDML(MetricTestCase):
     pairs = np.array([[[-10., 0.], [10., 0.]], [[0., -55.], [0., -60]]])
     y_pairs = [1, -1]
     X, y = make_classification(random_state=42)
-    with pytest.warns(None) as records:
+    with warnings.catch_warnings(record=True) as records:
       sdml = SDML(prior='covariance')
       sdml.fit(pairs, y_pairs)
     for record in records:
       assert record.category is not ConvergenceWarning
-    with pytest.warns(None) as records:
+    with warnings.catch_warnings(record=True) as records:
       sdml_supervised = SDML_Supervised(prior='identity', balance_param=1e-5)
       sdml_supervised.fit(X, y)
     for record in records:
@@ -999,7 +1000,7 @@ class TestRCA(MetricTestCase):
            'for instance using `sklearn.decomposition.PCA` as a '
            'preprocessing step.')
 
-    with pytest.warns(None) as raised_warnings:
+    with warnings.catch_warnings(record=True) as raised_warnings:
       rca.fit(X, y)
     assert any(str(w.message) == msg for w in raised_warnings)
 
@@ -1034,7 +1035,7 @@ class TestRCA(MetricTestCase):
            'Increase the number or size of the chunks to correct '
            'this problem.'
            )
-    with pytest.warns(None) as raised_warning:
+    with warnings.catch_warnings(record=True) as raised_warning:
       rca.fit(X, y)
     assert any(str(w.message) == msg for w in raised_warning)
 
