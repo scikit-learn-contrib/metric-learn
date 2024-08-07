@@ -64,7 +64,6 @@ sphinx_gallery_conf = {
 # generate autosummary even if no references
 autosummary_generate = True
 
-
 # Temporary work-around for spacing problem between parameter and parameter
 # type in the doc, see https://github.com/numpy/numpydoc/issues/215. The bug
 # has been fixed in sphinx (https://github.com/sphinx-doc/sphinx/pull/5976) but
