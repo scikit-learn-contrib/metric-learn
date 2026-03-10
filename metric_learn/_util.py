@@ -27,43 +27,22 @@ _CHECK_ARRAY_SUPPORTS_FORCE_ALL_FINITE = (
     'force_all_finite' in signature(check_array).parameters)
 _CHECK_X_Y_SUPPORTS_FORCE_ALL_FINITE = (
     'force_all_finite' in signature(check_X_y).parameters)
-_MISSING = object() # sentinel value to check if an argument is given or not
-
-def _normalize_force_all_finite_arg(kwargs, supports_force_all_finite):
-  """Take a dictionary of arguments, and make sure that the argument that
-  controls finite values check in `check_array` and `check_X_y` is named
-  correctly for the version of scikit-learn used (`force_all_finite` for
-  older version, `ensure_all_finite` for newer ones).
-  """
-  kwargs = kwargs.copy()
-  force_all_finite = kwargs.pop('force_all_finite', _MISSING)
-  ensure_all_finite = kwargs.pop('ensure_all_finite', _MISSING)
-  if supports_force_all_finite:
-    if ensure_all_finite is not _MISSING:
-      kwargs['force_all_finite'] = ensure_all_finite
-    elif force_all_finite is not _MISSING:
-      kwargs['force_all_finite'] = force_all_finite
-  else:
-    if force_all_finite is not _MISSING:
-      kwargs['ensure_all_finite'] = force_all_finite
-    elif ensure_all_finite is not _MISSING:
-      kwargs['ensure_all_finite'] = ensure_all_finite
-  return kwargs
 
 
 def _check_array(*args, **kwargs):
   """Local wrapper around `sklearn.utils.check_array` to deal with the change
   from `force_all_finite` to `ensure_all_finite` in scikit-learn."""
-  kwargs = _normalize_force_all_finite_arg(
-      kwargs, _CHECK_ARRAY_SUPPORTS_FORCE_ALL_FINITE)
+  if not _CHECK_ARRAY_SUPPORTS_FORCE_ALL_FINITE and "force_all_finite" in kwargs:
+    kwargs = kwargs.copy()
+    kwargs["ensure_all_finite"] = kwargs.pop("force_all_finite")
   return check_array(*args, **kwargs)
-
 
 def _check_X_y(*args, **kwargs):
   """Local wrapper around `sklearn.utils.check_X_y` to deal with the change
   from `force_all_finite` to `ensure_all_finite` in scikit-learn."""
-  kwargs = _normalize_force_all_finite_arg(
-      kwargs, _CHECK_X_Y_SUPPORTS_FORCE_ALL_FINITE)
+  if not _CHECK_X_Y_SUPPORTS_FORCE_ALL_FINITE and "force_all_finite" in kwargs:
+    kwargs = kwargs.copy()
+    kwargs["ensure_all_finite"] = kwargs.pop("force_all_finite")
   return check_X_y(*args, **kwargs)
 
 
