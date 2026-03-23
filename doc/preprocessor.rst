@@ -4,9 +4,11 @@
 Preprocessor
 ============
 
-Estimators in metric-learn all have a ``preprocessor`` option at instantiation.
-Filling this argument allows them to take more compact input representation
-when fitting, predicting etc...
+.. rst-class:: deprecated
+
+  Estimators in metric-learn all have a ``preprocessor`` option at instantiation.
+  Filling this argument allows them to take more compact input representation
+  when fitting, predicting etc...
 
 If ``preprocessor=None``, no preprocessor will be used and the user must
 provide the classical representation to the fit/predict/score/etc... methods of
