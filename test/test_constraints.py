@@ -186,3 +186,24 @@ def test_generate_knntriplets_k_impostor():
     Constraints(y).generate_knntriplets(X, 1, k_impostor)
   for warn in raised_warning:
     assert str(warn.message) in warn_msgs
+
+
+@pytest.mark.parametrize('unknown_positions', [[], [0], [3], [0, 3, 6], [6]])
+@pytest.mark.parametrize('k_genuine, k_impostor', [(1, 1), (1, 2), (2, 2)])
+def test_generate_knntriplets_preserves_original_indices(
+        unknown_positions, k_genuine, k_impostor):
+  """Triplets index the original input even after ignoring unknown labels."""
+  X = np.array([[0., 0.], [1., 0.], [4., 0.],
+                [10., 0.], [12., 0.], [16., 0.]])
+  y = np.array([1, 1, 1, 8, 8, 8])
+  expected = Constraints(y).generate_knntriplets(X, k_genuine, k_impostor)
+  for position in unknown_positions:
+    X = np.insert(X, position, [1000. + position, -1000.], axis=0)
+    y = np.insert(y, position, -1)
+
+  triplets = Constraints(y).generate_knntriplets(X, k_genuine, k_impostor)
+
+  np.testing.assert_array_equal(triplets, np.flatnonzero(y >= 0)[expected])
+  assert np.all(y[triplets] >= 0)
+  np.testing.assert_array_equal(y[triplets[:, 0]], y[triplets[:, 1]])
+  assert np.all(y[triplets[:, 0]] != y[triplets[:, 2]])
