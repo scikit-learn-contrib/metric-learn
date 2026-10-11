@@ -118,7 +118,7 @@ class Constraints(object):
     Returns
     -------
     triplets : array-like, shape=(n_constraints, 3)
-      2D array of triplets of indicators.
+      2D array of triplets of indices into the original input X.
     """
     # Ignore unlabeled samples
     known_labels_mask = self.partial_labels >= 0
@@ -199,7 +199,7 @@ class Constraints(object):
                                          k_genuine_vec[i],
                                          k_impostor_vec[i])
 
-    return triplets
+    return np.flatnonzero(known_labels_mask)[triplets]
 
   def _pairs(self, n_constraints, same_label=True, max_iter=10,
              random_state=np.random):
