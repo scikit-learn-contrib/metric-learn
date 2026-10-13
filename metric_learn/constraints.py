@@ -279,7 +279,7 @@ class Constraints(object):
       if len(all_inds) == 1:
         c = 0
       else:
-        c = random_state.randint(0, high=len(all_inds) - 1)
+        c = random_state.randint(0, high=len(all_inds))
       inds = all_inds[c]
       if len(inds) < chunk_size:
         del all_inds[c]
