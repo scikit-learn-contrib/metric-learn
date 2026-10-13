@@ -72,6 +72,34 @@ def test_unknown_labels_not_in_chunks(n_chunks, chunk_size):
   assert np.all(chunks[labels < 0] < 0)
 
 
+@pytest.mark.parametrize("labels, seed, last_label", [
+    ([0, 0, 0, 1, 1, 1], 1, 1),
+    ([7, 7, 7, 9, 9, 9, 14, 14, 14], 3, 14),
+    ([-1, 2, 2, 2, -1, 8, 8, 8, 19, 19, 19], 3, 19)])
+@pytest.mark.parametrize("chunk_size", [1, 2])
+def test_chunks_can_select_last_class(labels, seed, last_label, chunk_size):
+  labels = np.asarray(labels)
+  chunks = Constraints(labels).chunks(n_chunks=1, chunk_size=chunk_size,
+                                      random_state=seed)
+
+  np.testing.assert_array_equal(labels[chunks >= 0],
+                                np.full(chunk_size, last_label))
+  np.testing.assert_array_equal(chunks[labels < 0], -1)
+
+
+@pytest.mark.parametrize("labels", [[6, 6, 6, 6], [-1, 6, 6, 6, 6, -1]])
+@pytest.mark.parametrize("chunk_size", [1, 2])
+def test_chunks_single_class(labels, chunk_size):
+  labels = np.asarray(labels)
+  chunks = Constraints(labels).chunks(n_chunks=2, chunk_size=chunk_size,
+                                      random_state=SEED)
+
+  np.testing.assert_array_equal(chunks[labels < 0], -1)
+  np.testing.assert_array_equal(np.unique(chunks[chunks >= 0],
+                                          return_counts=True)[1],
+                                [chunk_size, chunk_size])
+
+
 @pytest.mark.parametrize("k_genuine, k_impostor, T_test",
                          [(2, 2,
                           [[0, 1, 3], [0, 1, 4], [0, 2, 3], [0, 2, 4],
