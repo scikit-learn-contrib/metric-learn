@@ -223,7 +223,7 @@ class Constraints(object):
     if len(ab) < n_constraints:
       warnings.warn("Only generated %d %s constraints (requested %d)" % (
           len(ab), 'positive' if same_label else 'negative', n_constraints))
-    ab = np.array(list(ab)[:n_constraints], dtype=int)
+    ab = np.array(list(ab)[:n_constraints], dtype=int).reshape(-1, 2)
     return known_label_idx[ab.T]
 
   def chunks(self, n_chunks=100, chunk_size=2, random_state=None,
