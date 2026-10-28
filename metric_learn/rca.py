@@ -13,13 +13,12 @@ from .constraints import Constraints
 
 # mean center each chunklet separately
 def _chunk_mean_centering(data, chunks):
-  n_chunks = chunks.max() + 1
   chunk_mask = chunks != -1
   # We need to ensure the data is float so that we can substract the
   # mean on it
   chunk_data = data[chunk_mask].astype(float, copy=False)
   chunk_labels = chunks[chunk_mask]
-  for c in range(n_chunks):
+  for c in np.unique(chunk_labels):
     mask = chunk_labels == c
     chunk_data[mask] -= chunk_data[mask].mean(axis=0)
 

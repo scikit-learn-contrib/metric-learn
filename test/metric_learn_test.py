@@ -1040,6 +1040,31 @@ class TestRCA(MetricTestCase):
     assert any(str(w.message) == msg for w in raised_warning)
 
 
+@pytest.mark.parametrize(
+    'chunk_ids', [[0, 1, 2, 3], [1, 2, 3, 4], [1, 4, 7, 12]])
+@pytest.mark.parametrize('n_components', [None, 1])
+@pytest.mark.parametrize('include_unassigned', [False, True])
+def test_rca_chunk_ids(chunk_ids, n_components, include_unassigned):
+  X = np.array([[-0.05, 3.0], [0.05, -3.0], [0.1, -3.55], [-0.1, 3.55],
+                [-0.95, -0.05], [0.95, 0.05], [0.4, 0.05], [-0.4, -0.05]])
+  expected = RCA(n_components=n_components).fit(X, np.repeat(np.arange(4), 2))
+  chunks = np.repeat(chunk_ids, 2)
+  if include_unassigned:
+    X = np.vstack([X, [[100.0, 200.0], [-100.0, -200.0]]])
+    chunks = np.append(chunks, [-1, -1])
+  original_X, original_chunks = X.copy(), chunks.copy()
+  rca = RCA(n_components=n_components)
+
+  with warnings.catch_warnings():
+    warnings.simplefilter('error', RuntimeWarning)
+    transformed = rca.fit_transform(X, chunks)
+
+  assert_allclose(rca.components_, expected.components_)
+  assert_allclose(transformed, expected.transform(X))
+  assert_array_equal(X, original_X)
+  assert_array_equal(chunks, original_chunks)
+
+
 class TestMLKR(MetricTestCase):
   def test_iris(self):
     mlkr = MLKR()
