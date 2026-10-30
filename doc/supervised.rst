@@ -391,8 +391,8 @@ Supervised versions of weakly-supervised algorithms
 ---------------------------------------------------
 
 Each :ref:`weakly-supervised algorithm <weakly_supervised_section>`
-has a supervised version of the form `*_Supervised` where similarity tuples are
-randomly generated from the labels information and passed to the underlying
+has a supervised version of the form `*_Supervised` where similarity tuples or
+chunklets are randomly generated from the labels and passed to the underlying
 algorithm. 
 
 .. warning::

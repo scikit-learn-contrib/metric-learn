@@ -31,7 +31,8 @@ of supervision available about the training data:
 - :doc:`Weakly supervised learning <weakly_supervised>`: the
   algorithm has access to a set of data points with supervision only
   at the tuple level (typically pairs, triplets, or quadruplets of
-  data points). A classic example of such weaker supervision is a set of
+  data points), or as :ref:`chunklets <learning_from_chunklets>` of points known
+  to share a class. A classic example of such weaker supervision is a set of
   positive and negative pairs: in this case, the goal is to learn a distance
   metric that puts positive pairs close together and negative pairs far away.
 

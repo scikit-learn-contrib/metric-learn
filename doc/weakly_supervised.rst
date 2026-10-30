@@ -7,8 +7,8 @@ Weakly Supervised Metric Learning
 Weakly supervised algorithms work on weaker information about the data points
 than supervised algorithms. Rather than labeled points, they take as input
 similarity judgments on tuples of data points, for instance pairs of similar
-and dissimilar points. Refer to the documentation of each algorithm for its
-particular form of input data.
+and dissimilar points, or chunklets of points known to share a class. Refer to
+the documentation of each algorithm for its particular form of input data.
 
 
 General API
@@ -17,15 +17,16 @@ General API
 Input data
 ----------
 
-In the following paragraph we talk about tuples for sake of generality. These
-can be pairs, triplets, quadruplets etc, depending on the particular metric
-learning algorithm we use.
+This section describes the API for tuple-based learners. Tuples can be pairs,
+triplets, quadruplets etc, depending on the metric learning algorithm.
+:py:class:`RCA <metric_learn.RCA>` instead takes points and chunklet assignments;
+see :ref:`learning_from_chunklets` for its input format.
 
 Basic form
 ^^^^^^^^^^
 
-Every weakly supervised algorithm will take as input tuples of
-points, and if needed labels for theses tuples. The tuples of points can
+Tuple-based learners take as input tuples of
+points, and if needed labels for these tuples. The tuples of points can
 also be called "constraints". They are a set of points that we consider (ex:
 two points, three points, etc...). The label is some information we have
 about this set of points (e.g. "these two points are similar"). Note that
@@ -34,9 +35,9 @@ instance the section :ref:`learning_on_quadruplets`). For more details about
 specific forms of tuples, refer to the appropriate sections 
 (:ref:`learning_on_pairs` or :ref:`learning_on_quadruplets`).
 
-The `tuples` argument is the first argument of every method (like the `X`
-argument for classical algorithms in scikit-learn). The second argument is the
-label of the tuple: its semantic depends on the algorithm used. For instance
+The `tuples` argument is the first argument when fitting these learners (like
+the `X` argument for classical algorithms in scikit-learn). The second argument
+is the label of the tuple: its semantic depends on the algorithm used. For instance
 for pairs learners `y` is a label indicating whether the pair is of similar
 samples or dissimilar samples.
 
@@ -207,7 +208,7 @@ array([[ 0.58603894, -5.69883982, -1.66614919],
 Prediction and scoring
 ----------------------
 
-Since weakly supervised are also able, after being fitted, to predict for a
+Tuple-based learners are also able, after being fitted, to predict for a
 given tuple what is its label (for pairs) or ordering (for quadruplets). See
 the appropriate section for more details, either :ref:`this
 one <pairs_predicting>` for pairs, or :ref:`this one
@@ -222,7 +223,7 @@ for quadruplets.
 Scikit-learn compatibility
 --------------------------
 
-Weakly supervised estimators are compatible with scikit-learn routines for
+Tuple-based estimators are compatible with scikit-learn routines for
 model selection (`sklearn.model_selection.cross_val_score`,
 `sklearn.model_selection.GridSearchCV`, etc).
 
@@ -239,6 +240,80 @@ Example:
 >>> y = 2 * rng.randint(2, size=30) - 1
 >>> mmc = MMC(preprocessor=X)
 >>> cross_val_score(mmc, pairs_indices, y)
+
+.. _learning_from_chunklets:
+
+Learning from chunklets
+=======================
+
+Chunklets are groups of points known to belong to the same class, without
+requiring class labels. Points in different chunklets may still belong to the
+same class.
+
+To fit :py:class:`RCA <metric_learn.RCA>`, pass a 2D array `X` of shape
+`(n_samples, n_features)` and a 1D array `chunks` of integer chunklet IDs, one
+per sample. Samples with the same ID belong to the same chunklet. The ID -1
+marks a sample that does not belong to any chunklet.
+
+If class labels are available, :py:class:`RCA_Supervised
+<metric_learn.RCA_Supervised>` samples chunklets from them; see
+:ref:`supervised_version`.
+
+Algorithms
+----------
+
+.. _rca:
+
+:py:class:`RCA <metric_learn.RCA>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Relative Components Analysis (:py:class:`RCA <metric_learn.RCA>`)
+
+`RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
+in-chunklets covariance matrices. It applies a global linear transformation to
+assign large weights to relevant dimensions and low weights to irrelevant
+dimensions. Those relevant dimensions are estimated using "chunklets", subsets
+of points that are known to belong to the same class.
+
+For a training set with :math:`n` training points in :math:`k` chunklets, the
+algorithm is efficient since it simply amounts to computing
+
+.. math::
+
+      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}
+      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)
+      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)^T
+
+
+where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}`
+with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used
+as the Mahalanobis matrix.
+
+.. rubric:: Example Code
+
+::
+
+    from metric_learn import RCA
+
+    X = [[-0.05,  3.0],[0.05, -3.0],
+        [0.1, -3.55],[-0.1, 3.55],
+        [-0.95, -0.05],[0.95, 0.05],
+        [0.4,  0.05],[-0.4, -0.05]]
+    chunks = [0, 0, 1, 1, 2, 2, 3, 3]
+
+    rca = RCA()
+    rca.fit(X, chunks)
+
+.. rubric:: References
+
+
+.. container:: hatnote hatnote-gray
+
+      [1]. Shental et al. `Adjustment learning and relevant component analysis <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871 &rep=rep1&type=pdf>`_. ECCV 2002.
+
+      [2]. Bar-Hillel et al. `Learning distance functions using equivalence relations <https://aaai.org/Papers/ICML/2003/ICML03-005.pdf>`_. ICML 2003.
+
+      [3]. Bar-Hillel et al. `Learning a Mahalanobis metric from equivalence constraints <http://www.jmlr.org/papers/volume6/bar-hillel05a/bar-hillel05a.pdf>`_. JMLR 2005.
 
 .. _learning_on_pairs:
 
@@ -500,59 +575,6 @@ is the off-diagonal L1 norm.
       [1]. Qi et al. `An efficient sparse metric learning in high-dimensional space via L1-penalized log-determinant regularization <https://icml.cc/Conferences/2009/papers/46.pdf>`_. ICML 2009.
 
       [2]. Code adapted from https://gist.github.com/kcarnold/5439945 .
-
-.. _rca:
-
-:py:class:`RCA <metric_learn.RCA>`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Relative Components Analysis (:py:class:`RCA <metric_learn.RCA>`)
-
-`RCA` learns a full rank Mahalanobis distance metric based on a weighted sum of
-in-chunklets covariance matrices. It applies a global linear transformation to 
-assign large weights to relevant dimensions and low weights to irrelevant 
-dimensions. Those relevant dimensions are estimated using "chunklets", subsets 
-of points that are known to belong to the same class.
-
-For a training set with :math:`n` training points in :math:`k` chunklets, the 
-algorithm is efficient since it simply amounts to computing
-
-.. math::
-
-      \mathbf{C} = \frac{1}{n}\sum_{j=1}^k\sum_{i=1}^{n_j}
-      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)
-      (\mathbf{x}_{ji}-\hat{\mathbf{m}}_j)^T
-
-
-where chunklet :math:`j` consists of :math:`\{\mathbf{x}_{ji}\}_{i=1}^{n_j}` 
-with a mean :math:`\hat{m}_j`. The inverse of :math:`\mathbf{C}^{-1}` is used 
-as the Mahalanobis matrix.
-
-.. rubric:: Example Code
-
-::
-
-    from metric_learn import RCA
-
-    X = [[-0.05,  3.0],[0.05, -3.0],
-        [0.1, -3.55],[-0.1, 3.55],
-        [-0.95, -0.05],[0.95, 0.05],
-        [0.4,  0.05],[-0.4, -0.05]]
-    chunks = [0, 0, 1, 1, 2, 2, 3, 3]
-
-    rca = RCA()
-    rca.fit(X, chunks)
-
-.. rubric:: References
-
-
-.. container:: hatnote hatnote-gray
-
-      [1]. Shental et al. `Adjustment learning and relevant component analysis <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.19.2871 &rep=rep1&type=pdf>`_. ECCV 2002.
-
-      [2]. Bar-Hillel et al. `Learning distance functions using equivalence relations <https://aaai.org/Papers/ICML/2003/ICML03-005.pdf>`_. ICML 2003.
-
-      [3]. Bar-Hillel et al. `Learning a Mahalanobis metric from equivalence constraints <http://www.jmlr.org/papers/volume6/bar-hillel05a/bar-hillel05a.pdf>`_. JMLR 2005.
 
 .. _mmc:
 
